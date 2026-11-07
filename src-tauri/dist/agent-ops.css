@@ -23197,3 +23197,26 @@ body.theme-dark .filter-chip-kb-hint {
   color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
   opacity: 1;
 }
+
+/*
+ * Dark: AI Chat filter chips still mixed on early `#0b0b10` (shared Data Poster
+ * remap) instead of CRT `#0a0a0a` (`.chat-filter-chip` resting / hover /
+ * is-active). Neon / Futuristic already remap on `#08120c` / `#0b0b10`; Data
+ * Poster stays on `#0b0b10`. Filter-miss CRT already uses `#00cc66` on `#0a0a0a`
+ * (v0.1.2434) — chips must match. Design-review fuel (feature-ai-chat) +
+ * standing P2 #14 after AI Chat kb-hint CRT v0.1.2441; layout-daily Data Poster
+ * adjacent (polish-without-capture grace).
+ */
+body.theme-dark .chat-filter-chip {
+  border-color: color-mix(in srgb, currentColor 18%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .chat-filter-chip:hover {
+  background: color-mix(in srgb, currentColor 12%, #0a0a0a);
+}
+body.theme-dark .chat-filter-chip.is-active {
+  background: color-mix(in srgb, var(--accent, #00cc66) 18%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+}
+
