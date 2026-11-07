@@ -17237,6 +17237,41 @@ body.theme-dark .chat-filter-miss-cta:focus-visible {
 }
 
 /*
+ * Dark: Top Processes filter-miss shell / CTA still mixed on early `#0b0b10`
+ * (shared Data Poster remap) instead of CRT `#0a0a0a` (.processes-filter-miss
+ * resting · Hot empty · Pinned empty · .processes-filter-miss-cta
+ * resting/hover/focus). Neon / Futuristic already remap on `#08120c` /
+ * `#0b0b10`; Data Poster stays on `#0b0b10`. Design-review fuel
+ * (feature-processes) + standing P2 #14 after AI Chat filter-miss CRT
+ * v0.1.2434; layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-dark .processes-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 34%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .processes-filter-miss.is-hot-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 10%, #0a0a0a);
+}
+body.theme-dark .processes-filter-miss.is-pinned-empty {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
+}
+body.theme-dark .processes-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 14%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .processes-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 48%, #0a0a0a);
+}
+body.theme-dark .processes-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+}
+
+/*
  * Data Poster: AI Chat exec / answer cards still mixed against early #0e0e14
  * (.chat-exec-card · .chat-exec-code · .chat-answer-part · .chat-answer-final) →
  * wrong dark slab on the opaque shell #0b0b10. Catch up to chat-filter-miss /
