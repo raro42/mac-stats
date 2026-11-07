@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2449
+
+- Dark / Neon / Futuristic Perplexity muted type opaque (`.perplexity-result-list` · `.perplexity-result-snippet` · `.perplexity-config-status`) early Dark `#0b0b10` / Apple `#ffffff` (Neon config-status wrong `#0b0b10`) → CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster already remapped). Standing P2 #14 after LPM busy CRT v0.1.2448; design-review `feature-ai-chat` / Perplexity adjacent / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark `.chat-filter-miss-msg` / `.process-name.is-just-saved` still on early `#0b0b10`, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2448
 
 - Dark / Neon / Futuristic LPM busy type opaque (`.lpm-info.is-busy` · label · value · is-on) early shared `#0b0b10` → CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster already remapped); also closes the broken `}` / `/*` from v0.1.2447 metrics kb-hint append. Standing P2 #14 after metrics kb-hints v0.1.2447; design-review `feature-cpu-metrics` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark Perplexity muted leftovers (`.perplexity-result-list` / `.perplexity-result-snippet` / `.perplexity-config-status`) still on early `#0b0b10` / `.chat-filter-miss-msg` / `.process-name.is-just-saved`, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
