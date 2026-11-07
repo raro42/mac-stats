@@ -16939,6 +16939,52 @@ body.theme-data-poster .monitors-empty-cta:hover {
 body.theme-data-poster .monitors-empty-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
 }
+/*
+ * Dark / Neon / Futuristic: Monitors empty CTA still mixes Apple `#ffffff`
+ * washes (.monitors-empty-cta resting/hover/focus) → white slab on opaque
+ * shells. Data Poster remapped earlier; Dark early remap still mixed on
+ * `#0b0b10` instead of CRT `#0a0a0a`. Design-review fuel (feature-monitors) +
+ * standing P2 #14 after Rings filter-miss v0.1.2428; layout-daily Data Poster
+ * adjacent (polish-without-capture grace).
+ */
+body.theme-dark .monitors-empty-cta {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 14%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .monitors-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 50%, #0a0a0a);
+}
+body.theme-dark .monitors-empty-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+}
+
+body.theme-neon .monitors-empty-cta {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 36%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 14%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .monitors-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #6dff7b) 22%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 50%, #08120c);
+}
+body.theme-neon .monitors-empty-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 22%, #08120c);
+}
+
+body.theme-futuristic .monitors-empty-cta {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .monitors-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 50%, #0b0b10);
+}
+body.theme-futuristic .monitors-empty-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
 
 /*
  * Data Poster: AI Chat exec / answer cards still mixed against early #0e0e14
