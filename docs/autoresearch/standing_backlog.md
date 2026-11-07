@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2439
+
+- Dark AI Chat empty CRT (`.chat-empty` resting · ready · no-model / offline / circuit · not-set · `.chat-empty-title` / `.chat-empty-copy` · ready title/copy) early `#0b0b10` → CRT `#0a0a0a` (Neon/Futuristic/Data Poster already remapped). Standing P2 #14 after AI Chat glances soft CRT v0.1.2438; design-review `feature-ai-chat` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark processes-top glances still on early `#0b0b10` / other Dark CRT leftovers / chat-empty-kb-hint CRT if still on `#0b0b10`, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2438
 
 - Dark AI Chat glances soft CRT catch-up (`.chat-model-glance` · `.chat-turn-glance` · `.chat-answer-glance` · `.chat-errors-glance` · `.chat-offline-attention-glance` soft wash + focus / has-answer / has-errors / Copied · offline Ready/Continue/Sending/filter/circuit) after thin resting CRT v0.1.2437. Standing P2 #14; design-review `feature-ai-chat` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark chat-empty CRT (`#0b0b10` → `#0a0a0a`) / Dark processes-top glances still on early `#0b0b10` / other leftovers, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.

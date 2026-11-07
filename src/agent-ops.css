@@ -23095,3 +23095,48 @@ body.theme-dark .chat-answer-glance.is-just-copied {
   border-color: color-mix(in srgb, #34c759 40%, #0a0a0a);
   background: color-mix(in srgb, #34c759 10%, #0a0a0a);
 }
+
+/*
+ * Dark: AI Chat empty shell still mixed on early `#0b0b10` (shared Data Poster
+ * remap) instead of CRT `#0a0a0a` (`.chat-empty` resting · ready · no-model /
+ * offline / circuit · not-set · title / copy · ready title/copy). Neon /
+ * Futuristic already remap on `#08120c` / `#0b0b10`; Data Poster stays on
+ * `#0b0b10`. Design-review fuel (feature-ai-chat) + standing P2 #14 after
+ * AI Chat glances soft CRT v0.1.2438; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+body.theme-dark .chat-empty {
+  border-color: color-mix(in srgb, currentColor 18%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 6%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .chat-empty.is-ready {
+  border-color: color-mix(in srgb, #34c759 32%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+}
+body.theme-dark .chat-empty.is-no-model,
+body.theme-dark .chat-empty.is-offline,
+body.theme-dark .chat-empty.is-circuit {
+  border-color: color-mix(in srgb, #ff9500 32%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 12%, #0a0a0a);
+}
+body.theme-dark .chat-empty.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 32%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 12%, #0a0a0a);
+}
+body.theme-dark .chat-empty-title {
+  color: color-mix(in srgb, #ffffff 85%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .chat-empty-copy {
+  color: color-mix(in srgb, #ffffff 72%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .chat-empty.is-ready .chat-empty-title {
+  color: color-mix(in srgb, #ffffff 92%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .chat-empty.is-ready .chat-empty-copy {
+  color: color-mix(in srgb, #ffffff 81%, #0a0a0a);
+  opacity: 1;
+}
