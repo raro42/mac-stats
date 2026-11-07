@@ -22353,3 +22353,183 @@ body.theme-futuristic .monitors-filter-chip[data-monitors-filter='slow'].is-acti
   background: color-mix(in srgb, #ff9500 20%, #0b0b10);
   border-color: color-mix(in srgb, #ff9500 40%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic: Settings section attention glances still mix Apple
+ * `#ffffff` washes (AI · Compact · Judge · Downloads · Ori · Having Fun · Voice
+ * STT · Help). Data Poster remapped earlier. Soft alert Off/On + Help
+ * closed/open stay on opaque shells (credential glance parity v0.1.2399).
+ * Design-review fuel (Settings) + standing P2 #14 after Monitors chips
+ * v0.1.2426; layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+/* OVERNIGHT v0.1.2427: Settings section attention glances opaque on Dark/Neon/Futuristic */
+body.theme-dark .settings-ai-attention-glance,
+body.theme-dark .settings-compact-attention-glance,
+body.theme-dark .settings-judge-attention-glance,
+body.theme-dark .settings-downloads-attention-glance,
+body.theme-dark .settings-ori-attention-glance,
+body.theme-dark .settings-having-fun-attention-glance,
+body.theme-dark .settings-voice-stt-attention-glance,
+body.theme-dark .settings-help-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .settings-ai-attention-glance:hover,
+body.theme-dark .settings-compact-attention-glance:hover,
+body.theme-dark .settings-judge-attention-glance:hover,
+body.theme-dark .settings-downloads-attention-glance:hover,
+body.theme-dark .settings-ori-attention-glance:hover,
+body.theme-dark .settings-having-fun-attention-glance:hover,
+body.theme-dark .settings-voice-stt-attention-glance:hover,
+body.theme-dark .settings-help-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 22%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-dark .settings-ai-attention-glance:focus-visible,
+body.theme-dark .settings-compact-attention-glance:focus-visible,
+body.theme-dark .settings-judge-attention-glance:focus-visible,
+body.theme-dark .settings-downloads-attention-glance:focus-visible,
+body.theme-dark .settings-ori-attention-glance:focus-visible,
+body.theme-dark .settings-having-fun-attention-glance:focus-visible,
+body.theme-dark .settings-voice-stt-attention-glance:focus-visible,
+body.theme-dark .settings-help-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 45%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-dark .settings-ai-attention-glance.is-off,
+body.theme-dark .settings-judge-attention-glance.is-off,
+body.theme-dark .settings-downloads-attention-glance.is-off,
+body.theme-dark .settings-ori-attention-glance.is-off,
+body.theme-dark .settings-having-fun-attention-glance.is-off,
+body.theme-dark .settings-voice-stt-attention-glance.is-off,
+body.theme-dark .settings-compact-attention-glance.is-on {
+  border-color: color-mix(in srgb, #ff9500 32%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 12%, #0a0a0a);
+  color: color-mix(in srgb, #ff9500 55%, var(--text, currentColor));
+}
+body.theme-dark .settings-help-attention-glance.is-closed {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 32%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 12%, #0a0a0a);
+  color: color-mix(in srgb, var(--accent, #00cc66) 55%, var(--text, currentColor));
+}
+body.theme-dark .settings-help-attention-glance.is-open {
+  border-color: color-mix(in srgb, #34c759 32%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+  color: color-mix(in srgb, #34c759 55%, var(--text, currentColor));
+}
+
+body.theme-neon .settings-ai-attention-glance,
+body.theme-neon .settings-compact-attention-glance,
+body.theme-neon .settings-judge-attention-glance,
+body.theme-neon .settings-downloads-attention-glance,
+body.theme-neon .settings-ori-attention-glance,
+body.theme-neon .settings-having-fun-attention-glance,
+body.theme-neon .settings-voice-stt-attention-glance,
+body.theme-neon .settings-help-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .settings-ai-attention-glance:hover,
+body.theme-neon .settings-compact-attention-glance:hover,
+body.theme-neon .settings-judge-attention-glance:hover,
+body.theme-neon .settings-downloads-attention-glance:hover,
+body.theme-neon .settings-ori-attention-glance:hover,
+body.theme-neon .settings-having-fun-attention-glance:hover,
+body.theme-neon .settings-voice-stt-attention-glance:hover,
+body.theme-neon .settings-help-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #08120c);
+  border-color: color-mix(in srgb, currentColor 22%, #08120c);
+  box-shadow: none;
+}
+body.theme-neon .settings-ai-attention-glance:focus-visible,
+body.theme-neon .settings-compact-attention-glance:focus-visible,
+body.theme-neon .settings-judge-attention-glance:focus-visible,
+body.theme-neon .settings-downloads-attention-glance:focus-visible,
+body.theme-neon .settings-ori-attention-glance:focus-visible,
+body.theme-neon .settings-having-fun-attention-glance:focus-visible,
+body.theme-neon .settings-voice-stt-attention-glance:focus-visible,
+body.theme-neon .settings-help-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
+  box-shadow: none;
+}
+body.theme-neon .settings-ai-attention-glance.is-off,
+body.theme-neon .settings-judge-attention-glance.is-off,
+body.theme-neon .settings-downloads-attention-glance.is-off,
+body.theme-neon .settings-ori-attention-glance.is-off,
+body.theme-neon .settings-having-fun-attention-glance.is-off,
+body.theme-neon .settings-voice-stt-attention-glance.is-off,
+body.theme-neon .settings-compact-attention-glance.is-on {
+  border-color: color-mix(in srgb, #ff9500 32%, #08120c);
+  background: color-mix(in srgb, #ff9500 12%, #08120c);
+  color: color-mix(in srgb, #ff9500 55%, var(--text, currentColor));
+}
+body.theme-neon .settings-help-attention-glance.is-closed {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 32%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 12%, #08120c);
+  color: color-mix(in srgb, var(--accent, #6dff7b) 55%, var(--text, currentColor));
+}
+body.theme-neon .settings-help-attention-glance.is-open {
+  border-color: color-mix(in srgb, #34c759 32%, #08120c);
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+  color: color-mix(in srgb, #34c759 55%, var(--text, currentColor));
+}
+
+body.theme-futuristic .settings-ai-attention-glance,
+body.theme-futuristic .settings-compact-attention-glance,
+body.theme-futuristic .settings-judge-attention-glance,
+body.theme-futuristic .settings-downloads-attention-glance,
+body.theme-futuristic .settings-ori-attention-glance,
+body.theme-futuristic .settings-having-fun-attention-glance,
+body.theme-futuristic .settings-voice-stt-attention-glance,
+body.theme-futuristic .settings-help-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .settings-ai-attention-glance:hover,
+body.theme-futuristic .settings-compact-attention-glance:hover,
+body.theme-futuristic .settings-judge-attention-glance:hover,
+body.theme-futuristic .settings-downloads-attention-glance:hover,
+body.theme-futuristic .settings-ori-attention-glance:hover,
+body.theme-futuristic .settings-having-fun-attention-glance:hover,
+body.theme-futuristic .settings-voice-stt-attention-glance:hover,
+body.theme-futuristic .settings-help-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-futuristic .settings-ai-attention-glance:focus-visible,
+body.theme-futuristic .settings-compact-attention-glance:focus-visible,
+body.theme-futuristic .settings-judge-attention-glance:focus-visible,
+body.theme-futuristic .settings-downloads-attention-glance:focus-visible,
+body.theme-futuristic .settings-ori-attention-glance:focus-visible,
+body.theme-futuristic .settings-having-fun-attention-glance:focus-visible,
+body.theme-futuristic .settings-voice-stt-attention-glance:focus-visible,
+body.theme-futuristic .settings-help-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-futuristic .settings-ai-attention-glance.is-off,
+body.theme-futuristic .settings-judge-attention-glance.is-off,
+body.theme-futuristic .settings-downloads-attention-glance.is-off,
+body.theme-futuristic .settings-ori-attention-glance.is-off,
+body.theme-futuristic .settings-having-fun-attention-glance.is-off,
+body.theme-futuristic .settings-voice-stt-attention-glance.is-off,
+body.theme-futuristic .settings-compact-attention-glance.is-on {
+  border-color: color-mix(in srgb, #ff9500 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
+  color: color-mix(in srgb, #ff9500 55%, var(--text, currentColor));
+}
+body.theme-futuristic .settings-help-attention-glance.is-closed {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+  color: color-mix(in srgb, var(--accent, #55c7ff) 55%, var(--text, currentColor));
+}
+body.theme-futuristic .settings-help-attention-glance.is-open {
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  color: color-mix(in srgb, #34c759 55%, var(--text, currentColor));
+}
