@@ -24119,3 +24119,48 @@ body.theme-futuristic .perplexity-filter-count {
 body.theme-futuristic .perplexity-filter-count.is-zero {
   color: color-mix(in srgb, #ffffff 37%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic: Agent Ops disabled Save · Disk Cleanup path hover ·
+ * Monitors checking still mixed on early shared `#0b0b10` (Data Poster / Futuristic
+ * shell already correct). Dark CRT `#0a0a0a` · Neon `#08120c` · Futuristic `#0b0b10`.
+ * Standing P2 #14 after Perplexity chips CRT v0.1.2455; design-review
+ * feature-agent-ops / feature-disk-cleanup / feature-monitors adjacent
+ * (polish-without-capture grace).
+ */
+/* OVERNIGHT v0.1.2456: disabled Save / path hover / checking CRT */
+body.theme-dark .ops-agent-edit-actions .btn-primary:disabled {
+  background: color-mix(in srgb, #2196f3 36%, #0a0a0a);
+  color: color-mix(in srgb, #ffffff 45%, #0a0a0a);
+}
+body.theme-neon .ops-agent-edit-actions .btn-primary:disabled {
+  background: color-mix(in srgb, #2196f3 36%, #08120c);
+  color: color-mix(in srgb, #ffffff 45%, #08120c);
+}
+body.theme-futuristic .ops-agent-edit-actions .btn-primary:disabled {
+  background: color-mix(in srgb, #2196f3 36%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 45%, #0b0b10);
+}
+
+body.theme-dark .disk-cleanup-item-path:hover,
+body.theme-dark .disk-cleanup-scope-path:hover {
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-neon .disk-cleanup-item-path:hover,
+body.theme-neon .disk-cleanup-scope-path:hover {
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-futuristic .disk-cleanup-item-path:hover,
+body.theme-futuristic .disk-cleanup-scope-path:hover {
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+
+body.theme-dark .monitor-item.is-checking {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+}
+body.theme-neon .monitor-item.is-checking {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+}
+body.theme-futuristic .monitor-item.is-checking {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+}
