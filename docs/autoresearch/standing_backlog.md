@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2450
+
+- Dark / Neon AI Chat filter-miss message + Dark Processes Saved flashes (`.chat-filter-miss-msg` · `.process-name.is-just-saved` · `.process-pin.is-just-saved`) early shared `#0b0b10` → CRT `#0a0a0a` / Neon `#08120c` (Data Poster / Futuristic already on `#0b0b10`; Neon process Saved already remapped). Standing P2 #14 after Perplexity muted CRT v0.1.2449; design-review `feature-ai-chat` / `feature-processes` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: other Dark CRT leftovers still on early `#0b0b10` if any, or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2449
 
 - Dark / Neon / Futuristic Perplexity muted type opaque (`.perplexity-result-list` · `.perplexity-result-snippet` · `.perplexity-config-status`) early Dark `#0b0b10` / Apple `#ffffff` (Neon config-status wrong `#0b0b10`) → CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster already remapped). Standing P2 #14 after LPM busy CRT v0.1.2448; design-review `feature-ai-chat` / Perplexity adjacent / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark `.chat-filter-miss-msg` / `.process-name.is-just-saved` still on early `#0b0b10`, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows `screencapture -l`.
