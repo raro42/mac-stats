@@ -14,13 +14,15 @@ Ralf: overnight Track B kept shipping Dark CRT opaque remaps (design-review poli
 
 ## Tried / deferred
 
+- Digester open candidates: none (0 turns / 7d)
+- Sibling OpenClaw/Hermes: missing on this rack
 - Mac recapture of stale `docs/screens/feature-agent-ops.png` (~52d) — deferred (Screen Recording TCC; no on-screen CPU window)
 - Layout-daily Data Poster screens missing — remaps_missing=none; deferred behind design-review CRT leftovers
 
 ## Next fuel
 
-- Other Dark CRT leftovers still on early `#0b0b10` if any
-- Mac capture when TCC allows
+- Dark collapsed chat/ollama glances still on early `#0b0b10` → CRT `#0a0a0a`
+- Other Dark CRT leftovers / Mac capture when TCC allows
 - Layout-daily Data Poster screen when a window grab works
 
-Generated: 2026-11-07T05:53:35+01:00
+Generated: 2026-11-07T05:54:45+01:00
