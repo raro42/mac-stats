@@ -1,25 +1,20 @@
 # Morning surprise — 2026-11-08
 
-Overnight autoresearch kept shipping Dark / Neon / Futuristic opaque-shell CRT catch-ups (standing P2 #14). Digester stayed empty; design-review / layout-daily stayed on polish-without-capture grace (Mac Screen Recording TCC).
+Overnight Track B kept shipping Dark/Neon/Futuristic opaque CRT catch-ups (#14) while Screen Recording TCC still blocks window capture of stale `docs/screens/feature-agent-ops.png` (~53d).
 
-## Shipped tonight
+## Shipped tonight (selected)
 
-- **v0.1.2456** — Dark / Neon / Futuristic Agent Ops disabled Save · Disk Cleanup path hover · Monitors checking CRT (`.ops-agent-edit-actions .btn-primary:disabled` · `.disk-cleanup-*-path:hover` · `.monitor-item.is-checking`) off early shared `#0b0b10` onto `#0a0a0a` / `#08120c` / `#0b0b10`.
-- **v0.1.2455** — Dark / Neon / Futuristic Perplexity filter chips CRT (`.perplexity-filter-chip` · `.perplexity-filter-count`).
-- **v0.1.2454** — Dark / Neon / Futuristic section toolbar kb-hints + muted captions CRT.
-- **v0.1.2453** — Dark Top Processes row washes CRT.
-- **v0.1.2452** — Dark / Neon AI Chat empty suggestion chips CRT.
-- **v0.1.2451** — Dark / Neon filter-miss · empty hints · Monitors detail · Process Detail muted CRT.
-- Earlier same window: **v0.1.2450** filter-miss-msg / process Saved; **v0.1.2449** Perplexity muted; **v0.1.2448** LPM busy; **v0.1.2447** metrics kb-hints; **v0.1.2446** Processes filter chips; **v0.1.2445** Agent Ops collapsed glance.
+- **v0.1.2457** — Monitors `.monitor-item.is-pending` / `.is-removing` CRT (`#0a0a0a` / `#08120c` / `#0b0b10`).
+- **v0.1.2456** — Agent Ops disabled Save · Disk Cleanup path hover · Monitors `.is-checking` CRT.
+- **v0.1.2455** — Perplexity filter chips + counts CRT.
+- Earlier in the window: section kb-hints / muted captions, process rows, empty chips, filter-miss muted, Perplexity muted, LPM busy, metrics kb-hints, Processes filter chips, Agent Ops collapsed glances (through ~v0.1.2445+).
 
-## Tried / context
+## Tried / deferred
 
-- Digester: 0 turns / 7d (no open Slowest fuel).
-- Sibling harnesses missing on this Linux rack.
-- Debug.log: quiet (no ERROR/WARN clusters in scan window).
-- Mac window-only recapture of stale `feature-agent-ops.png` (~53d) deferred — Screen Recording TCC / menu-bar only (`screencapture -l` unavailable).
+- Mac `screencapture -l` for `feature-agent-ops.png` — TCC / no on-screen CPU window (polish-without-capture grace).
+- Digester Slowest empty after instant noise filters — design-review + standing P2 #14 carried the night.
 
-## Still open
+## Next
 
-- Other Dark CRT leftovers still on early `#0b0b10` if any after disabled Save / path hover / checking catch-up.
-- Mac window-only recapture of stale `feature-agent-ops.png` / `feature-monitors.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+- Remaining Dark CRT leftovers: `.process-empty` · `.logs-viewer.is-empty` · Disk Cleanup empty/disabled/scope-rec · `#chat-input:focus`.
+- Recapture stale feature screens when Screen Recording allows.
