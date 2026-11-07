@@ -17095,6 +17095,60 @@ body.theme-futuristic .disk-cleanup-scope-filter-miss.is-on-empty {
 }
 
 /*
+ * Dark / Neon / Futuristic: Monitors filter-miss shells still mix Apple `#ffffff`
+ * washes (.monitors-filter-miss resting · Down/Slow empty · Up empty) → white
+ * slab on opaque shells. Neon / Futuristic had no shell remap; Dark early remap
+ * still mixed on `#0b0b10` instead of CRT `#0a0a0a`. Data Poster remapped earlier.
+ * Design-review fuel (feature-monitors) + standing P2 #14 after Disk Cleanup
+ * filter-miss v0.1.2431; layout-daily Data Poster adjacent (polish-without-capture
+ * grace).
+ */
+body.theme-dark .monitors-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 34%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .monitors-filter-miss.is-down-empty,
+body.theme-dark .monitors-filter-miss.is-slow-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 10%, #0a0a0a);
+}
+body.theme-dark .monitors-filter-miss.is-up-empty {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
+}
+
+body.theme-neon .monitors-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 34%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 10%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .monitors-filter-miss.is-down-empty,
+body.theme-neon .monitors-filter-miss.is-slow-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #08120c);
+  background: color-mix(in srgb, #34c759 10%, #08120c);
+}
+body.theme-neon .monitors-filter-miss.is-up-empty {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 36%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 10%, #08120c);
+}
+
+body.theme-futuristic .monitors-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .monitors-filter-miss.is-down-empty,
+body.theme-futuristic .monitors-filter-miss.is-slow-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 10%, #0b0b10);
+}
+body.theme-futuristic .monitors-filter-miss.is-up-empty {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+}
+
+/*
  * Data Poster: AI Chat exec / answer cards still mixed against early #0e0e14
  * (.chat-exec-card · .chat-exec-code · .chat-answer-part · .chat-answer-final) →
  * wrong dark slab on the opaque shell #0b0b10. Catch up to chat-filter-miss /

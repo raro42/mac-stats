@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2432
+
+- Dark / Neon / Futuristic Monitors filter-miss (`.monitors-filter-miss` resting · Down/Slow empty · Up empty) Apple `#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier; Dark early remap corrected off `#0b0b10`). Standing P2 #14 after Disk Cleanup filter-miss v0.1.2431; design-review `feature-monitors` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: other filter-miss / empty leftovers still on Apple `#ffffff` if any (e.g. `.perplexity-setup-note` / chat-filter-miss gaps), or Mac capture of stale `feature-monitors.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2431
 
 - Dark / Neon / Futuristic Disk Cleanup filter-miss (`.disk-cleanup-filter-miss` / `.disk-cleanup-scope-filter-miss` resting · reclaim/big/off empty · clean/on empty) Apple `#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier). Standing P2 #14 after Disk Cleanup empty CTA v0.1.2430; design-review `feature-disk-cleanup` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Neon·Futuristic `.monitors-filter-miss` (Dark early remap still on `#0b0b10`) if still Apple `#ffffff`, or Mac capture of stale `feature-disk-cleanup.png` / `feature-monitors.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
