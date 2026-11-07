@@ -23220,3 +23220,29 @@ body.theme-dark .chat-filter-chip.is-active {
   border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
 }
 
+/*
+ * Dark: AI Chat exec / answer cards still mixed on early `#0b0b10` (shared Data
+ * Poster remap) instead of CRT `#0a0a0a` (`.chat-exec-card` · `.chat-exec-code` ·
+ * `.chat-answer-part` · `.chat-answer-final`). Neon / Futuristic already remap on
+ * `#08120c` / `#0b0b10`; Data Poster stays on `#0b0b10`. Design-review fuel
+ * (feature-ai-chat) + standing P2 #14 after AI Chat filter chips CRT v0.1.2442;
+ * layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-dark .chat-exec-card {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  border-left-color: color-mix(in srgb, #34c759 75%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+}
+body.theme-dark .chat-exec-code {
+  background: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+}
+body.theme-dark .chat-answer-part {
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+}
+body.theme-dark .chat-answer-part.chat-answer-final {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
+}
+
