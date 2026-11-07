@@ -23140,3 +23140,43 @@ body.theme-dark .chat-empty.is-ready .chat-empty-copy {
   color: color-mix(in srgb, #ffffff 81%, #0a0a0a);
   opacity: 1;
 }
+
+/*
+ * Dark: Top Processes top glances still mixed on early `#0b0b10` (shared Data
+ * Poster remap) instead of CRT `#0a0a0a` (`.processes-top-glance` ·
+ * `.processes-top-gpu-glance` · `.processes-top-ram-glance` resting / hover /
+ * focus-visible / is-hot / is-ok). Neon / Futuristic already remap on
+ * `#08120c` / `#0b0b10`; Data Poster stays on `#0b0b10`. Design-review fuel
+ * (feature-processes) + standing P2 #14 after AI Chat empty CRT v0.1.2439;
+ * layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-dark .processes-top-glance,
+body.theme-dark .processes-top-gpu-glance,
+body.theme-dark .processes-top-ram-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .processes-top-glance:hover,
+body.theme-dark .processes-top-gpu-glance:hover,
+body.theme-dark .processes-top-ram-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 22%, #0a0a0a);
+}
+body.theme-dark .processes-top-glance:focus-visible,
+body.theme-dark .processes-top-gpu-glance:focus-visible,
+body.theme-dark .processes-top-ram-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 45%, #0a0a0a);
+}
+body.theme-dark .processes-top-glance.is-hot,
+body.theme-dark .processes-top-gpu-glance.is-hot,
+body.theme-dark .processes-top-ram-glance.is-hot {
+  border-color: color-mix(in srgb, #ff9500 32%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 12%, #0a0a0a);
+}
+body.theme-dark .processes-top-glance.is-ok,
+body.theme-dark .processes-top-gpu-glance.is-ok,
+body.theme-dark .processes-top-ram-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 32%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+}
