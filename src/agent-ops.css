@@ -24300,3 +24300,30 @@ body.theme-dark .setting-toggle .toggle-label.is-judge-off {
   color: color-mix(in srgb, #00ff00 44%, #0a0a0a);
   opacity: 1;
 }
+
+/*
+ * Neon: Agent Ops Runs Lite/Slow/Fail meta + filter-clear Saved ink still mix
+ * onto Apple `#ffffff` while Dark CRT phosphor mixes onto `#00ff00` and Neon
+ * Judge-off / chat chrome already use phosphor `#c8ffd2` on shell `#08120c`.
+ * Catch up Runs meta + Ops filter-clear Saved to `#c8ffd2`. Standing P2 #14
+ * after process-empty / filter-kb / judge-off CRT v0.1.2459; design-review
+ * feature-agent-ops adjacent (polish-without-capture grace; capture still
+ * TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2460: Neon Agent Ops Runs meta · filter-clear phosphor CRT */
+body.theme-neon #ops-runs-list .ops-row.is-lite .ops-row-meta {
+  color: color-mix(in srgb, #6dff7b 70%, #c8ffd2);
+}
+body.theme-neon #ops-runs-list .ops-row.is-slow .ops-row-meta {
+  color: color-mix(in srgb, #ff9f0a 88%, #c8ffd2);
+}
+body.theme-neon #ops-runs-list .ops-row.is-fail .ops-row-meta {
+  color: color-mix(in srgb, #ff3b30 88%, #c8ffd2);
+}
+body.theme-neon .ops-session-kind-filter-clear.is-just-saved,
+body.theme-neon .ops-agents-enabled-filter-clear.is-just-saved,
+body.theme-neon .ops-schedules-kind-filter-clear.is-just-saved,
+body.theme-neon .ops-memory-kind-filter-clear.is-just-saved,
+body.theme-neon .ops-runs-lane-filter-clear.is-just-saved {
+  color: color-mix(in srgb, #34c759 70%, #c8ffd2);
+}

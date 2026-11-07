@@ -7,6 +7,11 @@
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2460] - 2026-11-07
+
+### Changed
+- **Neon Agent Ops Runs meta · filter-clear phosphor CRT:** `#ops-runs-list .ops-row.is-lite/.is-slow/.is-fail .ops-row-meta` and Ops filter-clear Saved ink move off Apple `#ffffff` onto Neon phosphor `#c8ffd2` (Dark CRT already mixes onto `#00ff00`). Standing P2 #14 after process-empty / filter-kb / judge-off CRT v0.1.2459; design-review polish-without-capture grace (Mac recapture deferred, Screen Recording TCC / menu-bar only).
+
 ## [0.1.2459] - 2026-11-07
 
 ### Changed
