@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2461
+
+- Dark / Neon / Futuristic metric + history Hot/Ok/Fair CRT (`.metric-card.is-hot` · is-ok · is-fair · `.history-chart-container.is-hot` · is-ok · is-fair) Apple `#ffffff` → CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster already remapped). Standing P2 #14 after Neon Runs meta / filter-clear phosphor CRT v0.1.2460; design-review `feature-cpu-metrics` / `feature-agent-ops` adjacent (polish-without-capture grace; `feature-agent-ops` capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark/Neon/Futuristic remaps (e.g. chat-message hover/selected · logs-line hover/selected · disk-cleanup-meta-card) if any, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2460
 
 - Neon Agent Ops Runs meta · filter-clear phosphor CRT (`#ops-runs-list .ops-row.is-lite/.is-slow/.is-fail .ops-row-meta` · Ops filter-clear Saved ink) Apple `#ffffff` → Neon phosphor `#c8ffd2` (Dark CRT already mixes onto `#00ff00`; Futuristic/Data Poster keep bright `#ffffff` ink). Standing P2 #14 after process-empty / filter-kb / judge-off CRT v0.1.2459; design-review `feature-agent-ops` adjacent (polish-without-capture grace; capture still TCC-blocked). Next: other Neon phosphor ink leftovers still on Apple `#ffffff` if any, or Mac capture of stale `feature-agent-ops.png` / `feature-processes.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.

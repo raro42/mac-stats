@@ -24327,3 +24327,92 @@ body.theme-neon .ops-memory-kind-filter-clear.is-just-saved,
 body.theme-neon .ops-runs-lane-filter-clear.is-just-saved {
   color: color-mix(in srgb, #34c759 70%, #c8ffd2);
 }
+
+/*
+ * Dark / Neon / Futuristic: ring metric + history sparkline Hot / Ok / Fair still
+ * inherit Apple `#ffffff` washes (`.metric-card.is-hot` · is-ok · is-fair ·
+ * `.history-chart-container.is-hot` · is-ok · is-fair) → white slab on opaque
+ * CRT shells. Data Poster remapped onto `#0b0b10` in v0.1.2219 / v0.1.2216.
+ * Catch up to CRT `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after Neon
+ * Runs meta / filter-clear phosphor CRT v0.1.2460; design-review
+ * feature-cpu-metrics / feature-agent-ops adjacent (polish-without-capture
+ * grace; feature-agent-ops capture still TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2461: metric-card + history Hot/Ok/Fair CRT */
+body.theme-dark .metric-card.is-hot {
+  background-color: color-mix(in srgb, #ff9500 7%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-neon .metric-card.is-hot {
+  background-color: color-mix(in srgb, #ff9500 7%, #08120c);
+  box-shadow: none;
+}
+body.theme-futuristic .metric-card.is-hot {
+  background-color: color-mix(in srgb, #ff9500 7%, #0b0b10);
+  box-shadow: none;
+}
+
+body.theme-dark .metric-card.is-ok:not(.is-hot):not(.is-fair) {
+  background-color: color-mix(in srgb, #34c759 7%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-neon .metric-card.is-ok:not(.is-hot):not(.is-fair) {
+  background-color: color-mix(in srgb, #34c759 7%, #08120c);
+  box-shadow: none;
+}
+body.theme-futuristic .metric-card.is-ok:not(.is-hot):not(.is-fair) {
+  background-color: color-mix(in srgb, #34c759 7%, #0b0b10);
+  box-shadow: none;
+}
+
+body.theme-dark .metric-card.is-fair:not(.is-hot) {
+  background-color: color-mix(in srgb, #ff9500 7%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-neon .metric-card.is-fair:not(.is-hot) {
+  background-color: color-mix(in srgb, #ff9500 7%, #08120c);
+  box-shadow: none;
+}
+body.theme-futuristic .metric-card.is-fair:not(.is-hot) {
+  background-color: color-mix(in srgb, #ff9500 7%, #0b0b10);
+  box-shadow: none;
+}
+
+body.theme-dark .history-chart-container.is-hot {
+  background-color: color-mix(in srgb, #ff9500 7%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-neon .history-chart-container.is-hot {
+  background-color: color-mix(in srgb, #ff9500 7%, #08120c);
+  box-shadow: none;
+}
+body.theme-futuristic .history-chart-container.is-hot {
+  background-color: color-mix(in srgb, #ff9500 7%, #0b0b10);
+  box-shadow: none;
+}
+
+body.theme-dark .history-chart-container.is-ok:not(.is-hot):not(.is-fair) {
+  background-color: color-mix(in srgb, #34c759 5%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-neon .history-chart-container.is-ok:not(.is-hot):not(.is-fair) {
+  background-color: color-mix(in srgb, #34c759 5%, #08120c);
+  box-shadow: none;
+}
+body.theme-futuristic .history-chart-container.is-ok:not(.is-hot):not(.is-fair) {
+  background-color: color-mix(in srgb, #34c759 5%, #0b0b10);
+  box-shadow: none;
+}
+
+body.theme-dark .history-chart-container.is-fair:not(.is-hot) {
+  background-color: color-mix(in srgb, #ff9500 5%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-neon .history-chart-container.is-fair:not(.is-hot) {
+  background-color: color-mix(in srgb, #ff9500 5%, #08120c);
+  box-shadow: none;
+}
+body.theme-futuristic .history-chart-container.is-fair:not(.is-hot) {
+  background-color: color-mix(in srgb, #ff9500 5%, #0b0b10);
+  box-shadow: none;
+}
