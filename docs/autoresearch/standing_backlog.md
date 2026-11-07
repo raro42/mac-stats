@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2441
+
+- Dark AI Chat kb-hint CRT (`.chat-empty-kb-hint` · `.chat-composer-kb-hint` · `.chat-kb-hint` · `.filter-chip-kb-hint`) early `#0b0b10` → CRT `#0a0a0a` (Neon/Futuristic/Data Poster already remapped). Standing P2 #14 after processes-top CRT v0.1.2440; design-review `feature-ai-chat` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: other Dark CRT leftovers still on early `#0b0b10` (e.g. collapsed chat/ollama glances, response-time) / other muted leftovers, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2440
 
 - Dark Top Processes top glances CRT (`.processes-top-glance` · `.processes-top-gpu-glance` · `.processes-top-ram-glance` resting / hover / focus-visible / is-hot / is-ok) early `#0b0b10` → CRT `#0a0a0a` (Neon/Futuristic/Data Poster already remapped). Standing P2 #14 after AI Chat empty CRT v0.1.2439; design-review `feature-processes` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark chat-empty-kb-hint CRT leftovers still on `#0b0b10` / other Dark CRT leftovers, or Mac capture of stale `feature-processes.png` / `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.

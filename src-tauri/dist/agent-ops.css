@@ -23180,3 +23180,20 @@ body.theme-dark .processes-top-ram-glance.is-ok {
   border-color: color-mix(in srgb, #34c759 32%, #0a0a0a);
   background: color-mix(in srgb, #34c759 12%, #0a0a0a);
 }
+
+/*
+ * Dark: AI Chat keyboard hints still mixed on early `#0b0b10` (shared Data Poster
+ * remap) instead of CRT `#0a0a0a` (`.chat-empty-kb-hint` · `.chat-composer-kb-hint` ·
+ * `.chat-kb-hint` · `.filter-chip-kb-hint`). Neon / Futuristic already remap on
+ * `#08120c` / `#0b0b10`; Data Poster stays on `#0b0b10`. Empty shell already CRT
+ * in v0.1.2439 — hints under Ready / composer / filter chips must match.
+ * Design-review fuel (feature-ai-chat) + standing P2 #14 after processes-top CRT
+ * v0.1.2440; layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-dark .chat-empty-kb-hint,
+body.theme-dark .chat-composer-kb-hint,
+body.theme-dark .chat-kb-hint,
+body.theme-dark .filter-chip-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+  opacity: 1;
+}
