@@ -23605,3 +23605,52 @@ body.theme-futuristic .lpm-info.is-on.is-busy .lpm-value {
   color: color-mix(in srgb, #248a3d 72%, #0b0b10);
 }
 
+
+/*
+ * Dark / Neon / Futuristic: Perplexity muted type still wrong on dark shells
+ * (`.perplexity-result-list` · `.perplexity-result-snippet` ·
+ * `.perplexity-config-status`). Dark stays on early shared `#0b0b10` (Data
+ * Poster remap) instead of CRT `#0a0a0a`. Neon / Futuristic result list /
+ * snippet still inherit Apple dark-ink-on-`#ffffff`; Neon config-status mixes
+ * on wrong `#0b0b10` instead of `#08120c`. Data Poster already remaps on
+ * `#0b0b10`. Catch up so Perplexity results match opaque shells. Design-review
+ * fuel (feature-ai-chat / Perplexity adjacent) + standing P2 #14 after LPM
+ * busy CRT v0.1.2448; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+body.theme-dark .perplexity-result-list {
+  color: color-mix(in srgb, #ffffff 72%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .perplexity-result-snippet {
+  color: color-mix(in srgb, #ffffff 64%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .perplexity-config-status {
+  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 70%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-neon .perplexity-result-list {
+  color: color-mix(in srgb, #ffffff 72%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .perplexity-result-snippet {
+  color: color-mix(in srgb, #ffffff 64%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .perplexity-config-status {
+  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 70%, #08120c);
+  opacity: 1;
+}
+body.theme-futuristic .perplexity-result-list {
+  color: color-mix(in srgb, #ffffff 72%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .perplexity-result-snippet {
+  color: color-mix(in srgb, #ffffff 64%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .perplexity-config-status {
+  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 70%, #0b0b10);
+  opacity: 1;
+}
