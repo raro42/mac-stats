@@ -1,22 +1,21 @@
 # Morning surprise — 2026-11-08
 
-Overnight Track B kept shipping Dark/Neon/Futuristic opaque CRT catch-ups (#14) while Screen Recording TCC still blocks window capture of stale `docs/screens/feature-agent-ops.png` (~53d).
+Overnight autoresearch (20:00–06:00) kept shipping standing P2 #14 CRT / phosphor catch-up while digester stayed empty.
 
-## Shipped tonight (selected)
+## Shipped tonight
 
-- **v0.1.2459** — Dark `.process-empty` cascade CRT (late remap after shared `#0b0b10` override) · Neon `.filter-chip-kb-hint` · Neon/Dark Settings Judge-off CRT (`#0a0a0a` / `#08120c`).
-- **v0.1.2458** — Logs empty · Disk Cleanup empty/disabled/Recurse · Dark `#chat-input:focus` CRT.
-- **v0.1.2457** — Monitors `.monitor-item.is-pending` / `.is-removing` CRT (`#0a0a0a` / `#08120c` / `#0b0b10`).
-- **v0.1.2456** — Agent Ops disabled Save · Disk Cleanup path hover · Monitors `.is-checking` CRT.
-- **v0.1.2455** — Perplexity filter chips + counts CRT.
-- Earlier in the window: section kb-hints / muted captions, process rows, empty chips, filter-miss muted, Perplexity muted, LPM busy, metrics kb-hints, Processes filter chips, Agent Ops collapsed glances (through ~v0.1.2445+).
+- **v0.1.2460** — Neon Agent Ops Runs Lite/Slow/Fail meta + Ops filter-clear Saved ink off Apple `#ffffff` onto phosphor `#c8ffd2` (Dark CRT already mixes onto `#00ff00`).
+- **v0.1.2459** — Dark process-empty cascade · Neon filter-chip kb-hint · Neon/Dark Judge-off CRT (backfilled into `results.tsv` this tick).
+- **v0.1.2458** — Dark / Neon / Futuristic Logs empty · Disk Cleanup empty/disabled/Recurse · Dark `#chat-input:focus` CRT.
+- Earlier tonight: Monitors pending/removing, disabled Save / path hover / checking, Perplexity chips, section kb-hints, process-row washes, empty chips, muted hints (see `results.tsv` / CHANGELOG).
 
-## Tried / deferred
+## Why it matters
 
-- Mac `screencapture -l` for `feature-agent-ops.png` — TCC / no on-screen CPU window (polish-without-capture grace).
-- Digester Slowest empty after instant noise filters — design-review + standing P2 #14 carried the night.
+Neon Agent Ops Runs status ink was still mixing onto Apple white while the rest of Neon CRT chrome uses phosphor `#c8ffd2`. Lite / Slow / Fail meta and filter-clear Saved now match Judge-off / Dark phosphor parity.
 
-## Next
+## Still open
 
-- Other Dark/Neon CRT leftovers still on early `#0b0b10` if any.
-- Recapture stale feature screens when Screen Recording allows.
+- Digester: 0 turns / 7d (no Werner fuel).
+- Sibling OpenClaw / Hermes missing on this rack.
+- Mac Screen Recording TCC still blocks fresh `feature-*.png` captures; polish-without-capture grace continues.
+- Next: other Neon phosphor ink leftovers still on Apple `#ffffff` if any.
