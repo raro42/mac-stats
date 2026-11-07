@@ -23541,6 +23541,8 @@ body.theme-dark .processes-filter-chip[data-processes-filter='hot'].has-hits {
 body.theme-dark .processes-filter-chip[data-processes-filter='hot'].is-active {
   background: color-mix(in srgb, #ff9500 22%, #0a0a0a);
   border-color: color-mix(in srgb, #ff9500 40%, #0a0a0a);
+}
+/*
  * Dark / Neon / Futuristic: metrics keyboard hints still wrong on dark shells
  * (`.power-strip-kb-hint` · `.ring-gauge-kb-hint` · `.history-sparkline-kb-hint`).
  * Dark stays on early shared `#0b0b10` (Data Poster remap) instead of CRT
@@ -23568,5 +23570,38 @@ body.theme-futuristic .ring-gauge-kb-hint,
 body.theme-futuristic .history-sparkline-kb-hint {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
+}
+/*
+ * Dark / Neon / Futuristic: LPM busy type still on early shared `#0b0b10`
+ * (`.lpm-info.is-busy` · label · value · is-on.is-busy value) while metrics
+ * kb-hints / Bat·Power strip already mix on CRT `#0a0a0a` / Neon `#08120c` /
+ * Futuristic `#0b0b10`. Data Poster remapped earlier. Catch up so Low Power
+ * Mode busy wash matches the opaque shells. Design-review fuel
+ * (feature-cpu-metrics) + standing P2 #14 after metrics kb-hints v0.1.2447;
+ * layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-dark .lpm-info.is-busy,
+body.theme-dark .lpm-info.is-busy .lpm-label,
+body.theme-dark .lpm-info.is-busy .lpm-value {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+}
+body.theme-dark .lpm-info.is-on.is-busy .lpm-value {
+  color: color-mix(in srgb, #248a3d 72%, #0a0a0a);
+}
+body.theme-neon .lpm-info.is-busy,
+body.theme-neon .lpm-info.is-busy .lpm-label,
+body.theme-neon .lpm-info.is-busy .lpm-value {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+}
+body.theme-neon .lpm-info.is-on.is-busy .lpm-value {
+  color: color-mix(in srgb, #248a3d 72%, #08120c);
+}
+body.theme-futuristic .lpm-info.is-busy,
+body.theme-futuristic .lpm-info.is-busy .lpm-label,
+body.theme-futuristic .lpm-info.is-busy .lpm-value {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+}
+body.theme-futuristic .lpm-info.is-on.is-busy .lpm-value {
+  color: color-mix(in srgb, #248a3d 72%, #0b0b10);
 }
 
