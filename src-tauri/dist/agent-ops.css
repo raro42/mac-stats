@@ -17201,6 +17201,42 @@ body.theme-futuristic .perplexity-setup-note:not([hidden]) {
 }
 
 /*
+ * Dark: AI Chat filter-miss shell / CTA still mixed on early `#0b0b10` (shared
+ * Data Poster remap) instead of CRT `#0a0a0a` (.chat-filter-miss resting ·
+ * Errors · You/Assistant · .chat-filter-miss-cta resting/hover/focus). Neon /
+ * Futuristic already remap on `#08120c` / `#0b0b10`; Data Poster stays on
+ * `#0b0b10`. Design-review fuel (feature-ai-chat) + standing P2 #14 after
+ * Perplexity setup type v0.1.2433; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+body.theme-dark .chat-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 34%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .chat-filter-miss.is-errors {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 10%, #0a0a0a);
+}
+body.theme-dark .chat-filter-miss.is-you,
+body.theme-dark .chat-filter-miss.is-assistant {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
+}
+body.theme-dark .chat-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 14%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .chat-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 48%, #0a0a0a);
+}
+body.theme-dark .chat-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+}
+
+/*
  * Data Poster: AI Chat exec / answer cards still mixed against early #0e0e14
  * (.chat-exec-card · .chat-exec-code · .chat-answer-part · .chat-answer-final) →
  * wrong dark slab on the opaque shell #0b0b10. Catch up to chat-filter-miss /

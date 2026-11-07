@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2434
+
+- Dark AI Chat filter-miss CRT (`.chat-filter-miss` resting · Errors · You/Assistant · `.chat-filter-miss-cta` resting/hover/focus) early `#0b0b10` → CRT `#0a0a0a` (Neon/Futuristic/Data Poster already remapped). Standing P2 #14 after Perplexity setup type v0.1.2433; design-review `feature-ai-chat` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark processes-filter-miss CRT (`#0b0b10` → `#0a0a0a`) / Neon·Futuristic `.perplexity-search-kb-hint` if still Apple `#ffffff` or early shell, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2433
 
 - Dark / Neon / Futuristic Perplexity setup muted type (`.perplexity-setup-kb-hint` · `.perplexity-setup-lead` · `.perplexity-setup-note` resting · error `:not([hidden])`) Apple dark-ink-on-`#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier; Dark early remap corrected off `#0b0b10`). Standing P2 #14 after Monitors filter-miss v0.1.2432; design-review `feature-ai-chat` / Perplexity adjacent / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark AI Chat filter-miss CRT (`#0b0b10` → `#0a0a0a`) / Dark processes-filter-miss CRT / other Perplexity muted leftovers (e.g. `.perplexity-search-kb-hint`) if still wrong, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
