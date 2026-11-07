@@ -23757,3 +23757,41 @@ body.theme-neon .process-detail-pid:hover,
 body.theme-neon .process-detail-pid:focus-visible {
   color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
 }
+
+/*
+ * Dark / Neon: AI Chat empty suggestion chips still mix on early shared
+ * `#0b0b10` (`.chat-empty-chip` resting / hover / focus-visible) while the
+ * empty shell / kb-hints / Saved flash already CRT on Dark `#0a0a0a` and Neon
+ * `#08120c`. Data Poster / Futuristic already correct on `#0b0b10`. Catch up so
+ * suggestion chips match opaque shells. Design-review fuel (feature-ai-chat) +
+ * standing P2 #14 after muted CRT v0.1.2451; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+body.theme-dark .chat-empty-chip {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 34%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 13%, #0a0a0a);
+  color: color-mix(in srgb, #ffffff 87%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .chat-empty-chip:hover {
+  background: color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 48%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .chat-empty-chip:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
+}
+body.theme-neon .chat-empty-chip {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 34%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 13%, #08120c);
+  color: color-mix(in srgb, #ffffff 87%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .chat-empty-chip:hover {
+  background: color-mix(in srgb, var(--accent, #6dff7b) 22%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 48%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .chat-empty-chip:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
+}
