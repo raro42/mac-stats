@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2463
+
+- Dark / Neon / Futuristic Debug Log line CRT (`.logs-line` hover / selected / Copied; Data Poster hover/selected catch-up) Apple `#ffffff` → CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster Copied already remapped). Standing P2 #14 after AI Chat message CRT v0.1.2462; design-review Debug Log adjacent (polish-without-capture grace; `feature-agent-ops` capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark/Neon/Futuristic remaps (e.g. `.disk-cleanup-meta-card` resting/hover/status) if any, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2462
 
 - Dark / Neon / Futuristic AI Chat message hover/focus/selected/Copied CRT (`.chat-message[role=option|button]` hover · focus-visible · is-selected · is-just-copied) Apple `#ffffff` → CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster already remapped). Standing P2 #14 after metric/history Hot/Ok/Fair CRT v0.1.2461; design-review `feature-ai-chat` / `feature-agent-ops` adjacent (polish-without-capture grace; `feature-agent-ops` capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark/Neon/Futuristic remaps (e.g. logs-line hover/selected · disk-cleanup-meta-card) if any, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.

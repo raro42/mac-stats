@@ -24493,3 +24493,66 @@ body.theme-futuristic .chat-message[role='option'].is-just-copied::after,
 body.theme-futuristic .chat-message[role='button'].is-just-copied::after {
   background: color-mix(in srgb, #34c759 55%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic (+ Data Poster hover/selected catch-up): Debug Log
+ * line hover / selected / Copied still inherit Apple `#ffffff` washes → white
+ * slab on opaque shells. Data Poster Copied remapped in v0.1.2239; hover /
+ * selected still Apple. Chat-message CRT landed as sibling v0.1.2462. Catch up
+ * logs-line to `#0b0b10` / CRT `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2
+ * #14 after chat-message CRT v0.1.2462; design-review Debug Log adjacent
+ * (polish-without-capture grace; feature-agent-ops capture still TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2463: logs-line hover/selected CRT */
+body.theme-data-poster .logs-line[role='option']:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 8%, #0b0b10);
+}
+body.theme-dark .logs-line[role='option']:hover {
+  background: color-mix(in srgb, var(--accent, #00cc66) 8%, #0a0a0a);
+}
+body.theme-neon .logs-line[role='option']:hover {
+  background: color-mix(in srgb, var(--accent, #6dff7b) 8%, #08120c);
+}
+body.theme-futuristic .logs-line[role='option']:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 8%, #0b0b10);
+}
+
+body.theme-data-poster .logs-line[role='option'].is-selected {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+}
+body.theme-dark .logs-line[role='option'].is-selected {
+  background: color-mix(in srgb, var(--accent, #00cc66) 16%, #0a0a0a);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+}
+body.theme-neon .logs-line[role='option'].is-selected {
+  background: color-mix(in srgb, var(--accent, #6dff7b) 16%, #08120c);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #6dff7b) 28%, #08120c);
+}
+body.theme-futuristic .logs-line[role='option'].is-selected {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+}
+
+body.theme-dark .logs-line[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 18%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-neon .logs-line[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 18%, #08120c);
+  box-shadow: none;
+}
+body.theme-futuristic .logs-line[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10);
+  box-shadow: none;
+}
+
+body.theme-dark .logs-line[role='option'].is-just-copied::after {
+  color: color-mix(in srgb, #34c759 96%, #0a0a0a);
+}
+body.theme-neon .logs-line[role='option'].is-just-copied::after {
+  color: color-mix(in srgb, #34c759 96%, #08120c);
+}
+body.theme-futuristic .logs-line[role='option'].is-just-copied::after {
+  color: color-mix(in srgb, #34c759 96%, #0b0b10);
+}
