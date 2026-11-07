@@ -25034,3 +25034,166 @@ body.theme-neon .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
 body.theme-futuristic .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
   color: color-mix(in srgb, #ffffff 48%, #0b0b10);
 }
+
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Perplexity result rows + weather card still
+ * mix Apple `#ffffff` washes (`.perplexity-result-item` resting / hover / selected /
+ * focus / is-top / Copied · `.perplexity-weather-card`) → white slab on opaque shells.
+ * Standing P2 #14 after Disk Cleanup last-run/Scan CRT v0.1.2465; design-review
+ * `feature-ai-chat` / Perplexity adjacent (polish-without-capture grace; Mac capture
+ * deferred — Screen Recording TCC / menu-bar only). Data Poster Copied already remapped.
+ */
+body.theme-data-poster .perplexity-result-item {
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+}
+body.theme-data-poster .perplexity-result-item:hover {
+  background: color-mix(in srgb, #0a84ff 6%, #0b0b10);
+  border-color: color-mix(in srgb, #0a84ff 22%, #0b0b10);
+}
+body.theme-data-poster .perplexity-result-item[role='option']:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 45%, #0b0b10);
+}
+body.theme-data-poster .perplexity-result-item:focus-within,
+body.theme-data-poster .perplexity-result-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 14%, #0b0b10);
+}
+body.theme-data-poster .perplexity-result-item[role='option'].is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #007aff) 5%, #0b0b10);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 18%, #0b0b10);
+}
+body.theme-data-poster .perplexity-result-item.is-top {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #0b0b10);
+}
+body.theme-data-poster .perplexity-result-item.is-top:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #0b0b10);
+}
+body.theme-data-poster .perplexity-weather-card {
+  border-color: color-mix(in srgb, #0a84ff 22%, #0b0b10);
+  border-left-color: color-mix(in srgb, #0a84ff 70%, #0b0b10);
+  background: color-mix(in srgb, #0a84ff 6%, #0b0b10);
+}
+
+body.theme-dark .perplexity-result-item {
+  background: color-mix(in srgb, currentColor 4%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+}
+body.theme-dark .perplexity-result-item:hover {
+  background: color-mix(in srgb, #0a84ff 6%, #0a0a0a);
+  border-color: color-mix(in srgb, #0a84ff 22%, #0a0a0a);
+}
+body.theme-dark .perplexity-result-item[role='option']:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #00cc66) 45%, #0a0a0a);
+}
+body.theme-dark .perplexity-result-item:focus-within,
+body.theme-dark .perplexity-result-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 35%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 14%, #0a0a0a);
+}
+body.theme-dark .perplexity-result-item[role='option'].is-selected {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 5%, #0a0a0a);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #00cc66) 18%, #0a0a0a);
+}
+body.theme-dark .perplexity-result-item[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+}
+body.theme-dark .perplexity-result-item[role='option'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #0a0a0a);
+}
+body.theme-dark .perplexity-result-item.is-top {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 6%, #0a0a0a);
+}
+body.theme-dark .perplexity-result-item.is-top:hover {
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
+}
+body.theme-dark .perplexity-weather-card {
+  border-color: color-mix(in srgb, #0a84ff 22%, #0a0a0a);
+  border-left-color: color-mix(in srgb, #0a84ff 70%, #0a0a0a);
+  background: color-mix(in srgb, #0a84ff 6%, #0a0a0a);
+}
+
+body.theme-neon .perplexity-result-item {
+  background: color-mix(in srgb, currentColor 4%, #08120c);
+  border-color: color-mix(in srgb, currentColor 10%, #08120c);
+}
+body.theme-neon .perplexity-result-item:hover {
+  background: color-mix(in srgb, #0a84ff 6%, #08120c);
+  border-color: color-mix(in srgb, #0a84ff 22%, #08120c);
+}
+body.theme-neon .perplexity-result-item[role='option']:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
+}
+body.theme-neon .perplexity-result-item:focus-within,
+body.theme-neon .perplexity-result-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 35%, #08120c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 14%, #08120c);
+}
+body.theme-neon .perplexity-result-item[role='option'].is-selected {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 22%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 5%, #08120c);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #6dff7b) 18%, #08120c);
+}
+body.theme-neon .perplexity-result-item[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+}
+body.theme-neon .perplexity-result-item[role='option'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #08120c);
+}
+body.theme-neon .perplexity-result-item.is-top {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 28%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 6%, #08120c);
+}
+body.theme-neon .perplexity-result-item.is-top:hover {
+  background: color-mix(in srgb, var(--accent, #6dff7b) 10%, #08120c);
+}
+body.theme-neon .perplexity-weather-card {
+  border-color: color-mix(in srgb, #0a84ff 22%, #08120c);
+  border-left-color: color-mix(in srgb, #0a84ff 70%, #08120c);
+  background: color-mix(in srgb, #0a84ff 6%, #08120c);
+}
+
+body.theme-futuristic .perplexity-result-item {
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+}
+body.theme-futuristic .perplexity-result-item:hover {
+  background: color-mix(in srgb, #0a84ff 6%, #0b0b10);
+  border-color: color-mix(in srgb, #0a84ff 22%, #0b0b10);
+}
+body.theme-futuristic .perplexity-result-item[role='option']:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-futuristic .perplexity-result-item:focus-within,
+body.theme-futuristic .perplexity-result-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 35%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+}
+body.theme-futuristic .perplexity-result-item[role='option'].is-selected {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 5%, #0b0b10);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
+}
+body.theme-futuristic .perplexity-result-item[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+}
+body.theme-futuristic .perplexity-result-item[role='option'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #0b0b10);
+}
+body.theme-futuristic .perplexity-result-item.is-top {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 6%, #0b0b10);
+}
+body.theme-futuristic .perplexity-result-item.is-top:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+}
+body.theme-futuristic .perplexity-weather-card {
+  border-color: color-mix(in srgb, #0a84ff 22%, #0b0b10);
+  border-left-color: color-mix(in srgb, #0a84ff 70%, #0b0b10);
+  background: color-mix(in srgb, #0a84ff 6%, #0b0b10);
+}
