@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2467
+
+- Data Poster / Dark / Neon / Futuristic Monitors detail log CRT (`.monitor-detail-log`) Apple `#ffffff` → `#0b0b10` / CRT `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after Perplexity result + weather CRT v0.1.2466; design-review `feature-monitors` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark remaps if any, or Mac capture of stale `feature-monitors.png` / `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2466
 
 - Data Poster / Dark / Neon / Futuristic Perplexity result + weather CRT (`.perplexity-result-item` resting · hover · selected · focus · is-top · Copied · `.perplexity-weather-card`) Apple `#ffffff` → `#0b0b10` / CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster Copied already remapped). Standing P2 #14 after Disk Cleanup last-run/Scan CRT v0.1.2465; design-review `feature-ai-chat` / Perplexity adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark remaps (e.g. `.monitor-detail-log`) if any, or Mac capture of stale `feature-ai-chat.png` / `feature-disk-cleanup.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.

@@ -25197,3 +25197,24 @@ body.theme-futuristic .perplexity-weather-card {
   border-left-color: color-mix(in srgb, #0a84ff 70%, #0b0b10);
   background: color-mix(in srgb, #0a84ff 6%, #0b0b10);
 }
+
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Monitors detail response log still
+ * mixes Apple `#ffffff` wash (`.monitor-detail-log`) → white slab on opaque shells.
+ * Standing P2 #14 after Perplexity result + weather CRT v0.1.2466; design-review
+ * `feature-monitors` adjacent (polish-without-capture grace; Mac capture deferred —
+ * Screen Recording TCC / menu-bar only).
+ */
+body.theme-data-poster .monitor-detail-log {
+  background: color-mix(in srgb, #ffffff 6%, #0b0b10);
+}
+body.theme-dark .monitor-detail-log {
+  background: color-mix(in srgb, #ffffff 6%, #0a0a0a);
+}
+body.theme-neon .monitor-detail-log {
+  background: color-mix(in srgb, #ffffff 6%, #08120c);
+}
+body.theme-futuristic .monitor-detail-log {
+  background: color-mix(in srgb, #ffffff 6%, #0b0b10);
+}
