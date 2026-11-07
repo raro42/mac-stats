@@ -17149,6 +17149,58 @@ body.theme-futuristic .monitors-filter-miss.is-up-empty {
 }
 
 /*
+ * Dark / Neon / Futuristic: Perplexity setup muted type still mixes Apple
+ * dark-ink-on-`#ffffff` (`.perplexity-setup-kb-hint` · `.perplexity-setup-lead` ·
+ * `.perplexity-setup-note` resting · error `:not([hidden])`) — Neon / Futuristic
+ * lacked any opaque remap; Dark early remap mixed on `#0b0b10` not CRT `#0a0a0a`.
+ * Data Poster remapped earlier (kb-hint 66% · lead/note 78% · error pale-red mix).
+ * Design-review fuel (feature-ai-chat / Perplexity adjacent) + standing P2 #14
+ * after Monitors filter-miss v0.1.2432; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+body.theme-dark .perplexity-setup-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .perplexity-setup-lead,
+body.theme-dark .perplexity-setup-note {
+  color: color-mix(in srgb, #ffffff 78%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .perplexity-setup-note:not([hidden]) {
+  color: color-mix(in srgb, color-mix(in srgb, #c44 70%, #ffffff) 55%, #0a0a0a);
+  opacity: 1;
+}
+
+body.theme-neon .perplexity-setup-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .perplexity-setup-lead,
+body.theme-neon .perplexity-setup-note {
+  color: color-mix(in srgb, #ffffff 78%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .perplexity-setup-note:not([hidden]) {
+  color: color-mix(in srgb, color-mix(in srgb, #c44 70%, #ffffff) 55%, #08120c);
+  opacity: 1;
+}
+
+body.theme-futuristic .perplexity-setup-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .perplexity-setup-lead,
+body.theme-futuristic .perplexity-setup-note {
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .perplexity-setup-note:not([hidden]) {
+  color: color-mix(in srgb, color-mix(in srgb, #c44 70%, #ffffff) 55%, #0b0b10);
+  opacity: 1;
+}
+
+/*
  * Data Poster: AI Chat exec / answer cards still mixed against early #0e0e14
  * (.chat-exec-card · .chat-exec-code · .chat-answer-part · .chat-answer-final) →
  * wrong dark slab on the opaque shell #0b0b10. Catch up to chat-filter-miss /
