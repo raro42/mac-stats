@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2453
+
+- Dark Top Processes row washes CRT (`.process-row` is-pinned / hover / active / focus-visible) early shared `#0b0b10` → CRT `#0a0a0a` (Neon / Futuristic / Data Poster already remapped; pin type / empty / Copied already CRT). Standing P2 #14 after empty-chip CRT v0.1.2452; design-review `feature-processes` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: other Dark CRT leftovers still on early `#0b0b10` if any, or Mac capture of stale `feature-processes.png` / `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2452
 
 - Dark / Neon AI Chat empty suggestion chips CRT (`.chat-empty-chip` resting / hover / focus-visible) early shared `#0b0b10` → CRT `#0a0a0a` / Neon `#08120c` (Data Poster / Futuristic already on `#0b0b10`; Saved flash already remapped). Standing P2 #14 after muted CRT v0.1.2451; design-review `feature-ai-chat` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: other Dark CRT leftovers still on early `#0b0b10` (e.g. `.ops-subhead` / `.process-row` hover-active / `.ollama-collapsed-glance:hover` if still early), or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.

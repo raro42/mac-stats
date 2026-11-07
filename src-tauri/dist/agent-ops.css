@@ -23795,3 +23795,24 @@ body.theme-neon .chat-empty-chip:hover {
 body.theme-neon .chat-empty-chip:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
 }
+
+/*
+ * Dark: Top Processes list rows still mix on early shared `#0b0b10`
+ * (`.process-row` is-pinned / hover / active / focus-visible) while pin type /
+ * empty / Copied already CRT on `#0a0a0a`. Neon / Futuristic / Data Poster
+ * already remapped. Catch up so row washes match the CRT shell. Design-review
+ * fuel (feature-processes) + standing P2 #14 after empty-chip CRT v0.1.2452;
+ * layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-dark .process-row.is-pinned {
+  background: color-mix(in srgb, var(--accent, #00cc66) 14%, #0a0a0a);
+}
+body.theme-dark .process-row:hover {
+  background: color-mix(in srgb, currentColor 10%, #0a0a0a);
+}
+body.theme-dark .process-row:active {
+  background: color-mix(in srgb, currentColor 14%, #0a0a0a);
+}
+body.theme-dark .process-row:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
+}
