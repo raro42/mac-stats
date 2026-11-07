@@ -21715,3 +21715,154 @@ body.theme-futuristic .chat-filter-count.is-zero {
 body.theme-futuristic .rings-filter-count {
   color: color-mix(in srgb, #ffffff 79%, #0b0b10);
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Debug Log filter chips still mixed
+ * Apple dark-ink-on-#ffffff (`.logs-toolbar .logs-filter-chip` resting/hover/
+ * focus/active · Error · Warn) with zero theme remaps → near-black type on
+ * white slabs over opaque shells. Soft light type + shell washes (Processes
+ * filter-chip parity; count remapped in v0.1.2420). Design-review fuel
+ * (feature-agent-ops / Debug Log adjacent) + standing P2 #14 after
+ * Monitors/Chat/Rings counts v0.1.2421; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+/* OVERNIGHT v0.1.2422: Debug Log filter chips opaque on DP/Dark/Neon/Futuristic */
+body.theme-data-poster .logs-toolbar .logs-filter-chip {
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-data-poster .logs-toolbar .logs-filter-chip:hover {
+  color: var(--text, color-mix(in srgb, #ffffff 96%, #0b0b10));
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-data-poster .logs-toolbar .logs-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
+body.theme-data-poster .logs-toolbar .logs-filter-chip.is-active {
+  color: var(--text, color-mix(in srgb, #ffffff 96%, #0b0b10));
+  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+}
+body.theme-data-poster .logs-toolbar .logs-filter-chip[data-logs-filter='error'].has-hits {
+  background: color-mix(in srgb, #ff3b30 14%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+}
+body.theme-data-poster .logs-toolbar .logs-filter-chip[data-logs-filter='error'].is-active {
+  background: color-mix(in srgb, #ff3b30 22%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 42%, #0b0b10);
+}
+body.theme-data-poster .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 14%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0b0b10);
+}
+body.theme-data-poster .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].is-active {
+  background: color-mix(in srgb, #ff9f0a 22%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 40%, #0b0b10);
+}
+
+body.theme-dark .logs-toolbar .logs-filter-chip {
+  border-color: color-mix(in srgb, currentColor 18%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #00ff00 88%, #0a0a0a));
+}
+body.theme-dark .logs-toolbar .logs-filter-chip:hover {
+  color: var(--text, color-mix(in srgb, #00ff00 96%, #0a0a0a));
+  background: color-mix(in srgb, currentColor 12%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 22%, #0a0a0a);
+}
+body.theme-dark .logs-toolbar .logs-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+}
+body.theme-dark .logs-toolbar .logs-filter-chip.is-active {
+  color: var(--text, color-mix(in srgb, #00ff00 96%, #0a0a0a));
+  background: color-mix(in srgb, var(--accent, #00cc66) 18%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+}
+body.theme-dark .logs-toolbar .logs-filter-chip[data-logs-filter='error'].has-hits {
+  background: color-mix(in srgb, #ff3b30 14%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff3b30 30%, #0a0a0a);
+}
+body.theme-dark .logs-toolbar .logs-filter-chip[data-logs-filter='error'].is-active {
+  background: color-mix(in srgb, #ff3b30 22%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff3b30 42%, #0a0a0a);
+}
+body.theme-dark .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 14%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0a0a0a);
+}
+body.theme-dark .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].is-active {
+  background: color-mix(in srgb, #ff9f0a 22%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9f0a 40%, #0a0a0a);
+}
+
+body.theme-neon .logs-toolbar .logs-filter-chip {
+  border-color: color-mix(in srgb, currentColor 18%, #08120c);
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .logs-toolbar .logs-filter-chip:hover {
+  color: var(--text, color-mix(in srgb, #ffffff 96%, #08120c));
+  background: color-mix(in srgb, currentColor 12%, #08120c);
+  border-color: color-mix(in srgb, currentColor 22%, #08120c);
+}
+body.theme-neon .logs-toolbar .logs-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 22%, #08120c);
+}
+body.theme-neon .logs-toolbar .logs-filter-chip.is-active {
+  color: var(--text, color-mix(in srgb, #ffffff 96%, #08120c));
+  background: color-mix(in srgb, var(--accent, #6dff7b) 18%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 36%, #08120c);
+}
+body.theme-neon .logs-toolbar .logs-filter-chip[data-logs-filter='error'].has-hits {
+  background: color-mix(in srgb, #ff3b30 14%, #08120c);
+  border-color: color-mix(in srgb, #ff3b30 30%, #08120c);
+}
+body.theme-neon .logs-toolbar .logs-filter-chip[data-logs-filter='error'].is-active {
+  background: color-mix(in srgb, #ff3b30 22%, #08120c);
+  border-color: color-mix(in srgb, #ff3b30 42%, #08120c);
+}
+body.theme-neon .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 14%, #08120c);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #08120c);
+}
+body.theme-neon .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].is-active {
+  background: color-mix(in srgb, #ff9f0a 22%, #08120c);
+  border-color: color-mix(in srgb, #ff9f0a 40%, #08120c);
+}
+
+body.theme-futuristic .logs-toolbar .logs-filter-chip {
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .logs-toolbar .logs-filter-chip:hover {
+  color: var(--text, color-mix(in srgb, #ffffff 96%, #0b0b10));
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-futuristic .logs-toolbar .logs-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
+body.theme-futuristic .logs-toolbar .logs-filter-chip.is-active {
+  color: var(--text, color-mix(in srgb, #ffffff 96%, #0b0b10));
+  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+}
+body.theme-futuristic .logs-toolbar .logs-filter-chip[data-logs-filter='error'].has-hits {
+  background: color-mix(in srgb, #ff3b30 14%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+}
+body.theme-futuristic .logs-toolbar .logs-filter-chip[data-logs-filter='error'].is-active {
+  background: color-mix(in srgb, #ff3b30 22%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 42%, #0b0b10);
+}
+body.theme-futuristic .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 14%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0b0b10);
+}
+body.theme-futuristic .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].is-active {
+  background: color-mix(in srgb, #ff9f0a 22%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 40%, #0b0b10);
+}

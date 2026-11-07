@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2422
+
+- Data Poster / Dark / Neon / Futuristic Debug Log filter chips (`.logs-toolbar .logs-filter-chip` resting/hover/focus/active · Error · Warn) Apple dark-ink-on-`#ffffff` → opaque shells `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after Monitors/Chat/Rings counts v0.1.2421; design-review / layout-daily Data Poster adjacent (polish-without-capture grace). Next: rings-filter-chip / other Processes leftovers still without theme remaps if any, or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2421
 
 - Dark / Neon / Futuristic Monitors + AI Chat filter counts (`.monitors-filter-count` / `.chat-filter-count` + `.is-zero`) Apple dark-ink-on-`#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier); `.rings-filter-count` zero theme remaps → opaque on Data Poster / Dark / Neon / Futuristic `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after Processes/Logs filter-count v0.1.2420 (race reconcile); design-review `feature-monitors` / `feature-ai-chat` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark/Neon/Futuristic `.disk-cleanup-filter-count` / `.perplexity-filter-count` if still Apple `#ffffff` (Data Poster remapped), or Mac capture of stale `feature-monitors.png` / `feature-ai-chat.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
