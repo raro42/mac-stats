@@ -23385,3 +23385,120 @@ body.theme-dark .ops-filter-attention-glance.is-direct-filter {
   color: color-mix(in srgb, #30d158 55%, var(--text, currentColor));
 }
 
+/*
+ * Data Poster / Dark / Neon / Futuristic: Agent Ops collapsed glance shell still
+ * mixed Apple `#ffffff` washes (resting / hover / focus · is-ready · is-warn ·
+ * is-offline) → white slab under the header when Agent Ops is collapsed. Only
+ * `.is-empty` type had dark remaps. Opaque shells `#0b0b10` / CRT `#0a0a0a` /
+ * Neon `#08120c` / Futuristic `#0b0b10` (Monitors / AI Chat collapsed parity).
+ * Design-review fuel (feature-agent-ops) + standing P2 #14 after ops attention
+ * CRT v0.1.2444; layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-data-poster .agent-ops-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-data-poster .agent-ops-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-data-poster .agent-ops-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-data-poster .agent-ops-collapsed-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+body.theme-data-poster .agent-ops-collapsed-glance.is-warn {
+  border-color: color-mix(in srgb, #ff9500 28%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 7%, #0b0b10);
+}
+body.theme-data-poster .agent-ops-collapsed-glance.is-offline {
+  border-color: color-mix(in srgb, #ff3b30 28%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+}
+
+body.theme-dark .agent-ops-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3.5%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .agent-ops-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-dark .agent-ops-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 45%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-dark .agent-ops-collapsed-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 7%, #0a0a0a);
+}
+body.theme-dark .agent-ops-collapsed-glance.is-warn {
+  border-color: color-mix(in srgb, #ff9500 28%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 7%, #0a0a0a);
+}
+body.theme-dark .agent-ops-collapsed-glance.is-offline {
+  border-color: color-mix(in srgb, #ff3b30 28%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 7%, #0a0a0a);
+}
+
+body.theme-neon .agent-ops-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #08120c);
+  background: color-mix(in srgb, currentColor 3.5%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .agent-ops-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #08120c);
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+  box-shadow: none;
+}
+body.theme-neon .agent-ops-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
+  box-shadow: none;
+}
+body.theme-neon .agent-ops-collapsed-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #08120c);
+  background: color-mix(in srgb, #34c759 7%, #08120c);
+}
+body.theme-neon .agent-ops-collapsed-glance.is-warn {
+  border-color: color-mix(in srgb, #ff9500 28%, #08120c);
+  background: color-mix(in srgb, #ff9500 7%, #08120c);
+}
+body.theme-neon .agent-ops-collapsed-glance.is-offline {
+  border-color: color-mix(in srgb, #ff3b30 28%, #08120c);
+  background: color-mix(in srgb, #ff3b30 7%, #08120c);
+}
+
+body.theme-futuristic .agent-ops-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .agent-ops-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-futuristic .agent-ops-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-futuristic .agent-ops-collapsed-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+body.theme-futuristic .agent-ops-collapsed-glance.is-warn {
+  border-color: color-mix(in srgb, #ff9500 28%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 7%, #0b0b10);
+}
+body.theme-futuristic .agent-ops-collapsed-glance.is-offline {
+  border-color: color-mix(in srgb, #ff3b30 28%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+}
+
