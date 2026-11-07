@@ -1,20 +1,23 @@
 # Morning surprise — 2026-11-08
 
-Ralf: first tick of the new overnight window (from 20:00 CET 2026-11-07) kept a real Agent Ops design-review polish. Digester Slowest was empty; design-review `feature-agent-ops.png` (~53d) was the open fuel.
+Ralf: overnight Track B kept shipping Dark CRT / opaque remaps (design-review polish-without-capture; Screen Recording TCC blocked window captures). Digester Slowest was empty.
 
 ## Shipped this night (so far)
 
-- **v0.1.2445** — Data Poster / Dark / Neon / Futuristic `.agent-ops-collapsed-glance` (resting / hover / focus · is-ready · is-warn · is-offline) off Apple `#ffffff` onto `#0b0b10` / CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Monitors / AI Chat collapsed parity; `.is-empty` type already remapped)
+- **v0.1.2446** — Dark Top Processes `.processes-filter-chip` (resting / hover / focus / active · pinned · Hot) → CRT `#0a0a0a` (`#00cc66` active)
+- **v0.1.2445** — Data Poster / Dark / Neon / Futuristic Agent Ops `.agent-ops-collapsed-glance` (ready / warn / offline) off Apple `#ffffff` → opaque shells
 
 ## Tried / deferred
 
-- Mac recapture of stale `docs/screens/feature-agent-ops.png` (~53d) — deferred (Screen Recording TCC; `screencapture -l` / Quartz could not create image from on-screen window)
-- Layout-daily Data Poster — remaps_missing=none; marked checked after this DP remap; theme screen still missing until capture works
+- Digester open candidates: none (0 turns / 7d)
+- Sibling OpenClaw/Hermes: missing on this rack
+- Mac recapture of stale `docs/screens/feature-agent-ops.png` / `feature-processes.png` — deferred (Screen Recording TCC)
+- Layout-daily Data Poster screens missing — remaps_missing=none; deferred behind design-review CRT leftovers
 
 ## Next fuel
 
-- Other Apple `#ffffff` / early Dark kb-hint leftovers (e.g. power-strip / ring gauges) if still wrong
-- Mac capture of stale feature screens when TCC allows
-- Sibling harness ports only after design-review / standing leftovers thin out
+- Dark Perplexity muted leftovers (`.perplexity-result-list` / `.perplexity-result-snippet` / `.perplexity-config-status`) still on early `#0b0b10`
+- `.chat-filter-miss-msg` / `.process-name.is-just-saved` if still early
+- Mac capture when TCC allows
 
-Generated: 2026-11-07T20:08:00+01:00
+Generated: 2026-11-07T20:20:00+01:00
