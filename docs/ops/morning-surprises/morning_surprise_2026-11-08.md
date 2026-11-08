@@ -1,20 +1,27 @@
 # Morning surprise — 2026-11-08
 
-Overnight Track B kept opaque remaps rolling (standing P2 #14). Digester stayed empty; design-review stayed in polish-without-capture grace.
+Overnight autoresearch (Track B) kept shipping opaque Architect-parity (#14). Digester open stayed empty; design-review stayed in polish-without-capture grace (Screen Recording TCC / menu-bar only). Layout-daily already checked for dark shells; Architect still unmarked (screen missing). Material live glass `rgba` cleared by v0.1.2489; Swiss shell foundation started at v0.1.2490.
 
-## Shipped tonight (highlights)
+## Shipped tonight (keep)
 
-- **v0.1.2493** — Swiss AI Chat opaque (menu · model · messages · markdown · thinking-dots).
-- **v0.1.2492** — Swiss Settings + Monitors opaque.
-- **v0.1.2491** / **v0.1.2490** — Swiss history/process/battery + shell opaque.
-- Earlier: Material paper clear-out + dark-shell CRT catch-ups (see CHANGELOG).
+- **v0.1.2490** — Swiss-minimalistic shell opaque (`:root` tokens · Details/Processes scrollbar · title · `.icon-btn` · `.tile` → `color-mix` on `#ffffff` / `#f6f6f6`).
+- **v0.1.2489** — Material Monitors / collapse muted-var opaque (live Material glass `rgba` property values cleared).
+- **v0.1.2488** — Material battery icon / icon-line status type / history-controls label opaque.
+- **v0.1.2487** — Material history time-range / tooltip / Changelog code opaque.
+- **v0.1.2486** — Material Debug Log toolbar / autorefresh / viewer opaque.
+- **v0.1.2485** — Material Monitors settings popover opaque.
+- **v0.1.2484** — Material Settings modal chrome opaque.
+- Earlier same night: Material AI Chat / Settings+Monitors / history+processes+battery / shell foundation (v0.1.2480–2483), plus dark-shell CRT catch-up through filter-chip / collapsed-active remaps.
 
-## Tried / deferred
+## Tried / discarded
 
-- Sibling OpenClaw / Hermes missing on Linux rack.
-- Mac `feature-*.png` recapture still TCC-blocked.
-- Next: Swiss remaining modal leftovers / Light shell opaque, or Mac capture when TCC allows.
+- Parallel race discard on local Material history+processes as v0.1.2481 (origin already shipped the same surface) — reset to origin; no duplicate ship.
 
-## Why it matters
+## Next fuel
 
-Swiss AI Chat chrome no longer paints glass `rgba` washes over the paper shell. Same #14 opaque-shell family as Architect / Material.
+- Swiss remaining glass leftovers, or Light shell opaque foundation.
+- Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
+## Fitness
+
+Swiss shell tokens / scrollbar / title / icon buttons / metric tiles no longer sit as translucent rgba over paper — same opaque `color-mix` pattern as Material and Architect.

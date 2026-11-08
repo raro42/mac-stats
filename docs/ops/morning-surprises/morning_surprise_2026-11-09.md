@@ -1,17 +1,18 @@
 # Morning surprise — 2026-11-09
 
-Overnight autoresearch (20:00–06:00 CET window starting 2026-11-08).
+Overnight Track B kept shipping Swiss-minimalistic opaque chrome (#14).
 
 ## Shipped
 
-- **v0.1.2493** — Swiss-minimalistic AI Chat opaque (#14): Ollama menu / settings popover backdrop/close, model text/dropdown/select, chat messages + user/assistant washes, markdown blockquote/code/pre/table/hr/a, thinking-dots → opaque `color-mix` on Swiss paper `#ffffff` / `#f6f6f6` (Material-parity after Settings/Monitors v0.1.2492).
-- **v0.1.2492** — Swiss Settings + Monitors opaque (sibling tick earlier this window).
+- **v0.1.2494** — Swiss Monitors menu + settings popover opaque (Material-parity after AI Chat v0.1.2493). Menu button/panel, settings popover shell, settings-item / remove / add-form input move off glass `rgba` onto opaque `color-mix` on `#ffffff` / `#f6f6f6`.
+- Earlier same night: **v0.1.2493** Swiss AI Chat opaque; **v0.1.2492** Swiss Settings + Monitors list opaque (sibling ticks).
 
-## Context
+## Tried / notes
 
-- Digester open empty; design-review grace; layout-daily not due.
-- Fuel: standing P2 #14 Swiss glass leftovers after Settings/Monitors.
+- Digester open stayed empty (noise filters). Design-review / layout-daily not due (grace / already checked).
+- Mac `screencapture -l` still deferred (Screen Recording TCC / menu-bar only).
+- First AI Chat pick this tick raced sibling 2493 → pulled; Monitors popover kept instead.
 
-## Next
+## Next fuel
 
-- Swiss remaining modal `rgba` leftovers, or Light shell opaque, or Mac capture when Screen Recording TCC allows.
+- Swiss remaining modal `rgba` leftovers / Light shell opaque, or Mac capture when TCC allows.
