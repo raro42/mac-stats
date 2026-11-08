@@ -1,21 +1,16 @@
 # Morning surprise — 2026-11-09
 
-Overnight autoresearch (Track B) kept shipping Light opaque chrome (#14). Digester open stayed empty; design-review and layout-daily stayed in grace / unmarked.
+Overnight autoresearch (Track B) kept shipping Light theme opaque parity (#14).
 
-## Shipped this window (latest first)
+## Shipped
+- **v0.1.2504** — Light Monitors menu + settings popover opaque on paper #ffffff / #f7f7fa.
+- **v0.1.2505** — Light Settings modal chrome opaque on paper #ffffff: theme chips, inputs, buttons, help sheet, force-quit, Changelog scrollbar/error.
 
-- **v0.1.2504** — Light Monitors menu + settings popover opaque (`color-mix` on `#ffffff` / `#f7f7fa`).
-- **v0.1.2503** — Light AI Chat opaque (Ollama menu / model / messages / markdown).
-- **v0.1.2502** — Light Settings + Monitors list opaque.
-- **v0.1.2501** — Light history tile + Top Processes + metric labels opaque.
-- **v0.1.2500** — Light shell opaque foundation.
-- Earlier tonight: Swiss-minimalistic opaque catch-up through v0.1.2499 (and Material before that).
+## Context
+- Digester empty (0 turns / 7d); design-review + layout-daily not due (grace / already marked).
+- Fuel: standing P2 #14 Swiss-parity glass to opaque color-mix on Light paper.
+- Mac Screen Recording TCC still blocks fresh docs/screens captures; polish-without-capture grace.
 
-## Fitness
-
-Light Monitors menu and settings popover no longer lean on glass `rgba` fallbacks. Washes stay opaque on paper, same as Swiss after v0.1.2494.
-
-## Next fuel
-
-Light remaining modal `rgba` leftovers (Settings modal chrome / Debug Log / history tooltip), or Mac capture of stale `feature-monitors.png` / `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
-
+## Next
+- Light Debug Log / history time-range / tooltip / changelog-code leftovers.
+- Or Mac capture of stale feature screens when TCC allows screencapture -l.
