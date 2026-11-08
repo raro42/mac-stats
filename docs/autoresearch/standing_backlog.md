@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2506
+
+- Light Debug Log opaque (`.logs-toolbar` button · `.logs-autorefresh` · `.logs-viewer`) glass `rgba` → opaque `color-mix` on paper `#ffffff` (Swiss-parity after Settings modal v0.1.2505). Standing P2 #14; design-review Debug Log / `feature-agent-ops` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Light history time-range / tooltip / `.changelog-code` leftovers, or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2505
 
 - Light Settings modal chrome opaque (`.theme-item` · `.settings-input` / `.discord-token-input` · `.settings-btn` / primary · `.settings-help-sheet` · `.force-quit-section` / `.force-quit-btn` · Changelog scrollbar track/thumb · `.changelog-error`) glass `rgba` / `color-mix(…, transparent)` → opaque `color-mix` on paper `#ffffff` (Swiss-parity after Monitors popover v0.1.2504). Standing P2 #14; design-review Settings adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Light Debug Log / history time-range / tooltip / `.changelog-code` leftovers, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
