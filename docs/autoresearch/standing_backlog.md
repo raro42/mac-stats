@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2469
+
+- Dark / Neon / Futuristic Monitors row status CRT (`.monitor-item.is-selected` · `.is-down` · `.is-slow` · `:focus-visible` · `.is-just-copied`) Apple `#ffffff` → CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster already remapped). Standing P2 #14 after Top Processes bar CRT v0.1.2468; design-review `feature-monitors` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark remaps (e.g. `.logs-viewer` · `.monitor-detail` · `.section-header-collapsible:hover` · Disk Cleanup selected/reclaim) if any, or Mac capture of stale `feature-monitors.png` / `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2468
 
 - Data Poster / Dark / Neon / Futuristic Top Processes bar CRT (`#process-list .process-bar`) Apple `#ffffff` → `#0b0b10` / CRT `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after Monitors detail-log CRT v0.1.2467; design-review `feature-processes` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark remaps (e.g. `.section-header-collapsible:hover`) if any, or Mac capture of stale `feature-processes.png` / `feature-monitors.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
