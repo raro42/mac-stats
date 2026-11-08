@@ -1,21 +1,21 @@
-# Morning surprise — overnight autoresearch
+# Morning surprise — 2026-11-09
 
-Window: 2026-11-08 20:00 → 2026-11-09 (CEST)
+Overnight Track B kept shipping opaque-theme chrome so Light / Material / Swiss stay readable on paper (no glass alpha in Graphics and Media).
 
-## Shipped
+## Shipped tonight
 
-- **v0.1.2513** — Light / Material / Swiss-minimalistic `.section-title` opaque `color-mix` (was invalid glass `rgb(1,1,1,0.75)`; Apple / Architect parity).
-- **v0.1.2512** — Light metric-unit / divider opacity opaque (`.metric-unit`, `.cpu-divider`).
-- **v0.1.2511** — Settings note underline opaque across themes.
-- **v0.1.2510** — Light process-bar / Changelog accent leftovers opaque.
-- Earlier same night: Light + Swiss opaque stack through battery/icon-line (**v0.1.2490–2509**).
+- **v0.1.2514** — Material / Swiss `.metric-label` · `.metric-subtext` (and Material `.ring-track`) off remaining opacity glass onto opaque `color-mix` against `#e7e2d9` / `#ffffff` (Light parity after section-title v0.1.2513).
+- **v0.1.2513** (earlier tick) — Light / Material / Swiss `.section-title` off invalid glass `rgb(1,1,1,0.75)`.
+- **v0.1.2512** — Light `.metric-unit` / `.cpu-divider` opacity opaque.
+- Backfill keep logged for **v0.1.2513** (missed `results.tsv` row).
 
 ## Tried / notes
 
-- Digester open empty. Design review grace. Layout daily: Data Poster marked checked.
-- Parallel race: local section-title as v0.1.2512 discarded (origin already had metric-unit/divider at 2512); re-shipped as **v0.1.2513**.
-- Mac Screen Recording TCC still blocks fresh `docs/screens/` captures.
+- Digester empty (0 turns / 7d). Design-review grace; layout-daily already marked for Data Poster today.
+- Sibling OpenClaw/Hermes missing on this rack.
+- Debug.log quiet (no ERROR/WARN clusters in 180m).
+- Mac `docs/screens/` recapture still TCC-blocked (`screencapture -l`).
 
 ## Next fuel
 
-- Intentional decorative gradient leftovers only, or Mac capture when TCC allows.
+Intentional decorative gradient leftovers only, or Mac capture of stale `feature-cpu-metrics.png` / `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows.
