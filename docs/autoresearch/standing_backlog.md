@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2495
+
+- Swiss-minimalistic Settings modal chrome opaque (`.theme-item` · `.settings-input` / `.discord-token-input` · `.settings-btn` / primary · `.settings-help-sheet` · `.force-quit-section` / `.force-quit-btn` · Changelog scrollbar track/thumb · `.changelog-error`) glass `rgba` / `color-mix(…, transparent)` → opaque `color-mix` on paper `#ffffff` (Material-parity after Monitors popover v0.1.2494). Standing P2 #14; design-review Settings adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Swiss Debug Log / history time-range / tooltip / `.changelog-code` leftovers / Light shell opaque, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2494
 
 - Swiss-minimalistic Monitors menu + settings popover opaque (`.monitors-menu-btn` · `.monitors-menu` · `.monitors-menu-item:hover` · settings popover backdrop/content/header/close · `.monitor-settings-item` / URL / remove · `.add-monitor-form` input) glass `rgba` → opaque `color-mix` on paper `#ffffff` / `#f6f6f6` (Material-parity after AI Chat v0.1.2493). Standing P2 #14; design-review `feature-monitors` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Swiss remaining modal `rgba` leftovers / Light shell opaque, or Mac capture of stale `feature-monitors.png` / `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
