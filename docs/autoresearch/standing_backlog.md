@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2472
+
+- Data Poster / Dark / Neon / Futuristic Debug Log viewer + Monitors detail CRT (`.logs-viewer` resting · focus-visible · `.monitor-detail` resting) Apple `#ffffff` → `#0b0b10` / CRT `#0a0a0a` / `#08120c` / `#0b0b10` (empty/filter/log substates already remapped). Standing P2 #14 after Disk Cleanup list-row CRT v0.1.2471; design-review `feature-monitors` / Debug Log adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark remaps (e.g. Disk Cleanup add-scope chrome if still Apple) if any, or Mac capture of stale `feature-monitors.png` / `feature-disk-cleanup.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2471
 
 - Data Poster / Dark / Neon / Futuristic Disk Cleanup list-row CRT (`.disk-cleanup-item` resting · hover · focus · selected · `.has-reclaim` · `.is-big`) Apple `#ffffff` → `#0b0b10` / CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Copied already remapped). Standing P2 #14 after section-header CRT v0.1.2470; design-review `feature-disk-cleanup` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark remaps (e.g. `.logs-viewer` · `.monitor-detail` · `.perplexity-empty` if still Apple) if any, or Mac capture of stale `feature-disk-cleanup.png` / `feature-monitors.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.

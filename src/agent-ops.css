@@ -25605,3 +25605,63 @@ body.theme-futuristic .disk-cleanup-item.has-reclaim.is-big:focus-visible {
     inset 3px 0 0 color-mix(in srgb, #ff453a 85%, #0b0b10),
     0 0 0 3px color-mix(in srgb, #ff453a 20%, #0b0b10);
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
+ * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
+ * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log
+ * substates remapped earlier. Standing P2 #14 after Disk Cleanup list-row CRT
+ * v0.1.2471; design-review `feature-monitors` / Debug Log adjacent
+ * (polish-without-capture grace; Mac capture deferred — Screen Recording TCC /
+ * menu-bar only).
+ */
+body.theme-data-poster .logs-viewer {
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 12%, #0b0b10);
+}
+body.theme-dark .logs-viewer {
+  background: color-mix(in srgb, currentColor 4%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 12%, #0a0a0a);
+}
+body.theme-neon .logs-viewer {
+  background: color-mix(in srgb, currentColor 4%, #08120c);
+  border-color: color-mix(in srgb, currentColor 12%, #08120c);
+}
+body.theme-futuristic .logs-viewer {
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 12%, #0b0b10);
+}
+
+body.theme-data-poster .logs-viewer:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 35%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+}
+body.theme-dark .logs-viewer:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 35%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 14%, #0a0a0a);
+}
+body.theme-neon .logs-viewer:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 35%, #08120c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 14%, #08120c);
+}
+body.theme-futuristic .logs-viewer:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 35%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 14%, #0b0b10);
+}
+
+body.theme-data-poster .monitor-detail {
+  border-color: color-mix(in srgb, var(--hairline, currentColor) 55%, #0b0b10);
+  background: color-mix(in srgb, var(--glass-fill, currentColor) 18%, #0b0b10);
+}
+body.theme-dark .monitor-detail {
+  border-color: color-mix(in srgb, var(--hairline, currentColor) 55%, #0a0a0a);
+  background: color-mix(in srgb, var(--glass-fill, currentColor) 18%, #0a0a0a);
+}
+body.theme-neon .monitor-detail {
+  border-color: color-mix(in srgb, var(--hairline, currentColor) 55%, #08120c);
+  background: color-mix(in srgb, var(--glass-fill, currentColor) 18%, #08120c);
+}
+body.theme-futuristic .monitor-detail {
+  border-color: color-mix(in srgb, var(--hairline, currentColor) 55%, #0b0b10);
+  background: color-mix(in srgb, var(--glass-fill, currentColor) 18%, #0b0b10);
+}
