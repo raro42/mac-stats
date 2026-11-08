@@ -7,6 +7,11 @@
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2488] - 2026-11-08
+
+### Changed
+- **Material battery / icon-line / history-controls opaque (#14):** `.battery-icon` resting/charging, `.icon-line-item` resting/hover + status-good/warning/bad type, and `.history-controls label` move off glass `rgba` onto opaque `color-mix` against Material paper `#e7e2d9` (Architect-parity after history/tooltip v0.1.2487). Standing P2 #14; design-review `feature-cpu-metrics` adjacent (polish-without-capture grace; Mac recapture deferred, Screen Recording TCC / menu-bar only). Next: Material remaining glass leftovers (muted var fallbacks / Swiss-minimalistic / Light shell opaque), or Mac capture when TCC allows.
+
 ## [0.1.2487] - 2026-11-08
 
 ### Changed
