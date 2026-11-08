@@ -4,16 +4,16 @@ Window: 2026-11-08 20:00 → 2026-11-09 (CEST)
 
 ## Shipped
 
-- **v0.1.2510** — Light process-bar / Changelog accent leftovers opaque (`.process-bar-fill`, `.setting-note a`, Changelog version/bullet). Light live glass `rgba` property values cleared.
-- **v0.1.2509** (sibling tick) — Light Monitors/collapse muted-var opaque.
-- Earlier same night: Light + Swiss opaque stack through battery/icon-line (**v0.1.2490–2508**).
+- **v0.1.2512** — Light metric-unit / divider opacity opaque (`.metric-unit`, `.cpu-divider`). Opacity glass → opaque `color-mix` on paper `#ffffff`.
+- **v0.1.2511** — Settings note underline opaque across themes (sibling tick).
+- **v0.1.2510** — Light process-bar / Changelog accent leftovers opaque.
+- Earlier same night: Light + Swiss opaque stack through battery/icon-line (**v0.1.2490–2509**).
 
 ## Tried / notes
 
-- Digester open empty. Design review grace (marked `feature-monitors` / `feature-processes`). Layout daily already done today.
-- Concurrent sibling took muted-var as 2509 mid-tick; this tick finished the leftovers as 2510.
+- Digester open empty. Design review grace. Layout daily due → Data Poster remaps clean; marked checked; shipped Light opacity leftovers (standing P2 #14) as the product experiment.
 - Mac Screen Recording TCC still blocks fresh `docs/screens/` captures.
 
 ## Next fuel
 
-- Apple / other theme shell opaque if still glass, or Mac capture when TCC allows.
+- Other theme opacity glass leftovers if any, or Mac capture when TCC allows.
