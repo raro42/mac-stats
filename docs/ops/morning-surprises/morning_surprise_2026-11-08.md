@@ -1,25 +1,18 @@
 # Morning surprise — 2026-11-08
 
-Overnight Track B (product CRT / opaque shells, standing P2 #14). Digester open stayed empty; design-review surfaces stayed in polish-without-capture grace (Screen Recording TCC / menu-bar only). Layout-daily marked `dark` checked after CRT.
+Overnight Track B kept CRT opaque remaps rolling on dark shells (standing P2 #14). Digester stayed empty; design-review stayed in polish-without-capture grace (Mac Screen Recording TCC still blocks fresh `docs/screens/` grabs).
 
-## Shipped (keeps)
+## Shipped tonight (highlights)
 
-| Version | What |
-|---------|------|
-| v0.1.2464 | Disk Cleanup meta-card CRT |
-| v0.1.2466 | Perplexity result + weather CRT |
-| v0.1.2468 | Top Processes bar CRT |
-| v0.1.2470 | Collapsible section-header CRT |
-| v0.1.2471 | Disk Cleanup list-row CRT |
-| v0.1.2472 | Debug Log viewer + Monitors detail CRT |
-| v0.1.2473 | Disk Cleanup scope-row CRT |
-| **v0.1.2474** | **Debug Log toolbar CRT** (resting · button · hover · focus) |
+- **v0.1.2475** — Dark / Neon / Futuristic Top Processes `.process-row.is-selected` CRT (off Apple `#ffffff` → `#0a0a0a` / `#08120c` / `#0b0b10`; Data Poster already remapped).
+- **v0.1.2474** — Data Poster / Dark / Neon / Futuristic Debug Log `.logs-toolbar` CRT (resting / button / hover / focus-visible).
+- Earlier same night: Disk Cleanup add-scope / list-row, Debug Log viewer + Monitors detail, section-header, Monitors row status, Top Processes bar, and more CRT catch-ups (see CHANGELOG / standing_backlog).
 
-## Fitness
+## Tried / deferred
 
-Dark / Neon / Futuristic / Data Poster Debug Log toolbars no longer flash Apple `#ffffff` slabs on opaque shells.
+- Sibling OpenClaw / Hermes: missing on this Linux rack (no port fuel).
+- Window-only screen recapture for stale `feature-*.png`: still TCC-blocked; polish-without-capture grace only.
 
-## Still open
+## Why it matters
 
-- `.process-row.is-selected` Dark/Neon/Futuristic CRT (Data Poster already remapped).
-- Mac recapture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+Selected process rows no longer flash a white Apple wash on Dark / Neon / Futuristic. Same family of #14 compositor-friendly opaque shells as the rest of tonight’s CRT pass.
