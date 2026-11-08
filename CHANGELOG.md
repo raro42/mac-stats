@@ -7,6 +7,11 @@
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2499] - 2026-11-08
+
+### Changed
+- **Swiss-minimalistic Monitors/collapse muted-var opaque (#14):** `.collapse-btn` resting/hover, `.monitor-info` secondary, `.monitor-history` hairline, and `.theme-github-link:hover` move off glass `rgba` var fallbacks onto opaque `color-mix` against Swiss paper `#ffffff` (Material-parity after battery/icon-line v0.1.2498; Swiss live glass `rgba` property values cleared). Standing P2 #14; design-review `feature-monitors` adjacent (polish-without-capture grace; Mac recapture deferred, Screen Recording TCC / menu-bar only). Next: Light shell opaque, or Mac capture when TCC allows.
+
 ## [0.1.2498] - 2026-11-08
 
 ### Changed
