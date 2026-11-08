@@ -1,20 +1,19 @@
 # Morning surprise — 2026-11-08
 
-Overnight Track B kept shipping dark-shell CRT catch-ups (standing P2 #14). Digester open stayed empty; design-review stayed on polish-without-capture grace (Screen Recording TCC / menu-bar only).
+Overnight Track B kept CRT opaque remaps rolling on dark shells (standing P2 #14). Digester stayed empty; design-review stayed in polish-without-capture grace (Mac Screen Recording TCC still blocks fresh `docs/screens/` grabs).
 
-## Shipped tonight (selected)
+## Shipped tonight (highlights)
 
-- **v0.1.2476** — Neon / Futuristic AI Chat glance soft-state CRT (`has-answer` · `has-errors` · circuit · Copied · answer/errors hover/focus) off Apple `#ffffff` onto `#08120c` / `#0b0b10`.
+- **v0.1.2477** — Neon / Futuristic AI Chat `.chat-offline-attention-glance` soft-state CRT (hover / focus-visible / circuit / no-model / not-set / ready / continue / sending / filter / errors / last-answer / Copied off Apple `#ffffff` → `#08120c` / `#0b0b10`; Data Poster + Dark already remapped).
+- **v0.1.2476** — Neon / Futuristic AI Chat glance soft-state CRT (answer/errors hover · focus · has-answer · has-errors · circuit · Copied).
 - **v0.1.2475** — Dark / Neon / Futuristic Top Processes `.process-row.is-selected` CRT.
-- **v0.1.2474** — Debug Log `.logs-toolbar` CRT on Data Poster / Dark / Neon / Futuristic.
-- **v0.1.2473** — Disk Cleanup `.disk-cleanup-scope-row` CRT.
-- Earlier same night: logs-viewer / monitor-detail, section-header hover, process-bar, monitors detail-log, Perplexity/Disk Cleanup chrome, and more CRT remaps (see `CHANGELOG.md` / `results.tsv`).
+- Earlier same night: Debug Log toolbar, Disk Cleanup add-scope / list-row, Debug Log viewer + Monitors detail, section-header, Monitors row status, Top Processes bar, and more CRT catch-ups (see CHANGELOG / standing_backlog).
 
 ## Tried / deferred
 
-- Mac window-only recapture of stale `feature-*.png` — blocked (TCC / no CPU window in Quartz list).
-- Digester Slowest — empty after noise filters (not a quiet default; standing CRT backlog fueled keeps).
+- Sibling OpenClaw / Hermes: missing on this Linux rack (no port fuel).
+- Window-only screen recapture for stale `feature-*.png`: still TCC-blocked; polish-without-capture grace only.
 
-## Fitness
+## Why it matters
 
-Dark themes no longer flash white slabs on AI Chat soft glances (Neon/Futuristic catch-up to Data Poster + Dark). Nightly keep-or-discard satisfied many times over.
+Collapsed AI Chat offline-attention chips no longer flash a white Apple wash on Neon / Futuristic when Ready / Errors / Circuit / Copied. Same #14 opaque-shell family as the rest of tonight’s CRT pass.
