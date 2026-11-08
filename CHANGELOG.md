@@ -7,6 +7,11 @@
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2493] - 2026-11-08
+
+### Changed
+- **Swiss-minimalistic AI Chat opaque (#14):** `.ollama-menu-btn` / menu / item hover, settings popover backdrop/close, `.model-text` / dropdown / `.model-select`, `.chat-messages` / `.chat-message.user/.assistant`, markdown blockquote/code/pre/table/hr/a, and `.thinking-dots` move off glass `rgba` onto opaque `color-mix` against Swiss paper `#ffffff` / `#f6f6f6` (Material-parity after Settings/Monitors v0.1.2492). Standing P2 #14; design-review `feature-ai-chat` adjacent (polish-without-capture grace; Mac recapture deferred, Screen Recording TCC / menu-bar only). Next: Swiss remaining modal `rgba` leftovers / Light shell opaque, or Mac capture when TCC allows.
+
 ## [0.1.2492] - 2026-11-08
 
 ### Changed

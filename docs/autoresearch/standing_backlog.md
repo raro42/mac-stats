@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2493
+
+- Swiss-minimalistic AI Chat opaque (`.ollama-menu-btn` · `.ollama-menu` · `.ollama-menu-item:hover` · settings popover backdrop/close · `.model-text` · `.model-select-dropdown` · `.model-select` · `.chat-messages` · `.chat-message.user/.assistant` · markdown blockquote/code/pre/table/hr/a · `.thinking-dots`) glass `rgba` → opaque `color-mix` on paper `#ffffff` / `#f6f6f6` (Material-parity after Settings/Monitors v0.1.2492). Standing P2 #14; design-review `feature-ai-chat` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Swiss remaining modal `rgba` leftovers / Light shell opaque, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2491
 
 ## Overnight merge — v0.1.2492
