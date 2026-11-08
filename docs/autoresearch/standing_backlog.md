@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2510
+
+- Light process-bar / Changelog accent leftovers opaque (`.process-bar-fill` · `.setting-note a` underline · Changelog version/bullet) glass `rgba` / `transparent` mixes → opaque `color-mix` on paper `#ffffff` (after Monitors/collapse muted-var v0.1.2509; Light live glass `rgba` property values cleared). Standing P2 #14; design-review Changelog / `feature-processes` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Apple / other theme shell opaque if still glass, or Mac capture of stale `feature-processes.png` / `feature-cpu-metrics.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2509
 
 - Light Monitors/collapse muted-var opaque (`.collapse-btn` resting · hover · `.monitor-info` secondary · `.monitor-history` hairline) glass `rgba` var fallbacks → opaque `color-mix` on paper `#ffffff` (Swiss-parity after battery/icon-line v0.1.2508; Light live glass `rgba` property values nearly cleared). Standing P2 #14; design-review `feature-monitors` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Light process-bar / Changelog accent leftovers if any, or Mac capture of stale `feature-monitors.png` / `feature-cpu-metrics.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.

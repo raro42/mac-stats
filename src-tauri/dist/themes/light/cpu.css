@@ -483,7 +483,12 @@ body {
 .process-bar-fill {
   height: 100%;
   width: 0;
-  background: linear-gradient(90deg, rgba(110, 170, 230, 0.95), rgba(140, 190, 240, 0.95));
+  /* Opaque fill — was blue glass rgba(110/140,…,0.95) gradient (#14). */
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, #6eaae6 95%, #ffffff),
+    color-mix(in srgb, #8cbef0 95%, #ffffff)
+  );
   border-radius: 99px;
 }
 
@@ -605,7 +610,8 @@ body {
 .setting-note a {
   color: var(--text);
   text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  /* Opaque underline — was color-mix(…, transparent) glass (#14). */
+  text-decoration-color: color-mix(in srgb, currentColor 35%, #ffffff);
   text-underline-offset: 2px;
 }
 
@@ -1191,7 +1197,8 @@ body {
 }
 
 .changelog-version {
-  color: rgba(0, 122, 255, 0.9);
+  /* Opaque accent — was rgba(0,122,255,0.9) glass (#14). */
+  color: color-mix(in srgb, #007aff 90%, #ffffff);
   font-weight: 800;
 }
 
@@ -1247,7 +1254,8 @@ body {
   content: "•";
   position: absolute;
   left: 0;
-  color: rgba(0, 122, 255, 0.6);
+  /* Opaque accent — was rgba(0,122,255,0.6) glass (#14). */
+  color: color-mix(in srgb, #007aff 60%, #ffffff);
   font-weight: bold;
 }
 
