@@ -405,7 +405,8 @@ body {
   font-weight: 400;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
-  color: rgb(1, 1, 1, 0.75);
+  /* Opaque type — was rgb(1,1,1,0.75) glass (#14). */
+  color: color-mix(in srgb, #010101 75%, #ffffff);
   text-transform: uppercase;
 }
 
