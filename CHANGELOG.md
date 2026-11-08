@@ -7,6 +7,11 @@
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2480] - 2026-11-08
+
+### Changed
+- **Material shell opaque (#14):** theme `:root` tokens (`--text` · `--muted` · `--rule` · `--hairline` · `--dial-*` · `--ring-track` · `--panel*` · `--modal*`), body wash, `.mat-card`, Details/Processes scrollbar thumbs, title type, header `.icon-btn`, and dial pad/inset move off glass `rgba` onto opaque `color-mix` against Material paper `#e7e2d9` (Architect-parity foundation). Standing P2 #14 after dark-shell CRT catch-up v0.1.2479; layout-daily adjacent (Material still had shell glass; Mac recapture deferred, Screen Recording TCC / menu-bar only). Next: Material tile / Settings / AI Chat / Monitors `rgba` leftovers, or Swiss-minimalistic / Light shell opaque, or Mac capture when TCC allows.
+
 ## [0.1.2479] - 2026-11-08
 
 ### Changed

@@ -9,23 +9,26 @@
 
   --paper: #e7e2d9;
   --paper2: #eee9e1;
-  --text: rgba(24, 24, 26, 0.85);
-  --muted: rgba(24, 24, 26, 0.55);
-  --rule: rgba(24, 24, 26, 0.14);
-  --hairline: rgba(24, 24, 26, 0.14);
+  /* Opaque type / line tokens — was ink glass rgba over the Material paper (#14). */
+  --text: color-mix(in srgb, #18181a 85%, #e7e2d9);
+  --muted: color-mix(in srgb, #18181a 55%, #e7e2d9);
+  --rule: color-mix(in srgb, #18181a 14%, #e7e2d9);
+  --hairline: color-mix(in srgb, #18181a 14%, #e7e2d9);
 
-  --dial-face: rgba(245, 241, 234, 0.80);
-  --dial-border: rgba(0, 0, 0, 0.10);
+  /* Opaque dial tokens — was dial-face / border glass rgba (#14). */
+  --dial-face: color-mix(in srgb, #f5f1ea 80%, #e7e2d9);
+  --dial-border: color-mix(in srgb, #000000 10%, #e7e2d9);
 
   --accent: #b8a68b;
   --warn: #e2b14a;
-  --ring-track: rgba(0, 0, 0, 0.12);
+  --ring-track: color-mix(in srgb, #000000 12%, #e7e2d9);
 
-  --panel: rgba(245, 241, 234, 0.96);
-  --panel-border: rgba(24, 24, 26, 0.14);
-  --panel-shadow: 0 28px 90px rgba(0, 0, 0, 0.22);
-  --modal: rgba(0, 0, 0, 0.32);
-  --modal-backdrop: rgba(0, 0, 0, 0.32);
+  /* Opaque panel / modal tokens — was panel glass rgba over the Material paper (#14). */
+  --panel: color-mix(in srgb, #f5f1ea 96%, #e7e2d9);
+  --panel-border: color-mix(in srgb, #18181a 14%, #e7e2d9);
+  --panel-shadow: 0 28px 90px color-mix(in srgb, #000000 22%, #e7e2d9);
+  --modal: color-mix(in srgb, #000000 32%, #e7e2d9);
+  --modal-backdrop: color-mix(in srgb, #000000 32%, #e7e2d9);
 }
 
 body {
@@ -36,8 +39,9 @@ body {
   color: var(--text);
 
   background:
-    radial-gradient(1000px 800px at 20% 15%, rgba(255, 255, 255, 0.40), rgba(255, 255, 255, 0) 55%),
-    radial-gradient(1000px 800px at 80% 20%, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 55%),
+    /* Opaque wash — was white glass rgba over the Material paper (#14). */
+    radial-gradient(1000px 800px at 20% 15%, color-mix(in srgb, #ffffff 40%, #e7e2d9), transparent 55%),
+    radial-gradient(1000px 800px at 80% 20%, color-mix(in srgb, #ffffff 32%, #e7e2d9), transparent 55%),
     linear-gradient(180deg, var(--paper2), var(--paper));
 }
 
@@ -50,9 +54,10 @@ body {
   margin: 0 auto;
 
   border-radius: 34px;
-  background: rgba(235, 228, 217, 0.86);
-  border: 1px solid rgba(0, 0, 0, 0.10);
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.18);
+  /* Opaque card — was warm glass rgba(235,228,217,0.86) (#14). */
+  background: color-mix(in srgb, #ebe4d9 86%, #e7e2d9);
+  border: 1px solid color-mix(in srgb, #000000 10%, #e7e2d9);
+  box-shadow: 0 30px 90px color-mix(in srgb, #000000 18%, #e7e2d9);
 
   padding: 36px 36px 26px;
   display: flex;
@@ -86,13 +91,15 @@ body {
 
 .mat-details::-webkit-scrollbar-thumb,
 .mat-processes::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
+  /* Opaque thumb — was rgba(0,0,0,0.15) glass (#14). */
+  background: color-mix(in srgb, #000000 15%, #e7e2d9);
   border-radius: 3px;
 }
 
 .mat-details::-webkit-scrollbar-thumb:hover,
 .mat-processes::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.25);
+  /* Opaque hover — was rgba(0,0,0,0.25) glass (#14). */
+  background: color-mix(in srgb, #000000 25%, #e7e2d9);
 }
 
 .mat-header {
@@ -113,7 +120,8 @@ body {
   font-weight: 400;
   letter-spacing: -0.01em;
   line-height: 1.05;
-  color: rgba(24, 24, 26, 0.92);
+  /* Opaque type — was rgba(24,24,26,0.92) glass (#14). */
+  color: color-mix(in srgb, #18181a 92%, #e7e2d9);
   display: inline-block;
 }
 
@@ -136,13 +144,14 @@ body {
   width: 56px;
   height: 56px;
   border-radius: 999px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  background: rgba(255, 255, 255, 0.40);
-  color: rgba(24, 24, 26, 0.55);
+  /* Opaque chrome — was white / ink glass rgba (#14). */
+  border: 1px solid color-mix(in srgb, #000000 12%, #e7e2d9);
+  background: color-mix(in srgb, #ffffff 40%, #e7e2d9);
+  color: color-mix(in srgb, #18181a 55%, #e7e2d9);
   font-size: 22px;
   cursor: pointer;
 
-  box-shadow: 0 14px 24px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 14px 24px color-mix(in srgb, #000000 18%, #e7e2d9);
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
   transition: none;
 
@@ -175,7 +184,8 @@ body {
   position: relative;
   min-height: 250px;
   border-radius: 28px;
-  background: rgba(255, 255, 255, 0.06);
+  /* Opaque dial pad — was white glass rgba(255,255,255,0.06) (#14). */
+  background: color-mix(in srgb, #ffffff 6%, #e7e2d9);
   padding: 16px 12px 12px;
   overflow: hidden;
 }
@@ -187,10 +197,11 @@ body {
   border-radius: 999px;
   background: var(--dial-face);
   border: 1px solid var(--dial-border);
+  /* Opaque inset / drop — was white/black glass rgba (#14). */
   box-shadow:
-    inset 0 2px 5px rgba(255, 255, 255, 0.45),
-    inset 0 -6px 16px rgba(0, 0, 0, 0.18),
-    0 18px 40px rgba(0, 0, 0, 0.22);
+    inset 0 2px 5px color-mix(in srgb, #ffffff 45%, #e7e2d9),
+    inset 0 -6px 16px color-mix(in srgb, #000000 18%, #e7e2d9),
+    0 18px 40px color-mix(in srgb, #000000 22%, #e7e2d9);
 }
 
 /* Usage card clickable */

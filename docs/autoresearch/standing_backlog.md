@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2480
+
+- Material shell opaque (`:root` tokens · body wash · `.mat-card` · Details/Processes scrollbar · title · `.icon-btn` · dial pad/inset) glass `rgba` → opaque `color-mix` on paper `#e7e2d9` (Architect-parity foundation). Standing P2 #14 after dark-shell CRT catch-up v0.1.2479; layout-daily adjacent (Material shell glass; Mac capture still TCC-blocked). Next: Material tile / Settings / AI Chat / Monitors `rgba` leftovers, or Swiss-minimalistic / Light shell opaque, or Mac capture of stale `feature-cpu-metrics.png` / `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2479
 
 - Dark / Neon / Futuristic AI Chat filter-chip You/Assistant/Errors CRT (`.chat-filter-chip[data-chat-filter=you|assistant|errors].has-hits` · `.is-active`) Apple `#ffffff` → CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster already remapped; attribute selectors beat generic chip CRT). Standing P2 #14 after collapsed-active + assistant-error CRT v0.1.2478; design-review `feature-ai-chat` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark remaps if any, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
