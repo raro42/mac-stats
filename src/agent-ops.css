@@ -25387,3 +25387,221 @@ body.theme-futuristic .section-header-collapsible:focus-visible {
   background: color-mix(in srgb, var(--accent, #3bd6ff) 8%, #0b0b10);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 16%, #0b0b10);
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Disk Cleanup list rows still mix Apple
+ * `#ffffff` washes (`.disk-cleanup-item` resting / hover / focus / selected ·
+ * `.has-reclaim` · `.is-big`) → white slab on opaque shells. Copied badge remapped
+ * earlier. Standing P2 #14 after section-header CRT v0.1.2470; design-review
+ * `feature-disk-cleanup` adjacent (polish-without-capture grace; Mac capture
+ * deferred — Screen Recording TCC / menu-bar only).
+ */
+body.theme-data-poster .disk-cleanup-item {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-item {
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-item {
+  border-color: color-mix(in srgb, currentColor 10%, #08120c);
+  background: color-mix(in srgb, currentColor 3%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-item {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-item:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-item:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-item:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #08120c);
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-item:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-item:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-item:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 34%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 16%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-item:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 34%, #08120c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 16%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-item:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 34%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 16%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 6%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 6%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 28%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 6%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 6%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-item.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 6%, #0b0b10);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff9f0a 70%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-item.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0a0a0a);
+  background: color-mix(in srgb, #ff9f0a 6%, #0a0a0a);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff9f0a 70%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-item.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #08120c);
+  background: color-mix(in srgb, #ff9f0a 6%, #08120c);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff9f0a 70%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-item.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 6%, #0b0b10);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff9f0a 70%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-item.has-reclaim:hover {
+  background: color-mix(in srgb, #ff9f0a 10%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-item.has-reclaim:hover {
+  background: color-mix(in srgb, #ff9f0a 10%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-item.has-reclaim:hover {
+  background: color-mix(in srgb, #ff9f0a 10%, #08120c);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-item.has-reclaim:hover {
+  background: color-mix(in srgb, #ff9f0a 10%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-item.has-reclaim.is-selected,
+body.theme-data-poster .disk-cleanup-item.has-reclaim:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 11%, #0b0b10);
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #ff9f0a 80%, #0b0b10),
+    0 0 0 3px color-mix(in srgb, #ff9f0a 18%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-item.has-reclaim.is-selected,
+body.theme-dark .disk-cleanup-item.has-reclaim:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #0a0a0a);
+  background: color-mix(in srgb, #ff9f0a 11%, #0a0a0a);
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #ff9f0a 80%, #0a0a0a),
+    0 0 0 3px color-mix(in srgb, #ff9f0a 18%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-item.has-reclaim.is-selected,
+body.theme-neon .disk-cleanup-item.has-reclaim:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #08120c);
+  background: color-mix(in srgb, #ff9f0a 11%, #08120c);
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #ff9f0a 80%, #08120c),
+    0 0 0 3px color-mix(in srgb, #ff9f0a 18%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-item.has-reclaim.is-selected,
+body.theme-futuristic .disk-cleanup-item.has-reclaim:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 11%, #0b0b10);
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #ff9f0a 80%, #0b0b10),
+    0 0 0 3px color-mix(in srgb, #ff9f0a 18%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-item.has-reclaim.is-big {
+  border-color: color-mix(in srgb, #ff453a 30%, #0b0b10);
+  background: color-mix(in srgb, #ff453a 7%, #0b0b10);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff453a 75%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-item.has-reclaim.is-big {
+  border-color: color-mix(in srgb, #ff453a 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff453a 7%, #0a0a0a);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff453a 75%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-item.has-reclaim.is-big {
+  border-color: color-mix(in srgb, #ff453a 30%, #08120c);
+  background: color-mix(in srgb, #ff453a 7%, #08120c);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff453a 75%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-item.has-reclaim.is-big {
+  border-color: color-mix(in srgb, #ff453a 30%, #0b0b10);
+  background: color-mix(in srgb, #ff453a 7%, #0b0b10);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff453a 75%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-item.has-reclaim.is-big:hover {
+  background: color-mix(in srgb, #ff453a 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff453a 44%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-item.has-reclaim.is-big:hover {
+  background: color-mix(in srgb, #ff453a 12%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff453a 44%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-item.has-reclaim.is-big:hover {
+  background: color-mix(in srgb, #ff453a 12%, #08120c);
+  border-color: color-mix(in srgb, #ff453a 44%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-item.has-reclaim.is-big:hover {
+  background: color-mix(in srgb, #ff453a 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff453a 44%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-item.has-reclaim.is-big.is-selected,
+body.theme-data-poster .disk-cleanup-item.has-reclaim.is-big:focus-visible {
+  border-color: color-mix(in srgb, #ff453a 52%, #0b0b10);
+  background: color-mix(in srgb, #ff453a 13%, #0b0b10);
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #ff453a 85%, #0b0b10),
+    0 0 0 3px color-mix(in srgb, #ff453a 20%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-item.has-reclaim.is-big.is-selected,
+body.theme-dark .disk-cleanup-item.has-reclaim.is-big:focus-visible {
+  border-color: color-mix(in srgb, #ff453a 52%, #0a0a0a);
+  background: color-mix(in srgb, #ff453a 13%, #0a0a0a);
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #ff453a 85%, #0a0a0a),
+    0 0 0 3px color-mix(in srgb, #ff453a 20%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-item.has-reclaim.is-big.is-selected,
+body.theme-neon .disk-cleanup-item.has-reclaim.is-big:focus-visible {
+  border-color: color-mix(in srgb, #ff453a 52%, #08120c);
+  background: color-mix(in srgb, #ff453a 13%, #08120c);
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #ff453a 85%, #08120c),
+    0 0 0 3px color-mix(in srgb, #ff453a 20%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-item.has-reclaim.is-big.is-selected,
+body.theme-futuristic .disk-cleanup-item.has-reclaim.is-big:focus-visible {
+  border-color: color-mix(in srgb, #ff453a 52%, #0b0b10);
+  background: color-mix(in srgb, #ff453a 13%, #0b0b10);
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #ff453a 85%, #0b0b10),
+    0 0 0 3px color-mix(in srgb, #ff453a 20%, #0b0b10);
+}
