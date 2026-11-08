@@ -189,8 +189,9 @@ body {
 
 .cpu-divider {
   height: 1px;
-  background: var(--hairline);
-  opacity: 0.9;
+  /* Opaque hairline — was opacity 0.9 on --hairline (~10% ink) → ~9% ink on paper (#14). */
+  background: color-mix(in srgb, #0c0c10 9%, #ffffff);
+  opacity: 1;
   flex-shrink: 0; /* Don't shrink dividers */
 }
 
@@ -303,7 +304,9 @@ body {
   position: relative;
   top: 0;
   margin-left: 1px;
-  opacity: 0.68;
+  /* Was opacity 0.68 on inherit (~86% ink via --text) → ~58% ink on paper (#14). */
+  color: color-mix(in srgb, #0c0c10 58%, #ffffff);
+  opacity: 1;
 }
 
 .metric-subtext {

@@ -1,6 +1,10 @@
+## Overnight merge — v0.1.2512
+
+- Light metric-unit / divider opacity opaque (`.metric-unit` · `.cpu-divider`) opacity glass → opaque `color-mix` on paper `#ffffff` (after Settings note underline v0.1.2511; disabled / connection-indicator hover opacity left alone). Standing P2 #14; design-review `feature-cpu-metrics` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other theme opacity glass leftovers if any, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2511
 
-- Settings note underline opaque (Apple / Architect / Material / Swiss-minimalistic / Data Poster / Dark / Neon / Futuristic `.setting-note a`) glass `color-mix(…, transparent)` → opaque `color-mix` on each theme paper (Light-parity after process-bar / Changelog accent v0.1.2510). Standing P2 #14; layout-daily Data Poster adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: other glass leftovers if any, or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
+- Settings note underline opaque (Apple / Architect / Material / Swiss-minimalistic / Data Poster / Dark / Neon / Futuristic `.setting-note a`) glass `color-mix(…, transparent)` → opaque `color-mix` on each theme paper (Light-parity after process-bar / Changelog accent v0.1.2510). Standing P2 #14; layout-daily Data Poster adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: Light metric-unit / divider opacity leftovers if any, or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
 
 ## Overnight merge — v0.1.2510
 
