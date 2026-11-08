@@ -1,3 +1,7 @@
+## Overnight merge — 0.1.2476
+
+- Neon / Futuristic AI Chat glance soft-state CRT (answer/errors hover · focus-visible · has-answer · has-errors · circuit · Copied) Apple `#ffffff` → `#08120c` / `#0b0b10` (Data Poster + Dark already remapped). Standing P2 #14 after selected-row CRT v0.1.2475; design-review `feature-ai-chat` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing dark remaps if any, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2475
 
 - Dark / Neon / Futuristic Top Processes selected-row CRT (`.process-row.is-selected` background · inset ring) Apple `#ffffff` → CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster already remapped). Standing P2 #14 after Debug Log toolbar CRT v0.1.2474; design-review `feature-processes` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark remaps (e.g. Neon/Futuristic chat glance soft states if still Apple) if any, or Mac capture of stale `feature-processes.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.

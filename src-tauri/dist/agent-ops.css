@@ -25845,3 +25845,92 @@ body.theme-futuristic .process-row.is-selected {
   background: color-mix(in srgb, #0a84ff 12%, #0b0b10);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #0b0b10);
 }
+
+/*
+ * Neon / Futuristic: AI Chat glance soft states still mix Apple `#ffffff`
+ * (answer/errors hover · focus-visible · has-answer · has-errors · circuit ·
+ * Copied) → white slab on phosphor / CRT shells. Early Neon/Futuristic remaps
+ * cover resting + online/offline/active only; Data Poster + Dark late CRT
+ * already catch soft states. Standing P2 #14 after selected-row CRT v0.1.2475;
+ * design-review `feature-ai-chat` adjacent (polish-without-capture grace; Mac
+ * capture deferred — Screen Recording TCC / menu-bar only).
+ */
+/* --- Neon (#08120c) --- */
+body.theme-neon .chat-model-glance:hover,
+body.theme-neon .chat-turn-glance:hover,
+body.theme-neon .chat-answer-glance:hover,
+body.theme-neon .chat-errors-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #08120c);
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+}
+body.theme-neon .chat-model-glance:focus-visible,
+body.theme-neon .chat-turn-glance:focus-visible,
+body.theme-neon .chat-answer-glance:focus-visible,
+body.theme-neon .chat-errors-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
+}
+body.theme-neon .chat-model-glance.is-online,
+body.theme-neon .chat-turn-glance.is-ok:not(.is-active),
+body.theme-neon .chat-answer-glance.has-answer:not(.has-errors) {
+  border-color: color-mix(in srgb, #34c759 28%, #08120c);
+  background: color-mix(in srgb, #34c759 7%, #08120c);
+}
+body.theme-neon .chat-model-glance.is-offline,
+body.theme-neon .chat-model-glance.is-online.is-no-model,
+body.theme-neon .chat-model-glance.is-offline.is-circuit {
+  border-color: color-mix(in srgb, #ff9500 30%, #08120c);
+  background: color-mix(in srgb, #ff9500 7%, #08120c);
+}
+body.theme-neon .chat-turn-glance.is-active {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 34%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 8%, #08120c);
+}
+body.theme-neon .chat-answer-glance.has-errors,
+body.theme-neon .chat-errors-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #08120c);
+  background: color-mix(in srgb, #ff3b30 7%, #08120c);
+}
+body.theme-neon .chat-answer-glance.is-just-copied {
+  border-color: color-mix(in srgb, #34c759 40%, #08120c);
+  background: color-mix(in srgb, #34c759 10%, #08120c);
+}
+
+/* --- Futuristic (#0b0b10) --- */
+body.theme-futuristic .chat-model-glance:hover,
+body.theme-futuristic .chat-turn-glance:hover,
+body.theme-futuristic .chat-answer-glance:hover,
+body.theme-futuristic .chat-errors-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-futuristic .chat-model-glance:focus-visible,
+body.theme-futuristic .chat-turn-glance:focus-visible,
+body.theme-futuristic .chat-answer-glance:focus-visible,
+body.theme-futuristic .chat-errors-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-futuristic .chat-model-glance.is-online,
+body.theme-futuristic .chat-turn-glance.is-ok:not(.is-active),
+body.theme-futuristic .chat-answer-glance.has-answer:not(.has-errors) {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+body.theme-futuristic .chat-model-glance.is-offline,
+body.theme-futuristic .chat-model-glance.is-online.is-no-model,
+body.theme-futuristic .chat-model-glance.is-offline.is-circuit {
+  border-color: color-mix(in srgb, #ff9500 30%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 7%, #0b0b10);
+}
+body.theme-futuristic .chat-turn-glance.is-active {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 8%, #0b0b10);
+}
+body.theme-futuristic .chat-answer-glance.has-errors,
+body.theme-futuristic .chat-errors-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+}
+body.theme-futuristic .chat-answer-glance.is-just-copied {
+  border-color: color-mix(in srgb, #34c759 40%, #0b0b10);
+  background: color-mix(in srgb, #34c759 10%, #0b0b10);
+}
