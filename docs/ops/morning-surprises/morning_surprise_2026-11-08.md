@@ -4,16 +4,19 @@ Overnight Track B kept opaque remaps rolling (standing P2 #14). Digester stayed 
 
 ## Shipped tonight (highlights)
 
-- **v0.1.2481** — Material history tile + Top Processes + battery strip opaque (`.history-chart-container` early/late · Details `.details-grid` · process row/name/bar/percent · `.battery-power-strip`) glass `rgba` → `#e7e2d9` mixes (Architect-parity after shell foundation).
-- **v0.1.2480** — Material shell opaque foundation (`:root` tokens · body wash · `.mat-card` · Details/Processes scrollbar · title · `.icon-btn` · dial pad/inset).
-- Earlier same night: Dark / Neon / Futuristic AI Chat filter-chip You/Assistant/Errors CRT (**v0.1.2479**), collapsed-active + assistant-error (**v0.1.2478**), offline-attention / glance soft states, Top Processes selected-row, Debug Log toolbar, Disk Cleanup scope/list rows, and more CRT catch-ups (see CHANGELOG / standing_backlog).
+- **v0.1.2482** — Material Settings + Monitors opaque (`.settings-card` · header hairline · `.setting-toggle` tracks/checked · late `.toggle-label` · `.add-btn-small` · `.monitor-item`) glass `rgba` → `#e7e2d9` mixes (Architect-parity after tile/battery).
+- **v0.1.2481** — Material history tile + Top Processes + battery strip opaque (`.history-chart-container` · Details `.details-grid` · process row/name/bar/percent · `.battery-power-strip`).
+- **v0.1.2480** — Material shell opaque foundation (`:root` tokens · body wash · `.mat-card` · scrollbar · title · `.icon-btn` · dial pad/inset).
+- Earlier same night: Dark / Neon / Futuristic AI Chat filter-chip / collapsed-active / offline soft-state CRT catch-ups (see CHANGELOG from ~0.1.2464).
 
 ## Tried / deferred
 
-- Sibling OpenClaw / Hermes: missing on this Linux rack (no port fuel).
+- Local Material history+processes as v0.1.2481 raced sibling ship of the same version (plus battery strip) → discard; continued with Settings/Monitors as **v0.1.2482**.
 - Window-only screen recapture for stale `feature-*.png`: still TCC-blocked; polish-without-capture grace only.
-- Next Material leftovers: Settings / AI Chat / Monitors `rgba` (e.g. `.toggle-label`), or Swiss-minimalistic / Light shell opaque.
+- Next: Material AI Chat / remaining modal `rgba`, or Swiss-minimalistic / Light shell opaque.
 
 ## Why it matters
 
-Material sparklines, process bars, and the battery strip no longer sit on white glass washes that keep the WebView compositor busy. Same #14 opaque-shell family as Architect, now catching up on Material.
+Material Settings toggles and Monitors rows no longer sit on white glass washes that keep the WebView compositor busy. Same #14 opaque-shell family as Architect, catching up on Material chrome.
+
+keep @ 0b0a893c · results.tsv updated.
