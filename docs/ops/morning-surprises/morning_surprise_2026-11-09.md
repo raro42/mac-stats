@@ -1,15 +1,24 @@
 # Morning surprise — 2026-11-09
 
-Overnight Track B moved from Swiss-minimalistic into Light opaque remaps (standing P2 #14).
+Overnight autoresearch (Track B) — Swiss then Light glass → opaque parity (#14).
 
 ## Shipped
-- **v0.1.2501** — Light history tile + Top Processes + metric labels opaque: `.metric-label` / `.metric-subtext`, `.history-chart-container` early/late wash+inset+shadow, `.ring-track` stroke, `.details-grid` type, and process row/name/bar/percent off glass `rgba` onto opaque `color-mix` on paper `#ffffff` / `#f7f7fa` (Swiss 2491 parity after Light shell foundation v0.1.2500; battery strip already flat).
-- **v0.1.2500** — Light shell opaque foundation (backfilled keep this tick): `:root` tokens, `.cpu-shell` hairline, Details/Processes scrollbar, title, `.cpu-actions` / `.icon-btn`, `.metric-card` hairline.
-- Earlier evening window: Swiss Monitors/collapse **v0.1.2499**, battery/icon-line **v0.1.2498**, history chrome **v0.1.2497**, Debug Log **v0.1.2496**, Settings modal **v0.1.2495**.
 
-## Tried / context
-- Digester empty (0 turns / 7d). Design review due=false (grace; recommended `feature-agent-ops`). Layout-daily due=false. Sibling OpenClaw/Hermes missing on rack. Debug.log: no ERROR/WARN clusters in 180m.
+- **v0.1.2502** — Light Settings + Monitors opaque (`.settings-card` panel/hairline · both `.setting-toggle` tracks/checked · late `.toggle-label` · `.add-btn-small` · `.monitor-item`) → `color-mix` on paper `#ffffff` / `#f7f7fa`.
+- **v0.1.2501** — Light history tile + Top Processes + metric labels opaque (`.metric-label` / `.metric-subtext` · `.history-chart-container` · `.ring-track` · `.details-grid` · process row/name/bar/percent).
+- **v0.1.2500** — Light shell opaque (`:root` tokens · `.cpu-shell` hairline · Details/Processes scrollbar · title · `.cpu-actions` / `.icon-btn` · `.metric-card` hairline).
+- **v0.1.2499** — Swiss Monitors/collapse muted-var opaque; Swiss live glass `rgba` property values cleared.
+- **v0.1.2498** — Swiss battery / icon-line / history-controls opaque.
+- **v0.1.2497** — Swiss history time-range / tooltip / `.changelog-code` opaque.
+- **v0.1.2496** — Swiss Debug Log opaque.
+- **v0.1.2495**–**v0.1.2492** — Swiss Settings modal / Monitors popover / AI Chat / Settings+Monitors foundation opaque.
+
+## Fuel notes
+
+- Digester open empty all night; design-review grace (Mac Screen Recording TCC / menu-bar only).
+- Layout-daily overall due=false; architect unmarked (screen missing).
+- Nightly minimum satisfied with keeps (not quiet).
 
 ## Next
-- Light Settings / AI Chat / Monitors remaining glass `rgba`.
-- Mac window-only recapture of stale feature screens when Screen Recording TCC allows `screencapture -l`.
+
+- Light AI Chat / remaining modal `rgba` leftovers, or Mac capture of stale `feature-monitors.png` / `feature-ai-chat.png` / `feature-agent-ops.png` when TCC allows `screencapture -l`.
