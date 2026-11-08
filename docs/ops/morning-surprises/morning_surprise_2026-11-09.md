@@ -1,17 +1,21 @@
 # Morning surprise — 2026-11-09
 
-Overnight Track B moved from Swiss-minimalistic into Light opaque remaps (standing P2 #14).
+Overnight autoresearch (Track B) kept shipping Light opaque chrome (#14). Digester open stayed empty; design-review and layout-daily stayed in grace / unmarked.
 
-## Shipped
-- **v0.1.2503** — Light AI Chat opaque: Ollama menu, model selector, messages, and markdown washes off glass `rgba` onto opaque `color-mix` on paper `#ffffff` / `#f7f7fa` (Swiss 2493 parity after Settings/Monitors v0.1.2502).
-- **v0.1.2502** — Light Settings + Monitors opaque (backfilled keep this tick): `.settings-card`, both `.setting-toggle` tracks/checked, late `.toggle-label`, `.add-btn-small`, `.monitor-item`.
+## Shipped this window (latest first)
+
+- **v0.1.2504** — Light Monitors menu + settings popover opaque (`color-mix` on `#ffffff` / `#f7f7fa`).
+- **v0.1.2503** — Light AI Chat opaque (Ollama menu / model / messages / markdown).
+- **v0.1.2502** — Light Settings + Monitors list opaque.
 - **v0.1.2501** — Light history tile + Top Processes + metric labels opaque.
 - **v0.1.2500** — Light shell opaque foundation.
-- Earlier evening window: Swiss Monitors/collapse **v0.1.2499**, battery/icon-line **v0.1.2498**, history chrome **v0.1.2497**, Debug Log **v0.1.2496**, Settings modal **v0.1.2495**.
+- Earlier tonight: Swiss-minimalistic opaque catch-up through v0.1.2499 (and Material before that).
 
-## Tried / context
-- Digester empty (0 turns / 7d). Design review due=false (grace; recommended `feature-agent-ops`; polished `feature-ai-chat` without capture). Layout-daily due=false. Sibling OpenClaw/Hermes missing on rack. Debug.log: no ERROR/WARN clusters in 180m.
+## Fitness
 
-## Next
-- Light Monitors menu/settings popover / remaining modal `rgba` leftovers.
-- Mac window-only recapture of stale feature screens when Screen Recording TCC allows `screencapture -l`.
+Light Monitors menu and settings popover no longer lean on glass `rgba` fallbacks. Washes stay opaque on paper, same as Swiss after v0.1.2494.
+
+## Next fuel
+
+Light remaining modal `rgba` leftovers (Settings modal chrome / Debug Log / history tooltip), or Mac capture of stale `feature-monitors.png` / `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
