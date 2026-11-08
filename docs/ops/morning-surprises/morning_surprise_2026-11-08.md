@@ -1,20 +1,19 @@
-# Morning surprise — 2026-11-08
+# Morning surprise — overnight autoresearch
 
-Overnight Track B kept opaque remaps rolling (standing P2 #14). Digester stayed empty; design-review stayed in polish-without-capture grace.
+Window: 2026-11-08 20:00 → 2026-11-09 (CEST)
 
-## Shipped tonight (highlights)
+## Shipped
 
-- **v0.1.2493** — Swiss AI Chat opaque (menu · model · messages · markdown · thinking-dots).
-- **v0.1.2492** — Swiss Settings + Monitors opaque.
-- **v0.1.2491** / **v0.1.2490** — Swiss history/process/battery + shell opaque.
-- Earlier: Material paper clear-out + dark-shell CRT catch-ups (see CHANGELOG).
+- **v0.1.2510** — Light process-bar / Changelog accent leftovers opaque (`.process-bar-fill`, `.setting-note a`, Changelog version/bullet). Light live glass `rgba` property values cleared.
+- **v0.1.2509** (sibling tick) — Light Monitors/collapse muted-var opaque.
+- Earlier same night: Light + Swiss opaque stack through battery/icon-line (**v0.1.2490–2508**).
 
-## Tried / deferred
+## Tried / notes
 
-- Sibling OpenClaw / Hermes missing on Linux rack.
-- Mac `feature-*.png` recapture still TCC-blocked.
-- Next: Swiss remaining modal leftovers / Light shell opaque, or Mac capture when TCC allows.
+- Digester open empty. Design review grace (marked `feature-monitors` / `feature-processes`). Layout daily already done today.
+- Concurrent sibling took muted-var as 2509 mid-tick; this tick finished the leftovers as 2510.
+- Mac Screen Recording TCC still blocks fresh `docs/screens/` captures.
 
-## Why it matters
+## Next fuel
 
-Swiss AI Chat chrome no longer paints glass `rgba` washes over the paper shell. Same #14 opaque-shell family as Architect / Material.
+- Apple / other theme shell opaque if still glass, or Mac capture when TCC allows.
