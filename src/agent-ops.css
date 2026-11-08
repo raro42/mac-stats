@@ -26026,3 +26026,38 @@ body.theme-futuristic .chat-offline-attention-glance.is-just-copied {
   border-color: color-mix(in srgb, #34c759 42%, #0b0b10);
   background: color-mix(in srgb, #34c759 14%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic: AI Chat collapsed-active + assistant-error still
+ * mix Apple `#ffffff` (`.ollama-collapsed-glance.is-active` ·
+ * `.chat-message.assistant.is-error`) → white slab on opaque shells. Other
+ * ollama collapsed states remapped earlier; Data Poster already remaps both.
+ * Standing P2 #14 after offline-attention soft-state CRT v0.1.2477;
+ * design-review `feature-ai-chat` adjacent (polish-without-capture grace; Mac
+ * capture deferred — Screen Recording TCC / menu-bar only).
+ */
+body.theme-dark .ollama-collapsed-glance.is-active {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 34%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 8%, #0a0a0a);
+}
+body.theme-neon .ollama-collapsed-glance.is-active {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 34%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 8%, #08120c);
+}
+body.theme-futuristic .ollama-collapsed-glance.is-active {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 8%, #0b0b10);
+}
+
+body.theme-dark .chat-message.assistant.is-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 7%, #0a0a0a);
+}
+body.theme-neon .chat-message.assistant.is-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #08120c);
+  background: color-mix(in srgb, #ff3b30 7%, #08120c);
+}
+body.theme-futuristic .chat-message.assistant.is-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+}
