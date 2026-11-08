@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2489
+
+- Material Monitors / collapse muted-var opaque (`.collapse-btn` resting · hover · `.monitors-menu-btn` resting · hover · `.monitor-info` secondary · `.monitor-history` hairline) glass `rgba` var fallbacks → opaque `color-mix` on paper `#e7e2d9` (Architect-parity after battery/icon-line v0.1.2488; Material live glass `rgba` property values cleared). Standing P2 #14; design-review `feature-monitors` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Swiss-minimalistic / Light shell opaque, or Mac capture of stale `feature-monitors.png` / `feature-cpu-metrics.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2488
 
 - Material battery / icon-line / history-controls opaque (`.battery-icon` resting · charging · `.icon-line-item` resting · hover · status-good/warning/bad · `.history-controls label`) glass `rgba` → opaque `color-mix` on paper `#e7e2d9` (Architect-parity after history/tooltip v0.1.2487). Standing P2 #14; design-review `feature-cpu-metrics` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Material remaining glass leftovers (muted var fallbacks), or Swiss-minimalistic / Light shell opaque, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
