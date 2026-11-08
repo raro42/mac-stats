@@ -25238,3 +25238,115 @@ body.theme-neon #process-list .process-bar {
 body.theme-futuristic #process-list .process-bar {
   background: color-mix(in srgb, currentColor 12%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic: Monitors selected / Down / Slow / focus / Copied still
+ * mix Apple `#ffffff` washes (`.monitor-item.is-selected` · `.is-down` · `.is-slow`
+ * · `:focus-visible` · `.is-just-copied`) → white slab on opaque shells. Data Poster
+ * remapped earlier (v0.1.2217-ish). Standing P2 #14 after Top Processes bar CRT
+ * v0.1.2468; design-review `feature-monitors` adjacent (polish-without-capture grace;
+ * Mac capture deferred — Screen Recording TCC / menu-bar only).
+ */
+body.theme-dark .monitor-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 42%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 12%, #0a0a0a);
+}
+body.theme-neon .monitor-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 42%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 12%, #08120c);
+}
+body.theme-futuristic .monitor-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 42%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 12%, #0b0b10);
+}
+
+body.theme-dark .monitor-item.is-down {
+  border-color: color-mix(in srgb, #ff3b30 28%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 6%, #0a0a0a);
+}
+body.theme-neon .monitor-item.is-down {
+  border-color: color-mix(in srgb, #ff3b30 28%, #08120c);
+  background: color-mix(in srgb, #ff3b30 6%, #08120c);
+}
+body.theme-futuristic .monitor-item.is-down {
+  border-color: color-mix(in srgb, #ff3b30 28%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 6%, #0b0b10);
+}
+
+body.theme-dark .monitor-item.is-down:hover {
+  border-color: color-mix(in srgb, #ff3b30 40%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 10%, #0a0a0a);
+}
+body.theme-neon .monitor-item.is-down:hover {
+  border-color: color-mix(in srgb, #ff3b30 40%, #08120c);
+  background: color-mix(in srgb, #ff3b30 10%, #08120c);
+}
+body.theme-futuristic .monitor-item.is-down:hover {
+  border-color: color-mix(in srgb, #ff3b30 40%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 10%, #0b0b10);
+}
+
+body.theme-dark .monitor-item.is-slow:not(.is-down):not(.is-pending) {
+  border-color: color-mix(in srgb, #ff9500 28%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 6%, #0a0a0a);
+}
+body.theme-neon .monitor-item.is-slow:not(.is-down):not(.is-pending) {
+  border-color: color-mix(in srgb, #ff9500 28%, #08120c);
+  background: color-mix(in srgb, #ff9500 6%, #08120c);
+}
+body.theme-futuristic .monitor-item.is-slow:not(.is-down):not(.is-pending) {
+  border-color: color-mix(in srgb, #ff9500 28%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 6%, #0b0b10);
+}
+
+body.theme-dark .monitor-item.is-slow:not(.is-down):not(.is-pending):hover {
+  border-color: color-mix(in srgb, #ff9500 40%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 10%, #0a0a0a);
+}
+body.theme-neon .monitor-item.is-slow:not(.is-down):not(.is-pending):hover {
+  border-color: color-mix(in srgb, #ff9500 40%, #08120c);
+  background: color-mix(in srgb, #ff9500 10%, #08120c);
+}
+body.theme-futuristic .monitor-item.is-slow:not(.is-down):not(.is-pending):hover {
+  border-color: color-mix(in srgb, #ff9500 40%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 10%, #0b0b10);
+}
+
+body.theme-dark .monitor-item:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 18%, #0a0a0a);
+}
+body.theme-neon .monitor-item:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 36%, #08120c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 18%, #08120c);
+}
+body.theme-futuristic .monitor-item:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 36%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 18%, #0b0b10);
+}
+
+body.theme-dark .monitor-item.is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+  border-color: color-mix(in srgb, #34c759 32%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-neon .monitor-item.is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+  border-color: color-mix(in srgb, #34c759 32%, #08120c);
+  box-shadow: none;
+}
+body.theme-futuristic .monitor-item.is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  box-shadow: none;
+}
+
+body.theme-dark .monitor-item.is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #0a0a0a);
+}
+body.theme-neon .monitor-item.is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #08120c);
+}
+body.theme-futuristic .monitor-item.is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #0b0b10);
+}
