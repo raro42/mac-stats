@@ -959,41 +959,44 @@ body {
 }
 
 .time-range-dropdown {
-  background: rgba(106, 166, 223, 0.05);
-  border: 1px solid rgba(106, 166, 223, 0.3);
+  /* Opaque wash / hairline — was Light accent glass rgba(106,166,223,…) (#14). */
+  background: color-mix(in srgb, #6aa6df 5%, #ffffff);
+  border: 1px solid color-mix(in srgb, #6aa6df 30%, #ffffff);
   border-radius: 4px;
   color: #6aa6df;
   padding: 4px 8px;
   font-size: 12px;
   font-family: monospace;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .time-range-dropdown:hover {
-  background: rgba(106, 166, 223, 0.1);
-  border-color: rgba(106, 166, 223, 0.5);
+  background: color-mix(in srgb, #6aa6df 10%, #ffffff);
+  border-color: color-mix(in srgb, #6aa6df 50%, #ffffff);
 }
 
 .time-range-dropdown:focus {
   outline: none;
-  background: rgba(106, 166, 223, 0.15);
-  border-color: rgba(106, 166, 223, 0.7);
-  box-shadow: 0 0 0 2px rgba(106, 166, 223, 0.1);
+  background: color-mix(in srgb, #6aa6df 15%, #ffffff);
+  border-color: color-mix(in srgb, #6aa6df 70%, #ffffff);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #6aa6df 10%, #ffffff);
 }
 
 .time-range-dropdown option {
-  background: #1a1a1a;
+  /* Opaque option panel — was dark #1a1a1a glass hole on Light paper (#14). */
+  background: color-mix(in srgb, #f7f7fa 94%, #ffffff);
   color: #6aa6df;
 }
 
 /* History tooltip */
 .history-tooltip {
   position: fixed;
-  background: rgba(0, 0, 0, 0.95);
+  /* Opaque panel — was black/accent glass rgba (#14). */
+  background: color-mix(in srgb, #000000 95%, #ffffff);
   color: #6aa6df;
   padding: 8px 12px;
-  border: 1px solid rgba(106, 166, 223, 0.5);
+  border: 1px solid color-mix(in srgb, #6aa6df 50%, #ffffff);
   border-radius: 4px;
   font-size: 11px;
   font-family: monospace;
@@ -1002,7 +1005,7 @@ body {
   display: none;
   white-space: pre;
   line-height: 1.4;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 4px 12px color-mix(in srgb, #000000 80%, #ffffff);
 }
 
 @media (max-width: 560px) {
@@ -1258,7 +1261,8 @@ body {
 }
 
 .changelog-code {
-  background: rgba(0, 0, 0, 0.06);
+  /* Opaque code wash — was rgba(0,0,0,0.06) glass (#14). */
+  background: color-mix(in srgb, #000000 6%, #ffffff);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: "SF Mono", "Monaco", "Menlo", monospace;
