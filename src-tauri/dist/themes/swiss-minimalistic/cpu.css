@@ -207,7 +207,9 @@ body {
   letter-spacing: 0.8px;
   text-align: center;
   margin-bottom: 12px;
-  opacity: 0.5;
+  /* Was opacity 0.5 on inherit (~90% ink via --text) → ~45% ink on paper (#14). */
+  color: color-mix(in srgb, #121216 45%, #ffffff);
+  opacity: 1;
 }
 
 .metric-value {
@@ -256,9 +258,10 @@ body {
   transform: none;
   font-size: 10px;
   font-weight: 600;
-  color: var(--muted);
+  /* Was opacity 0.8 on --muted (~55% ink) → ~44% ink on paper (#14). */
+  color: color-mix(in srgb, #121216 44%, #ffffff);
   white-space: nowrap;
-  opacity: 0.8;
+  opacity: 1;
 }
 
 .metric-hint {

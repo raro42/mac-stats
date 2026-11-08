@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2514
+
+- Material / Swiss metric label opacity opaque (`.metric-label` · `.metric-subtext` · Material `.ring-track`) opacity glass → opaque `color-mix` on paper `#e7e2d9` / `#ffffff` (Light parity after section-title v0.1.2513; disabled / connection-indicator hover opacity left alone). Standing P2 #14; design-review `feature-cpu-metrics` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: intentional decorative gradient leftovers only, or Mac capture of stale `feature-cpu-metrics.png` / `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2513
 
 - Section titles opaque (Light / Material / Swiss-minimalistic `.section-title`) invalid glass `rgb(1,1,1,0.75)` → opaque `color-mix` on theme paper (Apple / Architect parity after Light metric-unit / divider v0.1.2512; local 2512 race discarded). Standing P2 #14; design-review Details / Processes adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: intentional decorative gradient leftovers only, or Mac capture of stale `feature-processes.png` / `feature-cpu-metrics.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
