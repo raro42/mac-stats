@@ -589,9 +589,10 @@ body {
   display: flex;
   flex-direction: column;
   border-radius: 22px;
-  background: var(--panel, rgba(255, 255, 255, 0.86));
-  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.65));
-  box-shadow: var(--panel-shadow, 0 32px 100px rgba(0, 0, 0, 0.20));
+  /* Opaque panel fallback — was white glass rgba(255,255,255,…) (#14). */
+  background: var(--panel, color-mix(in srgb, #f5f1ea 96%, #e7e2d9));
+  border: 1px solid var(--panel-border, color-mix(in srgb, #18181a 14%, #e7e2d9));
+  box-shadow: var(--panel-shadow, 0 32px 100px color-mix(in srgb, #000000 20%, #e7e2d9));
   padding: 18px 18px 16px;
   overflow: hidden;
 }
@@ -602,7 +603,8 @@ body {
   align-items: center;
   gap: 12px;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--hairline, rgba(0, 0, 0, 0.08));
+  /* Opaque hairline — was Apple rgba(0,0,0,0.08) glass (#14). */
+  border-bottom: 1px solid var(--hairline, color-mix(in srgb, #000000 8%, #e7e2d9));
   margin-bottom: 12px;
   flex-shrink: 0;
 }
@@ -788,8 +790,9 @@ body {
   width: 44px;
   height: 24px;
   border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.10);
-  background: rgba(0, 0, 0, 0.08);
+  /* Opaque track — was Apple rgba(0,0,0,…) glass (#14). */
+  border: 1px solid color-mix(in srgb, #000000 10%, #e7e2d9);
+  background: color-mix(in srgb, #000000 8%, #e7e2d9);
   appearance: none;
   cursor: pointer;
   position: relative;
@@ -798,8 +801,9 @@ body {
 }
 
 .setting-toggle input[type="checkbox"]:checked {
-  background: rgba(59, 130, 246, 0.8);
-  border-color: rgba(59, 130, 246, 0.6);
+  /* Opaque accent — was Apple rgba(59,130,246,…) glass (#14). */
+  background: color-mix(in srgb, #3b82f6 80%, #e7e2d9);
+  border-color: color-mix(in srgb, #3b82f6 60%, #e7e2d9);
 }
 
 .setting-toggle input[type="checkbox"]::before {
@@ -812,7 +816,7 @@ body {
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px color-mix(in srgb, #000000 20%, #e7e2d9);
 }
 
 .setting-toggle input[type="checkbox"]:checked::before {
@@ -909,8 +913,9 @@ body {
   width: 44px;
   height: 24px;
   border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.10);
-  background: rgba(0, 0, 0, 0.08);
+  /* Opaque track — was rgba(0,0,0,…) glass (#14). */
+  border: 1px solid color-mix(in srgb, #000000 10%, #e7e2d9);
+  background: color-mix(in srgb, #000000 8%, #e7e2d9);
   appearance: none;
   cursor: pointer;
   position: relative;
@@ -918,8 +923,9 @@ body {
 }
 
 .setting-toggle input[type="checkbox"]:checked {
-  background: rgba(184, 166, 139, 0.6);
-  border-color: rgba(184, 166, 139, 0.5);
+  /* Opaque accent — was Material rgba(184,166,139,…) glass (#14). */
+  background: color-mix(in srgb, #b8a68b 60%, #e7e2d9);
+  border-color: color-mix(in srgb, #b8a68b 50%, #e7e2d9);
 }
 
 .setting-toggle input[type="checkbox"]::before {
@@ -932,7 +938,7 @@ body {
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px color-mix(in srgb, #000000 20%, #e7e2d9);
 }
 
 .setting-toggle input[type="checkbox"]:checked::before {
@@ -943,7 +949,8 @@ body {
 .toggle-label {
   font-size: 14px;
   font-weight: 500;
-  color: rgba(24, 24, 26, 0.72);
+  /* Opaque type — was rgba(24,24,26,0.72) glass (#14). */
+  color: color-mix(in srgb, #18181a 72%, #e7e2d9);
 }
 
 /* Changelog Modal Styling */
@@ -1680,10 +1687,11 @@ body {
 }
 
 .add-btn-small {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.3)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.3) fallback (#14). */
+  background: color-mix(in srgb, #ffffff 30%, #e7e2d9);
+  border: 1px solid color-mix(in srgb, #000000 10%, #e7e2d9);
   border-radius: 6px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted, color-mix(in srgb, #808080 60%, #e7e2d9));
   padding: 4px 10px;
   cursor: pointer;
   font-size: 14px;
@@ -1694,13 +1702,13 @@ body {
 }
 
 .add-btn-small:hover {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.4)))));
-  border-color: var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.15)))));
+  background: color-mix(in srgb, #ffffff 40%, #e7e2d9);
+  border-color: color-mix(in srgb, #000000 15%, #e7e2d9);
   color: var(--text, var(--ink, inherit));
 }
 
 .add-btn-small:active {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
+  background: color-mix(in srgb, #ffffff 50%, #e7e2d9);
 }
 
 .monitors-list {
@@ -1708,8 +1716,9 @@ body {
 }
 
 .monitor-item {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.3)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.3) fallback (#14). */
+  background: color-mix(in srgb, #ffffff 30%, #e7e2d9);
+  border: 1px solid color-mix(in srgb, #000000 10%, #e7e2d9);
   border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 8px;
