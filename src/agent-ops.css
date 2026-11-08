@@ -25665,3 +25665,84 @@ body.theme-futuristic .monitor-detail {
   border-color: color-mix(in srgb, var(--hairline, currentColor) 55%, #0b0b10);
   background: color-mix(in srgb, var(--glass-fill, currentColor) 18%, #0b0b10);
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Disk Cleanup add-scope rows still
+ * mix Apple `#ffffff` washes (`.disk-cleanup-scope-row` resting · hover ·
+ * focus-visible/focus-within · is-selected) → white slab on opaque shells.
+ * Disabled / Copied / path hover remapped earlier. Standing P2 #14 after
+ * Debug Log + Monitors detail CRT v0.1.2472; design-review `feature-disk-cleanup`
+ * adjacent (polish-without-capture grace; Mac capture deferred — Screen
+ * Recording TCC / menu-bar only).
+ */
+body.theme-data-poster .disk-cleanup-scope-row {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-scope-row {
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-scope-row {
+  border-color: color-mix(in srgb, currentColor 10%, #08120c);
+  background: color-mix(in srgb, currentColor 3%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-scope-row {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-scope-row:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-scope-row:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-scope-row:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #08120c);
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-scope-row:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-scope-row:focus-visible,
+body.theme-data-poster .disk-cleanup-scope-row:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-scope-row:focus-visible,
+body.theme-dark .disk-cleanup-scope-row:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 34%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 16%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-scope-row:focus-visible,
+body.theme-neon .disk-cleanup-scope-row:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 34%, #08120c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 16%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-scope-row:focus-visible,
+body.theme-futuristic .disk-cleanup-scope-row:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 34%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 16%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-scope-row.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 6%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-scope-row.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 6%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-scope-row.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 28%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 6%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-scope-row.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 6%, #0b0b10);
+}

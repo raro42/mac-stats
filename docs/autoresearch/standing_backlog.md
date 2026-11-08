@@ -1,6 +1,10 @@
+## Overnight merge — v0.1.2473
+
+- Data Poster / Dark / Neon / Futuristic Disk Cleanup add-scope CRT (`.disk-cleanup-scope-row` resting · hover · focus-visible / focus-within · is-selected) Apple `#ffffff` → `#0b0b10` / CRT `#0a0a0a` / `#08120c` / `#0b0b10` (disabled / Copied / path hover already remapped). Standing P2 #14 after Debug Log + Monitors detail CRT v0.1.2472; design-review `feature-disk-cleanup` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark remaps (e.g. `.logs-toolbar` · `.process-row.is-selected` · chat glance soft states on Neon/Futuristic if still Apple) if any, or Mac capture of stale `feature-disk-cleanup.png` / `feature-monitors.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2472
 
-- Data Poster / Dark / Neon / Futuristic Debug Log viewer + Monitors detail CRT (`.logs-viewer` resting · focus-visible · `.monitor-detail` resting) Apple `#ffffff` → `#0b0b10` / CRT `#0a0a0a` / `#08120c` / `#0b0b10` (empty/filter/log substates already remapped). Standing P2 #14 after Disk Cleanup list-row CRT v0.1.2471; design-review `feature-monitors` / Debug Log adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark remaps (e.g. Disk Cleanup add-scope chrome if still Apple) if any, or Mac capture of stale `feature-monitors.png` / `feature-disk-cleanup.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+- Data Poster / Dark / Neon / Futuristic Debug Log viewer + Monitors detail CRT (`.logs-viewer` resting · focus-visible · `.monitor-detail` resting) Apple `#ffffff` → `#0b0b10` / CRT `#0a0a0a` / `#08120c` / `#0b0b10` (empty/filter/log substates already remapped). Standing P2 #14 after Disk Cleanup list-row CRT v0.1.2471; design-review `feature-monitors` / Debug Log adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Disk Cleanup add-scope chrome (shipped as v0.1.2473).
 
 ## Overnight merge — v0.1.2471
 
