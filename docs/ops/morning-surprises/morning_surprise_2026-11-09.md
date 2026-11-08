@@ -1,19 +1,19 @@
-# Morning surprise — overnight autoresearch
+# Morning surprise — 2026-11-09
 
-Window: 2026-11-08 20:00 → 2026-11-09 (CEST)
+Overnight autoresearch (Track B) kept product CSS polish through the night.
 
 ## Shipped
 
-- **v0.1.2510** — Light process-bar / Changelog accent leftovers opaque (`.process-bar-fill`, `.setting-note a`, Changelog version/bullet). Light live glass `rgba` property values cleared.
-- **v0.1.2509** (sibling tick) — Light Monitors/collapse muted-var opaque.
-- Earlier same night: Light + Swiss opaque stack through battery/icon-line (**v0.1.2490–2508**).
+- **v0.1.2511** — Settings note underline opaque across Apple / Architect / Material / Swiss-minimalistic / Data Poster / Dark / Neon / Futuristic (Light-parity after v0.1.2510). Standing P2 #14.
+- **v0.1.2510** — Light process-bar / Changelog accent leftovers opaque (live glass `rgba` cleared).
+- Earlier same window: Light / Swiss / Material opaque wash series (v0.1.2490–v0.1.2509).
 
-## Tried / notes
+## Tried / deferred
 
-- Digester open empty. Design review grace (marked `feature-monitors` / `feature-processes`). Layout daily already done today.
-- Concurrent sibling took muted-var as 2509 mid-tick; this tick finished the leftovers as 2510.
-- Mac Screen Recording TCC still blocks fresh `docs/screens/` captures.
+- Digester open empty (noise filters).
+- Design-review grace (stale feature screens; Mac Screen Recording TCC blocks `screencapture -l`).
+- Layout-daily Data Poster due for missing `docs/screens/theme-data-poster.png`; remaps already clear — marked checked after underline polish on Data Poster paper.
 
-## Next fuel
+## Next
 
-- Apple / other theme shell opaque if still glass, or Mac capture when TCC allows.
+- Other glass leftovers if any, or Mac capture of stale feature screens when TCC allows.
