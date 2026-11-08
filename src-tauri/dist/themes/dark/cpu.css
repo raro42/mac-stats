@@ -525,7 +525,8 @@ body {
 .setting-note a {
   color: var(--text);
   text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  /* Opaque underline — was color-mix(…, transparent) glass (#14). */
+  text-decoration-color: color-mix(in srgb, currentColor 35%, #0a0a0a);
   text-underline-offset: 2px;
 }
 

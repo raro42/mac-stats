@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2511
+
+- Settings note underline opaque (Apple / Architect / Material / Swiss-minimalistic / Data Poster / Dark / Neon / Futuristic `.setting-note a`) glass `color-mix(…, transparent)` → opaque `color-mix` on each theme paper (Light-parity after process-bar / Changelog accent v0.1.2510). Standing P2 #14; layout-daily Data Poster adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: other glass leftovers if any, or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2510
 
 - Light process-bar / Changelog accent leftovers opaque (`.process-bar-fill` · `.setting-note a` underline · Changelog version/bullet) glass `rgba` / `transparent` mixes → opaque `color-mix` on paper `#ffffff` (after Monitors/collapse muted-var v0.1.2509; Light live glass `rgba` property values cleared). Standing P2 #14; design-review Changelog / `feature-processes` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Apple / other theme shell opaque if still glass, or Mac capture of stale `feature-processes.png` / `feature-cpu-metrics.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
