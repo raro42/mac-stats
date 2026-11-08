@@ -1,19 +1,16 @@
 # Morning surprise — 2026-11-08
 
-Overnight Track B kept shipping Swiss-minimalistic opaque remaps (standing P2 #14), continuing into the 20:00 window.
+Overnight Track B finished Swiss-minimalistic opaque remaps, then opened Light opaque (standing P2 #14).
 
 ## Shipped
-- **v0.1.2499** — Swiss Monitors/collapse muted-var opaque: `.collapse-btn`, `.monitor-info` secondary, `.monitor-history` hairline, `.theme-github-link:hover` off glass `rgba` onto `color-mix` on paper `#ffffff` (Material 2489 parity; Swiss live glass `rgba` property values cleared).
-- **v0.1.2498** — Swiss battery / icon-line / history-controls opaque (backfilled keep this tick).
-- **v0.1.2497** — Swiss history time-range / tooltip / Changelog code opaque on paper `#ffffff` (Material 2487 parity).
-- **v0.1.2496** — Swiss Debug Log opaque.
-- **v0.1.2495** — Swiss Settings modal chrome opaque.
-- **v0.1.2494** — Swiss Monitors menu + settings popover opaque.
-- Earlier: Swiss AI Chat **v0.1.2493**, Settings/Monitors list **v0.1.2492**, history/process/battery **v0.1.2491**, shell foundation **v0.1.2490**; Material opaque catch-up through **v0.1.2489**.
+- **v0.1.2501** — Light history tile + Top Processes + metric labels opaque: `.metric-label` / `.metric-subtext`, `.history-chart-container` early/late, `.ring-track`, `.details-grid`, process row/name/bar/percent off glass `rgba` onto `color-mix` on paper `#ffffff` / `#f7f7fa` (Swiss 2491 parity after Light shell v0.1.2500; battery strip already flat).
+- **v0.1.2500** — Light shell opaque foundation (`:root` tokens, shell/scrollbar/title/actions/icon-btn/metric-card hairlines).
+- **v0.1.2499** — Swiss Monitors/collapse muted-var opaque (live glass `rgba` property values cleared).
+- Earlier same window: Swiss battery/icon-line **v0.1.2498**, history chrome **v0.1.2497**, Debug Log **v0.1.2496**, Settings modal **v0.1.2495**, Monitors popover **v0.1.2494**, AI Chat **v0.1.2493**, Settings/Monitors list **v0.1.2492**.
 
 ## Tried / context
-- Digester empty (0 turns / 7d). Design review + layout-daily grace. Sibling harnesses missing on rack. Debug.log quiet.
+- Digester empty (0 turns / 7d). Design review + layout-daily grace (polish-without-capture on `feature-cpu-metrics` / `feature-processes`). Sibling harnesses missing on rack. Debug.log quiet.
 
 ## Next
-- Light shell opaque foundation (Swiss live glass `rgba` cleared).
+- Light Settings / AI Chat / Monitors `rgba` leftovers.
 - Mac window-only recapture when Screen Recording TCC allows `screencapture -l`.
