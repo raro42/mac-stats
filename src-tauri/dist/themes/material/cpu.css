@@ -2559,9 +2559,10 @@ body {
 
 .logs-path-hint{font-size:11px;color:var(--muted);font-family:ui-monospace,Menlo,monospace;margin-left:8px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .logs-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
-.logs-toolbar button{font-size:12px;padding:6px 10px;border-radius:6px;border:1px solid var(--hairline,rgba(128,128,128,.3));background:rgba(128,128,128,.12);color:var(--text,inherit);cursor:pointer}
-.logs-autorefresh{font-size:12px;color:var(--muted,rgba(128,128,128,.8));display:inline-flex;align-items:center;gap:6px;margin-left:auto}
-.logs-viewer{margin:0;padding:12px;max-height:320px;overflow:auto;font-size:11px;line-height:1.45;font-family:ui-monospace,Menlo,monospace;color:var(--text,inherit);background:rgba(0,0,0,.08);border:1px solid var(--hairline,rgba(128,128,128,.3));border-radius:10px;white-space:pre-wrap;word-break:break-word}
+/* Opaque Debug Log chrome — was gray/black glass rgba (#14); Architect-parity on Material paper. */
+.logs-toolbar button{font-size:12px;padding:6px 10px;border-radius:6px;border:1px solid var(--hairline,color-mix(in srgb,#808080 30%,#e7e2d9));background:color-mix(in srgb,#808080 12%,#e7e2d9);color:var(--text,inherit);cursor:pointer}
+.logs-autorefresh{font-size:12px;color:var(--muted,color-mix(in srgb,#808080 80%,#e7e2d9));display:inline-flex;align-items:center;gap:6px;margin-left:auto}
+.logs-viewer{margin:0;padding:12px;max-height:320px;overflow:auto;font-size:11px;line-height:1.45;font-family:ui-monospace,Menlo,monospace;color:var(--text,inherit);background:color-mix(in srgb,#000000 8%,#e7e2d9);border:1px solid var(--hairline,color-mix(in srgb,#808080 30%,#e7e2d9));border-radius:10px;white-space:pre-wrap;word-break:break-word}
 
 
 /* Logs section */
