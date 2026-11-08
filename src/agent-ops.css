@@ -25218,3 +25218,23 @@ body.theme-neon .monitor-detail-log {
 body.theme-futuristic .monitor-detail-log {
   background: color-mix(in srgb, #ffffff 6%, #0b0b10);
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Top Processes usage bar track still mixes
+ * Apple `#ffffff` wash (`#process-list .process-bar`) → white slab on opaque shells.
+ * Standing P2 #14 after Monitors detail-log CRT v0.1.2467; design-review
+ * `feature-processes` adjacent (polish-without-capture grace; Mac capture deferred —
+ * Screen Recording TCC / menu-bar only).
+ */
+body.theme-data-poster #process-list .process-bar {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+}
+body.theme-dark #process-list .process-bar {
+  background: color-mix(in srgb, currentColor 12%, #0a0a0a);
+}
+body.theme-neon #process-list .process-bar {
+  background: color-mix(in srgb, currentColor 12%, #08120c);
+}
+body.theme-futuristic #process-list .process-bar {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+}

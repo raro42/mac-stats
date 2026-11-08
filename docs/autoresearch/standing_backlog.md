@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2468
+
+- Data Poster / Dark / Neon / Futuristic Top Processes bar CRT (`#process-list .process-bar`) Apple `#ffffff` → `#0b0b10` / CRT `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after Monitors detail-log CRT v0.1.2467; design-review `feature-processes` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark remaps (e.g. `.section-header-collapsible:hover`) if any, or Mac capture of stale `feature-processes.png` / `feature-monitors.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2467
 
 - Data Poster / Dark / Neon / Futuristic Monitors detail log CRT (`.monitor-detail-log`) Apple `#ffffff` → `#0b0b10` / CRT `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after Perplexity result + weather CRT v0.1.2466; design-review `feature-monitors` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark remaps if any, or Mac capture of stale `feature-monitors.png` / `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
