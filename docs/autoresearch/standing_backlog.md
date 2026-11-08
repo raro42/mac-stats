@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2502
+
+- Light Settings + Monitors opaque (`.settings-card` panel/hairline · both `.setting-toggle` tracks/checked · late `.toggle-label` · `.add-btn-small` · `.monitor-item`) glass `rgba` → opaque `color-mix` on paper `#ffffff` / `#f7f7fa` (Swiss-parity after history/process/metric labels v0.1.2501). Standing P2 #14; design-review Settings / `feature-monitors` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Light AI Chat / remaining modal `rgba` leftovers, or Mac capture of stale `feature-monitors.png` / `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2501
 
 - Light history tile + Top Processes + metric labels opaque (`.metric-label` · `.metric-subtext` · `.history-chart-container` early/late · `.ring-track` · `.details-grid` · process row/name/bar/percent) glass `rgba` → opaque `color-mix` on paper `#ffffff` / `#f7f7fa` (Swiss-parity after Light shell foundation v0.1.2500; battery strip already flat). Standing P2 #14; design-review `feature-cpu-metrics` / `feature-processes` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Light Settings / AI Chat / Monitors `rgba` leftovers, or Mac capture of stale `feature-cpu-metrics.png` / `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
