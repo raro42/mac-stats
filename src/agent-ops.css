@@ -26061,3 +26061,87 @@ body.theme-futuristic .chat-message.assistant.is-error {
   border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
   background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic: AI Chat filter-chip You/Assistant/Errors has-hits +
+ * is-active still mix Apple `#ffffff` (attribute selectors beat the generic
+ * `.chat-filter-chip.is-active` CRT remaps) → white slab on opaque shells.
+ * Data Poster already remaps the family. Standing P2 #14 after collapsed-active
+ * + assistant-error CRT v0.1.2478; design-review `feature-ai-chat` adjacent
+ * (polish-without-capture grace; Mac capture deferred — Screen Recording TCC /
+ * menu-bar only).
+ */
+body.theme-dark .chat-filter-chip[data-chat-filter='you'].has-hits {
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 24%, #0a0a0a);
+}
+body.theme-dark .chat-filter-chip[data-chat-filter='you'].is-active {
+  background: color-mix(in srgb, var(--accent, #00cc66) 18%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 38%, #0a0a0a);
+}
+body.theme-dark .chat-filter-chip[data-chat-filter='assistant'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+}
+body.theme-dark .chat-filter-chip[data-chat-filter='assistant'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #0a0a0a);
+  border-color: color-mix(in srgb, #34c759 38%, #0a0a0a);
+}
+body.theme-dark .chat-filter-chip[data-chat-filter='errors'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff3b30 28%, #0a0a0a);
+}
+body.theme-dark .chat-filter-chip[data-chat-filter='errors'].is-active {
+  background: color-mix(in srgb, #ff3b30 20%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff3b30 40%, #0a0a0a);
+}
+
+body.theme-neon .chat-filter-chip[data-chat-filter='you'].has-hits {
+  background: color-mix(in srgb, var(--accent, #6dff7b) 10%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 24%, #08120c);
+}
+body.theme-neon .chat-filter-chip[data-chat-filter='you'].is-active {
+  background: color-mix(in srgb, var(--accent, #6dff7b) 18%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 38%, #08120c);
+}
+body.theme-neon .chat-filter-chip[data-chat-filter='assistant'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+  border-color: color-mix(in srgb, #34c759 28%, #08120c);
+}
+body.theme-neon .chat-filter-chip[data-chat-filter='assistant'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #08120c);
+  border-color: color-mix(in srgb, #34c759 38%, #08120c);
+}
+body.theme-neon .chat-filter-chip[data-chat-filter='errors'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #08120c);
+  border-color: color-mix(in srgb, #ff3b30 28%, #08120c);
+}
+body.theme-neon .chat-filter-chip[data-chat-filter='errors'].is-active {
+  background: color-mix(in srgb, #ff3b30 20%, #08120c);
+  border-color: color-mix(in srgb, #ff3b30 40%, #08120c);
+}
+
+body.theme-futuristic .chat-filter-chip[data-chat-filter='you'].has-hits {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 24%, #0b0b10);
+}
+body.theme-futuristic .chat-filter-chip[data-chat-filter='you'].is-active {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 38%, #0b0b10);
+}
+body.theme-futuristic .chat-filter-chip[data-chat-filter='assistant'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+}
+body.theme-futuristic .chat-filter-chip[data-chat-filter='assistant'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
+}
+body.theme-futuristic .chat-filter-chip[data-chat-filter='errors'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 28%, #0b0b10);
+}
+body.theme-futuristic .chat-filter-chip[data-chat-filter='errors'].is-active {
+  background: color-mix(in srgb, #ff3b30 20%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 40%, #0b0b10);
+}
