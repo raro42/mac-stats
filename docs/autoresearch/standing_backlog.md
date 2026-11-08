@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2483
+
+- Material AI Chat opaque (`.ollama-menu-btn` · `.ollama-menu` · `.ollama-menu-item:hover` · settings popover backdrop/close · `.model-text` · `.model-select-dropdown` · `.model-select` · `.chat-messages` · `.chat-message.user/.assistant` · markdown blockquote/code/pre/table/hr/a · `.thinking-dots`) glass `rgba` → opaque `color-mix` on paper `#e7e2d9` (Architect-parity after Settings/Monitors v0.1.2482). Standing P2 #14; design-review `feature-ai-chat` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Material remaining modal `rgba` leftovers, or Swiss-minimalistic / Light shell opaque, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2482
 
 - Material Settings + Monitors opaque (`.settings-card` · header hairline · `.setting-toggle` tracks/checked · late `.toggle-label` · `.add-btn-small` · `.monitor-item`) glass `rgba` → opaque `color-mix` on paper `#e7e2d9` (Architect-parity after tile/battery v0.1.2481). Standing P2 #14; design-review Settings / `feature-monitors` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Material AI Chat / remaining modal `rgba` leftovers, or Swiss-minimalistic / Light shell opaque, or Mac capture of stale `feature-monitors.png` / `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
