@@ -2002,7 +2002,8 @@ body {
 .ollama-menu-btn {
   background: transparent;
   border: none;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Opaque type — was gray glass rgba(128,…) fallback (#14). */
+  color: var(--muted, color-mix(in srgb, #808080 60%, #ffffff));
   font-size: 18px;
   line-height: 1;
   padding: 4px 8px;
@@ -2014,17 +2015,19 @@ body {
 }
 
 .ollama-menu-btn:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  /* Opaque hairline wash — was gray glass rgba(128,…) fallback (#14). */
+  background: var(--hairline, color-mix(in srgb, #808080 10%, #ffffff));
   color: var(--text, var(--ink, inherit));
 }
 
 .ollama-menu {
   position: fixed;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.95)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque panel — was white glass rgba(255,255,255,0.95) fallback (#14). */
+  background: var(--panel, color-mix(in srgb, #ffffff 95%, #f7f7fa));
+  border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #ffffff));
   border-radius: 8px;
   padding: 4px 0;
-  box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.15))));
+  box-shadow: var(--panel-shadow, 0 4px 12px color-mix(in srgb, #000000 15%, #ffffff));
   z-index: 1000;
   min-width: 140px;
 }
@@ -2043,13 +2046,15 @@ body {
 }
 
 .ollama-menu-item:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  /* Opaque hairline wash — was gray glass rgba(128,…) fallback (#14). */
+  background: var(--hairline, color-mix(in srgb, #808080 10%, #ffffff));
 }
 
 .ollama-settings-popover {
   position: fixed;
   inset: 0;
-  background: var(--modal-backdrop, var(--modal, rgba(0, 0, 0, 0.5)));
+  /* Opaque modal — was black glass rgba(0,0,0,0.5) (#14). */
+  background: var(--modal-backdrop, color-mix(in srgb, #000000 50%, #ffffff));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2089,7 +2094,8 @@ body {
   border: none;
   font-size: 24px;
   line-height: 1;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Opaque type — was gray glass rgba(128,…) fallback (#14). */
+  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, color-mix(in srgb, #808080 60%, #ffffff)))));
   cursor: pointer;
   padding: 0;
   width: 28px;
@@ -2205,7 +2211,8 @@ body {
 
 .model-text {
   font-size: 12px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Opaque type — was gray glass rgba(128,…) fallback (#14). */
+  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, color-mix(in srgb, #808080 60%, #ffffff)))));
   cursor: pointer;
   user-select: none;
   padding: 2px 4px;
@@ -2219,16 +2226,20 @@ body {
 
 .model-text:hover {
   color: var(--text, var(--ink, inherit));
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  /* Opaque wash — was gray glass rgba(128,…) fallback (#14). */
+  background: var(--hairline, color-mix(in srgb, #808080 10%, #ffffff));
 }
 
 .model-select-dropdown {
   position: absolute;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.95)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque panel — was white glass rgba(255,255,255,0.95) fallback (#14). */
+  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #ffffff 95%, #f7f7fa)))));
+  /* Opaque hairline — was black glass rgba(0,0,0,0.1) fallback (#14). */
+  border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #ffffff));
   border-radius: 8px;
   padding: 4px 0;
-  box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.15))));
+  /* Opaque shadow — was black glass rgba(0,0,0,0.15) (#14). */
+  box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 4px 12px color-mix(in srgb, #000000 15%, #ffffff))));
   z-index: 1000;
   min-width: 200px;
   max-height: 300px;
@@ -2243,7 +2254,8 @@ body {
 }
 
 .model-select-dropdown option:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  /* Opaque wash — was gray glass rgba(128,…) fallback (#14). */
+  background: var(--hairline, color-mix(in srgb, #808080 10%, #ffffff));
 }
 
 .ollama-model-selector {
@@ -2262,8 +2274,10 @@ body {
 
 .model-select {
   flex: 1;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.5) fallback (#14). */
+  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #ffffff 50%, #f7f7fa)))));
+  /* Opaque hairline — was black glass rgba(0,0,0,0.1) fallback (#14). */
+  border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #ffffff));
   border-radius: 8px;
   padding: 6px 10px;
   color: var(--text, var(--ink, inherit));
@@ -2275,12 +2289,14 @@ body {
 
 .model-select:focus {
   outline: none;
-  border-color: var(--accent, rgba(0, 122, 255, 0.3));
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.7)))));
+  /* Opaque accent / wash — was Apple rgba glass fallback (#14). */
+  border-color: var(--accent, color-mix(in srgb, #007aff 30%, #ffffff));
+  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #ffffff 70%, #f7f7fa)))));
 }
 
 .model-select:hover {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.6)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.6) fallback (#14). */
+  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #ffffff 60%, #f7f7fa)))));
 }
 
 .ollama-chat {
@@ -2292,8 +2308,10 @@ body {
   overflow-y: auto;
   margin-bottom: 12px;
   padding: 12px;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.3)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.3) fallback (#14). */
+  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #ffffff 30%, #f7f7fa)))));
+  /* Opaque hairline — was black glass rgba(0,0,0,0.1) fallback (#14). */
+  border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #ffffff));
   border-radius: 8px;
   font-size: 13px;
 }
@@ -2307,13 +2325,15 @@ body {
 }
 
 .chat-message.user {
-  background: rgba(0, 122, 255, 0.1);
+  /* Opaque wash — was rgba(0,122,255,0.1) glass (#14). */
+  background: color-mix(in srgb, #007aff 10%, #ffffff);
   margin-left: 20px;
   color: var(--text, var(--ink, inherit));
 }
 
 .chat-message.assistant {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.5) fallback (#14). */
+  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #ffffff 50%, #f7f7fa)))));
   margin-right: 20px;
   color: var(--text, var(--ink, inherit));
 }
@@ -2364,14 +2384,16 @@ body {
 .chat-message .markdown blockquote {
   margin: 12px 0;
   padding: 8px 12px;
-  border-left: 3px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.2)))));
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.03)))));
+  /* Opaque hairline / wash — was black glass rgba fallback (#14). */
+  border-left: 3px solid var(--hairline, color-mix(in srgb, #000000 20%, #ffffff));
+  background: color-mix(in srgb, #000000 3%, #ffffff);
   border-radius: 4px;
   font-style: italic;
 }
 
 .chat-message .markdown code {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.08)))));
+  /* Opaque wash — was black glass rgba(0,0,0,0.08) fallback (#14). */
+  background: color-mix(in srgb, #000000 8%, #ffffff);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas', monospace;
@@ -2380,8 +2402,9 @@ body {
 }
 
 .chat-message .markdown pre {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.05)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque wash / hairline — was black glass rgba fallback (#14). */
+  background: color-mix(in srgb, #000000 5%, #ffffff);
+  border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #ffffff));
   border-radius: 8px;
   padding: 12px;
   margin: 12px 0;
@@ -2407,24 +2430,28 @@ body {
 
 .chat-message .markdown table th,
 .chat-message .markdown table td {
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque hairline — was black glass rgba(0,0,0,0.1) fallback (#14). */
+  border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #ffffff));
   padding: 6px 10px;
   text-align: left;
 }
 
 .chat-message .markdown table th {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.05)))));
+  /* Opaque wash — was black glass rgba(0,0,0,0.05) fallback (#14). */
+  background: color-mix(in srgb, #000000 5%, #ffffff);
   font-weight: 600;
 }
 
 .chat-message .markdown hr {
   border: none;
-  border-top: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque hairline — was black glass rgba(0,0,0,0.1) fallback (#14). */
+  border-top: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #ffffff));
   margin: 16px 0;
 }
 
 .chat-message .markdown a {
-  color: var(--accent, rgba(0, 122, 255, 0.9));
+  /* Opaque accent — was rgba(0,122,255,0.9) glass fallback (#14). */
+  color: var(--accent, color-mix(in srgb, #007aff 90%, #ffffff));
   text-decoration: none;
 }
 
@@ -2463,7 +2490,8 @@ body {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Opaque wash — was gray glass rgba(128,…) fallback (#14). */
+  background: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, color-mix(in srgb, #808080 60%, #ffffff)))));
   animation: none; /* was thinking-pulse; WebView CPU */
 }
 

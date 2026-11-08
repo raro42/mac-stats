@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2503] - 2026-11-08
+
+### Changed
+
+- Light theme: AI Chat chrome (Ollama menu, model selector, messages, markdown) moves off glass `rgba` onto opaque `color-mix` against paper `#ffffff` / `#f7f7fa` (Swiss-parity after Settings/Monitors v0.1.2502).
+
+
 ### Added
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
