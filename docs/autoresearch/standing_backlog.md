@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2498
+
+- Swiss-minimalistic battery / icon-line / history-controls opaque (`.battery-icon` resting · charging · `.icon-line-item` resting · hover · status-good/warning/bad · `.history-controls label`) glass `rgba` → opaque `color-mix` on paper `#ffffff` (Material-parity after history chrome v0.1.2497). Standing P2 #14; design-review `feature-cpu-metrics` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Swiss remaining glass leftovers / Light shell opaque, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2497
 
 - Swiss-minimalistic history time-range / tooltip / Changelog code opaque (`.time-range-dropdown` resting · hover · focus · option · `.history-tooltip` · `.changelog-code`) glass `rgba` → opaque `color-mix` on paper `#ffffff` (Material-parity after Debug Log v0.1.2496). Standing P2 #14; design-review `feature-cpu-metrics` / Changelog adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Swiss remaining glass leftovers (e.g. history-controls muted / battery status type) / Light shell opaque, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
