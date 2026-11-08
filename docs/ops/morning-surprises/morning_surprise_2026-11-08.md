@@ -1,25 +1,27 @@
 # Morning surprise — 2026-11-08
 
-Overnight Track B kept opaque remaps rolling (standing P2 #14). Digester stayed empty; design-review stayed in polish-without-capture grace (Mac Screen Recording TCC still blocks fresh `docs/screens/` grabs). After dark-shell CRT catch-up, the night moved onto **Material** glass → opaque `color-mix` on paper `#e7e2d9`, and finished clearing Material live glass `rgba` property values.
+Overnight autoresearch (Track B) kept shipping opaque Architect-parity (#14). Digester open stayed empty; design-review stayed in polish-without-capture grace (Screen Recording TCC / menu-bar only). Layout-daily already checked for dark shells; Architect still unmarked (screen missing). Material live glass `rgba` cleared by v0.1.2489; Swiss shell foundation started at v0.1.2490.
 
-## Shipped tonight (highlights)
+## Shipped tonight (keep)
 
-- **v0.1.2489** — Material Monitors / collapse muted-var opaque (`.collapse-btn` · `.monitors-menu-btn` · `.monitor-info` secondary · `.monitor-history` hairline). Material live glass `rgba` property values cleared.
-- **v0.1.2488** — Material battery / icon-line / history-controls opaque (`.battery-icon` · `.icon-line-item` status type · `.history-controls label`).
-- **v0.1.2487** — Material history time-range / tooltip / Changelog code opaque (`.time-range-dropdown` · `.history-tooltip` · `.changelog-code`).
-- **v0.1.2486** — Material Debug Log opaque (toolbar buttons · autorefresh · viewer).
-- **v0.1.2485** — Material Monitors settings popover opaque (menu · modal backdrop/panel · settings rows · remove · add-form inputs).
-- **v0.1.2484** — Material Settings modal chrome opaque (theme chips · inputs · buttons · help sheet · force-quit · Changelog scrollbar).
-- **v0.1.2483** — Material AI Chat opaque (Ollama menu · model selector · chat messages · markdown · thinking dots).
-- **v0.1.2482** / **v0.1.2481** / **v0.1.2480** — Material Settings/Monitors + history/process/battery + shell foundation opaque.
-- Earlier same night: Dark / Neon / Futuristic AI Chat CRT catch-ups through **v0.1.2479** and friends (see CHANGELOG / standing_backlog).
+- **v0.1.2490** — Swiss-minimalistic shell opaque (`:root` tokens · Details/Processes scrollbar · title · `.icon-btn` · `.tile` → `color-mix` on `#ffffff` / `#f6f6f6`).
+- **v0.1.2489** — Material Monitors / collapse muted-var opaque (live Material glass `rgba` property values cleared).
+- **v0.1.2488** — Material battery icon / icon-line status type / history-controls label opaque.
+- **v0.1.2487** — Material history time-range / tooltip / Changelog code opaque.
+- **v0.1.2486** — Material Debug Log toolbar / autorefresh / viewer opaque.
+- **v0.1.2485** — Material Monitors settings popover opaque.
+- **v0.1.2484** — Material Settings modal chrome opaque.
+- Earlier same night: Material AI Chat / Settings+Monitors / history+processes+battery / shell foundation (v0.1.2480–2483), plus dark-shell CRT catch-up through filter-chip / collapsed-active remaps.
 
-## Tried / deferred
+## Tried / discarded
 
-- Sibling OpenClaw / Hermes: missing on this Linux rack (no port fuel).
-- Window-only screen recapture for stale `feature-*.png`: still TCC-blocked; polish-without-capture grace only.
-- Next: Swiss-minimalistic / Light shell opaque (Material glass property values done), or Mac capture when TCC allows.
+- Parallel race discard on local Material history+processes as v0.1.2481 (origin already shipped the same surface) — reset to origin; no duplicate ship.
 
-## Why it matters
+## Next fuel
 
-Material Monitors chrome and collapse affordances no longer fall back to gray/black glass over the paper shell. Same #14 opaque-shell family as Architect; Material theme glass `rgba` property values are cleared, so the next opaque pass can move to Swiss-minimalistic / Light.
+- Swiss remaining glass leftovers, or Light shell opaque foundation.
+- Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
+## Fitness
+
+Swiss shell tokens / scrollbar / title / icon buttons / metric tiles no longer sit as translucent rgba over paper — same opaque `color-mix` pattern as Material and Architect.
