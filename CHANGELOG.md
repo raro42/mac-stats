@@ -7,6 +7,11 @@
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2487] - 2026-11-08
+
+### Changed
+- **Material history time-range / tooltip / Changelog code opaque (#14):** `.time-range-dropdown` resting/hover/focus/option, `.history-tooltip`, and `.changelog-code` move off Material blue/black glass `rgba` onto opaque `color-mix` against Material paper `#e7e2d9` (Architect-parity after Debug Log v0.1.2486). Standing P2 #14; design-review `feature-cpu-metrics` / Changelog adjacent (polish-without-capture grace; Mac recapture deferred, Screen Recording TCC / menu-bar only). Next: Material remaining glass leftovers (e.g. history-controls muted label / battery status type rgba), or Swiss-minimalistic / Light shell opaque, or Mac capture when TCC allows.
+
 ## [0.1.2486] - 2026-11-08
 
 ### Changed

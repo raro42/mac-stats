@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2487
+
+- Material history time-range / tooltip / Changelog code opaque (`.time-range-dropdown` resting · hover · focus · option · `.history-tooltip` · `.changelog-code`) glass `rgba` → opaque `color-mix` on paper `#e7e2d9` (Architect-parity after Debug Log v0.1.2486). Standing P2 #14; design-review `feature-cpu-metrics` / Changelog adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Material remaining glass leftovers (e.g. history-controls muted label / battery status type rgba), or Swiss-minimalistic / Light shell opaque, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2486
 
 - Material Debug Log opaque (`.logs-toolbar` button · `.logs-autorefresh` · `.logs-viewer`) glass `rgba` → opaque `color-mix` on paper `#e7e2d9` (Architect-parity after Monitors popover v0.1.2485). Standing P2 #14; design-review Debug Log / `feature-agent-ops` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Material history time-range / tooltip / `.changelog-code` glass leftovers, or Swiss-minimalistic / Light shell opaque, or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.

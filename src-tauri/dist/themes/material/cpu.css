@@ -1105,7 +1105,8 @@ body {
 }
 
 .changelog-code {
-  background: rgba(0, 0, 0, 0.08);
+  /* Opaque code wash — was rgba(0,0,0,0.08) glass (#14). */
+  background: color-mix(in srgb, #000000 8%, #e7e2d9);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: "SF Mono", "Monaco", "Menlo", monospace;
@@ -2509,41 +2510,44 @@ body {
 }
 
 .time-range-dropdown {
-  background: rgba(33, 150, 243, 0.05);
-  border: 1px solid rgba(33, 150, 243, 0.3);
+  /* Opaque wash / hairline — was Material blue glass rgba(33,150,243,…) (#14). */
+  background: color-mix(in srgb, #2196F3 5%, #e7e2d9);
+  border: 1px solid color-mix(in srgb, #2196F3 30%, #e7e2d9);
   border-radius: 4px;
-  color: #2196F3;
+  color: color-mix(in srgb, #2196F3 78%, #18181a);
   padding: 4px 8px;
   font-size: 12px;
   font-family: monospace;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .time-range-dropdown:hover {
-  background: rgba(33, 150, 243, 0.1);
-  border-color: rgba(33, 150, 243, 0.5);
+  background: color-mix(in srgb, #2196F3 10%, #e7e2d9);
+  border-color: color-mix(in srgb, #2196F3 50%, #e7e2d9);
 }
 
 .time-range-dropdown:focus {
   outline: none;
-  background: rgba(33, 150, 243, 0.15);
-  border-color: rgba(33, 150, 243, 0.7);
-  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+  background: color-mix(in srgb, #2196F3 15%, #e7e2d9);
+  border-color: color-mix(in srgb, #2196F3 70%, #e7e2d9);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #2196F3 10%, #e7e2d9);
 }
 
 .time-range-dropdown option {
-  background: #1a1a1a;
-  color: #2196F3;
+  /* Opaque option panel — was dark #1a1a1a glass hole on Material paper (#14). */
+  background: color-mix(in srgb, #f5f1ea 94%, #e7e2d9);
+  color: color-mix(in srgb, #2196F3 78%, #18181a);
 }
 
 /* History tooltip */
 .history-tooltip {
   position: fixed;
-  background: rgba(0, 0, 0, 0.95);
-  color: #2196F3;
+  /* Opaque panel — was black/blue glass rgba (#14). */
+  background: color-mix(in srgb, #18181a 92%, #e7e2d9);
+  color: #e7e2d9;
   padding: 8px 12px;
-  border: 1px solid rgba(33, 150, 243, 0.5);
+  border: 1px solid color-mix(in srgb, #2196F3 50%, #e7e2d9);
   border-radius: 4px;
   font-size: 11px;
   font-family: monospace;
@@ -2552,7 +2556,7 @@ body {
   display: none;
   white-space: pre;
   line-height: 1.4;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 4px 12px color-mix(in srgb, #000000 28%, #e7e2d9);
 }
 
 /* Debug Log viewer */
