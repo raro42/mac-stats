@@ -7,6 +7,11 @@
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2496] - 2026-11-08
+
+### Changed
+- **Swiss-minimalistic Debug Log opaque (#14):** `.logs-toolbar` button, `.logs-autorefresh`, and `.logs-viewer` move off gray/black glass `rgba` onto opaque `color-mix` against Swiss paper `#ffffff` (Material-parity after Settings modal v0.1.2495). Standing P2 #14; design-review Debug Log / `feature-agent-ops` adjacent (polish-without-capture grace; Mac recapture deferred, Screen Recording TCC / menu-bar only). Next: Swiss history time-range / tooltip / `.changelog-code` leftovers / Light shell opaque, or Mac capture when TCC allows.
+
 ## [0.1.2495] - 2026-11-08
 
 ### Changed

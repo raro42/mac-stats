@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2496
+
+- Swiss-minimalistic Debug Log opaque (`.logs-toolbar` button · `.logs-autorefresh` · `.logs-viewer`) glass `rgba` → opaque `color-mix` on paper `#ffffff` (Material-parity after Settings modal v0.1.2495). Standing P2 #14; design-review Debug Log / `feature-agent-ops` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Swiss history time-range / tooltip / `.changelog-code` leftovers / Light shell opaque, or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2495
 
 - Swiss-minimalistic Settings modal chrome opaque (`.theme-item` · `.settings-input` / `.discord-token-input` · `.settings-btn` / primary · `.settings-help-sheet` · `.force-quit-section` / `.force-quit-btn` · Changelog scrollbar track/thumb · `.changelog-error`) glass `rgba` / `color-mix(…, transparent)` → opaque `color-mix` on paper `#ffffff` (Material-parity after Monitors popover v0.1.2494). Standing P2 #14; design-review Settings adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Swiss Debug Log / history time-range / tooltip / `.changelog-code` leftovers / Light shell opaque, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
