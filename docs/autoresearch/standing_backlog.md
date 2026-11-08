@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2508
+
+- Light battery / icon-line / history-controls opaque (`.history-controls label` · `.battery-icon` resting/charging · `.icon-line-item` resting/hover/status-good/warning/bad) glass `rgba` → opaque `color-mix` on paper `#ffffff` (Swiss-parity after history chrome v0.1.2507). Standing P2 #14; design-review `feature-cpu-metrics` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Light remaining glass leftovers if any, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2507
 
 - Light history time-range / tooltip / Changelog code opaque (`.time-range-dropdown` resting · hover · focus · option · `.history-tooltip` · `.changelog-code`) glass `rgba` → opaque `color-mix` on paper `#ffffff` / `#f7f7fa` (Swiss-parity after Debug Log v0.1.2506). Standing P2 #14; design-review `feature-cpu-metrics` / Changelog adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Light remaining glass leftovers (e.g. history-controls muted / battery status type), or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.

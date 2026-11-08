@@ -954,7 +954,8 @@ body {
 }
 
 .history-controls label {
-  color: var(--text-muted, rgba(128, 128, 128, 0.8));
+  /* Opaque type — was gray glass rgba(128,…) fallback (#14). */
+  color: var(--muted, color-mix(in srgb, #808080 80%, #ffffff));
   font-weight: 500;
 }
 
@@ -1346,7 +1347,8 @@ body {
 .battery-icon {
   width: 16px;
   height: 16px;
-  color: rgba(12, 12, 16, 0.50); /* Same grey as --muted, matching settings icon */
+  /* Opaque type — was rgba(12,12,16,0.50) glass (#14). */
+  color: color-mix(in srgb, #0c0c10 50%, #ffffff);
   flex-shrink: 0;
   display: inline-block;
   vertical-align: middle;
@@ -1354,7 +1356,8 @@ body {
 }
 
 .battery-icon.charging {
-  color: rgba(52, 199, 89, 0.8); /* Slightly green when charging */
+  /* Opaque type — was rgba(52,199,89,0.8) glass (#14). */
+  color: color-mix(in srgb, #34c759 80%, #ffffff);
 }
 
 .battery-icon.no-battery {
@@ -1412,7 +1415,8 @@ body {
   box-shadow: none;
   padding: 0;
   cursor: pointer;
-  color: rgba(12, 12, 16, 0.42);
+  /* Opaque type — was rgba(12,12,16,0.42) glass (#14). */
+  color: color-mix(in srgb, #0c0c10 42%, #ffffff);
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
   transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
   border-radius: 9px;
@@ -1422,7 +1426,8 @@ body {
 }
 
 .icon-line-item:hover {
-  color: rgba(12, 12, 16, 0.72);
+  /* Opaque type — was rgba(12,12,16,0.72) glass (#14). */
+  color: color-mix(in srgb, #0c0c10 72%, #ffffff);
   background: #ececf1;
   border-color: #dcdce2;
 }
@@ -1459,14 +1464,16 @@ body {
 
 /* Soft ok (apple Ready calm / Monitors all-up 7%/28% parity). */
 .icon-line-item.status-good {
-  color: rgba(36, 160, 90, 0.78);
+  /* Opaque type — was rgba(36,160,90,0.78) glass (#14). */
+  color: color-mix(in srgb, #24a05a 78%, #ffffff);
   background: color-mix(in srgb, #34c759 7%, #ffffff);
   border-color: color-mix(in srgb, #34c759 28%, #ffffff);
   box-shadow: none;
 }
 
 .icon-line-item.status-good:hover {
-  color: rgba(36, 160, 90, 0.92);
+  /* Opaque type — was rgba(36,160,90,0.92) glass (#14). */
+  color: color-mix(in srgb, #24a05a 92%, #ffffff);
   background: color-mix(in srgb, #34c759 10%, #ffffff);
   border-color: color-mix(in srgb, #34c759 36%, #ffffff);
   box-shadow: none;
@@ -1492,14 +1499,16 @@ body {
 
 /* Soft alert (apple Monitors Slow / Ops health-warn 7%/30% parity). */
 .icon-line-item.status-warning {
-  color: rgba(200, 130, 20, 0.72);
+  /* Opaque type — was rgba(200,130,20,0.72) glass (#14). */
+  color: color-mix(in srgb, #c88214 72%, #ffffff);
   background: color-mix(in srgb, #ff9f0a 7%, #ffffff);
   border-color: color-mix(in srgb, #ff9f0a 30%, #ffffff);
   box-shadow: none;
 }
 
 .icon-line-item.status-warning:hover {
-  color: rgba(200, 130, 20, 0.88);
+  /* Opaque type — was rgba(200,130,20,0.88) glass (#14). */
+  color: color-mix(in srgb, #c88214 88%, #ffffff);
   background: color-mix(in srgb, #ff9f0a 10%, #ffffff);
   border-color: color-mix(in srgb, #ff9f0a 36%, #ffffff);
 }
@@ -1517,14 +1526,16 @@ body {
 
 /* Soft alert (apple Monitors Down / Ops health-bad 7%/30% parity). */
 .icon-line-item.status-bad {
-  color: rgba(200, 55, 50, 0.78);
+  /* Opaque type — was rgba(200,55,50,0.78) glass (#14). */
+  color: color-mix(in srgb, #c83732 78%, #ffffff);
   background: color-mix(in srgb, #ff3b30 7%, #ffffff);
   border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
   box-shadow: none;
 }
 
 .icon-line-item.status-bad:hover {
-  color: rgba(200, 55, 50, 0.92);
+  /* Opaque type — was rgba(200,55,50,0.92) glass (#14). */
+  color: color-mix(in srgb, #c83732 92%, #ffffff);
   background: color-mix(in srgb, #ff3b30 10%, #ffffff);
   border-color: color-mix(in srgb, #ff3b30 36%, #ffffff);
 }
