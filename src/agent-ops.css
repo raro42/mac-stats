@@ -25746,3 +25746,80 @@ body.theme-futuristic .disk-cleanup-scope-row.is-selected {
   border-color: color-mix(in srgb, var(--accent, #3bd6ff) 28%, #0b0b10);
   background: color-mix(in srgb, var(--accent, #3bd6ff) 6%, #0b0b10);
 }
+
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Debug Log toolbar chrome still mixes
+ * Apple `#ffffff` washes (`.logs-toolbar` resting · button · hover ·
+ * focus-visible) → white slab on opaque shells. Filter chips remapped earlier.
+ * Standing P2 #14 after Disk Cleanup scope-row CRT v0.1.2473; design-review
+ * Debug Log / `feature-agent-ops` adjacent (polish-without-capture grace; Mac
+ * capture deferred — Screen Recording TCC / menu-bar only).
+ */
+body.theme-data-poster .logs-toolbar {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+}
+body.theme-dark .logs-toolbar {
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3.5%, #0a0a0a);
+}
+body.theme-neon .logs-toolbar {
+  border-color: color-mix(in srgb, currentColor 10%, #08120c);
+  background: color-mix(in srgb, currentColor 3.5%, #08120c);
+}
+body.theme-futuristic .logs-toolbar {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+}
+
+body.theme-data-poster .logs-toolbar button {
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  background: color-mix(in srgb, currentColor 5%, #0b0b10);
+}
+body.theme-dark .logs-toolbar button {
+  border-color: color-mix(in srgb, currentColor 14%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 5%, #0a0a0a);
+}
+body.theme-neon .logs-toolbar button {
+  border-color: color-mix(in srgb, currentColor 14%, #08120c);
+  background: color-mix(in srgb, currentColor 5%, #08120c);
+}
+body.theme-futuristic .logs-toolbar button {
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  background: color-mix(in srgb, currentColor 5%, #0b0b10);
+}
+
+body.theme-data-poster .logs-toolbar button:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 8%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 24%, #0b0b10);
+}
+body.theme-dark .logs-toolbar button:hover {
+  background: color-mix(in srgb, var(--accent, #00cc66) 8%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 24%, #0a0a0a);
+}
+body.theme-neon .logs-toolbar button:hover {
+  background: color-mix(in srgb, var(--accent, #6dff7b) 8%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 24%, #08120c);
+}
+body.theme-futuristic .logs-toolbar button:hover {
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 8%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 24%, #0b0b10);
+}
+
+body.theme-data-poster .logs-toolbar button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+  outline-offset: 2px;
+}
+body.theme-dark .logs-toolbar button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
+  outline-offset: 2px;
+}
+body.theme-neon .logs-toolbar button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
+  outline-offset: 2px;
+}
+body.theme-futuristic .logs-toolbar button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
+  outline-offset: 2px;
+}
