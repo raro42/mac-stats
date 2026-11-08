@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2481
+
+- Material history tile + Top Processes + battery strip opaque (`.history-chart-container` early/late · `.details-grid` · process row/name/bar/percent · `.battery-power-strip`) glass `rgba` → opaque `color-mix` on paper `#e7e2d9` (Architect-parity after shell foundation v0.1.2480). Standing P2 #14; design-review `feature-cpu-metrics` / `feature-processes` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Material Settings / AI Chat / Monitors `rgba` leftovers, or Swiss-minimalistic / Light shell opaque, or Mac capture of stale `feature-cpu-metrics.png` / `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2480
 
 - Material shell opaque (`:root` tokens · body wash · `.mat-card` · Details/Processes scrollbar · title · `.icon-btn` · dial pad/inset) glass `rgba` → opaque `color-mix` on paper `#e7e2d9` (Architect-parity foundation). Standing P2 #14 after dark-shell CRT catch-up v0.1.2479; layout-daily adjacent (Material shell glass; Mac capture still TCC-blocked). Next: Material tile / Settings / AI Chat / Monitors `rgba` leftovers, or Swiss-minimalistic / Light shell opaque, or Mac capture of stale `feature-cpu-metrics.png` / `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.

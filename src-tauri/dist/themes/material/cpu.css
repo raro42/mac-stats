@@ -363,7 +363,8 @@ body {
   font-size: 11px;
   font-weight: 400;
   line-height: 1.35;
-  color: rgba(60, 60, 67, 0.72);
+  /* Opaque type — was rgba(60,60,67,0.72) glass (#14). */
+  color: color-mix(in srgb, #3c3c43 72%, #e7e2d9);
 }
 
 .detail-item {
@@ -400,14 +401,15 @@ body {
   height: 40px;
   border-radius: 16px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.20);
+  /* Opaque tile wash + inset — was white/black glass rgba (#14). */
+  background: color-mix(in srgb, #ffffff 20%, #e7e2d9);
   border: none;
   padding: 0;
   margin: 0;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.50),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.02),
-    0 2px 8px rgba(0, 0, 0, 0.06);
+    inset 0 1px 0 color-mix(in srgb, #ffffff 50%, #e7e2d9),
+    inset 0 -1px 0 color-mix(in srgb, #000000 2%, #e7e2d9),
+    0 2px 8px color-mix(in srgb, #000000 6%, #e7e2d9);
 }
 
 .history-chart {
@@ -452,13 +454,15 @@ body {
   gap: 12px;
   align-items: center;
   padding: 4px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  /* Opaque hairline — was rgba(0,0,0,0.08) glass (#14). */
+  border-bottom: 1px solid color-mix(in srgb, #000000 8%, #e7e2d9);
 }
 
 .process-name {
   font-size: 11px;
   font-weight: 400;
-  color: rgba(24, 24, 26, 0.72);
+  /* Opaque type — was rgba(24,24,26,0.72) glass (#14). */
+  color: color-mix(in srgb, #18181a 72%, #e7e2d9);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -473,7 +477,8 @@ body {
 .process-bar {
   width: 100px;
   height: 4px;
-  background: rgba(0, 0, 0, 0.12);
+  /* Opaque track — was rgba(0,0,0,0.12) glass (#14). */
+  background: color-mix(in srgb, #000000 12%, #e7e2d9);
   border-radius: 99px;
   overflow: hidden;
 }
@@ -481,7 +486,8 @@ body {
 .process-bar-fill {
   height: 100%;
   width: 0;
-  background: rgba(24, 24, 26, 0.28);
+  /* Opaque fill — was rgba(24,24,26,0.28) glass (#14). */
+  background: color-mix(in srgb, #18181a 28%, #e7e2d9);
 }
 
 .process-percent {
@@ -489,7 +495,8 @@ body {
   text-align: right;
   font-size: 11px;
   font-weight: 600;
-  color: rgba(24, 24, 26, 0.72);
+  /* Opaque type — was rgba(24,24,26,0.72) glass (#14). */
+  color: color-mix(in srgb, #18181a 72%, #e7e2d9);
 }
 
 .process-empty {
@@ -1094,7 +1101,8 @@ body {
   align-items: center;
   padding: 12px 16px;
   margin: 0;
-  background: rgba(255, 255, 255, 0.4);
+  /* Opaque strip wash — was rgba(255,255,255,0.4) glass (#14). */
+  background: color-mix(in srgb, #ffffff 40%, #e7e2d9);
   border: 1px solid var(--hairline);
   border-radius: 12px;
   font-size: 13px;
@@ -2401,12 +2409,13 @@ body {
   height: 40px;
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.20);
+  /* Opaque tile wash + inset — was white/black glass rgba (late duplicate of early #14). */
+  background: color-mix(in srgb, #ffffff 20%, #e7e2d9);
   border: none;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.50),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.02),
-    0 2px 8px rgba(0, 0, 0, 0.06);
+    inset 0 1px 0 color-mix(in srgb, #ffffff 50%, #e7e2d9),
+    inset 0 -1px 0 color-mix(in srgb, #000000 2%, #e7e2d9),
+    0 2px 8px color-mix(in srgb, #000000 6%, #e7e2d9);
 }
 
 .history-chart {
