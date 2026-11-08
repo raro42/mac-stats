@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2485
+
+- Material Monitors settings popover opaque (`.monitors-menu` · menu-item hover · `.monitors-settings-popover` backdrop/panel/header/close · `.monitor-settings-item` / remove · `.add-monitor-form` input) glass `rgba` → opaque `color-mix` on paper `#e7e2d9` (Architect-parity after Settings modal v0.1.2484). Standing P2 #14; design-review `feature-monitors` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Material remaining modal `rgba` leftovers (e.g. Ollama settings popover / Debug Log glass), or Swiss-minimalistic / Light shell opaque, or Mac capture of stale `feature-monitors.png` / `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2484
 
 - Material Settings modal chrome opaque (`.theme-item` · `.settings-input` / `.discord-token-input` · `.settings-btn` / primary · `.settings-help-sheet` · `.force-quit-section` / `.force-quit-btn` · Changelog scrollbar track/thumb · `.changelog-error`) glass `rgba` / `color-mix(…, transparent)` → opaque `color-mix` on paper `#e7e2d9` (Architect-parity after AI Chat v0.1.2483). Standing P2 #14; design-review Settings adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: Material Monitors settings popover / remaining modal `rgba` leftovers, or Swiss-minimalistic / Light shell opaque, or Mac capture of stale `feature-monitors.png` / `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
