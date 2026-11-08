@@ -4,7 +4,8 @@ Overnight Track B kept opaque remaps rolling (standing P2 #14). Digester stayed 
 
 ## Shipped tonight (highlights)
 
-- **v0.1.2483** — Material AI Chat opaque (Ollama menu · model selector · chat messages · markdown · thinking dots) glass `rgba` → `#e7e2d9` mixes (Architect-parity after Settings/Monitors).
+- **v0.1.2484** — Material Settings modal chrome opaque (`.theme-item` · inputs · buttons · help sheet · force-quit · Changelog scrollbar/error) glass `rgba` / `color-mix(…, transparent)` → `#e7e2d9` mixes (Architect-parity after AI Chat).
+- **v0.1.2483** — Material AI Chat opaque (Ollama menu · model selector · chat messages · markdown · thinking dots).
 - **v0.1.2482** — Material Settings + Monitors opaque (`.settings-card` · toggles · `.add-btn-small` · `.monitor-item`).
 - **v0.1.2481** — Material history tile + Top Processes + battery strip opaque.
 - **v0.1.2480** — Material shell opaque foundation (`:root` tokens · body wash · `.mat-card` · scrollbar · title · `.icon-btn` · dial pad/inset).
@@ -12,10 +13,12 @@ Overnight Track B kept opaque remaps rolling (standing P2 #14). Digester stayed 
 
 ## Tried / deferred
 
-- Sibling OpenClaw / Hermes: missing on this Linux rack (no port fuel).
+- Local Material history+processes as v0.1.2481 raced sibling ship → discard; continued on Material Settings/AI Chat/modal chrome.
 - Window-only screen recapture for stale `feature-*.png`: still TCC-blocked; polish-without-capture grace only.
-- Next Material leftovers: remaining modal `rgba`, or Swiss-minimalistic / Light shell opaque.
+- Next: Material Monitors settings popover / remaining modal `rgba`, or Swiss-minimalistic / Light shell opaque.
 
 ## Why it matters
 
-Material AI Chat no longer paints menu/model/message washes as white glass over the paper shell. Same #14 opaque-shell family as Architect, now catching up on Material chat chrome.
+Material Settings theme chips, inputs, buttons, force-quit, and Changelog chrome no longer sit on white glass washes. Same #14 opaque-shell family as Architect, catching up on Material modal chrome.
+
+keep @ 9e15cdcd · results.tsv updated.
