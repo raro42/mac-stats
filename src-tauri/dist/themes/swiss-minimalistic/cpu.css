@@ -900,41 +900,44 @@ body {
 }
 
 .time-range-dropdown {
-  background: rgba(18, 18, 22, 0.68, 0.05);
-  border: 1px solid rgba(18, 18, 22, 0.68, 0.3);
+  /* Opaque wash / hairline — was invalid 5-arg Swiss ink glass rgba(18,18,22,0.68,…) (#14). */
+  background: color-mix(in srgb, #121216 5%, #ffffff);
+  border: 1px solid color-mix(in srgb, #121216 30%, #ffffff);
   border-radius: 4px;
-  color: rgba(18, 18, 22, 0.68);
+  color: color-mix(in srgb, #121216 68%, #ffffff);
   padding: 4px 8px;
   font-size: 12px;
   font-family: monospace;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .time-range-dropdown:hover {
-  background: rgba(18, 18, 22, 0.68, 0.1);
-  border-color: rgba(18, 18, 22, 0.68, 0.5);
+  background: color-mix(in srgb, #121216 10%, #ffffff);
+  border-color: color-mix(in srgb, #121216 50%, #ffffff);
 }
 
 .time-range-dropdown:focus {
   outline: none;
-  background: rgba(18, 18, 22, 0.68, 0.15);
-  border-color: rgba(18, 18, 22, 0.68, 0.7);
-  box-shadow: 0 0 0 2px rgba(18, 18, 22, 0.68, 0.1);
+  background: color-mix(in srgb, #121216 15%, #ffffff);
+  border-color: color-mix(in srgb, #121216 70%, #ffffff);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #121216 10%, #ffffff);
 }
 
 .time-range-dropdown option {
-  background: #1a1a1a;
-  color: rgba(18, 18, 22, 0.68);
+  /* Opaque option panel — was dark #1a1a1a glass hole on Swiss paper (#14). */
+  background: color-mix(in srgb, #f6f6f6 94%, #ffffff);
+  color: color-mix(in srgb, #121216 68%, #ffffff);
 }
 
 /* History tooltip */
 .history-tooltip {
   position: fixed;
-  background: rgba(0, 0, 0, 0.95);
-  color: rgba(18, 18, 22, 0.68);
+  /* Opaque panel — was black/ink glass rgba (#14). */
+  background: color-mix(in srgb, #121216 92%, #ffffff);
+  color: #ffffff;
   padding: 8px 12px;
-  border: 1px solid rgba(18, 18, 22, 0.68, 0.5);
+  border: 1px solid color-mix(in srgb, #121216 50%, #ffffff);
   border-radius: 4px;
   font-size: 11px;
   font-family: monospace;
@@ -943,7 +946,7 @@ body {
   display: none;
   white-space: pre;
   line-height: 1.4;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 4px 12px color-mix(in srgb, #000000 28%, #ffffff);
 }
 
 @media (max-width: 560px) {
@@ -1196,7 +1199,8 @@ body {
 }
 
 .changelog-code {
-  background: rgba(0, 0, 0, 0.08);
+  /* Opaque code wash — was rgba(0,0,0,0.08) glass (#14). */
+  background: color-mix(in srgb, #000000 8%, #ffffff);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: "SF Mono", "Monaco", "Menlo", monospace;
