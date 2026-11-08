@@ -1,20 +1,15 @@
 # Morning surprise — 2026-11-08
 
-Overnight Track B kept opaque remaps rolling (standing P2 #14). Digester stayed empty; design-review stayed in polish-without-capture grace.
+Overnight Track B kept shipping Swiss-minimalistic opaque remaps (standing P2 #14).
 
-## Shipped tonight (highlights)
+## Shipped
+- **v0.1.2495** — Swiss Settings modal chrome opaque: theme chips, inputs, buttons, help sheet, force-quit, Changelog scrollbar/error off glass `rgba` onto `color-mix` on paper `#ffffff` (Material 2484 parity after Monitors popover v0.1.2494).
+- **v0.1.2494** — Swiss Monitors menu + settings popover opaque (backfilled keep this tick).
+- Earlier same night/window: Swiss AI Chat **v0.1.2493**, Settings/Monitors list **v0.1.2492**, history/process/battery **v0.1.2491**, shell foundation **v0.1.2490**.
 
-- **v0.1.2493** — Swiss AI Chat opaque (menu · model · messages · markdown · thinking-dots).
-- **v0.1.2492** — Swiss Settings + Monitors opaque.
-- **v0.1.2491** / **v0.1.2490** — Swiss history/process/battery + shell opaque.
-- Earlier: Material paper clear-out + dark-shell CRT catch-ups (see CHANGELOG).
+## Tried / context
+- Digester empty (0 turns / 7d). Design review + layout-daily not due (grace). Sibling harnesses missing on rack. Debug.log quiet.
 
-## Tried / deferred
-
-- Sibling OpenClaw / Hermes missing on Linux rack.
-- Mac `feature-*.png` recapture still TCC-blocked.
-- Next: Swiss remaining modal leftovers / Light shell opaque, or Mac capture when TCC allows.
-
-## Why it matters
-
-Swiss AI Chat chrome no longer paints glass `rgba` washes over the paper shell. Same #14 opaque-shell family as Architect / Material.
+## Next
+- Swiss Debug Log / history time-range / tooltip / `.changelog-code` leftovers, or Light shell opaque.
+- Mac window-only recapture of stale feature screens when Screen Recording TCC allows `screencapture -l`.
