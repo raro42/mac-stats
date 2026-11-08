@@ -8,21 +8,24 @@
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", sans-serif;
 
   --bg: #f6f6f6;
-  --panel: rgba(255, 255, 255, 0.94);
-  --border: rgba(0, 0, 0, 0.10);
-  --rule: rgba(0, 0, 0, 0.10);
-  --hairline: rgba(0, 0, 0, 0.10);
-  --panel-border: rgba(0, 0, 0, 0.10);
-  --panel-shadow: 0 28px 90px rgba(0, 0, 0, 0.18);
+  /* Opaque panel / line tokens — was white/black glass rgba over Swiss paper (#14). */
+  --panel: color-mix(in srgb, #ffffff 94%, #f6f6f6);
+  --border: color-mix(in srgb, #000000 10%, #ffffff);
+  --rule: color-mix(in srgb, #000000 10%, #ffffff);
+  --hairline: color-mix(in srgb, #000000 10%, #ffffff);
+  --panel-border: color-mix(in srgb, #000000 10%, #ffffff);
+  --panel-shadow: 0 28px 90px color-mix(in srgb, #000000 18%, #ffffff);
 
-  --text: rgba(18, 18, 22, 0.90);
-  --muted: rgba(18, 18, 22, 0.55);
+  /* Opaque type tokens — was ink glass rgba over Swiss paper (#14). */
+  --text: color-mix(in srgb, #121216 90%, #ffffff);
+  --muted: color-mix(in srgb, #121216 55%, #ffffff);
 
-  --ring-track: rgba(0, 0, 0, 0.12);
-  --accent: rgba(18, 18, 22, 0.68);
+  --ring-track: color-mix(in srgb, #000000 12%, #ffffff);
+  --accent: color-mix(in srgb, #121216 68%, #ffffff);
 
-  --modal: rgba(0, 0, 0, 0.32);
-  --modal-backdrop: rgba(0, 0, 0, 0.32);
+  /* Opaque modal tokens — was black glass rgba over Swiss paper (#14). */
+  --modal: color-mix(in srgb, #000000 32%, #ffffff);
+  --modal-backdrop: color-mix(in srgb, #000000 32%, #ffffff);
 }
 
 body {
@@ -82,13 +85,15 @@ body {
 
 .swiss-details::-webkit-scrollbar-thumb,
 .swiss-processes::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
+  /* Opaque thumb — was rgba(0,0,0,0.15) glass (#14). */
+  background: color-mix(in srgb, #000000 15%, #ffffff);
   border-radius: 3px;
 }
 
 .swiss-details::-webkit-scrollbar-thumb:hover,
 .swiss-processes::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.25);
+  /* Opaque hover — was rgba(0,0,0,0.25) glass (#14). */
+  background: color-mix(in srgb, #000000 25%, #ffffff);
 }
 
 .swiss-header {
@@ -110,7 +115,8 @@ body {
   font-weight: 400;
   letter-spacing: -0.01em;
   line-height: 1.05;
-  color: rgba(18, 18, 22, 0.92);
+  /* Opaque type — was rgba(18,18,22,0.92) glass (#14). */
+  color: color-mix(in srgb, #121216 92%, #ffffff);
 }
 
 .swiss-subtitle {
@@ -131,7 +137,8 @@ body {
   border-radius: 10px;
   border: none;
   background: transparent;
-  color: rgba(18, 18, 22, 0.55);
+  /* Opaque type — was rgba(18,18,22,0.55) glass (#14). */
+  color: color-mix(in srgb, #121216 55%, #ffffff);
   font-size: 20px;
   cursor: pointer;
   display: inline-flex;
@@ -140,7 +147,8 @@ body {
 }
 
 .icon-btn:hover {
-  color: rgba(18, 18, 22, 0.85);
+  /* Opaque type — was rgba(18,18,22,0.85) glass (#14). */
+  color: color-mix(in srgb, #121216 85%, #ffffff);
 }
 
 .swiss-rule {
@@ -159,9 +167,10 @@ body {
 .tile {
   position: relative;
   border-radius: 28px;
-  background: rgba(255, 255, 255, 0.24);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 16px 46px rgba(0, 0, 0, 0.08);
+  /* Opaque tile wash / hairline / shadow — was white/black glass rgba (#14). */
+  background: color-mix(in srgb, #ffffff 24%, #f6f6f6);
+  border: 1px solid color-mix(in srgb, #000000 8%, #ffffff);
+  box-shadow: 0 16px 46px color-mix(in srgb, #000000 8%, #ffffff);
   padding: 24px 18px 18px;
   min-height: 236px;
   overflow: hidden;
