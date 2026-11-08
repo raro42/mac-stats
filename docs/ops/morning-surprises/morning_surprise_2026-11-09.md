@@ -4,6 +4,7 @@ Overnight autoresearch (Track B) kept shipping Light opaque chrome (#14). Digest
 
 ## Shipped this window (latest first)
 
+- **v0.1.2509** — Light Monitors/collapse muted-var opaque (`.collapse-btn` · `.monitor-info` secondary · `.monitor-history` hairline).
 - **v0.1.2508** — Light battery / icon-line / history-controls opaque (`.history-controls label` · `.battery-icon` · `.icon-line-item` status washes).
 - **v0.1.2507** — Light history time-range / tooltip / Changelog code opaque.
 - **v0.1.2506** — Light Debug Log opaque (`.logs-toolbar` button · `.logs-autorefresh` · `.logs-viewer`).
@@ -17,13 +18,13 @@ Overnight autoresearch (Track B) kept shipping Light opaque chrome (#14). Digest
 
 ## Fitness
 
-Light battery icon, icon-line status colors, and history-controls label no longer lean on glass `rgba` type. Washes stay opaque on paper `#ffffff`, same as Swiss after v0.1.2498.
+Light collapse chevrons and Monitors secondary type/hairline no longer lean on nested glass `rgba` var fallbacks. Washes stay opaque on paper `#ffffff`, same as Swiss after v0.1.2499.
 
 ## Tried / deferred
 
-- Parallel race on history chrome (local ship discarded; origin already at v0.1.2507) — then this tick kept battery / icon-line as v0.1.2508.
 - Mac `feature-*.png` recapture still TCC-blocked / menu-bar only.
+- Light live glass leftovers remaining: process-bar fill gradient + Changelog accent `rgba` (next fuel).
 
 ## Next fuel
 
-Light remaining glass leftovers if any, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+Light process-bar / Changelog accent leftovers if any, or Mac capture of stale `feature-monitors.png` / `feature-cpu-metrics.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
