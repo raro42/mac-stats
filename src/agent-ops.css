@@ -25823,3 +25823,25 @@ body.theme-futuristic .logs-toolbar button:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
   outline-offset: 2px;
 }
+
+
+/*
+ * Dark / Neon / Futuristic: Top Processes selected row still mixes Apple
+ * `#ffffff` (`.process-row.is-selected` background · inset ring) → white slab
+ * on opaque shells. Data Poster remapped earlier. Standing P2 #14 after Debug
+ * Log toolbar CRT v0.1.2474; design-review `feature-processes` adjacent
+ * (polish-without-capture grace; Mac capture deferred — Screen Recording TCC /
+ * menu-bar only).
+ */
+body.theme-dark .process-row.is-selected {
+  background: color-mix(in srgb, #0a84ff 12%, #0a0a0a);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #0a0a0a);
+}
+body.theme-neon .process-row.is-selected {
+  background: color-mix(in srgb, #0a84ff 12%, #08120c);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #08120c);
+}
+body.theme-futuristic .process-row.is-selected {
+  background: color-mix(in srgb, #0a84ff 12%, #0b0b10);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #0b0b10);
+}

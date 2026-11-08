@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2475
+
+- Dark / Neon / Futuristic Top Processes selected-row CRT (`.process-row.is-selected` background · inset ring) Apple `#ffffff` → CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster already remapped). Standing P2 #14 after Debug Log toolbar CRT v0.1.2474; design-review `feature-processes` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark remaps (e.g. Neon/Futuristic chat glance soft states if still Apple) if any, or Mac capture of stale `feature-processes.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2474
 
 - Data Poster / Dark / Neon / Futuristic Debug Log toolbar CRT (`.logs-toolbar` resting · button · hover · focus-visible) Apple `#ffffff` → `#0b0b10` / CRT `#0a0a0a` / `#08120c` / `#0b0b10` (filter chips already remapped). Standing P2 #14 after Disk Cleanup scope-row CRT v0.1.2473; design-review Debug Log / `feature-agent-ops` adjacent (polish-without-capture grace; Mac capture still TCC-blocked). Next: other Apple `#ffffff` washes still missing Dark remaps (e.g. `.process-row.is-selected` Dark/Neon/Futuristic — Data Poster already remapped) if any, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
