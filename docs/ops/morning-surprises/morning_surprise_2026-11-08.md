@@ -1,20 +1,17 @@
 # Morning surprise — 2026-11-08
 
-Overnight Track B kept opaque remaps rolling (standing P2 #14). Digester stayed empty; design-review stayed in polish-without-capture grace.
+Overnight Track B finished Swiss-minimalistic opaque remaps, then opened Light opaque (standing P2 #14).
 
-## Shipped tonight (highlights)
+## Shipped
+- **v0.1.2503** — Light AI Chat opaque: `.ollama-menu-btn` / menu / item hover, settings popover backdrop/close, `.model-text`, `.model-select-dropdown` / `.model-select`, `.chat-messages`, `.chat-message.user/.assistant`, markdown blockquote/code/pre/table/hr/a, and `.thinking-dots` off glass `rgba` onto opaque `color-mix` on paper `#ffffff` / `#f7f7fa` (Swiss 2493 parity after Settings/Monitors v0.1.2502).
+- **v0.1.2502** — Light Settings + Monitors opaque (`.settings-card`, both `.setting-toggle` tracks, late `.toggle-label`, `.add-btn-small`, `.monitor-item`).
+- **v0.1.2501** — Light history tile + Top Processes + metric labels opaque.
+- **v0.1.2500** — Light shell opaque foundation.
+- Earlier same window: Swiss Monitors/collapse **v0.1.2499** through Settings/Monitors list **v0.1.2492**.
 
-- **v0.1.2493** — Swiss AI Chat opaque (menu · model · messages · markdown · thinking-dots).
-- **v0.1.2492** — Swiss Settings + Monitors opaque.
-- **v0.1.2491** / **v0.1.2490** — Swiss history/process/battery + shell opaque.
-- Earlier: Material paper clear-out + dark-shell CRT catch-ups (see CHANGELOG).
+## Tried / context
+- Digester empty (0 turns / 7d). Design review + layout-daily grace (polish-without-capture on `feature-ai-chat`). Sibling harnesses missing on rack. Debug.log quiet.
 
-## Tried / deferred
-
-- Sibling OpenClaw / Hermes missing on Linux rack.
-- Mac `feature-*.png` recapture still TCC-blocked.
-- Next: Swiss remaining modal leftovers / Light shell opaque, or Mac capture when TCC allows.
-
-## Why it matters
-
-Swiss AI Chat chrome no longer paints glass `rgba` washes over the paper shell. Same #14 opaque-shell family as Architect / Material.
+## Next
+- Light Monitors menu/settings popover / remaining modal `rgba` leftovers.
+- Mac window-only recapture when Screen Recording TCC allows `screencapture -l`.

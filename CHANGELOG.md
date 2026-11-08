@@ -1,18 +1,16 @@
 ## [Unreleased]
 
-## [0.1.2503] - 2026-11-08
-
-### Changed
-
-- Light theme: AI Chat chrome (Ollama menu, model selector, messages, markdown) moves off glass `rgba` onto opaque `color-mix` against paper `#ffffff` / `#f7f7fa` (Swiss-parity after Settings/Monitors v0.1.2502).
-
-
 ### Added
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
 ### Changed
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
+
+## [0.1.2503] - 2026-11-08
+
+### Changed
+- **Light AI Chat opaque (#14):** Ollama menu, model selector, messages, and markdown washes move off glass `rgba` onto opaque `color-mix` against Light paper `#ffffff` / `#f7f7fa` (Swiss-parity after Settings/Monitors v0.1.2502). Standing P2 #14; design-review `feature-ai-chat` adjacent (polish-without-capture grace; Mac recapture deferred, Screen Recording TCC / menu-bar only). Next: Light Monitors menu/settings popover / remaining modal `rgba` leftovers, or Mac capture when TCC allows.
 
 ## [0.1.2502] - 2026-11-08
 
