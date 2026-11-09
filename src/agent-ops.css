@@ -2588,12 +2588,17 @@ body.theme-futuristic .ops-health-value {
   animation: ops-overview-jump-flash 0.85s ease;
 }
 
+/* Opaque jump flash — was color-mix(…, transparent) glass (#14). CRT remaps override. */
+:root {
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #ffffff);
+}
+
 @keyframes ops-overview-jump-flash {
   0% {
     box-shadow: none;
   }
   30% {
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 32%, transparent);
+    box-shadow: 0 0 0 2px var(--ops-jump-flash-ring);
   }
   100% {
     box-shadow: none;
@@ -10770,7 +10775,8 @@ body.theme-futuristic .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
   height: 7px;
   border-radius: 999px;
   background: #ff9f0a;
-  box-shadow: 0 0 0 2px color-mix(in srgb, #000 12%, transparent);
+  /* Opaque halo — was color-mix(…, transparent) glass (#14). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, #000 12%, #ffffff);
   display: none;
 }
 
@@ -26639,5 +26645,39 @@ body.theme-neon .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
 }
 body.theme-futuristic .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0b0b10);
+}
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Disk Cleanup reclaim badge halo +
+ * Agent Ops overview jump-flash still mixed transparent glass after shared
+ * opaque pass (`#icon-disk-cleanup .disk-cleanup-badge` · `--ops-jump-flash-ring`).
+ * Remap onto CRT shells. Standing P2 #14 after Disk Cleanup secondary focus
+ * v0.1.2523; design-review feature-disk-cleanup / feature-agent-ops adjacent
+ * (polish-without-capture; Mac capture TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2524: disk-cleanup badge halo + jump-flash CRT */
+body.theme-data-poster #icon-disk-cleanup .disk-cleanup-badge {
+  box-shadow: 0 0 0 2px color-mix(in srgb, #000 12%, #0b0b10);
+}
+body.theme-dark #icon-disk-cleanup .disk-cleanup-badge {
+  box-shadow: 0 0 0 2px color-mix(in srgb, #000 12%, #0a0a0a);
+}
+body.theme-neon #icon-disk-cleanup .disk-cleanup-badge {
+  box-shadow: 0 0 0 2px color-mix(in srgb, #000 12%, #08120c);
+}
+body.theme-futuristic #icon-disk-cleanup .disk-cleanup-badge {
+  box-shadow: 0 0 0 2px color-mix(in srgb, #000 12%, #0b0b10);
+}
+body.theme-data-poster {
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #0b0b10);
+}
+body.theme-dark {
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #0a0a0a);
+}
+body.theme-neon {
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #08120c);
+}
+body.theme-futuristic {
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #0b0b10);
 }
 

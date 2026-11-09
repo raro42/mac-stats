@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2524
+
+- Disk Cleanup badge halo + Agent Ops jump-flash opaque (`#icon-disk-cleanup .disk-cleanup-badge` · `--ops-jump-flash-ring`) glass `color-mix(…, transparent)` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (after Disk Cleanup secondary focus v0.1.2523). Standing P2 #14; design-review `feature-disk-cleanup` / `feature-agent-ops` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: intentional scrollbar glass left alone, or Mac capture of stale `feature-disk-cleanup.png` / `feature-agent-ops.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2523
 
 - Disk Cleanup toolbar secondary focus opaque (`.disk-cleanup-toolbar .popover-btn-secondary:focus-visible`) glass `color-mix(…, transparent)` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (after Processes/Disk Cleanup path focus v0.1.2522). Standing P2 #14; design-review `feature-disk-cleanup` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: remaining intentional glass leftovers (scrollbar / badge / jump-flash) if any, or Mac capture of stale `feature-disk-cleanup.png` / `feature-processes.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows `screencapture -l`.
