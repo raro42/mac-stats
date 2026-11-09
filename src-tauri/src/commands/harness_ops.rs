@@ -13146,6 +13146,15 @@ pub fn looks_like_results_tsv_p90_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
         || n.contains("p20")
         || n.contains("p80")
         || n.contains("80th")
@@ -18139,6 +18148,15 @@ pub fn looks_like_results_tsv_p95_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
         || n.contains("p20")
         || n.contains("p80")
         || n.contains("80th")
@@ -18641,6 +18659,15 @@ pub fn looks_like_results_tsv_p10_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
         || n.contains("p20")
         || n.contains("p80")
         || n.contains("80th")
@@ -19140,6 +19167,15 @@ pub fn looks_like_results_tsv_p25_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
         || n.contains("p20")
         || n.contains("p80")
         || n.contains("80th")
@@ -19634,6 +19670,15 @@ pub fn looks_like_results_tsv_p75_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
         || n.contains("p20")
         || n.contains("p80")
         || n.contains("80th")
@@ -20138,6 +20183,15 @@ pub fn looks_like_results_tsv_p98_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
         || n.starts_with("/keep-mode")
     {
         return false;
@@ -20622,6 +20676,15 @@ pub fn looks_like_results_tsv_p99_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
         || n.contains("20th")
         || n.contains("50th")
         || n.starts_with("/keepp98")
@@ -21155,6 +21218,15 @@ pub fn looks_like_results_tsv_p5_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
         || n.contains("20th")
         || n.contains("50th")
         || n.starts_with("/keepp98")
@@ -21704,6 +21776,15 @@ pub fn looks_like_results_tsv_p1_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
         || n.contains("20th")
         || n.contains("50th")
         || n.starts_with("/keepp98")
@@ -22244,6 +22325,15 @@ pub fn looks_like_results_tsv_p2_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
         || n.contains("20th")
         || n.contains("50th")
         || n.starts_with("/keepp98")
@@ -22740,6 +22830,15 @@ pub fn looks_like_results_tsv_p50_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
         || n.starts_with("/keep-mode")
     {
         return false;
@@ -23153,6 +23252,15 @@ pub fn looks_like_results_tsv_p20_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
 || n.contains("p90")
         || n.contains("p-90")
         || n.contains("90th")
@@ -23648,6 +23756,15 @@ pub fn looks_like_results_tsv_p80_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
         // Also refuse p20 / p90 / other gap stats.
         || n.contains("p20")
         || n.contains("p-20")
@@ -24255,6 +24372,15 @@ pub fn looks_like_results_tsv_p15_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
     {
         return false;
     }
@@ -24639,6 +24765,15 @@ pub fn looks_like_results_tsv_p85_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
         || n.contains("p80")
         || n.contains("p-80")
         || n.contains("80th")
@@ -25263,6 +25398,15 @@ pub fn looks_like_results_tsv_p40_request(content: &str) -> bool {
         || n.starts_with("/discard-p60")
         || n.starts_with("/discardp60")
         || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
     {
         return false;
     }
@@ -25767,14 +25911,23 @@ pub fn looks_like_results_tsv_p60_request(content: &str) -> bool {
         || n.starts_with("/discard-p40")
         || n.starts_with("/discardp40")
         || n.starts_with("/p40-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
     {
         return false;
     }
     // Must say p60 / 60th (or /keep-p60 slash).
     if !(n.contains("p60")
-        || n.contains("p-40")
+        || n.contains("p-60")
         || n.contains("60th")
-        || n.contains("40 th")
+        || n.contains("60 th")
         || n.starts_with("/keep-p60")
         || n.starts_with("/keepp60")
         || n.starts_with("/discard-p60")
@@ -25892,6 +26045,520 @@ pub fn format_results_tsv_p60_gateway(content: &str) -> String {
             };
             format!(
                 "**{label}:** {night_part} · {all_part} · p60 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p60` for p60 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p60` for p60 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+            )
+        }
+    }
+}
+
+
+
+
+
+fn count_results_tsv_p70(
+    want: ResultsTsvLastWant,
+) -> Result<(Option<u64>, u64, Option<u64>, u64), String> {
+    let path = crate::config::Config::autoresearch_results_tsv();
+    if !path.exists() {
+        return Err("missing".into());
+    }
+    let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let window_start = overnight_window_start_local().with_timezone(&chrono::Utc);
+    let want_keep = matches!(want, ResultsTsvLastWant::Keep);
+    let mut all_ts: Vec<chrono::DateTime<chrono::Utc>> = Vec::new();
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut cols = line.splitn(4, '\t');
+        let Some(ts) = cols.next() else {
+            continue;
+        };
+        let _sha = cols.next();
+        let Some(outcome) = cols.next() else {
+            continue;
+        };
+        let outcome = outcome.trim().to_ascii_lowercase();
+        let is_keep = outcome == "keep";
+        let is_discard = outcome == "discard";
+        if want_keep && !is_keep {
+            continue;
+        }
+        if !want_keep && !is_discard {
+            continue;
+        }
+        let Some(parsed) = parse_run_ts(ts) else {
+            continue;
+        };
+        all_ts.push(parsed);
+    }
+    fn p70_gap_secs(ts: &[chrono::DateTime<chrono::Utc>]) -> (Option<u64>, u64) {
+        if ts.len() < 2 {
+            return (None, 0);
+        }
+        let mut gaps: Vec<u64> = Vec::with_capacity(ts.len() - 1);
+        for w in ts.windows(2) {
+            gaps.push((w[1] - w[0]).num_seconds().max(0) as u64);
+        }
+        let n = gaps.len() as u64;
+        if n == 0 {
+            return (None, 0);
+        }
+        gaps.sort_unstable();
+        // Nearest-rank: ceil(0.70 * N), 1-indexed → 0-based index.
+        let rank = ((n as f64) * 0.70).ceil() as usize;
+        let idx = rank.saturating_sub(1).min(gaps.len() - 1);
+        (Some(gaps[idx]), n)
+    }
+    let (p70_all, gaps_all) = p70_gap_secs(&all_ts);
+    let night_ts: Vec<_> = all_ts
+        .into_iter()
+        .filter(|t| *t >= window_start)
+        .collect();
+    let (p70_night, gaps_night) = p70_gap_secs(&night_ts);
+    Ok((p70_night, gaps_night, p70_all, gaps_all))
+}
+
+/// True for short keep-p70 asks (`/keep-p70`, `p70 keep gap`, `70th percentile keep gap`…).
+/// P70 gap only — does not dump TSV or steal range / median / pace / first / last / since / counts / rate / streak / recent / path/size/age / morning surprise.
+pub fn looks_like_results_tsv_p70_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains("kb")
+        || n.contains(" gi")
+        || (contains_age_token(&n) && !n.contains("average") && !n.contains("avg") && !n.contains("percentile"))
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what shipped")
+        || n.contains("morning surprise")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("changelog")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("loop backlog")
+        || n.contains("loop_backlog")
+        || n.contains("sibling")
+        || n.contains("standing")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("summary")
+        || n.contains("hit rate")
+        || n.contains("keep rate")
+        || n.contains("discard rate")
+        || n.contains("streak")
+        || n.contains("recent keeps")
+        || n.contains("recent discards")
+        || n.contains("recent-keeps")
+        || n.contains("recentkeeps")
+        || n.contains("recent-discards")
+        || n.contains("recentdiscards")
+        || n.contains("keep list")
+        || n.contains("discard list")
+        || n.contains("first keep")
+        || n.contains("first discard")
+        || n.contains("earliest keep")
+        || n.contains("earliest discard")
+        || n.contains("opening keep")
+        || n.contains("opening discard")
+        || n.contains("since last")
+        || n.contains("how long since")
+        || n.contains("how long ago")
+        || n.contains("time since")
+        || n.starts_with("/since-")
+        || n.starts_with("/timesince")
+        || n.starts_with("/time-since")
+        || n.starts_with("/last-")
+        || n.starts_with("/first-")
+        || n.starts_with("/firstkeep")
+        || n.starts_with("/firstdiscard")
+        || n.starts_with("/recent-")
+        || n.starts_with("/keep-rate")
+        || n.starts_with("/keeprate")
+        || n.starts_with("/hit-rate")
+        || n.starts_with("/keep-streak")
+        || n.starts_with("/longest-")
+        || n.starts_with("/keep-pace")
+        || n.starts_with("/keeppace")
+        || n.starts_with("/discard-pace")
+        || n.starts_with("/discardpace")
+        || n.starts_with("/keep-median")
+        || n.starts_with("/keepmedian")
+        || n.starts_with("/discard-median")
+        || n.starts_with("/discardmedian")
+        || n.starts_with("/median-")
+        || n.starts_with("/keep-range")
+        || n.starts_with("/keeprange")
+        || n.starts_with("/discard-range")
+        || n.starts_with("/discardrange")
+        || n.starts_with("/gap-range")
+        || n.starts_with("/keep-spread")
+        || n.starts_with("/discard-spread")
+        || n == "last keep"
+        || n == "the last keep"
+        || n == "last discard"
+        || n == "the last discard"
+        || n == "latest keep"
+        || n == "latest discard"
+        || n == "what was the last keep"
+        || n == "what was the last discard"
+        || n.starts_with("/keep-std")
+        || n.starts_with("/keepstd")
+        || n.starts_with("/discard-std")
+        || n.starts_with("/discardstd")
+        || n.starts_with("/std-")
+        || n.contains("stddev")
+        || n.contains("std-dev")
+        || n.contains("std deviation")
+        || n.contains("standard deviation")
+        || n.contains("keep std")
+        || n.contains("discard std")
+        || n.contains("std keep")
+        || n.contains("std discard")
+        || n.contains("std gap")
+        // Other gap stats own these words (not p25).
+        || n.contains("iqr")
+        || n.contains("interquartile")
+        || n.contains("inter quartile")
+        || n.starts_with("/keep-iqr")
+        || n.starts_with("/keepiqr")
+        || n.starts_with("/discard-iqr")
+        || n.starts_with("/discardiqr")
+        || n.starts_with("/iqr-")
+        || n.contains("median")
+        || n.contains("range")
+        || n.contains("spread")
+        || n.contains("min max")
+        || n.contains("minmax")
+        || n.contains("min-max")
+        || n.contains("shortest and longest")
+        || n.contains("longest and shortest")
+        || n.contains("keep pace")
+        || n.contains("discard pace")
+        || n.contains("ratchet pace")
+        || n.contains("average")
+        || n.contains("avg ")
+        || n.starts_with("avg ")
+        || n.contains(" mean ")
+        || n.starts_with("mean ")
+        // Hit-rate owns bare percent without p70.
+        || (n.contains("percent")
+            && !n.contains("percentile")
+            && !n.contains("p70")
+            && !n.contains("70th"))
+        || (n.contains("rate")
+            && !n.contains("p70")
+            && !n.contains("70th")
+            && !n.contains("pace")
+            && !n.contains("gap")
+            && !n.contains("between"))
+        // Do not steal p85 / p80 / p20 / p90 / bare percentile / other gap stats.
+        || n.contains("p85")
+        || n.contains("p-85")
+        || n.contains("85th")
+        || n.contains("85 th")
+        || n.starts_with("/keep-p85")
+        || n.starts_with("/keepp85")
+        || n.starts_with("/discard-p85")
+        || n.starts_with("/discardp85")
+        || n.starts_with("/p85-")
+        || n.contains("p80")
+        || n.contains("p-80")
+        || n.contains("80th")
+        || n.contains("80 th")
+        || n.starts_with("/keep-p80")
+        || n.starts_with("/keepp80")
+        || n.starts_with("/discard-p80")
+        || n.starts_with("/discardp80")
+        || n.starts_with("/p80-")
+        || n.contains("p15")
+        || n.contains("p-15")
+        || n.contains("15th")
+        || n.contains("15 th")
+        || n.starts_with("/keep-p15")
+        || n.starts_with("/keepp15")
+        || n.starts_with("/discard-p15")
+        || n.starts_with("/discardp15")
+        || n.starts_with("/p15-")
+        // Also refuse p20 / p90 / other gap stats.
+        || n.contains("p20")
+        || n.contains("p-20")
+        || n.contains("20th")
+        || n.contains("20 th")
+        || n.starts_with("/keep-p20")
+        || n.starts_with("/keepp20")
+        || n.starts_with("/discard-p20")
+        || n.starts_with("/discardp20")
+        || n.starts_with("/p20-")
+        || n.contains("p90")
+        || n.contains("p-90")
+        || n.contains("90th")
+        || n.contains("90 th")
+        || n.starts_with("/keep-p90")
+        || n.starts_with("/keepp90")
+        || n.starts_with("/discard-p90")
+        || n.starts_with("/discardp90")
+        || n.starts_with("/p90-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("95 th")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p10")
+        || n.contains("p-10")
+        || n.contains("10th")
+        || n.contains("10 th")
+        || n.starts_with("/keep-p10")
+        || n.starts_with("/keepp10")
+        || n.starts_with("/discard-p10")
+        || n.starts_with("/discardp10")
+        || n.starts_with("/p10-")
+        || n.contains("p25")
+        || n.contains("p-25")
+        || n.contains("25th")
+        || n.contains("25 th")
+        || n.starts_with("/keep-p25")
+        || n.starts_with("/keepp25")
+        || n.starts_with("/discard-p25")
+        || n.starts_with("/discardp25")
+        || n.starts_with("/p25-")
+        || n.contains("p75")
+        || n.contains("p-75")
+        || n.contains("75th")
+        || n.contains("75 th")
+        || n.starts_with("/keep-p75")
+        || n.starts_with("/keepp75")
+        || n.starts_with("/discard-p75")
+        || n.starts_with("/discardp75")
+        || n.starts_with("/p75-")
+        || mentions_results_tsv_p5(&n)
+        || mentions_results_tsv_p2(&n)
+        || n.contains("p50")
+        || n.contains("p-50")
+        || n.contains("50th")
+        || n.contains("50 th")
+        || n.starts_with("/keep-p50")
+        || n.starts_with("/keepp50")
+        || n.starts_with("/discard-p50")
+        || n.starts_with("/discardp50")
+        || n.starts_with("/p50-")
+        || n.contains("p98")
+        || n.contains("p-98")
+        || n.contains("98th")
+        || n.contains("98 th")
+        || n.starts_with("/keep-p98")
+        || n.starts_with("/keepp98")
+        || n.starts_with("/discard-p98")
+        || n.starts_with("/discardp98")
+        || n.starts_with("/p98-")
+        || n.contains("p99")
+        || n.contains("p-99")
+        || n.contains("99th")
+        || n.contains("99 th")
+        || n.starts_with("/keep-p99")
+        || n.starts_with("/keepp99")
+        || n.starts_with("/discard-p99")
+        || n.starts_with("/discardp99")
+        || n.starts_with("/p99-")
+        || mentions_results_tsv_p1(&n)
+        || n.starts_with("/keep-percentile")
+        || n.starts_with("/keeppercentile")
+        || n.contains("keep percentile")
+        || n.contains("discard percentile")
+        || n.contains("histogram")
+        || n.starts_with("/keep-histogram")
+        || n.starts_with("/keephistogram")
+        || n.contains("gini")
+        || n.starts_with("/keep-gini")
+        || n.contains("entropy")
+        || n.contains("kurtosis")
+        || n.contains("skew")
+        || n.contains("keep cv")
+        || n.starts_with("/keep-cv")
+        || n.contains("mad")
+        || n.starts_with("/keep-mad")
+        || n.contains("mode")
+        || n.starts_with("/keep-mode")
+        || n.contains("2nd")
+        || n.contains("2 nd")
+        || n.contains("p40")
+        || n.contains("p-40")
+        || n.contains("40th")
+        || n.contains("40 th")
+        || n.starts_with("/keep-p40")
+        || n.starts_with("/keepp40")
+        || n.starts_with("/discard-p40")
+        || n.starts_with("/discardp40")
+        || n.starts_with("/p40-")
+        || n.contains("p60")
+        || n.contains("p-60")
+        || n.contains("60th")
+        || n.contains("60 th")
+        || n.starts_with("/keep-p60")
+        || n.starts_with("/keepp60")
+        || n.starts_with("/discard-p60")
+        || n.starts_with("/discardp60")
+        || n.starts_with("/p60-")
+    {
+        return false;
+    }
+    // Must say p70 / 70th (or /keep-p70 slash).
+    if !(n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
+        || n.starts_with("/p70-keep")
+        || n.starts_with("/p70keep")
+        || n.starts_with("/p70-discard")
+        || n.starts_with("/p70discard"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/keep-p70"
+            | "/keepp70"
+            | "/discard-p70"
+            | "/discardp70"
+            | "/p70-keep-gap"
+            | "/p70keepgap"
+            | "/p70-discard-gap"
+            | "/p70discardgap"
+            | "/p70-gap"
+            | "/p70gap"
+            | "/p70-keep"
+            | "/p70keep"
+            | "/p70-discard"
+            | "/p70discard"
+            | "keep p70"
+            | "the keep p70"
+            | "keep p70 tonight"
+            | "tonight keep p70"
+            | "p70 keep"
+            | "the p70 keep"
+            | "p70 keep gap"
+            | "the p70 keep gap"
+            | "p70 gap between keeps"
+            | "p70 time between keeps"
+            | "70th percentile keep gap"
+            | "the 70th percentile keep gap"
+            | "70th percentile gap between keeps"
+            | "70th keep gap"
+            | "keep gap p60"
+            | "ratchet p70"
+            | "the ratchet p70"
+            | "overnight keep p70"
+            | "view keep p70"
+            | "see keep p70"
+            | "show the keep p70"
+            | "show me the keep p70"
+            | "open keep p70"
+            | "open the keep p70"
+            | "list keep p70"
+            | "list the keep p70"
+            | "what is the keep p70"
+            | "whats the keep p70"
+            | "what's the keep p70"
+            | "what is the p70 keep gap"
+            | "whats the p70 keep gap"
+            | "what's the p70 keep gap"
+            | "discard p70"
+            | "the discard p70"
+            | "discard p70 tonight"
+            | "tonight discard p70"
+            | "p70 discard"
+            | "the p70 discard"
+            | "p70 discard gap"
+            | "the p70 discard gap"
+            | "p70 gap between discards"
+            | "70th percentile discard gap"
+            | "view discard p70"
+            | "see discard p70"
+            | "show the discard p70"
+            | "show me the discard p70"
+            | "open discard p70"
+            | "open the discard p70"
+            | "list discard p70"
+            | "list the discard p70"
+            | "what is the discard p70"
+            | "whats the discard p70"
+            | "what's the discard p70"
+    )
+}
+
+/// Zero-LLM p70 gap between keep/discard rows from results.tsv (tonight + all-time; no row dump).
+/// Nearest-rank p70 (pairs above `/keep-p60` / under `/keep-p75`; densifies the ladder between p60 and p75; slash form for the percentile ladder).
+pub fn format_results_tsv_p70_gateway(content: &str) -> String {
+    let want = results_tsv_last_want(content);
+    let label = match want {
+        ResultsTsvLastWant::Keep => "Keep p70",
+        ResultsTsvLastWant::Discard => "Discard p70",
+    };
+    let unit = match want {
+        ResultsTsvLastWant::Keep => "keeps",
+        ResultsTsvLastWant::Discard => "discards",
+    };
+    match count_results_tsv_p70(want) {
+        Err(_) => format!(
+            "**{label}:** no `results.tsv` yet · overnight keep/discard will create it · `results.tsv path` for the file."
+        ),
+        Ok((p70_night, gaps_night, p70_all, gaps_all)) => {
+            let night_part = match p70_night {
+                Some(secs) => {
+                    let d = duration_label_secs(secs);
+                    format!("tonight p70 **{d}** between {unit} ({gaps_night} gaps since 20:00)")
+                }
+                None => format!("tonight need ≥2 {unit} since 20:00 to measure p70"),
+            };
+            let all_part = match p70_all {
+                Some(secs) => {
+                    let d = duration_label_secs(secs);
+                    format!("all-time p70 **{d}** ({gaps_all} gaps)")
+                }
+                None => format!("all-time need ≥2 {unit}"),
+            };
+            format!(
+                "**{label}:** {night_part} · {all_part} · p70 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p70` for p70 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p70` for p70 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -63927,6 +64594,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_p60_request(content) {
         return Some(format_results_tsv_p60_gateway(content));
     }
+    if looks_like_results_tsv_p70_request(content) {
+        return Some(format_results_tsv_p70_gateway(content));
+    }
     if looks_like_results_tsv_p2_request(content) {
         return Some(format_results_tsv_p2_gateway(content));
     }
@@ -64553,6 +65223,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_results_tsv_p60_request(content) {
         return Some(format_results_tsv_p60_gateway(content));
+    }
+    if looks_like_results_tsv_p70_request(content) {
+        return Some(format_results_tsv_p70_gateway(content));
     }
     if looks_like_results_tsv_p2_request(content) {
         return Some(format_results_tsv_p2_gateway(content));
@@ -65193,6 +65866,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/keep-p85` · `keep p85` · `p85 keep gap` · `85th percentile keep gap` · `p85 gap between keeps` · `view keep p85` / `open keep p85` · `/discard-p85` · `discard p85` · `p85 discard gap` — p85 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p85 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-p95` / `/keep-p10` / `/keep-p25` / `/keep-p20` / `/keep-p80` / `/keep-p75` / `/keep-p50` / `/keep-p98` / `/keep-p99` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-p40` · `keep p40` · `p40 keep gap` · `40th percentile keep gap` · `p40 gap between keeps` · `view keep p40` / `open keep p40` · `/discard-p40` · `discard p40` · `p40 discard gap` — p40 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p40 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-p95` / `/keep-p10` / `/keep-p25` / `/keep-p20` / `/keep-p80` / `/keep-p75` / `/keep-p50` / `/keep-p98` / `/keep-p99` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-p60` · `keep p60` · `p60 keep gap` · `60th percentile keep gap` · `p60 gap between keeps` · `view keep p60` / `open keep p60` · `/discard-p60` · `discard p60` · `p60 discard gap` — p60 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p60 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-p95` / `/keep-p10` / `/keep-p25` / `/keep-p20` / `/keep-p80` / `/keep-p75` / `/keep-p50` / `/keep-p98` / `/keep-p99` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
+• `/keep-p70` · `keep p70` · `p70 keep gap` · `70th percentile keep gap` · `p70 gap between keeps` · `view keep p70` / `open keep p70` · `/discard-p70` · `discard p70` · `p70 discard gap` — p70 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p70 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-p95` / `/keep-p10` / `/keep-p25` / `/keep-p20` / `/keep-p80` / `/keep-p75` / `/keep-p50` / `/keep-p98` / `/keep-p99` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-p99` · `keep p99` · `p99 keep gap` · `99th percentile keep gap` · `p99 gap between keeps` · `view keep p99` / `open keep p99` · `/discard-p99` · `discard p99` · `p99 discard gap` — p99 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p99 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-p95` / `/keep-p10` / `/keep-p25` / `/keep-p75` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-p1` · `keep p1` · `p1 keep gap` · `1st percentile keep gap` · `p1 gap between keeps` · `view keep p1` / `open keep p1` · `/discard-p1` · `discard p1` · `p1 discard gap` — p1 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p1 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-p95` / `/keep-p10` / `/keep-p5` / `/keep-p2` / `/keep-p25` / `/keep-p75` / `/keep-p99` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-p2` · `keep p2` · `p2 keep gap` · `2nd percentile keep gap` · `p2 gap between keeps` · `view keep p2` / `open keep p2` · `/discard-p2` · `discard p2` · `p2 discard gap` — p2 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p2 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-p95` / `/keep-p10` / `/keep-p5` / `/keep-p25` / `/keep-p75` / `/keep-p99` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
@@ -80520,6 +81194,10 @@ mod tests {
         assert!(!looks_like_results_tsv_p40_request("/keep-p85"));
         assert!(!looks_like_results_tsv_p40_request("/keep-p60"));
         assert!(!looks_like_results_tsv_p60_request("/keep-p40"));
+        assert!(!looks_like_results_tsv_p60_request("/keep-p70"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-p60"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-p40"));
+        assert!(!looks_like_results_tsv_p40_request("/keep-p70"));
     }
 
     #[test]
@@ -80616,6 +81294,7 @@ mod tests {
         );
     }
 
+    #[test]
     fn results_tsv_p60_request_detected() {
         assert!(looks_like_results_tsv_p60_request("/keep-p60"));
         assert!(looks_like_results_tsv_p60_request("keep p60"));
@@ -80692,7 +81371,7 @@ mod tests {
             "expected keep-p60 reply: {reply}"
         );
         assert!(
-            reply.contains("p40 only")
+            reply.contains("p60 only")
                 || reply.contains("does not dump")
                 || reply.contains("/keeps")
                 || reply.contains("no `results.tsv`")
@@ -80706,7 +81385,105 @@ mod tests {
         );
         let discard = try_operator_instant_reply("discard p60").expect("discard p60");
         assert!(
-            discard.contains("Discard p40") || discard.contains("no `results.tsv`"),
+            discard.contains("Discard p60") || discard.contains("no `results.tsv`"),
+            "{discard}"
+        );
+        assert!(!looks_like_results_tsv_p60_request("/keep-p70"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-p60"));
+    }
+
+
+    #[test]
+    fn results_tsv_p70_request_detected() {
+        assert!(looks_like_results_tsv_p70_request("/keep-p70"));
+        assert!(looks_like_results_tsv_p70_request("keep p70"));
+        assert!(looks_like_results_tsv_p70_request("keep p70 tonight"));
+        assert!(looks_like_results_tsv_p70_request("p70 keep gap"));
+        assert!(looks_like_results_tsv_p70_request("p70 gap between keeps"));
+        assert!(looks_like_results_tsv_p70_request("70th percentile keep gap"));
+        assert!(looks_like_results_tsv_p70_request("view keep p70"));
+        assert!(looks_like_results_tsv_p70_request("show me the keep p70"));
+        assert!(looks_like_results_tsv_p70_request("open keep p70"));
+        assert!(looks_like_results_tsv_p70_request("/discard-p70"));
+        assert!(looks_like_results_tsv_p70_request("discard p70"));
+        assert!(looks_like_results_tsv_p70_request("p70 discard gap"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-p60"));
+        assert!(!looks_like_results_tsv_p60_request("/keep-p70"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-p90"));
+        assert!(!looks_like_results_tsv_p70_request("keep p90"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-pace"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-median"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-range"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-iqr"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-histogram"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-gini"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-p10"));
+        assert!(!looks_like_results_tsv_p70_request("keep p10"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-p95"));
+        assert!(!looks_like_results_tsv_p70_request("keep p95"));
+        assert!(!looks_like_results_tsv_p10_request("/keep-p70"));
+        assert!(!looks_like_results_tsv_p10_request("keep p70"));
+        assert!(!looks_like_results_tsv_p95_request("/keep-p70"));
+        assert!(!looks_like_results_tsv_p95_request("keep p70"));
+        assert!(!looks_like_results_tsv_p90_request("/keep-p70"));
+
+        assert!(!looks_like_results_tsv_p70_request("/keep-p25"));
+        assert!(!looks_like_results_tsv_p70_request("keep p25"));
+        assert!(!looks_like_results_tsv_p25_request("/keep-p70"));
+        assert!(!looks_like_results_tsv_p25_request("keep p70"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-p75"));
+        assert!(!looks_like_results_tsv_p70_request("keep p75"));
+        assert!(!looks_like_results_tsv_p75_request("/keep-p70"));
+        assert!(!looks_like_results_tsv_p75_request("keep p70"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-p99"));
+        assert!(!looks_like_results_tsv_p70_request("keep p99"));
+        assert!(!looks_like_results_tsv_p99_request("/keep-p70"));
+        assert!(!looks_like_results_tsv_p99_request("keep p70"));
+
+        assert!(!looks_like_results_tsv_p70_request("/keep-p98"));
+        assert!(!looks_like_results_tsv_p70_request("keep p98"));
+        assert!(!looks_like_results_tsv_p50_request("/keep-p70"));
+        assert!(!looks_like_results_tsv_p50_request("keep p70"));
+        assert!(!looks_like_results_tsv_p98_request("/keep-p70"));
+        assert!(!looks_like_results_tsv_p98_request("keep p70"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-p5"));
+        assert!(!looks_like_results_tsv_p70_request("keep p5"));
+        assert!(!looks_like_results_tsv_p5_request("/keep-p70"));
+        assert!(!looks_like_results_tsv_p5_request("keep p70"));
+        assert!(!looks_like_results_tsv_p5_request("70th percentile keep gap"));
+        assert!(looks_like_results_tsv_p70_request("70th percentile keep gap"));
+        assert!(!looks_like_results_tsv_median_request("/keep-p70"));
+        assert!(!looks_like_results_tsv_median_request("keep p70"));
+        assert!(!looks_like_results_tsv_p70_request("/keep-median"));
+        assert!(!looks_like_results_tsv_p70_request("median keep gap"));
+
+        assert!(!looks_like_results_tsv_p70_request("/keep-p2"));
+        assert!(!looks_like_results_tsv_p70_request("keep p2"));
+        assert!(!looks_like_results_tsv_p70_request("2nd percentile keep gap"));
+        assert!(!looks_like_results_tsv_p2_request("/keep-p70"));
+        assert!(!looks_like_results_tsv_p2_request("keep p70"));
+        assert!(!looks_like_results_tsv_p2_request("70th percentile keep gap"));
+        let reply = try_operator_instant_reply("keep p70").expect("keep p70 instant");
+        assert!(
+            reply.contains("Keep p70") || reply.contains("no `results.tsv`"),
+            "expected keep-p70 reply: {reply}"
+        );
+        assert!(
+            reply.contains("p70 only")
+                || reply.contains("does not dump")
+                || reply.contains("/keeps")
+                || reply.contains("no `results.tsv`")
+                || reply.contains("need ≥2"),
+            "must stay keep-p70 glance: {reply}"
+        );
+        let slash = try_operator_instant_reply("/keep-p70").expect("/keep-p70 instant");
+        assert!(
+            slash.contains("Keep p70") || slash.contains("no `results.tsv`"),
+            "{slash}"
+        );
+        let discard = try_operator_instant_reply("discard p70").expect("discard p70");
+        assert!(
+            discard.contains("Discard p70") || discard.contains("no `results.tsv`"),
             "{discard}"
         );
     }
