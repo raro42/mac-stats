@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2534
+
+- Instant `/keep-p1` · `keep p1` · `p1 keep gap` · `1st percentile keep gap` · `p1 gap between keeps` (+ discard) — nearest-rank p1 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). Standing P0 p50 / instant lane after `/keep-p2` v0.1.2533 (glass leftovers intentional scrollbar only). Next: other ratchet glance, or Mac capture when TCC allows.
+
 ## Overnight merge — v0.1.2533
 
 - Instant `/keep-p2` · `keep p2` · `p2 keep gap` · `2nd percentile keep gap` · `p2 gap between keeps` (+ discard) — nearest-rank p2 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). Standing P0 p50 / instant lane after `/keep-p5` v0.1.2532 (glass leftovers intentional scrollbar only). Next: other ratchet glance, or Mac capture when TCC allows.
