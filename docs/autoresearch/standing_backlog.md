@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2530
+
+- Instant `/keep-p75` · `keep p75` · `p75 keep gap` · `75th percentile keep gap` · `p75 gap between keeps` (+ discard) — nearest-rank p75 (ceiling quartile) of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). Standing P0 p50 / instant lane after Settings/Ollama header focus opaque v0.1.2529 (glass leftovers intentional scrollbar only). Next: `/keep-p99` or other ratchet glance, or Mac capture when TCC allows.
+
 ## Overnight merge — v0.1.2529
 
 - Settings / Ollama header focus opaque (`.settings-header h2[tabindex]:focus` · `.ollama-settings-popover .popover-header h3[tabindex]:focus`) glass `var(--focus-ring, rgba(0,122,255,0.55))` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (after Changelog focus v0.1.2528). Standing P2 #14; design-review Settings / `feature-ai-chat` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: intentional scrollbar glass left alone, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
