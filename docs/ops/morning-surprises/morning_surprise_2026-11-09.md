@@ -6,6 +6,7 @@ Overnight autoresearch kept shipping. Empty digester; standing backlog + instant
 
 | Version | What |
 | --- | --- |
+| **v0.1.2533** | Instant `/keep-p2` nearest-rank gap glance (pairs under `/keep-p5`) |
 | **v0.1.2532** | Instant `/keep-p5` nearest-rank gap glance (pairs with `/keep-p95`) |
 | **v0.1.2531** | Instant `/keep-p99` nearest-rank gap glance (pairs with `/keep-p95` / `/keep-p75`) |
 | **v0.1.2530** | Instant `/keep-p75` ceiling-quartile gap glance (pairs with `/keep-p25`) |
@@ -14,9 +15,9 @@ Overnight autoresearch kept shipping. Empty digester; standing backlog + instant
 
 ## Try it
 
-In Discord / AI Chat operator lane: `/keep-p5` or `p5 keep gap` — nearest-rank p5 of keep gaps tonight + all-time, no row dump.
+In Discord / AI Chat operator lane: `/keep-p2` or `p2 keep gap` — nearest-rank p2 of keep gaps tonight + all-time, no row dump.
 
-Also still: `/keep-p99`, `/keep-p75`, `/keep-p95`, `/keep-pace`, `/keep-median`.
+Also still: `/keep-p5`, `/keep-p99`, `/keep-p75`, `/keep-p95`, `/keep-pace`, `/keep-median`.
 
 ## Notes
 
