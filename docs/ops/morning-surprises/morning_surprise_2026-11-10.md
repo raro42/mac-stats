@@ -1,12 +1,14 @@
 # Morning surprise — 2026-11-10
 
-Overnight autoresearch (Track B) shipped:
+Overnight autoresearch kept shipping the keep/discard gap percentile ladder (digester empty; design-review/layout grace on the Linux rack).
 
-- **v0.1.2542** — Instant `/keep-p60` · `keep p60` · `p60 keep gap` · `60th percentile keep gap` (+ discard). Nearest-rank p60 gap between consecutive keep/discard rows in `results.tsv` (tonight + all-time). Digester Slowest filters. Standing P0 after `/keep-p40` v0.1.2541. Densifies the ladder between `/keep-p50` and `/keep-p75`.
-- Layout daily: Data Poster remaps already complete; marked checked 2026-11-10. Theme PNG recapture still deferred on the Linux rack (no Screen Recording / CPU window).
-- Digester empty (0 turns / 7d). Design-review still in grace. Sibling OpenClaw/Hermes missing on rack. Debug.log quiet.
+## Shipped tonight
+- **v0.1.2543** — Instant `/keep-p70` (nearest-rank p70 gap between consecutive keep/discard rows; densifies between `/keep-p60` and `/keep-p75`).
+- Earlier keeps same night: `/keep-p60` (v0.1.2542), `/keep-p40` (v0.1.2541), plus the densify ladder from `/keep-p1` … `/keep-p85`.
 
-## Try it
+## Also fixed
+- Wired `#[test]` on the `/keep-p60` detector test (was dead) and cleaned p40 assertion leftovers in that test / must-say matcher.
 
-In AI Chat or Discord: `/keep-p60` or `p60 keep gap` — tonight + all-time nearest-rank p60 gap between keeps (no row dump). Pair with `/keep-p50` / `/keep-p75`.
-
+## Deferred
+- Dark layout-daily capture (theme remaps green; `theme-*.png` / Screen Recording TCC still blocked on this rack).
+- Intentional scrollbar glass left alone.
