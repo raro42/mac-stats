@@ -1,27 +1,20 @@
 # Morning surprise — 2026-11-09
 
-Overnight Track B kept shipping **#14 opaque chrome** (WebView glass → `color-mix` on paper + CRT remaps). Digester open stayed empty; design-review stayed in grace (TCC blocks Mac capture).
+Overnight Track B kept shipping. Digester open stayed empty; design review + layout daily were not due. Fuel stayed on standing backlog after the opaque-glass (#14) chain.
 
-## Shipped tonight (highlights)
+## Shipped tonight (selected)
 
-| Version | Keep | What |
-|---------|------|------|
-| **v0.1.2529** | Settings / Ollama header focus | `.settings-header h2[tabindex]:focus` · Ollama popover `h3[tabindex]:focus` off `--focus-ring` rgba glass |
-| **v0.1.2528** | Changelog focus | `.changelog-h2` / loading / error tabindex focus opaque |
-| **v0.1.2527** | First-launch tip + update banner | tip/banner border · underline · glyph · dismiss · code chip |
-| **v0.1.2526** | History sparkline focus | chart container focus-visible |
-| **v0.1.2525** | Metric-strip flash | RAM/CPU/GPU/Temp/Freq/Disk/Uptime highlights |
-| **v0.1.2524–2517** | Disk Cleanup / Agent Ops / Perplexity / Monitors / Processes | remaining interactive glass batches |
+| Version | What |
+| --- | --- |
+| **v0.1.2529** | Settings / Ollama header focus opaque (`#14`) |
+| **v0.1.2530** | Instant `/keep-p75` ceiling-quartile gap glance (pairs with `/keep-p25`) |
 
-## Tried / deferred
+## Try it
 
-- Intentional **scrollbar** hover thumbs still use `color-mix(…, transparent)` — left alone (near-invisible chrome).
-- Mac `screencapture -l` for stale `feature-*.png` — Screen Recording TCC still blocks.
+In Discord / AI Chat operator lane: `/keep-p75` or `p75 keep gap` — nearest-rank p75 of keep gaps tonight + all-time, no row dump.
 
-## Next fuel
+## Notes
 
-1. Scrollbar opaque only if a clear Graphics-and-Media win shows up.
-2. Mac capture when TCC allows (`feature-cpu-metrics` / `feature-agent-ops` / `feature-disk-cleanup`).
-3. Sibling ports (session resume / Discord reconnect) once glass #14 idle is quiet.
-
-_Generated ~03:55 CET by overnight autoresearch tick._
+- Intentional scrollbar glass left alone.
+- Mac Screen Recording TCC still blocks fresh `feature-*.png` captures on this rack path.
+- Linux rack: no `/Applications` install this tick (instant-lane Rust only).
