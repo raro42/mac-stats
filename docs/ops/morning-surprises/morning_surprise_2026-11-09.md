@@ -4,12 +4,13 @@ Overnight Track B kept baking remaining glass into opaque `color-mix` so CRT / p
 
 ## Shipped tonight
 
-- **v0.1.2524** — Disk Cleanup badge halo + Agent Ops jump-flash opaque: `#icon-disk-cleanup .disk-cleanup-badge` · `--ops-jump-flash-ring` off transparent glass onto opaque paper mixes with CRT remaps.
-- **v0.1.2523** — Disk Cleanup toolbar secondary focus opaque: `.disk-cleanup-toolbar .popover-btn-secondary:focus-visible` (results.tsv backfilled this tick).
-- **v0.1.2522** — Processes + Disk Cleanup path focus opaque: `.process-name:focus-visible` · `.process-detail-name:focus-visible` · `.process-detail-pid:focus-visible` · `.disk-cleanup-item-path:focus-visible` · `.disk-cleanup-scope-path:focus-visible` off transparent glass onto opaque paper mixes with CRT remaps.
-- **v0.1.2521** — Monitors URL / detail focus opaque: `.monitor-url:focus-visible` · `button.monitor-detail-url:focus-visible` · `.monitor-detail-remove:focus-visible` (results.tsv backfilled earlier).
-- **v0.1.2520** — Monitors settings focus opaque: `.monitor-settings-item:focus-within` · `.monitors-settings-popover .popover-btn-primary:focus-visible` (+ CRT remaps for `.monitor-remove-btn:focus-visible`) off transparent glass onto opaque paper mixes with CRT remaps.
-- **v0.1.2519** — Perplexity search / inline-key opaque: `.perplexity-search-box` input · button · `#perplexity-search-btn` hover / focus · `.perplexity-inline-key` · `.perplexity-inline-save` (results.tsv backfilled earlier).
+- **v0.1.2525** — Metric-strip flash highlights opaque: `.is-ram-highlight` · `.is-cpu-highlight` · `.is-gpu-highlight` · `.is-temp-highlight` · `.is-freq-highlight` · `.is-disk-highlight` · `.is-uptime-highlight` off transparent glass onto opaque paper `#ffffff` with CRT remaps (Data Poster / Dark / Neon / Futuristic).
+- **v0.1.2524** — Disk Cleanup badge halo + Agent Ops jump-flash opaque: `#icon-disk-cleanup .disk-cleanup-badge` · `--ops-jump-flash-ring`.
+- **v0.1.2523** — Disk Cleanup toolbar secondary focus opaque: `.disk-cleanup-toolbar .popover-btn-secondary:focus-visible`.
+- **v0.1.2522** — Processes + Disk Cleanup path focus opaque: `.process-name:focus-visible` · `.process-detail-name:focus-visible` · `.process-detail-pid:focus-visible` · `.disk-cleanup-item-path:focus-visible` · `.disk-cleanup-scope-path:focus-visible`.
+- **v0.1.2521** — Monitors URL / detail focus opaque: `.monitor-url:focus-visible` · `button.monitor-detail-url:focus-visible` · `.monitor-detail-remove:focus-visible`.
+- **v0.1.2520** — Monitors settings focus opaque: `.monitor-settings-item:focus-within` · `.monitors-settings-popover .popover-btn-primary:focus-visible` (+ CRT remaps for `.monitor-remove-btn:focus-visible`).
+- **v0.1.2519** — Perplexity search / inline-key opaque: `.perplexity-search-box` input · button · `#perplexity-search-btn` hover / focus · `.perplexity-inline-key` · `.perplexity-inline-save`.
 - **v0.1.2518** — Agent Ops Insights opaque: `.ops-insights-card` · `.ops-insight-line.is-clickable` hover / focus / selected.
 - **v0.1.2517** — Disk Cleanup add-scope opaque: `#disk-cleanup-add-btn` · scope/add inputs · `.disk-cleanup-scope-remove`.
 - **v0.1.2516** — Dark `.changelog-date` · `.changelog-paragraph` · `.changelog-item` opacity opaque on `#0a0a0a`.
@@ -20,11 +21,11 @@ Overnight Track B kept baking remaining glass into opaque `color-mix` so CRT / p
 
 ## Tried / notes
 
-- Digester empty (0 turns / 7d). Design-review grace; layout-daily already marked today.
-- Sibling OpenClaw/Hermes missing on this rack.
-- Debug.log quiet (no ERROR/WARN clusters in 180m).
+- Digester empty (open candidates none). Design-review grace; layout-daily already marked today (data-poster).
+- Debug.log quiet (no ERROR/WARN/panic clusters in 180m).
 - Mac `docs/screens/` recapture still TCC-blocked (`screencapture -l`).
+- Intentional thin scrollbar glass left alone (hover thumb).
 
 ## Next fuel
 
-Intentional scrollbar glass left alone, or Mac capture of stale `feature-disk-cleanup.png` / `feature-agent-ops.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows. Dashboard.css glass is a separate surface if fuel runs dry.
+History sparkline focus / first-launch banner glass leftovers if any, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows.
