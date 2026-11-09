@@ -1,27 +1,19 @@
-# Morning surprise — 2026-11-09
+# Morning surprise 2026-11-09
 
-Overnight autoresearch kept shipping. Empty digester; standing backlog + instant lane did the work.
+Overnight autoresearch kept shipping instant ratchet glances.
 
-## Shipped tonight
+## Shipped tonight (so far)
 
-| Version | What |
-| --- | --- |
-| **v0.1.2533** | Instant `/keep-p2` nearest-rank gap glance (pairs under `/keep-p5`) |
-| **v0.1.2532** | Instant `/keep-p5` nearest-rank gap glance (pairs with `/keep-p95`) |
-| **v0.1.2531** | Instant `/keep-p99` nearest-rank gap glance (pairs with `/keep-p95` / `/keep-p75`) |
-| **v0.1.2530** | Instant `/keep-p75` ceiling-quartile gap glance (pairs with `/keep-p25`) |
-| **v0.1.2529** | Settings / Ollama header focus opaque (#14) |
-| **v0.1.2528** | Changelog focus opaque (#14) |
+- **v0.1.2534** — Instant `/keep-p1` · `keep p1` · `p1 keep gap` · `1st percentile keep gap` (+ discard). Nearest-rank p1 gap between consecutive keep/discard rows in `results.tsv` (tonight + all-time). Digester Slowest filters. Standing P0 after `/keep-p2` v0.1.2533.
 
-## Try it
+Earlier same calendar night (pre-20:00 window closeouts still on the board): `/keep-p2` … `/keep-p75` percentile ladder + opaque focus/glass cascade through v0.1.2533.
 
-In Discord / AI Chat operator lane: `/keep-p2` or `p2 keep gap` — nearest-rank p2 of keep gaps tonight + all-time, no row dump.
+## Tried / notes
 
-Also still: `/keep-p5`, `/keep-p99`, `/keep-p75`, `/keep-p95`, `/keep-pace`, `/keep-median`.
-
-## Notes
-
-- Digester: 0 turns / 7d (ask Werner something).
-- Design review / layout-daily: not due (grace / already marked).
+- Digester empty (0 turns / 7d). Design-review and layout-daily not due (grace / already marked).
+- Sibling harnesses missing on Linux rack.
 - Glass leftovers: intentional scrollbar only.
-- Mac Screen Recording TCC still blocks fresh `docs/screens/` captures.
+
+## Next
+
+- Other ratchet glance, or Mac `feature-*.png` capture when Screen Recording TCC allows.
