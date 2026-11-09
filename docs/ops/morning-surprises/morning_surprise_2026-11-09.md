@@ -1,23 +1,25 @@
 # Morning surprise — 2026-11-09
 
-Overnight Track B kept baking remaining theme opacity glass into opaque `color-mix` so CRT / paper shells stay readable without glass alpha in Graphics and Media.
+Overnight autoresearch kept product chrome opaque (standing P2 #14). Digester open stayed empty; design-review and layout-daily were not due (grace / data-poster already marked).
 
-## Shipped tonight
+## Shipped
 
-- **v0.1.2516** — Dark `.changelog-date` · `.changelog-paragraph` · `.changelog-item` off remaining opacity glass onto opaque `color-mix` against CRT shell `#0a0a0a` (after metric opacity v0.1.2515).
-- **v0.1.2515** — Dark / Neon / Futuristic metric opacity opaque (Futuristic `.metric-label` · `.ring-track`, Neon `.metric-unit`, Dark `.ring-track`).
-- **v0.1.2514** — Material / Swiss `.metric-label` · `.metric-subtext` (and Material `.ring-track`) opacity opaque.
-- **v0.1.2513** — Light / Material / Swiss `.section-title` off invalid glass `rgb(1,1,1,0.75)`.
-- **v0.1.2512** — Light `.metric-unit` / `.cpu-divider` opacity opaque.
-- Backfill keep logged for **v0.1.2515** (missed `results.tsv` row).
+| Version | Keep | What |
+| --- | --- | --- |
+| v0.1.2517 | keep | Disk Cleanup add-scope opaque — `#disk-cleanup-add-btn` · scope/add inputs · `.disk-cleanup-scope-remove` off transparent glass onto opaque `#ffffff` + CRT remaps |
+| v0.1.2516 | keep | Dark Changelog opacity opaque — `.changelog-date` · `.changelog-paragraph` · `.changelog-item` → opaque `color-mix` on `#0a0a0a` |
+| v0.1.2515 | keep | Dark / Neon / Futuristic metric opacity opaque — Futuristic `.metric-label` · `.ring-track`, Neon `.metric-unit`, Dark `.ring-track` → opaque `color-mix` on CRT shells |
+| v0.1.2514 | keep | Material / Swiss `.metric-label` · `.metric-subtext` · Material `.ring-track` opacity → opaque `color-mix` |
+| v0.1.2513 | keep | Light / Material / Swiss `.section-title` invalid glass → opaque `color-mix` |
+| v0.1.2512 | keep | Light `.metric-unit` · `.cpu-divider` opacity → opaque `color-mix` |
+| v0.1.2511 | keep | Settings note underline opaque across themes |
 
-## Tried / notes
+## Tried / discarded
 
-- Digester empty (0 turns / 7d). Design-review grace; layout-daily already marked for Data Poster today.
-- Sibling OpenClaw/Hermes missing on this rack.
-- Debug.log quiet (no ERROR/WARN clusters in 180m).
-- Mac `docs/screens/` recapture still TCC-blocked (`screencapture -l`).
+- Parallel race earlier tonight: local section-title as v0.1.2512 discarded when origin already shipped Light metric-unit/divider as 2512 (re-shipped as 2513).
+- Material/Swiss metric-label plan raced origin v0.1.2514 — pulled and moved to CRT metric opacity instead (kept as 2515).
 
-## Next fuel
+## Notes
 
-Intentional decorative gradient leftovers only, or Mac capture of stale `feature-cpu-metrics.png` / `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows.
+- Mac feature-screen recapture still deferred (Screen Recording TCC / menu-bar only).
+- Next fuel: remaining Disk Cleanup / Agent Ops transparent leftovers if any, or Mac capture when TCC allows.
