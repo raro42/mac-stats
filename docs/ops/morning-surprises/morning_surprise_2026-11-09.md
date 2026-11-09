@@ -1,20 +1,25 @@
 # Morning surprise — 2026-11-09
 
-Overnight Track B kept shipping. Digester open stayed empty; design review + layout daily were not due. Fuel stayed on standing backlog after the opaque-glass (#14) chain.
+Overnight autoresearch kept shipping. Empty digester; standing backlog + instant lane did the work.
 
-## Shipped tonight (selected)
+## Shipped tonight
 
 | Version | What |
 | --- | --- |
-| **v0.1.2529** | Settings / Ollama header focus opaque (`#14`) |
+| **v0.1.2531** | Instant `/keep-p99` nearest-rank gap glance (pairs with `/keep-p95` / `/keep-p75`) |
 | **v0.1.2530** | Instant `/keep-p75` ceiling-quartile gap glance (pairs with `/keep-p25`) |
+| **v0.1.2529** | Settings / Ollama header focus opaque (#14) |
+| **v0.1.2528** | Changelog focus opaque (#14) |
 
 ## Try it
 
-In Discord / AI Chat operator lane: `/keep-p75` or `p75 keep gap` — nearest-rank p75 of keep gaps tonight + all-time, no row dump.
+In Discord / AI Chat operator lane: `/keep-p99` or `p99 keep gap` — nearest-rank p99 of keep gaps tonight + all-time, no row dump.
+
+Also still: `/keep-p75`, `/keep-p95`, `/keep-pace`, `/keep-median`.
 
 ## Notes
 
-- Intentional scrollbar glass left alone.
-- Mac Screen Recording TCC still blocks fresh `feature-*.png` captures on this rack path.
-- Linux rack: no `/Applications` install this tick (instant-lane Rust only).
+- Digester: 0 turns / 7d (ask Werner something).
+- Design review / layout-daily: not due (grace / already marked).
+- Glass leftovers: intentional scrollbar only.
+- Mac Screen Recording TCC still blocks fresh `docs/screens/` captures.
