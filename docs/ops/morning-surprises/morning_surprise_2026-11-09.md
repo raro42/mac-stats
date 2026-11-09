@@ -1,21 +1,22 @@
 # Morning surprise — 2026-11-09
 
-Overnight autoresearch kept product moves on the ratchet (not digester-empty alone).
+Overnight autoresearch kept shipping ratchet glances while digester stayed empty.
 
-## Shipped tonight
+## Shipped tonight (highlights)
 
-- **v0.1.2536** — Instant `/keep-p50` · `keep p50` · `p50 keep gap` · `50th percentile keep gap` (+ discard). Nearest-rank p50 gap between consecutive keep/discard rows in `results.tsv` (tonight + all-time). Digester Slowest filters. Standing P0 after `/keep-p98` v0.1.2535. Pairs with `/keep-median`.
-- **v0.1.2535** — Instant `/keep-p98` · `keep p98` · `p98 keep gap` · `98th percentile keep gap` (+ discard). Nearest-rank p98 gap between consecutive keep/discard rows in `results.tsv` (tonight + all-time). Digester Slowest filters. Standing P0 after `/keep-p1` v0.1.2534. Pairs with `/keep-p2`.
-- **v0.1.2534** — Instant `/keep-p1` · `keep p1` · `p1 keep gap` · `1st percentile keep gap` (+ discard). Nearest-rank p1 gap between consecutive keep/discard rows in `results.tsv` (tonight + all-time). Digester Slowest filters. Standing P0 after `/keep-p2` v0.1.2533.
-
-Earlier same calendar night (pre-20:00 window closeouts still on the board): `/keep-p2` … `/keep-p75` percentile ladder + opaque focus/glass cascade through v0.1.2533.
+- **v0.1.2537** — Instant `/keep-p20` · `keep p20` · `p20 keep gap` · `20th percentile keep gap` (+ discard). Nearest-rank p20 gap between consecutive keep/discard rows in `results.tsv` (tonight + all-time). Digester Slowest filters. Standing P0 after `/keep-p50` v0.1.2536. Between `/keep-p10` and `/keep-p25`.
+- **v0.1.2536** — Instant `/keep-p50` (pairs with `/keep-median`).
+- **v0.1.2535** — Instant `/keep-p98`.
+- **v0.1.2534** — Instant `/keep-p1`.
+- Earlier tonight: `/keep-p2` · `/keep-p5` · `/keep-p99` · `/keep-p75` plus opaque glass polish track (Settings/Ollama focus through Changelog).
 
 ## Try it
 
-In AI Chat or Discord: `/keep-p50` or `p50 keep gap` — tonight + all-time nearest-rank p50 gap between keeps (no row dump). Pair with `/keep-median` / `/keep-p98`.
+In AI Chat or Discord: `/keep-p20` or `p20 keep gap` — tonight + all-time nearest-rank p20 gap between keeps (no row dump). Pair with `/keep-p10` / `/keep-p25` / `/keep-p50`.
 
-## Context
+## Notes
 
-- Digester 7d open: empty. Design review + layout daily: not due (grace / already marked).
-- Sibling harnesses: missing on this Linux rack.
-- Glass leftovers: intentional scrollbar only.
+- Digester open candidates: none (0 turns / 7d).
+- Design review / layout daily: not due (grace / already marked).
+- Sibling harnesses missing on this rack.
+- Mac Screen Recording TCC still blocks fresh `docs/screens/` captures.
