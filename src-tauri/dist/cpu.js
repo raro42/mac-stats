@@ -4643,10 +4643,9 @@ function ensureHistorySparklineKbStyles() {
       cursor: pointer;
       outline: none;
     }
+    /* Opaque focus ring — was color-mix(…, transparent) + inset rgba glass (#14). CRT remaps in agent-ops.css. */
     .history-chart-container[role="button"]:focus-visible {
-      box-shadow:
-        0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent),
-        inset 0 1px 0 rgba(255, 255, 255, 0.58);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #ffffff);
     }
   `;
   document.head.appendChild(style);

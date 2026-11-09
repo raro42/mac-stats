@@ -7,6 +7,11 @@
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2526] - 2026-11-09
+
+### Changed
+- **History sparkline focus opaque (#14):** `.history-chart-container[role="button"]:focus-visible` moves off `color-mix(…, transparent)` + inset white `rgba` glass onto opaque `color-mix` against paper `#ffffff`, with CRT remaps on Data Poster / Dark / Neon / Futuristic shells (after metric-strip flash v0.1.2525). Standing P2 #14; design-review `feature-cpu-metrics` adjacent (polish-without-capture; Mac recapture deferred, Screen Recording TCC / menu-bar only). Next: update-banner glass leftovers if any, or Mac capture when TCC allows.
+
 ## [0.1.2525] - 2026-11-09
 
 ### Changed

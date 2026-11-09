@@ -26754,3 +26754,24 @@ body.theme-futuristic .disk-cleanup-section.is-disk-highlight {
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #0b0b10);
 }
 
+/*
+ * Data Poster / Dark / Neon / Futuristic: history sparkline focus ring still
+ * mixed transparent glass (+ inset white rgba) in the injected cpu.js sheet.
+ * Remap onto CRT shells. Standing P2 #14 after metric-strip flash v0.1.2525;
+ * design-review feature-cpu-metrics adjacent (polish-without-capture; Mac
+ * capture TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2526: history sparkline focus CRT */
+body.theme-data-poster .history-chart-container[role="button"]:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #0b0b10);
+}
+body.theme-dark .history-chart-container[role="button"]:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #0a0a0a);
+}
+body.theme-neon .history-chart-container[role="button"]:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #08120c);
+}
+body.theme-futuristic .history-chart-container[role="button"]:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #0b0b10);
+}
+

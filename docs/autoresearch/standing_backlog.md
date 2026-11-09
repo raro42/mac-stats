@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2526
+
+- History sparkline focus opaque (`.history-chart-container[role="button"]:focus-visible`) glass `color-mix(…, transparent)` + inset white `rgba` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (after metric-strip flash v0.1.2525). Standing P2 #14; design-review `feature-cpu-metrics` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: update-banner glass leftovers if any, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2525
 
 - Metric-strip flash highlights opaque (`.is-ram-highlight` · `.is-cpu-highlight` · `.is-gpu-highlight` · `.is-temp-highlight` · `.is-freq-highlight` · `.is-disk-highlight` · `.is-uptime-highlight`) glass `color-mix(…, transparent)` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (after Disk Cleanup badge / jump-flash v0.1.2524). Standing P2 #14; design-review `feature-cpu-metrics` / `feature-disk-cleanup` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: history sparkline focus / banner glass leftovers if any, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
