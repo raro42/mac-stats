@@ -5875,9 +5875,10 @@ function ensureAppBannerStyles() {
       padding: 12px 12px 12px 14px;
       border-radius: 14px;
       font: 12px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
-      color: var(--text, rgba(12, 12, 16, 0.88));
+      /* Opaque type — was rgba glass fallback (#14). CRT remaps in agent-ops.css. */
+      color: var(--text, color-mix(in srgb, #0c0c10 88%, #ffffff));
       background: var(--panel, #f7f7fa);
-      border: 1px solid var(--panel-border, rgba(0, 0, 0, 0.08));
+      border: 1px solid var(--panel-border, color-mix(in srgb, #000 8%, #ffffff));
       box-shadow: none;
       /* No live backdrop-filter — keeps WebView compositor busy (#14). */
       backdrop-filter: none;
@@ -5889,8 +5890,9 @@ function ensureAppBannerStyles() {
       to { opacity: 1; transform: translateY(0); }
     }
     #mac-stats-update-banner {
-      background: color-mix(in srgb, var(--accent, #8bb4e8) 22%, var(--panel, rgba(255,255,255,0.72)));
-      border-color: color-mix(in srgb, var(--accent, #8bb4e8) 35%, transparent);
+      /* Opaque wash — was panel rgba(…,0.72) + transparent border glass (#14). */
+      background: color-mix(in srgb, var(--accent, #8bb4e8) 22%, var(--panel, #ffffff));
+      border-color: color-mix(in srgb, var(--accent, #8bb4e8) 35%, #ffffff);
     }
     #mac-stats-first-launch-tip .tip-glyph,
     #mac-stats-update-banner .tip-glyph {
@@ -5901,10 +5903,11 @@ function ensureAppBannerStyles() {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255, 255, 255, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.55);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
-      color: var(--muted, rgba(12, 12, 16, 0.5));
+      /* Opaque glyph — was white rgba glass + inset (#14). */
+      background: color-mix(in srgb, #ffffff 45%, #f7f7fa);
+      border: 1px solid color-mix(in srgb, #ffffff 55%, #e8e8ee);
+      box-shadow: none;
+      color: var(--muted, color-mix(in srgb, #0c0c10 50%, #ffffff));
     }
     #mac-stats-update-banner .tip-glyph {
       color: color-mix(in srgb, var(--accent, #007aff) 70%, var(--text, #1d1d1f));
@@ -5928,18 +5931,18 @@ function ensureAppBannerStyles() {
       font-size: 13px;
       font-weight: 650;
       letter-spacing: -0.01em;
-      color: var(--text, rgba(12, 12, 16, 0.88));
+      color: var(--text, color-mix(in srgb, #0c0c10 88%, #ffffff));
     }
     #mac-stats-first-launch-tip .tip-copy,
     #mac-stats-update-banner .tip-copy {
       font-size: 12px;
       line-height: 1.45;
-      color: var(--muted, rgba(12, 12, 16, 0.55));
+      color: var(--muted, color-mix(in srgb, #0c0c10 55%, #ffffff));
     }
     #mac-stats-first-launch-tip .tip-copy strong,
     #mac-stats-update-banner .tip-copy strong {
       font-weight: 600;
-      color: var(--text, rgba(12, 12, 16, 0.78));
+      color: var(--text, color-mix(in srgb, #0c0c10 78%, #ffffff));
     }
     #mac-stats-first-launch-tip code,
     #mac-stats-update-banner code {
@@ -5947,9 +5950,10 @@ function ensureAppBannerStyles() {
       font-size: 11px;
       padding: 1px 5px;
       border-radius: 5px;
-      background: rgba(12, 12, 16, 0.06);
-      border: 1px solid rgba(12, 12, 16, 0.04);
-      color: var(--text, rgba(12, 12, 16, 0.72));
+      /* Opaque code chip — was rgba glass (#14). */
+      background: color-mix(in srgb, #0c0c10 6%, #ffffff);
+      border: 1px solid color-mix(in srgb, #0c0c10 4%, #ffffff);
+      color: var(--text, color-mix(in srgb, #0c0c10 72%, #ffffff));
     }
     #mac-stats-first-launch-tip .tip-dismiss,
     #mac-stats-update-banner .tip-dismiss {
@@ -5957,13 +5961,14 @@ function ensureAppBannerStyles() {
       width: 24px;
       height: 24px;
       margin-top: 2px;
-      border: 1px solid rgba(12, 12, 16, 0.08);
+      /* Opaque dismiss — was white/ink rgba glass (#14). */
+      border: 1px solid color-mix(in srgb, #0c0c10 8%, #ffffff);
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.35);
+      background: color-mix(in srgb, #ffffff 35%, #f7f7fa);
       cursor: pointer;
       font-size: 14px;
       line-height: 1;
-      color: var(--muted, rgba(12, 12, 16, 0.45));
+      color: var(--muted, color-mix(in srgb, #0c0c10 45%, #ffffff));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -5971,15 +5976,16 @@ function ensureAppBannerStyles() {
     }
     #mac-stats-first-launch-tip .tip-dismiss:hover,
     #mac-stats-update-banner .tip-dismiss:hover {
-      color: var(--text, rgba(12, 12, 16, 0.8));
-      background: rgba(255, 255, 255, 0.55);
-      border-color: rgba(12, 12, 16, 0.12);
+      color: var(--text, color-mix(in srgb, #0c0c10 80%, #ffffff));
+      background: color-mix(in srgb, #ffffff 55%, #f0f0f4);
+      border-color: color-mix(in srgb, #0c0c10 12%, #ffffff);
     }
     #mac-stats-update-banner a {
       color: inherit;
       font-weight: 600;
       text-decoration: underline;
-      text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+      /* Opaque underline — was color-mix(…, transparent) glass (#14). */
+      text-decoration-color: color-mix(in srgb, currentColor 35%, #ffffff);
       text-underline-offset: 2px;
     }
     #mac-stats-update-banner a:hover {
