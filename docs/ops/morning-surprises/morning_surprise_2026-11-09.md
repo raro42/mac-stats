@@ -1,29 +1,28 @@
 # Morning surprise — 2026-11-09
 
-Overnight autoresearch kept product chrome opaque (standing P2 #14). Digester open stayed empty; design-review and layout-daily were not due (grace / data-poster already marked).
+Overnight Track B kept baking remaining glass into opaque `color-mix` so CRT / paper shells stay readable without glass alpha in Graphics and Media.
 
-## Shipped
+## Shipped tonight
 
-| Version | Keep | What |
-| --- | --- | --- |
-| v0.1.2521 | keep | Monitors URL / detail focus opaque — `.monitor-url:focus-visible` · `button.monitor-detail-url:focus-visible` · `.monitor-detail-remove:focus-visible` off transparent glass onto opaque `#ffffff` + CRT remaps |
-| v0.1.2520 | keep | Monitors settings focus opaque — `.monitor-settings-item:focus-within` · `.monitors-settings-popover .popover-btn-primary:focus-visible` (+ CRT remaps for `.monitor-remove-btn:focus-visible`) |
-| v0.1.2519 | keep | Perplexity search / inline-key opaque — `.perplexity-search-box` input · button · `#perplexity-search-btn` hover/focus · `.perplexity-inline-key` · `.perplexity-inline-save` off transparent glass onto opaque `#ffffff` + CRT remaps |
-| v0.1.2518 | keep | Agent Ops Insights opaque — `.ops-insights-card` · `.ops-insight-line.is-clickable` hover / focus / selected → opaque `color-mix` + CRT remaps |
-| v0.1.2517 | keep | Disk Cleanup add-scope opaque — `#disk-cleanup-add-btn` · scope/add inputs · `.disk-cleanup-scope-remove` off transparent glass onto opaque `#ffffff` + CRT remaps |
-| v0.1.2516 | keep | Dark Changelog opacity opaque — `.changelog-date` · `.changelog-paragraph` · `.changelog-item` → opaque `color-mix` on `#0a0a0a` |
-| v0.1.2515 | keep | Dark / Neon / Futuristic metric opacity opaque — Futuristic `.metric-label` · `.ring-track`, Neon `.metric-unit`, Dark `.ring-track` → opaque `color-mix` on CRT shells |
-| v0.1.2514 | keep | Material / Swiss `.metric-label` · `.metric-subtext` · Material `.ring-track` opacity → opaque `color-mix` |
-| v0.1.2513 | keep | Light / Material / Swiss `.section-title` invalid glass → opaque `color-mix` |
-| v0.1.2512 | keep | Light `.metric-unit` · `.cpu-divider` opacity → opaque `color-mix` |
-| v0.1.2511 | keep | Settings note underline opaque across themes |
+- **v0.1.2522** — Processes + Disk Cleanup path focus opaque: `.process-name:focus-visible` · `.process-detail-name:focus-visible` · `.process-detail-pid:focus-visible` · `.disk-cleanup-item-path:focus-visible` · `.disk-cleanup-scope-path:focus-visible` off transparent glass onto opaque paper mixes with CRT remaps.
+- **v0.1.2521** — Monitors URL / detail focus opaque: `.monitor-url:focus-visible` · `button.monitor-detail-url:focus-visible` · `.monitor-detail-remove:focus-visible` (results.tsv backfilled this tick).
+- **v0.1.2520** — Monitors settings focus opaque: `.monitor-settings-item:focus-within` · `.monitors-settings-popover .popover-btn-primary:focus-visible` (+ CRT remaps for `.monitor-remove-btn:focus-visible`) off transparent glass onto opaque paper mixes with CRT remaps.
+- **v0.1.2519** — Perplexity search / inline-key opaque: `.perplexity-search-box` input · button · `#perplexity-search-btn` hover / focus · `.perplexity-inline-key` · `.perplexity-inline-save` (results.tsv backfilled earlier).
+- **v0.1.2518** — Agent Ops Insights opaque: `.ops-insights-card` · `.ops-insight-line.is-clickable` hover / focus / selected.
+- **v0.1.2517** — Disk Cleanup add-scope opaque: `#disk-cleanup-add-btn` · scope/add inputs · `.disk-cleanup-scope-remove`.
+- **v0.1.2516** — Dark `.changelog-date` · `.changelog-paragraph` · `.changelog-item` opacity opaque on `#0a0a0a`.
+- **v0.1.2515** — Dark / Neon / Futuristic metric opacity opaque.
+- **v0.1.2514** — Material / Swiss metric-label opacity opaque.
+- **v0.1.2513** — Light / Material / Swiss `.section-title` off invalid glass `rgb(1,1,1,0.75)`.
+- **v0.1.2512** — Light `.metric-unit` / `.cpu-divider` opacity opaque.
 
-## Tried / discarded
+## Tried / notes
 
-- Parallel race earlier tonight: local section-title as v0.1.2512 discarded when origin already shipped Light metric-unit/divider as 2512 (re-shipped as 2513).
-- Material/Swiss metric-label plan raced origin v0.1.2514 — pulled and moved to CRT metric opacity instead (kept as 2515).
+- Digester empty (0 turns / 7d). Design-review grace; layout-daily already marked today.
+- Sibling OpenClaw/Hermes missing on this rack.
+- Debug.log quiet (no ERROR/WARN clusters in 180m).
+- Mac `docs/screens/` recapture still TCC-blocked (`screencapture -l`).
 
-## Notes
+## Next fuel
 
-- Mac feature-screen recapture still deferred (Screen Recording TCC / menu-bar only).
-- Next fuel: remaining Monitors / Disk Cleanup / Processes focus glass leftovers if any, or Mac capture when TCC allows.
+Remaining Disk Cleanup toolbar secondary focus ring / intentional scrollbar glass, or Mac capture of stale `feature-processes.png` / `feature-disk-cleanup.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows.
