@@ -1,14 +1,15 @@
 # Morning surprise — 2026-11-09
 
-Overnight Track B kept baking remaining glass into opaque `color-mix` so CRT / paper shells stay readable without glass alpha in Graphics and Media.
+Overnight autoresearch kept product glass-opaque ships on standing P2 #14 (Data Poster / CRT shells). Digester stayed empty; design-review / layout-daily were in polish-without-capture grace (Mac Screen Recording TCC still blocks fresh `docs/screens/` captures).
 
 ## Shipped tonight
 
-- **v0.1.2527** — First-launch tip + update banner opaque: `#mac-stats-first-launch-tip` / `#mac-stats-update-banner` border · underline · tip-glyph · tip-dismiss · code chip off transparent / white `rgba` glass onto opaque paper `#ffffff` with CRT remaps (Data Poster / Dark / Neon / Futuristic).
-- **v0.1.2526** — History sparkline focus opaque: `.history-chart-container[role="button"]:focus-visible` off transparent + inset white `rgba`.
-- **v0.1.2525** — Metric-strip flash highlights opaque: `.is-ram-highlight` · `.is-cpu-highlight` · `.is-gpu-highlight` · `.is-temp-highlight` · `.is-freq-highlight` · `.is-disk-highlight` · `.is-uptime-highlight`.
-- **v0.1.2524** — Disk Cleanup badge halo + Agent Ops jump-flash opaque: `#icon-disk-cleanup .disk-cleanup-badge` · `--ops-jump-flash-ring`.
-- **v0.1.2523** — Disk Cleanup toolbar secondary focus opaque: `.disk-cleanup-toolbar .popover-btn-secondary:focus-visible`.
+- **v0.1.2528** — Changelog focus opaque (`.changelog-h2[tabindex]:focus` · `.changelog-loading[tabindex]:focus` · `.changelog-error[tabindex]:focus`) off glass `rgba` focus-ring fallback onto paper `#ffffff`, with CRT remaps (Data Poster / Dark / Neon / Futuristic).
+- **v0.1.2527** — First-launch tip + update banner opaque.
+- **v0.1.2526** — History sparkline focus opaque (`.history-chart-container[role="button"]:focus-visible`) off transparent glass + inset white rgba onto paper `#ffffff`, with CRT remaps (Data Poster / Dark / Neon / Futuristic).
+- **v0.1.2525** — Metric-strip flash highlights opaque (RAM · CPU · GPU · Temp · Freq · Disk · Uptime).
+- **v0.1.2524** — Disk Cleanup badge halo + Agent Ops jump-flash opaque.
+- **v0.1.2523** — Disk Cleanup toolbar secondary focus opaque.
 - **v0.1.2522** — Processes + Disk Cleanup path focus opaque.
 - **v0.1.2521** — Monitors URL / detail focus opaque.
 - **v0.1.2520** — Monitors settings focus opaque.
@@ -18,15 +19,16 @@ Overnight Track B kept baking remaining glass into opaque `color-mix` so CRT / p
 - **v0.1.2516** — Dark Changelog opacity opaque.
 - **v0.1.2515** — Dark / Neon / Futuristic metric opacity opaque.
 - **v0.1.2514** — Material / Swiss metric-label opacity opaque.
-- **v0.1.2513** — Light / Material / Swiss `.section-title` off invalid glass `rgb(1,1,1,0.75)`.
+- **v0.1.2513** — Section titles opaque (Light / Material / Swiss).
+- **v0.1.2512** — Light metric-unit / divider opacity opaque.
 
 ## Tried / notes
 
-- Digester empty (open candidates none). Design-review grace; layout-daily already marked today (data-poster).
-- Debug.log quiet (no ERROR/WARN/panic clusters in 180m).
-- Mac `docs/screens/` recapture still TCC-blocked (`screencapture -l`).
-- Intentional thin scrollbar glass left alone (hover thumb).
+- Digester: 0 turns / 7d (no open Slowest candidates).
+- Sibling harnesses (OpenClaw / Hermes): missing on this rack.
+- Debug.log: clean (no ERROR/WARN clusters in scan windows).
+- Next fuel: Settings / Ollama header `tabindex` focus glass leftover (`cpu-ui.js`), or Mac capture of stale feature screens when TCC allows.
 
-## Next fuel
+## Fitness
 
-Intentional scrollbar glass left alone, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows.
+Keyboard focus on Changelog version headings / loading / error states no longer paints a semi-transparent `rgba` focus ring (and CRT themes get shell-matched remaps), so focus stays readable without pulling Graphics and Media alpha washes.
