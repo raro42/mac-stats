@@ -10601,16 +10601,18 @@ body.theme-futuristic .disk-cleanup-scope-row.is-disabled {
   font-size: 12px;
   padding: 4px 6px;
   border-radius: 6px;
-  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
-  background: color-mix(in srgb, currentColor 4%, transparent);
+  /* Opaque field — was color-mix(…, transparent) glass (#14). */
+  border: 1px solid color-mix(in srgb, currentColor 14%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
   color: inherit;
 }
 
 .disk-cleanup-scope-row input[type="number"]:focus-visible,
 .disk-cleanup-add-scope input:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, #0a84ff 40%, transparent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 18%, transparent);
+  /* Opaque focus — was color-mix(…, transparent) glass (#14). */
+  border-color: color-mix(in srgb, #0a84ff 40%, #ffffff);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 18%, #ffffff);
 }
 
 .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
@@ -10636,21 +10638,24 @@ body.theme-futuristic .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
   font-size: 11px;
   padding: 4px 8px;
   border-radius: 6px;
-  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
-  background: transparent;
+  /* Opaque control — was transparent / color-mix(…, transparent) glass (#14). */
+  border: 1px solid color-mix(in srgb, currentColor 14%, #ffffff);
+  background: color-mix(in srgb, currentColor 2%, #ffffff);
   color: inherit;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .disk-cleanup-scope-remove:hover {
-  background: color-mix(in srgb, #ff453a 12%, transparent);
-  border-color: color-mix(in srgb, #ff453a 32%, transparent);
+  /* Opaque hover — was color-mix(…, transparent) glass (#14). */
+  background: color-mix(in srgb, #ff453a 12%, #ffffff);
+  border-color: color-mix(in srgb, #ff453a 32%, #ffffff);
 }
 
 .disk-cleanup-scope-remove:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, transparent);
+  /* Opaque focus — was color-mix(…, transparent) glass (#14). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #ffffff);
 }
 
 .disk-cleanup-add-scope {
@@ -10670,31 +10675,30 @@ body.theme-futuristic .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
   padding: 8px 14px;
   min-height: 34px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, #0a84ff 32%, transparent);
-  background: color-mix(in srgb, #0a84ff 16%, transparent);
+  /* Opaque Add — was color-mix(…, transparent) + soft glass shadow (#14; Clean now primary parity). */
+  border: 1px solid color-mix(in srgb, #0a84ff 32%, #ffffff);
+  background: color-mix(in srgb, #0a84ff 16%, #ffffff);
   color: inherit;
   cursor: pointer;
   white-space: nowrap;
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, #fff 40%, transparent),
-    0 1px 2px color-mix(in srgb, #000 12%, transparent);
+  box-shadow: none;
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
-  background: color-mix(in srgb, #0a84ff 24%, transparent);
-  border-color: color-mix(in srgb, #0a84ff 46%, transparent);
+  background: color-mix(in srgb, #0a84ff 24%, #ffffff);
+  border-color: color-mix(in srgb, #0a84ff 46%, #ffffff);
 }
 
 .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
-  box-shadow: inset 0 1px 2px color-mix(in srgb, #000 14%, transparent);
+  background: color-mix(in srgb, #0a84ff 28%, #ffffff);
+  box-shadow: none;
 }
 
 .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
   outline: none;
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, #fff 40%, transparent),
-    0 0 0 3px color-mix(in srgb, #0a84ff 22%, transparent);
+  /* Opaque focus ring — was inset glass + transparent mix (#14). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #ffffff);
 }
 
 .disk-cleanup-add-scope input[type="text"],
@@ -10702,8 +10706,9 @@ body.theme-futuristic .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
   font-size: 12px;
   padding: 6px 8px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
-  background: color-mix(in srgb, currentColor 4%, transparent);
+  /* Opaque field — was color-mix(…, transparent) glass (#14). */
+  border: 1px solid color-mix(in srgb, currentColor 14%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
   color: inherit;
   min-width: 0;
 }
@@ -25033,6 +25038,166 @@ body.theme-neon .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
 }
 body.theme-futuristic .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
   color: color-mix(in srgb, #ffffff 48%, #0b0b10);
+}
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Disk Cleanup add-scope chrome still mixed
+ * Apple `#ffffff` after shared opaque pass (Add · scope inputs · Remove). Remap onto
+ * CRT shells. Standing P2 #14 after primary CRT v0.1.2465; design-review
+ * feature-disk-cleanup adjacent (polish-without-capture; Mac capture TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2517: disk-cleanup add-scope CRT */
+body.theme-data-poster .disk-cleanup-scope-row input[type="number"],
+body.theme-data-poster .disk-cleanup-add-scope input[type="text"],
+body.theme-data-poster .disk-cleanup-add-scope input[type="number"] {
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-scope-row input[type="number"],
+body.theme-dark .disk-cleanup-add-scope input[type="text"],
+body.theme-dark .disk-cleanup-add-scope input[type="number"] {
+  border-color: color-mix(in srgb, currentColor 14%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 4%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-scope-row input[type="number"],
+body.theme-neon .disk-cleanup-add-scope input[type="text"],
+body.theme-neon .disk-cleanup-add-scope input[type="number"] {
+  border-color: color-mix(in srgb, currentColor 14%, #08120c);
+  background: color-mix(in srgb, currentColor 4%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-scope-row input[type="number"],
+body.theme-futuristic .disk-cleanup-add-scope input[type="text"],
+body.theme-futuristic .disk-cleanup-add-scope input[type="number"] {
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-scope-row input[type="number"]:focus-visible,
+body.theme-data-poster .disk-cleanup-add-scope input:focus-visible {
+  border-color: color-mix(in srgb, #0a84ff 40%, #0b0b10);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 18%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-scope-row input[type="number"]:focus-visible,
+body.theme-dark .disk-cleanup-add-scope input:focus-visible {
+  border-color: color-mix(in srgb, #0a84ff 40%, #0a0a0a);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 18%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-scope-row input[type="number"]:focus-visible,
+body.theme-neon .disk-cleanup-add-scope input:focus-visible {
+  border-color: color-mix(in srgb, #0a84ff 40%, #08120c);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 18%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-scope-row input[type="number"]:focus-visible,
+body.theme-futuristic .disk-cleanup-add-scope input:focus-visible {
+  border-color: color-mix(in srgb, #0a84ff 40%, #0b0b10);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 18%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-scope-remove {
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  background: color-mix(in srgb, currentColor 2%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-scope-remove {
+  border-color: color-mix(in srgb, currentColor 14%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 2%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-scope-remove {
+  border-color: color-mix(in srgb, currentColor 14%, #08120c);
+  background: color-mix(in srgb, currentColor 2%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-scope-remove {
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  background: color-mix(in srgb, currentColor 2%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-scope-remove:hover {
+  background: color-mix(in srgb, #ff453a 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff453a 32%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-scope-remove:hover {
+  background: color-mix(in srgb, #ff453a 12%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff453a 32%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-scope-remove:hover {
+  background: color-mix(in srgb, #ff453a 12%, #08120c);
+  border-color: color-mix(in srgb, #ff453a 32%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-scope-remove:hover {
+  background: color-mix(in srgb, #ff453a 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff453a 32%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-scope-remove:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-scope-remove:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-scope-remove:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-scope-remove:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-add-scope #disk-cleanup-add-btn {
+  background: color-mix(in srgb, #0a84ff 16%, #0b0b10);
+  border-color: color-mix(in srgb, #0a84ff 32%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-add-scope #disk-cleanup-add-btn {
+  background: color-mix(in srgb, #0a84ff 16%, #0a0a0a);
+  border-color: color-mix(in srgb, #0a84ff 32%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-add-scope #disk-cleanup-add-btn {
+  background: color-mix(in srgb, #0a84ff 16%, #08120c);
+  border-color: color-mix(in srgb, #0a84ff 32%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-add-scope #disk-cleanup-add-btn {
+  background: color-mix(in srgb, #0a84ff 16%, #0b0b10);
+  border-color: color-mix(in srgb, #0a84ff 32%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
+  background: color-mix(in srgb, #0a84ff 24%, #0b0b10);
+  border-color: color-mix(in srgb, #0a84ff 46%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
+  background: color-mix(in srgb, #0a84ff 24%, #0a0a0a);
+  border-color: color-mix(in srgb, #0a84ff 46%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
+  background: color-mix(in srgb, #0a84ff 24%, #08120c);
+  border-color: color-mix(in srgb, #0a84ff 46%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
+  background: color-mix(in srgb, #0a84ff 24%, #0b0b10);
+  border-color: color-mix(in srgb, #0a84ff 46%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
+  background: color-mix(in srgb, #0a84ff 28%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
+  background: color-mix(in srgb, #0a84ff 28%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
+  background: color-mix(in srgb, #0a84ff 28%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
+  background: color-mix(in srgb, #0a84ff 28%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0b0b10);
 }
 
 

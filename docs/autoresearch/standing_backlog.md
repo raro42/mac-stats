@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2517
+
+- Disk Cleanup add-scope opaque (`#disk-cleanup-add-btn` · scope/add inputs · `.disk-cleanup-scope-remove`) glass `color-mix(…, transparent)` (+ soft Add shadow) → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (Clean now primary parity after v0.1.2465; after Dark Changelog opacity v0.1.2516). Standing P2 #14; design-review `feature-disk-cleanup` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: remaining Disk Cleanup / Agent Ops transparent leftovers if any, or Mac capture of stale `feature-disk-cleanup.png` / `feature-agent-ops.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2516
 
 - Dark Changelog opacity opaque (`.changelog-date` · `.changelog-paragraph` · `.changelog-item`) opacity glass → opaque `color-mix` on CRT shell `#0a0a0a` (after Dark/Neon/Futuristic metric opacity v0.1.2515; disabled / connection-indicator hover opacity left alone). Standing P2 #14; design-review Changelog / `feature-cpu-metrics` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: intentional decorative gradient leftovers only, or Mac capture of stale `feature-cpu-metrics.png` / `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
