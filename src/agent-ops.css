@@ -10045,7 +10045,8 @@ body.theme-futuristic .monitor-item.is-removing {
 
 .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, transparent);
+  /* Opaque focus — was color-mix(…, transparent) glass (#14). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #ffffff);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
@@ -26616,5 +26617,27 @@ body.theme-futuristic .process-detail-pid:focus-visible,
 body.theme-futuristic .disk-cleanup-item-path:focus-visible,
 body.theme-futuristic .disk-cleanup-scope-path:focus-visible {
   outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+}
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Disk Cleanup toolbar secondary focus
+ * still mixed Apple `#ffffff` after shared opaque pass
+ * (`.disk-cleanup-toolbar .popover-btn-secondary:focus-visible`). Remap onto
+ * CRT shells. Standing P2 #14 after Processes/Disk Cleanup path focus v0.1.2522;
+ * design-review feature-disk-cleanup adjacent (polish-without-capture; Mac
+ * capture TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2523: disk-cleanup toolbar secondary focus CRT */
+body.theme-data-poster .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0b0b10);
 }
 
