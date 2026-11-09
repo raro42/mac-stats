@@ -10954,8 +10954,9 @@ body.theme-futuristic .ops-insight-line em {
   min-height: 28px;
   padding: 6px 10px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-  background: color-mix(in srgb, currentColor 4%, transparent);
+  /* Opaque wash — was color-mix(…, transparent) glass (#14). */
+  border: 1px solid color-mix(in srgb, currentColor 18%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
   color: inherit;
   font: inherit;
 }
@@ -10963,19 +10964,22 @@ body.theme-futuristic .ops-insight-line em {
 #perplexity-search-btn {
   padding: 6px 12px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-  background: color-mix(in srgb, currentColor 8%, transparent);
+  /* Opaque wash — was color-mix(…, transparent) glass (#14). */
+  border: 1px solid color-mix(in srgb, currentColor 18%, #ffffff);
+  background: color-mix(in srgb, currentColor 8%, #ffffff);
   color: inherit;
   cursor: pointer;
   font: inherit;
   transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
 }
 #perplexity-search-btn:hover:not(:disabled) {
-  background: color-mix(in srgb, currentColor 12%, transparent);
-  border-color: color-mix(in srgb, currentColor 28%, transparent);
+  /* Opaque hover — was color-mix(…, transparent) glass (#14). */
+  background: color-mix(in srgb, currentColor 12%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 28%, #ffffff);
 }
 #perplexity-search-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  /* Opaque focus — was color-mix(…, transparent) glass (#14). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
 }
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
@@ -11448,8 +11452,9 @@ body.theme-futuristic .ops-insight-line em {
   min-height: 28px;
   padding: 6px 10px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-  background: color-mix(in srgb, currentColor 4%, transparent);
+  /* Opaque wash — was color-mix(…, transparent) glass (#14). */
+  border: 1px solid color-mix(in srgb, currentColor 18%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
   color: inherit;
   font: inherit;
 }
@@ -11457,8 +11462,9 @@ body.theme-futuristic .ops-insight-line em {
 .perplexity-inline-save {
   padding: 6px 12px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-  background: color-mix(in srgb, currentColor 8%, transparent);
+  /* Opaque wash — was color-mix(…, transparent) glass (#14). */
+  border: 1px solid color-mix(in srgb, currentColor 18%, #ffffff);
+  background: color-mix(in srgb, currentColor 8%, #ffffff);
   color: inherit;
   cursor: pointer;
   font: inherit;
@@ -25274,6 +25280,91 @@ body.theme-neon .ops-insight-line.is-clickable.is-selected {
 body.theme-futuristic .ops-insight-line.is-clickable.is-selected {
   border-color: color-mix(in srgb, var(--accent, #55c7ff) 42%, #0b0b10);
   background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+}
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Perplexity search + inline-key chrome still
+ * mixed Apple `#ffffff` after shared opaque pass (`.perplexity-search-box` input /
+ * button · `#perplexity-search-btn` hover / focus · `.perplexity-inline-key` /
+ * `.perplexity-inline-save`). Remap onto CRT shells.
+ * Standing P2 #14 after Agent Ops Insights v0.1.2518; design-review feature-agent-ops /
+ * Perplexity adjacent (polish-without-capture; Mac capture TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2519: perplexity search/inline-key CRT */
+body.theme-data-poster .perplexity-search-box input,
+body.theme-data-poster .perplexity-inline-key {
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+}
+body.theme-dark .perplexity-search-box input,
+body.theme-dark .perplexity-inline-key {
+  border-color: color-mix(in srgb, currentColor 18%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 4%, #0a0a0a);
+}
+body.theme-neon .perplexity-search-box input,
+body.theme-neon .perplexity-inline-key {
+  border-color: color-mix(in srgb, currentColor 18%, #08120c);
+  background: color-mix(in srgb, currentColor 4%, #08120c);
+}
+body.theme-futuristic .perplexity-search-box input,
+body.theme-futuristic .perplexity-inline-key {
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+}
+
+body.theme-data-poster .perplexity-search-box button,
+body.theme-data-poster #perplexity-search-btn,
+body.theme-data-poster .perplexity-inline-save {
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+}
+body.theme-dark .perplexity-search-box button,
+body.theme-dark #perplexity-search-btn,
+body.theme-dark .perplexity-inline-save {
+  border-color: color-mix(in srgb, currentColor 18%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+}
+body.theme-neon .perplexity-search-box button,
+body.theme-neon #perplexity-search-btn,
+body.theme-neon .perplexity-inline-save {
+  border-color: color-mix(in srgb, currentColor 18%, #08120c);
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+}
+body.theme-futuristic .perplexity-search-box button,
+body.theme-futuristic #perplexity-search-btn,
+body.theme-futuristic .perplexity-inline-save {
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+}
+
+body.theme-data-poster #perplexity-search-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 28%, #0b0b10);
+}
+body.theme-dark #perplexity-search-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 28%, #0a0a0a);
+}
+body.theme-neon #perplexity-search-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, #08120c);
+  border-color: color-mix(in srgb, currentColor 28%, #08120c);
+}
+body.theme-futuristic #perplexity-search-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 28%, #0b0b10);
+}
+
+body.theme-data-poster #perplexity-search-btn:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #0b0b10);
+}
+body.theme-dark #perplexity-search-btn:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
+}
+body.theme-neon #perplexity-search-btn:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
+}
+body.theme-futuristic #perplexity-search-btn:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
 }
 
 

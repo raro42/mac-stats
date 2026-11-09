@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2519
+
+- Perplexity search / inline-key opaque (`.perplexity-search-box` input · button · `#perplexity-search-btn` hover / focus · `.perplexity-inline-key` · `.perplexity-inline-save`) glass `color-mix(…, transparent)` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (after Agent Ops Insights v0.1.2518). Standing P2 #14; design-review `feature-agent-ops` / Perplexity adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: remaining Perplexity / Agent Ops transparent leftovers if any, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2518
 
 - Agent Ops Insights opaque (`.ops-insights-card` · `.ops-insight-line.is-clickable` hover / focus / selected) glass `color-mix(…, transparent)` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (after Disk Cleanup add-scope v0.1.2517). Standing P2 #14; design-review `feature-agent-ops` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: Perplexity search / inline-key glass leftovers if any, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows `screencapture -l`.
