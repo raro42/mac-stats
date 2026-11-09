@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2531
+
+- Instant `/keep-p99` · `keep p99` · `p99 keep gap` · `99th percentile keep gap` · `p99 gap between keeps` (+ discard) — nearest-rank p99 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). Standing P0 p50 / instant lane after `/keep-p75` v0.1.2530 (glass leftovers intentional scrollbar only). Next: other ratchet glance, or Mac capture when TCC allows.
+
 ## Overnight merge — v0.1.2530
 
 - Instant `/keep-p75` · `keep p75` · `p75 keep gap` · `75th percentile keep gap` · `p75 gap between keeps` (+ discard) — nearest-rank p75 (ceiling quartile) of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). Standing P0 p50 / instant lane after Settings/Ollama header focus opaque v0.1.2529 (glass leftovers intentional scrollbar only). Next: `/keep-p99` or other ratchet glance, or Mac capture when TCC allows.
