@@ -4398,6 +4398,14 @@ body.theme-futuristic .process-empty {
   border-radius: 4px;
 }
 
+.settings-header h2[tabindex]:focus,
+.ollama-settings-popover .popover-header h3[tabindex]:focus {
+  /* Opaque focus — was var(--focus-ring, rgba(0,122,255,0.55)) glass (#14). */
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ffffff);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .settings-header-kb-hint {
   margin: 0;
   font-size: 11px;
@@ -26933,6 +26941,31 @@ body.theme-neon .changelog-error[tabindex]:focus {
 body.theme-futuristic .changelog-h2[tabindex]:focus,
 body.theme-futuristic .changelog-loading[tabindex]:focus,
 body.theme-futuristic .changelog-error[tabindex]:focus {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+}
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Settings + Ollama settings header
+ * focus still fell back to glass rgba(0,122,255,0.55) via --focus-ring.
+ * Remap opaque mixes onto CRT shells. Standing P2 #14 after Changelog focus
+ * v0.1.2528; design-review Settings / feature-ai-chat adjacent
+ * (polish-without-capture; Mac capture TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2529: settings/ollama header focus CRT */
+body.theme-data-poster .settings-header h2[tabindex]:focus,
+body.theme-data-poster .ollama-settings-popover .popover-header h3[tabindex]:focus {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+}
+body.theme-dark .settings-header h2[tabindex]:focus,
+body.theme-dark .ollama-settings-popover .popover-header h3[tabindex]:focus {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #0a0a0a);
+}
+body.theme-neon .settings-header h2[tabindex]:focus,
+body.theme-neon .ollama-settings-popover .popover-header h3[tabindex]:focus {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #08120c);
+}
+body.theme-futuristic .settings-header h2[tabindex]:focus,
+body.theme-futuristic .ollama-settings-popover .popover-header h3[tabindex]:focus {
   outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
 }
 
