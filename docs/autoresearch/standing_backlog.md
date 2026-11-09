@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2528
+
+- Changelog focus opaque (`.changelog-h2[tabindex]:focus` · `.changelog-loading[tabindex]:focus` · `.changelog-error[tabindex]:focus`) glass `var(--focus-ring, rgba(0,122,255,0.55))` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (after first-launch / update-banner v0.1.2527). Standing P2 #14; design-review Changelog / `feature-cpu-metrics` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: Settings / Ollama header `tabindex` focus glass leftover if any, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2527
 
 - First-launch tip + update banner opaque (`#mac-stats-first-launch-tip` · `#mac-stats-update-banner` border / underline · tip-glyph · tip-dismiss · code chip) glass `color-mix(…, transparent)` / white `rgba` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (after history sparkline focus v0.1.2526). Standing P2 #14; design-review `feature-cpu-metrics` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: intentional scrollbar glass left alone, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.

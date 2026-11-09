@@ -5174,13 +5174,15 @@
         display: none !important;
       }
       .changelog-h2[tabindex]:focus {
-        outline: 2px solid var(--focus-ring, rgba(0, 122, 255, 0.55));
+        /* Opaque focus — was var(--focus-ring, rgba(0,122,255,0.55)) glass (#14). CRT remaps in agent-ops.css. */
+        outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ffffff);
         outline-offset: 2px;
         border-radius: 4px;
       }
       .changelog-loading[tabindex]:focus,
       .changelog-error[tabindex]:focus {
-        outline: 2px solid var(--focus-ring, rgba(0, 122, 255, 0.55));
+        /* Opaque focus — was var(--focus-ring, rgba(0,122,255,0.55)) glass (#14). CRT remaps in agent-ops.css. */
+        outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ffffff);
         outline-offset: 2px;
         border-radius: 4px;
       }
