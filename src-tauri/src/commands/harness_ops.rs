@@ -13102,6 +13102,12 @@ pub fn looks_like_results_tsv_p90_request(content: &str) -> bool {
         || n.starts_with("/discard-p50")
         || n.starts_with("/discardp50")
         || n.contains("p50")
+        || n.starts_with("/keep-p20")
+        || n.starts_with("/keepp20")
+        || n.starts_with("/discard-p20")
+        || n.starts_with("/discardp20")
+        || n.contains("p20")
+        || n.contains("20th")
         || n.contains("50th")
         || n.starts_with("/keepp98")
         || n.starts_with("/discard-p98")
@@ -18047,6 +18053,12 @@ pub fn looks_like_results_tsv_p95_request(content: &str) -> bool {
         || n.starts_with("/discard-p50")
         || n.starts_with("/discardp50")
         || n.contains("p50")
+        || n.starts_with("/keep-p20")
+        || n.starts_with("/keepp20")
+        || n.starts_with("/discard-p20")
+        || n.starts_with("/discardp20")
+        || n.contains("p20")
+        || n.contains("20th")
         || n.contains("50th")
         || n.starts_with("/keepp98")
         || n.starts_with("/discard-p98")
@@ -18501,6 +18513,12 @@ pub fn looks_like_results_tsv_p10_request(content: &str) -> bool {
         || n.starts_with("/discard-p50")
         || n.starts_with("/discardp50")
         || n.contains("p50")
+        || n.starts_with("/keep-p20")
+        || n.starts_with("/keepp20")
+        || n.starts_with("/discard-p20")
+        || n.starts_with("/discardp20")
+        || n.contains("p20")
+        || n.contains("20th")
         || n.contains("50th")
         || n.starts_with("/keepp98")
         || n.starts_with("/discard-p98")
@@ -18952,6 +18970,12 @@ pub fn looks_like_results_tsv_p25_request(content: &str) -> bool {
         || n.starts_with("/discard-p50")
         || n.starts_with("/discardp50")
         || n.contains("p50")
+        || n.starts_with("/keep-p20")
+        || n.starts_with("/keepp20")
+        || n.starts_with("/discard-p20")
+        || n.starts_with("/discardp20")
+        || n.contains("p20")
+        || n.contains("20th")
         || n.contains("50th")
         || n.starts_with("/keepp98")
         || n.starts_with("/discard-p98")
@@ -19112,7 +19136,7 @@ pub fn format_results_tsv_p25_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · p25 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · p25 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p20` for p20 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -19398,6 +19422,12 @@ pub fn looks_like_results_tsv_p75_request(content: &str) -> bool {
         || n.starts_with("/discard-p50")
         || n.starts_with("/discardp50")
         || n.contains("p50")
+        || n.starts_with("/keep-p20")
+        || n.starts_with("/keepp20")
+        || n.starts_with("/discard-p20")
+        || n.starts_with("/discardp20")
+        || n.contains("p20")
+        || n.contains("20th")
         || n.contains("50th")
         || n.starts_with("/keepp98")
         || n.starts_with("/discard-p98")
@@ -19551,7 +19581,7 @@ pub fn format_results_tsv_p75_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · p75 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · p75 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p20` for p20 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -19877,6 +19907,12 @@ pub fn looks_like_results_tsv_p98_request(content: &str) -> bool {
         || n.starts_with("/discard-p50")
         || n.starts_with("/discardp50")
         || n.contains("p50")
+        || n.starts_with("/keep-p20")
+        || n.starts_with("/keepp20")
+        || n.starts_with("/discard-p20")
+        || n.starts_with("/discardp20")
+        || n.contains("p20")
+        || n.contains("20th")
         || n.contains("50th")
         || n.starts_with("/keepp98")
         || n.starts_with("/discard-p98")
@@ -19992,7 +20028,7 @@ pub fn format_results_tsv_p98_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · p98 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · p98 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p20` for p20 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -20287,6 +20323,12 @@ pub fn looks_like_results_tsv_p99_request(content: &str) -> bool {
         || n.starts_with("/discard-p50")
         || n.starts_with("/discardp50")
         || n.contains("p50")
+        || n.starts_with("/keep-p20")
+        || n.starts_with("/keepp20")
+        || n.starts_with("/discard-p20")
+        || n.starts_with("/discardp20")
+        || n.contains("p20")
+        || n.contains("20th")
         || n.contains("50th")
         || n.starts_with("/keepp98")
         || n.starts_with("/discard-p98")
@@ -20434,7 +20476,7 @@ pub fn format_results_tsv_p99_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · p99 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · p99 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p20` for p20 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -20772,6 +20814,12 @@ pub fn looks_like_results_tsv_p5_request(content: &str) -> bool {
         || n.starts_with("/discard-p50")
         || n.starts_with("/discardp50")
         || n.contains("p50")
+        || n.starts_with("/keep-p20")
+        || n.starts_with("/keepp20")
+        || n.starts_with("/discard-p20")
+        || n.starts_with("/discardp20")
+        || n.contains("p20")
+        || n.contains("20th")
         || n.contains("50th")
         || n.starts_with("/keepp98")
         || n.starts_with("/discard-p98")
@@ -20914,7 +20962,7 @@ pub fn format_results_tsv_p5_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · p5 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · p5 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p20` for p20 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -21273,6 +21321,12 @@ pub fn looks_like_results_tsv_p1_request(content: &str) -> bool {
         || n.starts_with("/discard-p50")
         || n.starts_with("/discardp50")
         || n.contains("p50")
+        || n.starts_with("/keep-p20")
+        || n.starts_with("/keepp20")
+        || n.starts_with("/discard-p20")
+        || n.starts_with("/discardp20")
+        || n.contains("p20")
+        || n.contains("20th")
         || n.contains("50th")
         || n.starts_with("/keepp98")
         || n.starts_with("/discard-p98")
@@ -21413,7 +21467,7 @@ pub fn format_results_tsv_p1_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · p1 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · p1 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p20` for p20 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -21765,6 +21819,12 @@ pub fn looks_like_results_tsv_p2_request(content: &str) -> bool {
         || n.starts_with("/discard-p50")
         || n.starts_with("/discardp50")
         || n.contains("p50")
+        || n.starts_with("/keep-p20")
+        || n.starts_with("/keepp20")
+        || n.starts_with("/discard-p20")
+        || n.starts_with("/discardp20")
+        || n.contains("p20")
+        || n.contains("20th")
         || n.contains("50th")
         || n.starts_with("/keepp98")
         || n.starts_with("/discard-p98")
@@ -21905,7 +21965,7 @@ pub fn format_results_tsv_p2_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · p2 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · p2 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p20` for p20 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -22349,7 +22409,7 @@ pub fn format_results_tsv_p50_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · p50 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · p50 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p20` for p20 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p50` for p50 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -22360,6 +22420,462 @@ pub fn format_results_tsv_p50_gateway(content: &str) -> String {
 
 
 
+
+
+fn count_results_tsv_p20(
+    want: ResultsTsvLastWant,
+) -> Result<(Option<u64>, u64, Option<u64>, u64), String> {
+    let path = crate::config::Config::autoresearch_results_tsv();
+    if !path.exists() {
+        return Err("missing".into());
+    }
+    let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let window_start = overnight_window_start_local().with_timezone(&chrono::Utc);
+    let want_keep = matches!(want, ResultsTsvLastWant::Keep);
+    let mut all_ts: Vec<chrono::DateTime<chrono::Utc>> = Vec::new();
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut cols = line.splitn(4, '\t');
+        let Some(ts) = cols.next() else {
+            continue;
+        };
+        let _sha = cols.next();
+        let Some(outcome) = cols.next() else {
+            continue;
+        };
+        let outcome = outcome.trim().to_ascii_lowercase();
+        let is_keep = outcome == "keep";
+        let is_discard = outcome == "discard";
+        if want_keep && !is_keep {
+            continue;
+        }
+        if !want_keep && !is_discard {
+            continue;
+        }
+        let Some(parsed) = parse_run_ts(ts) else {
+            continue;
+        };
+        all_ts.push(parsed);
+    }
+    fn p20_gap_secs(ts: &[chrono::DateTime<chrono::Utc>]) -> (Option<u64>, u64) {
+        if ts.len() < 2 {
+            return (None, 0);
+        }
+        let mut gaps: Vec<u64> = Vec::with_capacity(ts.len() - 1);
+        for w in ts.windows(2) {
+            gaps.push((w[1] - w[0]).num_seconds().max(0) as u64);
+        }
+        let n = gaps.len() as u64;
+        if n == 0 {
+            return (None, 0);
+        }
+        gaps.sort_unstable();
+        // Nearest-rank: ceil(0.20 * N), 1-indexed → 0-based index.
+        let rank = ((n as f64) * 0.20).ceil() as usize;
+        let idx = rank.saturating_sub(1).min(gaps.len() - 1);
+        (Some(gaps[idx]), n)
+    }
+    let (p20_all, gaps_all) = p20_gap_secs(&all_ts);
+    let night_ts: Vec<_> = all_ts
+        .into_iter()
+        .filter(|t| *t >= window_start)
+        .collect();
+    let (p20_night, gaps_night) = p20_gap_secs(&night_ts);
+    Ok((p20_night, gaps_night, p20_all, gaps_all))
+}
+
+/// True for short keep-p20 asks (`/keep-p20`, `p20 keep gap`, `20th percentile keep gap`…).
+/// P50 gap only — does not dump TSV or steal range / median / pace / first / last / since / counts / rate / streak / recent / path/size/age / morning surprise.
+pub fn looks_like_results_tsv_p20_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains("kb")
+        || n.contains(" gi")
+        || (contains_age_token(&n) && !n.contains("average") && !n.contains("avg") && !n.contains("percentile"))
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what shipped")
+        || n.contains("morning surprise")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("changelog")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("loop backlog")
+        || n.contains("loop_backlog")
+        || n.contains("sibling")
+        || n.contains("standing")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("summary")
+        || n.contains("hit rate")
+        || n.contains("keep rate")
+        || n.contains("discard rate")
+        || n.contains("streak")
+        || n.contains("recent keeps")
+        || n.contains("recent discards")
+        || n.contains("recent-keeps")
+        || n.contains("recentkeeps")
+        || n.contains("recent-discards")
+        || n.contains("recentdiscards")
+        || n.contains("keep list")
+        || n.contains("discard list")
+        || n.contains("first keep")
+        || n.contains("first discard")
+        || n.contains("earliest keep")
+        || n.contains("earliest discard")
+        || n.contains("opening keep")
+        || n.contains("opening discard")
+        || n.contains("since last")
+        || n.contains("how long since")
+        || n.contains("how long ago")
+        || n.contains("time since")
+        || n.starts_with("/since-")
+        || n.starts_with("/timesince")
+        || n.starts_with("/time-since")
+        || n.starts_with("/last-")
+        || n.starts_with("/first-")
+        || n.starts_with("/firstkeep")
+        || n.starts_with("/firstdiscard")
+        || n.starts_with("/recent-")
+        || n.starts_with("/keep-rate")
+        || n.starts_with("/keeprate")
+        || n.starts_with("/hit-rate")
+        || n.starts_with("/keep-streak")
+        || n.starts_with("/longest-")
+        || n.starts_with("/keep-pace")
+        || n.starts_with("/keeppace")
+        || n.starts_with("/discard-pace")
+        || n.starts_with("/discardpace")
+        || n.starts_with("/keep-median")
+        || n.starts_with("/keepmedian")
+        || n.starts_with("/discard-median")
+        || n.starts_with("/discardmedian")
+        || n.starts_with("/median-")
+        || n.starts_with("/keep-range")
+        || n.starts_with("/keeprange")
+        || n.starts_with("/discard-range")
+        || n.starts_with("/discardrange")
+        || n.starts_with("/gap-range")
+        || n.starts_with("/keep-spread")
+        || n.starts_with("/discard-spread")
+        || n == "last keep"
+        || n == "the last keep"
+        || n == "last discard"
+        || n == "the last discard"
+        || n == "latest keep"
+        || n == "latest discard"
+        || n == "what was the last keep"
+        || n == "what was the last discard"
+        || n.starts_with("/keep-std")
+        || n.starts_with("/keepstd")
+        || n.starts_with("/discard-std")
+        || n.starts_with("/discardstd")
+        || n.starts_with("/std-")
+        || n.contains("stddev")
+        || n.contains("std-dev")
+        || n.contains("std deviation")
+        || n.contains("standard deviation")
+        || n.contains("keep std")
+        || n.contains("discard std")
+        || n.contains("std keep")
+        || n.contains("std discard")
+        || n.contains("std gap")
+        // Other gap stats own these words (not p25).
+        || n.contains("iqr")
+        || n.contains("interquartile")
+        || n.contains("inter quartile")
+        || n.starts_with("/keep-iqr")
+        || n.starts_with("/keepiqr")
+        || n.starts_with("/discard-iqr")
+        || n.starts_with("/discardiqr")
+        || n.starts_with("/iqr-")
+        || n.contains("median")
+        || n.contains("range")
+        || n.contains("spread")
+        || n.contains("min max")
+        || n.contains("minmax")
+        || n.contains("min-max")
+        || n.contains("shortest and longest")
+        || n.contains("longest and shortest")
+        || n.contains("keep pace")
+        || n.contains("discard pace")
+        || n.contains("ratchet pace")
+        || n.contains("average")
+        || n.contains("avg ")
+        || n.starts_with("avg ")
+        || n.contains(" mean ")
+        || n.starts_with("mean ")
+        // Hit-rate owns bare percent without p25.
+        || (n.contains("percent")
+            && !n.contains("percentile")
+            && !n.contains("p20")
+            && !n.contains("20th"))
+        || (n.contains("rate")
+            && !n.contains("p20")
+            && !n.contains("20th")
+            && !n.contains("pace")
+            && !n.contains("gap")
+            && !n.contains("between"))
+        // Do not steal p90 / bare percentile / other gap stats.
+        || n.contains("p90")
+        || n.contains("p-90")
+        || n.contains("90th")
+        || n.contains("90 th")
+        || n.starts_with("/keep-p90")
+        || n.starts_with("/keepp90")
+        || n.starts_with("/discard-p90")
+        || n.starts_with("/discardp90")
+        || n.starts_with("/p90-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("95 th")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p10")
+        || n.contains("p-10")
+        || n.contains("10th")
+        || n.contains("10 th")
+        || n.starts_with("/keep-p10")
+        || n.starts_with("/keepp10")
+        || n.starts_with("/discard-p10")
+        || n.starts_with("/discardp10")
+        || n.starts_with("/p10-")
+        || n.contains("p25")
+        || n.contains("p-25")
+        || n.contains("25th")
+        || n.contains("25 th")
+        || n.starts_with("/keep-p25")
+        || n.starts_with("/keepp25")
+        || n.starts_with("/discard-p25")
+        || n.starts_with("/discardp25")
+        || n.starts_with("/p25-")
+        || n.contains("p75")
+        || n.contains("p-75")
+        || n.contains("75th")
+        || n.contains("75 th")
+        || n.starts_with("/keep-p75")
+        || n.starts_with("/keepp75")
+        || n.starts_with("/discard-p75")
+        || n.starts_with("/discardp75")
+        || n.starts_with("/p75-")
+        || mentions_results_tsv_p5(&n)
+        || mentions_results_tsv_p2(&n)
+        || n.contains("p50")
+        || n.contains("p-20")
+        || n.contains("50th")
+        || n.contains("50 th")
+        || n.starts_with("/keep-p50")
+        || n.starts_with("/keepp50")
+        || n.starts_with("/discard-p50")
+        || n.starts_with("/discardp50")
+        || n.starts_with("/p50-")
+        || n.contains("p98")
+        || n.contains("p-98")
+        || n.contains("98th")
+        || n.contains("98 th")
+        || n.starts_with("/keep-p98")
+        || n.starts_with("/keepp98")
+        || n.starts_with("/discard-p98")
+        || n.starts_with("/discardp98")
+        || n.starts_with("/p98-")
+        || n.contains("p99")
+        || n.contains("p-99")
+        || n.contains("99th")
+        || n.contains("99 th")
+        || n.starts_with("/keep-p99")
+        || n.starts_with("/keepp99")
+        || n.starts_with("/discard-p99")
+        || n.starts_with("/discardp99")
+        || n.starts_with("/p99-")
+        || mentions_results_tsv_p1(&n)
+        || n.starts_with("/keep-percentile")
+        || n.starts_with("/keeppercentile")
+        || n.contains("keep percentile")
+        || n.contains("discard percentile")
+        || n.contains("histogram")
+        || n.starts_with("/keep-histogram")
+        || n.starts_with("/keephistogram")
+        || n.contains("gini")
+        || n.starts_with("/keep-gini")
+        || n.contains("entropy")
+        || n.contains("kurtosis")
+        || n.contains("skew")
+        || n.contains("keep cv")
+        || n.starts_with("/keep-cv")
+        || n.contains("mad")
+        || n.starts_with("/keep-mad")
+        || n.contains("mode")
+        || n.starts_with("/keep-mode")
+        || n.contains("2nd")
+        || n.contains("2 nd")
+    {
+        return false;
+    }
+    // Must say p20 / 20th (or /keep-p20 slash).
+    if !(n.contains("p20")
+        || n.contains("p-20")
+        || n.contains("20th")
+        || n.contains("20 th")
+        || n.starts_with("/keep-p20")
+        || n.starts_with("/keepp20")
+        || n.starts_with("/discard-p20")
+        || n.starts_with("/discardp20")
+        || n.starts_with("/p20-")
+        || n.starts_with("/p20-keep")
+        || n.starts_with("/p20keep")
+        || n.starts_with("/p20-discard")
+        || n.starts_with("/p20discard"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/keep-p20"
+            | "/keepp20"
+            | "/discard-p20"
+            | "/discardp20"
+            | "/p20-keep-gap"
+            | "/p20keepgap"
+            | "/p20-discard-gap"
+            | "/p20discardgap"
+            | "/p20-gap"
+            | "/p20gap"
+            | "/p20-keep"
+            | "/p20keep"
+            | "/p20-discard"
+            | "/p20discard"
+            | "keep p20"
+            | "the keep p20"
+            | "keep p20 tonight"
+            | "tonight keep p20"
+            | "p20 keep"
+            | "the p20 keep"
+            | "p20 keep gap"
+            | "the p20 keep gap"
+            | "p20 gap between keeps"
+            | "p20 time between keeps"
+            | "20th percentile keep gap"
+            | "the 20th percentile keep gap"
+            | "20th percentile gap between keeps"
+            | "20th keep gap"
+            | "keep gap p20"
+            | "ratchet p20"
+            | "the ratchet p20"
+            | "overnight keep p20"
+            | "view keep p20"
+            | "see keep p20"
+            | "show the keep p20"
+            | "show me the keep p20"
+            | "open keep p20"
+            | "open the keep p20"
+            | "list keep p20"
+            | "list the keep p20"
+            | "what is the keep p20"
+            | "whats the keep p20"
+            | "what's the keep p20"
+            | "what is the p20 keep gap"
+            | "whats the p20 keep gap"
+            | "what's the p20 keep gap"
+            | "discard p20"
+            | "the discard p20"
+            | "discard p20 tonight"
+            | "tonight discard p20"
+            | "p20 discard"
+            | "the p20 discard"
+            | "p20 discard gap"
+            | "the p20 discard gap"
+            | "p20 gap between discards"
+            | "20th percentile discard gap"
+            | "view discard p20"
+            | "see discard p20"
+            | "show the discard p20"
+            | "show me the discard p20"
+            | "open discard p20"
+            | "open the discard p20"
+            | "list discard p20"
+            | "list the discard p20"
+            | "what is the discard p20"
+            | "whats the discard p20"
+            | "what's the discard p20"
+    )
+}
+
+/// Zero-LLM p20 gap between keep/discard rows from results.tsv (tonight + all-time; no row dump).
+/// Nearest-rank p20 (pairs under `/keep-p25`; slash form for the percentile ladder).
+pub fn format_results_tsv_p20_gateway(content: &str) -> String {
+    let want = results_tsv_last_want(content);
+    let label = match want {
+        ResultsTsvLastWant::Keep => "Keep p20",
+        ResultsTsvLastWant::Discard => "Discard p20",
+    };
+    let unit = match want {
+        ResultsTsvLastWant::Keep => "keeps",
+        ResultsTsvLastWant::Discard => "discards",
+    };
+    match count_results_tsv_p20(want) {
+        Err(_) => format!(
+            "**{label}:** no `results.tsv` yet · overnight keep/discard will create it · `results.tsv path` for the file."
+        ),
+        Ok((p20_night, gaps_night, p20_all, gaps_all)) => {
+            let night_part = match p20_night {
+                Some(secs) => {
+                    let d = duration_label_secs(secs);
+                    format!("tonight p20 **{d}** between {unit} ({gaps_night} gaps since 20:00)")
+                }
+                None => format!("tonight need ≥2 {unit} since 20:00 to measure p20"),
+            };
+            let all_part = match p20_all {
+                Some(secs) => {
+                    let d = duration_label_secs(secs);
+                    format!("all-time p20 **{d}** ({gaps_all} gaps)")
+                }
+                None => format!("all-time need ≥2 {unit}"),
+            };
+            format!(
+                "**{label}:** {night_part} · {all_part} · p20 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p20` for p20 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p20` for p20 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+            )
+        }
+    }
+}
 
 
 /// Shannon entropy (bits) of minute-bucketed gaps between consecutive matching keep/discard rows.
@@ -60370,6 +60886,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_p1_request(content) {
         return Some(format_results_tsv_p1_gateway(content));
     }
+    if looks_like_results_tsv_p20_request(content) {
+        return Some(format_results_tsv_p20_gateway(content));
+    }
     if looks_like_results_tsv_p2_request(content) {
         return Some(format_results_tsv_p2_gateway(content));
     }
@@ -60978,6 +61497,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_results_tsv_p1_request(content) {
         return Some(format_results_tsv_p1_gateway(content));
+    }
+    if looks_like_results_tsv_p20_request(content) {
+        return Some(format_results_tsv_p20_gateway(content));
     }
     if looks_like_results_tsv_p2_request(content) {
         return Some(format_results_tsv_p2_gateway(content));
@@ -61612,6 +62134,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/first-keep` · `first keep` · `first keep tonight` · `earliest keep` · `what was the first keep` · `view first keep` / `open first keep` · `/first-discard` · `first discard tonight` — earliest keep or discard row tonight since 20:00 (one description only — no full dump; not `/last-keep` / `/since-keep` / `/keep-pace` / `/keep-median` / recent / counts / rate / streak / path/size/age / morning surprise)\n\
 • `/keep-p98` · `keep p98` · `p98 keep gap` · `98th percentile keep gap` · `p98 gap between keeps` · `view keep p98` / `open keep p98` · `/discard-p98` · `discard p98` · `p98 discard gap` — p98 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p98 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-p95` / `/keep-p10` / `/keep-p25` / `/keep-p75` / `/keep-p99` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-p50` · `keep p50` · `p50 keep gap` · `50th percentile keep gap` · `p50 gap between keeps` · `view keep p50` / `open keep p50` · `/discard-p50` · `discard p50` · `p50 discard gap` — p50 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p50 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-p95` / `/keep-p10` / `/keep-p25` / `/keep-p75` / `/keep-p98` / `/keep-p99` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
+• `/keep-p20` · `keep p20` · `p20 keep gap` · `20th percentile keep gap` · `p20 gap between keeps` · `view keep p20` / `open keep p20` · `/discard-p20` · `discard p20` · `p20 discard gap` — p20 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p20 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-p95` / `/keep-p10` / `/keep-p25` / `/keep-p75` / `/keep-p50` / `/keep-p98` / `/keep-p99` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-p99` · `keep p99` · `p99 keep gap` · `99th percentile keep gap` · `p99 gap between keeps` · `view keep p99` / `open keep p99` · `/discard-p99` · `discard p99` · `p99 discard gap` — p99 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p99 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-p95` / `/keep-p10` / `/keep-p25` / `/keep-p75` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-p1` · `keep p1` · `p1 keep gap` · `1st percentile keep gap` · `p1 gap between keeps` · `view keep p1` / `open keep p1` · `/discard-p1` · `discard p1` · `p1 discard gap` — p1 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p1 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-p95` / `/keep-p10` / `/keep-p5` / `/keep-p2` / `/keep-p25` / `/keep-p75` / `/keep-p99` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-p2` · `keep p2` · `p2 keep gap` · `2nd percentile keep gap` · `p2 gap between keeps` · `view keep p2` / `open keep p2` · `/discard-p2` · `discard p2` · `p2 discard gap` — p2 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p2 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-p95` / `/keep-p10` / `/keep-p5` / `/keep-p25` / `/keep-p75` / `/keep-p99` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
@@ -62126,6 +62649,9 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("p50")
         && !q.contains("/keep-p50")
         && !q.contains("50th")
+        && !q.contains("p20")
+        && !q.contains("/keep-p20")
+        && !q.contains("20th")
         && !q.contains("p90")
         && !q.contains("/keep-p90")
         && !q.contains("90th")
@@ -62204,6 +62730,9 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("p50")
         && !q.contains("/keep-p50")
         && !q.contains("50th")
+        && !q.contains("p20")
+        && !q.contains("/keep-p20")
+        && !q.contains("20th")
         && !q.contains("p1")
         && !q.contains("/keep-p1")
         && !q.contains("1st")
@@ -62264,6 +62793,9 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("p50")
         && !q.contains("/keep-p50")
         && !q.contains("50th")
+        && !q.contains("p20")
+        && !q.contains("/keep-p20")
+        && !q.contains("20th")
         && !q.contains("p90")
         && !q.contains("/keep-p90")
         && !q.contains("90th")
@@ -62284,6 +62816,93 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("99th")
         && !q.contains("p98")
         && !q.contains("/keep-p50")
+        && !q.contains("98th")
+        && !q.contains("p1")
+        && !q.contains("/keep-p1")
+        && !q.contains("1st")
+        && !q.contains("p2")
+        && !q.contains("/keep-p2")
+        && !q.contains("2nd")
+        && !q.contains("p5")
+        && !q.contains("/keep-p5")
+        && !q.contains("5th")
+        && !q.contains("iqr")
+        && !q.contains("histogram")
+        && !q.contains("gini")
+        && !q.contains("pace")
+        && !q.contains("median")
+        && !q.contains("range")
+    {
+        return true;
+    }
+    // `/keep-p20` / p20 gap between keeps (v0.1.2537).
+    if (q.contains("/keep-p20")
+        || q.contains("/keepp20")
+        || q.contains("/discard-p20")
+        || q.contains("/discardp20")
+        || q.contains("/p20-keep-gap")
+        || q.contains("/p20-gap")
+        || q.contains("keep p20")
+        || q.contains("discard p20")
+        || q.contains("p20 keep")
+        || q.contains("p20 discard")
+        || q.contains("p20 keep gap")
+        || q.contains("p20 discard gap")
+        || q.contains("p20 gap between keeps")
+        || q.contains("20th percentile keep gap")
+        || q.contains("20th percentile discard gap")
+        || q.contains("view keep p20")
+        || q.contains("open keep p20")
+        || q.contains("view discard p20")
+        || q.contains("open discard p20"))
+        && !q.contains("what shipped")
+        && !q.contains("morning surprise")
+        && !q.contains("path")
+        && !q.contains("size")
+        && !q.contains("results.tsv age")
+        && !q.contains("count")
+        && !q.contains("how many")
+        && !q.contains("hit rate")
+        && !q.contains("keep rate")
+        && !q.contains("streak")
+        && !q.contains("recent")
+        && !q.contains("/recent-")
+        && !q.contains("/last-keep")
+        && !q.contains("/last-discard")
+        && !q.contains("since last")
+        && !q.contains("/since-")
+        && !q.contains("p50")
+        && !q.contains("/keep-p50")
+        && !q.contains("50th")
+        && !q.contains("p20")
+        && !q.contains("/keep-p20")
+        && !q.contains("20th")
+        && !q.contains("p98")
+        && !q.contains("/keep-p98")
+        && !q.contains("98th")
+        && !q.contains("p20")
+        && !q.contains("/keep-p20")
+        && !q.contains("20th")
+        && !q.contains("p90")
+        && !q.contains("/keep-p90")
+        && !q.contains("90th")
+        && !q.contains("p95")
+        && !q.contains("/keep-p95")
+        && !q.contains("95th")
+        && !q.contains("p10")
+        && !q.contains("/keep-p10")
+        && !q.contains("10th")
+        && !q.contains("p25")
+        && !q.contains("/keep-p25")
+        && !q.contains("25th")
+        && !q.contains("p75")
+        && !q.contains("/keep-p75")
+        && !q.contains("75th")
+        && !q.contains("p99")
+        && !q.contains("/keep-p99")
+        && !q.contains("99th")
+        && !q.contains("p98")
+        && !q.contains("/keep-p20")
         && !q.contains("98th")
         && !q.contains("p1")
         && !q.contains("/keep-p1")
@@ -62435,6 +63054,9 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("p50")
         && !q.contains("/keep-p50")
         && !q.contains("50th")
+        && !q.contains("p20")
+        && !q.contains("/keep-p20")
+        && !q.contains("20th")
         && !q.contains("iqr")
         && !q.contains("histogram")
         && !q.contains("gini")
@@ -62510,6 +63132,9 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("p50")
         && !q.contains("/keep-p50")
         && !q.contains("50th")
+        && !q.contains("p20")
+        && !q.contains("/keep-p20")
+        && !q.contains("20th")
         && !q.contains("iqr")
         && !q.contains("histogram")
         && !q.contains("gini")
@@ -76110,6 +76735,99 @@ mod tests {
         let discard = try_operator_instant_reply("discard p50").expect("discard p50");
         assert!(
             discard.contains("Discard p50") || discard.contains("no `results.tsv`"),
+            "{discard}"
+        );
+    }
+
+    fn results_tsv_p20_request_detected() {
+        assert!(looks_like_results_tsv_p20_request("/keep-p20"));
+        assert!(looks_like_results_tsv_p20_request("keep p20"));
+        assert!(looks_like_results_tsv_p20_request("keep p20 tonight"));
+        assert!(looks_like_results_tsv_p20_request("p20 keep gap"));
+        assert!(looks_like_results_tsv_p20_request("p20 gap between keeps"));
+        assert!(looks_like_results_tsv_p20_request("20th percentile keep gap"));
+        assert!(looks_like_results_tsv_p20_request("view keep p20"));
+        assert!(looks_like_results_tsv_p20_request("show me the keep p20"));
+        assert!(looks_like_results_tsv_p20_request("open keep p20"));
+        assert!(looks_like_results_tsv_p20_request("/discard-p20"));
+        assert!(looks_like_results_tsv_p20_request("discard p20"));
+        assert!(looks_like_results_tsv_p20_request("p20 discard gap"));
+        assert!(!looks_like_results_tsv_p20_request("/keep-p90"));
+        assert!(!looks_like_results_tsv_p20_request("keep p90"));
+        assert!(!looks_like_results_tsv_p20_request("/keep-pace"));
+        assert!(!looks_like_results_tsv_p20_request("/keep-median"));
+        assert!(!looks_like_results_tsv_p20_request("/keep-range"));
+        assert!(!looks_like_results_tsv_p20_request("/keep-iqr"));
+        assert!(!looks_like_results_tsv_p20_request("/keep-histogram"));
+        assert!(!looks_like_results_tsv_p20_request("/keep-gini"));
+        assert!(!looks_like_results_tsv_p20_request("/keep-p10"));
+        assert!(!looks_like_results_tsv_p20_request("keep p10"));
+        assert!(!looks_like_results_tsv_p20_request("/keep-p95"));
+        assert!(!looks_like_results_tsv_p20_request("keep p95"));
+        assert!(!looks_like_results_tsv_p10_request("/keep-p20"));
+        assert!(!looks_like_results_tsv_p10_request("keep p20"));
+        assert!(!looks_like_results_tsv_p95_request("/keep-p20"));
+        assert!(!looks_like_results_tsv_p95_request("keep p20"));
+        assert!(!looks_like_results_tsv_p90_request("/keep-p20"));
+        
+        assert!(!looks_like_results_tsv_p20_request("/keep-p25"));
+        assert!(!looks_like_results_tsv_p20_request("keep p25"));
+        assert!(!looks_like_results_tsv_p25_request("/keep-p20"));
+        assert!(!looks_like_results_tsv_p25_request("keep p20"));
+        assert!(!looks_like_results_tsv_p20_request("/keep-p75"));
+        assert!(!looks_like_results_tsv_p20_request("keep p75"));
+        assert!(!looks_like_results_tsv_p75_request("/keep-p20"));
+        assert!(!looks_like_results_tsv_p75_request("keep p20"));
+        assert!(!looks_like_results_tsv_p20_request("/keep-p99"));
+        assert!(!looks_like_results_tsv_p20_request("keep p99"));
+        assert!(!looks_like_results_tsv_p99_request("/keep-p20"));
+        assert!(!looks_like_results_tsv_p99_request("keep p20"));
+
+        assert!(!looks_like_results_tsv_p20_request("/keep-p98"));
+        assert!(!looks_like_results_tsv_p20_request("keep p98"));
+        assert!(!looks_like_results_tsv_p50_request("/keep-p20"));
+        assert!(!looks_like_results_tsv_p50_request("keep p20"));
+        assert!(!looks_like_results_tsv_p98_request("/keep-p20"));
+        assert!(!looks_like_results_tsv_p98_request("keep p20"));
+        assert!(!looks_like_results_tsv_p20_request("/keep-p5"));
+        assert!(!looks_like_results_tsv_p20_request("keep p5"));
+        assert!(!looks_like_results_tsv_p5_request("/keep-p20"));
+        assert!(!looks_like_results_tsv_p5_request("keep p20"));
+        assert!(!looks_like_results_tsv_p5_request("20th percentile keep gap"));
+        assert!(looks_like_results_tsv_p20_request("20th percentile keep gap"));
+        assert!(!looks_like_results_tsv_median_request("/keep-p20"));
+        assert!(!looks_like_results_tsv_median_request("keep p20"));
+        assert!(!looks_like_results_tsv_p20_request("/keep-median"));
+        assert!(!looks_like_results_tsv_p20_request("median keep gap"));
+
+
+        assert!(!looks_like_results_tsv_p20_request("/keep-p2"));
+        assert!(!looks_like_results_tsv_p20_request("keep p2"));
+        assert!(!looks_like_results_tsv_p20_request("2nd percentile keep gap"));
+        assert!(!looks_like_results_tsv_p2_request("/keep-p20"));
+        assert!(!looks_like_results_tsv_p2_request("keep p20"));
+        assert!(!looks_like_results_tsv_p2_request("20th percentile keep gap"));
+        let reply = try_operator_instant_reply("keep p20").expect("keep p20 instant");
+        assert!(
+            reply.contains("Keep p20") || reply.contains("no `results.tsv`"),
+            "expected keep-p20 reply: {reply}"
+        );
+        assert!(
+            reply.contains("p20 only")
+                || reply.contains("does not dump")
+                || reply.contains("/keeps")
+                || reply.contains("no `results.tsv`")
+                || reply.contains("need ≥2"),
+            "must stay keep-p20 glance: {reply}"
+        );
+        let slash = try_operator_instant_reply("/keep-p20").expect("/keep-p20 instant");
+        assert!(
+            slash.contains("Keep p20") || slash.contains("no `results.tsv`"),
+            "{slash}"
+        );
+        let discard = try_operator_instant_reply("discard p20").expect("discard p20");
+        assert!(
+            discard.contains("Discard p20") || discard.contains("no `results.tsv`"),
             "{discard}"
         );
     }
