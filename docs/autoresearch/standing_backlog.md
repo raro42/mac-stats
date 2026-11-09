@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2516
+
+- Dark Changelog opacity opaque (`.changelog-date` · `.changelog-paragraph` · `.changelog-item`) opacity glass → opaque `color-mix` on CRT shell `#0a0a0a` (after Dark/Neon/Futuristic metric opacity v0.1.2515; disabled / connection-indicator hover opacity left alone). Standing P2 #14; design-review Changelog / `feature-cpu-metrics` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: intentional decorative gradient leftovers only, or Mac capture of stale `feature-cpu-metrics.png` / `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2515
 
 - Dark / Neon / Futuristic metric opacity opaque (Futuristic `.metric-label` · `.ring-track` · Neon `.metric-unit` · Dark `.ring-track`) opacity glass → opaque `color-mix` on CRT shells `#0b0b10` / `#08120c` / `#0a0a0a` (Material/Swiss metric-label parity after v0.1.2514; disabled / connection-indicator hover opacity left alone). Standing P2 #14; design-review `feature-cpu-metrics` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: Dark Changelog opacity leftovers if any, or Mac capture of stale `feature-cpu-metrics.png` / `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.

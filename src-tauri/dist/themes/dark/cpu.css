@@ -953,8 +953,9 @@ body {
 .changelog-date {
   font-size: 14px;
   font-weight: 500;
-  color: var(--text);
-  opacity: 0.7;
+  /* Was opacity 0.7 on --text #00ff00 → ~70% green; mix on #0a0a0a (#14). */
+  color: color-mix(in srgb, #00ff00 70%, #0a0a0a);
+  opacity: 1;
 }
 
 .changelog-h3 {
@@ -966,9 +967,10 @@ body {
 
 .changelog-paragraph {
   margin: 12px 0;
-  color: var(--text);
+  /* Was opacity 0.9 on --text #00ff00 → ~90% green; mix on #0a0a0a (#14). */
+  color: color-mix(in srgb, #00ff00 90%, #0a0a0a);
   font-size: 14px;
-  opacity: 0.9;
+  opacity: 1;
 }
 
 .changelog-list {
@@ -985,10 +987,11 @@ body {
   margin: 0;
   padding: 0 0 0 20px;
   position: relative;
-  color: var(--text);
+  /* Was opacity 0.9 on --text #00ff00 → ~90% green; mix on #0a0a0a (#14). */
+  color: color-mix(in srgb, #00ff00 90%, #0a0a0a);
   font-size: 14px;
   line-height: 1.5;
-  opacity: 0.9;
+  opacity: 1;
 }
 
 /* Nested lists - indent and reduce spacing */
