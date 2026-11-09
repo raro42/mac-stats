@@ -1,21 +1,23 @@
 # Morning surprise — 2026-11-09
 
-Overnight Track B kept shipping opaque-theme chrome so Light / Material / Swiss stay readable on paper (no glass alpha in Graphics and Media).
+Overnight autoresearch kept product chrome opaque (standing P2 #14). Digester open stayed empty; design-review and layout-daily were not due (grace / data-poster already marked).
 
-## Shipped tonight
+## Shipped
 
-- **v0.1.2514** — Material / Swiss `.metric-label` · `.metric-subtext` (and Material `.ring-track`) off remaining opacity glass onto opaque `color-mix` against `#e7e2d9` / `#ffffff` (Light parity after section-title v0.1.2513).
-- **v0.1.2513** (earlier tick) — Light / Material / Swiss `.section-title` off invalid glass `rgb(1,1,1,0.75)`.
-- **v0.1.2512** — Light `.metric-unit` / `.cpu-divider` opacity opaque.
-- Backfill keep logged for **v0.1.2513** (missed `results.tsv` row).
+| Version | Keep | What |
+| --- | --- | --- |
+| v0.1.2515 | keep | Dark / Neon / Futuristic metric opacity opaque — Futuristic `.metric-label` · `.ring-track`, Neon `.metric-unit`, Dark `.ring-track` → opaque `color-mix` on CRT shells |
+| v0.1.2514 | keep | Material / Swiss `.metric-label` · `.metric-subtext` · Material `.ring-track` opacity → opaque `color-mix` |
+| v0.1.2513 | keep | Light / Material / Swiss `.section-title` invalid glass → opaque `color-mix` |
+| v0.1.2512 | keep | Light `.metric-unit` · `.cpu-divider` opacity → opaque `color-mix` |
+| v0.1.2511 | keep | Settings note underline opaque across themes |
 
-## Tried / notes
+## Tried / discarded
 
-- Digester empty (0 turns / 7d). Design-review grace; layout-daily already marked for Data Poster today.
-- Sibling OpenClaw/Hermes missing on this rack.
-- Debug.log quiet (no ERROR/WARN clusters in 180m).
-- Mac `docs/screens/` recapture still TCC-blocked (`screencapture -l`).
+- Parallel race earlier tonight: local section-title as v0.1.2512 discarded when origin already shipped Light metric-unit/divider as 2512 (re-shipped as 2513).
+- This tick: Material/Swiss metric-label plan raced origin v0.1.2514 — pulled and moved to CRT metric opacity instead (kept as 2515).
 
-## Next fuel
+## Notes
 
-Intentional decorative gradient leftovers only, or Mac capture of stale `feature-cpu-metrics.png` / `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows.
+- Mac feature-screen recapture still deferred (Screen Recording TCC / menu-bar only).
+- Next fuel: Dark Changelog opacity leftovers, or Mac capture when TCC allows.
