@@ -9375,7 +9375,8 @@ body.theme-futuristic .monitor-item.is-pending {
   text-underline-offset: 2px;
 }
 .monitor-url:focus-visible {
-  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  /* Opaque focus — was color-mix(…, transparent) glass (#14). */
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ffffff);
   outline-offset: 2px;
 }
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
@@ -9480,7 +9481,8 @@ button.monitor-detail-url:hover {
   text-underline-offset: 2px;
 }
 button.monitor-detail-url:focus-visible {
-  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  /* Opaque focus — was color-mix(…, transparent) glass (#14). */
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ffffff);
   outline-offset: 2px;
 }
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
@@ -9752,7 +9754,8 @@ button.monitor-detail-url.is-just-saved {
 }
 
 .monitor-detail-remove:focus-visible {
-  outline: 2px solid color-mix(in srgb, #ff3b30 55%, transparent);
+  /* Opaque focus — was color-mix(…, transparent) glass (#14). */
+  outline: 2px solid color-mix(in srgb, #ff3b30 55%, #ffffff);
   outline-offset: 2px;
 }
 
@@ -26529,6 +26532,45 @@ body.theme-neon .monitor-remove-btn:focus-visible {
   outline-color: color-mix(in srgb, #ff3b30 55%, #08120c);
 }
 body.theme-futuristic .monitor-remove-btn:focus-visible {
+  outline-color: color-mix(in srgb, #ff3b30 55%, #0b0b10);
+}
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Monitors URL / detail focus chrome still
+ * mixed Apple `#ffffff` after shared opaque pass (`.monitor-url:focus-visible` ·
+ * `button.monitor-detail-url:focus-visible` · `.monitor-detail-remove:focus-visible`).
+ * Remap onto CRT shells.
+ * Standing P2 #14 after Monitors settings focus v0.1.2520; design-review
+ * feature-monitors adjacent (polish-without-capture; Mac capture TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2521: monitors URL/detail focus CRT */
+body.theme-data-poster .monitor-url:focus-visible,
+body.theme-data-poster button.monitor-detail-url:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+}
+body.theme-dark .monitor-url:focus-visible,
+body.theme-dark button.monitor-detail-url:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #0a0a0a);
+}
+body.theme-neon .monitor-url:focus-visible,
+body.theme-neon button.monitor-detail-url:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #08120c);
+}
+body.theme-futuristic .monitor-url:focus-visible,
+body.theme-futuristic button.monitor-detail-url:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+}
+
+body.theme-data-poster .monitor-detail-remove:focus-visible {
+  outline-color: color-mix(in srgb, #ff3b30 55%, #0b0b10);
+}
+body.theme-dark .monitor-detail-remove:focus-visible {
+  outline-color: color-mix(in srgb, #ff3b30 55%, #0a0a0a);
+}
+body.theme-neon .monitor-detail-remove:focus-visible {
+  outline-color: color-mix(in srgb, #ff3b30 55%, #08120c);
+}
+body.theme-futuristic .monitor-detail-remove:focus-visible {
   outline-color: color-mix(in srgb, #ff3b30 55%, #0b0b10);
 }
 

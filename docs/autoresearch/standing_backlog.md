@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2521
+
+- Monitors URL / detail focus opaque (`.monitor-url:focus-visible` · `button.monitor-detail-url:focus-visible` · `.monitor-detail-remove:focus-visible`) glass `color-mix(…, transparent)` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (after Monitors settings focus v0.1.2520). Standing P2 #14; design-review `feature-monitors` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: remaining Monitors / Disk Cleanup / Processes focus glass leftovers if any, or Mac capture of stale `feature-monitors.png` / `feature-agent-ops.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2520
 
 - Monitors settings focus opaque (`.monitor-settings-item:focus-within` · `.monitors-settings-popover .popover-btn-primary:focus-visible` · CRT remaps for `.monitor-remove-btn:focus-visible`) glass `color-mix(…, transparent)` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (after Perplexity search/inline-key v0.1.2519). Standing P2 #14; design-review `feature-monitors` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: remaining Monitors / Agent Ops transparent leftovers if any, or Mac capture of stale `feature-monitors.png` / `feature-agent-ops.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows `screencapture -l`.
