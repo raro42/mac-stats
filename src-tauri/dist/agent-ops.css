@@ -26681,3 +26681,76 @@ body.theme-futuristic {
   --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #0b0b10);
 }
 
+/*
+ * Data Poster / Dark / Neon / Futuristic: metric-strip flash highlights
+ * (RAM · CPU · GPU · Temp · Freq · Disk · Uptime) still mixed transparent
+ * glass in the injected cpu.js sheet. Remap onto CRT shells. Standing P2 #14
+ * after badge/jump-flash v0.1.2524; design-review feature-cpu-metrics /
+ * feature-disk-cleanup adjacent (polish-without-capture; Mac capture TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2525: metric-strip flash highlight CRT */
+body.theme-data-poster .detail-label.is-ram-highlight,
+body.theme-data-poster .detail-value.is-ram-highlight,
+body.theme-data-poster #cpu-usage-card.is-cpu-highlight,
+body.theme-data-poster .metric-card.is-gpu-highlight,
+body.theme-data-poster #gpu-power.is-gpu-highlight,
+body.theme-data-poster .metric-card.is-temp-highlight,
+body.theme-data-poster .metric-card.is-freq-highlight,
+body.theme-data-poster .detail-label.is-uptime-highlight,
+body.theme-data-poster .detail-value.is-uptime-highlight {
+  background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #0b0b10);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-section.is-disk-highlight {
+  background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #0b0b10);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #0b0b10);
+}
+body.theme-dark .detail-label.is-ram-highlight,
+body.theme-dark .detail-value.is-ram-highlight,
+body.theme-dark #cpu-usage-card.is-cpu-highlight,
+body.theme-dark .metric-card.is-gpu-highlight,
+body.theme-dark #gpu-power.is-gpu-highlight,
+body.theme-dark .metric-card.is-temp-highlight,
+body.theme-dark .metric-card.is-freq-highlight,
+body.theme-dark .detail-label.is-uptime-highlight,
+body.theme-dark .detail-value.is-uptime-highlight {
+  background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #0a0a0a);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-section.is-disk-highlight {
+  background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #0a0a0a);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #0a0a0a);
+}
+body.theme-neon .detail-label.is-ram-highlight,
+body.theme-neon .detail-value.is-ram-highlight,
+body.theme-neon #cpu-usage-card.is-cpu-highlight,
+body.theme-neon .metric-card.is-gpu-highlight,
+body.theme-neon #gpu-power.is-gpu-highlight,
+body.theme-neon .metric-card.is-temp-highlight,
+body.theme-neon .metric-card.is-freq-highlight,
+body.theme-neon .detail-label.is-uptime-highlight,
+body.theme-neon .detail-value.is-uptime-highlight {
+  background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #08120c);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #08120c);
+}
+body.theme-neon .disk-cleanup-section.is-disk-highlight {
+  background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #08120c);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #08120c);
+}
+body.theme-futuristic .detail-label.is-ram-highlight,
+body.theme-futuristic .detail-value.is-ram-highlight,
+body.theme-futuristic #cpu-usage-card.is-cpu-highlight,
+body.theme-futuristic .metric-card.is-gpu-highlight,
+body.theme-futuristic #gpu-power.is-gpu-highlight,
+body.theme-futuristic .metric-card.is-temp-highlight,
+body.theme-futuristic .metric-card.is-freq-highlight,
+body.theme-futuristic .detail-label.is-uptime-highlight,
+body.theme-futuristic .detail-value.is-uptime-highlight {
+  background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #0b0b10);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-section.is-disk-highlight {
+  background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #0b0b10);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #0b0b10);
+}
+

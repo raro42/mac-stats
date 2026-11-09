@@ -3645,39 +3645,40 @@ function ensureRamStripStyles() {
       width: 100%;
       flex-basis: 100%;
     }
+    /* Opaque flash wash — was color-mix(…, transparent) glass (#14). CRT remaps in agent-ops.css. */
     .detail-label.is-ram-highlight,
     .detail-value.is-ram-highlight {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
       border-radius: 6px;
-      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
     }
     #cpu-usage-card.is-cpu-highlight {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
       border-radius: 10px;
-      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
     }
     .metric-card.is-gpu-highlight,
     #gpu-power.is-gpu-highlight {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
       border-radius: 10px;
-      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
     }
     .metric-card.is-temp-highlight,
     .metric-card.is-freq-highlight {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
       border-radius: 10px;
-      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
     }
     .disk-cleanup-section.is-disk-highlight {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, transparent);
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #ffffff);
       border-radius: 12px;
-      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, transparent);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #ffffff);
     }
     .detail-label.is-uptime-highlight,
     .detail-value.is-uptime-highlight {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
       border-radius: 6px;
-      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
     }
   `;
   document.head.appendChild(style);

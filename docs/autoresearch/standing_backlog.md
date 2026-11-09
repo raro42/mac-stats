@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2525
+
+- Metric-strip flash highlights opaque (`.is-ram-highlight` · `.is-cpu-highlight` · `.is-gpu-highlight` · `.is-temp-highlight` · `.is-freq-highlight` · `.is-disk-highlight` · `.is-uptime-highlight`) glass `color-mix(…, transparent)` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (after Disk Cleanup badge / jump-flash v0.1.2524). Standing P2 #14; design-review `feature-cpu-metrics` / `feature-disk-cleanup` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: history sparkline focus / banner glass leftovers if any, or Mac capture of stale `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2524
 
 - Disk Cleanup badge halo + Agent Ops jump-flash opaque (`#icon-disk-cleanup .disk-cleanup-badge` · `--ops-jump-flash-ring`) glass `color-mix(…, transparent)` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (after Disk Cleanup secondary focus v0.1.2523). Standing P2 #14; design-review `feature-disk-cleanup` / `feature-agent-ops` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: intentional scrollbar glass left alone, or Mac capture of stale `feature-disk-cleanup.png` / `feature-agent-ops.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows `screencapture -l`.
