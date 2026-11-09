@@ -4268,7 +4268,8 @@ body.theme-futuristic .process-empty {
   text-underline-offset: 2px;
 }
 .process-name:focus-visible {
-  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  /* Opaque focus — was color-mix(…, transparent) glass (#14). */
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ffffff);
   outline-offset: 2px;
 }
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
@@ -4441,7 +4442,8 @@ body.theme-futuristic .process-empty {
   text-underline-offset: 2px;
 }
 .process-detail-name:focus-visible {
-  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  /* Opaque focus — was color-mix(…, transparent) glass (#14). */
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ffffff);
   outline-offset: 2px;
 }
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
@@ -4476,7 +4478,8 @@ body.theme-futuristic .process-empty {
   text-underline-offset: 2px;
 }
 .process-detail-pid:focus-visible {
-  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  /* Opaque focus — was color-mix(…, transparent) glass (#14). */
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ffffff);
   outline-offset: 2px;
   color: inherit;
 }
@@ -10245,7 +10248,8 @@ body.theme-futuristic .monitor-item.is-removing {
   opacity: 1;
 }
 .disk-cleanup-item-path:focus-visible {
-  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  /* Opaque focus — was color-mix(…, transparent) glass (#14). */
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ffffff);
   outline-offset: 2px;
 }
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
@@ -10589,7 +10593,8 @@ body.theme-futuristic .disk-cleanup-scope-row.is-disabled {
   opacity: 1;
 }
 .disk-cleanup-scope-path:focus-visible {
-  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  /* Opaque focus — was color-mix(…, transparent) glass (#14). */
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ffffff);
   outline-offset: 2px;
 }
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
@@ -26572,5 +26577,44 @@ body.theme-neon .monitor-detail-remove:focus-visible {
 }
 body.theme-futuristic .monitor-detail-remove:focus-visible {
   outline-color: color-mix(in srgb, #ff3b30 55%, #0b0b10);
+}
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Processes + Disk Cleanup path/name focus
+ * chrome still mixed Apple `#ffffff` after shared opaque pass (`.process-name` ·
+ * `.process-detail-name` · `.process-detail-pid` · `.disk-cleanup-item-path` ·
+ * `.disk-cleanup-scope-path` `:focus-visible`). Remap onto CRT shells.
+ * Standing P2 #14 after Monitors URL/detail focus v0.1.2521; design-review
+ * feature-processes / feature-disk-cleanup adjacent (polish-without-capture;
+ * Mac capture TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2522: processes + disk-cleanup path focus CRT */
+body.theme-data-poster .process-name:focus-visible,
+body.theme-data-poster .process-detail-name:focus-visible,
+body.theme-data-poster .process-detail-pid:focus-visible,
+body.theme-data-poster .disk-cleanup-item-path:focus-visible,
+body.theme-data-poster .disk-cleanup-scope-path:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+}
+body.theme-dark .process-name:focus-visible,
+body.theme-dark .process-detail-name:focus-visible,
+body.theme-dark .process-detail-pid:focus-visible,
+body.theme-dark .disk-cleanup-item-path:focus-visible,
+body.theme-dark .disk-cleanup-scope-path:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #0a0a0a);
+}
+body.theme-neon .process-name:focus-visible,
+body.theme-neon .process-detail-name:focus-visible,
+body.theme-neon .process-detail-pid:focus-visible,
+body.theme-neon .disk-cleanup-item-path:focus-visible,
+body.theme-neon .disk-cleanup-scope-path:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #08120c);
+}
+body.theme-futuristic .process-name:focus-visible,
+body.theme-futuristic .process-detail-name:focus-visible,
+body.theme-futuristic .process-detail-pid:focus-visible,
+body.theme-futuristic .disk-cleanup-item-path:focus-visible,
+body.theme-futuristic .disk-cleanup-scope-path:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
 }
 
