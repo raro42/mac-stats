@@ -10777,8 +10777,9 @@ body.theme-futuristic .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
   margin: 0 0 10px;
   padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-  background: color-mix(in srgb, currentColor 5%, transparent);
+  /* Opaque card — was color-mix(…, transparent) glass (#14). */
+  border: 1px solid color-mix(in srgb, currentColor 12%, #ffffff);
+  background: color-mix(in srgb, currentColor 5%, #ffffff);
 }
 
 .ops-insight-title {
@@ -10845,8 +10846,9 @@ body.theme-futuristic .ops-insight-line.is-clickable {
 }
 
 .ops-insight-line.is-clickable:hover {
-  background: color-mix(in srgb, currentColor 8%, transparent);
-  border-color: color-mix(in srgb, currentColor 14%, transparent);
+  /* Opaque hover — was color-mix(…, transparent) glass (#14). */
+  background: color-mix(in srgb, currentColor 8%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 14%, #ffffff);
   /* Was opacity 1 on inherit (~88% ink). */
   color: color-mix(in srgb, #0c0c10 88%, #ffffff);
   opacity: 1;
@@ -10862,13 +10864,15 @@ body.theme-futuristic .ops-insight-line.is-clickable:hover {
 }
 
 .ops-insight-line.is-clickable:focus-visible {
-  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  /* Opaque focus — was color-mix(…, transparent) glass (#14). */
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ffffff);
   outline-offset: 1px;
 }
 
 .ops-insight-line.is-clickable.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  /* Opaque selected — was color-mix(…, transparent) glass (#14). */
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #ffffff);
   /* Was opacity 1 on inherit (~88% ink). */
   color: color-mix(in srgb, #0c0c10 88%, #ffffff);
   opacity: 1;
@@ -25198,6 +25202,78 @@ body.theme-neon .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
 }
 body.theme-futuristic .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0b0b10);
+}
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Agent Ops Insights card + clickable insight
+ * lines still mixed Apple `#ffffff` after shared opaque pass (`.ops-insights-card` ·
+ * `.ops-insight-line.is-clickable` hover / focus / selected). Remap onto CRT shells.
+ * Standing P2 #14 after Disk Cleanup add-scope v0.1.2517; design-review
+ * feature-agent-ops adjacent (polish-without-capture; Mac capture TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2518: agent-ops insights CRT */
+body.theme-data-poster .ops-insights-card {
+  border-color: color-mix(in srgb, currentColor 12%, #0b0b10);
+  background: color-mix(in srgb, currentColor 5%, #0b0b10);
+}
+body.theme-dark .ops-insights-card {
+  border-color: color-mix(in srgb, currentColor 12%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 5%, #0a0a0a);
+}
+body.theme-neon .ops-insights-card {
+  border-color: color-mix(in srgb, currentColor 12%, #08120c);
+  background: color-mix(in srgb, currentColor 5%, #08120c);
+}
+body.theme-futuristic .ops-insights-card {
+  border-color: color-mix(in srgb, currentColor 12%, #0b0b10);
+  background: color-mix(in srgb, currentColor 5%, #0b0b10);
+}
+
+body.theme-data-poster .ops-insight-line.is-clickable:hover {
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+}
+body.theme-dark .ops-insight-line.is-clickable:hover {
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 14%, #0a0a0a);
+}
+body.theme-neon .ops-insight-line.is-clickable:hover {
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+  border-color: color-mix(in srgb, currentColor 14%, #08120c);
+}
+body.theme-futuristic .ops-insight-line.is-clickable:hover {
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+}
+
+body.theme-data-poster .ops-insight-line.is-clickable:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+}
+body.theme-dark .ops-insight-line.is-clickable:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #0a0a0a);
+}
+body.theme-neon .ops-insight-line.is-clickable:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #08120c);
+}
+body.theme-futuristic .ops-insight-line.is-clickable:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+}
+
+body.theme-data-poster .ops-insight-line.is-clickable.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #0b0b10);
+}
+body.theme-dark .ops-insight-line.is-clickable.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 42%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 12%, #0a0a0a);
+}
+body.theme-neon .ops-insight-line.is-clickable.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 42%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 12%, #08120c);
+}
+body.theme-futuristic .ops-insight-line.is-clickable.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 42%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
 }
 
 

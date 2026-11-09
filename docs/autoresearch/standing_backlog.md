@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2518
+
+- Agent Ops Insights opaque (`.ops-insights-card` · `.ops-insight-line.is-clickable` hover / focus / selected) glass `color-mix(…, transparent)` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (after Disk Cleanup add-scope v0.1.2517). Standing P2 #14; design-review `feature-agent-ops` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: Perplexity search / inline-key glass leftovers if any, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2517
 
 - Disk Cleanup add-scope opaque (`#disk-cleanup-add-btn` · scope/add inputs · `.disk-cleanup-scope-remove`) glass `color-mix(…, transparent)` (+ soft Add shadow) → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (Clean now primary parity after v0.1.2465; after Dark Changelog opacity v0.1.2516). Standing P2 #14; design-review `feature-disk-cleanup` adjacent (polish-without-capture; Mac capture still TCC-blocked). Next: remaining Disk Cleanup / Agent Ops transparent leftovers if any, or Mac capture of stale `feature-disk-cleanup.png` / `feature-agent-ops.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows `screencapture -l`.
