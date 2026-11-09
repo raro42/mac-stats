@@ -282,9 +282,10 @@ body {
 
 .ring-track {
   fill: none;
-  stroke: var(--ring-inactive);
+  /* Was opacity 0.7 on --ring-inactive #003300 → ~70% green; mix on #0a0a0a (#14). */
+  stroke: color-mix(in srgb, #003300 70%, #0a0a0a);
   stroke-width: 3;
-  opacity: 0.7;
+  opacity: 1;
 }
 
 .ring-progress {

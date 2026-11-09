@@ -219,9 +219,10 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: var(--muted);
+  /* Was opacity 0.5 on --muted (60% white) → ~30% white; mix on #0b0b10 (#14). */
+  color: color-mix(in srgb, #ffffff 30%, #0b0b10);
   margin-bottom: 12px;
-  opacity: 0.5;
+  opacity: 1;
 }
 
 .metric-value {
@@ -301,10 +302,10 @@ body {
 
 .ring-track {
   fill: none;
-  /* Opaque track — was rgba(255,255,255,0.14) glass (#14). */
-  stroke: color-mix(in srgb, #ffffff 14%, #0b0b10);
+  /* Was opacity 0.6 on 14% white stroke → ~8% white; mix on #0b0b10 (#14). */
+  stroke: color-mix(in srgb, #ffffff 8%, #0b0b10);
   stroke-width: 3;
-  opacity: 0.6;
+  opacity: 1;
 }
 
 .ring-progress {
