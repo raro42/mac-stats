@@ -4,7 +4,8 @@ Overnight autoresearch (Track B) kept shipping.
 
 ## Shipped tonight
 
-- **v0.1.2538** — Instant `/keep-p80` · `keep p80` · `p80 keep gap` · `80th percentile keep gap` (+ discard). Nearest-rank p80 gap between consecutive keep/discard rows in `results.tsv` (tonight + all-time). Digester Slowest filters. Standing P0 after `/keep-p20` v0.1.2537. High-side twin of `/keep-p20`; between `/keep-p75` and `/keep-p90`.
+- **v0.1.2539** — Instant `/keep-p15` · `keep p15` · `p15 keep gap` · `15th percentile keep gap` (+ discard). Nearest-rank p15 gap between consecutive keep/discard rows in `results.tsv` (tonight + all-time). Digester Slowest filters. Standing P0 after `/keep-p80` v0.1.2538. Densifies the ladder between `/keep-p10` and `/keep-p20`.
+- **v0.1.2538** — Instant `/keep-p80` (high-side twin of `/keep-p20`; between `/keep-p75` and `/keep-p90`).
 - **v0.1.2537** — Instant `/keep-p20` (between `/keep-p10` and `/keep-p25`).
 - **v0.1.2536** — Instant `/keep-p50` (pairs with `/keep-median`).
 - **v0.1.2535** — Instant `/keep-p98`.
@@ -13,7 +14,7 @@ Overnight autoresearch (Track B) kept shipping.
 
 ## Try it
 
-In AI Chat or Discord: `/keep-p80` or `p80 keep gap` — tonight + all-time nearest-rank p80 gap between keeps (no row dump). Pair with `/keep-p20` / `/keep-p75` / `/keep-p90`.
+In AI Chat or Discord: `/keep-p15` or `p15 keep gap` — tonight + all-time nearest-rank p15 gap between keeps (no row dump). Pair with `/keep-p10` / `/keep-p20` / `/keep-p80`.
 
 ## Notes
 
