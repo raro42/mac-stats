@@ -1,15 +1,23 @@
 # Morning surprise — 2026-11-10
 
-Overnight autoresearch kept shipping.
+Overnight autoresearch (Track B) kept shipping. Digester stayed empty; fuel came from standing backlog + layout-daily.
 
 ## Shipped tonight
-- **v0.1.2558** — Instant `/keep-p6` (nearest-rank p6 gap between consecutive keep/discard rows; digit-safe vs `/keep-p60` / `/keep-p65` / `/keep-p16`). Densifies the low ladder between `/keep-p5` and `/keep-p8`.
-- **v0.1.2557** — Instant `/keep-p8` (digit-safe vs p80/p85) — parallel tick on origin.
-- **v0.1.2556** — Layout-daily Data Poster: opaque hover scrollbar thumbs + CRT remaps.
 
-## Tried / discarded
-- Local `/keep-p8` as v0.1.2557 raced origin — discard, then re-picked `/keep-p6`.
+- **v0.1.2559** — Instant `/keep-p9` (digit-safe nearest-rank p9 gap between consecutive keep/discard rows; between `/keep-p8` and `/keep-p10`; does not steal `/keep-p90` / `/keep-p95` / `/keep-p98` / `/keep-p99` / `/keep-p92`).
+- **v0.1.2558** — Instant `/keep-p6` (digit-safe nearest-rank p6 gap; between `/keep-p5` and `/keep-p8`; does not steal `/keep-p60` / `/keep-p65`).
+- **v0.1.2557** — Instant `/keep-p8` (digit-safe nearest-rank p8 gap between consecutive keep/discard rows; between `/keep-p5` and `/keep-p10`; does not steal `/keep-p80` / `/keep-p85`).
+- **v0.1.2556** — Layout-daily Data Poster: global hover scrollbar thumbs opaque (`*:hover::-webkit-scrollbar-thumb` · intensify · `html/body:hover` `scrollbar-color`) → `#ffffff` + CRT remaps (Data Poster / Dark / Neon / Futuristic). Resting thumbs stay invisible.
+- **v0.1.2555** — Discord `SKILL:` loads Hermes topic/`SKILL.md` folders again.
+- **v0.1.2554** — Instant `/keep-p92` (nearest-rank p92 gap between consecutive keep/discard rows; densifies between `/keep-p90` and `/keep-p95`).
+## Context
 
-## Fuel notes
-- Digester open empty; design-review in grace; layout-daily data-poster done for the day.
-- Next: `/keep-p9` digit-safe, or Mac capture when TCC allows; Dark layout-daily tomorrow.
+- Digester open: empty (0 turns / 7d).
+- Design review: grace (recommended feature-agent-ops still stale; Mac Screen Recording TCC still blocks capture).
+- Layout daily: data-poster marked today; Dark next.
+- Sibling harnesses: missing on this rack.
+- Debug.log: quiet.
+
+## Next fuel
+
+- Other ratchet glance (`/keep-p38` / `/keep-p42` / `/keep-p48` / `/keep-p88`), or Mac capture when TCC allows; Dark layout-daily tomorrow; intentional resting scrollbar glass left alone, or Mac capture when TCC allows; Dark layout-daily tomorrow; intentional resting scrollbar glass left alone.
