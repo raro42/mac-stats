@@ -2039,7 +2039,7 @@ impl Config {
     }
 
     /// Skills directory for agent prompt overlays: `$HOME/.mac-stats/agents/skills/`
-    /// Files: skill-<number>-<topic>.md (e.g. skill-1-summarize.md, skill-2-code.md).
+    /// Layouts: `skill-<number>-<topic>.md` (legacy) or `<topic>/SKILL.md` (Hermes).
     pub fn skills_dir() -> PathBuf {
         Self::agents_dir().join("skills")
     }

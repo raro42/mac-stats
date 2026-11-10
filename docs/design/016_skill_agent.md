@@ -61,7 +61,9 @@ The SKILL agent lets Ollama run a specialized skill (a Markdown system-prompt ov
 ## Skill Files
 
 *   **Directory**: `~/.mac-stats/agents/skills/` (see `Config::skills_dir()` in `config/mod.rs`; it is `agents_dir()/skills`).
-*   **Naming**: `skill-<number>-<topic>.md`, e.g. `skill-1-summarize.md`, `skill-2-code.md`. The filename must have the form `skill-<number>-<topic>.md`; e.g. `skill-1.md` (missing topic) or `skill-x-foo.md` (non-numeric number) are ignored.
+*   **Naming (either form)**:
+    *   Legacy flat: `skill-<number>-<topic>.md`, e.g. `skill-1-summarize.md`, `skill-2-code.md`. Invalid names (`skill-1.md`, `skill-x-foo.md`) are ignored.
+    *   Hermes folder: `<topic>/SKILL.md`, e.g. `changelog-weekly-review/SKILL.md`. Optional YAML frontmatter is stripped before the skill session.
 *   **Default skills**: When the skills directory is empty, the app creates two default skills: **1-summarize** (summarization) and **2-code** (code help). You can edit or remove them.
 *   **Content**: Markdown (or plain text) used as the **system prompt** for the skill session. The file is read and trimmed; empty files are skipped and reported in the app log.
 
@@ -70,9 +72,10 @@ The SKILL agent lets Ollama run a specialized skill (a Markdown system-prompt ov
 If the app reports "no valid skill files" or a skill you expect is missing:
 
 1. **Path**: Ensure skills live in `~/.mac-stats/agents/skills/`, not `~/.mac-stats/skills/`. Create the directory if needed; the app creates it and default skills when the directory is empty.
-2. **Naming**: Only files matching `skill-<number>-<topic>.md` are loaded (e.g. `skill-1-summarize.md`). Files like `skill-1.md` or `skill-x-foo.md` are skipped; the app logs which files were skipped and why (invalid name or empty).
+2. **Naming**: Load either `skill-<number>-<topic>.md` **or** `<topic>/SKILL.md`. Weekly Discord schedules (`changelog-weekly-review`, `ui-weekly-review`, `quality-weekly-review`) use the Hermes folder form. Flat files like `skill-1.md` or `skill-x-foo.md` are skipped; the app logs which files were skipped and why (invalid name or empty).
 3. **Empty files**: Files that are empty or contain only whitespace are skipped; check `~/.mac-stats/debug.log` at verbosity `-vv` or higher for "Skills: skipping empty file".
 4. **Permissions**: If the app cannot read the directory or a file, it logs "could not read directory" or "could not read file" with the path and error.
+5. **Unknown skill on Discord**: If logs say `Unknown skill "changelog-weekly-review". Available skills: 1-summarize, 2-code`, the Hermes folders were not loaded (fixed in the loader that accepts `<topic>/SKILL.md`). Restart mac-stats after that fix; confirm `Skills: loaded N … changelog-weekly-review` in `debug.log`.
 
 See `~/.mac-stats/debug.log` after a run (e.g. open CPU window and trigger a skill, or start with `--cpu`) for "Skills: loaded …" or "Skills: skipping …" lines.
 
