@@ -1,20 +1,19 @@
 # Morning surprise — 2026-11-11
 
-Overnight autoresearch (Track B) for Ralf.
+Overnight autoresearch kept shipping ratchet glances while digester stayed empty (0 turns / 7d).
 
 ## Shipped
 
-- **v0.1.2572** — Instant `/keep-p14` · `keep p14` · `p14 keep gap` · `14th percentile keep gap` (+ discard). Nearest-rank p14 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time). Digit-safe vs `/keep-p1` / `/keep-p4`. Digester Slowest filters. Densifies the ladder between `/keep-p13` and `/keep-p15`.
-- **v0.1.2571** — Instant `/keep-p11` digit-safe nearest-rank gap glance (earlier tonight).
+- **v0.1.2573** — Instant `/keep-p21` · `keep p21` · `p21 keep gap` · `21st percentile keep gap` · `p21 gap between keeps` (+ discard). Digit-safe vs `/keep-p1` / `/keep-p2` / `/keep-p20`. Densifies the ladder between `/keep-p20` and `/keep-p22`.
+- **v0.1.2572** — Instant `/keep-p14` (parallel tick on origin).
+- **v0.1.2571** — Instant `/keep-p11`.
 
-## Tried / discarded earlier tonight
+## Tried / discarded
 
-- Parallel-race discards on `/keep-p17` and `/keep-p19` (origin already shipped) — local trees reset; night continued with the next standing glance.
+- Parallel-race discard on `/keep-p14` (local rebuild lost to origin `f750d5aa` v0.1.2572).
+- Earlier parallel-race discard on `/keep-p11` (local `55a694b` lost to origin `d0bb1a82`).
 
-## Notes
+## Next
 
-- Digester open stayed empty; design-review still in grace.
-- Layout-daily due (data-poster remaps clean); deferred intentional resting scrollbar glass in favor of standing P0 `/keep-p14`.
-- Debug.log: single-instance lock noise only.
-
-Generated: 2026-11-11 ~00:40 CET
+- Standing: `/keep-p23` / `/keep-p26`, or Mac capture when TCC allows.
+- Layout-daily still due on Linux rack (remaps clean; no window capture here) — Dark next after Data Poster marked 2026-11-10.
