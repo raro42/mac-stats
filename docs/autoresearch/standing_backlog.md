@@ -1,6 +1,11 @@
+## Overnight merge — v0.1.2557
+
+- Instant `/keep-p8` · `keep p8` · `p8 keep gap` · `8th percentile keep gap` · `p8 gap between keeps` (+ discard) — nearest-rank p8 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters; digit-safe vs p80/p85). Standing P0 after layout-daily hover-scrollbar opaque v0.1.2556 (intentional resting scrollbar glass left alone). Next: other ratchet glance, or Mac capture when TCC allows; Dark layout-daily tomorrow.
+
 ## Overnight merge — v0.1.2556
 
 - Layout-daily Data Poster: global hover scrollbar thumbs opaque (`*:hover::-webkit-scrollbar-thumb` · intensify · `html/body:hover` `scrollbar-color`) glass `color-mix(…, transparent)` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (resting thumbs stay transparent; after SKILL loader v0.1.2555; earlier parallel v0.1.2530 race left HEAD on transparent glass). Standing P2 #14; layout-daily data-poster marked. Next: `/keep-p8` digit-safe, or Mac capture when TCC allows; Dark layout-daily tomorrow.
+
 
 ## Overnight merge — v0.1.2554
 
