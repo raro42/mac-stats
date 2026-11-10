@@ -7,7 +7,7 @@
 - [x] Resume path: hydrate monitors list immediately when expanded (not only 30s poll)
 - [x] Sync dist, bump version + CHANGELOG, `cargo check`
 - [x] Rename `WIP-24-…` → `UNTESTED-24-…`
-- [ ] Commit and push `origin/main` (do not close GitHub issue)
+- [x] Commit and push `origin/main` (do not close GitHub issue)
 
 ## Notes
 GitHub: https://github.com/raro42/mac-stats/issues/24
@@ -16,5 +16,6 @@ Fix: `applyIconPaneVisibilityFromLocalEarly()` + start monitoring features when 
 
 ## Review
 - v0.1.2566: Monitors empty-on-open fix (#24).
-- `cargo check` pending / in progress.
+- `cargo check` PASS.
+- Pushed `8a6241eb` to `origin/main`.
 - Issue #24 left open for tester / 004.
