@@ -921,3 +921,12 @@ Open tasks for this plan are tracked in **agents/006-feature-coder/FEATURE-CODER
 - [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `unnecessary_get_then_check`, `assertions_on_constants`, `items_after_test_module`). Not caused by #20.
 - [x] `cargo test --offline` — **1359** passed, **0** failed; 1 doc-test ignored.
 - [x] `cargo build --release` succeeds (**v0.1.2351**). Did not start a second process.
+
+### Closing reviewer smoke test 2026-11-10 (`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md` — GitHub #22 hover layout broken)
+
+- [x] Entry: **`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md`** — §9 integration checklist consulted (`src/ollama.js` vs `src-tauri/dist/ollama.js` identical; `toggle_cpu_window` / `set_chat_verbosity` in `generate_handler!`; `run_due_monitor_checks` still on the 30s thread). No **FEAT-D\*** for this GitHub issue. No **`pkill -f mac_stats`** (none running on this Linux host).
+- [x] Product fix already on `main` as **v0.1.2561** (`c578658b`): `ensureMetricValueCopyStyles()` hover / focus-visible / Copied washes mix accent into `var(--panel, var(--bg, #1c1c1e))` with a flat 1px (2px focus) ring; never mix into `#ffffff`. `src/cpu.js` matches `src-tauri/dist/cpu.js`. Changelog **[0.1.2561] Fixed** already names GitHub #22. Deduped accidental double **[0.1.2562]** keep-p3 block while aligning tree; **[Unreleased]** unchanged (unrelated overnight/CI notes only).
+- [x] `cargo check` — pass (dev profile). Linux-only unused IOReport / status-bar warnings; none from the #22 CSS change.
+- [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `unnecessary_get_then_check`, `assertions_on_constants`, `items_after_test_module`). Not caused by #22.
+- [x] `cargo test --offline` — **1397** passed, **0** failed; 1 doc-test ignored.
+- [x] `cargo build --release` succeeds (**v0.1.2562** tree with #22 fix on **v0.1.2561**). Did not start a second process.
