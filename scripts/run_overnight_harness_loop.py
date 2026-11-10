@@ -23,6 +23,7 @@ Does not spawn agents during daytime — only prints AGENT_LOOP_SLEEP_harness th
 from __future__ import annotations
 
 import os
+import signal
 import shutil
 import subprocess
 import time
@@ -36,6 +37,7 @@ CLEAN_NOTE = "AGENT_LOOP_RUST_CLEAN"
 CI_NOTE = "AGENT_LOOP_CI"
 RELEASE_NOTE = "AGENT_LOOP_RELEASE"
 AGENT_NOTE = "AGENT_LOOP_AGENT"
+REAP_NOTE = "AGENT_LOOP_REAP"
 START_H, END_H = 20, 6
 FLUSH_H = 23
 INTERVAL = 1200
@@ -256,11 +258,105 @@ def resolve_agent_bin() -> str | None:
     return None
 
 
+def kill_process_group(pid: int) -> None:
+    """SIGKILL the session/process group. Popen(..., start_new_session=True) → pgid == pid."""
+    try:
+        os.killpg(pid, signal.SIGKILL)
+    except ProcessLookupError:
+        return
+    except PermissionError:
+        try:
+            os.kill(pid, signal.SIGKILL)
+        except ProcessLookupError:
+            return
+
+
+def _proc_cmdline(pid: int) -> list[str]:
+    try:
+        raw = Path(f"/proc/{pid}/cmdline").read_bytes()
+    except OSError:
+        return []
+    return [p.decode("utf-8", "replace") for p in raw.split(b"\0") if p]
+
+
+def _proc_environ_bytes(pid: int) -> bytes:
+    try:
+        return Path(f"/proc/{pid}/environ").read_bytes()
+    except OSError:
+        return b""
+
+
+def _proc_cwd(pid: int) -> Path | None:
+    try:
+        return Path(f"/proc/{pid}/cwd").resolve()
+    except OSError:
+        return None
+
+
+def _is_python_exe(name: str) -> bool:
+    base = Path(name).name
+    return base == "python" or base.startswith("python3")
+
+
+def _is_orphan_cursor_python(pid: int, root: Path) -> bool:
+    """Bare/hung python left by Cursor agent shells (often `python3 <<'PY'` with empty argv)."""
+    if pid <= 1 or pid == os.getpid():
+        return False
+    env = _proc_environ_bytes(pid)
+    if b"CURSOR_AGENT=1" not in env and b"CURSOR_CONVERSATION_ID=" not in env:
+        return False
+    cwd = _proc_cwd(pid)
+    if cwd is None or cwd != root:
+        return False
+    cmd = _proc_cmdline(pid)
+    if not cmd or not _is_python_exe(cmd[0]):
+        return False
+    # Keep intentional named scripts (digest/ratchet/etc.). Reap heredoc / -c / bare interpreters.
+    args = cmd[1:]
+    if any(a.endswith(".py") for a in args):
+        return False
+    return True
+
+
+def reap_orphan_cursor_pythons() -> list[int]:
+    """Kill leftover agent pythons in this repo after the agent CLI has exited.
+
+    Overnight ticks spawn `python3 <<'PY'` editors that can busy-loop on huge files.
+    Timeout used to SIGKILL only the agent PID, so those children survived under
+    user systemd and pegged cores for days. Match: CURSOR_* env + cwd=ROOT + no .py argv.
+    """
+    root = ROOT.resolve()
+    killed: list[int] = []
+    try:
+        entries = list(Path("/proc").iterdir())
+    except OSError:
+        return killed
+    for entry in entries:
+        if not entry.name.isdigit():
+            continue
+        pid = int(entry.name)
+        if not _is_orphan_cursor_python(pid, root):
+            continue
+        try:
+            os.kill(pid, signal.SIGKILL)
+        except ProcessLookupError:
+            continue
+        except PermissionError:
+            continue
+        killed.append(pid)
+    return killed
+
+
 def run_agent_tick(now: datetime) -> None:
     """Spawn Cursor agent CLI for one overnight experiment."""
     IMPROVEMENTS.mkdir(parents=True, exist_ok=True)
     payload = PROMPT.replace("\\", "\\\\").replace('"', '\\"')
     print(f'{SENTINEL} {{"prompt":"{payload}"}}', flush=True)
+
+    # Safety net for leftovers from a previous tick / crashed agent.
+    reaped = reap_orphan_cursor_pythons()
+    if reaped:
+        print(f'{REAP_NOTE} {{"killed":{reaped},"when":"pre-tick"}}', flush=True)
 
     if agent_still_running():
         print(
@@ -313,22 +409,31 @@ def run_agent_tick(now: datetime) -> None:
             print(f'{AGENT_NOTE} {{"error":"spawn failed","detail":"{exc}"}}', flush=True)
             return
         AGENT_LOCK.write_text(str(proc.pid) + "\n")
+        timed_out = False
         try:
             code = proc.wait(timeout=AGENT_TIMEOUT_S)
         except subprocess.TimeoutExpired:
-            proc.kill()
+            timed_out = True
+            # killpg: agent shells / python heredocs often outlive a single-PID kill.
+            kill_process_group(proc.pid)
             try:
                 proc.wait(timeout=30)
             except subprocess.TimeoutExpired:
                 pass
+            code = None
+        # Always sweep: agent can exit 0 while leaving spinning `python3` children.
+        kill_process_group(proc.pid)
+        reaped = reap_orphan_cursor_pythons()
+        AGENT_LOCK.unlink(missing_ok=True)
+        if timed_out:
             print(
                 f'{AGENT_NOTE} {{"exit":"timeout","seconds":{AGENT_TIMEOUT_S}}}',
                 flush=True,
             )
-            AGENT_LOCK.unlink(missing_ok=True)
-            return
-        AGENT_LOCK.unlink(missing_ok=True)
-        print(f'{AGENT_NOTE} {{"exit":{code}}}', flush=True)
+        else:
+            print(f'{AGENT_NOTE} {{"exit":{code}}}', flush=True)
+        if reaped:
+            print(f'{REAP_NOTE} {{"killed":{reaped},"when":"post-tick"}}', flush=True)
 
 
 def main() -> None:
@@ -345,6 +450,13 @@ def main() -> None:
         )
     while True:
         now = datetime.now().astimezone()
+        # Daytime + between ticks: reap hung agent pythons so they cannot burn cores for days.
+        reaped = reap_orphan_cursor_pythons()
+        if reaped:
+            print(
+                f'{REAP_NOTE} {{"killed":{reaped},"when":"loop","at":"{now.isoformat(timespec="seconds")}"}}',
+                flush=True,
+            )
         if not in_window(now):
             wait = seconds_until_window(now)
             time.sleep(min(wait, 1800))
