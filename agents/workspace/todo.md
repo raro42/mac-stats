@@ -4,9 +4,9 @@
 - [x] Read issue #22 + locate click-to-copy hover styles
 - [x] Replace white `#ffffff` hover/Copied wash with accent glow on `--panel`
 - [x] Sync `src/cpu.js` → `src-tauri/dist/`, bump version + CHANGELOG
-- [ ] `cargo check` in `src-tauri/`
+- [x] `cargo check` in `src-tauri/`
 - [x] Rename `WIP-22-…` → `UNTESTED-22-…`
-- [ ] Commit and push `origin/main` (do not close GitHub issue)
+- [x] Commit and push `origin/main` (do not close GitHub issue)
 
 ## Notes
 GitHub: https://github.com/raro42/mac-stats/issues/22
@@ -15,4 +15,5 @@ Cause: `ensureMetricValueCopyStyles()` mixes accent into `#ffffff`.
 
 ## Review
 - v0.1.2561: hover / focus / Copied mix into `--panel` / `--bg` + flat 1px accent ring.
+- `cargo check` PASS.
 - Issue #22 left open for tester / 004.
