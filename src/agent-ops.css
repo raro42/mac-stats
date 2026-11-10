@@ -5837,16 +5837,16 @@ body.theme-futuristic .monitors-collapsed-glance.is-empty {
   display: none !important;
 }
 
-/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+/* Opaque wash — mix into --panel so Data Poster / dark shells stay dark (#23). */
 #battery-power-strip .battery-info.is-hot-attention-flash,
 #lpm-strip.is-hot-attention-flash {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 28%, #ececf1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 28%, var(--panel, #ececf1));
   transition: box-shadow 0.25s ease;
 }
 
-/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+/* Opaque wash — mix into --panel so Data Poster / dark shells stay dark (#23). */
 #lpm-strip.is-hot-attention-flash {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #30d158 28%, #ececf1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #30d158 28%, var(--panel, #ececf1));
 }
 
 /* Top Processes — Filter attention glance (AI Chat / Perplexity Filter parity) */

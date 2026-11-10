@@ -3457,12 +3457,13 @@ function ensureRamStripStyles() {
       flex-wrap: wrap;
       gap: 8px 12px;
     }
-    /* Opaque washes — glass alpha + ring shadows stay in Graphics and Media (#14). */
+    /* Opaque washes — mix into --panel so Data Poster / dark shells stay dark (#23).
+       Was Apple #ececf1 (reads as white pills on the poster field). */
     .battery-info.is-low {
       border-radius: 8px;
       padding: 2px 6px;
       margin: -2px -6px;
-      background-color: color-mix(in srgb, #ff9f0a 16%, #ececf1);
+      background-color: color-mix(in srgb, #ff9f0a 16%, var(--panel, #ececf1));
       box-shadow: none;
       transition: background-color 0.2s ease, border-color 0.2s ease;
     }
@@ -3471,12 +3472,12 @@ function ensureRamStripStyles() {
       border-radius: 8px;
       padding: 2px 6px;
       margin: -2px -6px;
-      background-color: color-mix(in srgb, #34c759 7%, #ececf1);
+      background-color: color-mix(in srgb, #34c759 7%, var(--panel, #ececf1));
       box-shadow: none;
       transition: background-color 0.2s ease, border-color 0.2s ease;
     }
     #battery-power-strip.is-lpm-highlight {
-      background-color: color-mix(in srgb, #30d158 16%, #ececf1);
+      background-color: color-mix(in srgb, #30d158 16%, var(--panel, #ececf1));
       border-radius: 10px;
       box-shadow: none;
       transition: background-color 0.2s ease, border-color 0.2s ease;
@@ -3493,16 +3494,16 @@ function ensureRamStripStyles() {
       transition: background-color 0.2s ease, border-color 0.2s ease;
     }
     .lpm-info:hover {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, #ececf1);
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, var(--panel, #ececf1));
     }
     .lpm-info:focus-visible {
       box-shadow: none;
-      outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, #ececf1);
+      outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, var(--panel, #ececf1));
       outline-offset: 2px;
     }
     /* LPM Off calm (Ready / battery / Monitors all-up soft 7% parity). */
     .lpm-info.is-ok:not(.is-on):not(.is-lpm-error) {
-      background-color: color-mix(in srgb, #34c759 7%, #ececf1);
+      background-color: color-mix(in srgb, #34c759 7%, var(--panel, #ececf1));
       box-shadow: none;
     }
     /* Power low-draw calm (Ready / battery / LPM Off soft 7% parity). */
@@ -3510,7 +3511,7 @@ function ensureRamStripStyles() {
       border-radius: 8px;
       padding: 2px 6px;
       margin: -2px -6px;
-      background-color: color-mix(in srgb, #34c759 7%, #ececf1);
+      background-color: color-mix(in srgb, #34c759 7%, var(--panel, #ececf1));
       box-shadow: none;
       transition: background-color 0.2s ease, border-color 0.2s ease;
     }
@@ -3518,7 +3519,7 @@ function ensureRamStripStyles() {
       border-radius: 8px;
       padding: 2px 6px;
       margin: -2px -6px;
-      background-color: color-mix(in srgb, #ff9f0a 16%, #ececf1);
+      background-color: color-mix(in srgb, #ff9f0a 16%, var(--panel, #ececf1));
       box-shadow: none;
       transition: background-color 0.2s ease, border-color 0.2s ease;
     }
@@ -3527,7 +3528,7 @@ function ensureRamStripStyles() {
       border-radius: 8px;
       padding: 2px 6px;
       margin: -2px -6px;
-      background-color: color-mix(in srgb, #34c759 7%, #ececf1);
+      background-color: color-mix(in srgb, #34c759 7%, var(--panel, #ececf1));
       box-shadow: none;
       transition: background-color 0.2s ease, border-color 0.2s ease;
       opacity: 1;
@@ -3536,13 +3537,13 @@ function ensureRamStripStyles() {
       border-radius: 8px;
       padding: 2px 6px;
       margin: -2px -6px;
-      background-color: color-mix(in srgb, #ff9f0a 16%, #ececf1);
+      background-color: color-mix(in srgb, #ff9f0a 16%, var(--panel, #ececf1));
       box-shadow: none;
       transition: background-color 0.2s ease, border-color 0.2s ease;
       opacity: 1;
     }
     .lpm-info.is-on {
-      background-color: color-mix(in srgb, #30d158 16%, #ececf1);
+      background-color: color-mix(in srgb, #30d158 16%, var(--panel, #ececf1));
       box-shadow: none;
     }
     .lpm-info.is-on .lpm-value {
@@ -3554,9 +3555,9 @@ function ensureRamStripStyles() {
       width: 34px;
       height: 18px;
       border-radius: 999px;
-      /* Opaque track — alpha mix + inset shadow stay in Graphics and Media (#14). */
-      background: color-mix(in srgb, var(--muted, #888) 22%, #ececf1);
-      border: 1px solid color-mix(in srgb, var(--muted, #888) 28%, #ececf1);
+      /* Opaque track — mix into --panel (not Apple #ececf1) so dark themes stay dark (#23). */
+      background: color-mix(in srgb, var(--muted, #888) 22%, var(--panel, #ececf1));
+      border: 1px solid color-mix(in srgb, var(--muted, #888) 28%, var(--panel, #ececf1));
       box-shadow: none;
       transition: background-color 0.2s ease, border-color 0.2s ease;
     }
@@ -3619,11 +3620,11 @@ function ensureRamStripStyles() {
     }
     .lpm-info.is-lpm-flash {
       box-shadow: none;
-      outline: 2px solid color-mix(in srgb, #30d158 55%, #ececf1);
+      outline: 2px solid color-mix(in srgb, #30d158 55%, var(--panel, #ececf1));
       outline-offset: 2px;
     }
     .lpm-info.is-lpm-error {
-      background-color: color-mix(in srgb, #ff9f0a 14%, #ececf1);
+      background-color: color-mix(in srgb, #ff9f0a 14%, var(--panel, #ececf1));
       box-shadow: none;
     }
     .lpm-label {
