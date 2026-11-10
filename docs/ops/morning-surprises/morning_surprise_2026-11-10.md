@@ -17,6 +17,7 @@ Overnight autoresearch (Track B) kept shipping.
 - Design review still in grace; layout-daily data-poster already marked for the day (Dark next).
 - Sibling OpenClaw/Hermes repos missing on this Linux rack.
 - Debug.log quiet (no ERROR/WARN clusters in the scan window).
+- Parallel-race discard on `/keep-p19` (local rebuild lost to origin `59487acb` v0.1.2570); next standing `/keep-p11` / `/keep-p14`.
 - Intentional resting scrollbar glass left alone.
 
 ## Ratchet
