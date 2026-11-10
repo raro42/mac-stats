@@ -1,19 +1,22 @@
 # Morning surprise — 2026-11-10
 
-Overnight autoresearch kept shipping. Digester open stayed empty; design-review and layout-daily were not due (grace / already marked). Fuel came from the standing ratchet-glance ladder.
+Overnight autoresearch (Track B) kept shipping.
 
-## Shipped tonight
+## Shipped tonight (highlights)
 
-- **v0.1.2565** — Instant `/keep-p13` · `keep p13` · `p13 keep gap` · `13th percentile keep gap` (+ discard). Nearest-rank p13 gaps from `results.tsv` (tonight + all-time). Digit-safe vs `/keep-p1` / `/keep-p3` / `/keep-p12`. Digester Slowest filters.
-- **v0.1.2564** — Data Poster power-strip pills: battery/power washes mix into `--panel` instead of Apple `#ececf1` white slabs (#23).
-- **v0.1.2563** — Instant `/keep-p4` digit-safe nearest-rank gap glance.
-- **v0.1.2562** — Instant `/keep-p3` digit-safe nearest-rank gap glance.
-- **v0.1.2560** — Instant `/keep-p7` (after a parallel discard race on `/keep-p9`).
+- **v0.1.2567** — Removed the first hairline under the section icon row (#25). Themes no longer paint a divider between icons and External / Monitors (futuristic already had none).
+- **v0.1.2566** — External / Monitors empty on fresh open (#24): early localStorage hide + hydrate when a pane was left expanded.
+- **v0.1.2565** — Instant `/keep-p13` nearest-rank keep/discard gap glance (+ digester Slowest filters).
+- Earlier in the window: denser keep-p ladder (`/keep-p4` and friends) and Data Poster power-strip pill wash (#23 / v0.1.2564).
 
-## Tried / discarded
+## Tried / notes
 
-- Parallel version races earlier tonight on `/keep-p8` and `/keep-p9` (origin won) → discarded local twins, then re-picked neighbors.
+- Digester open stayed empty (0 Werner turns / 7d).
+- Design review still in grace; layout-daily data-poster already marked for the day (Dark next).
+- Sibling OpenClaw/Hermes repos missing on this Linux rack.
+- Debug.log quiet (no ERROR/WARN clusters in the scan window).
 
-## Next fuel
+## Next
 
-- `/keep-p16` / `/keep-p17` / `/keep-p19`, or Mac capture when Screen Recording TCC allows; Dark layout-daily tomorrow.
+- `/keep-p16` / `/keep-p17` / `/keep-p19` ratchet glances, or Mac window capture when TCC allows.
+- Dark layout-daily when due.
