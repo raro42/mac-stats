@@ -8,11 +8,11 @@ This is the **single** project-instructions file for **Cursor**, **Claude Code**
 
 Build a polished macOS (Apple Silicon) stats app (Rust + Tauri) that reads CPU/process metrics and presents them in a clean "macOS glass" UI. Favor correctness, safety, and maintainability over hacks.
 
-## Decision plane (Laya-shaped)
+## Decision plane ([Laya](https://github.com/NandhaKishorM/laya)-shaped)
 
 We are integrating a **decision plane** into the thin agent / autoresearch loop: **tool coordinator** (which tool or next action before a generative worker) and **answer quality gate** (keep / discard / one repair after a result). Full pattern: [raro42/agents-explained](https://github.com/raro42/agents-explained).
 
-Today triage and keep/discard still lean on **rules, metrics, and Ollama**. Laya clients are not required on every tick yet. Same roles; swap the decision head when ready.
+Today triage and keep/discard still lean on **rules, metrics, and Ollama**. [Laya](https://github.com/NandhaKishorM/laya) clients are not required on every tick yet. Same roles; swap the decision head when ready.
 
 ## Project overview (at a glance)
 
