@@ -1,21 +1,17 @@
-# WIP-24: External monitors show nothing on fresh open
+# FEAT-25: Remove first horizontal line below icons
 
 ## Plan
-- [x] Read issue #24 + task file (empty "Nothing watching yet" until icon toggle)
-- [x] Early-hide collapsed icon panes from localStorage (HTML shows monitors expanded)
-- [x] Start monitoring features when a pane is already saved expanded
-- [x] Resume path: hydrate monitors list immediately when expanded (not only 30s poll)
-- [x] Sync dist, bump version + CHANGELOG, `cargo check`
-- [x] Rename `WIP-24-…` → `UNTESTED-24-…`
+- [x] Read issue #25 + task file (hairline under icon row)
+- [x] Remove first post-icon-line divider/rule in theme `cpu.html` files (skip futuristic)
+- [x] Bump version + CHANGELOG, `cargo check` / ratchet verify
+- [x] Rename `FEAT-25-…` → `UNTESTED-25-…`
 - [x] Commit and push `origin/main` (do not close GitHub issue)
 
 ## Notes
-GitHub: https://github.com/raro42/mac-stats/issues/24
-Cause: theme HTML paints External / Monitors with empty state; `initMonitorsSection` waits for section intent (#14), so configured sites never replace first paint until the icon is toggled.
-Fix: `applyIconPaneVisibilityFromLocalEarly()` + start monitoring features when any icon pane is saved expanded; focus resume calls `ensureMonitorsListHydrated()` immediately.
+GitHub: https://github.com/raro42/mac-stats/issues/25
+Cause: each theme painted a divider (`apple-divider` / `poster-rule` / …) immediately under `#icon-line`.
+Fix: drop that first rule so the icon row sits flush above Monitors / empty space.
 
 ## Review
-- v0.1.2566: Monitors empty-on-open fix (#24).
-- `cargo check` PASS.
-- Pushed `8a6241eb` to `origin/main`.
-- Issue #24 left open for tester / 004.
+- v0.1.2567: first under-icon hairline removed (#25).
+- Issue #25 left open for tester / 004.

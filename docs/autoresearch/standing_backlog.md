@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2567
+
+- First hairline under section icons removed (#25) across themes (futuristic already clean). Standing P0 after Monitors empty-on-open #24 v0.1.2566. Next: ratchet glance (`/keep-p16` / `/keep-p17` / `/keep-p19`), or Mac capture when TCC allows; Dark layout-daily tomorrow.
+
 ## Overnight merge — v0.1.2565
 
 - Instant `/keep-p13` · `keep p13` · `p13 keep gap` · `13th percentile keep gap` · `p13 gap between keeps` (+ discard) — nearest-rank p13 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters; digit-safe vs p1/p3/p12). Standing P0 after Data Poster #23 v0.1.2564 / `/keep-p4` v0.1.2563. Next: other ratchet glance (`/keep-p16` / `/keep-p17` / `/keep-p19`), or Mac capture when TCC allows; Dark layout-daily tomorrow.
