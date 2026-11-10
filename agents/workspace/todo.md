@@ -1,19 +1,20 @@
-# WIP-23: Widgets with white background (Data Poster power strip)
+# WIP-24: External monitors show nothing on fresh open
 
 ## Plan
-- [x] Read issue #23 + screenshot (battery / power / LPM / remaining pills)
-- [x] Remap `#ececf1` power-strip washes to `--panel` in `ensureRamStripStyles()`
-- [x] Sync `src/cpu.js` / `agent-ops.css` → `src-tauri/dist/`, bump version + CHANGELOG
-- [x] `cargo check` in `src-tauri/`
-- [x] Rename `WIP-23-…` → `UNTESTED-23-…`
-- [x] Commit and push `origin/main` (do not close GitHub issue)
+- [x] Read issue #24 + task file (empty "Nothing watching yet" until icon toggle)
+- [x] Early-hide collapsed icon panes from localStorage (HTML shows monitors expanded)
+- [x] Start monitoring features when a pane is already saved expanded
+- [x] Resume path: hydrate monitors list immediately when expanded (not only 30s poll)
+- [x] Sync dist, bump version + CHANGELOG, `cargo check`
+- [x] Rename `WIP-24-…` → `UNTESTED-24-…`
+- [ ] Commit and push `origin/main` (do not close GitHub issue)
 
 ## Notes
-GitHub: https://github.com/raro42/mac-stats/issues/23
-Cause: shared injected strip styles mixed status washes into Apple `#ececf1` (reads as white on Data Poster).
-Fix: mix into `var(--panel, #ececf1)` so dark themes stay dark.
+GitHub: https://github.com/raro42/mac-stats/issues/24
+Cause: theme HTML paints External / Monitors with empty state; `initMonitorsSection` waits for section intent (#14), so configured sites never replace first paint until the icon is toggled.
+Fix: `applyIconPaneVisibilityFromLocalEarly()` + start monitoring features when any icon pane is saved expanded; focus resume calls `ensureMonitorsListHydrated()` immediately.
 
 ## Review
-- v0.1.2564: power-strip + flash rings use `--panel`.
-- `cargo check` PASS.
-- Issue #23 left open for tester / 004.
+- v0.1.2566: Monitors empty-on-open fix (#24).
+- `cargo check` pending / in progress.
+- Issue #24 left open for tester / 004.

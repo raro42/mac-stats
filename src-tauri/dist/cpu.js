@@ -162,6 +162,83 @@ function setIconPaneVisibility(section, content, hidden, divider) {
   }
 }
 window.setIconPaneVisibility = setIconPaneVisibility;
+
+/** Icon-line panes that theme HTML paints open with empty shells (#24). */
+const ICON_PANE_LOCAL_SPECS = [
+  {
+    sectionSel: '.monitors-section',
+    contentId: 'monitors-content',
+    dividerId: 'monitors-ollama-divider',
+    collapsedKey: 'monitors_collapsed',
+    iconId: 'icon-monitors',
+  },
+  {
+    sectionSel: '.ollama-section',
+    contentId: 'ollama-content',
+    dividerId: 'monitors-ollama-divider',
+    collapsedKey: 'ollama_collapsed',
+    iconId: 'icon-ollama',
+  },
+  {
+    sectionSel: '.perplexity-section',
+    contentId: 'perplexity-content',
+    dividerId: 'perplexity-details-divider',
+    collapsedKey: 'perplexity_collapsed',
+    iconId: 'icon-perplexity',
+  },
+  {
+    sectionSel: '.logs-section',
+    contentId: 'logs-content',
+    dividerId: 'logs-details-divider',
+    collapsedKey: 'logs_collapsed',
+    iconId: 'icon-logs',
+  },
+  {
+    sectionSel: '.disk-cleanup-section',
+    contentId: 'disk-cleanup-content',
+    dividerId: null,
+    collapsedKey: 'disk_cleanup_collapsed',
+    iconId: 'icon-disk-cleanup',
+  },
+  {
+    sectionSel: '.agent-ops-section',
+    contentId: 'agent-ops-content',
+    dividerId: null,
+    collapsedKey: 'agent_ops_collapsed',
+    iconId: 'icon-agent-ops',
+  },
+];
+
+/** True when any icon-line pane is saved expanded (needs open-path hydrate, #24). */
+function anySavedIconPaneExpanded() {
+  return ICON_PANE_LOCAL_SPECS.some((spec) => !getSectionCollapsed(spec.collapsedKey));
+}
+
+/**
+ * Hide collapsed icon panes before monitoring intent (#24 / #14).
+ * Theme HTML paints Monitors (and peers) open with empty shells; without this,
+ * a fresh window shows "Nothing watching yet" until the icon is toggled.
+ * localStorage only — no list_monitor_statuses / section IPC.
+ */
+function applyIconPaneVisibilityFromLocalEarly() {
+  if (window.__macStatsIconPanesLocalApplied) return;
+  window.__macStatsIconPanesLocalApplied = true;
+  if (!cpuUiSectionsCache) {
+    cpuUiSectionsCache = seedCpuUiSectionsFromLocalStorage();
+  }
+  for (const spec of ICON_PANE_LOCAL_SPECS) {
+    const collapsed = getSectionCollapsed(spec.collapsedKey);
+    const section = document.querySelector(spec.sectionSel);
+    const content = document.getElementById(spec.contentId);
+    const divider = spec.dividerId
+      ? document.getElementById(spec.dividerId)
+      : null;
+    // Shared monitors↔ollama divider: hide only when that pane is collapsed.
+    setIconPaneVisibility(section, content, collapsed, divider);
+    syncSectionIcon(spec.iconId, !collapsed);
+  }
+}
+window.applyIconPaneVisibilityFromLocalEarly = applyIconPaneVisibilityFromLocalEarly;
 // Seed from localStorage only — do not IPC get_cpu_window_ui_state on parse,
 // monitoring idle, or focus resume (#14). Persist still writes config.json.
 window.cpuUiSectionsReady = Promise.resolve().then(() => {
@@ -2909,6 +2986,8 @@ function wireCpuWindowDomOnce() {
   removeRingsFilterChips();
   ensureRamStripStyles();
   pruneMetricStripChips();
+  // Collapse empty HTML shells from localStorage before section intent (#24).
+  applyIconPaneVisibilityFromLocalEarly();
   wireCpuWindowChromeOnIntentOnce();
 }
 
@@ -6400,22 +6479,27 @@ function applyDeferredResumeIdleWindowPolls() {
       void refreshMonitorsSettingsList();
     }
   }
-  // Monitors: collapsed uses last-known icon wash; expanded restarts list poll (#14).
+  // Monitors: collapsed uses last-known icon wash; expanded hydrates + list poll (#14 / #24).
   if (monitorsCollapsed) {
     if (monitorsUpdateInterval) {
       clearInterval(monitorsUpdateInterval);
       monitorsUpdateInterval = null;
     }
     paintMonitorsIconFromLocal();
-  } else if (!monitorsUpdateInterval) {
-    monitorsUpdateInterval = setInterval(() => {
-      if (windowWorkPaused()) return;
-      updateMonitorsSummary();
-      loadMonitors().then(() => {
+  } else {
+    // Focus resume used to arm only the 30s poll — empty first-paint stayed (#24).
+    void ensureMonitorsListHydrated();
+    updateMonitorsSummary();
+    if (!monitorsUpdateInterval) {
+      monitorsUpdateInterval = setInterval(() => {
         if (windowWorkPaused()) return;
-        updateMonitorsHeight();
-      });
-    }, 30000);
+        updateMonitorsSummary();
+        loadMonitors().then(() => {
+          if (windowWorkPaused()) return;
+          updateMonitorsHeight();
+        });
+      }, 30000);
+    }
   }
   // Process Details: blur cleared the live interval — re-arm if still open (#14).
   if (
@@ -25942,7 +26026,8 @@ function wireMonitoringFeaturesOnIntentOnce() {
  * Heavy section wiring (monitors, chat, logs, Agent Ops, …).
  * requestIdleCallback timeouts fire as soon as the thread is idle, so a
  * deferred open-path schedule still stacked this work with first gauges (#14).
- * Capture `?open=` hydrates now. Common collapsed path waits for section intent.
+ * Capture `?open=` hydrates now. Saved-expanded panes hydrate now (#24).
+ * Common all-collapsed path waits for section intent.
  */
 function scheduleMonitoringFeaturesOnce() {
   if (
@@ -25951,7 +26036,14 @@ function scheduleMonitoringFeaturesOnce() {
   ) {
     return;
   }
+  // Match HTML collapse from localStorage before deciding intent vs now (#24).
+  applyIconPaneVisibilityFromLocalEarly();
   if (cpuWindowOpenSectionToken()) {
+    startMonitoringFeaturesNow();
+    return;
+  }
+  // Left open last session: replace empty first-paint shells (e.g. Monitors) (#24).
+  if (anySavedIconPaneExpanded()) {
     startMonitoringFeaturesNow();
     return;
   }
