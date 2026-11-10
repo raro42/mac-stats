@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2569
+
+- Instant `/keep-p17` · `keep p17` · `p17 keep gap` · `17th percentile keep gap` · `p17 gap between keeps` (+ discard) — nearest-rank p17 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters; digit-safe vs p1/p7/p16). Standing P0 after `/keep-p16` v0.1.2568. Next: other ratchet glance (`/keep-p19`), or Mac capture when TCC allows; Dark layout-daily tomorrow.
+
 ## Overnight merge — v0.1.2568
 
 - Instant `/keep-p16` · `keep p16` · `p16 keep gap` · `16th percentile keep gap` · `p16 gap between keeps` (+ discard) — nearest-rank p16 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters; digit-safe vs p1/p6/p13). Standing P0 after hairline #25 v0.1.2567 / `/keep-p13` v0.1.2565. Next: other ratchet glance (`/keep-p17` / `/keep-p19`), or Mac capture when TCC allows; Dark layout-daily tomorrow.
