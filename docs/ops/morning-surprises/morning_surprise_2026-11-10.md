@@ -1,24 +1,21 @@
 # Morning surprise — 2026-11-10
 
-Overnight autoresearch (Track B) kept shipping while digester stayed empty.
+Overnight autoresearch (Track B) kept shipping instant ratchet glances while digester stayed empty.
 
 ## Shipped tonight
-- **v0.1.2552** — Instant `/keep-p28` (nearest-rank p28 gap between consecutive keep/discard rows; densifies between `/keep-p25` and `/keep-p30`).
-- **v0.1.2551** — Instant `/keep-p22` (nearest-rank p22 gap between consecutive keep/discard rows; densifies between `/keep-p20` and `/keep-p25`).
-- **v0.1.2550** — Instant `/keep-p18` (nearest-rank p18 gap between consecutive keep/discard rows; densifies between `/keep-p15` and `/keep-p20`).
-- **v0.1.2549** — Instant `/keep-p12` (nearest-rank p12 gap between consecutive keep/discard rows; densifies between `/keep-p10` and `/keep-p15`).
-- **v0.1.2548** — Instant `/keep-p65` (between `/keep-p60` and `/keep-p70`).
-- **v0.1.2547** — Instant `/keep-p55` (between `/keep-p50` and `/keep-p60`).
-- **v0.1.2546** — Instant `/keep-p45`.
-- **v0.1.2545** — Instant `/keep-p35`.
-- **v0.1.2544** — Instant `/keep-p30`.
+- **v0.1.2553** — Instant `/keep-p32` (nearest-rank p32 gap between consecutive keep/discard rows; densifies between `/keep-p30` and `/keep-p35`).
+- **v0.1.2552** — Instant `/keep-p28` (between `/keep-p25` and `/keep-p30`).
+- **v0.1.2551** — Instant `/keep-p22`.
+- **v0.1.2550** — Instant `/keep-p18`.
+- Earlier tonight: `/keep-p12` · `/keep-p65` · `/keep-p55` · `/keep-p45` · `/keep-p35` · `/keep-p30` and more percentile ladder densifiers.
 
-## Context
-- Digester open candidates: none (0 turns / 7d).
-- Design-review screens still in grace (Mac Screen Recording TCC blocks fresh captures).
-- Layout-daily: data-poster marked for 2026-11-10; Dark recommended next.
-- Glass leftovers: intentional scrollbar only.
+## Skipped / blocked
+- Digester open: empty (0 turns / 7d).
+- Design-review screenshots: grace; Mac Screen Recording TCC still blocks fresh captures.
+- Layout-daily Dark: deferred (data-poster already marked today).
+- Sibling OpenClaw/Hermes: missing on this rack.
+- Intentional scrollbar glass left alone.
 
 ## Next
-- Other ratchet glance (`/keep-p8` with digit-safe mentions helper, or `/keep-p32` / `/keep-p92`), or Mac capture when TCC allows.
+- `/keep-p8` (digit-safe) or `/keep-p92`, or Mac capture when TCC allows.
 - Dark layout-daily tomorrow.
