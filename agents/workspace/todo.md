@@ -6,7 +6,7 @@
 - [x] Sync `src/cpu.js` / `agent-ops.css` → `src-tauri/dist/`, bump version + CHANGELOG
 - [x] `cargo check` in `src-tauri/`
 - [x] Rename `WIP-23-…` → `UNTESTED-23-…`
-- [ ] Commit and push `origin/main` (do not close GitHub issue)
+- [x] Commit and push `origin/main` (do not close GitHub issue)
 
 ## Notes
 GitHub: https://github.com/raro42/mac-stats/issues/23
