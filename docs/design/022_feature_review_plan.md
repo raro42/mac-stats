@@ -948,3 +948,12 @@ Open tasks for this plan are tracked in **agents/006-feature-coder/FEATURE-CODER
 - [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `unnecessary_get_then_check`, `assertions_on_constants`, `items_after_test_module`). Not caused by #24.
 - [x] `cargo test --offline` — **1397** passed, **0** failed; 1 doc-test ignored.
 - [x] `cargo build --release` succeeds (**v0.1.2567**). Did not start a second process.
+
+### Closing reviewer smoke test 2026-11-10 (`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md` — GitHub #25 first hairline under icons)
+
+- [x] Entry: **`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md`** — §9 integration checklist consulted (`src/ollama.js` vs `src-tauri/dist/ollama.js` identical; `toggle_cpu_window` / `set_chat_verbosity` in `generate_handler!`; `run_due_monitor_checks` still on the 30s thread). No **FEAT-D\*** for this GitHub issue. No **`pkill -f mac_stats`** (none running on this Linux host).
+- [x] Product fix already on `main` as **v0.1.2567** (`07161fcf`): anonymous post-`#icon-line` `panel-divider` removed in Apple, Architect, Dark, Data Poster, Light, Material, Neon, Swiss; Futuristic already had none. Named dividers (`monitors-ollama-divider`, `logs-details-divider`) kept. Changelog **[0.1.2567] Fixed** already names GitHub #25. **[Unreleased]** unchanged (unrelated overnight/CI notes only); tree at **v0.1.2568**.
+- [x] `cargo check` — pass (dev profile). Linux-only unused IOReport / status-bar warnings; none from the #25 HTML divider removal.
+- [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `unnecessary_get_then_check`, `assertions_on_constants`, `items_after_test_module`). Not caused by #25.
+- [x] `cargo test --offline` — **1398** passed, **0** failed; 1 doc-test ignored.
+- [x] `cargo build --release` succeeds (**v0.1.2568**). Did not start a second process.

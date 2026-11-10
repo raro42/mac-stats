@@ -49,3 +49,17 @@ Version **v0.1.2567** (`07161fcf`).
 ### Notes
 - No Mac UI capture on this Linux host; acceptance verified via theme HTML + cargo.
 - GitHub issue #25 left open (004 closes).
+
+## Closing review (004)
+
+- Date: 2026-11-10 (23:14 CET / 22:14 UTC)
+- Ship: **v0.1.2567** (`07161fcf`) already on `main` for #25.
+- `cargo check` pass. `cargo build --release` pass (**v0.1.2568** tree; #25 fix remains in **v0.1.2567**).
+- `cargo clippy --all-targets -- -D warnings` fail (pre-existing lints; not this fix).
+- `cargo test --offline`: **1398** passed, **0** failed; 1 doc-test ignored.
+- `CHANGELOG.md` **[0.1.2567] Fixed** already names GitHub #25. No Unreleased drift for this bug.
+- Static re-check: all nine themes have zero anonymous `panel-divider` between `#icon-line` and `.monitors-section`; named `monitors-ollama-divider` / `logs-details-divider` still present.
+- Smoke block appended in `docs/design/022_feature_review_plan.md`. No FEAT-D* row. No `pkill`.
+- GitHub issue **#25** closed by 004.
+
+Handoff: complete

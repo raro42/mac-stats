@@ -6,6 +6,7 @@
 - [x] Bump version + CHANGELOG, `cargo check` / ratchet verify
 - [x] Rename `FEAT-25-…` → `UNTESTED-25-…`
 - [x] Commit and push `origin/main` (do not close GitHub issue)
+- [x] Closing review 004: cargo check / clippy / test / release; smoke block; close #25
 
 ## Notes
 GitHub: https://github.com/raro42/mac-stats/issues/25
@@ -14,4 +15,5 @@ Fix: drop that first rule so the icon row sits flush above Monitors / empty spac
 
 ## Review
 - v0.1.2567: first under-icon hairline removed (#25).
-- Issue #25 left open for tester / 004.
+- Closing review 004: smoke pass; CHANGELOG already aligned; issue #25 closed.
+- Handoff: complete
