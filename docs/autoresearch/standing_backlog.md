@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2560
+
+- Instant `/keep-p7` · `keep p7` · `p7 keep gap` · `7th percentile keep gap` · `p7 gap between keeps` (+ discard) — nearest-rank p7 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters; digit-safe vs p70/p75/p17). Standing P0 after `/keep-p9` v0.1.2559. Next: other ratchet glance (`/keep-p3` / `/keep-p4`), or Mac capture when TCC allows; Dark layout-daily tomorrow.
+
 ## Overnight merge — v0.1.2559
 
 - Instant `/keep-p9` · `keep p9` · `p9 keep gap` · `9th percentile keep gap` · `p9 gap between keeps` (+ discard) — nearest-rank p9 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters; digit-safe vs p90/p95/p98/p99/p92). Standing P0 after `/keep-p6` v0.1.2558 (intentional resting scrollbar glass left alone). Next: other ratchet glance, or Mac capture when TCC allows; Dark layout-daily tomorrow.
