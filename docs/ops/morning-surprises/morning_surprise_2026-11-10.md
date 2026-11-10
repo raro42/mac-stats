@@ -4,6 +4,7 @@ Overnight autoresearch (Track B) kept shipping.
 
 ## Shipped tonight (highlights)
 
+- **v0.1.2570** — Instant `/keep-p19` nearest-rank keep/discard gap glance (+ digester Slowest filters; digit-safe vs p1/p9/p18). Densifies the ladder between `/keep-p18` and `/keep-p20`.
 - **v0.1.2569** — Instant `/keep-p17` nearest-rank keep/discard gap glance (+ digester Slowest filters; digit-safe vs p1/p7/p16). Densifies the ladder between `/keep-p16` and `/keep-p18`.
 - **v0.1.2568** — Instant `/keep-p16` nearest-rank keep/discard gap glance.
 - **v0.1.2567** — Removed the first hairline under the section icon row (#25). Themes no longer paint a divider between icons and External / Monitors (futuristic already had none).
@@ -16,8 +17,8 @@ Overnight autoresearch (Track B) kept shipping.
 - Design review still in grace; layout-daily data-poster already marked for the day (Dark next).
 - Sibling OpenClaw/Hermes repos missing on this Linux rack.
 - Debug.log quiet (no ERROR/WARN clusters in the scan window).
+- Intentional resting scrollbar glass left alone.
 
-## Next
+## Ratchet
 
-- `/keep-p19` ratchet glance, or Mac window capture when TCC allows.
-- Dark layout-daily when due.
+- Latest keep: v0.1.2570 `/keep-p19` @ 59487acb
