@@ -8,6 +8,12 @@
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2559] - 2026-11-10
+
+### Added
+
+- **Instant `/keep-p9`:** `/keep-p9` · `keep p9` · `p9 keep gap` · `9th percentile keep gap` · `p9 gap between keeps` · `view keep p9` / `open keep p9` (and discard variants) — nearest-rank p9 gap between consecutive keep or discard rows from `results.tsv` (tonight since 20:00 + all-time; p9 only; no row dump). Digit-safe vs `/keep-p90` / `/keep-p95` / `/keep-p98` / `/keep-p99` / `/keep-p92`. Digester Slowest filters. Densifies the ladder between `/keep-p8` and `/keep-p10`. Hermes-style ratchet glance; standing P0.
+
 ## [0.1.2558] - 2026-11-10
 
 ### Added
