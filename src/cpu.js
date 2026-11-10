@@ -3321,22 +3321,25 @@ function ensureMetricValueCopyStyles() {
     .power-value[data-metric-copy="1"] {
       position: relative;
     }
-    /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+    /* Accent glow on --panel — never mix into #ffffff (white slab on dark tiles, #22).
+       Opaque color-mix only; flat 1px ring (no soft blur shadow — Graphics and Media, #14). */
     .metric-value[data-metric-copy="1"]:hover,
     .battery-level[data-metric-copy="1"]:hover,
     .power-value[data-metric-copy="1"]:hover {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, #ffffff);
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 18%, var(--panel, var(--bg, #1c1c1e)));
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 42%, var(--panel, var(--bg, #1c1c1e)));
     }
     .metric-value[data-metric-copy="1"]:focus-visible,
     .battery-level[data-metric-copy="1"]:focus-visible,
     .power-value[data-metric-copy="1"]:focus-visible {
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #ffffff);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, var(--panel, var(--bg, #1c1c1e)));
     }
     /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
     .metric-value[data-metric-copy="1"].is-just-copied,
     .battery-level[data-metric-copy="1"].is-just-copied,
     .power-value[data-metric-copy="1"].is-just-copied {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 18%, #ffffff);
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, var(--panel, var(--bg, #1c1c1e)));
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 48%, var(--panel, var(--bg, #1c1c1e)));
     }
     .metric-value[data-metric-copy="1"].is-just-copied::after,
     .battery-level[data-metric-copy="1"].is-just-copied::after,
