@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2556
+
+- Layout-daily Data Poster: global hover scrollbar thumbs opaque (`*:hover::-webkit-scrollbar-thumb` · intensify · `html/body:hover` `scrollbar-color`) glass `color-mix(…, transparent)` → opaque `color-mix` on paper `#ffffff` with CRT remaps on Data Poster / Dark / Neon / Futuristic (resting thumbs stay transparent; after SKILL loader v0.1.2555; earlier parallel v0.1.2530 race left HEAD on transparent glass). Standing P2 #14; layout-daily data-poster marked. Next: `/keep-p8` digit-safe, or Mac capture when TCC allows; Dark layout-daily tomorrow.
+
 ## Overnight merge — v0.1.2554
 
 - Instant `/keep-p92` · `keep p92` · `p92 keep gap` · `92nd percentile keep gap` · `p92 gap between keeps` (+ discard) — nearest-rank p92 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). Standing P0 after `/keep-p32` v0.1.2553 (glass leftovers intentional scrollbar only). Next: other ratchet glance (`/keep-p8` digit-safe), or Mac capture when TCC allows; Dark layout-daily tomorrow.

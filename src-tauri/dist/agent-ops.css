@@ -285,6 +285,8 @@ html.is-occluded *::after {
  * Practically invisible scrollbars (all themes / nested panes).
  * Loads after theme cpu.css — overrides loud WKWebView / theme thumbs.
  * Thumb appears faintly only while the scrolling element is hovered.
+ * Hover thumbs are opaque paper mixes (#14) — resting stay fully transparent.
+ * CRT remaps (Data Poster / Dark / Neon / Futuristic) live at file end.
  */
 html,
 body,
@@ -324,16 +326,19 @@ body,
 }
 
 *:hover::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, currentColor 16%, transparent) !important;
+  /* Opaque hover — was color-mix(…, transparent) glass (#14). CRT remaps at file end. */
+  background: color-mix(in srgb, currentColor 16%, #ffffff) !important;
 }
 
 *:hover::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in srgb, currentColor 28%, transparent) !important;
+  /* Opaque hover — was color-mix(…, transparent) glass (#14). CRT remaps at file end. */
+  background: color-mix(in srgb, currentColor 28%, #ffffff) !important;
 }
 
 html:hover,
 body:hover {
-  scrollbar-color: color-mix(in srgb, currentColor 16%, transparent) transparent;
+  /* Opaque hover thumb + transparent track — was transparent glass (#14). */
+  scrollbar-color: color-mix(in srgb, currentColor 16%, #ffffff) transparent;
 }
 
 .dashboard-container {
@@ -26967,5 +26972,54 @@ body.theme-neon .ollama-settings-popover .popover-header h3[tabindex]:focus {
 body.theme-futuristic .settings-header h2[tabindex]:focus,
 body.theme-futuristic .ollama-settings-popover .popover-header h3[tabindex]:focus {
   outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+}
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: global hover scrollbar thumbs still
+ * mixed transparent glass (currentColor × transparent). Remap opaque mixes onto
+ * CRT shells. Resting thumbs stay fully transparent. Layout-daily Data Poster
+ * 2026-11-10 after SKILL loader v0.1.2555 (parallel v0.1.2530 race left HEAD
+ * on transparent glass); design-review chrome adjacent (polish-without-capture).
+ */
+/* OVERNIGHT v0.1.2556: global hover scrollbar thumbs CRT */
+body.theme-data-poster *:hover::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, currentColor 16%, #0b0b10) !important;
+}
+body.theme-data-poster *:hover::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, currentColor 28%, #0b0b10) !important;
+}
+body.theme-data-poster html:hover,
+body.theme-data-poster body:hover {
+  scrollbar-color: color-mix(in srgb, currentColor 16%, #0b0b10) transparent;
+}
+body.theme-dark *:hover::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, currentColor 16%, #0a0a0a) !important;
+}
+body.theme-dark *:hover::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, currentColor 28%, #0a0a0a) !important;
+}
+body.theme-dark html:hover,
+body.theme-dark body:hover {
+  scrollbar-color: color-mix(in srgb, currentColor 16%, #0a0a0a) transparent;
+}
+body.theme-neon *:hover::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, currentColor 16%, #08120c) !important;
+}
+body.theme-neon *:hover::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, currentColor 28%, #08120c) !important;
+}
+body.theme-neon html:hover,
+body.theme-neon body:hover {
+  scrollbar-color: color-mix(in srgb, currentColor 16%, #08120c) transparent;
+}
+body.theme-futuristic *:hover::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, currentColor 16%, #0b0b10) !important;
+}
+body.theme-futuristic *:hover::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, currentColor 28%, #0b0b10) !important;
+}
+body.theme-futuristic html:hover,
+body.theme-futuristic body:hover {
+  scrollbar-color: color-mix(in srgb, currentColor 16%, #0b0b10) transparent;
 }
 
