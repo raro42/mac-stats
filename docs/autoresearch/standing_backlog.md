@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2547
+
+- Instant `/keep-p55` · `keep p55` · `p55 keep gap` · `55th percentile keep gap` · `p55 gap between keeps` (+ discard) — nearest-rank p55 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). Standing P0 after `/keep-p45` v0.1.2546 (glass leftovers intentional scrollbar only). Next: other ratchet glance (`/keep-p65`), or Mac capture when TCC allows; Dark layout-daily tomorrow.
+
 ## Overnight merge — v0.1.2546
 
 - Instant `/keep-p45` · `keep p45` · `p45 keep gap` · `45th percentile keep gap` · `p45 gap between keeps` (+ discard) — nearest-rank p45 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). Standing P0 after `/keep-p35` v0.1.2545 (glass leftovers intentional scrollbar only). Next: other ratchet glance (`/keep-p55` / `/keep-p65`), or Mac capture when TCC allows; Dark layout-daily tomorrow.
