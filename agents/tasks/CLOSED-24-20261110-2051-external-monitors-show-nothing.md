@@ -47,3 +47,17 @@ Version **v0.1.2566** (`8a6241eb`).
 ### Notes
 - No Mac UI capture on this Linux host; acceptance verified via static JS + cargo.
 - GitHub issue #24 left open (004 closes).
+
+## Closing review (004)
+
+- Date: 2026-11-10 (22:58 CET / 21:58 UTC)
+- Ship: **v0.1.2566** (`8a6241eb`) already on `main` for #24.
+- `cargo check` pass. `cargo build --release` pass (**v0.1.2567** tree; #24 fix remains in **v0.1.2566**).
+- `cargo clippy --all-targets -- -D warnings` fail (pre-existing lints; not this fix).
+- `cargo test --offline`: **1397** passed, **0** failed; 1 doc-test ignored.
+- `CHANGELOG.md` **[0.1.2566] Fixed** already names GitHub #24. No Unreleased drift for this bug.
+- Static re-check: `applyIconPaneVisibilityFromLocalEarly()` + `scheduleMonitoringFeaturesOnce()` / focus-resume `ensureMonitorsListHydrated()`. `src/cpu.js` ↔ `src-tauri/dist/cpu.js` in sync.
+- Smoke block appended in `docs/design/022_feature_review_plan.md`. No FEAT-D* row. No `pkill`.
+- GitHub issue **#24** closed by 004.
+
+Handoff: complete
