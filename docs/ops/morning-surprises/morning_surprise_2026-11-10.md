@@ -3,6 +3,7 @@
 Overnight autoresearch (Track B) kept shipping while digester stayed empty.
 
 ## Shipped tonight
+- **v0.1.2552** — Instant `/keep-p28` (nearest-rank p28 gap between consecutive keep/discard rows; densifies between `/keep-p25` and `/keep-p30`).
 - **v0.1.2551** — Instant `/keep-p22` (nearest-rank p22 gap between consecutive keep/discard rows; densifies between `/keep-p20` and `/keep-p25`).
 - **v0.1.2550** — Instant `/keep-p18` (nearest-rank p18 gap between consecutive keep/discard rows; densifies between `/keep-p15` and `/keep-p20`).
 - **v0.1.2549** — Instant `/keep-p12` (nearest-rank p12 gap between consecutive keep/discard rows; densifies between `/keep-p10` and `/keep-p15`).
@@ -19,5 +20,5 @@ Overnight autoresearch (Track B) kept shipping while digester stayed empty.
 - Glass leftovers: intentional scrollbar only.
 
 ## Next
-- Other ratchet glance, or Mac capture when TCC allows.
+- Other ratchet glance (`/keep-p8` with digit-safe mentions helper, or `/keep-p32` / `/keep-p92`), or Mac capture when TCC allows.
 - Dark layout-daily tomorrow.
