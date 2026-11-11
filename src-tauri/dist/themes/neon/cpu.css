@@ -181,6 +181,13 @@ body::before {
   color: color-mix(in srgb, #e1ffeb 95%, #08120c);
 }
 
+/* Opaque CRT focus ring — was missing (Apple/Data Poster already had it) (#14). */
+.icon-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
+  outline-offset: 1px;
+  z-index: 1;
+}
+
 .divider {
   height: 1px;
   /* Opaque divider peak — was green glass rgba gradient (#14). */

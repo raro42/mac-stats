@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2603
+
+- CRT header icon-btn focus: Dark / Neon / Futuristic `.icon-btn:focus-visible` was missing (Apple / Data Poster already had it). Accent rings on CRT paper `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after Swiss Send disabled v0.1.2602; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, leftover CRT gaps (settings attention-glance hover/focus Apple mixes if still muddy), or sibling/product fuel — not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2602
 
 - Swiss AI Chat Send disabled: `#chat-send-btn:disabled` was missing (Light / Material / Architect / Dark / Apple already shipped). Opaque muted wash on Swiss paper `#ffffff`. Standing P2 #14 after Send focus Light/Material/Architect v0.1.2601; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, Dark/Neon/Futuristic `.icon-btn:focus-visible` if still missing (Apple/Data Poster have it), or sibling/product fuel — not another keep-pNN clone.

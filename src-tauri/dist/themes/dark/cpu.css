@@ -166,6 +166,13 @@ body {
   background: color-mix(in srgb, #00ff00 6%, #0a0a0a);
 }
 
+/* Opaque CRT focus ring — was missing (Apple/Data Poster already had it) (#14). */
+.icon-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
+  outline-offset: 1px;
+  z-index: 1;
+}
+
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
