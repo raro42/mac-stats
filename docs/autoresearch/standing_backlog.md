@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2613
+
+- Data Poster AI Chat / Monitors menu + popover focus: `.monitors-menu-item:focus-visible` / `.ollama-menu-item:focus-visible` and Monitors / AI Chat `.popover-close:focus-visible` were missing (Apple already had them). Accent rings on CRT paper `#0b0b10`. Layout-daily Data Poster 2026-11-12 (Standing P2 #14 after ollama-menu-btn v0.1.2612); digester empty; design-review grace; not keep-pNN. Next: Dark/Neon/Futuristic/Light same menu-item + popover-close focus if still Apple-only, Dark layout-daily next calendar day, Mac capture when TCC allows, leftover `.monitor-remove-btn` / `.add-btn-small` focus on non–Data Poster themes, or sibling/product fuel — not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2612
 
 - AI Chat menu button focus: Light / Material / Architect / Swiss Minimalistic / Dark / Neon / Futuristic `.ollama-menu-btn:focus-visible` was missing (Apple / Data Poster already had it). Accent rings on theme paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` / `#ffffff` / `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after Light section/FQ/monitors v0.1.2611 (local race discard of same Light keep); product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, leftover focus gaps (`.monitor-remove-btn` / `.add-btn-small` / popover-close / menu-item focus if still Apple-only), or sibling/product fuel — not another keep-pNN clone.
