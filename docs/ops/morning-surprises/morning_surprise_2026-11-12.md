@@ -1,29 +1,21 @@
 # Morning surprise — 2026-11-12
 
-Overnight autoresearch kept real product polish (not digester-empty quiet).
+Overnight Track B kept product focus polish for keyboard users on opaque shells.
 
 ## Shipped
 
-- **v0.1.2614** — Dark / Neon / Futuristic Monitors / AI Chat menu-item + popover-close + Add / Remove focus rings on CRT paper `#0a0a0a` / `#08120c` / `#0b0b10` (Apple / Data Poster parity after layout-daily v0.1.2613).
-- **v0.1.2613** — Layout-daily Data Poster `.monitors-menu-item:focus-visible` / `.ollama-menu-item:focus-visible` + Monitors / AI Chat `.popover-close:focus-visible` on `#0b0b10` (Apple parity; Standing P2 #14).
-- **v0.1.2611** — Light / Material / Architect / Swiss Minimalistic `.collapsible-header:focus-visible` / `.force-quit-btn:focus-visible` / `.monitors-menu-btn:focus-visible` accent + danger rings on `#f7f7fa` / `#ebe4d9` / `#f1f1f1` / `#ffffff` (Apple / CRT parity after v0.1.2610; Standing P2 #14).
-- **v0.1.2610** — Dark / Neon / Futuristic `.collapsible-header:focus-visible` / `.force-quit-btn:focus-visible` / `.monitors-menu-btn:focus-visible` + Data Poster collapsible-header focus on CRT paper `#0a0a0a` / `#08120c` / `#0b0b10` (Apple parity; Standing P2 #14 after CRT collapse v0.1.2609).
-- **v0.1.2609** — Dark / Neon / Futuristic `.collapse-btn:focus-visible` + Data Poster / Dark / Neon / Futuristic `.theme-version:focus-visible` CRT accent rings on `#0a0a0a` / `#08120c` / `#0b0b10` (was missing; Apple / Light / Material / Architect / Swiss already had both; Data Poster had collapse only).
-- **v0.1.2608** — Light / Material / Architect / Swiss Minimalistic `.collapse-btn:focus-visible` + `.theme-version:focus-visible` / `.arch-version:focus-visible` accent rings on `#f7f7fa` / `#ebe4d9` / `#f1f1f1` / `#ffffff` (Apple `.app-version` / collapse parity; Data Poster already had collapse).
-- **v0.1.2607** — Data Poster / Dark / Neon / Futuristic `.icon-line-item:focus-visible` CRT accent rings on `#0b0b10` / `#0a0a0a` / `#08120c` (was missing; Apple / Light / Material / Architect / Swiss already had it).
-- **v0.1.2606** — Light / Material / Architect / Swiss Minimalistic `.icon-line-item:focus-visible` accent rings on `#f7f7fa` / `#ebe4d9` / `#f1f1f1` / `#ffffff`.
-- **v0.1.2605** — Light / Material / Architect / Swiss / Dark / Neon / Futuristic `.theme-item:focus-visible` accent rings on theme paper (was missing; Apple / Data Poster already had it).
-- **v0.1.2604** — Light / Material / Architect / Swiss Minimalistic `.icon-btn:focus-visible` accent rings on `#f7f7fa` / `#ebe4d9` / `#f1f1f1` / `#ffffff`.
-- **v0.1.2603** — Dark / Neon / Futuristic `.icon-btn:focus-visible` CRT accent rings on `#0a0a0a` / `#08120c` / `#0b0b10` (was missing; Apple / Data Poster already had it).
-- **v0.1.2602** — Swiss Minimalistic `#chat-send-btn:disabled` opaque muted wash (was missing; Light/Material/Architect/Dark/Apple parity).
-- **v0.1.2601** — Light / Material / Architect `#chat-send-btn:focus-visible` / `:active` / `:disabled` on theme paper.
-- **v0.1.2600** — Agent Ops `.ops-close-btn:focus-visible` keyboard ring + CRT paper remaps on Data Poster / Dark / Neon / Futuristic.
-- **v0.1.2599** — Dark / Neon / Futuristic `.chat-filter-chip:focus-visible` (+ Futuristic empty-chip) CRT remaps.
-- **v0.1.2597** — Serialize `monitor_history.json` RMW behind a process-wide mutex.
+- **v0.1.2615** — Light / Material / Architect / Swiss Minimalistic Monitors + AI Chat menu-item / popover-close / Remove / Add `:focus-visible` rings on theme paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1` / `#ffffff`). Standing P2 #14 after CRT v0.1.2614.
+- **v0.1.2614** — Dark / Neon / Futuristic same Monitors + AI Chat menu / popover / Remove / Add focus set on CRT paper.
+- **v0.1.2613** — Data Poster layout-daily menu-item + popover-close focus on `#0b0b10`.
+- **v0.1.2612** — AI Chat `.ollama-menu-btn:focus-visible` across Light + CRT themes.
+- Earlier tonight: focus parity cascade (section headers, Force Quit, collapse, icon-line, theme picker, Send disabled, Ops Close, GitHub CRT remaps) plus `monitor_history.json` RMW mutex (**v0.1.2597**).
 
-## Context
+## Fuel / process
 
-- Digester: empty (0 turns / 7d). Design review grace. Layout-daily **data-poster** marked 2026-11-12 (sibling tick shipped v0.1.2613).
-- Sibling OpenClaw/Hermes missing on Linux rack. Debug.log quiet.
-- This tick: parallel-race discard of overlapping local 2613, then shipped CRT Dark/Neon/Futuristic menu + popover focus as **v0.1.2614**.
-- Next: Light/Material/Architect/Swiss Monitors / AI Chat menu-item + popover-close + add/remove focus if still missing, Dark layout-daily when the day quota opens again, Mac capture when TCC allows, or sibling/product fuel — not keep-pNN clones.
+- Digester open stayed empty; design-review in grace; layout-daily Data Poster already marked for 2026-11-12.
+- Nightly minimum: multiple keep rows in `results.tsv` (not quiet).
+- Next morning fuel: Dark layout-daily when the calendar day quota opens; Mac window capture when TCC allows; leftover settings attention-glance Apple mixes if still muddy — not another `/keep-pNN` clone.
+
+## Ratchet
+
+- Latest keep: `9d2ac649` v0.1.2615 Light menu/popover focus.
