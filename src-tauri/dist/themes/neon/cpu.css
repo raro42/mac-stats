@@ -2205,6 +2205,13 @@ body::before {
   border-color: color-mix(in srgb, #46ff78 20%, #08120c);
 }
 
+.ollama-settings-popover .popover-btn-primary:focus-visible,
+.ollama-settings-popover .popover-btn-secondary:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
+  outline-offset: 2px;
+}
+
+
 .connection-indicator {
   width: 10px;
   height: 10px;
@@ -2304,6 +2311,13 @@ body::before {
   border-color: color-mix(in srgb, #007aff 55%, #08120c);
   background: color-mix(in srgb, #ffffff 8%, #08120c);
 }
+
+.model-select:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
+  outline-offset: 2px;
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
+}
+
 
 .model-select:hover {
   background: color-mix(in srgb, #ffffff 7%, #08120c);

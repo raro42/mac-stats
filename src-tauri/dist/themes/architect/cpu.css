@@ -2151,6 +2151,13 @@ body {
   border-color: color-mix(in srgb, #232d41 14%, #f1f1f1);
 }
 
+.ollama-settings-popover .popover-btn-primary:focus-visible,
+.ollama-settings-popover .popover-btn-secondary:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+  outline-offset: 2px;
+}
+
+
 .connection-indicator {
   width: 10px;
   height: 10px;
@@ -2254,6 +2261,13 @@ body {
   border-color: var(--accent, color-mix(in srgb, #007aff 30%, #f1f1f1));
   background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #ffffff 70%, #f1f1f1)))));
 }
+
+.model-select:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+  outline-offset: 2px;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #f1f1f1);
+}
+
 
 .model-select:hover {
   /* Opaque wash — was white glass rgba(255,255,255,0.6) fallback (#14). */
