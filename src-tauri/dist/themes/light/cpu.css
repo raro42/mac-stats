@@ -183,6 +183,13 @@ body {
   box-shadow: 0 14px 30px color-mix(in srgb, #000000 14%, #ffffff);
 }
 
+/* Opaque focus ring — was missing (Apple / Data Poster / CRT already had it) (#14). */
+.icon-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
+  outline-offset: 1px;
+  z-index: 1;
+}
+
 .icon-btn:active {
   transform: none;
 }

@@ -177,6 +177,13 @@ body {
   background: color-mix(in srgb, #232d41 8%, #f1f1f1);
 }
 
+/* Opaque focus ring — was missing (Apple / Data Poster / CRT already had it) (#14). */
+.icon-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+  outline-offset: 1px;
+  z-index: 1;
+}
+
 .icon-btn:active {
   /* Opaque active wash — was rgba(35,45,65,0.12) glass (#14). */
   background: color-mix(in srgb, #232d41 12%, #f1f1f1);

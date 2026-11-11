@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2604
+
+- Light theme header icon-btn focus: Light / Material / Architect / Swiss Minimalistic `.icon-btn:focus-visible` was missing (Apple / Data Poster / Dark / Neon / Futuristic already had it). Accent rings on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` / `#ffffff`. Standing P2 #14 after CRT icon-btn focus v0.1.2603; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, leftover CRT gaps (settings attention-glance hover/focus Apple mixes if still muddy), or sibling/product fuel — not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2603
 
 - CRT header icon-btn focus: Dark / Neon / Futuristic `.icon-btn:focus-visible` was missing (Apple / Data Poster already had it). Accent rings on CRT paper `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after Swiss Send disabled v0.1.2602; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, leftover CRT gaps (settings attention-glance hover/focus Apple mixes if still muddy), or sibling/product fuel — not another keep-pNN clone.
