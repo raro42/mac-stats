@@ -1,20 +1,29 @@
 # Morning surprise — 2026-11-11
 
-Overnight autoresearch (Track B) kept shipping.
+Overnight autoresearch (Track B) for Ralf.
 
-## Shipped tonight
-- **v0.1.2580** — Instant `/keep-p31` (digit-safe vs `/keep-p3`; densifies p30→p32).
-- **v0.1.2579** — Instant `/keep-p29` (digit-safe vs `/keep-p2` / `/keep-p9`; densifies p28→p30).
-- **v0.1.2578** — Instant `/keep-p24` (digit-safe vs `/keep-p2` / `/keep-p4`; densifies p23→p25).
-- **v0.1.2577** — Layout-daily Data Poster/Dark/Neon/Futuristic: `#refresh-btn.is-refreshing` dim ink + Ops hairline CRT remaps.
-- **v0.1.2575** — Instant `/keep-p26` digit-safe.
-- **v0.1.2573** — Instant `/keep-p21` digit-safe.
-- Earlier tonight: `/keep-p19` · `/keep-p17` · hairline #25 · `/keep-p4` and more ladder densify keeps (see `results.tsv`).
+## Shipped
+
+- **v0.1.2580** — Instant `/keep-p31` nearest-rank keep/discard gap glance (digit-safe vs `/keep-p3`; digester Slowest filters). Ladder densifies between `/keep-p30` and `/keep-p32`.
+- **v0.1.2579** — Instant `/keep-p29` nearest-rank keep/discard gap glance (digit-safe vs `/keep-p2` / `/keep-p9`; digester Slowest filters). Ladder densifies between `/keep-p28` and `/keep-p30`.
+- **v0.1.2578** — Instant `/keep-p24` nearest-rank keep/discard gap glance (digit-safe vs `/keep-p2` / `/keep-p4`; digester Slowest filters). Ladder densifies between `/keep-p23` and `/keep-p25`.
+- **v0.1.2577** — Layout-daily Data Poster / Dark / Neon / Futuristic: `#refresh-btn.is-refreshing` dim ink + Ops top refresh hairline CRT remaps (Apple white → paper).
+- **v0.1.2576** — Instant `/keep-p27` digit-safe nearest-rank gap glance.
+- **v0.1.2575** — Instant `/keep-p26` digit-safe nearest-rank gap glance.
+- **v0.1.2574** — Instant `/keep-p23` digit-safe nearest-rank gap glance.
+- **v0.1.2572** — Instant `/keep-p14` digit-safe nearest-rank gap glance.
+- **v0.1.2571** — Instant `/keep-p11` digit-safe nearest-rank gap glance.
 
 ## Tried / discarded
-- Parallel-race discards on raced rebuilds of `/keep-p29` (this tick), `/keep-p24`, `/keep-p11`, `/keep-p14` — origin keep stood.
 
-## Fuel note
-- Digester open empty (0 turns / 7d). Design review grace. Layout-daily data-poster marked; Dark next due theme.
-- Next: other ratchet glance (`/keep-p33` / `/keep-p34`), or Mac capture when TCC allows.
+- Parallel race on `/keep-p31` (~03:01 CET) — local v0.1.2580 rebuild discarded; origin already shipped `e3d80450`.
+- Parallel races earlier tonight on `/keep-p17` / `/keep-p19` (local discarded; origin already shipped).
 
+## Notes
+
+- Digester open stayed empty most of the night — standing backlog + layout-daily fueled keeps.
+- Design-review surfaces still in grace (Agent Ops oldest).
+- Layout-daily data-poster marked today; Dark next due theme.
+- Next standing: `/keep-p33` / `/keep-p34` digit-safe, or Mac capture when TCC allows.
+
+Updated: 2026-11-11 ~03:01 CET after race-discard @ bfe3105 (origin keep v0.1.2580 stands).
