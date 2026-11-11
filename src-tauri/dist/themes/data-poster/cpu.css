@@ -1529,6 +1529,12 @@ body {
   background: color-mix(in srgb, #ffffff 8%, #0b0b10);
 }
 
+.monitors-menu-item:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #0b0b10);
+  outline-offset: -2px;
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
+}
+
 .monitors-settings-popover {
   position: fixed;
   inset: 0;
@@ -1593,6 +1599,12 @@ body {
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitors-settings-popover .popover-close:hover {
   background: color-mix(in srgb, #ffffff 8%, #0b0b10);
+  color: var(--text, var(--ink, inherit));
+}
+
+.monitors-settings-popover .popover-close:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #0b0b10);
+  outline-offset: 2px;
   color: var(--text, var(--ink, inherit));
 }
 
@@ -1969,6 +1981,12 @@ body {
   background: color-mix(in srgb, #ffffff 8%, #0b0b10);
 }
 
+.ollama-menu-item:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #0b0b10);
+  outline-offset: -2px;
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
+}
+
 .ollama-settings-popover {
   position: fixed;
   inset: 0;
@@ -2029,6 +2047,12 @@ body {
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ollama-settings-popover .popover-close:hover {
   background: color-mix(in srgb, #ffffff 8%, #0b0b10);
+  color: var(--text, var(--ink, inherit));
+}
+
+.ollama-settings-popover .popover-close:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #0b0b10);
+  outline-offset: 2px;
   color: var(--text, var(--ink, inherit));
 }
 
