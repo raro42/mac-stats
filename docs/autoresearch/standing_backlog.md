@@ -1,6 +1,6 @@
 ## Overnight merge — v0.1.2596
 
-- Footer GitHub CRT remaps: Data Poster / Dark / Neon / Futuristic `#github-link:hover` / `:focus-visible` / `[aria-busy]` / `[aria-disabled]` Apple `#ffffff` → CRT paper (`#0b0b10` / `#0a0a0a` / `#08120c`). Standing P2 #14 after refresh dim CRT v0.1.2577 / Architect layout-daily gate v0.1.2595; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, or sibling/product fuel (not another keep-pNN clone).
+- Footer GitHub CRT remaps: Data Poster / Dark / Neon / Futuristic `#github-link:hover` / `:focus-visible` / `[aria-busy]` / `[aria-disabled]` Apple `#ffffff` → CRT paper (`#0b0b10` / `#0a0a0a` / `#08120c`). Standing P2 #14 after refresh dim CRT v0.1.2577 / Architect layout-daily gate v0.1.2595; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: **serialize `monitor_history.json` RMW** with a process-wide mutex in `commands/monitors.rs` (`record_monitor_history_tick` / clear / history getters) so background checks + “Check now” cannot drop each other’s 24h ticks (atomic write alone is not enough); or Dark layout-daily when the day quota opens / Mac capture when TCC allows — not another keep-pNN clone.
 
 ## Overnight merge — v0.1.2595
 
