@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2577
+
+- Layout-daily Data Poster / Dark / Neon / Futuristic: `#refresh-btn.is-refreshing` dim ink + `.ops-refresh-row.ops-refresh-row-top` hairline Apple `#ffffff` → CRT paper (`#0b0b10` / `#0a0a0a` / `#08120c`). Standing P2 #14 after hover-scrollbar CRT v0.1.2556; layout-daily data-poster marked 2026-11-11. Next: Instant `/keep-p24` digit-safe (missing between p23 and p25), or Mac capture when TCC allows; Dark layout-daily next due theme.
+
 ## Overnight merge — v0.1.2576
 
 - Instant `/keep-p27` · `keep p27` · `p27 keep gap` · `27th percentile keep gap` · `p27 gap between keeps` (+ discard) — nearest-rank p27 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters; digit-safe vs p2/p7). Standing P0 after `/keep-p26` v0.1.2575. Next: other ratchet glance (`/keep-p24` / `/keep-p29`), or Mac capture when TCC allows; Dark layout-daily today.
