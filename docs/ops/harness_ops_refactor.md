@@ -40,11 +40,15 @@ commands/harness_ops/
 1. **New keep percentiles** — use `/keep-p{N}` (1–99) via `parse_keep_percentile`.
    Do **not** add `looks_like_results_tsv_pNN_request` or
    `format_results_tsv_pNN_gateway`.
-2. **New path/size/age file lanes** — add a `ResourceLane` (nouns + short phrases).
+2. **Ops help + digester** — keep one parameterized `/keep-p{N}` bullet in
+   `format_ops_help_gateway`, and use `looks_like_keep_percentile_ask` in
+   `scripts/digest_agent_runs.py`. Do **not** grow per-N Slowest needles or
+   help lines again (v0.1.2594).
+3. **New path/size/age file lanes** — add a `ResourceLane` (nouns + short phrases).
    Do **not** clone exclusion laundry lists. Sibling excludes stay string-only.
-3. **Sibling path excludes** — never call other `looks_like_*` from a path matcher
+4. **Sibling path excludes** — never call other `looks_like_*` from a path matcher
    (see `2026-09-15-instant-lane-path-nesting-hang.md`).
-4. **Line budget** — `python3 scripts/check_harness_ops_budget.py` must pass.
+5. **Line budget** — `python3 scripts/check_harness_ops_budget.py` must pass.
 
 ## Related
 

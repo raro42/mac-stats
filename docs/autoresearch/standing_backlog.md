@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2594
+
+- Collapse Instant `/keep-p{N}` ops-help + digester Slowest filters onto the parameterized lane (1–99) after harness_ops split — no more per-N Discord bullets or digester needles. Standing P0 after `/keep-p48` v0.1.2593 / god-file collapse. Next: Dark layout-daily (next due theme), Mac capture when TCC allows, or sibling/product fuel (not another keep-pNN clone).
+
 ## Overnight merge — v0.1.2593
 
 - Instant `/keep-p48` · `keep p48` · `p48 keep gap` · `48th percentile keep gap` · `p48 gap between keeps` (+ discard) — nearest-rank p48 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters; digit-safe vs p4/p8/p40/p44/p45/p46/p47/p14). Standing P0 after `/keep-p47` v0.1.2592. Next: other ratchet glance (`/keep-p49` / `/keep-p51`), or Mac capture when TCC allows; Dark layout-daily next due theme.
