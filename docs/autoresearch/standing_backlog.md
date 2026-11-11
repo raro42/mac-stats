@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2600
+
+- CRT Agent Ops Close focus: `.ops-close-btn:focus-visible` keyboard ring (was missing) + Data Poster / Dark / Neon / Futuristic Apple `#ffffff` → CRT paper. Standing P2 #14 after chat-filter CRT v0.1.2599; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, leftover CRT gaps (settings attention-glance hover/focus Apple mixes if still muddy, or sibling/product fuel) — not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2599
 
 - CRT chat focus remaps: Dark / Neon / Futuristic `.chat-filter-chip:focus-visible` + Futuristic `.chat-empty-chip:focus-visible` Apple `#ffffff` → CRT paper (`#0a0a0a` / `#08120c` / `#0b0b10`). Standing P2 #14 after logs-path / cpu-usage / perplexity disabled CRT v0.1.2598; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, leftover CRT gaps (settings attention-glance hover/focus Apple mixes if still muddy, or sibling/product fuel) — not another keep-pNN clone.

@@ -2049,6 +2049,15 @@ body.theme-futuristic .icon-line-item:not(.status-good):not(.status-bad):not(.st
   background: color-mix(in srgb, currentColor 8%, #ffffff);
 }
 
+/* Opaque focus — was missing; CRT remaps at file end (Standing P2 #14). */
+.ops-close-btn:focus-visible {
+  outline: none;
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
+  background: color-mix(in srgb, currentColor 8%, #ffffff);
+  border-color: color-mix(in srgb, #0a84ff 55%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ffffff);
+}
+
 .agent-ops-section .section-header-collapsible,
 .agent-ops-section .section-header {
   display: flex;
@@ -27218,5 +27227,42 @@ body.theme-futuristic .chat-filter-chip:focus-visible {
 }
 body.theme-futuristic .chat-empty-chip:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+}
+
+/*
+ * OVERNIGHT v0.1.2600: Agent Ops Close focus CRT.
+ * `.ops-close-btn:focus-visible` was missing (keyboard Tab had no ring) and the
+ * Apple `#ffffff` mix would slab on CRT paper. Standing P2 #14 after chat-filter
+ * CRT v0.1.2599; product fuel (not keep-pNN; layout-daily already marked
+ * data-poster today). Polish-without-capture.
+ */
+/* OVERNIGHT v0.1.2600: ops-close focus CRT */
+body.theme-data-poster .ops-close-btn:focus-visible {
+  outline: none;
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
+}
+body.theme-dark .ops-close-btn:focus-visible {
+  outline: none;
+  color: color-mix(in srgb, #00ff00 88%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+  border-color: color-mix(in srgb, #00cc66 55%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #00cc66 18%, #0a0a0a);
+}
+body.theme-neon .ops-close-btn:focus-visible {
+  outline: none;
+  color: color-mix(in srgb, #ffffff 88%, #08120c);
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+  border-color: color-mix(in srgb, #6dff7b 55%, #08120c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #6dff7b 18%, #08120c);
+}
+body.theme-futuristic .ops-close-btn:focus-visible {
+  outline: none;
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
 }
 
