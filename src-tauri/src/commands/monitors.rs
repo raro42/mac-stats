@@ -46,6 +46,21 @@ fn monitor_history_path() -> std::path::PathBuf {
     Config::monitor_history_file_path()
 }
 
+/// Serialize all `monitor_history.json` read-modify-write paths.
+/// Atomic rename alone does not stop two checks from loading the same snapshot
+/// and each dropping the other's new 24h tick (background + "Check now").
+fn monitor_history_file_lock() -> &'static Mutex<()> {
+    static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+    LOCK.get_or_init(|| Mutex::new(()))
+}
+
+fn with_monitor_history_file_lock<T>(f: impl FnOnce() -> T) -> T {
+    let _guard = monitor_history_file_lock()
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    f()
+}
+
 fn prune_monitor_history_entries(entries: &mut Vec<MonitorHistoryEntry>, now_ms: i64) {
     let cutoff = now_ms - MONITOR_HISTORY_RETENTION_MS;
     entries.retain(|e| e.timestamp >= cutoff);
@@ -70,54 +85,62 @@ fn save_monitor_history_file(file: &MonitorHistoryFile) -> Result<(), String> {
 
 /// Record one real HTTP check for the green/red history bars (works with CPU window closed).
 fn record_monitor_history_tick(monitor_id: &str, is_up: bool, at: chrono::DateTime<chrono::Utc>) {
-    let now_ms = at.timestamp_millis();
-    let mut file = load_monitor_history_file();
-    let entries = file.monitors.entry(monitor_id.to_string()).or_default();
-    // Dedup same-second spam if check_monitor is invoked twice quickly.
-    if let Some(last) = entries.last() {
-        if last.is_up == is_up && (now_ms - last.timestamp).abs() < 5_000 {
-            return;
+    with_monitor_history_file_lock(|| {
+        let now_ms = at.timestamp_millis();
+        let mut file = load_monitor_history_file();
+        let entries = file.monitors.entry(monitor_id.to_string()).or_default();
+        // Dedup same-second spam if check_monitor is invoked twice quickly.
+        if let Some(last) = entries.last() {
+            if last.is_up == is_up && (now_ms - last.timestamp).abs() < 5_000 {
+                return;
+            }
         }
-    }
-    entries.push(MonitorHistoryEntry {
-        timestamp: now_ms,
-        is_up,
-    });
-    prune_monitor_history_entries(entries, now_ms);
-    if let Err(e) = save_monitor_history_file(&file) {
-        tracing::debug!("Monitor history: save failed for {}: {}", monitor_id, e);
-    }
+        entries.push(MonitorHistoryEntry {
+            timestamp: now_ms,
+            is_up,
+        });
+        prune_monitor_history_entries(entries, now_ms);
+        if let Err(e) = save_monitor_history_file(&file) {
+            tracing::debug!("Monitor history: save failed for {}: {}", monitor_id, e);
+        }
+    })
 }
 
 fn clear_monitor_history_for(monitor_id: &str) {
-    let mut file = load_monitor_history_file();
-    if file.monitors.remove(monitor_id).is_some() {
-        let _ = save_monitor_history_file(&file);
-    }
+    with_monitor_history_file_lock(|| {
+        let mut file = load_monitor_history_file();
+        if file.monitors.remove(monitor_id).is_some() {
+            let _ = save_monitor_history_file(&file);
+        }
+    })
 }
 
 /// Last 24h of real background/manual checks for one monitor (history bars).
 #[tauri::command]
 pub fn get_monitor_check_history(monitor_id: String) -> Result<Vec<MonitorHistoryEntry>, String> {
-    let now_ms = chrono::Utc::now().timestamp_millis();
-    let mut file = load_monitor_history_file();
-    let Some(entries) = file.monitors.get_mut(&monitor_id) else {
-        return Ok(Vec::new());
-    };
-    prune_monitor_history_entries(entries, now_ms);
-    Ok(entries.clone())
+    with_monitor_history_file_lock(|| {
+        let now_ms = chrono::Utc::now().timestamp_millis();
+        let mut file = load_monitor_history_file();
+        let Some(entries) = file.monitors.get_mut(&monitor_id) else {
+            return Ok(Vec::new());
+        };
+        prune_monitor_history_entries(entries, now_ms);
+        Ok(entries.clone())
+    })
 }
 
 /// Last 24h of real checks for all monitors (one round-trip for the CPU window).
 #[tauri::command]
 pub fn get_all_monitor_check_histories() -> Result<HashMap<String, Vec<MonitorHistoryEntry>>, String>
 {
-    let now_ms = chrono::Utc::now().timestamp_millis();
-    let mut file = load_monitor_history_file();
-    for entries in file.monitors.values_mut() {
-        prune_monitor_history_entries(entries, now_ms);
-    }
-    Ok(file.monitors)
+    with_monitor_history_file_lock(|| {
+        let now_ms = chrono::Utc::now().timestamp_millis();
+        let mut file = load_monitor_history_file();
+        for entries in file.monitors.values_mut() {
+            prune_monitor_history_entries(entries, now_ms);
+        }
+        Ok(file.monitors)
+    })
 }
 
 /// True when up/down or error text changed (ignore response-time jitter).
@@ -1331,6 +1354,35 @@ mod monitor_interval_tests {
         assert_eq!(entries.len(), 2);
         assert!(!entries[0].is_up);
         assert!(entries[1].is_up);
+    }
+
+    /// Guard: concurrent background + "Check now" must not RMW-clobber ticks.
+    #[test]
+    fn monitor_history_rmw_uses_process_wide_mutex() {
+        let src = include_str!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/src/commands/monitors.rs"
+        ));
+        assert!(
+            src.contains("fn monitor_history_file_lock()")
+                && src.contains("with_monitor_history_file_lock"),
+            "monitor_history.json RMW must serialize via a process-wide mutex"
+        );
+        for needle in [
+            "fn record_monitor_history_tick",
+            "fn clear_monitor_history_for",
+            "pub fn get_monitor_check_history",
+            "pub fn get_all_monitor_check_histories",
+        ] {
+            let idx = src
+                .find(needle)
+                .unwrap_or_else(|| panic!("missing {needle}"));
+            let window = &src[idx..idx.saturating_add(450).min(src.len())];
+            assert!(
+                window.contains("with_monitor_history_file_lock"),
+                "{needle} should run under with_monitor_history_file_lock"
+            );
+        }
     }
 
     #[test]
