@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2601
+
+- AI Chat Send keyboard focus on Light / Material / Architect: `#chat-send-btn:focus-visible` / `:active` / `:disabled` were missing (Apple / Swiss / Dark already shipped). Mix on theme paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`. Standing P2 #14 after Ops Close focus CRT v0.1.2600; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, Swiss `#chat-send-btn:disabled` if still missing, or sibling/product fuel — not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2600
 
 - CRT Agent Ops Close focus: `.ops-close-btn:focus-visible` keyboard ring (was missing) + Data Poster / Dark / Neon / Futuristic Apple `#ffffff` → CRT paper. Standing P2 #14 after chat-filter CRT v0.1.2599; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, leftover CRT gaps (settings attention-glance hover/focus Apple mixes if still muddy, or sibling/product fuel) — not another keep-pNN clone.
