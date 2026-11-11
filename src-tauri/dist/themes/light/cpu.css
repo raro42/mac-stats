@@ -1456,6 +1456,11 @@ body {
   border-color: #dcdce2;
 }
 
+.icon-line-item:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
+  outline-offset: 2px;
+}
+
 .icon-line-item:active {
   transform: none;
 }
