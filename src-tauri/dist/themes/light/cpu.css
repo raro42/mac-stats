@@ -258,6 +258,12 @@ body {
   background: color-mix(in srgb, currentColor 6%, #f7f7fa);
 }
 
+.collapsible-header:focus-visible {
+  outline: none;
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, #f7f7fa);
+}
+
 .metric-label {
   position: relative;
   z-index: 2;
@@ -870,6 +876,11 @@ body {
 .force-quit-btn:hover {
   background: color-mix(in srgb, #ff3b30 15%, #ffffff);
   border-color: color-mix(in srgb, #ff3b30 40%, #ffffff);
+}
+
+.force-quit-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, #ff3b30 70%, #f7f7fa);
+  outline-offset: 2px;
 }
 
 .force-quit-btn:active {
@@ -1697,6 +1708,12 @@ body {
 .monitors-menu-btn:hover {
   /* Opaque wash — was gray glass rgba(128,…) fallback (#14). */
   background: var(--hairline, color-mix(in srgb, #808080 10%, #ffffff));
+  color: var(--text, var(--ink, inherit));
+}
+
+.monitors-menu-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
+  outline-offset: 2px;
   color: var(--text, var(--ink, inherit));
 }
 
