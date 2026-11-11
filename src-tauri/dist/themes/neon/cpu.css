@@ -1320,6 +1320,11 @@ body::before {
   border-color: #2a5a32;
 }
 
+.icon-line-item:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
+  outline-offset: 2px;
+}
+
 .icon-line-item:active {
   transform: none;
 }
