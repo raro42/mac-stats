@@ -925,6 +925,11 @@ body {
   color: var(--ink);
 }
 
+.arch-version:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+  outline-offset: 2px;
+}
+
 .arch-version:active {
   /* Was opacity 0.6 on inherit (~28% ink) → ~17% ink on the shell fill. */
   color: color-mix(in srgb, #232d41 17%, #f1f1f1);
@@ -1438,6 +1443,12 @@ body {
   /* Opaque hairline wash — was gray glass rgba(128,…) fallback (#14). */
   background: var(--hairline, color-mix(in srgb, #808080 10%, #f1f1f1));
   color: var(--text, var(--ink, inherit));
+}
+
+.collapse-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+  outline-offset: 2px;
+  color: var(--text);
 }
 
 .section-content-collapsible {

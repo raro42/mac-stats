@@ -550,6 +550,11 @@ body {
   color: var(--text);
 }
 
+.theme-version:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
+  outline-offset: 2px;
+}
+
 .theme-version:active {
   /* Was opacity 0.6 on inherit (~28% ink) → ~17% ink on the shell fill. */
   color: color-mix(in srgb, #18181a 17%, #ebe4d9);
@@ -1463,6 +1468,12 @@ body {
   /* Opaque wash — was gray glass rgba(128,…) fallback (#14). */
   background: var(--hairline, color-mix(in srgb, #808080 10%, #e7e2d9));
   color: var(--text, var(--ink, inherit));
+}
+
+.collapse-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
+  outline-offset: 2px;
+  color: var(--text);
 }
 
 .section-content-collapsible {
