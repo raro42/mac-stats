@@ -27023,3 +27023,47 @@ body.theme-futuristic body:hover {
   scrollbar-color: color-mix(in srgb, currentColor 16%, #0b0b10) transparent;
 }
 
+/*
+ * Data Poster / Dark / Neon / Futuristic: header Refresh dim
+ * (`#refresh-btn.is-refreshing`) still mixed Apple dark-ink-on-`#ffffff`, and
+ * Agent Ops refresh-row hairline (`.ops-refresh-row.ops-refresh-row-top`) still
+ * mixed the bottom border onto `#ffffff` → muddy wash / white slab on CRT
+ * shells while is-just-saved refresh + ops-updated-ago already remap. Remap
+ * dim ink to light-on-shell (62%) and hairline onto CRT paper. Layout-daily
+ * Data Poster 2026-11-11 (AI Chat + Monitors / Agent Ops adjacent;
+ * polish-without-capture; Mac capture still TCC-blocked). Standing P2 #14
+ * after hover-scrollbar CRT v0.1.2556.
+ */
+/* OVERNIGHT v0.1.2577: refresh dim + ops refresh-row hairline CRT */
+body.theme-data-poster #refresh-btn.is-refreshing {
+  color: color-mix(in srgb, #ffffff 62%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .ops-refresh-row.ops-refresh-row-top {
+  border-bottom-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+}
+
+body.theme-dark #refresh-btn.is-refreshing {
+  color: color-mix(in srgb, #ffffff 62%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .ops-refresh-row.ops-refresh-row-top {
+  border-bottom-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+}
+
+body.theme-neon #refresh-btn.is-refreshing {
+  color: color-mix(in srgb, #ffffff 62%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .ops-refresh-row.ops-refresh-row-top {
+  border-bottom-color: color-mix(in srgb, currentColor 10%, #08120c);
+}
+
+body.theme-futuristic #refresh-btn.is-refreshing {
+  color: color-mix(in srgb, #ffffff 62%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .ops-refresh-row.ops-refresh-row-top {
+  border-bottom-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+}
+

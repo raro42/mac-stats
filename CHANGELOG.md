@@ -8,6 +8,12 @@
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2577] - 2026-11-11
+
+### Fixed
+
+- **Layout-daily Data Poster / Dark / Neon / Futuristic:** header Refresh dim (`#refresh-btn.is-refreshing`) no longer mixes Apple dark-ink-on-`#ffffff`, and Agent Ops refresh-row hairline (`.ops-refresh-row.ops-refresh-row-top`) no longer mixes its bottom border onto `#ffffff`. Both remap onto CRT paper (`#0b0b10` / `#0a0a0a` / `#08120c`) so the busy Refresh glyph and Ops divider stay readable on opaque shells (AI Chat + Monitors / Agent Ops adjacent).
+
 ## [0.1.2576] - 2026-11-11
 
 ### Added
