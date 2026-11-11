@@ -9,6 +9,12 @@
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2615] - 2026-11-12
+
+### Changed
+
+- **Light AI Chat / Monitors menu + popover focus:** Light / Material / Architect / Swiss Minimalistic `.monitors-menu-item:focus-visible` / `.ollama-menu-item:focus-visible`, Monitors / AI Chat `.popover-close:focus-visible`, plus `.monitor-remove-btn:focus-visible` / `.add-btn-small:focus-visible` were missing (Apple / Data Poster / Dark / Neon / Futuristic already had them after CRT v0.1.2614). Accent and danger rings mix on theme paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1` / `#ffffff`) so Tab through ⋮ menus, settings Close, Remove, and Add stays readable on opaque light shells (Standing P2 #14).
+
 ## [0.1.2614] - 2026-11-12
 
 ### Changed

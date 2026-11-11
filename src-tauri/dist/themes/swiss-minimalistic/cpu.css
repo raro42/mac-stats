@@ -1678,6 +1678,12 @@ body {
   background: var(--hairline, color-mix(in srgb, #808080 10%, #ffffff));
 }
 
+.monitors-menu-item:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline-offset: -2px;
+  background: color-mix(in srgb, var(--text, #0c0c10) 6%, #ffffff);
+}
+
 .monitors-settings-popover {
   position: fixed;
   inset: 0;
@@ -1742,6 +1748,12 @@ body {
 .monitors-settings-popover .popover-close:hover {
   /* Opaque hairline wash — was gray glass rgba(128,…) fallback (#14). */
   background: var(--hairline, color-mix(in srgb, #808080 10%, #ffffff));
+  color: var(--text, var(--ink, inherit));
+}
+
+.monitors-settings-popover .popover-close:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline-offset: 2px;
   color: var(--text, var(--ink, inherit));
 }
 
@@ -1837,6 +1849,11 @@ body {
   border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
 }
 
+.monitor-remove-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, #ff3b30 55%, #ffffff);
+  outline-offset: 2px;
+}
+
 .add-monitor-form {
   padding-top: 20px;
   /* Opaque hairline — was black glass rgba(0,0,0,0.1) fallback (#14). */
@@ -1896,6 +1913,12 @@ body {
 .add-btn-small:hover {
   background: color-mix(in srgb, #ffffff 40%, #f6f6f6);
   border-color: color-mix(in srgb, #000000 15%, #ffffff);
+  color: var(--text, var(--ink, inherit));
+}
+
+.add-btn-small:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline-offset: 2px;
   color: var(--text, var(--ink, inherit));
 }
 
@@ -2096,6 +2119,12 @@ body {
   background: var(--hairline, color-mix(in srgb, #808080 10%, #ffffff));
 }
 
+.ollama-menu-item:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline-offset: -2px;
+  background: color-mix(in srgb, var(--text, #0c0c10) 6%, #ffffff);
+}
+
 .ollama-settings-popover {
   position: fixed;
   inset: 0;
@@ -2156,6 +2185,12 @@ body {
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ollama-settings-popover .popover-close:hover {
   background: color-mix(in srgb, #121216 8%, #ffffff);
+  color: var(--text, var(--ink, inherit));
+}
+
+.ollama-settings-popover .popover-close:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline-offset: 2px;
   color: var(--text, var(--ink, inherit));
 }
 
