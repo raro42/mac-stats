@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2602
+
+- Swiss AI Chat Send disabled: `#chat-send-btn:disabled` was missing (Light / Material / Architect / Dark / Apple already shipped). Opaque muted wash on Swiss paper `#ffffff`. Standing P2 #14 after Send focus Light/Material/Architect v0.1.2601; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, Dark/Neon/Futuristic `.icon-btn:focus-visible` if still missing (Apple/Data Poster have it), or sibling/product fuel — not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2601
 
 - AI Chat Send keyboard focus on Light / Material / Architect: `#chat-send-btn:focus-visible` / `:active` / `:disabled` were missing (Apple / Swiss / Dark already shipped). Mix on theme paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`. Standing P2 #14 after Ops Close focus CRT v0.1.2600; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, Swiss `#chat-send-btn:disabled` if still missing, or sibling/product fuel — not another keep-pNN clone.

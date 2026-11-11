@@ -2598,6 +2598,15 @@ body {
   background: color-mix(in srgb, #0064dc 95%, #ffffff);
 }
 
+/* Opaque disabled — was missing (Light/Material/Architect/Dark/Apple parity). */
+#chat-send-btn:disabled {
+  color: color-mix(in srgb, #ffffff 55%, #007aff);
+  background: color-mix(in srgb, #007aff 50%, #ffffff);
+  opacity: 1;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 /* Debug Log viewer */
 
 .logs-path-hint{font-size:11px;color:var(--muted);font-family:ui-monospace,Menlo,monospace;margin-left:8px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
