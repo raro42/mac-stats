@@ -9,6 +9,12 @@
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2614] - 2026-11-12
+
+### Changed
+
+- **CRT Dark / Neon / Futuristic Monitors / AI Chat menu + popover focus:** `.monitors-menu-item:focus-visible` / `.ollama-menu-item:focus-visible`, Monitors / AI Chat `.popover-close:focus-visible`, plus `.add-btn-small:focus-visible` / `.monitor-remove-btn:focus-visible` were missing (Apple / Data Poster already had the menu + Close set after v0.1.2613; Data Poster already had Add / Remove). Accent and danger rings mix on CRT paper (`#0a0a0a` / `#08120c` / `#0b0b10`) so Tab through ⋮ menus, Add / Remove, and settings Close stays readable (after layout-daily Data Poster v0.1.2613).
+
 ## [0.1.2613] - 2026-11-12
 
 ### Changed
