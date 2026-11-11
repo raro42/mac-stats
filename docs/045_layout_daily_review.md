@@ -20,7 +20,9 @@ Shared `agent-ops.css` opaque washes mix against `#ffffff` for Apple. Dark theme
 | 1 | `data-poster` | CPU window → AI Chat + Monitors expanded |
 | 2 | `dark` | Same |
 | 3 | `neon` / `futuristic` | Same if dark ink |
-| 4 | Active light theme | Spot-check only (Apple washes are intended) |
+| 4 | Active light theme (`architect`, Apple, …) | Spot-check only (Apple washes are intended; do **not** paint CRT `#0b0b10` remaps onto Architect paper) |
+
+`scripts/layout_daily_review.py` only marks **dark-ink** themes due. Architect is listed for spot-check, never as CRT remap fuel.
 
 Capture window-only PNG under `docs/screens/theme-<name>.png` when polishing (warm-up ≥30s; see `docs/screens/README.md`).
 

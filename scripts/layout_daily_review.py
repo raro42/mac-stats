@@ -24,13 +24,15 @@ SCREENS = ROOT / "docs" / "screens"
 STATE_DIR = Path.home() / ".mac-stats" / "improvements"
 STATE_FILE = STATE_DIR / "layout_daily_review_state.json"
 
-# Dark shells first — Apple #ffffff opaque washes hurt these hardest.
+# Dark / CRT shells first — Apple #ffffff opaque washes hurt these hardest.
+# Architect is light paper (#f1f1f1): Apple washes are intended (spot-check only).
+DARK_INK_THEMES = ("data-poster", "dark", "neon", "futuristic")
 THEMES = (
     ("data-poster", "CPU window → AI Chat + Monitors (Data Poster)"),
     ("dark", "CPU window → AI Chat + Monitors (Dark)"),
     ("neon", "CPU window → AI Chat + Monitors (Neon)"),
     ("futuristic", "CPU window → AI Chat + Monitors (Futuristic)"),
-    ("architect", "CPU window → AI Chat + Monitors (Architect)"),
+    ("architect", "CPU window → AI Chat + Monitors (Architect, light spot-check)"),
 )
 
 # Shared Apple washes that dark themes must remap (substring markers).
@@ -113,7 +115,9 @@ def main() -> None:
     for name, how in THEMES:
         theme_path = THEMES_DIR / name / "cpu.html"
         screen = SCREENS / f"theme-{name}.png"
-        missing = _agent_ops_remap_hits(name) if name in ("data-poster", "dark") else []
+        is_dark_ink = name in DARK_INK_THEMES
+        # Neon / Futuristic need the same CRT remap audit as Data Poster / Dark.
+        missing = _agent_ops_remap_hits(name) if is_dark_ink else []
         age_days = None
         if screen.is_file():
             age_days = round((time.time() - screen.stat().st_mtime) / 86400, 2)
@@ -121,7 +125,12 @@ def main() -> None:
         checked_today = checked_day == today
         stale_screen = (age_days is None) or (age_days >= 7.0)
         needs_css = bool(missing)
-        due_theme = (not checked_today) and (needs_css or stale_screen or not theme_path.is_file())
+        # Light Architect: never due for CRT remaps (Apple washes intended).
+        due_theme = (
+            is_dark_ink
+            and (not checked_today)
+            and (needs_css or stale_screen or not theme_path.is_file())
+        )
         rows.append(
             {
                 "theme": name,
@@ -130,14 +139,15 @@ def main() -> None:
                 "screen_age_days": age_days,
                 "checked_today": checked_today,
                 "missing_remaps": missing,
+                "dark_ink": is_dark_ink,
                 "due": due_theme,
             }
         )
 
     due_rows = [r for r in rows if r["due"]]
-    # Prefer data-poster when anything is due.
+    # Prefer data-poster / dark when anything is due.
     pick = None
-    for prefer in ("data-poster", "dark"):
+    for prefer in DARK_INK_THEMES:
         for r in due_rows:
             if r["theme"] == prefer:
                 pick = r
@@ -145,7 +155,9 @@ def main() -> None:
         if pick:
             break
     if pick is None:
-        pick = due_rows[0] if due_rows else rows[0]
+        pick = due_rows[0] if due_rows else next(
+            (r for r in rows if r.get("dark_ink")), rows[0]
+        )
 
     already_today = state.get("last_checked_day") == today
     due = bool(due_rows) and not already_today

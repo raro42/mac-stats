@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2595
+
+- Layout-daily helper: Architect is light paper (spot-check only); dark-ink due set is `data-poster` / `dark` / `neon` / `futuristic` with CRT remap audit. Standing P0 after digester/ops-help collapse v0.1.2594. Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, or sibling/product fuel (not another keep-pNN clone).
+
 ## Overnight merge — v0.1.2594
 
 - Collapse Instant `/keep-p{N}` ops-help + digester Slowest filters onto the parameterized lane (1–99) after harness_ops split — no more per-N Discord bullets or digester needles. Standing P0 after `/keep-p48` v0.1.2593 / god-file collapse. Next: Dark layout-daily (next due theme), Mac capture when TCC allows, or sibling/product fuel (not another keep-pNN clone).
