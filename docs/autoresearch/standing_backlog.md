@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2580
+
+- Instant `/keep-p31` · `keep p31` · `p31 keep gap` · `31st percentile keep gap` · `p31 gap between keeps` (+ discard) — nearest-rank p31 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters; digit-safe vs p3). Standing P0 after `/keep-p29` v0.1.2579. Next: other ratchet glance (`/keep-p33` / `/keep-p34`), or Mac capture when TCC allows; Dark layout-daily next due theme.
+
 ## Overnight merge — v0.1.2579
 
 - Instant `/keep-p29` · `keep p29` · `p29 keep gap` · `29th percentile keep gap` · `p29 gap between keeps` (+ discard) — nearest-rank p29 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters; digit-safe vs p2/p9). Standing P0 after `/keep-p24` v0.1.2578. Next: other ratchet glance (`/keep-p31`), or Mac capture when TCC allows; Dark layout-daily next due theme.
