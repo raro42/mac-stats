@@ -743,6 +743,11 @@ body::before {
   box-shadow: none;
 }
 
+.theme-item:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
+  outline-offset: 2px;
+}
+
 .theme-item[aria-current="true"] {
   /* Opaque accent wash — was color-mix(…, transparent) glass (#14). */
   border-color: color-mix(in srgb, var(--accent, #8bb4e8) 55%, #08120c);
