@@ -873,6 +873,11 @@ body {
   color: var(--text);
 }
 
+.theme-version:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #0b0b10);
+  outline-offset: 2px;
+}
+
 .theme-version:active {
   /* Was opacity 0.6 on inherit (~30% white) → ~18% white on the shell fill. */
   color: color-mix(in srgb, #ffffff 18%, #111123);
@@ -1392,6 +1397,12 @@ body {
 .collapse-btn:hover {
   background: var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
   color: var(--text, var(--ink, inherit));
+}
+
+.collapse-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #0b0b10);
+  outline-offset: 2px;
+  color: var(--text);
 }
 
 .section-content-collapsible {

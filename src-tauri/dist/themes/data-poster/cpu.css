@@ -508,6 +508,11 @@ body {
   color: var(--text);
 }
 
+.theme-version:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #0b0b10);
+  outline-offset: 2px;
+}
+
 .theme-version:active {
   /* Was 80% text on transparent. */
   color: color-mix(in srgb, var(--text) 80%, #0b0b10);
