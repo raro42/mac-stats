@@ -13430,6 +13430,7 @@ pub fn looks_like_results_tsv_p90_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -13445,6 +13446,7 @@ pub fn looks_like_results_tsv_p90_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -18971,6 +18973,7 @@ pub fn looks_like_results_tsv_p95_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -18986,6 +18989,7 @@ pub fn looks_like_results_tsv_p95_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -19805,6 +19809,7 @@ pub fn looks_like_results_tsv_p10_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -19820,6 +19825,7 @@ pub fn looks_like_results_tsv_p10_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -20636,6 +20642,7 @@ pub fn looks_like_results_tsv_p25_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -20651,6 +20658,7 @@ pub fn looks_like_results_tsv_p25_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -21462,6 +21470,7 @@ pub fn looks_like_results_tsv_p75_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -21477,6 +21486,7 @@ pub fn looks_like_results_tsv_p75_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -22298,6 +22308,7 @@ pub fn looks_like_results_tsv_p98_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -22313,6 +22324,7 @@ pub fn looks_like_results_tsv_p98_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -23085,6 +23097,7 @@ pub fn looks_like_results_tsv_p99_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -23100,6 +23113,7 @@ pub fn looks_like_results_tsv_p99_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -23907,6 +23921,7 @@ pub fn looks_like_results_tsv_p6_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -23922,6 +23937,7 @@ pub fn looks_like_results_tsv_p6_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -24730,6 +24746,7 @@ pub fn looks_like_results_tsv_p7_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -24745,6 +24762,7 @@ pub fn looks_like_results_tsv_p7_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -25562,6 +25580,7 @@ pub fn looks_like_results_tsv_p3_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -25577,6 +25596,7 @@ pub fn looks_like_results_tsv_p3_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -26284,6 +26304,7 @@ pub fn looks_like_results_tsv_p4_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -26299,6 +26320,7 @@ pub fn looks_like_results_tsv_p4_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -26527,6 +26549,7 @@ pub fn looks_like_results_tsv_p4_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -26542,6 +26565,7 @@ pub fn looks_like_results_tsv_p4_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -27363,6 +27387,7 @@ pub fn looks_like_results_tsv_p9_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -27378,6 +27403,7 @@ pub fn looks_like_results_tsv_p9_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -28188,6 +28214,7 @@ pub fn looks_like_results_tsv_p8_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -28203,6 +28230,7 @@ pub fn looks_like_results_tsv_p8_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -29026,6 +29054,7 @@ pub fn looks_like_results_tsv_p5_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -29041,6 +29070,7 @@ pub fn looks_like_results_tsv_p5_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -29875,6 +29905,7 @@ pub fn looks_like_results_tsv_p1_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -29890,6 +29921,7 @@ pub fn looks_like_results_tsv_p1_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -30704,6 +30736,7 @@ pub fn looks_like_results_tsv_p2_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -30719,6 +30752,7 @@ pub fn looks_like_results_tsv_p2_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -31508,6 +31542,7 @@ pub fn looks_like_results_tsv_p50_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -31523,6 +31558,7 @@ pub fn looks_like_results_tsv_p50_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -32205,6 +32241,7 @@ pub fn looks_like_results_tsv_p20_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -32220,6 +32257,7 @@ pub fn looks_like_results_tsv_p20_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -33008,6 +33046,7 @@ pub fn looks_like_results_tsv_p80_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -33023,6 +33062,7 @@ pub fn looks_like_results_tsv_p80_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -33947,6 +33987,7 @@ pub fn looks_like_results_tsv_p15_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -33962,6 +34003,7 @@ pub fn looks_like_results_tsv_p15_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -34615,6 +34657,7 @@ pub fn looks_like_results_tsv_p85_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -34630,6 +34673,7 @@ pub fn looks_like_results_tsv_p85_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -35571,6 +35615,7 @@ pub fn looks_like_results_tsv_p40_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -35586,6 +35631,7 @@ pub fn looks_like_results_tsv_p40_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -36383,6 +36429,7 @@ pub fn looks_like_results_tsv_p60_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -36398,6 +36445,7 @@ pub fn looks_like_results_tsv_p60_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -37196,6 +37244,7 @@ pub fn looks_like_results_tsv_p70_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -37211,6 +37260,7 @@ pub fn looks_like_results_tsv_p70_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -38009,6 +38059,7 @@ pub fn looks_like_results_tsv_p30_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -38024,6 +38075,7 @@ pub fn looks_like_results_tsv_p30_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -38818,6 +38870,7 @@ pub fn looks_like_results_tsv_p35_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -38833,6 +38886,7 @@ pub fn looks_like_results_tsv_p35_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -40222,6 +40276,7 @@ pub fn looks_like_results_tsv_p55_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -40237,6 +40292,7 @@ pub fn looks_like_results_tsv_p55_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -41408,6 +41464,7 @@ pub fn looks_like_results_tsv_p12_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -41423,6 +41480,7 @@ pub fn looks_like_results_tsv_p12_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -43185,6 +43243,7 @@ pub fn looks_like_results_tsv_p16_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -43200,6 +43259,7 @@ pub fn looks_like_results_tsv_p16_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -43989,6 +44049,7 @@ pub fn looks_like_results_tsv_p17_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -44004,6 +44065,7 @@ pub fn looks_like_results_tsv_p17_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -44523,6 +44585,7 @@ pub fn looks_like_results_tsv_p19_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -44538,6 +44601,7 @@ pub fn looks_like_results_tsv_p19_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -46669,6 +46733,7 @@ pub fn looks_like_results_tsv_p18_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -46684,6 +46749,7 @@ pub fn looks_like_results_tsv_p18_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -49356,6 +49422,7 @@ pub fn looks_like_results_tsv_p26_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -49371,6 +49438,7 @@ pub fn looks_like_results_tsv_p26_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -53366,6 +53434,7 @@ pub fn looks_like_results_tsv_p33_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp34")
         || n.starts_with("/keepp36")
 || n.starts_with("/keepp37")
@@ -55018,6 +55087,7 @@ pub fn looks_like_results_tsv_p36_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp37")
 || n.starts_with("/keepp38")
 || n.starts_with("/keepp39")
@@ -55064,6 +55134,7 @@ pub fn looks_like_results_tsv_p36_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp36")
 || n.starts_with("/keepp37")
 || n.starts_with("/keepp38")
@@ -55914,6 +55985,7 @@ pub fn looks_like_results_tsv_p37_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
 || n.starts_with("/keep-p37")
 || n.starts_with("/keep-p38")
 || n.starts_with("/keep-p39")
@@ -55923,6 +55995,7 @@ pub fn looks_like_results_tsv_p37_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp37")
 || n.starts_with("/keepp38")
 || n.starts_with("/keepp39")
@@ -56806,6 +56879,7 @@ pub fn looks_like_results_tsv_p38_request(content: &str) -> bool {
         || n.starts_with("/keep-p44")
         || n.starts_with("/keep-p46")
         || n.starts_with("/keep-p47")
+        || n.starts_with("/keep-p48")
         || n.starts_with("/keepp39")
         || n.starts_with("/keepp41")
         || n.starts_with("/keepp42")
@@ -56850,6 +56924,7 @@ pub fn looks_like_results_tsv_p38_request(content: &str) -> bool {
         || n.starts_with("/keep-p44")
         || n.starts_with("/keep-p46")
         || n.starts_with("/keep-p47")
+        || n.starts_with("/keep-p48")
 || n.starts_with("/keep-p38")
 || n.starts_with("/keep-p39")
 || n.starts_with("/keep-p41")
@@ -56858,6 +56933,7 @@ pub fn looks_like_results_tsv_p38_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp38")
         || n.starts_with("/keepp39")
         || n.starts_with("/keepp41")
@@ -57753,6 +57829,7 @@ pub fn looks_like_results_tsv_p39_request(content: &str) -> bool {
         || n.starts_with("/keep-p44")
         || n.starts_with("/keep-p46")
         || n.starts_with("/keep-p47")
+        || n.starts_with("/keep-p48")
         || n.starts_with("/keepp41")
         || n.starts_with("/keepp42")
         || n.starts_with("/keepp43")
@@ -58633,6 +58710,7 @@ pub fn looks_like_results_tsv_p41_request(content: &str) -> bool {
         || n.starts_with("/keep-p44")
         || n.starts_with("/keep-p46")
         || n.starts_with("/keep-p47")
+        || n.starts_with("/keep-p48")
         || n.starts_with("/keepp42")
         || n.starts_with("/keepp43")
         || n.starts_with("/keepp44")
@@ -59536,6 +59614,7 @@ pub fn looks_like_results_tsv_p42_request(content: &str) -> bool {
         || n.starts_with("/keep-p44")
         || n.starts_with("/keep-p46")
         || n.starts_with("/keep-p47")
+        || n.starts_with("/keep-p48")
         || n.starts_with("/keepp43")
         || n.starts_with("/keepp44")
         || n.starts_with("/keepp46")
@@ -59565,11 +59644,13 @@ pub fn looks_like_results_tsv_p42_request(content: &str) -> bool {
         || n.starts_with("/keep-p44")
         || n.starts_with("/keep-p46")
         || n.starts_with("/keep-p47")
+        || n.starts_with("/keep-p48")
 || n.starts_with("/keep-p42")
 || n.starts_with("/keep-p43")
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp42")
         || n.starts_with("/keepp43")
         || n.starts_with("/keepp44")
@@ -60479,6 +60560,7 @@ pub fn looks_like_results_tsv_p43_request(content: &str) -> bool {
         || n.starts_with("/keep-p44")
         || n.starts_with("/keep-p46")
         || n.starts_with("/keep-p47")
+        || n.starts_with("/keep-p48")
         || n.starts_with("/keepp44")
         || n.starts_with("/keepp46")
         || n.starts_with("/keepp47")
@@ -61142,6 +61224,7 @@ pub fn looks_like_results_tsv_p44_request(content: &str) -> bool {
         || n.starts_with("/keep-p45")
         || n.starts_with("/keep-p46")
         || n.starts_with("/keep-p47")
+        || n.starts_with("/keep-p48")
         || n.starts_with("/keepp46")
         || n.starts_with("/keepp47")
         || n.starts_with("/discard-p46")
@@ -61401,9 +61484,11 @@ pub fn looks_like_results_tsv_p44_request(content: &str) -> bool {
         || n.starts_with("/keep-p44")
         || n.starts_with("/keep-p46")
         || n.starts_with("/keep-p47")
+        || n.starts_with("/keep-p48")
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp44")
         || n.starts_with("/keepp46")
         || n.starts_with("/keepp47")
@@ -62318,6 +62403,7 @@ pub fn looks_like_results_tsv_p46_request(content: &str) -> bool {
         || n.contains("47th")
         || n.contains("47 th")
         || n.starts_with("/keep-p47")
+        || n.starts_with("/keep-p48")
         || n.starts_with("/keepp47")
         || n.starts_with("/discard-p47")
         || n.starts_with("/discardp47")
@@ -63223,7 +63309,16 @@ pub fn looks_like_results_tsv_p47_request(content: &str) -> bool {
         || n.starts_with("/discard-p46")
         || n.starts_with("/discardp46")
         || n.starts_with("/p46-")
-        // digit-safe p47 vs p4 / p7 / p40 / p41 / p42 / p43 / p44 / p45 / p46 / p14
+        || n.contains("p48")
+        || n.contains("p-48")
+        || n.contains("48th")
+        || n.contains("48 th")
+        || n.starts_with("/keep-p48")
+        || n.starts_with("/keepp48")
+        || n.starts_with("/discard-p48")
+        || n.starts_with("/discardp48")
+        || n.starts_with("/p48-")
+        // digit-safe p47 vs p4 / p7 / p40 / p44 / p45 / p46 / p48 / p14
     {
         return false;
     }
@@ -63350,6 +63445,915 @@ pub fn format_results_tsv_p47_gateway(content: &str) -> String {
             };
             format!(
                 "**{label}:** {night_part} · {all_part} · p47 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p26` for p26 gap · `/keep-p33` for p33 gap · `/keep-p36` for p36 gap · `/keep-p47` for p47 gap · `/keep-p38` for p38 gap · `/keep-p47` for p47 gap · `/keep-p34` for p34 gap · `/keep-p28` for p28 gap · `/keep-p32` for p32 gap · `/keep-p92` for p92 gap · `/keep-p55` for p55 gap · `/keep-p30` for p30 gap · `/keep-p9` for p9 gap · `/keep-p8` for p8 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+            )
+        }
+    }
+}
+
+fn count_results_tsv_p48(
+    want: ResultsTsvLastWant,
+) -> Result<(Option<u64>, u64, Option<u64>, u64), String> {
+    let path = crate::config::Config::autoresearch_results_tsv();
+    if !path.exists() {
+        return Err("missing".into());
+    }
+    let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let window_start = overnight_window_start_local().with_timezone(&chrono::Utc);
+    let want_keep = matches!(want, ResultsTsvLastWant::Keep);
+    let mut all_ts: Vec<chrono::DateTime<chrono::Utc>> = Vec::new();
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut cols = line.splitn(4, '\t');
+        let Some(ts) = cols.next() else {
+            continue;
+        };
+        let _sha = cols.next();
+        let Some(outcome) = cols.next() else {
+            continue;
+        };
+        let outcome = outcome.trim().to_ascii_lowercase();
+        let is_keep = outcome == "keep";
+        let is_discard = outcome == "discard";
+        if want_keep && !is_keep {
+            continue;
+        }
+        if !want_keep && !is_discard {
+            continue;
+        }
+        let Some(parsed) = parse_run_ts(ts) else {
+            continue;
+        };
+        all_ts.push(parsed);
+    }
+    fn p48_gap_secs(ts: &[chrono::DateTime<chrono::Utc>]) -> (Option<u64>, u64) {
+        if ts.len() < 2 {
+            return (None, 0);
+        }
+        let mut gaps: Vec<u64> = Vec::with_capacity(ts.len() - 1);
+        for w in ts.windows(2) {
+            gaps.push((w[1] - w[0]).num_seconds().max(0) as u64);
+        }
+        let n = gaps.len() as u64;
+        if n == 0 {
+            return (None, 0);
+        }
+        gaps.sort_unstable();
+        // Nearest-rank: ceil(0.48 * N), 1-indexed → 0-based index.
+        let rank = ((n as f64) * 0.48).ceil() as usize;
+        let idx = rank.saturating_sub(1).min(gaps.len() - 1);
+        (Some(gaps[idx]), n)
+    }
+    let (p48_all, gaps_all) = p48_gap_secs(&all_ts);
+    let night_ts: Vec<_> = all_ts
+        .into_iter()
+        .filter(|t| *t >= window_start)
+        .collect();
+    let (p48_night, gaps_night) = p48_gap_secs(&night_ts);
+    Ok((p48_night, gaps_night, p48_all, gaps_all))
+}
+
+
+/// True for short keep-p48 asks (`/keep-p48`, `p48 keep gap`, `48th percentile keep gap`…).
+/// P48 gap only — does not dump TSV or steal range / median / pace / first / last / since / counts / rate / streak / recent / path/size/age / morning surprise.
+pub fn looks_like_results_tsv_p48_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains("kb")
+        || n.contains(" gi")
+        || (contains_age_token(&n) && !n.contains("average") && !n.contains("avg") && !n.contains("percentile"))
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what shipped")
+        || n.contains("morning surprise")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("changelog")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("loop backlog")
+        || n.contains("loop_backlog")
+        || n.contains("sibling")
+        || n.contains("standing")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("summary")
+        || n.contains("hit rate")
+        || n.contains("keep rate")
+        || n.contains("discard rate")
+        || n.contains("streak")
+        || n.contains("recent keeps")
+        || n.contains("recent discards")
+        || n.contains("recent-keeps")
+        || n.contains("recentkeeps")
+        || n.contains("recent-discards")
+        || n.contains("recentdiscards")
+        || n.contains("keep list")
+        || n.contains("discard list")
+        || n.contains("first keep")
+        || n.contains("first discard")
+        || n.contains("earliest keep")
+        || n.contains("earliest discard")
+        || n.contains("opening keep")
+        || n.contains("opening discard")
+        || n.contains("since last")
+        || n.contains("how long since")
+        || n.contains("how long ago")
+        || n.contains("time since")
+        || n.starts_with("/since-")
+        || n.starts_with("/timesince")
+        || n.starts_with("/time-since")
+        || n.starts_with("/last-")
+        || n.starts_with("/first-")
+        || n.starts_with("/firstkeep")
+        || n.starts_with("/firstdiscard")
+        || n.starts_with("/recent-")
+        || n.starts_with("/keep-rate")
+        || n.starts_with("/keeprate")
+        || n.starts_with("/hit-rate")
+        || n.starts_with("/keep-streak")
+        || n.starts_with("/longest-")
+        || n.starts_with("/keep-pace")
+        || n.starts_with("/keeppace")
+        || n.starts_with("/discard-pace")
+        || n.starts_with("/discardpace")
+        || n.starts_with("/keep-median")
+        || n.starts_with("/keepmedian")
+        || n.starts_with("/discard-median")
+        || n.starts_with("/discardmedian")
+        || n.starts_with("/median-")
+        || n.starts_with("/keep-range")
+        || n.starts_with("/keeprange")
+        || n.starts_with("/discard-range")
+        || n.starts_with("/discardrange")
+        || n.starts_with("/gap-range")
+        || n.starts_with("/keep-spread")
+        || n.starts_with("/discard-spread")
+        || n == "last keep"
+        || n == "the last keep"
+        || n == "last discard"
+        || n == "the last discard"
+        || n == "latest keep"
+        || n == "latest discard"
+        || n == "what was the last keep"
+        || n == "what was the last discard"
+        || n.starts_with("/keep-std")
+        || n.starts_with("/keepstd")
+        || n.starts_with("/discard-std")
+        || n.starts_with("/discardstd")
+        || n.starts_with("/std-")
+        || n.contains("stddev")
+        || n.contains("std-dev")
+        || n.contains("std deviation")
+        || n.contains("standard deviation")
+        || n.contains("keep std")
+        || n.contains("discard std")
+        || n.contains("std keep")
+        || n.contains("std discard")
+        || n.contains("std gap")
+        // Other gap stats own these words (not p25).
+        || n.contains("iqr")
+        || n.contains("interquartile")
+        || n.contains("inter quartile")
+        || n.starts_with("/keep-iqr")
+        || n.starts_with("/keepiqr")
+        || n.starts_with("/discard-iqr")
+        || n.starts_with("/discardiqr")
+        || n.starts_with("/iqr-")
+        || n.contains("median")
+        || n.contains("range")
+        || n.contains("spread")
+        || n.contains("min max")
+        || n.contains("minmax")
+        || n.contains("min-max")
+        || n.contains("shortest and longest")
+        || n.contains("longest and shortest")
+        || n.contains("keep pace")
+        || n.contains("discard pace")
+        || n.contains("ratchet pace")
+        || n.contains("average")
+        || n.contains("avg ")
+        || n.starts_with("avg ")
+        || n.contains(" mean ")
+        || n.starts_with("mean ")
+        // Hit-rate owns bare percent without p48.
+        || (n.contains("percent")
+            && !n.contains("percentile")
+            && !n.contains("p48")
+            && !n.contains("48th"))
+        || (n.contains("rate")
+            && !n.contains("p48")
+            && !n.contains("48th")
+            && !n.contains("pace")
+            && !n.contains("gap")
+            && !n.contains("between"))
+        // Do not steal p85 / p80 / p20 / p90 / bare percentile / other gap stats.
+        || n.contains("p85")
+        || n.contains("p-85")
+        || n.contains("85th")
+        || n.contains("85 th")
+        || n.starts_with("/keep-p85")
+        || n.starts_with("/keepp85")
+        || n.starts_with("/discard-p85")
+        || n.starts_with("/discardp85")
+        || n.starts_with("/p85-")
+        || n.contains("p80")
+        || n.contains("p-80")
+        || n.contains("80th")
+        || n.contains("80 th")
+        || n.starts_with("/keep-p80")
+        || n.starts_with("/keepp80")
+        || n.starts_with("/discard-p80")
+        || n.starts_with("/discardp80")
+        || n.starts_with("/p80-")
+        || n.contains("p15")
+        || n.contains("p-15")
+        || n.contains("15th")
+        || n.contains("15 th")
+        || n.starts_with("/keep-p15")
+        || n.starts_with("/keepp15")
+        || n.starts_with("/discard-p15")
+        || n.starts_with("/discardp15")
+        || n.starts_with("/p15-")
+        || n.contains("p12")
+        || n.contains("p-12")
+        || n.contains("12th")
+        || n.contains("12 th")
+        || n.starts_with("/keep-p12")
+        || n.contains("p13")
+        || n.contains("p-13")
+        || n.contains("13th")
+        || n.contains("13 th")
+        || n.starts_with("/keep-p13")
+        || n.starts_with("/keepp13")
+        || n.starts_with("/discard-p13")
+        || n.starts_with("/discardp13")
+        || n.starts_with("/p13-")
+        || n.contains("p16")
+        || n.contains("p-16")
+        || n.contains("16th")
+        || n.contains("16 th")
+        || n.starts_with("/keep-p16")
+        || n.starts_with("/keepp16")
+        || n.starts_with("/discard-p16")
+        || n.starts_with("/discardp16")
+        || n.starts_with("/p16-")
+        || n.contains("p17")
+        || n.contains("p-17")
+        || n.contains("17th")
+        || n.contains("17 th")
+        || n.starts_with("/keep-p17")
+        || n.starts_with("/keepp17")
+        || n.starts_with("/discard-p17")
+        || n.starts_with("/discardp17")
+        || n.starts_with("/p17-")
+        || n.contains("p19")
+        || n.contains("p-19")
+        || n.contains("19th")
+        || n.contains("19 th")
+        || n.starts_with("/keep-p19")
+        || n.starts_with("/keepp19")
+        || n.starts_with("/discard-p19")
+        || n.starts_with("/discardp19")
+        || n.starts_with("/p19-")
+        || n.contains("p11")
+        || n.contains("p-11")
+        || n.contains("11th")
+        || n.contains("11 th")
+        || n.starts_with("/keep-p11")
+        || n.starts_with("/keepp11")
+        || n.starts_with("/discard-p11")
+        || n.starts_with("/discardp11")
+        || n.starts_with("/p11-")
+        || n.contains("p14")
+        || n.contains("p-14")
+        || n.contains("14th")
+        || n.contains("14 th")
+        || n.starts_with("/keep-p14")
+        || n.starts_with("/keepp14")
+        || n.starts_with("/discard-p14")
+        || n.starts_with("/discardp14")
+        || n.starts_with("/p14-")
+        || n.starts_with("/keepp12")
+        || n.starts_with("/discard-p12")
+        || n.starts_with("/discardp12")
+        || n.starts_with("/p12-")
+        // Also refuse p20 / p90 / other gap stats.
+        || n.contains("p20")
+        || n.contains("p-20")
+        || n.contains("20th")
+        || n.contains("20 th")
+        || n.starts_with("/keep-p20")
+        || n.starts_with("/keepp20")
+        || n.starts_with("/discard-p20")
+        || n.starts_with("/discardp20")
+        || n.starts_with("/p20-")
+        || n.contains("p90")
+        || n.contains("p-90")
+        || n.contains("90th")
+        || n.contains("90 th")
+        || n.starts_with("/keep-p90")
+        || n.starts_with("/keepp90")
+        || n.starts_with("/discard-p90")
+        || n.starts_with("/discardp90")
+        || n.starts_with("/p90-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("95 th")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p10")
+        || n.contains("p-10")
+        || n.contains("10th")
+        || n.contains("10 th")
+        || n.starts_with("/keep-p10")
+        || n.starts_with("/keepp10")
+        || n.starts_with("/discard-p10")
+        || n.starts_with("/discardp10")
+        || n.starts_with("/p10-")
+        || n.contains("p25")
+        || n.contains("p-25")
+        || n.contains("25th")
+        || n.contains("25 th")
+        || n.starts_with("/keep-p25")
+        || n.starts_with("/keepp25")
+        || n.starts_with("/discard-p25")
+        || n.starts_with("/discardp25")
+        || n.starts_with("/p25-")
+        || n.contains("p75")
+        || n.contains("p-75")
+        || n.contains("75th")
+        || n.contains("75 th")
+        || n.starts_with("/keep-p75")
+        || n.starts_with("/keepp75")
+        || n.starts_with("/discard-p75")
+        || n.starts_with("/discardp75")
+        || n.starts_with("/p75-")
+        || mentions_results_tsv_p5(&n)
+        || mentions_results_tsv_p6(&n)
+        || mentions_results_tsv_p4(&n)
+        || mentions_results_tsv_p3(&n)
+        || mentions_results_tsv_p4(&n)
+        || mentions_results_tsv_p9(&n)
+        || mentions_results_tsv_p9(&n)
+        || mentions_results_tsv_p4(&n)
+        || mentions_results_tsv_p3(&n)
+        || mentions_results_tsv_p4(&n)
+        || mentions_results_tsv_p6(&n)
+        || mentions_results_tsv_p9(&n)
+        || mentions_results_tsv_p4(&n)
+        || mentions_results_tsv_p3(&n)
+        || mentions_results_tsv_p4(&n)
+        // digit-safe p48 vs p4/p7 (47 contains 4 and 7)
+        || mentions_results_tsv_p2(&n)
+        || mentions_results_tsv_p9(&n)
+        || mentions_results_tsv_p6(&n)
+        || mentions_results_tsv_p9(&n)
+        || mentions_results_tsv_p4(&n)
+        || mentions_results_tsv_p3(&n)
+        || mentions_results_tsv_p4(&n)
+        || n.contains("p50")
+        || n.contains("p-50")
+        || n.contains("50th")
+        || n.contains("50 th")
+        || n.starts_with("/keep-p50")
+        || n.starts_with("/keepp50")
+        || n.starts_with("/discard-p50")
+        || n.starts_with("/discardp50")
+        || n.starts_with("/p50-")
+        || n.contains("p98")
+        || n.contains("p-98")
+        || n.contains("98th")
+        || n.contains("98 th")
+        || n.starts_with("/keep-p98")
+        || n.starts_with("/keepp98")
+        || n.starts_with("/discard-p98")
+        || n.starts_with("/discardp98")
+        || n.starts_with("/p98-")
+        || n.contains("p99")
+        || n.contains("p-99")
+        || n.contains("99th")
+        || n.contains("99 th")
+        || n.starts_with("/keep-p99")
+        || n.starts_with("/keepp99")
+        || n.starts_with("/discard-p99")
+        || n.starts_with("/discardp99")
+        || n.starts_with("/p99-")
+        || mentions_results_tsv_p2(&n)
+        || mentions_results_tsv_p6(&n)
+        || mentions_results_tsv_p9(&n)
+        || mentions_results_tsv_p4(&n)
+        || mentions_results_tsv_p3(&n)
+        || mentions_results_tsv_p4(&n)
+        || n.starts_with("/keep-percentile")
+        || n.starts_with("/keeppercentile")
+        || n.contains("keep percentile")
+        || n.contains("discard percentile")
+        || n.contains("histogram")
+        || n.starts_with("/keep-histogram")
+        || n.starts_with("/keephistogram")
+        || n.contains("gini")
+        || n.starts_with("/keep-gini")
+        || n.contains("entropy")
+        || n.contains("kurtosis")
+        || n.contains("skew")
+        || n.contains("keep cv")
+        || n.starts_with("/keep-cv")
+        || n.contains("mad")
+        || n.starts_with("/keep-mad")
+        || n.contains("mode")
+        || n.starts_with("/keep-mode")
+        || n.contains("2 nd")
+        || (n.contains("3rd") && !n.contains("43rd"))
+        || n.contains("3 rd")
+        || n.contains("2 nd")
+        || n.contains("p40")
+        || n.contains("p41")
+        || n.contains("p-40")
+        || n.contains("p-41")
+        || n.contains("40th")
+        || n.contains("41st")
+        || n.contains("40 th")
+        || n.contains("41 th")
+        || n.starts_with("/keep-p40")
+        || n.starts_with("/keep-p41")
+        || n.starts_with("/keepp40")
+        || n.starts_with("/keepp41")
+        || n.starts_with("/discard-p40")
+        || n.starts_with("/discard-p41")
+        || n.starts_with("/discardp40")
+        || n.starts_with("/discardp41")
+        || n.starts_with("/p40-")
+        || n.starts_with("/p41-")
+        || n.contains("p60")
+        || n.contains("p-60")
+        || n.contains("60th")
+        || n.contains("60 th")
+        || n.starts_with("/keep-p60")
+        || n.starts_with("/keepp60")
+        || n.starts_with("/discard-p60")
+        || n.starts_with("/discardp60")
+        || n.starts_with("/p60-")
+        || n.contains("p70")
+        || n.contains("p-70")
+        || n.contains("70th")
+        || n.contains("70 th")
+        || n.starts_with("/keep-p70")
+        || n.starts_with("/keepp70")
+        || n.starts_with("/discard-p70")
+        || n.starts_with("/discardp70")
+        || n.starts_with("/p70-")
+        || n.contains("p30")
+        || n.contains("p-30")
+        || n.contains("30th")
+        || n.contains("30 th")
+        || n.starts_with("/keep-p30")
+        || n.starts_with("/keepp30")
+        || n.starts_with("/discard-p30")
+        || n.starts_with("/discardp30")
+        || n.starts_with("/p30-")
+        || n.contains("p35")
+        || n.contains("p-35")
+        || n.contains("35th")
+        || n.contains("35 th")
+        || n.starts_with("/keep-p35")
+        || n.starts_with("/keepp35")
+        || n.starts_with("/discard-p35")
+        || n.starts_with("/discardp35")
+        || n.starts_with("/p35-")
+        || n.contains("p45")
+        || n.contains("p-45")
+        || n.contains("45th")
+        || n.contains("45 th")
+        || n.starts_with("/keep-p45")
+        || n.starts_with("/keepp45")
+        || n.starts_with("/discard-p45")
+        || n.starts_with("/discardp45")
+        || n.starts_with("/p45-")
+        || n.contains("p55")
+        || n.contains("p-55")
+        || n.contains("55th")
+        || n.contains("55 th")
+        || n.starts_with("/keep-p55")
+        || n.starts_with("/keepp55")
+        || n.starts_with("/discard-p55")
+        || n.starts_with("/discardp55")
+        || n.starts_with("/p55-")
+        || n.contains("p18")
+        || n.contains("p-18")
+        || n.contains("18th")
+        || n.contains("18 th")
+        || n.starts_with("/keep-p18")
+        || n.contains("p13")
+        || n.contains("p-13")
+        || n.contains("13th")
+        || n.contains("13 th")
+        || n.starts_with("/keep-p13")
+        || n.starts_with("/keepp13")
+        || n.starts_with("/discard-p13")
+        || n.starts_with("/discardp13")
+        || n.starts_with("/p13-")
+        || n.contains("p16")
+        || n.contains("p-16")
+        || n.contains("16th")
+        || n.contains("16 th")
+        || n.starts_with("/keep-p16")
+        || n.starts_with("/keepp16")
+        || n.starts_with("/discard-p16")
+        || n.starts_with("/discardp16")
+        || n.starts_with("/p16-")
+        || n.contains("p17")
+        || n.contains("p-17")
+        || n.contains("17th")
+        || n.contains("17 th")
+        || n.starts_with("/keep-p17")
+        || n.starts_with("/keepp17")
+        || n.starts_with("/discard-p17")
+        || n.starts_with("/discardp17")
+        || n.starts_with("/p17-")
+        || n.contains("p19")
+        || n.contains("p-19")
+        || n.contains("19th")
+        || n.contains("19 th")
+        || n.starts_with("/keep-p19")
+        || n.starts_with("/keepp19")
+        || n.starts_with("/discard-p19")
+        || n.starts_with("/discardp19")
+        || n.starts_with("/p19-")
+        || n.contains("p11")
+        || n.contains("p-11")
+        || n.contains("11th")
+        || n.contains("11 th")
+        || n.starts_with("/keep-p11")
+        || n.starts_with("/keepp11")
+        || n.starts_with("/discard-p11")
+        || n.starts_with("/discardp11")
+        || n.starts_with("/p11-")
+        || n.contains("p14")
+        || n.contains("p-14")
+        || n.contains("14th")
+        || n.contains("14 th")
+        || n.starts_with("/keep-p14")
+        || n.starts_with("/keepp14")
+        || n.starts_with("/discard-p14")
+        || n.starts_with("/discardp14")
+        || n.starts_with("/p14-")
+        || n.starts_with("/keepp18")
+        || n.starts_with("/discard-p18")
+        || n.starts_with("/discardp18")
+        || n.starts_with("/p18-")
+        || n.contains("p26")
+        || n.contains("p-26")
+        || n.contains("26th")
+        || n.contains("26 th")
+        || n.starts_with("/keep-p26")
+        || n.starts_with("/keepp26")
+        || n.starts_with("/discard-p26")
+        || n.starts_with("/discardp26")
+        || n.starts_with("/p26-")
+        || n.contains("p23")
+        || n.contains("p-23")
+        || n.contains("23rd")
+        || n.contains("23 rd")
+        || n.starts_with("/keep-p23")
+        || n.starts_with("/keepp23")
+        || n.starts_with("/discard-p23")
+        || n.starts_with("/discardp23")
+        || n.starts_with("/p23-")
+        || n.contains("p28")
+        || n.contains("p-28")
+        || n.contains("28th")
+        || n.contains("28 th")
+        || n.starts_with("/keep-p28")
+        || n.starts_with("/keepp28")
+        || n.starts_with("/discard-p28")
+        || n.starts_with("/discardp28")
+        || n.starts_with("/p28-")
+        || n.contains("p32")
+        || n.contains("p-32")
+        || n.contains("32nd")
+        || n.contains("32 nd")
+        || n.starts_with("/keep-p32")
+        || n.starts_with("/keepp32")
+        || n.starts_with("/discard-p32")
+        || n.starts_with("/discardp32")
+        || n.starts_with("/p32-")
+        || n.contains("p92")
+        || n.contains("p-92")
+        || n.contains("92nd")
+        || n.contains("92 nd")
+        || n.starts_with("/keep-p92")
+        || n.starts_with("/keepp92")
+        || n.starts_with("/discard-p92")
+        || n.starts_with("/discardp92")
+        || n.starts_with("/p92-")
+        || n.starts_with("/keep-p92")
+        || n.starts_with("/keepp92")
+        || n.starts_with("/discard-p92")
+        || n.starts_with("/discardp92")
+        || n.starts_with("/p92-")
+
+        || n.contains("p22")
+        || n.contains("p-22")
+        || n.contains("22nd")
+        || n.contains("22 nd")
+        || n.starts_with("/keep-p22")
+        || n.starts_with("/keepp22")
+        || n.starts_with("/discard-p22")
+        || n.starts_with("/discardp22")
+        || n.starts_with("/p22-")
+        || n.contains("p21")
+        || n.contains("p-21")
+        || n.contains("21st")
+        || n.contains("21 st")
+        || n.starts_with("/keep-p21")
+        || n.starts_with("/keepp21")
+        || n.starts_with("/discard-p21")
+        || n.starts_with("/discardp21")
+        || n.starts_with("/p21-")
+        // digit-safe p48 vs p4 / p7 / p40 / p41 / p42 / p43 / p44 / p45 / p46 / p14
+        || n.contains("p31")
+        || n.contains("p-31")
+        || n.contains("31st")
+        || n.contains("31 st")
+        || n.starts_with("/keep-p31")
+        || n.starts_with("/keepp31")
+        || n.starts_with("/discard-p31")
+        || n.starts_with("/discardp31")
+        || n.starts_with("/p31-")
+        || n.contains("p33")
+        || n.contains("p-33")
+        || n.contains("33rd")
+        || n.contains("33 rd")
+        || n.starts_with("/keep-p33")
+        || n.starts_with("/keepp33")
+        || n.starts_with("/discard-p33")
+        || n.starts_with("/discardp33")
+        || n.starts_with("/p33-")
+        || mentions_results_tsv_p6(&n)
+        || n.contains("p34")
+        || n.contains("p-34")
+        || n.contains("34th")
+        || n.contains("34 th")
+        || n.starts_with("/keep-p34")
+        || n.starts_with("/keepp34")
+        || n.starts_with("/discard-p34")
+        || n.starts_with("/discardp34")
+        || n.starts_with("/p34-")
+        || mentions_results_tsv_p8(&n)
+        || n.contains("p36")
+        || n.contains("p-36")
+        || n.contains("36th")
+        || n.contains("36 th")
+        || n.starts_with("/keep-p36")
+        || n.starts_with("/keepp36")
+        || n.starts_with("/discard-p36")
+        || n.starts_with("/discardp36")
+        || n.starts_with("/p36-")
+        || n.contains("p37")
+        || n.contains("p-37")
+        || n.contains("37th")
+        || n.contains("37 th")
+        || n.starts_with("/keep-p37")
+        || n.starts_with("/keepp37")
+        || n.starts_with("/discard-p37")
+        || n.starts_with("/discardp37")
+        || n.starts_with("/p37-")
+        || n.contains("p38")
+        || n.contains("p-38")
+        || n.contains("38th")
+        || n.contains("38 th")
+        || n.starts_with("/keep-p38")
+        || n.starts_with("/keepp38")
+        || n.starts_with("/discard-p38")
+        || n.starts_with("/discardp38")
+        || n.starts_with("/p38-")
+        || n.contains("p39")
+        || n.contains("p-39")
+        || n.contains("39th")
+        || n.contains("39 th")
+        || n.starts_with("/keep-p39")
+        || n.starts_with("/keepp39")
+        || n.starts_with("/discard-p39")
+        || n.starts_with("/discardp39")
+        || n.starts_with("/p39-")
+        || n.contains("p41")
+        || n.contains("p-41")
+        || n.contains("41st")
+        || n.contains("41 th")
+        || n.starts_with("/keep-p41")
+        || n.starts_with("/keepp41")
+        || n.starts_with("/discard-p41")
+        || n.starts_with("/discardp41")
+        || n.starts_with("/p41-")
+        || n.contains("p42")
+        || n.contains("42nd")
+        || n.contains("42 nd")
+        || n.starts_with("/keep-p42")
+        || n.starts_with("/keepp42")
+        || n.starts_with("/discard-p42")
+        || n.starts_with("/discardp42")
+        || n.starts_with("/p42-")
+        || n.contains("p43")
+        || n.contains("p-43")
+        || n.contains("43rd")
+        || n.contains("43 rd")
+        || n.starts_with("/keep-p43")
+        || n.starts_with("/keepp43")
+        || n.starts_with("/discard-p43")
+        || n.starts_with("/discardp43")
+        || n.starts_with("/p43-")
+        || n.contains("p44")
+        || n.contains("p-44")
+        || n.contains("44th")
+        || n.contains("44 th")
+        || n.starts_with("/keep-p44")
+        || n.starts_with("/keepp44")
+        || n.starts_with("/discard-p44")
+        || n.starts_with("/discardp44")
+        || n.starts_with("/p44-")
+        || n.contains("p46")
+        || n.contains("p-46")
+        || n.contains("46th")
+        || n.contains("46 th")
+        || n.starts_with("/keep-p46")
+        || n.starts_with("/keepp46")
+        || n.starts_with("/discard-p46")
+        || n.starts_with("/discardp46")
+        || n.starts_with("/p46-")
+        || n.contains("p47")
+        || n.contains("p-47")
+        || n.contains("47th")
+        || n.contains("47 th")
+        || n.starts_with("/keep-p47")
+        || n.starts_with("/keepp47")
+        || n.starts_with("/discard-p47")
+        || n.starts_with("/discardp47")
+        || n.starts_with("/p47-")
+        // digit-safe p48 vs p4 / p8 / p40 / p44 / p45 / p46 / p47 / p14
+    {
+        return false;
+    }
+    // Must say p48 / 48th (or /keep-p48 slash).
+    if !(n.contains("p48")
+        || n.contains("p-48")
+        || n.contains("48th")
+        || n.contains("48 th")
+        || n.starts_with("/keep-p48")
+        || n.starts_with("/keepp48")
+        || n.starts_with("/discard-p48")
+        || n.starts_with("/discardp48")
+        || n.starts_with("/p48-")
+        || n.starts_with("/p48-keep")
+        || n.starts_with("/p48keep")
+        || n.starts_with("/p48-discard")
+        || n.starts_with("/p48discard"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/keep-p48"
+            | "/keepp48"
+            | "/discard-p48"
+            | "/discardp48"
+            | "/p48-keep-gap"
+            | "/p48keepgap"
+            | "/p48-discard-gap"
+            | "/p48discardgap"
+            | "/p48-gap"
+            | "/p48gap"
+            | "/p48-keep"
+            | "/p48keep"
+            | "/p48-discard"
+            | "/p48discard"
+            | "keep p48"
+            | "the keep p48"
+            | "keep p48 tonight"
+            | "tonight keep p48"
+            | "p48 keep"
+            | "the p48 keep"
+            | "p48 keep gap"
+            | "the p48 keep gap"
+            | "p48 gap between keeps"
+            | "p48 time between keeps"
+            | "48th percentile keep gap"
+            | "the 48th percentile keep gap"
+            | "48th percentile gap between keeps"
+            | "48th keep gap"
+            | "keep gap p48"
+            | "ratchet p48"
+            | "the ratchet p48"
+            | "overnight keep p48"
+            | "view keep p48"
+            | "see keep p48"
+            | "show the keep p48"
+            | "show me the keep p48"
+            | "open keep p48"
+            | "open the keep p48"
+            | "list keep p48"
+            | "list the keep p48"
+            | "what is the keep p48"
+            | "whats the keep p48"
+            | "what's the keep p48"
+            | "what is the p48 keep gap"
+            | "whats the p48 keep gap"
+            | "what's the p48 keep gap"
+            | "discard p48"
+            | "the discard p48"
+            | "discard p48 tonight"
+            | "tonight discard p48"
+            | "p48 discard"
+            | "the p48 discard"
+            | "p48 discard gap"
+            | "the p48 discard gap"
+            | "p48 gap between discards"
+            | "48th percentile discard gap"
+            | "view discard p48"
+            | "see discard p48"
+            | "show the discard p48"
+            | "show me the discard p48"
+            | "open discard p48"
+            | "open the discard p48"
+            | "list discard p48"
+            | "list the discard p48"
+            | "what is the discard p48"
+            | "whats the discard p48"
+            | "what's the discard p48"
+    )
+}
+
+
+/// Zero-LLM p48 gap between keep/discard rows from results.tsv (tonight + all-time; no row dump).
+/// Nearest-rank p48 (pairs above `/keep-p47`; densifies the ladder between p47 and p50; slash form for the percentile ladder).
+pub fn format_results_tsv_p48_gateway(content: &str) -> String {
+    let want = results_tsv_last_want(content);
+    let label = match want {
+        ResultsTsvLastWant::Keep => "Keep p48",
+        ResultsTsvLastWant::Discard => "Discard p48",
+    };
+    let unit = match want {
+        ResultsTsvLastWant::Keep => "keeps",
+        ResultsTsvLastWant::Discard => "discards",
+    };
+    match count_results_tsv_p48(want) {
+        Err(_) => format!(
+            "**{label}:** no `results.tsv` yet · overnight keep/discard will create it · `results.tsv path` for the file."
+        ),
+        Ok((p48_night, gaps_night, p48_all, gaps_all)) => {
+            let night_part = match p48_night {
+                Some(secs) => {
+                    let d = duration_label_secs(secs);
+                    format!("tonight p48 **{d}** between {unit} ({gaps_night} gaps since 20:00)")
+                }
+                None => format!("tonight need ≥2 {unit} since 20:00 to measure p48"),
+            };
+            let all_part = match p48_all {
+                Some(secs) => {
+                    let d = duration_label_secs(secs);
+                    format!("all-time p48 **{d}** ({gaps_all} gaps)")
+                }
+                None => format!("all-time need ≥2 {unit}"),
+            };
+            format!(
+                "**{label}:** {night_part} · {all_part} · p48 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-p10` for p10 gap · `/keep-p26` for p26 gap · `/keep-p33` for p33 gap · `/keep-p36` for p36 gap · `/keep-p48` for p48 gap · `/keep-p38` for p38 gap · `/keep-p48` for p48 gap · `/keep-p34` for p34 gap · `/keep-p28` for p28 gap · `/keep-p32` for p32 gap · `/keep-p92` for p92 gap · `/keep-p55` for p55 gap · `/keep-p30` for p30 gap · `/keep-p9` for p9 gap · `/keep-p8` for p8 gap · `/keep-p5` for p5 gap · `/keep-p2` for p2 gap · `/keep-p1` for p1 gap · `/keep-p25` for p25 gap · `/keep-p75` for p75 gap · `/keep-p98` for p98 gap · `/keep-p99` for p99 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -63726,6 +64730,7 @@ pub fn looks_like_results_tsv_p22_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -63741,6 +64746,7 @@ pub fn looks_like_results_tsv_p22_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -64103,6 +65109,7 @@ pub fn looks_like_results_tsv_p22_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -64118,6 +65125,7 @@ pub fn looks_like_results_tsv_p22_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -64708,6 +65716,7 @@ pub fn looks_like_results_tsv_p28_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -64723,6 +65732,7 @@ pub fn looks_like_results_tsv_p28_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -65085,6 +66095,7 @@ pub fn looks_like_results_tsv_p28_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -65100,6 +66111,7 @@ pub fn looks_like_results_tsv_p28_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -65667,6 +66679,7 @@ pub fn looks_like_results_tsv_p32_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -65682,6 +66695,7 @@ pub fn looks_like_results_tsv_p32_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -66044,6 +67058,7 @@ pub fn looks_like_results_tsv_p32_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -66059,6 +67074,7 @@ pub fn looks_like_results_tsv_p32_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -66649,6 +67665,7 @@ pub fn looks_like_results_tsv_p92_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -66664,6 +67681,7 @@ pub fn looks_like_results_tsv_p92_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -67026,6 +68044,7 @@ pub fn looks_like_results_tsv_p92_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keep-p24")
         || n.starts_with("/keep-p29")
 || n.starts_with("/keep-p31")
@@ -67041,6 +68060,7 @@ pub fn looks_like_results_tsv_p92_request(content: &str) -> bool {
 || n.starts_with("/keep-p44")
 || n.starts_with("/keep-p46")
 || n.starts_with("/keep-p47")
+|| n.starts_with("/keep-p48")
         || n.starts_with("/keepp27")
         || n.starts_with("/keepp24")
         || n.starts_with("/keepp29")
@@ -105395,6 +106415,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_p47_request(content) {
         return Some(format_results_tsv_p47_gateway(content));
     }
+    if looks_like_results_tsv_p48_request(content) {
+        return Some(format_results_tsv_p48_gateway(content));
+    }
     if looks_like_results_tsv_p43_request(content) {
         return Some(format_results_tsv_p43_gateway(content));
     }
@@ -106150,6 +107173,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_results_tsv_p47_request(content) {
         return Some(format_results_tsv_p47_gateway(content));
+    }
+    if looks_like_results_tsv_p48_request(content) {
+        return Some(format_results_tsv_p48_gateway(content));
     }
     if looks_like_results_tsv_p43_request(content) {
         return Some(format_results_tsv_p43_gateway(content));
@@ -125314,8 +126340,12 @@ mod tests {
         assert!(!looks_like_results_tsv_p44_request("/keep-p46"));
         assert!(!looks_like_results_tsv_p44_request("keep p46"));
         assert!(!looks_like_results_tsv_p44_request("46th percentile keep gap"));
+        assert!(!looks_like_results_tsv_p46_request("/keep-p48"));
+        assert!(!looks_like_results_tsv_p46_request("keep p48"));
+        assert!(!looks_like_results_tsv_p46_request("48th percentile keep gap"));
     }
 
+    #[test]
     fn results_tsv_p47_request_detected() {
         assert!(looks_like_results_tsv_p47_request("/keep-p47"));
         assert!(looks_like_results_tsv_p47_request("keep p47"));
@@ -125352,9 +126382,57 @@ mod tests {
         assert!(!looks_like_results_tsv_p47_request("/keep-p7"));
         assert!(!looks_like_results_tsv_p47_request("keep p7"));
         assert!(!looks_like_results_tsv_p47_request("7th percentile keep gap"));
+        assert!(!looks_like_results_tsv_p47_request("/keep-p48"));
+        assert!(!looks_like_results_tsv_p47_request("keep p48"));
+        assert!(!looks_like_results_tsv_p47_request("48th percentile keep gap"));
         assert!(!looks_like_results_tsv_p47_request("/keep-p46"));
         assert!(!looks_like_results_tsv_p47_request("keep p46"));
         assert!(!looks_like_results_tsv_p47_request("46th percentile keep gap"));
+    }
+
+    #[test]
+    fn results_tsv_p48_request_detected() {
+        assert!(looks_like_results_tsv_p48_request("/keep-p48"));
+        assert!(looks_like_results_tsv_p48_request("keep p48"));
+        assert!(looks_like_results_tsv_p48_request("keep p48 tonight"));
+        assert!(looks_like_results_tsv_p48_request("p48 keep gap"));
+        assert!(looks_like_results_tsv_p48_request("p48 gap between keeps"));
+        assert!(looks_like_results_tsv_p48_request("48th percentile keep gap"));
+        assert!(looks_like_results_tsv_p48_request("view keep p48"));
+        assert!(looks_like_results_tsv_p48_request("open keep p48"));
+        assert!(looks_like_results_tsv_p48_request("/discard-p48"));
+        assert!(looks_like_results_tsv_p48_request("discard p48"));
+        assert!(looks_like_results_tsv_p48_request("p48 discard gap"));
+        assert!(!looks_like_results_tsv_p48_request("/keep-p4"));
+        assert!(!looks_like_results_tsv_p48_request("keep p4"));
+        assert!(!looks_like_results_tsv_p48_request("4th percentile keep gap"));
+        assert!(!looks_like_results_tsv_p48_request("/keep-p6"));
+        assert!(!looks_like_results_tsv_p48_request("keep p6"));
+        assert!(!looks_like_results_tsv_p48_request("6th percentile keep gap"));
+        assert!(!looks_like_results_tsv_p48_request("/keep-p40"));
+        assert!(!looks_like_results_tsv_p48_request("/keep-p44"));
+        assert!(!looks_like_results_tsv_p48_request("/keep-p45"));
+        assert!(!looks_like_results_tsv_p48_request("keep p44"));
+        assert!(!looks_like_results_tsv_p48_request("keep p45"));
+        assert!(!looks_like_results_tsv_p48_request("44th percentile keep gap"));
+        assert!(!looks_like_results_tsv_p48_request("45th percentile keep gap"));
+        assert!(!looks_like_results_tsv_p48_request("/keep-p14"));
+        assert!(!looks_like_results_tsv_p48_request("/keep-p43"));
+        assert!(!looks_like_results_tsv_p48_request("/keep-pace"));
+        assert!(!looks_like_results_tsv_p48_request("/keep-median"));
+        assert!(!looks_like_results_tsv_p48_request("results.tsv path"));
+        assert!(!looks_like_results_tsv_p44_request("/keep-p48"));
+        assert!(!looks_like_results_tsv_p44_request("keep p48"));
+        assert!(!looks_like_results_tsv_p44_request("48th percentile keep gap"));
+        assert!(!looks_like_results_tsv_p48_request("/keep-p8"));
+        assert!(!looks_like_results_tsv_p48_request("keep p8"));
+        assert!(!looks_like_results_tsv_p48_request("8th percentile keep gap"));
+        assert!(!looks_like_results_tsv_p48_request("/keep-p47"));
+        assert!(!looks_like_results_tsv_p48_request("keep p47"));
+        assert!(!looks_like_results_tsv_p48_request("47th percentile keep gap"));
+        assert!(!looks_like_results_tsv_p48_request("/keep-p46"));
+        assert!(!looks_like_results_tsv_p48_request("keep p46"));
+        assert!(!looks_like_results_tsv_p48_request("46th percentile keep gap"));
     }
 #[test]
         fn results_tsv_p18_request_detected() {
