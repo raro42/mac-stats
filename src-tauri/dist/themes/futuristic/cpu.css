@@ -1884,6 +1884,12 @@ body {
   color: var(--text, var(--ink, inherit));
 }
 
+.ollama-menu-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
+  outline-offset: 2px;
+  color: var(--text, var(--ink, inherit));
+}
+
 .ollama-menu {
   position: fixed;
   /* Opaque panel — was white glass rgba(255,255,255,0.95) fallback (#14). */
