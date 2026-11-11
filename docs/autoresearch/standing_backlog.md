@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2596
+
+- Footer GitHub CRT remaps: Data Poster / Dark / Neon / Futuristic `#github-link:hover` / `:focus-visible` / `[aria-busy]` / `[aria-disabled]` Apple `#ffffff` → CRT paper (`#0b0b10` / `#0a0a0a` / `#08120c`). Standing P2 #14 after refresh dim CRT v0.1.2577 / Architect layout-daily gate v0.1.2595; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, or sibling/product fuel (not another keep-pNN clone).
+
 ## Overnight merge — v0.1.2595
 
 - Layout-daily helper: Architect is light paper (spot-check only); dark-ink due set is `data-poster` / `dark` / `neon` / `futuristic` with CRT remap audit. Standing P0 after digester/ops-help collapse v0.1.2594. Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, or sibling/product fuel (not another keep-pNN clone).

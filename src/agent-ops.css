@@ -27067,3 +27067,66 @@ body.theme-futuristic .ops-refresh-row.ops-refresh-row-top {
   border-bottom-color: color-mix(in srgb, currentColor 10%, #0b0b10);
 }
 
+/*
+ * Data Poster / Dark / Neon / Futuristic: footer GitHub link hover / focus /
+ * busy-disabled still mixed Apple `#ffffff` (`#github-link:hover` wash,
+ * `:focus-visible` outline, `[aria-busy]` / `[aria-disabled]` dark-ink-on-white)
+ * → muddy slab on CRT shells while is-just-saved already remaps. Remap wash /
+ * outline onto CRT paper and busy type to light-on-shell (62%). Standing P2 #14
+ * after refresh dim + Ops hairline CRT v0.1.2577 / Architect layout-daily
+ * gate v0.1.2595; product fuel (not keep-pNN; layout-daily already marked
+ * data-poster today). Polish-without-capture; Mac capture still TCC-blocked.
+ */
+/* OVERNIGHT v0.1.2596: footer GitHub hover/focus/busy CRT */
+body.theme-data-poster #github-link:hover {
+  background: color-mix(in srgb, currentColor 10%, #0b0b10);
+}
+body.theme-data-poster #github-link:focus-visible {
+  outline: 2px solid color-mix(in srgb, currentColor 45%, #0b0b10);
+  outline-offset: 2px;
+}
+body.theme-data-poster #github-link[aria-busy="true"],
+body.theme-data-poster #github-link[aria-disabled="true"] {
+  color: color-mix(in srgb, #ffffff 62%, #0b0b10);
+  opacity: 1;
+}
+
+body.theme-dark #github-link:hover {
+  background: color-mix(in srgb, currentColor 10%, #0a0a0a);
+}
+body.theme-dark #github-link:focus-visible {
+  outline: 2px solid color-mix(in srgb, currentColor 45%, #0a0a0a);
+  outline-offset: 2px;
+}
+body.theme-dark #github-link[aria-busy="true"],
+body.theme-dark #github-link[aria-disabled="true"] {
+  color: color-mix(in srgb, #ffffff 62%, #0a0a0a);
+  opacity: 1;
+}
+
+body.theme-neon #github-link:hover {
+  background: color-mix(in srgb, currentColor 10%, #08120c);
+}
+body.theme-neon #github-link:focus-visible {
+  outline: 2px solid color-mix(in srgb, currentColor 45%, #08120c);
+  outline-offset: 2px;
+}
+body.theme-neon #github-link[aria-busy="true"],
+body.theme-neon #github-link[aria-disabled="true"] {
+  color: color-mix(in srgb, #ffffff 62%, #08120c);
+  opacity: 1;
+}
+
+body.theme-futuristic #github-link:hover {
+  background: color-mix(in srgb, currentColor 10%, #0b0b10);
+}
+body.theme-futuristic #github-link:focus-visible {
+  outline: 2px solid color-mix(in srgb, currentColor 45%, #0b0b10);
+  outline-offset: 2px;
+}
+body.theme-futuristic #github-link[aria-busy="true"],
+body.theme-futuristic #github-link[aria-disabled="true"] {
+  color: color-mix(in srgb, #ffffff 62%, #0b0b10);
+  opacity: 1;
+}
+

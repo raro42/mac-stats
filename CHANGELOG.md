@@ -9,6 +9,12 @@
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2596] - 2026-11-11
+
+### Changed
+
+- **Footer GitHub CRT remaps:** Data Poster / Dark / Neon / Futuristic `#github-link:hover` wash, `:focus-visible` outline, and `[aria-busy]` / `[aria-disabled]` dim type no longer mix Apple `#ffffff`. Remap onto CRT paper (`#0b0b10` / `#0a0a0a` / `#08120c`) so hover, focus, and busy states stay readable on opaque shells (footer adjacent; after Refresh dim CRT v0.1.2577 / layout-daily Architect gate v0.1.2595).
+
 ## [0.1.2595] - 2026-11-11
 
 ### Changed
