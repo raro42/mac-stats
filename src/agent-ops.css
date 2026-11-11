@@ -27130,3 +27130,66 @@ body.theme-futuristic #github-link[aria-disabled="true"] {
   opacity: 1;
 }
 
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: leftover focus / disabled mixes still
+ * use Apple `#ffffff` — `.logs-path-hint:focus-visible` outline, `#cpu-usage-card:focus-visible`
+ * focus wash, `#perplexity-search-btn:disabled` dark-ink-on-white → muddy slab on CRT
+ * shells (Saved / Search hover-focus already remapped). Remap focus onto CRT paper and
+ * disabled type to light-on-shell (48%). Standing P2 #14 after monitor_history mutex
+ * v0.1.2597 / GitHub CRT v0.1.2596; product fuel (not keep-pNN; layout-daily already
+ * marked data-poster today). Polish-without-capture; Mac capture still TCC-blocked.
+ */
+/* OVERNIGHT v0.1.2598: logs-path / cpu-usage / perplexity disabled CRT */
+body.theme-data-poster .logs-path-hint:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #0b0b10);
+  outline-offset: 2px;
+}
+body.theme-data-poster #cpu-usage-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0b0b10);
+}
+body.theme-data-poster #perplexity-search-btn:disabled {
+  color: color-mix(in srgb, #ffffff 48%, #0b0b10);
+  opacity: 1;
+}
+
+body.theme-dark .logs-path-hint:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #0a0a0a);
+  outline-offset: 2px;
+}
+body.theme-dark #cpu-usage-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0a0a0a);
+}
+body.theme-dark #perplexity-search-btn:disabled {
+  color: color-mix(in srgb, #ffffff 48%, #0a0a0a);
+  opacity: 1;
+}
+
+body.theme-neon .logs-path-hint:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #08120c);
+  outline-offset: 2px;
+}
+body.theme-neon #cpu-usage-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #08120c);
+}
+body.theme-neon #perplexity-search-btn:disabled {
+  color: color-mix(in srgb, #ffffff 48%, #08120c);
+  opacity: 1;
+}
+
+body.theme-futuristic .logs-path-hint:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #0b0b10);
+  outline-offset: 2px;
+}
+body.theme-futuristic #cpu-usage-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0b0b10);
+}
+body.theme-futuristic #perplexity-search-btn:disabled {
+  color: color-mix(in srgb, #ffffff 48%, #0b0b10);
+  opacity: 1;
+}
+

@@ -15,6 +15,10 @@ Overnight autoresearch kept shipping Instant ratchet glances through `/keep-p48`
 - Ladder densify keeps through `/keep-p48` (v0.1.2593) and related morning-surprise docs.
 - **Refactor:** harness_ops god file → `commands/harness_ops/` (~24k lines) with ResourceLane + budget guard.
 
+## Later same night
+
+- Continued in `morning_surprise_2026-11-12.md` (v0.1.2597 mutex + v0.1.2598 CRT focus/disabled remaps).
+
 ## Next fuel
 
 - Dark layout-daily when due, Mac window capture when TCC allows, or real sibling/product work — **not** another `/keep-pNN` clone.

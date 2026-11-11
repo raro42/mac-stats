@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2598
+
+- CRT focus / disabled remaps: Data Poster / Dark / Neon / Futuristic `.logs-path-hint:focus-visible` / `#cpu-usage-card:focus-visible` / `#perplexity-search-btn:disabled` Apple `#ffffff` → CRT paper (`#0b0b10` / `#0a0a0a` / `#08120c`). Standing P2 #14 after monitor_history mutex v0.1.2597 / GitHub CRT v0.1.2596; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, leftover CRT gaps (e.g. `#cpu-usage-card` Apple outline-only path if themes still inherit, or sibling/product fuel) — not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2597
 
 - Serialize `monitor_history.json` RMW with a process-wide mutex in `commands/monitors.rs` (`record_monitor_history_tick` / clear / history getters) so background checks + “Check now” cannot drop each other’s 24h ticks (atomic write alone is not enough). Standing P0 user-facing correctness after footer GitHub CRT v0.1.2596; digester empty; design-review grace; layout-daily data-poster already today. Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, leftover CRT focus/disabled gaps (`.logs-path-hint:focus-visible` / `#cpu-usage-card:focus-visible` / `#perplexity-search-btn:disabled`), or sibling/product fuel — not another keep-pNN clone.
