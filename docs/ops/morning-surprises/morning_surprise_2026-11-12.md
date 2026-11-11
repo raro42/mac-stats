@@ -4,6 +4,7 @@ Overnight autoresearch kept real product polish (not digester-empty quiet).
 
 ## Shipped
 
+- **v0.1.2611** — Light / Material / Architect / Swiss Minimalistic `.collapsible-header:focus-visible` / `.force-quit-btn:focus-visible` / `.monitors-menu-btn:focus-visible` accent + danger rings on `#f7f7fa` / `#ebe4d9` / `#f1f1f1` / `#ffffff` (Apple / CRT parity after v0.1.2610; Standing P2 #14).
 - **v0.1.2610** — Dark / Neon / Futuristic `.collapsible-header:focus-visible` / `.force-quit-btn:focus-visible` / `.monitors-menu-btn:focus-visible` + Data Poster collapsible-header focus on CRT paper `#0a0a0a` / `#08120c` / `#0b0b10` (Apple parity; Standing P2 #14 after CRT collapse v0.1.2609).
 - **v0.1.2609** — Dark / Neon / Futuristic `.collapse-btn:focus-visible` + Data Poster / Dark / Neon / Futuristic `.theme-version:focus-visible` CRT accent rings on `#0a0a0a` / `#08120c` / `#0b0b10` (was missing; Apple / Light / Material / Architect / Swiss already had both; Data Poster had collapse only).
 - **v0.1.2608** — Light / Material / Architect / Swiss Minimalistic `.collapse-btn:focus-visible` + `.theme-version:focus-visible` / `.arch-version:focus-visible` accent rings on `#f7f7fa` / `#ebe4d9` / `#f1f1f1` / `#ffffff` (Apple `.app-version` / collapse parity; Data Poster already had collapse).
@@ -20,7 +21,7 @@ Overnight autoresearch kept real product polish (not digester-empty quiet).
 
 ## Context
 
-- Digester: empty (0 turns / 7d). Design review grace. Layout-daily data-poster already marked today.
-- Sibling OpenClaw/Hermes missing on Linux rack. Debug.log idle-thought Ollama wall-budget WARNs only.
-- Race discard then re-pick: local CRT icon-line collided with origin **v0.1.2607**; later local CRT collapse/version collided with origin **v0.1.2609**; this tick shipped CRT collapsible-header / Force Quit / Monitors menu focus as **v0.1.2610**.
-- Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, Light/Material/Architect/Swiss Minimalistic `.collapsible-header:focus-visible` / `.force-quit-btn:focus-visible` / `.monitors-menu-btn:focus-visible` if still missing, or sibling/product fuel — not keep-pNN clones.
+- Digester: empty (0 turns / 7d). Design review grace. Layout-daily data-poster already marked 2026-11-11.
+- Sibling OpenClaw/Hermes missing on Linux rack. Debug.log quiet (no ERROR/WARN clusters in recent windows).
+- ~23:55 tick shipped Light section / Force Quit / Monitors menu focus as **v0.1.2611** after CRT parity **v0.1.2610**.
+- Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, leftover attention-glance focus mixes if still muddy, or sibling/product fuel — not keep-pNN clones.
