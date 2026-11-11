@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2590
+
+- Instant `/keep-p44` · `keep p44` · `p44 keep gap` · `44th percentile keep gap` · `p44 gap between keeps` (+ discard) — nearest-rank p44 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters; digit-safe vs p4/p40/p41/p42/p43/p45/p14). Standing P0 after `/keep-p43` v0.1.2589. Next: other ratchet glance (`/keep-p46` / `/keep-p47`), or Mac capture when TCC allows; Dark layout-daily next due theme.
+
 ## Overnight merge — v0.1.2589
 
 - Instant `/keep-p43` · `keep p43` · `p43 keep gap` · `43rd percentile keep gap` · `p43 gap between keeps` (+ discard) — nearest-rank p43 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters; digit-safe vs p4/p3/p40/p41/p42/p45/p14). Standing P0 after `/keep-p42` v0.1.2588. Next: other ratchet glance (`/keep-p44` / `/keep-p46`), or Mac capture when TCC allows; Dark layout-daily next due theme.
