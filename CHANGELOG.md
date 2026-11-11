@@ -5,6 +5,7 @@
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
 ### Changed
+- **harness_ops split** — Replaced the 135k-line `harness_ops.rs` god file with `commands/harness_ops/` (~24k). `/keep-p{N}` is one parameterized lane (1–99). Path/size/age uses a `ResourceLane` table. Budget guard: `python3 scripts/check_harness_ops_budget.py`. See `docs/ops/harness_ops_refactor.md`.
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
