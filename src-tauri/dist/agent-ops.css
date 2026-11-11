@@ -27193,3 +27193,30 @@ body.theme-futuristic #perplexity-search-btn:disabled {
   opacity: 1;
 }
 
+/*
+ * Dark / Neon / Futuristic: AI Chat filter-chip focus still mixed Apple `#ffffff`
+ * (Data Poster remapped earlier). Futuristic empty-chip focus also still inherited
+ * the Apple outline mix while Dark / Neon already CRT. Remap focus washes onto CRT
+ * paper so keyboard focus stays readable on opaque shells. Standing P2 #14 after
+ * logs-path / cpu-usage / perplexity disabled CRT v0.1.2598; product fuel
+ * (digester empty; design-review grace; layout-daily data-poster already today —
+ * not a second layout tick; not keep-pNN). Polish-without-capture; Mac capture
+ * still TCC-blocked.
+ */
+/* OVERNIGHT v0.1.2599: chat-filter / futuristic empty-chip focus CRT */
+body.theme-dark .chat-filter-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 20%, #0a0a0a);
+}
+body.theme-neon .chat-filter-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 20%, #08120c);
+}
+body.theme-futuristic .chat-filter-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+body.theme-futuristic .chat-empty-chip:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+}
+

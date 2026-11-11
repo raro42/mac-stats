@@ -8,18 +8,18 @@ Overnight autoresearch (Track B) starting 2026-11-11 20:00 CET.
 - **v0.1.2595** — Layout-daily helper: Architect is light paper (spot-check only). Dark-ink due set is `data-poster` / `dark` / `neon` / `futuristic` with CRT remap audit.
 - **v0.1.2596** — Footer GitHub hover / focus / busy CRT remaps on Data Poster / Dark / Neon / Futuristic.
 - **v0.1.2597** — Serialize `monitor_history.json` RMW behind a process-wide mutex so background checks and “Check now” cannot drop each other’s 24h ticks.
-- **v0.1.2598** — CRT remaps for `.logs-path-hint:focus-visible`, `#cpu-usage-card:focus-visible`, and `#perplexity-search-btn:disabled` on Data Poster / Dark / Neon / Futuristic (Apple `#ffffff` → CRT paper).
+- **v0.1.2598** — CRT remaps for `.logs-path-hint:focus-visible`, `#cpu-usage-card:focus-visible`, `#perplexity-search-btn:disabled`.
+- **v0.1.2599** — Dark / Neon / Futuristic `.chat-filter-chip:focus-visible` + Futuristic `.chat-empty-chip:focus-visible` CRT remaps (Apple `#ffffff` → CRT paper).
 
 ## Tried / discarded
 
 - Local digester keep-p generator rebuild raced origin v0.1.2594 (same Slowest collapse) → discard.
-- Parallel tick already took monitor_history mutex as v0.1.2597 before this tick could start it → re-picked CRT focus/disabled gaps.
 
 ## Context
 
-- Digester open empty; design review not due (grace); layout-daily data-poster already marked today (no second layout tick).
-- Debug.log: idle-thought Ollama wall-budget WARNs (best-effort; not product ERROR/panic).
+- Digester open empty; design review not due (grace); layout-daily data-poster already marked today.
+- Sibling OpenClaw/Hermes missing on Linux rack; debug.log quiet.
 
 ## Next fuel
 
-- Dark layout-daily when the day quota opens, Mac capture when TCC allows, or sibling/product fuel (not another keep-pNN clone).
+- Dark layout-daily when the day quota opens, Mac capture when TCC allows, leftover CRT gaps (settings attention-glance hover/focus), or sibling/product fuel (not another keep-pNN clone).

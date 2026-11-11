@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2599
+
+- CRT chat focus remaps: Dark / Neon / Futuristic `.chat-filter-chip:focus-visible` + Futuristic `.chat-empty-chip:focus-visible` Apple `#ffffff` → CRT paper (`#0a0a0a` / `#08120c` / `#0b0b10`). Standing P2 #14 after logs-path / cpu-usage / perplexity disabled CRT v0.1.2598; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, leftover CRT gaps (settings attention-glance hover/focus Apple mixes if still muddy, or sibling/product fuel) — not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2598
 
 - CRT focus / disabled remaps: Data Poster / Dark / Neon / Futuristic `.logs-path-hint:focus-visible` / `#cpu-usage-card:focus-visible` / `#perplexity-search-btn:disabled` Apple `#ffffff` → CRT paper (`#0b0b10` / `#0a0a0a` / `#08120c`). Standing P2 #14 after monitor_history mutex v0.1.2597 / GitHub CRT v0.1.2596; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily when the day quota opens, Mac capture when TCC allows, leftover CRT gaps (e.g. `#cpu-usage-card` Apple outline-only path if themes still inherit, or sibling/product fuel) — not another keep-pNN clone.
