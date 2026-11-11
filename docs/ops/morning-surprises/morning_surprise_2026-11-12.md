@@ -5,7 +5,7 @@ Overnight autoresearch kept real product polish (not digester-empty quiet).
 ## Shipped
 
 - **v0.1.2614** — Dark / Neon / Futuristic Monitors / AI Chat menu-item + popover-close + Add / Remove focus rings on CRT paper `#0a0a0a` / `#08120c` / `#0b0b10` (Apple / Data Poster parity after layout-daily v0.1.2613).
-- **v0.1.2613** — Layout-daily Data Poster / Dark / Neon / Futuristic `.monitors-menu-item:focus-visible` / `.ollama-menu-item:focus-visible` + Monitors / AI Chat `.popover-close:focus-visible` on CRT paper `#0b0b10` / `#0a0a0a` / `#08120c` (Apple parity; Dark/Neon/Futuristic also Add / Remove focus; Standing P2 #14 after v0.1.2612).
+- **v0.1.2613** — Layout-daily Data Poster `.monitors-menu-item:focus-visible` / `.ollama-menu-item:focus-visible` + Monitors / AI Chat `.popover-close:focus-visible` on `#0b0b10` (Apple parity; Standing P2 #14).
 - **v0.1.2611** — Light / Material / Architect / Swiss Minimalistic `.collapsible-header:focus-visible` / `.force-quit-btn:focus-visible` / `.monitors-menu-btn:focus-visible` accent + danger rings on `#f7f7fa` / `#ebe4d9` / `#f1f1f1` / `#ffffff` (Apple / CRT parity after v0.1.2610; Standing P2 #14).
 - **v0.1.2610** — Dark / Neon / Futuristic `.collapsible-header:focus-visible` / `.force-quit-btn:focus-visible` / `.monitors-menu-btn:focus-visible` + Data Poster collapsible-header focus on CRT paper `#0a0a0a` / `#08120c` / `#0b0b10` (Apple parity; Standing P2 #14 after CRT collapse v0.1.2609).
 - **v0.1.2609** — Dark / Neon / Futuristic `.collapse-btn:focus-visible` + Data Poster / Dark / Neon / Futuristic `.theme-version:focus-visible` CRT accent rings on `#0a0a0a` / `#08120c` / `#0b0b10` (was missing; Apple / Light / Material / Architect / Swiss already had both; Data Poster had collapse only).
