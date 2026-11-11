@@ -251,6 +251,12 @@ body {
   background: color-mix(in srgb, currentColor 8%, #0b0b10);
 }
 
+.collapsible-header:focus-visible {
+  outline: none;
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, #0b0b10);
+}
+
 .metric-label {
   position: relative;
   z-index: 1;
