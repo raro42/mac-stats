@@ -2130,6 +2130,11 @@ body {
   opacity: 0.8;
 }
 
+.connection-indicator:focus-visible:not(.connected) {
+  outline: 2px solid color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
+  outline-offset: 3px;
+}
+
 .model-text {
   font-size: 12px;
   /* Opaque type — was gray glass rgba(128,…) fallback (#14). */
@@ -2148,6 +2153,12 @@ body {
 .model-text:hover {
   color: var(--text, var(--ink, inherit));
   background: var(--hairline, color-mix(in srgb, #ffffff 12%, #0a0a0a));
+}
+
+.model-text:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
+  outline-offset: 2px;
+  color: var(--text, var(--ink, inherit));
 }
 
 .model-select-dropdown {

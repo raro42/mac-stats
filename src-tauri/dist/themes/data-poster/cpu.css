@@ -2159,6 +2159,11 @@ body {
   opacity: 0.8;
 }
 
+.connection-indicator:focus-visible:not(.connected) {
+  outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+  outline-offset: 3px;
+}
+
 /* Opaque type + wash — glass alpha stays in Graphics and Media (#14). */
 .model-text {
   font-size: 12px;
@@ -2178,6 +2183,12 @@ body {
 .model-text:hover {
   color: color-mix(in srgb, #ffffff 92%, #0b0b10);
   background: color-mix(in srgb, #ffffff 8%, #0b0b10);
+}
+
+.model-text:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+  outline-offset: 2px;
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */

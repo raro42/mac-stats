@@ -2120,6 +2120,11 @@ body {
   opacity: 0.8;
 }
 
+.connection-indicator:focus-visible:not(.connected) {
+  outline: 2px solid color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
+  outline-offset: 3px;
+}
+
 .model-text {
   font-size: 12px;
   color: var(--muted, color-mix(in srgb, #ffffff 60%, #0b0b10));
@@ -2138,6 +2143,12 @@ body {
   color: var(--text, var(--ink, inherit));
   /* Opaque wash — was gray glass rgba(128,128,128,0.1) (#14). */
   background: color-mix(in srgb, #ffffff 8%, #0b0b10);
+}
+
+.model-text:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
+  outline-offset: 2px;
+  color: var(--text, var(--ink, inherit));
 }
 
 .model-select-dropdown {
