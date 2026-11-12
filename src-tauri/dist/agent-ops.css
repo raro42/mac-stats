@@ -31977,3 +31977,227 @@ body.theme-architect .chat-answer-part.chat-answer-final {
   border-color: color-mix(in srgb, #0a84ff 28%, #f1f1f1);
   background: color-mix(in srgb, #0a84ff 6%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: AI Chat glances still mix Apple `#ffffff`
+ * (`.chat-model-glance` · `.chat-turn-glance` · `.chat-answer-glance` ·
+ * `.chat-errors-glance` · `.chat-offline-attention-glance` resting / hover /
+ * focus / soft-states) while Data Poster / Dark / Neon / Futuristic remaps
+ * already exist. Opaque washes on cream paper so AI Chat glances match light
+ * shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
+ * AI Chat answer-part remaps v0.1.2660.
+ */
+/* OVERNIGHT v0.1.2661: light AI Chat glance remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .chat-model-glance,
+body.theme-light .chat-turn-glance,
+body.theme-light .chat-answer-glance,
+body.theme-light .chat-errors-glance,
+body.theme-light .chat-offline-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .chat-model-glance:hover,
+body.theme-light .chat-turn-glance:hover,
+body.theme-light .chat-answer-glance:hover,
+body.theme-light .chat-errors-glance:hover,
+body.theme-light .chat-offline-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .chat-model-glance:focus-visible,
+body.theme-light .chat-turn-glance:focus-visible,
+body.theme-light .chat-answer-glance:focus-visible,
+body.theme-light .chat-errors-glance:focus-visible,
+body.theme-light .chat-offline-attention-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .chat-model-glance.is-online,
+body.theme-light .chat-turn-glance.is-ok:not(.is-active),
+body.theme-light .chat-answer-glance.has-answer:not(.has-errors),
+body.theme-light .chat-offline-attention-glance.is-ready,
+body.theme-light .chat-offline-attention-glance.is-last-answer {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+body.theme-light .chat-model-glance.is-offline,
+body.theme-light .chat-model-glance.is-online.is-no-model,
+body.theme-light .chat-model-glance.is-offline.is-circuit,
+body.theme-light .chat-offline-attention-glance.is-offline,
+body.theme-light .chat-offline-attention-glance.is-circuit,
+body.theme-light .chat-offline-attention-glance.is-no-model {
+  border-color: color-mix(in srgb, #ff9500 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff9500 7%, #f7f7fa);
+}
+body.theme-light .chat-turn-glance.is-active,
+body.theme-light .chat-offline-attention-glance.is-continue {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f7f7fa);
+}
+body.theme-light .chat-offline-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #f7f7fa);
+}
+body.theme-light .chat-offline-attention-glance.is-sending {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 38%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #f7f7fa);
+}
+body.theme-light .chat-answer-glance.has-errors,
+body.theme-light .chat-errors-glance.has-errors,
+body.theme-light .chat-offline-attention-glance.is-not-set,
+body.theme-light .chat-offline-attention-glance.is-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
+}
+body.theme-light .chat-answer-glance.is-just-copied,
+body.theme-light .chat-offline-attention-glance.is-just-copied {
+  border-color: color-mix(in srgb, #34c759 40%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 10%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .chat-model-glance,
+body.theme-material .chat-turn-glance,
+body.theme-material .chat-answer-glance,
+body.theme-material .chat-errors-glance,
+body.theme-material .chat-offline-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .chat-model-glance:hover,
+body.theme-material .chat-turn-glance:hover,
+body.theme-material .chat-answer-glance:hover,
+body.theme-material .chat-errors-glance:hover,
+body.theme-material .chat-offline-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .chat-model-glance:focus-visible,
+body.theme-material .chat-turn-glance:focus-visible,
+body.theme-material .chat-answer-glance:focus-visible,
+body.theme-material .chat-errors-glance:focus-visible,
+body.theme-material .chat-offline-attention-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .chat-model-glance.is-online,
+body.theme-material .chat-turn-glance.is-ok:not(.is-active),
+body.theme-material .chat-answer-glance.has-answer:not(.has-errors),
+body.theme-material .chat-offline-attention-glance.is-ready,
+body.theme-material .chat-offline-attention-glance.is-last-answer {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+body.theme-material .chat-model-glance.is-offline,
+body.theme-material .chat-model-glance.is-online.is-no-model,
+body.theme-material .chat-model-glance.is-offline.is-circuit,
+body.theme-material .chat-offline-attention-glance.is-offline,
+body.theme-material .chat-offline-attention-glance.is-circuit,
+body.theme-material .chat-offline-attention-glance.is-no-model {
+  border-color: color-mix(in srgb, #ff9500 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff9500 7%, #ebe4d9);
+}
+body.theme-material .chat-turn-glance.is-active,
+body.theme-material .chat-offline-attention-glance.is-continue {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #ebe4d9);
+}
+body.theme-material .chat-offline-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #ebe4d9);
+}
+body.theme-material .chat-offline-attention-glance.is-sending {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 38%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #ebe4d9);
+}
+body.theme-material .chat-answer-glance.has-errors,
+body.theme-material .chat-errors-glance.has-errors,
+body.theme-material .chat-offline-attention-glance.is-not-set,
+body.theme-material .chat-offline-attention-glance.is-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
+}
+body.theme-material .chat-answer-glance.is-just-copied,
+body.theme-material .chat-offline-attention-glance.is-just-copied {
+  border-color: color-mix(in srgb, #34c759 40%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 10%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .chat-model-glance,
+body.theme-architect .chat-turn-glance,
+body.theme-architect .chat-answer-glance,
+body.theme-architect .chat-errors-glance,
+body.theme-architect .chat-offline-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .chat-model-glance:hover,
+body.theme-architect .chat-turn-glance:hover,
+body.theme-architect .chat-answer-glance:hover,
+body.theme-architect .chat-errors-glance:hover,
+body.theme-architect .chat-offline-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .chat-model-glance:focus-visible,
+body.theme-architect .chat-turn-glance:focus-visible,
+body.theme-architect .chat-answer-glance:focus-visible,
+body.theme-architect .chat-errors-glance:focus-visible,
+body.theme-architect .chat-offline-attention-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .chat-model-glance.is-online,
+body.theme-architect .chat-turn-glance.is-ok:not(.is-active),
+body.theme-architect .chat-answer-glance.has-answer:not(.has-errors),
+body.theme-architect .chat-offline-attention-glance.is-ready,
+body.theme-architect .chat-offline-attention-glance.is-last-answer {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}
+body.theme-architect .chat-model-glance.is-offline,
+body.theme-architect .chat-model-glance.is-online.is-no-model,
+body.theme-architect .chat-model-glance.is-offline.is-circuit,
+body.theme-architect .chat-offline-attention-glance.is-offline,
+body.theme-architect .chat-offline-attention-glance.is-circuit,
+body.theme-architect .chat-offline-attention-glance.is-no-model {
+  border-color: color-mix(in srgb, #ff9500 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff9500 7%, #f1f1f1);
+}
+body.theme-architect .chat-turn-glance.is-active,
+body.theme-architect .chat-offline-attention-glance.is-continue {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f1f1f1);
+}
+body.theme-architect .chat-offline-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 24%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 5.5%, #f1f1f1);
+}
+body.theme-architect .chat-offline-attention-glance.is-sending {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 38%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, #f1f1f1);
+}
+body.theme-architect .chat-answer-glance.has-errors,
+body.theme-architect .chat-errors-glance.has-errors,
+body.theme-architect .chat-offline-attention-glance.is-not-set,
+body.theme-architect .chat-offline-attention-glance.is-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+}
+body.theme-architect .chat-answer-glance.is-just-copied,
+body.theme-architect .chat-offline-attention-glance.is-just-copied {
+  border-color: color-mix(in srgb, #34c759 40%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 10%, #f1f1f1);
+}
