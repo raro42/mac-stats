@@ -31570,3 +31570,77 @@ body.theme-architect #ops-runs-list .ops-row.is-fail:not(.is-selected):hover {
   background: color-mix(in srgb, #ff3b30 10%, #f1f1f1);
   border-color: color-mix(in srgb, #ff3b30 28%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Agent Ops On/Off badges still mix Apple
+ * `#ffffff` (.ops-badge · hover · focus · disabled · .off) while Data Poster /
+ * Dark / Neon / Futuristic remaps already exist. Opaque washes on cream paper
+ * so Ops badges match light shells (Swiss / Apple keep shared `#ffffff`).
+ * Standing P2 #14 after light Ops row/list remaps v0.1.2653.
+ */
+/* OVERNIGHT v0.1.2654: light Ops badge remaps */
+body.theme-light .ops-badge {
+  background: color-mix(in srgb, #30d158 28%, #f7f7fa);
+  border-color: color-mix(in srgb, #30d158 35%, #f7f7fa);
+}
+body.theme-light button.ops-badge:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, #30d158 22%, #f7f7fa);
+}
+body.theme-light button.ops-badge.off:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 14%, #f7f7fa);
+}
+body.theme-light button.ops-badge:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 28%, #f7f7fa);
+}
+body.theme-light button.ops-badge:disabled {
+  color: color-mix(in srgb, #0c0c10 48%, #f7f7fa);
+}
+body.theme-light .ops-badge.off {
+  background: color-mix(in srgb, currentColor 8%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 12%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 53%, #f7f7fa);
+}
+
+body.theme-material .ops-badge {
+  background: color-mix(in srgb, #30d158 28%, #ebe4d9);
+  border-color: color-mix(in srgb, #30d158 35%, #ebe4d9);
+}
+body.theme-material button.ops-badge:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, #30d158 22%, #ebe4d9);
+}
+body.theme-material button.ops-badge.off:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 14%, #ebe4d9);
+}
+body.theme-material button.ops-badge:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 28%, #ebe4d9);
+}
+body.theme-material button.ops-badge:disabled {
+  color: color-mix(in srgb, #0c0c10 48%, #ebe4d9);
+}
+body.theme-material .ops-badge.off {
+  background: color-mix(in srgb, currentColor 8%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 12%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 53%, #ebe4d9);
+}
+
+body.theme-architect .ops-badge {
+  background: color-mix(in srgb, #30d158 28%, #f1f1f1);
+  border-color: color-mix(in srgb, #30d158 35%, #f1f1f1);
+}
+body.theme-architect button.ops-badge:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, #30d158 22%, #f1f1f1);
+}
+body.theme-architect button.ops-badge.off:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 14%, #f1f1f1);
+}
+body.theme-architect button.ops-badge:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 28%, #f1f1f1);
+}
+body.theme-architect button.ops-badge:disabled {
+  color: color-mix(in srgb, #0c0c10 48%, #f1f1f1);
+}
+body.theme-architect .ops-badge.off {
+  background: color-mix(in srgb, currentColor 8%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 12%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 53%, #f1f1f1);
+}
