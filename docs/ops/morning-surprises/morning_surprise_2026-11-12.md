@@ -1,20 +1,22 @@
 # Morning surprise — 2026-11-12
 
-Overnight autoresearch kept shipping keyboard-focus rings on opaque theme paper (Standing P2 #14). Digester stayed empty; design-review still in grace; layout-daily Data Poster already marked for today.
+Overnight autoresearch kept product focus polish (not digester-empty quiet).
 
-## Shipped tonight (highlights)
+## Shipped
 
-- **v0.1.2618** — Agent Ops Logs toolbar focus on Light / Material / Architect / Swiss / Dark / Neon / Futuristic (`.logs-toolbar button:focus-visible`). Apple / Data Poster already had it.
-- **v0.1.2617** — AI Chat `.connection-indicator:focus-visible:not(.connected)` + `.model-text:focus-visible` across non-Apple themes (sibling tick; this rack discarded a parallel race of the same keep).
-- Earlier keeps same night: settings Save/Cancel + model-select (2616), Light menu/popover (2615), CRT menu/popover (2614), Data Poster layout-daily menu focus (2613), and the long focus ladder down from section / Force Quit / Monitors / icon / theme picker / Send.
+| Version | What |
+|---------|------|
+| **v0.1.2619** | Perplexity search query focus: shared  + CRT/light-paper remaps (Tab into query stays readable; Apple already had theme-local). |
+| **v0.1.2618** | Agent Ops logs-toolbar button focus rings on Light/Material/Architect/Swiss/Dark/Neon/Futuristic. |
+| **v0.1.2617** | AI Chat connection + model-text focus rings across themes. |
+| **v0.1.2616** | AI Chat settings Save/Cancel + model-select focus. |
+| **v0.1.2615** | Light Monitors/AI Chat menu-item + popover-close + add/remove focus. |
+| **v0.1.2613** | Layout-daily Data Poster menu-item + popover-close focus. |
 
-## Tried / discarded
+## Context
 
-- Parallel-race discard: local duplicate of v0.1.2617 model-text/connection focus vs origin `be75dbc4`.
+- Digester open empty most of the night; design-review in grace; layout-daily quota used on Data Poster.
+- Standing P2 #14 keyboard focus parity on opaque shells (not keep-pNN clones).
+- Next: Dark layout-daily next calendar day; Mac capture when TCC allows; leftover section-header / settings attention-glance remaps.
 
-## Still open for later ticks
-
-- Dark layout-daily next calendar day (quota used by Data Poster today).
-- Leftover: `.perplexity-search-box` input/button focus + `.perplexity-result-item:focus-within` if still Apple-only.
-- Mac window capture when TCC allows; design-review Agent Ops when grace ends.
-
+Generated: 2026-11-12T01:41:20
