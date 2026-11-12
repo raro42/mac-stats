@@ -31716,3 +31716,24 @@ body.theme-architect .ops-keyboard-hint {
   color: color-mix(in srgb, #0c0c10 62%, #f1f1f1);
   opacity: 1;
 }
+
+/*
+ * Light / Material / Architect: Agent Ops refresh-row keyboard hint still mixes
+ * Apple `#ffffff` (.ops-refresh-row-kb-hint) while Data Poster / Dark / Neon /
+ * Futuristic remaps already exist. Opaque type on cream paper so Ops refresh
+ * chrome matches light shells (Swiss / Apple keep shared `#ffffff`). Standing
+ * P2 #14 after light Ops updated-ago / keyboard-hint remaps v0.1.2655.
+ */
+/* OVERNIGHT v0.1.2656: light Ops refresh-row kb-hint remaps */
+body.theme-light .ops-refresh-row-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-material .ops-refresh-row-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-architect .ops-refresh-row-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+  opacity: 1;
+}

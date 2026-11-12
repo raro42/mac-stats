@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2656
+
+- Light Agent Ops refresh-row kb-hint washes: Light / Material / Architect `.ops-refresh-row-kb-hint` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`. Standing P2 #14 after light Ops updated-ago / keyboard-hint remaps v0.1.2655; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover light Ops `.ops-health-value` / AI Chat `.response-time` cream `#ffffff` mixes if still muddy, or sibling/product fuel — not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2655
 
 - Light Agent Ops Updated ago / keyboard-hint washes: Light / Material / Architect `.ops-updated-ago` (resting / visible / hover / focus) / `.ops-keyboard-hint` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`. Standing P2 #14 after light Ops badge remaps v0.1.2654; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover light Ops `.ops-refresh-row-kb-hint` / other cream `#ffffff` mixes if still muddy, or sibling/product fuel — not another keep-pNN clone.
