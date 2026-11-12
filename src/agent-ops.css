@@ -31387,3 +31387,186 @@ body.theme-architect .ops-tab-bar-kb-hint {
 body.theme-architect {
   --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Agent Ops list rows still mix Apple `#ffffff`
+ * (.ops-row resting/hover/focus/selected/copied · .ops-row-meta · Runs
+ * Lite·Slow·Fail) while Data Poster / Dark / Neon / Futuristic remaps already
+ * exist. Opaque washes on cream paper so Ops lists match light shells
+ * (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light Ops
+ * loading/hint remaps v0.1.2652.
+ */
+/* OVERNIGHT v0.1.2653: light Ops row/list remaps */
+body.theme-light .ops-row {
+  background: color-mix(in srgb, currentColor 4%, #f7f7fa);
+}
+body.theme-light .ops-row:hover {
+  border-color: color-mix(in srgb, currentColor 18%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 9%, #f7f7fa);
+}
+body.theme-light .ops-row:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #f7f7fa);
+}
+body.theme-light .ops-row.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #f7f7fa);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 16%, #f7f7fa);
+}
+body.theme-light .ops-row.is-selected:hover {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 52%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #007aff) 15%, #f7f7fa);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 20%, #f7f7fa);
+}
+body.theme-light .ops-row.is-copied,
+body.theme-light .ops-row.is-selected.is-copied,
+body.theme-light .ops-row.is-selected.is-copied:hover {
+  border-color: color-mix(in srgb, #34c759 48%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 14%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .ops-row.is-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #f7f7fa);
+}
+body.theme-light .ops-row-meta:not(.ops-updated-ago):not(.ops-keyboard-hint) {
+  color: color-mix(in srgb, #0c0c10 51%, #f7f7fa);
+}
+body.theme-light #ops-runs-list .ops-row.is-lite:not(.is-selected) {
+  background: color-mix(in srgb, #0a84ff 8%, #f7f7fa);
+  border-color: color-mix(in srgb, #0a84ff 22%, #f7f7fa);
+}
+body.theme-light #ops-runs-list .ops-row.is-lite:not(.is-selected):hover {
+  background: color-mix(in srgb, #0a84ff 12%, #f7f7fa);
+  border-color: color-mix(in srgb, #0a84ff 28%, #f7f7fa);
+}
+body.theme-light #ops-runs-list .ops-row.is-slow:not(.is-selected) {
+  background: color-mix(in srgb, #ff9f0a 7%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f7f7fa);
+}
+body.theme-light #ops-runs-list .ops-row.is-slow:not(.is-selected):hover {
+  background: color-mix(in srgb, #ff9f0a 10%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #f7f7fa);
+}
+body.theme-light #ops-runs-list .ops-row.is-fail:not(.is-selected) {
+  background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
+}
+body.theme-light #ops-runs-list .ops-row.is-fail:not(.is-selected):hover {
+  background: color-mix(in srgb, #ff3b30 10%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff3b30 28%, #f7f7fa);
+}
+
+body.theme-material .ops-row {
+  background: color-mix(in srgb, currentColor 4%, #ebe4d9);
+}
+body.theme-material .ops-row:hover {
+  border-color: color-mix(in srgb, currentColor 18%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 9%, #ebe4d9);
+}
+body.theme-material .ops-row:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #ebe4d9);
+}
+body.theme-material .ops-row.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #ebe4d9);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 16%, #ebe4d9);
+}
+body.theme-material .ops-row.is-selected:hover {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 52%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #007aff) 15%, #ebe4d9);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 20%, #ebe4d9);
+}
+body.theme-material .ops-row.is-copied,
+body.theme-material .ops-row.is-selected.is-copied,
+body.theme-material .ops-row.is-selected.is-copied:hover {
+  border-color: color-mix(in srgb, #34c759 48%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 14%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .ops-row.is-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #ebe4d9);
+}
+body.theme-material .ops-row-meta:not(.ops-updated-ago):not(.ops-keyboard-hint) {
+  color: color-mix(in srgb, #0c0c10 51%, #ebe4d9);
+}
+body.theme-material #ops-runs-list .ops-row.is-lite:not(.is-selected) {
+  background: color-mix(in srgb, #0a84ff 8%, #ebe4d9);
+  border-color: color-mix(in srgb, #0a84ff 22%, #ebe4d9);
+}
+body.theme-material #ops-runs-list .ops-row.is-lite:not(.is-selected):hover {
+  background: color-mix(in srgb, #0a84ff 12%, #ebe4d9);
+  border-color: color-mix(in srgb, #0a84ff 28%, #ebe4d9);
+}
+body.theme-material #ops-runs-list .ops-row.is-slow:not(.is-selected) {
+  background: color-mix(in srgb, #ff9f0a 7%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ebe4d9);
+}
+body.theme-material #ops-runs-list .ops-row.is-slow:not(.is-selected):hover {
+  background: color-mix(in srgb, #ff9f0a 10%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #ebe4d9);
+}
+body.theme-material #ops-runs-list .ops-row.is-fail:not(.is-selected) {
+  background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
+}
+body.theme-material #ops-runs-list .ops-row.is-fail:not(.is-selected):hover {
+  background: color-mix(in srgb, #ff3b30 10%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff3b30 28%, #ebe4d9);
+}
+
+body.theme-architect .ops-row {
+  background: color-mix(in srgb, currentColor 4%, #f1f1f1);
+}
+body.theme-architect .ops-row:hover {
+  border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 9%, #f1f1f1);
+}
+body.theme-architect .ops-row:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
+}
+body.theme-architect .ops-row.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #f1f1f1);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 16%, #f1f1f1);
+}
+body.theme-architect .ops-row.is-selected:hover {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 52%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 15%, #f1f1f1);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 20%, #f1f1f1);
+}
+body.theme-architect .ops-row.is-copied,
+body.theme-architect .ops-row.is-selected.is-copied,
+body.theme-architect .ops-row.is-selected.is-copied:hover {
+  border-color: color-mix(in srgb, #34c759 48%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 14%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .ops-row.is-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #f1f1f1);
+}
+body.theme-architect .ops-row-meta:not(.ops-updated-ago):not(.ops-keyboard-hint) {
+  color: color-mix(in srgb, #0c0c10 51%, #f1f1f1);
+}
+body.theme-architect #ops-runs-list .ops-row.is-lite:not(.is-selected) {
+  background: color-mix(in srgb, #0a84ff 8%, #f1f1f1);
+  border-color: color-mix(in srgb, #0a84ff 22%, #f1f1f1);
+}
+body.theme-architect #ops-runs-list .ops-row.is-lite:not(.is-selected):hover {
+  background: color-mix(in srgb, #0a84ff 12%, #f1f1f1);
+  border-color: color-mix(in srgb, #0a84ff 28%, #f1f1f1);
+}
+body.theme-architect #ops-runs-list .ops-row.is-slow:not(.is-selected) {
+  background: color-mix(in srgb, #ff9f0a 7%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f1f1f1);
+}
+body.theme-architect #ops-runs-list .ops-row.is-slow:not(.is-selected):hover {
+  background: color-mix(in srgb, #ff9f0a 10%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #f1f1f1);
+}
+body.theme-architect #ops-runs-list .ops-row.is-fail:not(.is-selected) {
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
+}
+body.theme-architect #ops-runs-list .ops-row.is-fail:not(.is-selected):hover {
+  background: color-mix(in srgb, #ff3b30 10%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff3b30 28%, #f1f1f1);
+}
