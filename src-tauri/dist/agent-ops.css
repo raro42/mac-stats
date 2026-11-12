@@ -27349,6 +27349,47 @@ body.theme-architect .chat-filter-count.is-zero {
 }
 
 /*
+ * Light / Material / Architect: Disk Cleanup / Perplexity filter counts still
+ * mix Apple `#ffffff` (`.disk-cleanup-filter-count` /
+ * `.disk-cleanup-scope-filter-count` / `.perplexity-filter-count` · `.is-zero`)
+ * while CRT / Data Poster remaps already exist. Opaque 79%/37% ink on cream
+ * paper so chip counts match light shells (Swiss / Apple keep shared
+ * `#ffffff`). Standing P2 #14 after light Monitors/Chat/Rings filter-count
+ * remaps v0.1.2639.
+ */
+/* OVERNIGHT v0.1.2640: light Disk Cleanup/Perplexity filter-count remaps */
+body.theme-light .disk-cleanup-filter-count,
+body.theme-light .disk-cleanup-scope-filter-count,
+body.theme-light .perplexity-filter-count {
+  color: color-mix(in srgb, #0c0c10 79%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-filter-count.is-zero,
+body.theme-light .disk-cleanup-scope-filter-count.is-zero,
+body.theme-light .perplexity-filter-count.is-zero {
+  color: color-mix(in srgb, #0c0c10 37%, #f7f7fa);
+}
+body.theme-material .disk-cleanup-filter-count,
+body.theme-material .disk-cleanup-scope-filter-count,
+body.theme-material .perplexity-filter-count {
+  color: color-mix(in srgb, #0c0c10 79%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-filter-count.is-zero,
+body.theme-material .disk-cleanup-scope-filter-count.is-zero,
+body.theme-material .perplexity-filter-count.is-zero {
+  color: color-mix(in srgb, #0c0c10 37%, #ebe4d9);
+}
+body.theme-architect .disk-cleanup-filter-count,
+body.theme-architect .disk-cleanup-scope-filter-count,
+body.theme-architect .perplexity-filter-count {
+  color: color-mix(in srgb, #0c0c10 79%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-filter-count.is-zero,
+body.theme-architect .disk-cleanup-scope-filter-count.is-zero,
+body.theme-architect .perplexity-filter-count.is-zero {
+  color: color-mix(in srgb, #0c0c10 37%, #f1f1f1);
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
  * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
  * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log
