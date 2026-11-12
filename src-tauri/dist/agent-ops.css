@@ -31644,3 +31644,75 @@ body.theme-architect .ops-badge.off {
   border-color: color-mix(in srgb, currentColor 12%, #f1f1f1);
   color: color-mix(in srgb, #0c0c10 53%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Agent Ops Updated ago + keyboard hint still mix
+ * Apple `#ffffff` (.ops-updated-ago resting / visible / hover / focus ·
+ * .ops-keyboard-hint) while Data Poster / Dark / Neon / Futuristic remaps
+ * already exist. Opaque type/washes on cream paper so Ops chrome matches
+ * light shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after
+ * light Ops badge remaps v0.1.2654.
+ */
+/* OVERNIGHT v0.1.2655: light Ops updated-ago / keyboard-hint remaps */
+body.theme-light .ops-updated-ago {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .ops-updated-ago:not([hidden]) {
+  color: color-mix(in srgb, #0c0c10 69%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .ops-updated-ago[role='button']:hover {
+  color: color-mix(in srgb, #0c0c10 81%, #f7f7fa);
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 8%, #f7f7fa);
+}
+body.theme-light .ops-updated-ago[role='button']:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
+}
+body.theme-light .ops-keyboard-hint {
+  color: color-mix(in srgb, #0c0c10 62%, #f7f7fa);
+  opacity: 1;
+}
+
+body.theme-material .ops-updated-ago {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .ops-updated-ago:not([hidden]) {
+  color: color-mix(in srgb, #0c0c10 69%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .ops-updated-ago[role='button']:hover {
+  color: color-mix(in srgb, #0c0c10 81%, #ebe4d9);
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 8%, #ebe4d9);
+}
+body.theme-material .ops-updated-ago[role='button']:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
+}
+body.theme-material .ops-keyboard-hint {
+  color: color-mix(in srgb, #0c0c10 62%, #ebe4d9);
+  opacity: 1;
+}
+
+body.theme-architect .ops-updated-ago {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .ops-updated-ago:not([hidden]) {
+  color: color-mix(in srgb, #0c0c10 69%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .ops-updated-ago[role='button']:hover {
+  color: color-mix(in srgb, #0c0c10 81%, #f1f1f1);
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 8%, #f1f1f1);
+}
+body.theme-architect .ops-updated-ago[role='button']:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+}
+body.theme-architect .ops-keyboard-hint {
+  color: color-mix(in srgb, #0c0c10 62%, #f1f1f1);
+  opacity: 1;
+}
