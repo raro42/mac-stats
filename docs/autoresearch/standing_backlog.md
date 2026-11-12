@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2619
+
+- Perplexity search query focus: shared `.perplexity-search-box input:focus-visible` was missing (Apple theme-local only; Search button focus already shared). Accent rings + opaque fill on CRT `#0b0b10` / `#0a0a0a` / `#08120c` and Light / Material / Architect `#f7f7fa` / `#ebe4d9` / `#f1f1f1`. Standing P2 #14 after logs-toolbar v0.1.2618; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover focus gaps (`.section-header-collapsible:focus-visible` light-paper remaps if still muddy, settings attention-glance Apple mixes), or sibling/product fuel — not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2618
 
 - Agent Ops logs toolbar focus: Light / Material / Architect / Swiss Minimalistic / Dark / Neon / Futuristic `.logs-toolbar button:focus-visible` was missing (Apple / Data Poster already had it). Accent rings on theme paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` / `#ffffff` / `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after connection/model-text v0.1.2617; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover focus gaps (`.perplexity-search-box` input/button / `.perplexity-result-item:focus-within` if still Apple-only), or sibling/product fuel — not another keep-pNN clone.

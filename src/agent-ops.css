@@ -11001,6 +11001,13 @@ body.theme-futuristic .ops-insight-line em {
   color: inherit;
   font: inherit;
 }
+/* Opaque focus — Apple already had theme-local input:focus-visible; shared was button-only. */
+.perplexity-search-box input:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline-offset: 1px;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #ffffff);
+  background: #ffffff;
+}
 .perplexity-search-box button,
 #perplexity-search-btn {
   padding: 6px 12px;
@@ -25406,6 +25413,47 @@ body.theme-neon #perplexity-search-btn:focus-visible {
 }
 body.theme-futuristic #perplexity-search-btn:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+}
+
+/*
+ * Perplexity search query focus (shared was missing; Apple theme-local only).
+ * CRT + light-paper remaps so Tab into the query field stays readable on opaque shells.
+ * Standing P2 #14 after logs-toolbar focus v0.1.2618.
+ */
+body.theme-data-poster .perplexity-search-box input:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 35%, #0b0b10);
+  background: #0b0b10;
+}
+body.theme-dark .perplexity-search-box input:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 35%, #0a0a0a);
+  background: #0a0a0a;
+}
+body.theme-neon .perplexity-search-box input:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 35%, #08120c);
+  background: #08120c;
+}
+body.theme-futuristic .perplexity-search-box input:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 35%, #0b0b10);
+  background: #0b0b10;
+}
+body.theme-light .perplexity-search-box input:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #f7f7fa);
+  background: #f7f7fa;
+}
+body.theme-material .perplexity-search-box input:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #ebe4d9);
+  background: #ebe4d9;
+}
+body.theme-architect .perplexity-search-box input:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #f1f1f1);
+  background: #f1f1f1;
 }
 
 
