@@ -27095,6 +27095,70 @@ body.theme-architect .monitor-detail {
 }
 
 /*
+ * Light / Material / Architect: Disk Cleanup add-scope rows still mix Apple
+ * `#ffffff` washes (`.disk-cleanup-scope-row` resting · hover ·
+ * focus-visible/focus-within · is-selected) while CRT / Data Poster remaps
+ * already exist. Opaque mixes on cream paper so add-scope rows match light
+ * shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
+ * Debug Log / Monitors detail remaps v0.1.2632.
+ */
+/* OVERNIGHT v0.1.2633: light Disk Cleanup add-scope-row remaps */
+body.theme-light .disk-cleanup-scope-row {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3%, #f7f7fa);
+}
+body.theme-material .disk-cleanup-scope-row {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3%, #ebe4d9);
+}
+body.theme-architect .disk-cleanup-scope-row {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3%, #f1f1f1);
+}
+
+body.theme-light .disk-cleanup-scope-row:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-material .disk-cleanup-scope-row:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-architect .disk-cleanup-scope-row:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+
+body.theme-light .disk-cleanup-scope-row:focus-visible,
+body.theme-light .disk-cleanup-scope-row:focus-within {
+  border-color: color-mix(in srgb, #0a84ff 34%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #f7f7fa);
+}
+body.theme-material .disk-cleanup-scope-row:focus-visible,
+body.theme-material .disk-cleanup-scope-row:focus-within {
+  border-color: color-mix(in srgb, #0a84ff 34%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #ebe4d9);
+}
+body.theme-architect .disk-cleanup-scope-row:focus-visible,
+body.theme-architect .disk-cleanup-scope-row:focus-within {
+  border-color: color-mix(in srgb, #0a84ff 34%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #f1f1f1);
+}
+
+body.theme-light .disk-cleanup-scope-row.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #f7f7fa);
+}
+body.theme-material .disk-cleanup-scope-row.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #ebe4d9);
+}
+body.theme-architect .disk-cleanup-scope-row.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #f1f1f1);
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
  * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
  * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log
