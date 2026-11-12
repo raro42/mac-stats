@@ -32335,3 +32335,95 @@ body.theme-architect #chat-input:focus {
   box-shadow: 0 0 0 3px color-mix(in srgb, #007aff 18%, #f1f1f1);
   background: #f1f1f1;
 }
+
+/*
+ * Light / Material / Architect: AI Chat message soft-states still mix Apple
+ * `#ffffff` (`.chat-message[role]` hover · `:focus-visible` · `.is-selected` ·
+ * `.is-just-copied` · Copied badge · `.chat-message.assistant.is-error`) while
+ * Data Poster / Dark / Neon / Futuristic remaps already exist. Opaque washes on
+ * cream paper so click-to-copy / j/k selection match light shells (Swiss /
+ * Apple keep shared `#ffffff`). Standing P2 #14 after light AI Chat empty /
+ * composer remaps v0.1.2662.
+ */
+/* OVERNIGHT v0.1.2663: light AI Chat message soft-state remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .chat-message[role='option']:hover,
+body.theme-light .chat-message[role='button']:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #f7f7fa);
+}
+body.theme-light .chat-message[role='option']:focus-visible,
+body.theme-light .chat-message[role='button']:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+}
+body.theme-light .chat-message[role='option'].is-selected,
+body.theme-light .chat-message[role='button'].is-selected {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 22%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5%, #f7f7fa);
+}
+body.theme-light .chat-message[role='option'].is-just-copied,
+body.theme-light .chat-message[role='button'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #f7f7fa);
+}
+body.theme-light .chat-message[role='option'].is-just-copied::after,
+body.theme-light .chat-message[role='button'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #f7f7fa);
+}
+body.theme-light .chat-message.assistant.is-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .chat-message[role='option']:hover,
+body.theme-material .chat-message[role='button']:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #ebe4d9);
+}
+body.theme-material .chat-message[role='option']:focus-visible,
+body.theme-material .chat-message[role='button']:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+}
+body.theme-material .chat-message[role='option'].is-selected,
+body.theme-material .chat-message[role='button'].is-selected {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 22%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5%, #ebe4d9);
+}
+body.theme-material .chat-message[role='option'].is-just-copied,
+body.theme-material .chat-message[role='button'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #ebe4d9);
+}
+body.theme-material .chat-message[role='option'].is-just-copied::after,
+body.theme-material .chat-message[role='button'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #ebe4d9);
+}
+body.theme-material .chat-message.assistant.is-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .chat-message[role='option']:hover,
+body.theme-architect .chat-message[role='button']:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 6%, #f1f1f1);
+}
+body.theme-architect .chat-message[role='option']:focus-visible,
+body.theme-architect .chat-message[role='button']:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #007aff) 45%, #f1f1f1);
+}
+body.theme-architect .chat-message[role='option'].is-selected,
+body.theme-architect .chat-message[role='button'].is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 5%, #f1f1f1);
+}
+body.theme-architect .chat-message[role='option'].is-just-copied,
+body.theme-architect .chat-message[role='button'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #f1f1f1);
+}
+body.theme-architect .chat-message[role='option'].is-just-copied::after,
+body.theme-architect .chat-message[role='button'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #f1f1f1);
+}
+body.theme-architect .chat-message.assistant.is-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+}
