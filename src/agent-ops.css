@@ -29048,6 +29048,167 @@ body.theme-architect .ops-session-copy-chip.is-just-saved {
 }
 
 /*
+ * Light / Material / Architect: Agent Ops filter Clear + empty-state washes still
+ * mix Apple `#ffffff` (`.ops-filter-clear` resting/hover/focus; `.ops-empty` /
+ * hover; empty-filter calm/fail; `.ops-empty-tab-hint`; `.ops-clear-filter`
+ * resting/hover/focus; overview empty CTA calm) while CRT / Data Poster remaps
+ * already exist (kind Clear/count/copy in v0.1.2647). Opaque washes on cream
+ * paper so Ops Clear/empty match light shells (Swiss / Apple keep shared
+ * `#ffffff`). Standing P2 #14 after light Ops kind Clear/count/copy v0.1.2647.
+ */
+/* OVERNIGHT v0.1.2648: light Ops filter-clear + empty-state remaps */
+body.theme-light .ops-filter-clear {
+  border-color: color-mix(in srgb, currentColor 18%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 7%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 77%, #f7f7fa);
+}
+body.theme-light .ops-filter-clear:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #007aff) 14%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f7f7fa);
+}
+body.theme-light .ops-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #f7f7fa);
+}
+body.theme-light .ops-empty {
+  color: color-mix(in srgb, #0c0c10 69%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 22%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 4%, #f7f7fa);
+}
+body.theme-light .ops-empty:hover {
+  color: color-mix(in srgb, #0c0c10 81%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #007aff) 6%, #f7f7fa);
+}
+body.theme-light .ops-empty-filter-miss.is-calm,
+body.theme-light .ops-empty-tab.ops-empty-filter-miss.is-calm {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f7f7fa);
+}
+body.theme-light .ops-empty-filter-miss.is-fail-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+body.theme-light .ops-empty-tab-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+}
+body.theme-light .ops-clear-filter {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #f7f7fa);
+}
+body.theme-light .ops-clear-filter:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 18%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 48%, #f7f7fa);
+}
+body.theme-light .ops-clear-filter:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, #f7f7fa);
+}
+body.theme-light .ops-overview-body > .ops-empty-overview-cta.is-calm {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f7f7fa);
+}
+body.theme-material .ops-filter-clear {
+  border-color: color-mix(in srgb, currentColor 18%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 7%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 77%, #ebe4d9);
+}
+body.theme-material .ops-filter-clear:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #007aff) 14%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #ebe4d9);
+}
+body.theme-material .ops-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #ebe4d9);
+}
+body.theme-material .ops-empty {
+  color: color-mix(in srgb, #0c0c10 69%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 22%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 4%, #ebe4d9);
+}
+body.theme-material .ops-empty:hover {
+  color: color-mix(in srgb, #0c0c10 81%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #007aff) 6%, #ebe4d9);
+}
+body.theme-material .ops-empty-filter-miss.is-calm,
+body.theme-material .ops-empty-tab.ops-empty-filter-miss.is-calm {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ebe4d9);
+}
+body.theme-material .ops-empty-filter-miss.is-fail-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+body.theme-material .ops-empty-tab-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+}
+body.theme-material .ops-clear-filter {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #ebe4d9);
+}
+body.theme-material .ops-clear-filter:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 18%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 48%, #ebe4d9);
+}
+body.theme-material .ops-clear-filter:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, #ebe4d9);
+}
+body.theme-material .ops-overview-body > .ops-empty-overview-cta.is-calm {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ebe4d9);
+}
+body.theme-architect .ops-filter-clear {
+  border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 7%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 77%, #f1f1f1);
+}
+body.theme-architect .ops-filter-clear:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 14%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f1f1f1);
+}
+body.theme-architect .ops-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #f1f1f1);
+}
+body.theme-architect .ops-empty {
+  color: color-mix(in srgb, #0c0c10 69%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 22%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 4%, #f1f1f1);
+}
+body.theme-architect .ops-empty:hover {
+  color: color-mix(in srgb, #0c0c10 81%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 6%, #f1f1f1);
+}
+body.theme-architect .ops-empty-filter-miss.is-calm,
+body.theme-architect .ops-empty-tab.ops-empty-filter-miss.is-calm {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f1f1f1);
+}
+body.theme-architect .ops-empty-filter-miss.is-fail-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}
+body.theme-architect .ops-empty-tab-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+}
+body.theme-architect .ops-clear-filter {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #f1f1f1);
+}
+body.theme-architect .ops-clear-filter:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 18%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 48%, #f1f1f1);
+}
+body.theme-architect .ops-clear-filter:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, #f1f1f1);
+}
+body.theme-architect .ops-overview-body > .ops-empty-overview-cta.is-calm {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f1f1f1);
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
  * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
  * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log
