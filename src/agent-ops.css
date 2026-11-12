@@ -27312,6 +27312,43 @@ body.theme-architect .logs-filter-count.is-zero {
 }
 
 /*
+ * Light / Material / Architect: Monitors / AI Chat / Rings filter counts still
+ * mix Apple `#ffffff` (`.monitors-filter-count` / `.chat-filter-count` ·
+ * `.is-zero` · `.rings-filter-count`) while CRT / Data Poster remaps already
+ * exist. Opaque 79%/37% ink on cream paper so chip counts match light shells
+ * (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
+ * Processes/Logs filter-count remaps v0.1.2638.
+ */
+/* OVERNIGHT v0.1.2639: light Monitors/Chat/Rings filter-count remaps */
+body.theme-light .monitors-filter-count,
+body.theme-light .chat-filter-count,
+body.theme-light .rings-filter-count {
+  color: color-mix(in srgb, #0c0c10 79%, #f7f7fa);
+}
+body.theme-light .monitors-filter-count.is-zero,
+body.theme-light .chat-filter-count.is-zero {
+  color: color-mix(in srgb, #0c0c10 37%, #f7f7fa);
+}
+body.theme-material .monitors-filter-count,
+body.theme-material .chat-filter-count,
+body.theme-material .rings-filter-count {
+  color: color-mix(in srgb, #0c0c10 79%, #ebe4d9);
+}
+body.theme-material .monitors-filter-count.is-zero,
+body.theme-material .chat-filter-count.is-zero {
+  color: color-mix(in srgb, #0c0c10 37%, #ebe4d9);
+}
+body.theme-architect .monitors-filter-count,
+body.theme-architect .chat-filter-count,
+body.theme-architect .rings-filter-count {
+  color: color-mix(in srgb, #0c0c10 79%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-count.is-zero,
+body.theme-architect .chat-filter-count.is-zero {
+  color: color-mix(in srgb, #0c0c10 37%, #f1f1f1);
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
  * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
  * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log
