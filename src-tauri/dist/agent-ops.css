@@ -27219,6 +27219,27 @@ body.theme-architect .logs-toolbar button:focus-visible {
 }
 
 /*
+ * Light / Material / Architect: Top Processes selected row still mixes Apple
+ * `#ffffff` (`.process-row.is-selected` background · inset ring) while CRT /
+ * Data Poster remaps already exist. Opaque mixes on cream paper so selected
+ * rows match light shells (Swiss / Apple keep shared `#ffffff`). Standing P2
+ * #14 after light Debug Log toolbar remaps v0.1.2634.
+ */
+/* OVERNIGHT v0.1.2635: light Top Processes selected-row remaps */
+body.theme-light .process-row.is-selected {
+  background: color-mix(in srgb, #0a84ff 12%, #f7f7fa);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #f7f7fa);
+}
+body.theme-material .process-row.is-selected {
+  background: color-mix(in srgb, #0a84ff 12%, #ebe4d9);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #ebe4d9);
+}
+body.theme-architect .process-row.is-selected {
+  background: color-mix(in srgb, #0a84ff 12%, #f1f1f1);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #f1f1f1);
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
  * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
  * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log
