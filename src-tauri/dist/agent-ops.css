@@ -27390,6 +27390,147 @@ body.theme-architect .perplexity-filter-count.is-zero {
 }
 
 /*
+ * Light / Material / Architect: filter Clear chips still mix Apple `#ffffff`
+ * (`.monitors-filter-clear` / `.processes-filter-clear` / `.logs-filter-clear` /
+ * `.perplexity-filter-clear` / `.disk-cleanup-filter-clear` /
+ * `.disk-cleanup-scope-filter-clear` / `.chat-filter-clear` resting · hover ·
+ * `:focus-visible` · `.is-just-saved`) while CRT / Data Poster remaps already
+ * exist. Opaque accent washes + 81%/88% ink on cream paper so Clear matches
+ * light shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after
+ * light Disk Cleanup/Perplexity filter-count remaps v0.1.2640.
+ */
+/* OVERNIGHT v0.1.2642: light filter Clear remaps */
+body.theme-light .monitors-filter-clear,
+body.theme-light .processes-filter-clear,
+body.theme-light .logs-filter-clear,
+body.theme-light .perplexity-filter-clear,
+body.theme-light .disk-cleanup-filter-clear,
+body.theme-light .disk-cleanup-scope-filter-clear,
+body.theme-light .chat-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 32%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 81%, #f7f7fa);
+}
+body.theme-light .monitors-filter-clear:hover,
+body.theme-light .processes-filter-clear:hover,
+body.theme-light .logs-filter-clear:hover,
+body.theme-light .perplexity-filter-clear:hover,
+body.theme-light .disk-cleanup-filter-clear:hover,
+body.theme-light .disk-cleanup-scope-filter-clear:hover,
+body.theme-light .chat-filter-clear:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #007aff) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 44%, #f7f7fa);
+}
+body.theme-light .monitors-filter-clear:focus-visible,
+body.theme-light .processes-filter-clear:focus-visible,
+body.theme-light .logs-filter-clear:focus-visible,
+body.theme-light .perplexity-filter-clear:focus-visible,
+body.theme-light .disk-cleanup-filter-clear:focus-visible,
+body.theme-light .disk-cleanup-scope-filter-clear:focus-visible,
+body.theme-light .chat-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #f7f7fa);
+}
+body.theme-light .monitors-filter-clear.is-just-saved,
+body.theme-light .processes-filter-clear.is-just-saved,
+body.theme-light .logs-filter-clear.is-just-saved,
+body.theme-light .perplexity-filter-clear.is-just-saved,
+body.theme-light .disk-cleanup-filter-clear.is-just-saved,
+body.theme-light .disk-cleanup-scope-filter-clear.is-just-saved,
+body.theme-light .chat-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #f7f7fa);
+  border-color: color-mix(in srgb, #34c759 38%, #f7f7fa);
+  color: color-mix(in srgb, #34c759 55%, var(--text, currentColor));
+  box-shadow: none;
+}
+body.theme-material .monitors-filter-clear,
+body.theme-material .processes-filter-clear,
+body.theme-material .logs-filter-clear,
+body.theme-material .perplexity-filter-clear,
+body.theme-material .disk-cleanup-filter-clear,
+body.theme-material .disk-cleanup-scope-filter-clear,
+body.theme-material .chat-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 32%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 81%, #ebe4d9);
+}
+body.theme-material .monitors-filter-clear:hover,
+body.theme-material .processes-filter-clear:hover,
+body.theme-material .logs-filter-clear:hover,
+body.theme-material .perplexity-filter-clear:hover,
+body.theme-material .disk-cleanup-filter-clear:hover,
+body.theme-material .disk-cleanup-scope-filter-clear:hover,
+body.theme-material .chat-filter-clear:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #007aff) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 44%, #ebe4d9);
+}
+body.theme-material .monitors-filter-clear:focus-visible,
+body.theme-material .processes-filter-clear:focus-visible,
+body.theme-material .logs-filter-clear:focus-visible,
+body.theme-material .perplexity-filter-clear:focus-visible,
+body.theme-material .disk-cleanup-filter-clear:focus-visible,
+body.theme-material .disk-cleanup-scope-filter-clear:focus-visible,
+body.theme-material .chat-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #ebe4d9);
+}
+body.theme-material .monitors-filter-clear.is-just-saved,
+body.theme-material .processes-filter-clear.is-just-saved,
+body.theme-material .logs-filter-clear.is-just-saved,
+body.theme-material .perplexity-filter-clear.is-just-saved,
+body.theme-material .disk-cleanup-filter-clear.is-just-saved,
+body.theme-material .disk-cleanup-scope-filter-clear.is-just-saved,
+body.theme-material .chat-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #ebe4d9);
+  border-color: color-mix(in srgb, #34c759 38%, #ebe4d9);
+  color: color-mix(in srgb, #34c759 55%, var(--text, currentColor));
+  box-shadow: none;
+}
+body.theme-architect .monitors-filter-clear,
+body.theme-architect .processes-filter-clear,
+body.theme-architect .logs-filter-clear,
+body.theme-architect .perplexity-filter-clear,
+body.theme-architect .disk-cleanup-filter-clear,
+body.theme-architect .disk-cleanup-scope-filter-clear,
+body.theme-architect .chat-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 32%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 81%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-clear:hover,
+body.theme-architect .processes-filter-clear:hover,
+body.theme-architect .logs-filter-clear:hover,
+body.theme-architect .perplexity-filter-clear:hover,
+body.theme-architect .disk-cleanup-filter-clear:hover,
+body.theme-architect .disk-cleanup-scope-filter-clear:hover,
+body.theme-architect .chat-filter-clear:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 44%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-clear:focus-visible,
+body.theme-architect .processes-filter-clear:focus-visible,
+body.theme-architect .logs-filter-clear:focus-visible,
+body.theme-architect .perplexity-filter-clear:focus-visible,
+body.theme-architect .disk-cleanup-filter-clear:focus-visible,
+body.theme-architect .disk-cleanup-scope-filter-clear:focus-visible,
+body.theme-architect .chat-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-clear.is-just-saved,
+body.theme-architect .processes-filter-clear.is-just-saved,
+body.theme-architect .logs-filter-clear.is-just-saved,
+body.theme-architect .perplexity-filter-clear.is-just-saved,
+body.theme-architect .disk-cleanup-filter-clear.is-just-saved,
+body.theme-architect .disk-cleanup-scope-filter-clear.is-just-saved,
+body.theme-architect .chat-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #f1f1f1);
+  border-color: color-mix(in srgb, #34c759 38%, #f1f1f1);
+  color: color-mix(in srgb, #34c759 55%, var(--text, currentColor));
+  box-shadow: none;
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
  * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
  * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log
