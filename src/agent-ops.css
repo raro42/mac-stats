@@ -26830,6 +26830,174 @@ body.theme-futuristic .disk-cleanup-item.has-reclaim.is-big:focus-visible {
 }
 
 /*
+ * Light / Material / Architect: Disk Cleanup list rows still mix Apple `#ffffff`
+ * washes (`.disk-cleanup-item` resting / hover / focus / selected · `.has-reclaim`
+ * · `.is-big`) while CRT / Data Poster remaps already exist. Opaque mixes on
+ * cream paper so rows match light shells (Swiss / Apple keep shared `#ffffff`).
+ * Standing P2 #14 after light Disk Cleanup path Saved remaps v0.1.2629.
+ */
+/* OVERNIGHT v0.1.2630: light Disk Cleanup list-row remaps */
+body.theme-light .disk-cleanup-item {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3%, #f7f7fa);
+}
+body.theme-material .disk-cleanup-item {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3%, #ebe4d9);
+}
+body.theme-architect .disk-cleanup-item {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3%, #f1f1f1);
+}
+
+body.theme-light .disk-cleanup-item:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-material .disk-cleanup-item:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-architect .disk-cleanup-item:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+
+body.theme-light .disk-cleanup-item:focus-visible {
+  border-color: color-mix(in srgb, #0a84ff 34%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #f7f7fa);
+}
+body.theme-material .disk-cleanup-item:focus-visible {
+  border-color: color-mix(in srgb, #0a84ff 34%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #ebe4d9);
+}
+body.theme-architect .disk-cleanup-item:focus-visible {
+  border-color: color-mix(in srgb, #0a84ff 34%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #f1f1f1);
+}
+
+body.theme-light .disk-cleanup-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #f7f7fa);
+}
+body.theme-material .disk-cleanup-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #ebe4d9);
+}
+body.theme-architect .disk-cleanup-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #f1f1f1);
+}
+
+body.theme-light .disk-cleanup-item.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #f7f7fa);
+  background: color-mix(in srgb, #ff9f0a 6%, #f7f7fa);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff9f0a 70%, #f7f7fa);
+}
+body.theme-material .disk-cleanup-item.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #ebe4d9);
+  background: color-mix(in srgb, #ff9f0a 6%, #ebe4d9);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff9f0a 70%, #ebe4d9);
+}
+body.theme-architect .disk-cleanup-item.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #f1f1f1);
+  background: color-mix(in srgb, #ff9f0a 6%, #f1f1f1);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff9f0a 70%, #f1f1f1);
+}
+
+body.theme-light .disk-cleanup-item.has-reclaim:hover {
+  background: color-mix(in srgb, #ff9f0a 10%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #f7f7fa);
+}
+body.theme-material .disk-cleanup-item.has-reclaim:hover {
+  background: color-mix(in srgb, #ff9f0a 10%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #ebe4d9);
+}
+body.theme-architect .disk-cleanup-item.has-reclaim:hover {
+  background: color-mix(in srgb, #ff9f0a 10%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #f1f1f1);
+}
+
+body.theme-light .disk-cleanup-item.has-reclaim.is-selected,
+body.theme-light .disk-cleanup-item.has-reclaim:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #f7f7fa);
+  background: color-mix(in srgb, #ff9f0a 11%, #f7f7fa);
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #ff9f0a 80%, #f7f7fa),
+    0 0 0 3px color-mix(in srgb, #ff9f0a 18%, #f7f7fa);
+}
+body.theme-material .disk-cleanup-item.has-reclaim.is-selected,
+body.theme-material .disk-cleanup-item.has-reclaim:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #ebe4d9);
+  background: color-mix(in srgb, #ff9f0a 11%, #ebe4d9);
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #ff9f0a 80%, #ebe4d9),
+    0 0 0 3px color-mix(in srgb, #ff9f0a 18%, #ebe4d9);
+}
+body.theme-architect .disk-cleanup-item.has-reclaim.is-selected,
+body.theme-architect .disk-cleanup-item.has-reclaim:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #f1f1f1);
+  background: color-mix(in srgb, #ff9f0a 11%, #f1f1f1);
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #ff9f0a 80%, #f1f1f1),
+    0 0 0 3px color-mix(in srgb, #ff9f0a 18%, #f1f1f1);
+}
+
+body.theme-light .disk-cleanup-item.has-reclaim.is-big {
+  border-color: color-mix(in srgb, #ff453a 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff453a 7%, #f7f7fa);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff453a 75%, #f7f7fa);
+}
+body.theme-material .disk-cleanup-item.has-reclaim.is-big {
+  border-color: color-mix(in srgb, #ff453a 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff453a 7%, #ebe4d9);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff453a 75%, #ebe4d9);
+}
+body.theme-architect .disk-cleanup-item.has-reclaim.is-big {
+  border-color: color-mix(in srgb, #ff453a 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff453a 7%, #f1f1f1);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff453a 75%, #f1f1f1);
+}
+
+body.theme-light .disk-cleanup-item.has-reclaim.is-big:hover {
+  background: color-mix(in srgb, #ff453a 12%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff453a 44%, #f7f7fa);
+}
+body.theme-material .disk-cleanup-item.has-reclaim.is-big:hover {
+  background: color-mix(in srgb, #ff453a 12%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff453a 44%, #ebe4d9);
+}
+body.theme-architect .disk-cleanup-item.has-reclaim.is-big:hover {
+  background: color-mix(in srgb, #ff453a 12%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff453a 44%, #f1f1f1);
+}
+
+body.theme-light .disk-cleanup-item.has-reclaim.is-big.is-selected,
+body.theme-light .disk-cleanup-item.has-reclaim.is-big:focus-visible {
+  border-color: color-mix(in srgb, #ff453a 52%, #f7f7fa);
+  background: color-mix(in srgb, #ff453a 13%, #f7f7fa);
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #ff453a 85%, #f7f7fa),
+    0 0 0 3px color-mix(in srgb, #ff453a 20%, #f7f7fa);
+}
+body.theme-material .disk-cleanup-item.has-reclaim.is-big.is-selected,
+body.theme-material .disk-cleanup-item.has-reclaim.is-big:focus-visible {
+  border-color: color-mix(in srgb, #ff453a 52%, #ebe4d9);
+  background: color-mix(in srgb, #ff453a 13%, #ebe4d9);
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #ff453a 85%, #ebe4d9),
+    0 0 0 3px color-mix(in srgb, #ff453a 20%, #ebe4d9);
+}
+body.theme-architect .disk-cleanup-item.has-reclaim.is-big.is-selected,
+body.theme-architect .disk-cleanup-item.has-reclaim.is-big:focus-visible {
+  border-color: color-mix(in srgb, #ff453a 52%, #f1f1f1);
+  background: color-mix(in srgb, #ff453a 13%, #f1f1f1);
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #ff453a 85%, #f1f1f1),
+    0 0 0 3px color-mix(in srgb, #ff453a 20%, #f1f1f1);
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
  * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
  * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log
