@@ -26362,6 +26362,62 @@ body.theme-architect #view-debug-log.is-just-saved {
 }
 
 /*
+ * Light / Material / Architect: solid Settings credential Save flashes still mix
+ * Apple `#ffffff` (#perplexity-save-key / #brave-save-key / #redmine-save /
+ * #mastodon-save / #mcp-save / #browser-save / #cursor-agent-save /
+ * #telegram-save / #slack-save / #discord-save-token) while CRT / Data Poster
+ * remaps already exist. Soft Settings secondary remapped in v0.1.2624. Solid
+ * 95% green on light paper so Saved flashes match cream shells (Swiss / Apple
+ * keep shared `#ffffff`). Standing P2 #14 after light soft Save flash v0.1.2624.
+ */
+/* OVERNIGHT v0.1.2625: light solid Settings credential Save flash remaps */
+body.theme-light #perplexity-save-key.is-just-saved,
+body.theme-light #brave-save-key.is-just-saved,
+body.theme-light #redmine-save.is-just-saved,
+body.theme-light #mastodon-save.is-just-saved,
+body.theme-light #mcp-save.is-just-saved,
+body.theme-light #browser-save.is-just-saved,
+body.theme-light #cursor-agent-save.is-just-saved,
+body.theme-light #telegram-save.is-just-saved,
+body.theme-light #slack-save.is-just-saved,
+body.theme-light #discord-save-token.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #f7f7fa) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #f7f7fa) !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+body.theme-material #perplexity-save-key.is-just-saved,
+body.theme-material #brave-save-key.is-just-saved,
+body.theme-material #redmine-save.is-just-saved,
+body.theme-material #mastodon-save.is-just-saved,
+body.theme-material #mcp-save.is-just-saved,
+body.theme-material #browser-save.is-just-saved,
+body.theme-material #cursor-agent-save.is-just-saved,
+body.theme-material #telegram-save.is-just-saved,
+body.theme-material #slack-save.is-just-saved,
+body.theme-material #discord-save-token.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #ebe4d9) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #ebe4d9) !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+body.theme-architect #perplexity-save-key.is-just-saved,
+body.theme-architect #brave-save-key.is-just-saved,
+body.theme-architect #redmine-save.is-just-saved,
+body.theme-architect #mastodon-save.is-just-saved,
+body.theme-architect #mcp-save.is-just-saved,
+body.theme-architect #browser-save.is-just-saved,
+body.theme-architect #cursor-agent-save.is-just-saved,
+body.theme-architect #telegram-save.is-just-saved,
+body.theme-architect #slack-save.is-just-saved,
+body.theme-architect #discord-save-token.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #f1f1f1) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #f1f1f1) !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Disk Cleanup list rows still mix Apple
  * `#ffffff` washes (`.disk-cleanup-item` resting / hover / focus / selected ·
  * `.has-reclaim` · `.is-big`) → white slab on opaque shells. Copied badge remapped
