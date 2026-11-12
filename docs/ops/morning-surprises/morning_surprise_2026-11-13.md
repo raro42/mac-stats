@@ -4,7 +4,8 @@ Overnight Track B (product) kept light Agent Ops cream-paper remaps (Standing P2
 
 ## Shipped
 
-- **v0.1.2655** — Light / Material / Architect `.ops-updated-ago` (resting · visible · hover · `:focus-visible`) and `.ops-keyboard-hint` remapped from Apple `#ffffff` mixes onto paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (Data Poster / Dark / Neon / Futuristic already had these). Standing P2 #14 after badge remaps v0.1.2654.
+- **v0.1.2656** — Light / Material / Architect `.ops-refresh-row-kb-hint` remapped from Apple `#ffffff` mixes onto paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (Data Poster / Dark / Neon / Futuristic already had these). Standing P2 #14 after updated-ago / keyboard-hint remaps v0.1.2655.
+- **v0.1.2655** — Light / Material / Architect `.ops-updated-ago` (resting · visible · hover · `:focus-visible`) and `.ops-keyboard-hint` remaps onto cream paper.
 - **v0.1.2654** — Light / Material / Architect `.ops-badge` (On · Off · hover · `:focus-visible` · `:disabled`) remaps onto cream paper.
 - **v0.1.2653** — Light / Material / Architect `.ops-row` / `.ops-row-meta` / Runs Lite·Slow·Fail remaps onto cream paper.
 - **v0.1.2652** — Light / Material / Architect `.ops-loading` / `.ops-hint` / `.ops-tab-bar-kb-hint` / `--ops-jump-flash-ring` remaps onto cream paper.
@@ -15,13 +16,11 @@ Overnight Track B (product) kept light Agent Ops cream-paper remaps (Standing P2
 ## Tried / notes
 
 - Digester empty; design-review still in grace; layout-daily data-poster already done for 2026-11-12 (Dark due next calendar day).
-- Sibling harness scan ran (OpenClaw / Hermes recent commits noted; no port this tick).
-- Debug log: no ERROR/panic clusters; soul/content noise only.
+- Parallel-race discards earlier in the window (local overview/card + row/list lost to origin same keeps); re-picked next leftover and kept.
+- Sibling harness scan ran (OpenClaw / Hermes paths missing on this rack; no port).
+- Debug log: no ERROR/WARN/panic clusters in the scan window.
 
-## Next fuel
+## Still open
 
-- Dark layout-daily next calendar day; Mac window-only capture when TCC allows.
-- Leftover light Ops `.ops-refresh-row-kb-hint` / other cream `#ffffff` mixes if still muddy.
-- Sibling/product fuel — not another keep-pNN clone.
-
-Generated: 2026-11-12T22:55:00+01:00
+- Dark layout-daily next calendar day; Mac capture when TCC allows.
+- Leftover light Ops `.ops-health-value` / AI Chat `.response-time` if still Apple white on cream.
