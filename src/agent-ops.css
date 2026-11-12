@@ -27279,6 +27279,39 @@ body.theme-architect .process-list-header-pin {
 }
 
 /*
+ * Light / Material / Architect: Top Processes + Debug Log filter counts still
+ * mix Apple `#ffffff` (`.processes-filter-count` / `.logs-filter-count` resting
+ * · `.is-zero`) while CRT / Data Poster remaps already exist. Opaque 79%/37%
+ * ink on cream paper so chip counts match light shells (Swiss / Apple keep
+ * shared `#ffffff`). Standing P2 #14 after light header-pin remaps v0.1.2637.
+ */
+/* OVERNIGHT v0.1.2638: light Processes/Logs filter-count remaps */
+body.theme-light .processes-filter-count,
+body.theme-light .logs-filter-count {
+  color: color-mix(in srgb, #0c0c10 79%, #f7f7fa);
+}
+body.theme-light .processes-filter-count.is-zero,
+body.theme-light .logs-filter-count.is-zero {
+  color: color-mix(in srgb, #0c0c10 37%, #f7f7fa);
+}
+body.theme-material .processes-filter-count,
+body.theme-material .logs-filter-count {
+  color: color-mix(in srgb, #0c0c10 79%, #ebe4d9);
+}
+body.theme-material .processes-filter-count.is-zero,
+body.theme-material .logs-filter-count.is-zero {
+  color: color-mix(in srgb, #0c0c10 37%, #ebe4d9);
+}
+body.theme-architect .processes-filter-count,
+body.theme-architect .logs-filter-count {
+  color: color-mix(in srgb, #0c0c10 79%, #f1f1f1);
+}
+body.theme-architect .processes-filter-count.is-zero,
+body.theme-architect .logs-filter-count.is-zero {
+  color: color-mix(in srgb, #0c0c10 37%, #f1f1f1);
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
  * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
  * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log
