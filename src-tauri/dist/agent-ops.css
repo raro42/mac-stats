@@ -32497,3 +32497,30 @@ body.theme-architect .chat-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
   opacity: 1;
 }
+
+/*
+ * Light / Material / Architect: filter-chip keyboard hints still mix Apple
+ * `#ffffff` (`.filter-chip-kb-hint`) while Data Poster / Dark / Neon /
+ * Futuristic remaps already exist. Opaque type on cream paper so chip-row
+ * hints match light shells (Swiss / Apple keep shared `#ffffff`). Standing
+ * P2 #14 after light AI Chat empty-chip / kb-hint remaps v0.1.2664.
+ */
+/* OVERNIGHT v0.1.2665: light filter-chip-kb-hint remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .filter-chip-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+  opacity: 1;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .filter-chip-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+  opacity: 1;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .filter-chip-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+  opacity: 1;
+}

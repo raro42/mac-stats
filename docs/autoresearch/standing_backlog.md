@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2665
+
+- Light filter-chip kb-hint washes: Light / Material / Architect `.filter-chip-kb-hint` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`. Standing P2 #14 after light AI Chat empty-chip / kb-hint remaps v0.1.2664; product fuel (digester empty; design-review grace; layout-daily Data Poster marked today — remaps already complete / polish-without-capture; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover light AI Chat filter-miss / collapsed-glance cream `#ffffff` mixes if still muddy, or sibling/product fuel — not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2664
 
 - Light AI Chat empty-chip / kb-hint washes: Light / Material / Architect `.chat-empty-chip` (resting · hover · `:focus-visible`) and `.chat-kb-hint` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`. Standing P2 #14 after light AI Chat message soft-state remaps v0.1.2663; product fuel (digester empty; design-review grace; layout-daily Data Poster marked today — remaps already complete / polish-without-capture; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover light `.filter-chip-kb-hint` cream `#ffffff` mixes if still muddy, or sibling/product fuel — not another keep-pNN clone.
