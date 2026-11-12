@@ -1,19 +1,19 @@
-# FEAT-25: Remove first horizontal line below icons
+# FEAT-26: External monitors empty flash on fresh open
 
 ## Plan
-- [x] Read issue #25 + task file (hairline under icon row)
-- [x] Remove first post-icon-line divider/rule in theme `cpu.html` files (skip futuristic)
-- [x] Bump version + CHANGELOG, `cargo check` / ratchet verify
-- [x] Rename `FEAT-25-…` → `UNTESTED-25-…`
+- [x] Read issue #26 + WIP task + lessons
+- [x] Persist last monitor rows to localStorage on successful `loadMonitors`
+- [x] Seed list from local cache synchronously when Monitors is expanded (before IPC)
+- [x] Call seed on early open path (`applyIconPaneVisibilityFromLocalEarly` / hydrate)
+- [x] Bump version + CHANGELOG, sync `src-tauri/dist/cpu.js`, `cargo check`
+- [x] Rename `WIP-26-…` → `UNTESTED-26-…`
 - [x] Commit and push `origin/main` (do not close GitHub issue)
-- [x] Closing review 004: cargo check / clippy / test / release; smoke block; close #25
 
 ## Notes
-GitHub: https://github.com/raro42/mac-stats/issues/25
-Cause: each theme painted a divider (`apple-divider` / `poster-rule` / …) immediately under `#icon-line`.
-Fix: drop that first rule so the icon row sits flush above Monitors / empty space.
+GitHub: https://github.com/raro42/mac-stats/issues/26
+Cause: theme HTML ships "Nothing watching yet"; #24 starts hydrate when expanded, but list still waits on history + `list_monitor_statuses` IPC, so configured sites flash empty for a few seconds.
+Fix: last-known rows in localStorage (icon-wash parity); paint list IPC before history ticks.
 
 ## Review
-- v0.1.2567: first under-icon hairline removed (#25).
-- Closing review 004: smoke pass; CHANGELOG already aligned; issue #25 closed.
-- Handoff: complete
+- v0.1.2641: local seed + list-before-history (#26).
+- Handoff: tester / 004 (issue left open).

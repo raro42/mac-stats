@@ -219,6 +219,7 @@ function anySavedIconPaneExpanded() {
  * Theme HTML paints Monitors (and peers) open with empty shells; without this,
  * a fresh window shows "Nothing watching yet" until the icon is toggled.
  * localStorage only — no list_monitor_statuses / section IPC.
+ * Expanded Monitors: seed last-known rows so configured sites do not flash empty (#26).
  */
 function applyIconPaneVisibilityFromLocalEarly() {
   if (window.__macStatsIconPanesLocalApplied) return;
@@ -236,6 +237,10 @@ function applyIconPaneVisibilityFromLocalEarly() {
     // Shared monitors↔ollama divider: hide only when that pane is collapsed.
     setIconPaneVisibility(section, content, collapsed, divider);
     syncSectionIcon(spec.iconId, !collapsed);
+  }
+  // Replace first-paint empty shell before list_monitor_statuses returns (#26).
+  if (!getSectionCollapsed('monitors_collapsed')) {
+    paintMonitorsListFromLocal();
   }
 }
 window.applyIconPaneVisibilityFromLocalEarly = applyIconPaneVisibilityFromLocalEarly;
@@ -7894,7 +7899,10 @@ async function refreshMonitorHistoryFromBackend() {
 
 // Initialize monitor history (prefer backend; fall back to legacy localStorage once).
 async function initMonitorHistory() {
-  await refreshMonitorHistoryFromBackend();
+  // loadMonitors may already have filled this — skip a second history IPC (#26).
+  if (monitorHistory.size === 0) {
+    await refreshMonitorHistoryFromBackend();
+  }
   if (monitorHistory.size > 0) return;
   try {
     const stored = localStorage.getItem('monitor_history');
@@ -8004,14 +8012,14 @@ function saveMonitorsCollapsedState(collapsed) {
 /** Expanded Monitors: history + list IPC (skipped while collapsed, #14). */
 function ensureMonitorsListHydrated() {
   if (windowWorkPaused()) return Promise.resolve();
-  // Legacy localStorage fallback lives in initMonitorHistory; loadMonitors
-  // also refreshes from the backend when painting the list.
-  return initMonitorHistory().then(() => {
+  // Last-known rows before IPC so "Nothing watching yet" does not flash (#26).
+  paintMonitorsListFromLocal();
+  // List IPC first inside loadMonitors; history ticks follow (not blocking #26).
+  // Legacy localStorage history import still runs after the list paints.
+  return loadMonitors().then(() => {
     if (windowWorkPaused()) return;
-    return loadMonitors().then(() => {
-      if (windowWorkPaused()) return;
-      updateMonitorsHeight();
-    });
+    updateMonitorsHeight();
+    void initMonitorHistory();
   });
 }
 
@@ -10736,15 +10744,13 @@ async function loadMonitors() {
   if (windowWorkPaused()) return;
 
   try {
-    // Pull real background-check ticks (not UI poll stamps).
-    await refreshMonitorHistoryFromBackend();
-    if (windowWorkPaused()) return;
-
+    // Rows before history so configured sites replace the empty shell quickly (#26).
     // One IPC for ids + urls + cached statuses (no N+1 details/status, #14).
     const rows = await invoke('list_monitor_statuses');
     if (windowWorkPaused()) return;
     const list = Array.isArray(rows) ? rows : [];
-    
+    persistMonitorsListLocal(list);
+
     // Create a map of existing monitor items by their data-monitor-id attribute
     const existingItems = new Map();
     monitorsList.querySelectorAll('.monitor-item').forEach(item => {
@@ -10753,16 +10759,16 @@ async function loadMonitors() {
         existingItems.set(monitorId, item);
       }
     });
-    
+
     // Track which monitor IDs we've processed
     const processedIds = new Set();
-    
+
     for (const row of list) {
       if (windowWorkPaused()) return;
       const monitorId = row?.id;
       if (!monitorId) continue;
       processedIds.add(monitorId);
-      
+
       try {
         const monitorUrl = row.url || monitorId;
         const status = row.status || null;
@@ -10778,7 +10784,7 @@ async function loadMonitors() {
           continue;
         }
         monitorStatusCache.set(monitorId, status);
-        
+
         // Check if we already have an item for this monitor
         const existingItem = existingItems.get(monitorId);
         if (existingItem) {
@@ -10793,7 +10799,7 @@ async function loadMonitors() {
         console.error(`Failed to load monitor ${monitorId}:`, err);
       }
     }
-    
+
     // Remove any monitor items that no longer exist
     existingItems.forEach((item, monitorId) => {
       if (!processedIds.has(monitorId)) {
@@ -10809,7 +10815,7 @@ async function loadMonitors() {
       return;
     }
     ensureMonitorsListEmptyState(monitorsList, false);
-    
+
     // Update icon status based on all monitors
     let upCount = 0;
     let downCount = 0;
@@ -10831,6 +10837,14 @@ async function loadMonitors() {
 
     // Update height after loading monitors
     updateMonitorsHeight();
+
+    // Background-check ticks after rows are on screen (not UI poll stamps) (#26).
+    await refreshMonitorHistoryFromBackend();
+    if (windowWorkPaused()) return;
+    monitorsList.querySelectorAll('.monitor-history').forEach((el) => {
+      const id = el.getAttribute('data-monitor-id');
+      if (id) updateMonitorHistory(el, id);
+    });
   } catch (err) {
     console.error('Failed to load monitors:', err);
     updateMonitorsIconStatus({ anyDown: false, allUp: false, upCount: 0, totalCount: 0 });
@@ -11643,6 +11657,8 @@ function updateOllamaIconStatus(status) {
 }
 
 const MONITORS_ICON_STATUS_LOCAL_KEY = 'monitors_icon_status';
+/** Last-known monitor rows for expanded first paint (#26). */
+const MONITORS_LIST_LOCAL_KEY = 'monitors_list_rows';
 
 function readMonitorsIconStatusLocal() {
   try {
@@ -11680,6 +11696,111 @@ function paintMonitorsIconFromLocal() {
   if (!cached) return;
   updateMonitorsIconStatus(cached);
 }
+
+function readMonitorsListLocal() {
+  try {
+    const raw = localStorage.getItem(MONITORS_LIST_LOCAL_KEY);
+    if (!raw) return null;
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return null;
+    return arr.filter((r) => r && typeof r.id === 'string' && r.id);
+  } catch (_) {
+    return null;
+  }
+}
+
+function persistMonitorsListLocal(rows) {
+  try {
+    const slim = (Array.isArray(rows) ? rows : []).map((row) => {
+      const id = String(row.id || '');
+      const st = row.status && typeof row.status === 'object' ? row.status : null;
+      return {
+        id,
+        url: row.url != null ? String(row.url) : id,
+        name: row.name != null ? String(row.name) : '',
+        status: st
+          ? {
+              is_up: !!st.is_up,
+              response_time_ms:
+                st.response_time_ms == null ? null : Number(st.response_time_ms),
+              error: st.error != null ? String(st.error) : null,
+              checked_at: st.checked_at ?? null,
+            }
+          : null,
+      };
+    }).filter((r) => r.id);
+    localStorage.setItem(MONITORS_LIST_LOCAL_KEY, JSON.stringify(slim));
+  } catch (_) {}
+}
+
+/** Summary text from last-known wash / rows (no IPC) (#26). */
+function paintMonitorsSummaryFromLocal(rows) {
+  const summaryText = document.getElementById('monitors-summary-text');
+  if (!summaryText) return;
+  const list = Array.isArray(rows) ? rows : [];
+  if (list.length === 0) return;
+  const icon = readMonitorsIconStatusLocal();
+  if (icon && icon.totalCount > 0) {
+    summaryText.textContent = icon.anyDown
+      ? `${icon.upCount} / ${icon.totalCount} up`
+      : `${icon.upCount} / ${icon.totalCount} sites up`;
+    applyMonitorsSummaryState({
+      anyDown: !!icon.anyDown,
+      allUp: !!icon.allUp,
+      empty: false,
+    });
+    return;
+  }
+  let up = 0;
+  let down = 0;
+  let checked = 0;
+  for (const row of list) {
+    const st = row.status;
+    if (!st) continue;
+    checked++;
+    if (st.is_up) up++;
+    else down++;
+  }
+  summaryText.textContent =
+    checked === 0 ? 'None yet' : `${up} / ${list.length} sites up`;
+  applyMonitorsSummaryState({
+    anyDown: down > 0,
+    allUp: checked > 0 && down === 0 && checked === list.length,
+    empty: false,
+  });
+}
+
+/**
+ * Seed expanded Monitors from localStorage before list_monitor_statuses (#26).
+ * Only fills when the shell still shows the first-paint empty (or is blank).
+ */
+function paintMonitorsListFromLocal() {
+  const monitorsList = document.getElementById('monitors-list');
+  if (!monitorsList) return false;
+  if (monitorsList.querySelector('.monitor-item')) return false;
+  const cached = readMonitorsListLocal();
+  if (!cached || cached.length === 0) return false;
+  ensureMonitorsListEmptyState(monitorsList, false);
+  for (const row of cached) {
+    const monitorId = row.id;
+    const monitorUrl = row.url || monitorId;
+    const status = row.status || {
+      is_up: false,
+      response_time_ms: null,
+      error: 'Waiting for first check…',
+    };
+    monitorStatusCache.set(monitorId, status);
+    monitorsList.appendChild(createMonitorItem(monitorId, monitorUrl, status));
+  }
+  sortMonitorsListByHealth(monitorsList);
+  applyMonitorsListFilter();
+  syncMonitorsListTabOrder(monitorsList);
+  paintMonitorsIconFromLocal();
+  paintMonitorsSummaryFromLocal(cached);
+  updateMonitorsHeight();
+  return true;
+}
+window.paintMonitorsListFromLocal = paintMonitorsListFromLocal;
 
 const DISCORD_GATEWAY_READY_LOCAL_KEY = 'discord_gateway_ready';
 
