@@ -1,23 +1,23 @@
 # Morning surprise — 2026-11-12
 
-Overnight autoresearch kept product fuel (not digester-empty alone).
+Overnight autoresearch (Track B) kept shipping keyboard-focus polish on opaque theme shells.
 
-## Shipped
+## Shipped tonight (highlights)
 
-- **v0.1.2616** — AI Chat settings Save / Cancel + model select focus rings across Light / Material / Architect / Swiss Minimalistic / Dark / Neon / Futuristic / Data Poster (Apple parity for popover buttons; model-select catch-up where missing).
-- Earlier tonight: **v0.1.2615** Light menu/popover/add/remove focus; **v0.1.2614** CRT Dark/Neon/Futuristic menu/popover; **v0.1.2613** Data Poster menu/popover (layout-daily).
+- **v0.1.2617** — AI Chat connection dot + model label `:focus-visible` rings (Light / Material / Architect / Swiss / Dark / Neon / Futuristic / Data Poster). Tab to reconnect / model name stays readable.
+- **v0.1.2616** — AI Chat settings Save / Cancel + model-select focus rings.
+- **v0.1.2615** — Light family Monitors / AI Chat menu-item + popover Close + Add/Remove focus.
+- **v0.1.2613–2614** — Data Poster then CRT menu / popover focus (layout-daily Data Poster counted for the day).
 
-## Tried / context
+## Also tried
 
-- Digester open: empty (0 turns / 7d).
-- Design review: grace (not due).
-- Layout daily: data-poster already marked today; Dark next calendar day.
-- Sibling harnesses missing on Linux rack.
-- Debug.log: no ERROR/WARN clusters.
+- Local model-select-only keep raced origin **v0.1.2616** (same surface + settings Save/Cancel) → discard, then re-picked connection/model-text.
 
-## Next
+## Quiet / deferred
 
-- Dark layout-daily when the day quota opens.
-- Mac window capture when Screen Recording TCC allows.
-- Leftover focus: model-text / connection-indicator / logs-toolbar button / perplexity-search-box if still Apple-only.
-- Not another keep-pNN clone.
+- Digester open empty; design-review still in grace; Dark layout-daily waits for the next calendar day.
+- Mac window capture still needs TCC when available.
+
+## Fitness
+
+Keyboard users on non-Apple themes can Tab the AI Chat status row without losing the focus ring on paper washes.
