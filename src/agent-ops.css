@@ -27746,6 +27746,342 @@ body.theme-architect .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].is
 }
 
 /*
+ * Light / Material / Architect: Monitors / AI Chat / Rings filter chips still
+ * mix Apple `#ffffff` (`.monitors-filter-chip` resting/hover/focus/active ·
+ * Down · Up · Slow; `.chat-filter-chip` resting/hover/focus/active · You ·
+ * Assistant · Errors; `.rings-filter-chip` resting/hover/focus/active · Hot)
+ * while CRT / Data Poster remaps already exist (Processes/Logs chips in
+ * v0.1.2643). Opaque washes on cream paper so filter chips match light shells
+ * (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
+ * Processes/Logs filter-chip remaps v0.1.2643.
+ */
+/* OVERNIGHT v0.1.2644: light Monitors/Chat/Rings filter-chip remaps */
+
+body.theme-light .monitors-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 4%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 77%, #f7f7fa);
+}
+body.theme-light .monitors-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 7%, #f7f7fa);
+}
+body.theme-light .monitors-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f7f7fa);
+}
+body.theme-light .monitors-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f7f7fa);
+}
+body.theme-light .monitors-filter-chip[data-monitors-filter='down'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff3b30 28%, #f7f7fa);
+}
+body.theme-light .monitors-filter-chip[data-monitors-filter='down'].is-active {
+  background: color-mix(in srgb, #ff3b30 18%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff3b30 38%, #f7f7fa);
+}
+body.theme-light .monitors-filter-chip[data-monitors-filter='up'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #f7f7fa);
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+}
+body.theme-light .monitors-filter-chip[data-monitors-filter='up'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #f7f7fa);
+  border-color: color-mix(in srgb, #34c759 38%, #f7f7fa);
+}
+body.theme-light .monitors-filter-chip[data-monitors-filter='slow'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff9500 28%, #f7f7fa);
+}
+body.theme-light .monitors-filter-chip[data-monitors-filter='slow'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff9500 40%, #f7f7fa);
+}
+body.theme-light .chat-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 4%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 77%, #f7f7fa);
+}
+body.theme-light .chat-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 7%, #f7f7fa);
+}
+body.theme-light .chat-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f7f7fa);
+}
+body.theme-light .chat-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f7f7fa);
+}
+body.theme-light .chat-filter-chip[data-chat-filter='you'].has-hits {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f7f7fa);
+}
+body.theme-light .chat-filter-chip[data-chat-filter='you'].is-active {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 18%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 38%, #f7f7fa);
+}
+body.theme-light .chat-filter-chip[data-chat-filter='assistant'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #f7f7fa);
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+}
+body.theme-light .chat-filter-chip[data-chat-filter='assistant'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #f7f7fa);
+  border-color: color-mix(in srgb, #34c759 38%, #f7f7fa);
+}
+body.theme-light .chat-filter-chip[data-chat-filter='errors'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff3b30 28%, #f7f7fa);
+}
+body.theme-light .chat-filter-chip[data-chat-filter='errors'].is-active {
+  background: color-mix(in srgb, #ff3b30 20%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff3b30 40%, #f7f7fa);
+}
+body.theme-light .rings-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 4%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 77%, #f7f7fa);
+}
+body.theme-light .rings-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 7%, #f7f7fa);
+}
+body.theme-light .rings-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f7f7fa);
+}
+body.theme-light .rings-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f7f7fa);
+}
+body.theme-light .rings-filter-chip[data-rings-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff9500 28%, #f7f7fa);
+}
+body.theme-light .rings-filter-chip[data-rings-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff9500 40%, #f7f7fa);
+}
+
+body.theme-material .monitors-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 4%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 77%, #ebe4d9);
+}
+body.theme-material .monitors-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 7%, #ebe4d9);
+}
+body.theme-material .monitors-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #ebe4d9);
+}
+body.theme-material .monitors-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #ebe4d9);
+}
+body.theme-material .monitors-filter-chip[data-monitors-filter='down'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff3b30 28%, #ebe4d9);
+}
+body.theme-material .monitors-filter-chip[data-monitors-filter='down'].is-active {
+  background: color-mix(in srgb, #ff3b30 18%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff3b30 38%, #ebe4d9);
+}
+body.theme-material .monitors-filter-chip[data-monitors-filter='up'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #ebe4d9);
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+}
+body.theme-material .monitors-filter-chip[data-monitors-filter='up'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #ebe4d9);
+  border-color: color-mix(in srgb, #34c759 38%, #ebe4d9);
+}
+body.theme-material .monitors-filter-chip[data-monitors-filter='slow'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff9500 28%, #ebe4d9);
+}
+body.theme-material .monitors-filter-chip[data-monitors-filter='slow'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff9500 40%, #ebe4d9);
+}
+body.theme-material .chat-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 4%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 77%, #ebe4d9);
+}
+body.theme-material .chat-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 7%, #ebe4d9);
+}
+body.theme-material .chat-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #ebe4d9);
+}
+body.theme-material .chat-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #ebe4d9);
+}
+body.theme-material .chat-filter-chip[data-chat-filter='you'].has-hits {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #ebe4d9);
+}
+body.theme-material .chat-filter-chip[data-chat-filter='you'].is-active {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 18%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 38%, #ebe4d9);
+}
+body.theme-material .chat-filter-chip[data-chat-filter='assistant'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #ebe4d9);
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+}
+body.theme-material .chat-filter-chip[data-chat-filter='assistant'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #ebe4d9);
+  border-color: color-mix(in srgb, #34c759 38%, #ebe4d9);
+}
+body.theme-material .chat-filter-chip[data-chat-filter='errors'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff3b30 28%, #ebe4d9);
+}
+body.theme-material .chat-filter-chip[data-chat-filter='errors'].is-active {
+  background: color-mix(in srgb, #ff3b30 20%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff3b30 40%, #ebe4d9);
+}
+body.theme-material .rings-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 4%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 77%, #ebe4d9);
+}
+body.theme-material .rings-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 7%, #ebe4d9);
+}
+body.theme-material .rings-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #ebe4d9);
+}
+body.theme-material .rings-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #ebe4d9);
+}
+body.theme-material .rings-filter-chip[data-rings-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff9500 28%, #ebe4d9);
+}
+body.theme-material .rings-filter-chip[data-rings-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff9500 40%, #ebe4d9);
+}
+
+body.theme-architect .monitors-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 4%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 77%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 7%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-chip[data-monitors-filter='down'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff3b30 28%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-chip[data-monitors-filter='down'].is-active {
+  background: color-mix(in srgb, #ff3b30 18%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff3b30 38%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-chip[data-monitors-filter='up'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #f1f1f1);
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-chip[data-monitors-filter='up'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #f1f1f1);
+  border-color: color-mix(in srgb, #34c759 38%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-chip[data-monitors-filter='slow'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9500 28%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-chip[data-monitors-filter='slow'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9500 40%, #f1f1f1);
+}
+body.theme-architect .chat-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 4%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 77%, #f1f1f1);
+}
+body.theme-architect .chat-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 7%, #f1f1f1);
+}
+body.theme-architect .chat-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f1f1f1);
+}
+body.theme-architect .chat-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f1f1f1);
+}
+body.theme-architect .chat-filter-chip[data-chat-filter='you'].has-hits {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f1f1f1);
+}
+body.theme-architect .chat-filter-chip[data-chat-filter='you'].is-active {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 18%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 38%, #f1f1f1);
+}
+body.theme-architect .chat-filter-chip[data-chat-filter='assistant'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #f1f1f1);
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+}
+body.theme-architect .chat-filter-chip[data-chat-filter='assistant'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #f1f1f1);
+  border-color: color-mix(in srgb, #34c759 38%, #f1f1f1);
+}
+body.theme-architect .chat-filter-chip[data-chat-filter='errors'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff3b30 28%, #f1f1f1);
+}
+body.theme-architect .chat-filter-chip[data-chat-filter='errors'].is-active {
+  background: color-mix(in srgb, #ff3b30 20%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff3b30 40%, #f1f1f1);
+}
+body.theme-architect .rings-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 4%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 77%, #f1f1f1);
+}
+body.theme-architect .rings-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 7%, #f1f1f1);
+}
+body.theme-architect .rings-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f1f1f1);
+}
+body.theme-architect .rings-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f1f1f1);
+}
+body.theme-architect .rings-filter-chip[data-rings-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9500 28%, #f1f1f1);
+}
+body.theme-architect .rings-filter-chip[data-rings-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9500 40%, #f1f1f1);
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
  * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
  * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log
