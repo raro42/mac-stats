@@ -27531,6 +27531,221 @@ body.theme-architect .chat-filter-clear.is-just-saved {
 }
 
 /*
+ * Light / Material / Architect: Top Processes + Debug Log filter chips still
+ * mix Apple `#ffffff` (`.processes-filter-chip` resting/hover/focus/active ·
+ * pinned · Hot; `.logs-toolbar .logs-filter-chip` resting/hover/focus/active ·
+ * error · warn) while CRT / Data Poster remaps already exist (Clear remaps
+ * landed in v0.1.2642). Opaque washes on cream paper so filter chips match
+ * light shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after
+ * light filter Clear remaps v0.1.2642.
+ */
+/* OVERNIGHT v0.1.2643: light Processes/Logs filter-chip remaps */
+
+body.theme-light .processes-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 4%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 77%, #f7f7fa);
+}
+body.theme-light .processes-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 7%, #f7f7fa);
+}
+body.theme-light .processes-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f7f7fa);
+}
+body.theme-light .processes-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f7f7fa);
+}
+body.theme-light .processes-filter-chip[data-processes-filter='pinned'].has-hits {
+  background: color-mix(in srgb, #ffd60a 14%, #f7f7fa);
+  border-color: color-mix(in srgb, #ffd60a 32%, #f7f7fa);
+}
+body.theme-light .processes-filter-chip[data-processes-filter='pinned'].is-active {
+  background: color-mix(in srgb, #ffd60a 22%, #f7f7fa);
+  border-color: color-mix(in srgb, #ffd60a 42%, #f7f7fa);
+}
+body.theme-light .processes-filter-chip[data-processes-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff9500 28%, #f7f7fa);
+}
+body.theme-light .processes-filter-chip[data-processes-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff9500 40%, #f7f7fa);
+}
+body.theme-light .logs-toolbar .logs-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 4%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 77%, #f7f7fa);
+}
+body.theme-light .logs-toolbar .logs-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 7%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 20%, #f7f7fa);
+}
+body.theme-light .logs-toolbar .logs-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #f7f7fa);
+}
+body.theme-light .logs-toolbar .logs-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f7f7fa);
+}
+body.theme-light .logs-toolbar .logs-filter-chip[data-logs-filter='error'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff3b30 28%, #f7f7fa);
+}
+body.theme-light .logs-toolbar .logs-filter-chip[data-logs-filter='error'].is-active {
+  background: color-mix(in srgb, #ff3b30 18%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff3b30 38%, #f7f7fa);
+}
+body.theme-light .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 14%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f7f7fa);
+}
+body.theme-light .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].is-active {
+  background: color-mix(in srgb, #ff9f0a 20%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff9f0a 40%, #f7f7fa);
+}
+
+body.theme-material .processes-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 4%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 77%, #ebe4d9);
+}
+body.theme-material .processes-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 7%, #ebe4d9);
+}
+body.theme-material .processes-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #ebe4d9);
+}
+body.theme-material .processes-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #ebe4d9);
+}
+body.theme-material .processes-filter-chip[data-processes-filter='pinned'].has-hits {
+  background: color-mix(in srgb, #ffd60a 14%, #ebe4d9);
+  border-color: color-mix(in srgb, #ffd60a 32%, #ebe4d9);
+}
+body.theme-material .processes-filter-chip[data-processes-filter='pinned'].is-active {
+  background: color-mix(in srgb, #ffd60a 22%, #ebe4d9);
+  border-color: color-mix(in srgb, #ffd60a 42%, #ebe4d9);
+}
+body.theme-material .processes-filter-chip[data-processes-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff9500 28%, #ebe4d9);
+}
+body.theme-material .processes-filter-chip[data-processes-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff9500 40%, #ebe4d9);
+}
+body.theme-material .logs-toolbar .logs-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 4%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 77%, #ebe4d9);
+}
+body.theme-material .logs-toolbar .logs-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 7%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 20%, #ebe4d9);
+}
+body.theme-material .logs-toolbar .logs-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #ebe4d9);
+}
+body.theme-material .logs-toolbar .logs-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #ebe4d9);
+}
+body.theme-material .logs-toolbar .logs-filter-chip[data-logs-filter='error'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff3b30 28%, #ebe4d9);
+}
+body.theme-material .logs-toolbar .logs-filter-chip[data-logs-filter='error'].is-active {
+  background: color-mix(in srgb, #ff3b30 18%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff3b30 38%, #ebe4d9);
+}
+body.theme-material .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 14%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ebe4d9);
+}
+body.theme-material .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].is-active {
+  background: color-mix(in srgb, #ff9f0a 20%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff9f0a 40%, #ebe4d9);
+}
+
+body.theme-architect .processes-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 4%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 77%, #f1f1f1);
+}
+body.theme-architect .processes-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 7%, #f1f1f1);
+}
+body.theme-architect .processes-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f1f1f1);
+}
+body.theme-architect .processes-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f1f1f1);
+}
+body.theme-architect .processes-filter-chip[data-processes-filter='pinned'].has-hits {
+  background: color-mix(in srgb, #ffd60a 14%, #f1f1f1);
+  border-color: color-mix(in srgb, #ffd60a 32%, #f1f1f1);
+}
+body.theme-architect .processes-filter-chip[data-processes-filter='pinned'].is-active {
+  background: color-mix(in srgb, #ffd60a 22%, #f1f1f1);
+  border-color: color-mix(in srgb, #ffd60a 42%, #f1f1f1);
+}
+body.theme-architect .processes-filter-chip[data-processes-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9500 28%, #f1f1f1);
+}
+body.theme-architect .processes-filter-chip[data-processes-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9500 40%, #f1f1f1);
+}
+body.theme-architect .logs-toolbar .logs-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 4%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 77%, #f1f1f1);
+}
+body.theme-architect .logs-toolbar .logs-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 7%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 20%, #f1f1f1);
+}
+body.theme-architect .logs-toolbar .logs-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #f1f1f1);
+}
+body.theme-architect .logs-toolbar .logs-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f1f1f1);
+}
+body.theme-architect .logs-toolbar .logs-filter-chip[data-logs-filter='error'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff3b30 28%, #f1f1f1);
+}
+body.theme-architect .logs-toolbar .logs-filter-chip[data-logs-filter='error'].is-active {
+  background: color-mix(in srgb, #ff3b30 18%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff3b30 38%, #f1f1f1);
+}
+body.theme-architect .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 14%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f1f1f1);
+}
+body.theme-architect .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].is-active {
+  background: color-mix(in srgb, #ff9f0a 20%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9f0a 40%, #f1f1f1);
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
  * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
  * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log
