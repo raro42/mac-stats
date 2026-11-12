@@ -1,16 +1,22 @@
 # Morning surprise — 2026-11-12
 
-Overnight autoresearch (Track B) on the Linux rack. Digester empty; design-review grace; layout-daily Data Poster already marked for the day.
+Overnight autoresearch kept product CSS remaps on cream paper (Standing P2 #14). Digester open stayed empty; design-review stayed in grace; layout-daily Data Poster already marked today.
 
-## Shipped
+## Shipped tonight
 
-- **v0.1.2626** — Light / Material / Architect ollama settings Save, Agent Ops Save, Monitors Add Save (solid), plus Load-into-Chat Loaded flashes (soft) remapped off Apple `#ffffff` onto cream paper so Saved/Loaded feedback matches the shell.
-- Earlier same night: credential Save flashes (v0.1.2625), soft Settings Save flashes (v0.1.2624), toggle Saved flash (v0.1.2623), Perplexity result remaps (v0.1.2622), and more light-paper focus/Save polish down the ladder.
+- **v0.1.2627** — Light / Material / Architect soft Save leftovers (`#settings-help-btn` / `#ollama-settings-reset` / `#refresh-btn` / `#github-link` / version-clickable) remapped onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (after ollama/Ops/Monitors Save + Load-into-chat v0.1.2626).
+- **v0.1.2626** — Light / Material / Architect `#ollama-settings-save` / `#ops-agent-save` / `#monitors-add-save` + Agent Ops Load-into-Chat Saved flashes on cream paper.
+- **v0.1.2625** — Light / Material / Architect solid Settings credential Save flashes on cream paper.
+- **v0.1.2624** — Light / Material / Architect `.logs-path-hint` / `.chat-empty-chip` / soft Settings secondary Saved flashes on cream paper.
+- **v0.1.2623** — Light / Material / Architect `.setting-toggle .toggle-label.is-just-saved` soft green on cream paper.
+- Earlier tonight: Perplexity result / Settings attention-glance / section-header / Perplexity query / logs-toolbar / connection·model-text through **v0.1.2616+** (see `loop_backlog.md`).
 
-## Tried / context
+## Tried / discarded
 
-- Sibling OpenClaw/Hermes paths missing on this rack.
-- Debug.log: no ERROR/WARN clusters in the scan window.
-- Next fuel: Dark layout-daily when the calendar day opens; Mac capture when TCC allows; leftover soft Save leftovers on Light if still muddy.
+- Parallel race discards earlier tonight (model-select / overlapping Light focus keeps) — reset + ff to origin; re-picked next standing.
 
-Generated: 2026-11-12T03:06:48+01:00
+## Next
+
+- Dark layout-daily next calendar day; Mac capture when TCC allows.
+- Leftover light Monitors URL Saved flashes (`.monitor-url` / `button.monitor-detail-url` if still Apple `#ffffff` on cream).
+- Sibling/product fuel — not another keep-pNN clone.
