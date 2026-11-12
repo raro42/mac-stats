@@ -31337,3 +31337,53 @@ body.theme-futuristic .ops-close-btn:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
 }
 
+/*
+ * Light / Material / Architect: Agent Ops loading / hint / tab-bar kb hint /
+ * overview jump-flash ring still mix Apple `#ffffff` while CRT / Data Poster
+ * remaps already exist (overview/card in v0.1.2651). Opaque washes on cream
+ * paper so Ops loading/hint match light shells (Swiss / Apple keep shared
+ * `#ffffff`). Standing P2 #14 after light Ops overview/card remaps v0.1.2651.
+ */
+/* OVERNIGHT v0.1.2652: light Ops loading/hint remaps */
+body.theme-light .ops-loading {
+  color: color-mix(in srgb, #0c0c10 55%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 18%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 4%, #f7f7fa);
+}
+body.theme-light .ops-hint {
+  color: color-mix(in srgb, #0c0c10 40%, #f7f7fa);
+}
+body.theme-light .ops-tab-bar-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+}
+body.theme-light {
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #f7f7fa);
+}
+body.theme-material .ops-loading {
+  color: color-mix(in srgb, #0c0c10 55%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 18%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 4%, #ebe4d9);
+}
+body.theme-material .ops-hint {
+  color: color-mix(in srgb, #0c0c10 40%, #ebe4d9);
+}
+body.theme-material .ops-tab-bar-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+}
+body.theme-material {
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #ebe4d9);
+}
+body.theme-architect .ops-loading {
+  color: color-mix(in srgb, #0c0c10 55%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 4%, #f1f1f1);
+}
+body.theme-architect .ops-hint {
+  color: color-mix(in srgb, #0c0c10 40%, #f1f1f1);
+}
+body.theme-architect .ops-tab-bar-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+}
+body.theme-architect {
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #f1f1f1);
+}
