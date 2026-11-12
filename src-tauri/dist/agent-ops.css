@@ -31895,3 +31895,52 @@ body.theme-architect .ops-health-card.is-active:not(.ops-health-ok):not(.ops-hea
 body.theme-architect .ops-health-card.is-active.ops-health-clickable:hover {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 52%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: AI Chat exec chrome still mixes Apple `#ffffff`
+ * (`.chat-exec-label` · `.chat-exec-card` · `.chat-exec-code`) while Data Poster /
+ * Dark / Neon / Futuristic remaps already exist. Opaque washes on cream paper so
+ * tool/exec cards match light shells (Swiss / Apple keep shared `#ffffff`).
+ * Standing P2 #14 after light Ops health-label/card/kb-hint remaps v0.1.2658
+ * (`.response-time` already paper in theme cpu.css — skip duplicate).
+ */
+/* OVERNIGHT v0.1.2659: light AI Chat exec chrome remaps */
+body.theme-light .chat-exec-label {
+  color: color-mix(in srgb, #0c0c10 57%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .chat-exec-card {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  border-left-color: color-mix(in srgb, #34c759 75%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 4%, #f7f7fa);
+}
+body.theme-light .chat-exec-code {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+}
+body.theme-material .chat-exec-label {
+  color: color-mix(in srgb, #0c0c10 57%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .chat-exec-card {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  border-left-color: color-mix(in srgb, #34c759 75%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 4%, #ebe4d9);
+}
+body.theme-material .chat-exec-code {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+}
+body.theme-architect .chat-exec-label {
+  color: color-mix(in srgb, #0c0c10 57%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .chat-exec-card {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  border-left-color: color-mix(in srgb, #34c759 75%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 4%, #f1f1f1);
+}
+body.theme-architect .chat-exec-code {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+}
