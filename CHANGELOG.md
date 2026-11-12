@@ -9,6 +9,12 @@
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2623] - 2026-11-12
+
+### Changed
+
+- **Light Settings toggle Saved flash:** Light / Material / Architect `.setting-toggle .toggle-label.is-just-saved` still mixed Apple `#ffffff` (CRT / Data Poster remaps already existed; Swiss / Apple keep shared white). Soft 16% green tint on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so the Saved flash matches cream Settings shells (after Perplexity result light remaps v0.1.2622).
+
 ## [0.1.2622] - 2026-11-12
 
 ### Changed

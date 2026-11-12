@@ -26272,6 +26272,30 @@ body.theme-architect .perplexity-weather-card {
 }
 
 /*
+ * Light / Material / Architect: Settings product-toggle Saved flash still mixes
+ * Apple `#ffffff` (`.setting-toggle .toggle-label.is-just-saved`) while CRT /
+ * Data Poster remaps already exist. Soft 16% green tint on light paper so the
+ * flash matches cream shells (Swiss / Apple keep shared `#ffffff`). Standing
+ * P2 #14 after Perplexity result light remaps v0.1.2622.
+ */
+/* OVERNIGHT v0.1.2623: setting-toggle Saved flash light-paper remaps */
+body.theme-light .setting-toggle .toggle-label.is-just-saved {
+  color: #1a7f37;
+  background: color-mix(in srgb, #34c759 16%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-material .setting-toggle .toggle-label.is-just-saved {
+  color: #1a7f37;
+  background: color-mix(in srgb, #34c759 16%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-architect .setting-toggle .toggle-label.is-just-saved {
+  color: #1a7f37;
+  background: color-mix(in srgb, #34c759 16%, #f1f1f1);
+  box-shadow: none;
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Disk Cleanup list rows still mix Apple
  * `#ffffff` washes (`.disk-cleanup-item` resting / hover / focus / selected ·
  * `.has-reclaim` · `.is-big`) → white slab on opaque shells. Copied badge remapped
