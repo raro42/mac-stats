@@ -27047,6 +27047,54 @@ body.theme-architect .disk-cleanup-item.has-reclaim.is-just-copied {
 }
 
 /*
+ * Light / Material / Architect: Debug Log viewer + Monitors detail panel still
+ * mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
+ * `.monitor-detail` resting) while CRT / Data Poster remaps already exist.
+ * Opaque mixes on cream paper so Debug Log / Monitors detail match light shells
+ * (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light Disk
+ * Cleanup Copied flash remaps v0.1.2631.
+ */
+/* OVERNIGHT v0.1.2632: light Debug Log / Monitors detail remaps */
+body.theme-light .logs-viewer {
+  background: color-mix(in srgb, currentColor 4%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 12%, #f7f7fa);
+}
+body.theme-material .logs-viewer {
+  background: color-mix(in srgb, currentColor 4%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 12%, #ebe4d9);
+}
+body.theme-architect .logs-viewer {
+  background: color-mix(in srgb, currentColor 4%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 12%, #f1f1f1);
+}
+
+body.theme-light .logs-viewer:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 35%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 14%, #f7f7fa);
+}
+body.theme-material .logs-viewer:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 35%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 14%, #ebe4d9);
+}
+body.theme-architect .logs-viewer:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 35%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 14%, #f1f1f1);
+}
+
+body.theme-light .monitor-detail {
+  border-color: color-mix(in srgb, var(--hairline, currentColor) 55%, #f7f7fa);
+  background: color-mix(in srgb, var(--glass-fill, #fff) 55%, #f7f7fa);
+}
+body.theme-material .monitor-detail {
+  border-color: color-mix(in srgb, var(--hairline, currentColor) 55%, #ebe4d9);
+  background: color-mix(in srgb, var(--glass-fill, #fff) 55%, #ebe4d9);
+}
+body.theme-architect .monitor-detail {
+  border-color: color-mix(in srgb, var(--hairline, currentColor) 55%, #f1f1f1);
+  background: color-mix(in srgb, var(--glass-fill, #fff) 55%, #f1f1f1);
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
  * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
  * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log
