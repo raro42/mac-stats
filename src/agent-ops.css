@@ -27240,6 +27240,27 @@ body.theme-architect .process-row.is-selected {
 }
 
 /*
+ * Light / Material / Architect: Top Processes list header still mixes Apple
+ * `#ffffff` (`.process-list-header` color · border-bottom) while CRT /
+ * Data Poster remaps already exist. Opaque mixes on cream paper so list
+ * headers match light shells (Swiss / Apple keep shared `#ffffff`). Standing
+ * P2 #14 after light Top Processes selected-row remaps v0.1.2635.
+ */
+/* OVERNIGHT v0.1.2636: light Top Processes list-header remaps */
+body.theme-light .process-list-header {
+  color: color-mix(in srgb, #0c0c10 48%, #f7f7fa);
+  border-bottom-color: color-mix(in srgb, currentColor 12%, #f7f7fa);
+}
+body.theme-material .process-list-header {
+  color: color-mix(in srgb, #0c0c10 48%, #ebe4d9);
+  border-bottom-color: color-mix(in srgb, currentColor 12%, #ebe4d9);
+}
+body.theme-architect .process-list-header {
+  color: color-mix(in srgb, #0c0c10 48%, #f1f1f1);
+  border-bottom-color: color-mix(in srgb, currentColor 12%, #f1f1f1);
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
  * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
  * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log

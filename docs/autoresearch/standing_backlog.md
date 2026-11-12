@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2636
+
+- Light Top Processes list-header washes: Light / Material / Architect `.process-list-header` (color · border-bottom) still mixed Apple `#ffffff` (CRT / Data Poster remaps already existed; Swiss / Apple keep shared white). Opaque mixes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`. Standing P2 #14 after Top Processes selected-row remaps v0.1.2635; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover light Top Processes pin washes (`.process-list-header-pin` if still Apple `#ffffff` on cream), or sibling/product fuel — not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2635
 
 - Light Top Processes selected-row washes: Light / Material / Architect `.process-row.is-selected` (background · inset ring) still mixed Apple `#ffffff` (CRT / Data Poster remaps already existed; Swiss / Apple keep shared white). Opaque mixes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`. Standing P2 #14 after Debug Log toolbar remaps v0.1.2634; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover light Top Processes list-header washes (`.process-list-header` color / border if still Apple `#ffffff` on cream), or sibling/product fuel — not another keep-pNN clone.
