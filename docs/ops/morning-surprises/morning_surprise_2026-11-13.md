@@ -1,24 +1,19 @@
 # Morning surprise — 2026-11-13
 
-Overnight Track B (product) kept light Agent Ops filter search / match / tab-count remaps on cream paper.
+Overnight Track B (mac-stats autoresearch). Digester open stayed empty; design-review grace; layout-daily already used (data-poster). Standing P2 #14 light Ops cream remaps continued.
 
 ## Shipped
 
-- **v0.1.2649** — Light / Material / Architect `.ops-filter-input` (resting · hover · focus), `.ops-filter-match` (resting · is-all · is-partial · is-zero), and `.ops-tab-count` (resting · is-zero · hover · active) remapped from Apple `#ffffff` mixes onto paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (CRT / Data Poster already had these). Standing P2 #14 after filter Clear + empty v0.1.2648.
+- **v0.1.2650** — Light / Material / Architect Agent Ops attention-glance washes (runs / filter / digest / discord / redmine / ollama / brave / browser / mcp / cursor / perplexity / mastodon / telegram / slack / signal — resting · hover · focus · fail · slow · warn · filter soft-states) remapped onto paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (after filter-input + match + tab-count v0.1.2649).
+- Earlier same night / prior ticks already logged: v0.1.2648–2649 filter Clear/empty + filter-input/match/tab-count (and earlier chip/count remaps).
 
-## Also this night (earlier)
+## Tried / context
 
-- v0.1.2647–2648 — Light Ops kind Clear/count/copy + filter Clear/empty-state remaps on cream paper.
-- v0.1.2642–2646 — Light filter Clear + Processes/Logs/Monitors/Chat/Rings/Disk/Perplexity filter chips + Ops kind-filter chips on cream paper.
+- Fuel order: digester empty → design-review not due → layout-daily already today → standing Next (Ops attention after 2649).
+- Ratchet: `keep` @ `3e430636` (verify OK). Pushed `origin/main`.
 
-## Tried / notes
+## Next
 
-- Digester empty; design-review still in grace; layout-daily data-poster already done for 2026-11-12 (Dark due next calendar day).
-- Sibling harness paths missing on this rack (OpenClaw / Hermes).
-- Debug log: no ERROR/WARN clusters in the scan window.
-
-## Next fuel
-
-- Dark layout-daily next calendar day; Mac window-only capture when TCC allows.
-- Leftover light Ops attention-glance washes if still muddy.
-- Not another keep-pNN clone.
+- Dark layout-daily next calendar day (when due).
+- Mac capture when Screen Recording TCC allows.
+- Leftover light Ops overview/card washes if still Apple `#ffffff` on cream, or sibling/product fuel — not another keep-pNN clone.
