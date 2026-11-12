@@ -27261,6 +27261,24 @@ body.theme-architect .process-list-header {
 }
 
 /*
+ * Light / Material / Architect: Top Processes pin column still mixes Apple
+ * `#ffffff` (`.process-list-header-pin` color) while CRT / Data Poster remaps
+ * already exist. Opaque mixes on cream paper so the pin glyph matches light
+ * shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
+ * list-header remaps v0.1.2636.
+ */
+/* OVERNIGHT v0.1.2637: light Top Processes header-pin remaps */
+body.theme-light .process-list-header-pin {
+  color: color-mix(in srgb, #0c0c10 48%, #f7f7fa);
+}
+body.theme-material .process-list-header-pin {
+  color: color-mix(in srgb, #0c0c10 48%, #ebe4d9);
+}
+body.theme-architect .process-list-header-pin {
+  color: color-mix(in srgb, #0c0c10 48%, #f1f1f1);
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
  * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
  * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log
