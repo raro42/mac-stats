@@ -27159,6 +27159,66 @@ body.theme-architect .disk-cleanup-scope-row.is-selected {
 }
 
 /*
+ * Light / Material / Architect: Debug Log toolbar chrome still mixes Apple
+ * `#ffffff` washes (`.logs-toolbar` resting · button · hover · focus-visible)
+ * while CRT / Data Poster remaps already exist. Opaque mixes on cream paper so
+ * toolbar chrome matches light shells (Swiss / Apple keep shared `#ffffff`).
+ * Standing P2 #14 after light Disk Cleanup add-scope-row remaps v0.1.2633.
+ */
+/* OVERNIGHT v0.1.2634: light Debug Log toolbar remaps */
+body.theme-light .logs-toolbar {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+}
+body.theme-material .logs-toolbar {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+}
+body.theme-architect .logs-toolbar {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+}
+
+body.theme-light .logs-toolbar button {
+  border-color: color-mix(in srgb, currentColor 14%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 5%, #f7f7fa);
+}
+body.theme-material .logs-toolbar button {
+  border-color: color-mix(in srgb, currentColor 14%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 5%, #ebe4d9);
+}
+body.theme-architect .logs-toolbar button {
+  border-color: color-mix(in srgb, currentColor 14%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 5%, #f1f1f1);
+}
+
+body.theme-light .logs-toolbar button:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 8%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f7f7fa);
+}
+body.theme-material .logs-toolbar button:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 8%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #ebe4d9);
+}
+body.theme-architect .logs-toolbar button:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 8%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f1f1f1);
+}
+
+body.theme-light .logs-toolbar button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, #f7f7fa);
+  outline-offset: 2px;
+}
+body.theme-material .logs-toolbar button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, #ebe4d9);
+  outline-offset: 2px;
+}
+body.theme-architect .logs-toolbar button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, #f1f1f1);
+  outline-offset: 2px;
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
  * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
  * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log

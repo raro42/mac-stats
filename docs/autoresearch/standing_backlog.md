@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2634
+
+- Light Debug Log toolbar washes: Light / Material / Architect `.logs-toolbar` resting / button / hover / `:focus-visible` still mixed Apple `#ffffff` (CRT / Data Poster remaps already existed; Swiss / Apple keep shared white). Opaque mixes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`. Standing P2 #14 after Disk Cleanup add-scope-row remaps v0.1.2633; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover light Top Processes selected-row washes (`.process-row.is-selected` if still Apple `#ffffff` on cream), or sibling/product fuel — not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2633
 
 - Light Disk Cleanup add-scope rows: Light / Material / Architect `.disk-cleanup-scope-row` resting / hover / `:focus-visible` / `:focus-within` / `.is-selected` still mixed Apple `#ffffff` (CRT / Data Poster remaps already existed; Swiss / Apple keep shared white). Opaque mixes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`. Standing P2 #14 after Debug Log / Monitors detail remaps v0.1.2632; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover light Debug Log toolbar washes (`.logs-toolbar` resting/button/hover/focus if still Apple `#ffffff` on cream), or sibling/product fuel — not another keep-pNN clone.
