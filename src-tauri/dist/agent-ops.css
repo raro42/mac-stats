@@ -28844,6 +28844,210 @@ body.theme-architect .ops-runs-lane-chip[data-ops-runs-lane='fail'].is-active {
 }
 
 /*
+ * Light / Material / Architect: Agent Ops kind Clear / count / copy-chip still
+ * mix Apple `#ffffff` (`.ops-session-kind-filter-clear` · agents/schedules/
+ * memory/runs Clear resting/hover/focus/`.is-just-saved`; matching
+ * `.ops-*-count` / `.is-zero`; `.ops-session-copy-chip` resting/hover/focus/
+ * `.is-just-saved`) while CRT / Data Poster remaps already exist (kind chips
+ * in v0.1.2646). Opaque washes on cream paper so Ops Clear/count/copy match
+ * light shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after
+ * light Ops kind-filter chip remaps v0.1.2646.
+ */
+/* OVERNIGHT v0.1.2647: light Ops kind Clear/count/copy remaps */
+body.theme-light .ops-session-kind-filter-clear,
+body.theme-light .ops-agents-enabled-filter-clear,
+body.theme-light .ops-schedules-kind-filter-clear,
+body.theme-light .ops-memory-kind-filter-clear,
+body.theme-light .ops-runs-lane-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 32%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 81%, #f7f7fa);
+}
+body.theme-light .ops-session-kind-filter-clear:hover,
+body.theme-light .ops-agents-enabled-filter-clear:hover,
+body.theme-light .ops-schedules-kind-filter-clear:hover,
+body.theme-light .ops-memory-kind-filter-clear:hover,
+body.theme-light .ops-runs-lane-filter-clear:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #007aff) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 44%, #f7f7fa);
+}
+body.theme-light .ops-session-kind-filter-clear:focus-visible,
+body.theme-light .ops-agents-enabled-filter-clear:focus-visible,
+body.theme-light .ops-schedules-kind-filter-clear:focus-visible,
+body.theme-light .ops-memory-kind-filter-clear:focus-visible,
+body.theme-light .ops-runs-lane-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #f7f7fa);
+}
+body.theme-light .ops-session-kind-filter-clear.is-just-saved,
+body.theme-light .ops-agents-enabled-filter-clear.is-just-saved,
+body.theme-light .ops-schedules-kind-filter-clear.is-just-saved,
+body.theme-light .ops-memory-kind-filter-clear.is-just-saved,
+body.theme-light .ops-runs-lane-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #f7f7fa);
+  border-color: color-mix(in srgb, #34c759 38%, #f7f7fa);
+  color: color-mix(in srgb, #34c759 55%, var(--text, currentColor));
+  box-shadow: none;
+}
+body.theme-light .ops-session-kind-count,
+body.theme-light .ops-agents-enabled-count,
+body.theme-light .ops-schedules-kind-count,
+body.theme-light .ops-memory-kind-count,
+body.theme-light .ops-runs-lane-count {
+  color: color-mix(in srgb, #0c0c10 79%, #f7f7fa);
+}
+body.theme-light .ops-session-kind-count.is-zero,
+body.theme-light .ops-agents-enabled-count.is-zero,
+body.theme-light .ops-schedules-kind-count.is-zero,
+body.theme-light .ops-memory-kind-count.is-zero,
+body.theme-light .ops-runs-lane-count.is-zero {
+  color: color-mix(in srgb, #0c0c10 37%, #f7f7fa);
+}
+body.theme-light .ops-session-copy-chip {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, #f7f7fa);
+}
+body.theme-light .ops-session-copy-chip:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 14%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #f7f7fa);
+}
+body.theme-light .ops-session-copy-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, #f7f7fa);
+}
+body.theme-light .ops-session-copy-chip.is-just-saved {
+  border-color: color-mix(in srgb, #34c759 45%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 14%, #f7f7fa);
+}
+body.theme-material .ops-session-kind-filter-clear,
+body.theme-material .ops-agents-enabled-filter-clear,
+body.theme-material .ops-schedules-kind-filter-clear,
+body.theme-material .ops-memory-kind-filter-clear,
+body.theme-material .ops-runs-lane-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 32%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 81%, #ebe4d9);
+}
+body.theme-material .ops-session-kind-filter-clear:hover,
+body.theme-material .ops-agents-enabled-filter-clear:hover,
+body.theme-material .ops-schedules-kind-filter-clear:hover,
+body.theme-material .ops-memory-kind-filter-clear:hover,
+body.theme-material .ops-runs-lane-filter-clear:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #007aff) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 44%, #ebe4d9);
+}
+body.theme-material .ops-session-kind-filter-clear:focus-visible,
+body.theme-material .ops-agents-enabled-filter-clear:focus-visible,
+body.theme-material .ops-schedules-kind-filter-clear:focus-visible,
+body.theme-material .ops-memory-kind-filter-clear:focus-visible,
+body.theme-material .ops-runs-lane-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #ebe4d9);
+}
+body.theme-material .ops-session-kind-filter-clear.is-just-saved,
+body.theme-material .ops-agents-enabled-filter-clear.is-just-saved,
+body.theme-material .ops-schedules-kind-filter-clear.is-just-saved,
+body.theme-material .ops-memory-kind-filter-clear.is-just-saved,
+body.theme-material .ops-runs-lane-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #ebe4d9);
+  border-color: color-mix(in srgb, #34c759 38%, #ebe4d9);
+  color: color-mix(in srgb, #34c759 55%, var(--text, currentColor));
+  box-shadow: none;
+}
+body.theme-material .ops-session-kind-count,
+body.theme-material .ops-agents-enabled-count,
+body.theme-material .ops-schedules-kind-count,
+body.theme-material .ops-memory-kind-count,
+body.theme-material .ops-runs-lane-count {
+  color: color-mix(in srgb, #0c0c10 79%, #ebe4d9);
+}
+body.theme-material .ops-session-kind-count.is-zero,
+body.theme-material .ops-agents-enabled-count.is-zero,
+body.theme-material .ops-schedules-kind-count.is-zero,
+body.theme-material .ops-memory-kind-count.is-zero,
+body.theme-material .ops-runs-lane-count.is-zero {
+  color: color-mix(in srgb, #0c0c10 37%, #ebe4d9);
+}
+body.theme-material .ops-session-copy-chip {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, #ebe4d9);
+}
+body.theme-material .ops-session-copy-chip:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 14%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #ebe4d9);
+}
+body.theme-material .ops-session-copy-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, #ebe4d9);
+}
+body.theme-material .ops-session-copy-chip.is-just-saved {
+  border-color: color-mix(in srgb, #34c759 45%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 14%, #ebe4d9);
+}
+body.theme-architect .ops-session-kind-filter-clear,
+body.theme-architect .ops-agents-enabled-filter-clear,
+body.theme-architect .ops-schedules-kind-filter-clear,
+body.theme-architect .ops-memory-kind-filter-clear,
+body.theme-architect .ops-runs-lane-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 32%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 81%, #f1f1f1);
+}
+body.theme-architect .ops-session-kind-filter-clear:hover,
+body.theme-architect .ops-agents-enabled-filter-clear:hover,
+body.theme-architect .ops-schedules-kind-filter-clear:hover,
+body.theme-architect .ops-memory-kind-filter-clear:hover,
+body.theme-architect .ops-runs-lane-filter-clear:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 44%, #f1f1f1);
+}
+body.theme-architect .ops-session-kind-filter-clear:focus-visible,
+body.theme-architect .ops-agents-enabled-filter-clear:focus-visible,
+body.theme-architect .ops-schedules-kind-filter-clear:focus-visible,
+body.theme-architect .ops-memory-kind-filter-clear:focus-visible,
+body.theme-architect .ops-runs-lane-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #f1f1f1);
+}
+body.theme-architect .ops-session-kind-filter-clear.is-just-saved,
+body.theme-architect .ops-agents-enabled-filter-clear.is-just-saved,
+body.theme-architect .ops-schedules-kind-filter-clear.is-just-saved,
+body.theme-architect .ops-memory-kind-filter-clear.is-just-saved,
+body.theme-architect .ops-runs-lane-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #f1f1f1);
+  border-color: color-mix(in srgb, #34c759 38%, #f1f1f1);
+  color: color-mix(in srgb, #34c759 55%, var(--text, currentColor));
+  box-shadow: none;
+}
+body.theme-architect .ops-session-kind-count,
+body.theme-architect .ops-agents-enabled-count,
+body.theme-architect .ops-schedules-kind-count,
+body.theme-architect .ops-memory-kind-count,
+body.theme-architect .ops-runs-lane-count {
+  color: color-mix(in srgb, #0c0c10 79%, #f1f1f1);
+}
+body.theme-architect .ops-session-kind-count.is-zero,
+body.theme-architect .ops-agents-enabled-count.is-zero,
+body.theme-architect .ops-schedules-kind-count.is-zero,
+body.theme-architect .ops-memory-kind-count.is-zero,
+body.theme-architect .ops-runs-lane-count.is-zero {
+  color: color-mix(in srgb, #0c0c10 37%, #f1f1f1);
+}
+body.theme-architect .ops-session-copy-chip {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, #f1f1f1);
+}
+body.theme-architect .ops-session-copy-chip:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 14%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #f1f1f1);
+}
+body.theme-architect .ops-session-copy-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, #f1f1f1);
+}
+body.theme-architect .ops-session-copy-chip.is-just-saved {
+  border-color: color-mix(in srgb, #34c759 45%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 14%, #f1f1f1);
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Debug Log viewer + Monitors detail
  * panel still mix Apple `#ffffff` washes (`.logs-viewer` resting / focus-visible ·
  * `.monitor-detail` resting) → white slab on opaque shells. Empty/filter/log
