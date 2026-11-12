@@ -1,20 +1,27 @@
 # Morning surprise — 2026-11-13
 
-Overnight Track B (mac-stats autoresearch). Digester open stayed empty; design-review grace; layout-daily already used (data-poster). Standing P2 #14 light Ops cream remaps continued.
+Overnight Track B (product) kept light Agent Ops loading / hint remaps on cream paper (after a parallel-race discard of the same overview/card keep origin already shipped).
 
 ## Shipped
 
-- **v0.1.2651** — Light / Material / Architect Agent Ops overview/card washes (`.ops-overview-kb-hint` · `.ops-overview-card` resting / hover / focus / active / health ok·warn·bad · `.ops-overview-head-count` · `.ops-overview-link` · `.ops-overview-count`) remapped onto paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (after attention-glance v0.1.2650).
-- **v0.1.2650** — Light / Material / Architect Agent Ops attention-glance washes (runs / filter / digest / discord / redmine / ollama / brave / browser / mcp / cursor / perplexity / mastodon / telegram / slack / signal — resting · hover · focus · fail · slow · warn · filter soft-states) remapped onto cream paper (after filter-input + match + tab-count v0.1.2649).
-- Earlier same night / prior ticks already logged: v0.1.2648–2649 filter Clear/empty + filter-input/match/tab-count (and earlier chip/count remaps).
+- **v0.1.2652** — Light / Material / Architect `.ops-loading` (color · border · background), `.ops-hint`, `.ops-tab-bar-kb-hint`, and `--ops-jump-flash-ring` remapped from Apple `#ffffff` mixes onto paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (CRT / Data Poster already had these). Standing P2 #14 after overview/card v0.1.2651.
 
-## Tried / context
+## Also this night (earlier)
 
-- Fuel order: digester empty → design-review not due → layout-daily already today → standing Next (Ops overview/card after 2650).
-- Ratchet: `keep` @ `e1fedcbc` (verify OK). Pushed `origin/main`.
+- v0.1.2650–2651 — Light Ops attention-glance + overview/card remaps on cream paper.
+- v0.1.2647–2649 — Light Ops kind Clear/count/copy + filter Clear/empty + filter-input/match/tab-count remaps.
+- v0.1.2642–2646 — Light filter Clear + Processes/Logs/Monitors/Chat/Rings/Disk/Perplexity filter chips + Ops kind-filter chips on cream paper.
 
-## Next
+## Tried / notes
 
-- Dark layout-daily next calendar day (when due).
-- Mac capture when Screen Recording TCC allows.
-- Leftover light Ops loading/hint or other cream `#ffffff` mixes if still muddy, or sibling/product fuel — not another keep-pNN clone.
+- Parallel-race discard: local v0.1.2651 overview/card remaps lost to origin e1fedcbc (same keep); re-picked loading/hint as 2652.
+- Digester empty; design-review still in grace; layout-daily data-poster already done for 2026-11-12 (Dark due next calendar day).
+- Sibling harness paths missing on this rack (OpenClaw / Hermes).
+- Debug log: no ERROR/WARN clusters in the scan window.
+- X: new follow @meiyouchen logged (draft-only, no send).
+
+## Next fuel
+
+- Dark layout-daily next calendar day; Mac window-only capture when TCC allows.
+- Leftover light Ops row/list washes (`.ops-row` / row-meta) if still muddy.
+- Not another keep-pNN clone.
