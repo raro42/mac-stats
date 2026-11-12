@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2629
+
+- Light Disk Cleanup path Saved flashes: Light / Material / Architect `.disk-cleanup-item-path` / `.disk-cleanup-scope-path` `.is-just-saved` still mixed Apple `#ffffff` (CRT / Data Poster remaps already existed; Swiss / Apple keep shared white). Soft 12% green on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`. Standing P2 #14 after Monitors URL Saved remaps v0.1.2628; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover light Disk Cleanup list-row washes (`.disk-cleanup-item` resting/hover/focus if still Apple `#ffffff` on cream), or sibling/product fuel — not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2628
 
 - Light Monitors URL Saved flashes: Light / Material / Architect `.monitor-url` / `button.monitor-detail-url` `.is-just-saved` still mixed Apple `#ffffff` (CRT / Data Poster remaps already existed; Swiss / Apple keep shared white). Soft 12% green on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`. Standing P2 #14 after soft Save leftovers v0.1.2627; product fuel (digester empty; design-review grace; layout-daily data-poster already today — not a second layout tick; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover light Disk Cleanup path Saved flashes (`.disk-cleanup-item-path` / `.disk-cleanup-scope-path` if still Apple `#ffffff` on cream), or sibling/product fuel — not another keep-pNN clone.

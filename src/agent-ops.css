@@ -26585,6 +26585,33 @@ body.theme-architect button.monitor-detail-url.is-just-saved {
 }
 
 /*
+ * Light / Material / Architect: Disk Cleanup path Saved flashes still mix Apple
+ * `#ffffff` (`.disk-cleanup-item-path` / `.disk-cleanup-scope-path` is-just-saved)
+ * while CRT / Data Poster remaps already exist. Soft 12% green on light paper so
+ * Saved flashes match cream shells (Swiss / Apple keep shared `#ffffff`).
+ * Standing P2 #14 after light Monitors URL Saved remaps v0.1.2628.
+ */
+/* OVERNIGHT v0.1.2629: light Disk Cleanup path Saved flash remaps */
+body.theme-light .disk-cleanup-item-path.is-just-saved,
+body.theme-light .disk-cleanup-scope-path.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #f7f7fa);
+  color: #34c759;
+  box-shadow: none;
+}
+body.theme-material .disk-cleanup-item-path.is-just-saved,
+body.theme-material .disk-cleanup-scope-path.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #ebe4d9);
+  color: #34c759;
+  box-shadow: none;
+}
+body.theme-architect .disk-cleanup-item-path.is-just-saved,
+body.theme-architect .disk-cleanup-scope-path.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #f1f1f1);
+  color: #34c759;
+  box-shadow: none;
+}
+
+/*
  * Data Poster / Dark / Neon / Futuristic: Disk Cleanup list rows still mix Apple
  * `#ffffff` washes (`.disk-cleanup-item` resting / hover / focus / selected ·
  * `.has-reclaim` · `.is-big`) → white slab on opaque shells. Copied badge remapped
