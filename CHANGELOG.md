@@ -9,6 +9,12 @@
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2662] - 2026-11-13
+
+### Changed
+
+- **Light AI Chat empty / composer washes:** Light / Material / Architect `.chat-empty` (resting · ready · no-model · offline · circuit · not-set · title/copy/kb-hint), `.chat-composer-kb-hint`, and `#chat-input:focus` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so empty shell and composer match cream shells (after glance remaps v0.1.2661).
+
 ## [0.1.2661] - 2026-11-13
 
 ### Changed

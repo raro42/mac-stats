@@ -32201,3 +32201,137 @@ body.theme-architect .chat-offline-attention-glance.is-just-copied {
   border-color: color-mix(in srgb, #34c759 40%, #f1f1f1);
   background: color-mix(in srgb, #34c759 10%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: AI Chat empty shell + composer still mix Apple
+ * `#ffffff` (`.chat-empty` resting · ready · no-model · offline · circuit ·
+ * not-set · title/copy/kb-hint · `.chat-composer-kb-hint` · `#chat-input:focus`)
+ * while Data Poster / Dark / Neon / Futuristic remaps already exist. Opaque
+ * washes on cream paper so empty / composer match light shells (Swiss / Apple
+ * keep shared `#ffffff`). Standing P2 #14 after light AI Chat glance remaps
+ * v0.1.2661.
+ */
+/* OVERNIGHT v0.1.2662: light AI Chat empty / composer remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .chat-empty {
+  border-color: color-mix(in srgb, currentColor 18%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+}
+body.theme-light .chat-empty.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+body.theme-light .chat-empty.is-ready .chat-empty-title {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+}
+body.theme-light .chat-empty.is-ready .chat-empty-copy {
+  color: color-mix(in srgb, #0c0c10 77%, #f7f7fa);
+}
+body.theme-light .chat-empty.is-no-model,
+body.theme-light .chat-empty.is-offline,
+body.theme-light .chat-empty.is-circuit {
+  border-color: color-mix(in srgb, #ff9500 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff9500 7%, #f7f7fa);
+}
+body.theme-light .chat-empty.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 28%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
+}
+body.theme-light .chat-empty-title {
+  color: color-mix(in srgb, #0c0c10 81%, #f7f7fa);
+}
+body.theme-light .chat-empty-copy {
+  color: color-mix(in srgb, #0c0c10 69%, #f7f7fa);
+}
+body.theme-light .chat-empty-kb-hint,
+body.theme-light .chat-composer-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+}
+body.theme-light #chat-input:focus {
+  border-color: color-mix(in srgb, #0a84ff 55%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f7f7fa);
+  background: #f7f7fa;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .chat-empty {
+  border-color: color-mix(in srgb, currentColor 18%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+}
+body.theme-material .chat-empty.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+body.theme-material .chat-empty.is-ready .chat-empty-title {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+}
+body.theme-material .chat-empty.is-ready .chat-empty-copy {
+  color: color-mix(in srgb, #0c0c10 77%, #ebe4d9);
+}
+body.theme-material .chat-empty.is-no-model,
+body.theme-material .chat-empty.is-offline,
+body.theme-material .chat-empty.is-circuit {
+  border-color: color-mix(in srgb, #ff9500 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff9500 7%, #ebe4d9);
+}
+body.theme-material .chat-empty.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 28%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
+}
+body.theme-material .chat-empty-title {
+  color: color-mix(in srgb, #0c0c10 81%, #ebe4d9);
+}
+body.theme-material .chat-empty-copy {
+  color: color-mix(in srgb, #0c0c10 69%, #ebe4d9);
+}
+body.theme-material .chat-empty-kb-hint,
+body.theme-material .chat-composer-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+}
+body.theme-material #chat-input:focus {
+  border-color: color-mix(in srgb, #0a84ff 55%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ebe4d9);
+  background: #ebe4d9;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .chat-empty {
+  border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+}
+body.theme-architect .chat-empty.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}
+body.theme-architect .chat-empty.is-ready .chat-empty-title {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+}
+body.theme-architect .chat-empty.is-ready .chat-empty-copy {
+  color: color-mix(in srgb, #0c0c10 77%, #f1f1f1);
+}
+body.theme-architect .chat-empty.is-no-model,
+body.theme-architect .chat-empty.is-offline,
+body.theme-architect .chat-empty.is-circuit {
+  border-color: color-mix(in srgb, #ff9500 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff9500 7%, #f1f1f1);
+}
+body.theme-architect .chat-empty.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 28%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+}
+body.theme-architect .chat-empty-title {
+  color: color-mix(in srgb, #0c0c10 81%, #f1f1f1);
+}
+body.theme-architect .chat-empty-copy {
+  color: color-mix(in srgb, #0c0c10 69%, #f1f1f1);
+}
+body.theme-architect .chat-empty-kb-hint,
+body.theme-architect .chat-composer-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+}
+body.theme-architect #chat-input:focus {
+  border-color: color-mix(in srgb, #007aff 55%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #007aff 18%, #f1f1f1);
+  background: #f1f1f1;
+}
