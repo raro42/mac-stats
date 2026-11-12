@@ -1,22 +1,16 @@
 # Morning surprise — 2026-11-12
 
-Overnight autoresearch kept product CSS remaps on cream paper (Standing P2 #14). Digester open stayed empty; design-review stayed in grace; layout-daily Data Poster already marked today.
+Overnight autoresearch (Track B) on the Linux rack. Digester empty; design-review grace; layout-daily Data Poster already marked for the day.
 
-## Shipped tonight
+## Shipped
 
-- **v0.1.2625** — Light / Material / Architect solid Settings credential Save flashes (`#perplexity-save-key` / `#brave-save-key` / `#redmine-save` / `#mastodon-save` / `#mcp-save` / `#browser-save` / `#cursor-agent-save` / `#telegram-save` / `#slack-save` / `#discord-save-token`) remapped onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (after soft Save flash v0.1.2624).
-- **v0.1.2624** — Light / Material / Architect `.logs-path-hint` / `.chat-empty-chip` / soft Settings secondary Saved flashes on cream paper.
-- **v0.1.2623** — Light / Material / Architect `.setting-toggle .toggle-label.is-just-saved` soft green on cream paper.
-- **v0.1.2622** — Light / Material / Architect Perplexity result + weather-card remaps.
-- **v0.1.2621** — Light / Material / Architect Settings attention-glance remaps.
-- Earlier tonight: section-header / Perplexity query / logs-toolbar / connection·model-text / AI Chat settings focus through **v0.1.2616+** (see `loop_backlog.md`).
+- **v0.1.2626** — Light / Material / Architect ollama settings Save, Agent Ops Save, Monitors Add Save (solid), plus Load-into-Chat Loaded flashes (soft) remapped off Apple `#ffffff` onto cream paper so Saved/Loaded feedback matches the shell.
+- Earlier same night: credential Save flashes (v0.1.2625), soft Settings Save flashes (v0.1.2624), toggle Saved flash (v0.1.2623), Perplexity result remaps (v0.1.2622), and more light-paper focus/Save polish down the ladder.
 
-## Tried / discarded
+## Tried / context
 
-- Parallel race discards earlier tonight (model-select / overlapping Light focus keeps) — reset + ff to origin; re-picked next standing.
+- Sibling OpenClaw/Hermes paths missing on this rack.
+- Debug.log: no ERROR/WARN clusters in the scan window.
+- Next fuel: Dark layout-daily when the calendar day opens; Mac capture when TCC allows; leftover soft Save leftovers on Light if still muddy.
 
-## Next
-
-- Dark layout-daily next calendar day; Mac capture when TCC allows.
-- Leftover light Save flashes: `#ollama-settings-save` / `#ops-agent-save` / `#monitors-add-save` / Load-into-chat if still Apple `#ffffff` on cream.
-- Sibling/product fuel — not another keep-pNN clone.
+Generated: 2026-11-12T03:06:48+01:00
