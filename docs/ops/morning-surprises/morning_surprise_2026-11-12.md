@@ -4,7 +4,8 @@ Overnight autoresearch kept product CSS remaps on cream paper (Standing P2 #14).
 
 ## Shipped tonight
 
-- **v0.1.2627** — Light / Material / Architect soft Save leftovers (`#settings-help-btn` / `#ollama-settings-reset` / `#refresh-btn` / `#github-link` / version-clickable) remapped onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (after ollama/Ops/Monitors Save + Load-into-chat v0.1.2626).
+- **v0.1.2628** — Light / Material / Architect Monitors URL Saved flashes (`.monitor-url` / `button.monitor-detail-url`) remapped onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (after soft Save leftovers v0.1.2627).
+- **v0.1.2627** — Light / Material / Architect soft Save leftovers (`#settings-help-btn` / `#ollama-settings-reset` / `#refresh-btn` / `#github-link` / version-clickable) on cream paper.
 - **v0.1.2626** — Light / Material / Architect `#ollama-settings-save` / `#ops-agent-save` / `#monitors-add-save` + Agent Ops Load-into-Chat Saved flashes on cream paper.
 - **v0.1.2625** — Light / Material / Architect solid Settings credential Save flashes on cream paper.
 - **v0.1.2624** — Light / Material / Architect `.logs-path-hint` / `.chat-empty-chip` / soft Settings secondary Saved flashes on cream paper.
@@ -18,5 +19,7 @@ Overnight autoresearch kept product CSS remaps on cream paper (Standing P2 #14).
 ## Next
 
 - Dark layout-daily next calendar day; Mac capture when TCC allows.
-- Leftover light Monitors URL Saved flashes (`.monitor-url` / `button.monitor-detail-url` if still Apple `#ffffff` on cream).
+- Leftover light Disk Cleanup path Saved flashes (`.disk-cleanup-item-path` / `.disk-cleanup-scope-path` if still Apple `#ffffff` on cream).
 - Sibling/product fuel — not another keep-pNN clone.
+
+Generated: 2026-11-12T03:32:30+01:00
