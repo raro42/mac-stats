@@ -1,23 +1,22 @@
 # Morning surprise — 2026-11-13
 
-Overnight autoresearch kept product CSS remaps on Light / Material / Architect cream paper (Standing P2 #14). Digester open stayed empty; design-review stayed in grace; layout-daily already marked Data Poster today.
+Overnight autoresearch kept shipping Light/Material/Architect cream remaps so AI Chat stops washing against Apple `#ffffff` on paper shells.
 
 ## Shipped tonight
 
-- **v0.1.2665** — `.filter-chip-kb-hint` remaps onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1`
-- **v0.1.2664** — `.chat-empty-chip` / `.chat-kb-hint` remaps
-- **v0.1.2663** — `.chat-message` soft-states (hover / focus / selected / copied / error)
-- **v0.1.2662** — `.chat-empty` / composer / `#chat-input:focus` remaps
-- **v0.1.2661** — AI Chat model / turn / answer / errors / offline glances
+- **v0.1.2666** — AI Chat filter-miss shell + CTA + collapsed glance (`.chat-filter-miss` resting/Errors/You/Assistant/msg/CTA + `.ollama-collapsed-glance` / `.chat-collapsed-glance` soft-states) → paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`.
+- **v0.1.2665** — filter-chip keyboard hints (`.filter-chip-kb-hint`).
+- **v0.1.2664** — AI Chat empty suggestion chips + message-list kb-hint.
+- **v0.1.2663** — AI Chat message soft-states (hover / focus / selected / Copied / error).
+- **v0.1.2662** — AI Chat empty shell + composer focus / kb-hints.
+- Earlier same night: glances, answer-part, exec chrome, Ops health chrome, badges, filters (see loop_backlog).
 
-## Also tried
+## Tried / context
 
-- No discards this tick (origin race avoided by pull-before-implement).
+- Digester empty; design-review in grace; layout-daily Data Poster already marked for the calendar day.
+- Linux rack: CSS-only; no /Applications install.
 
-## Next fuel
+## Next
 
-- Dark layout-daily when the next calendar day quota opens
-- Mac capture when TCC allows (feature-agent-ops still stale)
-- Leftover light AI Chat filter-miss / collapsed-glance if still Apple `#ffffff` on cream
-- Sibling/product fuel — not keep-pNN
-
+- Dark layout-daily next calendar day; Mac capture when TCC allows.
+- Leftover light Monitors / Processes / Logs filter-miss if still muddy; sibling/product fuel — not keep-pNN clones.
