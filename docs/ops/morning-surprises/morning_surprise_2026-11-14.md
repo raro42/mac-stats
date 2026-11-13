@@ -1,17 +1,18 @@
 # Morning surprise — 2026-11-14
 
-Overnight autoresearch (Track B) starting 2026-11-13 ~20:00 CET.
+Overnight autoresearch (Track B) kept product polish on Standing P2 #14 cream remaps.
 
 ## Shipped
 
-- **v0.1.2689** — Light / Material / Architect Processes + Disk Cleanup path focus remaps (parallel tick).
-- **v0.1.2690** — Light / Material / Architect Monitors summary soft-state + muted caption remaps (`.monitors-summary` · latency · detail-k · backoff-hint) onto cream paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`.
+- **v0.1.2691** — Light / Material / Architect Monitors URL/detail + Debug Log path `:focus-visible` outlines onto cream paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1`).
+- Earlier same window: **v0.1.2690** Monitors summary + muted captions; **v0.1.2689** Processes + Disk Cleanup path focus (and prior light focus/caption remaps through the night).
 
-## Tried / discarded
+## Tried / context
 
-- Local v0.1.2689 Monitors summary remaps lost a parallel race to origin Processes+Disk path focus; re-picked as **v0.1.2690**.
+- Digester open empty; design-review grace; layout-daily Data Poster already marked for 2026-11-13.
+- Fuel: standing backlog leftover light `#ffffff` focus mixes (not keep-pNN).
 
-## Still open
+## Next
 
-- Dark layout-daily when next calendar day / Mac capture when TCC allows.
-- Leftover light cream `#ffffff` mixes: Monitors URL/detail focus, logs-path-hint, monitor row hover, Ops tabs.
+- Dark layout-daily when the next calendar day quota opens.
+- Leftover light monitor row hover / Ops tabs / other muted type if still muddy.
