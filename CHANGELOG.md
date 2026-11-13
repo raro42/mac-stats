@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2695] - 2026-11-13
+
+### Changed
+
+- **Light Monitors removing + Ops editor meta/focus washes:** Light / Material / Architect `.monitor-item.is-removing` · `.monitor-remove-btn:focus-visible` · `textarea.ops-agent-editor:focus` · `.is-dirty` · `.ops-agent-save-status` · `.ops-detail-meta` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque type/outlines on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so removing rows and Ops editor chrome match cream shells (after checking/pending + Ops kb-hint remaps v0.1.2694).
+
 ## [0.1.2694] - 2026-11-13
 
 ### Changed

@@ -35907,3 +35907,77 @@ body.theme-architect .ops-preview-row-kb-hint,
 body.theme-architect .ops-insights-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Monitors removing + Ops editor meta/focus still
+ * mix Apple `#ffffff` (`.monitor-item.is-removing` · `.monitor-remove-btn:focus-visible`
+ * · `textarea.ops-agent-editor:focus` · `.is-dirty` · `.ops-agent-save-status` ·
+ * `.ops-detail-meta`) while Data Poster / Dark / Neon / Futuristic remaps already
+ * exist. Opaque type/outlines on cream paper so removing rows and Ops editor
+ * chrome match light shells (Swiss / Apple keep shared `#ffffff`). Standing
+ * P2 #14 after light checking/pending + Ops kb-hint remaps v0.1.2694.
+ */
+/* OVERNIGHT v0.1.2695: light removing + Ops editor meta/focus remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .monitor-item.is-removing {
+  color: color-mix(in srgb, #0c0c10 48%, #f7f7fa);
+}
+body.theme-light .monitor-remove-btn:focus-visible {
+  outline-color: color-mix(in srgb, #ff3b30 55%, #f7f7fa);
+}
+body.theme-light textarea.ops-agent-editor:focus {
+  border-color: color-mix(in srgb, #0a84ff 55%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f7f7fa);
+}
+body.theme-light textarea.ops-agent-editor.is-dirty {
+  border-color: color-mix(in srgb, #ff9f0a 50%, #f7f7fa);
+}
+body.theme-light .ops-agent-save-status {
+  color: color-mix(in srgb, #0c0c10 62%, #f7f7fa);
+}
+body.theme-light .ops-detail-meta {
+  color: color-mix(in srgb, #0c0c10 66%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .monitor-item.is-removing {
+  color: color-mix(in srgb, #0c0c10 48%, #ebe4d9);
+}
+body.theme-material .monitor-remove-btn:focus-visible {
+  outline-color: color-mix(in srgb, #ff3b30 55%, #ebe4d9);
+}
+body.theme-material textarea.ops-agent-editor:focus {
+  border-color: color-mix(in srgb, #0a84ff 55%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ebe4d9);
+}
+body.theme-material textarea.ops-agent-editor.is-dirty {
+  border-color: color-mix(in srgb, #ff9f0a 50%, #ebe4d9);
+}
+body.theme-material .ops-agent-save-status {
+  color: color-mix(in srgb, #0c0c10 62%, #ebe4d9);
+}
+body.theme-material .ops-detail-meta {
+  color: color-mix(in srgb, #0c0c10 66%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .monitor-item.is-removing {
+  color: color-mix(in srgb, #0c0c10 48%, #f1f1f1);
+}
+body.theme-architect .monitor-remove-btn:focus-visible {
+  outline-color: color-mix(in srgb, #ff3b30 55%, #f1f1f1);
+}
+body.theme-architect textarea.ops-agent-editor:focus {
+  border-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f1f1f1);
+}
+body.theme-architect textarea.ops-agent-editor.is-dirty {
+  border-color: color-mix(in srgb, #ff9f0a 50%, #f1f1f1);
+}
+body.theme-architect .ops-agent-save-status {
+  color: color-mix(in srgb, #0c0c10 62%, #f1f1f1);
+}
+body.theme-architect .ops-detail-meta {
+  color: color-mix(in srgb, #0c0c10 66%, #f1f1f1);
+}
