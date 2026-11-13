@@ -1,14 +1,20 @@
 # Morning surprise — 2026-11-14
 
-Overnight Track B kept product CSS (Standing P2 #14 cream remaps). Digester open stayed empty; design-review grace; layout-daily already marked for Data Poster today.
+Overnight autoresearch (Track B) kept cream remaps on Light / Material / Architect so muted type matches paper shells instead of Apple white.
 
 ## Shipped
 
-- **v0.1.2693** — Light / Material / Architect Agent Ops tab chrome + digit washes (`.agent-ops-tab` / `.ops-file-tab` resting · hover · focus · active · `.ops-tab-digit`) onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1`.
-- Earlier same window: **v0.1.2692** Monitors row soft-states; **v0.1.2691** Monitors URL/detail + logs-path-hint focus; **v0.1.2690** Monitors summary + muted captions (and earlier light cream remaps through the night).
+- **v0.1.2694** (`69107850`): Monitors `.is-checking` / `.is-pending` + Ops `.ops-file-tab-kb-hint` / `.ops-agent-edit-actions-kb-hint` / `.ops-preview-row-kb-hint` / `.ops-insights-kb-hint` → paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`.
+- **v0.1.2693** (`423124b9`): Ops tab chrome + digit washes (keep row backfilled this tick).
+- Earlier same night window: Monitors row soft-states, summary captions, Processes/Disk path focus, and more P2 #14 cream remaps (see `loop_backlog.md`).
 
-## Tried / next
+## Context
 
-- Next fuel: Dark layout-daily when the day quota opens; leftover light monitor checking·pending type / ops-file kb-hints / other muted type; sibling/product — not another keep-pNN clone.
+- Digester empty; design-review still in grace; layout-daily already marked for 2026-11-13 (Dark due next calendar day).
+- Linux rack: CSS + sync-dist only (no /Applications install).
 
-Generated: 2026-11-13T20:50 CET (overnight tick keep).
+## Next fuel
+
+- Dark layout-daily when the calendar flips.
+- Leftover light cream: monitor removing type / other muted type / focus rings if still muddy.
+- Sibling / product fuel when digester has open candidates — not another keep-pNN clone.
