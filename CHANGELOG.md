@@ -1,6 +1,12 @@
 ## [Unreleased]
 
 
+## [0.1.2673] - 2026-11-13
+
+### Changed
+
+- **Light Logs error-glance + Processes filter/hot attention washes:** Light / Material / Architect `.logs-error-glance` (resting · hover · `:focus-visible` · errors · warns-only · quiet), `.processes-filter-attention-glance` (resting · hover · `:focus-visible` · filter · pinned · hot-filter), and `.processes-hot-attention-glance` (resting · hover · `:focus-visible` · hot) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so collapsed/attention glances match cream shells (after Monitors filter-attention + Logs attention remaps v0.1.2672).
+
 ## [0.1.2672] - 2026-11-13
 
 ### Changed
