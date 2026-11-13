@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2691] - 2026-11-13
+
+### Changed
+
+- **Light Monitors URL/detail + logs-path-hint focus washes:** Light / Material / Architect `.monitor-url:focus-visible` · `button.monitor-detail-url:focus-visible` · `.monitor-detail-remove:focus-visible` · `.logs-path-hint:focus-visible` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque outline mixes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Monitors URL/detail and Debug Log path keyboard focus match cream shells (after Monitors summary + muted caption remaps v0.1.2690).
+
+
 ## [0.1.2690] - 2026-11-13
 
 ### Changed

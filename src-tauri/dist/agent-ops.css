@@ -35578,3 +35578,49 @@ body.theme-architect .monitor-backoff-hint {
   color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 78%, #f1f1f1);
   opacity: 1;
 }
+
+/*
+ * Light / Material / Architect: Monitors URL / detail focus + logs-path-hint still
+ * mix Apple `#ffffff` (`.monitor-url:focus-visible` · `button.monitor-detail-url:focus-visible` ·
+ * `.monitor-detail-remove:focus-visible` · `.logs-path-hint:focus-visible`) while CRT
+ * remaps already mix on dark shells. Opaque outline mixes so keyboard focus matches
+ * cream paper (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
+ * Monitors summary + muted caption remaps v0.1.2690.
+ */
+/* OVERNIGHT v0.1.2691: light Monitors URL/detail + logs-path-hint focus remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .monitor-url:focus-visible,
+body.theme-light button.monitor-detail-url:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #f7f7fa);
+}
+body.theme-light .monitor-detail-remove:focus-visible {
+  outline-color: color-mix(in srgb, #ff3b30 55%, #f7f7fa);
+}
+body.theme-light .logs-path-hint:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .monitor-url:focus-visible,
+body.theme-material button.monitor-detail-url:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #ebe4d9);
+}
+body.theme-material .monitor-detail-remove:focus-visible {
+  outline-color: color-mix(in srgb, #ff3b30 55%, #ebe4d9);
+}
+body.theme-material .logs-path-hint:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .monitor-url:focus-visible,
+body.theme-architect button.monitor-detail-url:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
+}
+body.theme-architect .monitor-detail-remove:focus-visible {
+  outline-color: color-mix(in srgb, #ff3b30 55%, #f1f1f1);
+}
+body.theme-architect .logs-path-hint:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
+}
