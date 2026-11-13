@@ -1,20 +1,24 @@
 # Morning surprise — 2026-11-13
 
-Overnight autoresearch kept shipping cream-paper remaps on Light / Material / Architect (standing P2 #14). Digester stayed empty; design-review stayed in grace; layout-daily Data Poster already marked for the day.
+## Shipped overnight (Track B)
 
-## Shipped
+Latest keep: **v0.1.2678** — Light / Material / Architect Settings credential toolbar + modal-header kb-hints remap onto cream paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1`) so Discord·Perplexity·Brave·Redmine·Mastodon·MCP·Browser·Cursor·Telegram·Slack·Ollama row hints match light shells (Standing P2 #14).
 
-- **v0.1.2677** — Light Settings chrome kb-hints (`.settings-header-kb-hint` · `.ollama-settings-header-kb-hint` · `.theme-list-kb-hint` · `.appearance-setting-kb-hint` · `.product-setting-kb-hint` · `.credentials-section-kb-hint`) remaps Apple `#ffffff` → paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`.
-- **v0.1.2676** — Light Perplexity `.perplexity-last-glance` remaps.
-- **v0.1.2675** — Light Disk Cleanup attention / filter-attention remaps.
-- Earlier same night: **v0.1.2674**–**2671** Perplexity / Logs / Processes / Monitors / Agent Ops attention + collapsed glances, plus the longer Light cream remap chain through Ops / Chat / filters.
+Also this window (same cream-paper ratchet): v0.1.2667–v0.1.2677 filter-miss / collapsed / attention / Perplexity / Disk Cleanup / Settings chrome kb-hint remaps.
 
-## Tried / context
+## Fuel / method
 
-- Fuel: standing backlog after Settings credential attention glances were already paper (v0.1.2621); picked leftover Settings chrome kb-hints.
-- Sibling OpenClaw/Hermes missing on rack; debug.log quiet (0 interesting lines / 180m).
-- Linux rack: CSS + sync-dist only (no /Applications install).
+- Digester open: empty most ticks.
+- Design-review: grace (screens stale but not due).
+- Layout-daily: Data Poster marked today; Dark deferred to next calendar day.
+- Quiet ticks: none required — standing P2 #14 kept feeding product CSS.
 
-## Next fuel
+## Tried / discarded
 
-- Dark layout-daily next calendar day; Mac capture when TCC allows; leftover light Settings credential toolbar kb-hints / `.modal-header-kb-hint` or other cream `#ffffff` mixes; sibling/product fuel — not another keep-pNN clone.
+- One parallel-race discard earlier (~v0.1.2673 overlap) then re-pick Perplexity attention → keep v0.1.2674.
+
+## Next for Ralf
+
+- Dark layout-daily when the day quota opens.
+- Leftover light Process Detail / Force Quit / Logs / Perplexity / Changelog kb-hints if still Apple `#ffffff` on cream.
+- Mac window capture when TCC allows.
