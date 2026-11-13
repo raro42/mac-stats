@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2681] - 2026-11-13
+
+### Changed
+
+- **Light muted path/meta caption washes:** Light / Material / Architect `.logs-viewer-prefix` · `.monitor-checked-ago` · `.history-chart-caption` · `.monitor-detail-note` · `.disk-cleanup-summary` · `.disk-cleanup-item-path` · `.disk-cleanup-scope-path` (plus Down `.monitor-checked-ago`) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Debug Log prefix, Monitors age, sparkline captions, and Disk Cleanup paths match cream shells (after section kb-hint remaps v0.1.2680).
+
 ## [0.1.2680] - 2026-11-13
 
 ### Changed
