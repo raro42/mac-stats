@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2685] - 2026-11-13
+
+### Changed
+
+- **Light metric-card + history Hot/Ok/Fair washes:** Light / Material / Architect `.metric-card.is-hot` · `.is-ok` · `.is-fair` and `.history-chart-container.is-hot` · `.is-ok` · `.is-fair` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so CPU · GPU · FREQ · TEMP rings and matching sparklines match cream shells (after metrics kb-hint + LPM busy remaps v0.1.2684).
+
 ## [0.1.2684] - 2026-11-13
 
 ### Changed

@@ -35103,3 +35103,92 @@ body.theme-architect .lpm-info.is-on.is-busy .lpm-value {
   color: color-mix(in srgb, #248a3d 72%, #f1f1f1);
   opacity: 1;
 }
+
+/*
+ * Light / Material / Architect: ring metric + history sparkline Hot / Ok / Fair
+ * still mix Apple `#ffffff` washes (`.metric-card.is-hot` · is-ok · is-fair ·
+ * `.history-chart-container.is-hot` · is-ok · is-fair) while Data Poster /
+ * Dark / Neon / Futuristic remaps already mix on opaque shells. Opaque washes
+ * on cream paper so CPU · GPU · FREQ · TEMP rings and matching sparklines
+ * match light shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14
+ * after light metrics kb-hint + LPM busy remaps v0.1.2684.
+ */
+/* OVERNIGHT v0.1.2685: light metric-card + history Hot/Ok/Fair remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .metric-card.is-hot {
+  background-color: color-mix(in srgb, #ff9500 7%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .metric-card.is-ok:not(.is-hot):not(.is-fair) {
+  background-color: color-mix(in srgb, #34c759 7%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .metric-card.is-fair:not(.is-hot) {
+  background-color: color-mix(in srgb, #ff9500 7%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .history-chart-container.is-hot {
+  background-color: color-mix(in srgb, #ff9500 7%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .history-chart-container.is-ok:not(.is-hot):not(.is-fair) {
+  background-color: color-mix(in srgb, #34c759 5%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .history-chart-container.is-fair:not(.is-hot) {
+  background-color: color-mix(in srgb, #ff9500 5%, #f7f7fa);
+  box-shadow: none;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .metric-card.is-hot {
+  background-color: color-mix(in srgb, #ff9500 7%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .metric-card.is-ok:not(.is-hot):not(.is-fair) {
+  background-color: color-mix(in srgb, #34c759 7%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .metric-card.is-fair:not(.is-hot) {
+  background-color: color-mix(in srgb, #ff9500 7%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .history-chart-container.is-hot {
+  background-color: color-mix(in srgb, #ff9500 7%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .history-chart-container.is-ok:not(.is-hot):not(.is-fair) {
+  background-color: color-mix(in srgb, #34c759 5%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .history-chart-container.is-fair:not(.is-hot) {
+  background-color: color-mix(in srgb, #ff9500 5%, #ebe4d9);
+  box-shadow: none;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .metric-card.is-hot {
+  background-color: color-mix(in srgb, #ff9500 7%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .metric-card.is-ok:not(.is-hot):not(.is-fair) {
+  background-color: color-mix(in srgb, #34c759 7%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .metric-card.is-fair:not(.is-hot) {
+  background-color: color-mix(in srgb, #ff9500 7%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .history-chart-container.is-hot {
+  background-color: color-mix(in srgb, #ff9500 7%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .history-chart-container.is-ok:not(.is-hot):not(.is-fair) {
+  background-color: color-mix(in srgb, #34c759 5%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .history-chart-container.is-fair:not(.is-hot) {
+  background-color: color-mix(in srgb, #ff9500 5%, #f1f1f1);
+  box-shadow: none;
+}
