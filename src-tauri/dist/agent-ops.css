@@ -37022,3 +37022,79 @@ body.theme-architect .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
   color: color-mix(in srgb, #0c0c10 48%, #f1f1f1);
   opacity: 1;
 }
+
+/*
+ * Light / Material / Architect: Perplexity Search chrome + Clear/Send Saved
+ * flashes still mix Apple `#ffffff` (`#perplexity-search-btn` /
+ * `.perplexity-inline-save` resting · hover; `#chat-clear-btn.is-just-saved` ·
+ * `#chat-send-btn.is-just-saved`) while Data Poster / Dark / Neon / Futuristic
+ * remaps already exist (Clear/GitHub soft-states + Disk Cleanup Scan remapped
+ * in v0.1.2704; Perplexity disabled + focus in v0.1.2701–2702). Opaque washes
+ * on cream paper so Search / Cleared·Saved flashes match light shells (Swiss /
+ * Apple keep shared `#ffffff`). Standing P2 #14 after Clear/GitHub + Scan
+ * remaps v0.1.2704 (race-discard re-pick).
+ */
+/* OVERNIGHT v0.1.2705: light Perplexity Search + Clear/Send saved-flash remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light #perplexity-search-btn,
+body.theme-light .perplexity-inline-save {
+  border-color: color-mix(in srgb, currentColor 18%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 8%, #f7f7fa);
+}
+body.theme-light #perplexity-search-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 28%, #f7f7fa);
+}
+body.theme-light #chat-clear-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #f7f7fa) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #f7f7fa) !important;
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+  box-shadow: none;
+}
+body.theme-light #chat-send-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #f7f7fa) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #f7f7fa) !important;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material #perplexity-search-btn,
+body.theme-material .perplexity-inline-save {
+  border-color: color-mix(in srgb, currentColor 18%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 8%, #ebe4d9);
+}
+body.theme-material #perplexity-search-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 28%, #ebe4d9);
+}
+body.theme-material #chat-clear-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #ebe4d9) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #ebe4d9) !important;
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+  box-shadow: none;
+}
+body.theme-material #chat-send-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #ebe4d9) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #ebe4d9) !important;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect #perplexity-search-btn,
+body.theme-architect .perplexity-inline-save {
+  border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 8%, #f1f1f1);
+}
+body.theme-architect #perplexity-search-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 28%, #f1f1f1);
+}
+body.theme-architect #chat-clear-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #f1f1f1) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #f1f1f1) !important;
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+  box-shadow: none;
+}
+body.theme-architect #chat-send-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #f1f1f1) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #f1f1f1) !important;
+}

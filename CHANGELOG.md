@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2705] - 2026-11-13
+
+### Changed
+
+- **Light Perplexity Search + Clear/Send saved-flash washes:** Light / Material / Architect `#perplexity-search-btn` / `.perplexity-inline-save` (resting · hover) · `#chat-clear-btn.is-just-saved` · `#chat-send-btn.is-just-saved` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Search / Cleared·Saved flashes match cream shells (after Clear/GitHub soft-states + Disk Cleanup Scan remaps v0.1.2704; race-discard re-pick).
+
+
 ## [0.1.2704] - 2026-11-13
 
 ### Changed
