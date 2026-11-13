@@ -37296,3 +37296,80 @@ body.theme-architect .icon-line-item.status-bad:hover {
   background: color-mix(in srgb, #ff3b30 10%, #f1f1f1);
   border-color: color-mix(in srgb, #ff3b30 36%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Force Quit confirming + Disk Cleanup soft-delete
+ * still mix Apple `#ffffff` (`.force-quit-btn.is-confirming` background/border/
+ * ring · `.disk-cleanup-soft-delete` resting/hover/focus-within) while Data
+ * Poster / Dark / Neon / Futuristic remaps already exist on shell paper.
+ * Opaque washes on cream paper so confirming Force Quit and soft-delete chrome
+ * match light shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14
+ * after light icon-line status remaps v0.1.2707.
+ */
+/* OVERNIGHT v0.1.2708: light force-quit confirming + disk soft-delete remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .force-quit-btn.is-confirming {
+  background: color-mix(in srgb, #ff3b30 22%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff3b30 55%, #f7f7fa);
+  color: #ff3b30;
+  box-shadow: 0 0 0 4px color-mix(in srgb, #ff3b30 22%, #f7f7fa);
+  animation: none;
+}
+body.theme-light .disk-cleanup-soft-delete {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .disk-cleanup-soft-delete:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-soft-delete:focus-within {
+  border-color: color-mix(in srgb, #0a84ff 34%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .force-quit-btn.is-confirming {
+  background: color-mix(in srgb, #ff3b30 22%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff3b30 55%, #ebe4d9);
+  color: #ff3b30;
+  box-shadow: 0 0 0 4px color-mix(in srgb, #ff3b30 22%, #ebe4d9);
+  animation: none;
+}
+body.theme-material .disk-cleanup-soft-delete {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .disk-cleanup-soft-delete:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-soft-delete:focus-within {
+  border-color: color-mix(in srgb, #0a84ff 34%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .force-quit-btn.is-confirming {
+  background: color-mix(in srgb, #ff3b30 22%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff3b30 55%, #f1f1f1);
+  color: #ff3b30;
+  box-shadow: 0 0 0 4px color-mix(in srgb, #ff3b30 22%, #f1f1f1);
+  animation: none;
+}
+body.theme-architect .disk-cleanup-soft-delete {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .disk-cleanup-soft-delete:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-soft-delete:focus-within {
+  border-color: color-mix(in srgb, #0a84ff 34%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #f1f1f1);
+}

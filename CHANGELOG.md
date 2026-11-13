@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2708] - 2026-11-14
+
+### Changed
+
+- **Light Force Quit confirming + Disk Cleanup soft-delete washes:** Light / Material / Architect `.force-quit-btn.is-confirming` · `.disk-cleanup-soft-delete` (resting · hover · `:focus-within`) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so confirming Force Quit and soft-delete chrome match cream shells (after icon-line status remaps v0.1.2707; layout-daily Data Poster marked today — remaps already complete / polish-without-capture).
+
 ## [0.1.2707] - 2026-11-13
 
 ### Changed
