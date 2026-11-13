@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2699] - 2026-11-13
+
+### Changed
+
+- **Light refresh dim + Ops Insights muted type:** Light / Material / Architect `#refresh-btn.is-refreshing` · `.ops-subhead` · `.ops-insight-sub` · `.ops-filter-row-kb-hint` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Refresh busy dim and Ops Insights / filter kb-hint match cream shells (after Details option soft-state remaps v0.1.2698).
+
+
 ## [0.1.2698] - 2026-11-13
 
 ### Changed

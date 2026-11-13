@@ -36184,3 +36184,59 @@ body.theme-architect .details-grid > .detail-value[role='option'].is-just-copied
 body.theme-architect .details-grid > .detail-value[role='option'].is-just-copied::after {
   background: color-mix(in srgb, #34c759 55%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Refresh dim + Ops Insights muted type still
+ * mix Apple `#ffffff` (`#refresh-btn.is-refreshing` · `.ops-subhead` ·
+ * `.ops-insight-sub` · `.ops-filter-row-kb-hint`) while Data Poster / Dark /
+ * Neon / Futuristic remaps already exist. Opaque type on cream paper so
+ * header Refresh busy dim and Ops Insights / filter kb-hint match light
+ * shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
+ * Details option soft-state remaps v0.1.2698.
+ */
+/* OVERNIGHT v0.1.2699: light refresh dim + Ops subhead / filter-row kb-hint remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light #refresh-btn.is-refreshing {
+  color: color-mix(in srgb, #0c0c10 62%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .ops-subhead,
+body.theme-light .ops-insight-sub {
+  color: color-mix(in srgb, #0c0c10 44%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .ops-filter-row-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+  opacity: 1;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material #refresh-btn.is-refreshing {
+  color: color-mix(in srgb, #0c0c10 62%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .ops-subhead,
+body.theme-material .ops-insight-sub {
+  color: color-mix(in srgb, #0c0c10 44%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .ops-filter-row-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+  opacity: 1;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect #refresh-btn.is-refreshing {
+  color: color-mix(in srgb, #0c0c10 62%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .ops-subhead,
+body.theme-architect .ops-insight-sub {
+  color: color-mix(in srgb, #0c0c10 44%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .ops-filter-row-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+  opacity: 1;
+}
