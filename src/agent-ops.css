@@ -32748,3 +32748,279 @@ body.theme-architect .ollama-collapsed-glance.is-empty {
   color: color-mix(in srgb, #0c0c10 75%, #f1f1f1);
   opacity: 1;
 }
+
+/*
+ * Light / Material / Architect: Monitors / Processes / Logs filter-miss shells
+ * still mixed Apple `#ffffff` (`.monitors-filter-miss` · Down/Slow/Up empty ·
+ * hint · empty CTA · `.processes-filter-miss` · Hot/Pinned empty · hint · CTA ·
+ * `.logs-viewer-empty.logs-filter-miss` · Error/Warn empty · hint · CTA) while
+ * Data Poster / Dark / Neon / Futuristic remaps already exist. Opaque washes on
+ * cream paper so filter-empty chrome matches light shells (Swiss / Apple keep
+ * shared `#ffffff`). Standing P2 #14 after light AI Chat filter-miss /
+ * collapsed-glance remaps v0.1.2666.
+ */
+/* OVERNIGHT v0.1.2667: light Monitors/Processes/Logs filter-miss remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .monitors-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 34%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .monitors-filter-miss.is-down-empty,
+body.theme-light .monitors-filter-miss.is-slow-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+body.theme-light .monitors-filter-miss.is-up-empty {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 34%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f7f7fa);
+}
+body.theme-light .monitors-filter-miss-hint,
+body.theme-light .monitors-empty-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .monitors-empty-cta {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 35%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 88%, #f7f7fa));
+}
+body.theme-light .monitors-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 20%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 50%, #f7f7fa);
+}
+body.theme-light .monitors-empty-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 22%, #f7f7fa);
+}
+body.theme-light .processes-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 34%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .processes-filter-miss.is-hot-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+body.theme-light .processes-filter-miss.is-pinned-empty {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 34%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f7f7fa);
+}
+body.theme-light .processes-filter-miss-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .processes-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 35%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 88%, #f7f7fa));
+}
+body.theme-light .processes-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 20%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 48%, #f7f7fa);
+}
+body.theme-light .processes-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 22%, #f7f7fa);
+}
+body.theme-light .logs-viewer-empty.logs-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 34%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .logs-viewer-empty.logs-filter-miss.is-error-empty,
+body.theme-light .logs-viewer-empty.logs-filter-miss.is-warn-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+body.theme-light .logs-filter-miss-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .logs-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 35%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 88%, #f7f7fa));
+}
+body.theme-light .logs-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 18%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 48%, #f7f7fa);
+}
+body.theme-light .logs-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .monitors-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 34%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .monitors-filter-miss.is-down-empty,
+body.theme-material .monitors-filter-miss.is-slow-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+body.theme-material .monitors-filter-miss.is-up-empty {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 34%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #ebe4d9);
+}
+body.theme-material .monitors-filter-miss-hint,
+body.theme-material .monitors-empty-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .monitors-empty-cta {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 35%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 88%, #ebe4d9));
+}
+body.theme-material .monitors-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 20%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 50%, #ebe4d9);
+}
+body.theme-material .monitors-empty-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 22%, #ebe4d9);
+}
+body.theme-material .processes-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 34%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .processes-filter-miss.is-hot-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+body.theme-material .processes-filter-miss.is-pinned-empty {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 34%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #ebe4d9);
+}
+body.theme-material .processes-filter-miss-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .processes-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 35%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 88%, #ebe4d9));
+}
+body.theme-material .processes-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 20%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 48%, #ebe4d9);
+}
+body.theme-material .processes-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 22%, #ebe4d9);
+}
+body.theme-material .logs-viewer-empty.logs-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 34%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .logs-viewer-empty.logs-filter-miss.is-error-empty,
+body.theme-material .logs-viewer-empty.logs-filter-miss.is-warn-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+body.theme-material .logs-filter-miss-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .logs-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 35%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 88%, #ebe4d9));
+}
+body.theme-material .logs-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 18%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 48%, #ebe4d9);
+}
+body.theme-material .logs-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .monitors-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 34%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .monitors-filter-miss.is-down-empty,
+body.theme-architect .monitors-filter-miss.is-slow-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-miss.is-up-empty {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 34%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-miss-hint,
+body.theme-architect .monitors-empty-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .monitors-empty-cta {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 35%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 88%, #f1f1f1));
+}
+body.theme-architect .monitors-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 20%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 50%, #f1f1f1);
+}
+body.theme-architect .monitors-empty-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 22%, #f1f1f1);
+}
+body.theme-architect .processes-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 34%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .processes-filter-miss.is-hot-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}
+body.theme-architect .processes-filter-miss.is-pinned-empty {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 34%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f1f1f1);
+}
+body.theme-architect .processes-filter-miss-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .processes-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 35%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 88%, #f1f1f1));
+}
+body.theme-architect .processes-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 20%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 48%, #f1f1f1);
+}
+body.theme-architect .processes-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 22%, #f1f1f1);
+}
+body.theme-architect .logs-viewer-empty.logs-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 34%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .logs-viewer-empty.logs-filter-miss.is-error-empty,
+body.theme-architect .logs-viewer-empty.logs-filter-miss.is-warn-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}
+body.theme-architect .logs-filter-miss-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .logs-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 35%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 88%, #f1f1f1));
+}
+body.theme-architect .logs-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 18%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 48%, #f1f1f1);
+}
+body.theme-architect .logs-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f1f1f1);
+}
