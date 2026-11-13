@@ -1,21 +1,22 @@
 # Morning surprise — 2026-11-14
 
-Overnight autoresearch kept shipping Light / Material / Architect cream remaps (Standing P2 #14). Digester open stayed empty; design-review stayed in grace; layout-daily already marked Data Poster for 2026-11-13.
+Overnight Track B kept shipping Light / Material / Architect cream-paper remaps (Standing P2 #14). Digester open stayed empty; design-review grace; layout-daily day quota already used (Data Poster).
 
-## Shipped this window (latest)
+## Shipped tonight (latest)
 
-- **v0.1.2702** — `#perplexity-search-btn:focus-visible` · `.process-pin` (resting · hover · `:focus-visible` · `.is-just-saved`) · `.disk-cleanup-scope-remove:focus-visible` · `.disk-cleanup-toolbar .popover-btn-secondary:focus-visible` · `.monitors-settings-popover .popover-btn-primary:focus-visible` onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1`. Commit `961813ec`.
-- **v0.1.2701** — `#cpu-usage-card:focus-visible` · `#github-link:focus-visible` · `#chat-clear-btn:focus-visible` · `#chat-send-btn:focus-visible` · Disk Cleanup add focus · `#perplexity-search-btn:disabled` · `.icon-line-item.is-ai-off` onto cream paper (results.tsv keep backfilled this tick).
-- **v0.1.2700** — `.ops-insights-card` · `.ops-insight-line` · `.ops-preview` · Light AI-off nested glyph onto cream paper.
-- Earlier keeps the same night include refresh dim + Ops Insights muted (**2699**), Details option soft-state (**2698**), Ops Close (**2697**), and the long light cream remap chain before that.
+- **v0.1.2703** — Disk Cleanup `.disk-cleanup-meta-card` + `.disk-cleanup-last` soft-states onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (after race-discard of a local Clear/Perplexity/GitHub 2702 that lost to origin’s focus-rings + process-pin 2702).
+- **v0.1.2702** (parallel tick) — leftover focus rings (`#perplexity-search-btn:focus-visible`) + `.process-pin` + Disk Cleanup / Monitors popover focus remaps.
+- **v0.1.2701** — focus rings + Perplexity disabled + AI-off washes.
+- **v0.1.2700** — Ops Insights card / insight-line / preview (+ AI-off nested white).
 
-## Tried / context
+## Tried / discarded
 
-- Sibling harness: OpenClaw / Hermes scan had no urgent mac-stats port for this tick.
-- Debug.log: no ERROR/WARN/panic clusters in the last 180m.
+- Local **v0.1.2702** Clear / Perplexity Search / GitHub soft-states — parallel race discard (origin took a different 2702 first). Still open fuel for a later tick.
 
-## Next
+## Still open
 
-- Dark layout-daily when the calendar day quota opens.
-- Leftover light cream mixes: disk-cleanup meta-card/last action focus · other muted type / remaining focus rings still on Apple white.
-- Mac capture when Screen Recording TCC allows.
+- Dark / Neon / Futuristic layout-daily (next calendar day).
+- Leftover light cream mixes: Clear/Perplexity/GitHub soft-states, Disk Cleanup primary Scan, other muted type / focus rings.
+- Mac screenshot capture when TCC allows.
+
+Generated: 2026-11-13T23:00:31+01:00
