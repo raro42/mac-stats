@@ -33516,3 +33516,110 @@ body.theme-architect .details-collapsed-glance.is-ok {
   border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
   background: color-mix(in srgb, #34c759 7%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Top Processes CPU/GPU/RAM glances still mixed
+ * Apple `#ffffff` (`.processes-top-glance` · `.processes-top-gpu-glance` ·
+ * `.processes-top-ram-glance` resting · hover · `:focus-visible` · hot · ok)
+ * while Data Poster / Dark / Neon / Futuristic remaps already exist. Opaque
+ * washes on cream paper so keep-header glances match light shells (Swiss /
+ * Apple keep shared `#ffffff`). Standing P2 #14 after light Monitors/Disk/
+ * Details collapsed-glance remaps v0.1.2669.
+ */
+/* OVERNIGHT v0.1.2670: light Top Processes CPU/GPU/RAM glance remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .processes-top-glance,
+body.theme-light .processes-top-gpu-glance,
+body.theme-light .processes-top-ram-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .processes-top-glance:hover,
+body.theme-light .processes-top-gpu-glance:hover,
+body.theme-light .processes-top-ram-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-light .processes-top-glance:focus-visible,
+body.theme-light .processes-top-gpu-glance:focus-visible,
+body.theme-light .processes-top-ram-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+}
+body.theme-light .processes-top-glance.is-hot,
+body.theme-light .processes-top-gpu-glance.is-hot,
+body.theme-light .processes-top-ram-glance.is-hot {
+  border-color: color-mix(in srgb, #ff9500 26%, #f7f7fa);
+  background: color-mix(in srgb, #ff9500 6%, #f7f7fa);
+}
+body.theme-light .processes-top-glance.is-ok,
+body.theme-light .processes-top-gpu-glance.is-ok,
+body.theme-light .processes-top-ram-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .processes-top-glance,
+body.theme-material .processes-top-gpu-glance,
+body.theme-material .processes-top-ram-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .processes-top-glance:hover,
+body.theme-material .processes-top-gpu-glance:hover,
+body.theme-material .processes-top-ram-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-material .processes-top-glance:focus-visible,
+body.theme-material .processes-top-gpu-glance:focus-visible,
+body.theme-material .processes-top-ram-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+}
+body.theme-material .processes-top-glance.is-hot,
+body.theme-material .processes-top-gpu-glance.is-hot,
+body.theme-material .processes-top-ram-glance.is-hot {
+  border-color: color-mix(in srgb, #ff9500 26%, #ebe4d9);
+  background: color-mix(in srgb, #ff9500 6%, #ebe4d9);
+}
+body.theme-material .processes-top-glance.is-ok,
+body.theme-material .processes-top-gpu-glance.is-ok,
+body.theme-material .processes-top-ram-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .processes-top-glance,
+body.theme-architect .processes-top-gpu-glance,
+body.theme-architect .processes-top-ram-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .processes-top-glance:hover,
+body.theme-architect .processes-top-gpu-glance:hover,
+body.theme-architect .processes-top-ram-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+body.theme-architect .processes-top-glance:focus-visible,
+body.theme-architect .processes-top-gpu-glance:focus-visible,
+body.theme-architect .processes-top-ram-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+}
+body.theme-architect .processes-top-glance.is-hot,
+body.theme-architect .processes-top-gpu-glance.is-hot,
+body.theme-architect .processes-top-ram-glance.is-hot {
+  border-color: color-mix(in srgb, #ff9500 26%, #f1f1f1);
+  background: color-mix(in srgb, #ff9500 6%, #f1f1f1);
+}
+body.theme-architect .processes-top-glance.is-ok,
+body.theme-architect .processes-top-gpu-glance.is-ok,
+body.theme-architect .processes-top-ram-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}
