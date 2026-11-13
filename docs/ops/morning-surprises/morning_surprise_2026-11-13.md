@@ -1,18 +1,21 @@
 # Morning surprise — 2026-11-13
 
-Overnight autoresearch kept light cream-paper remaps so muted type stops floating on Apple white.
+Overnight autoresearch (Track B) kept product CSS remaps through the light cream P2 #14 trail.
 
 ## Shipped
 
-- **v0.1.2683** — Light / Material / Architect Disk Cleanup size lines, Perplexity setup lead/note (incl. error), Agent Ops filter caption, and AI Chat response-time (opaque on `#f7f7fa` / `#ebe4d9` / `#f1f1f1`).
-- Earlier same night (already on main before this tick): v0.1.2662–v0.1.2682 light glance / filter-miss / kb-hint / muted label remaps along the same paper path.
+- **v0.1.2684** — Light / Material / Architect metrics kb-hints + LPM busy type on cream paper (`.power-strip-kb-hint` · `.ring-gauge-kb-hint` · `.history-sparkline-kb-hint` · `.lpm-info.is-busy` · is-on busy value). Standing P2 #14 after v0.1.2683.
+- Earlier same night (selection): muted labels, setup/stat/caption, section kb-hints, Perplexity glances, filter-miss / attention washes — see `results.tsv` / CHANGELOG.
 
-## Tried / notes
+## Fuel / ratchet
 
-- Digester empty (no Werner runs in window). Design-review still in grace. Layout-daily Data Poster already marked today.
-- Backfilled missing v0.1.2682 keep row in results.tsv.
-- Next leftover: scan Light/Material/Architect muted type still mixed on Apple `#ffffff`.
+- Digester open empty most of the night; design-review grace; layout-daily Data Poster already marked today.
+- Nightly minimum satisfied with many keep rows (plus one race discard → re-pick).
 
-## Fitness
+## Next
 
-Cream shells read cleaner: setup copy, size stats, filter caption, and latency ink match the paper, not a leftover Apple white mix.
+- Dark layout-daily when the calendar day quota opens.
+- Leftover light metric-card soft-state / history hot-caption if still Apple `#ffffff` on cream.
+- Mac capture when TCC allows; sibling/product fuel — not keep-pNN clones only.
+
+Generated: 2026-11-13T05:00:28+01:00
