@@ -1,20 +1,26 @@
 # Morning surprise — 2026-11-13
 
-Overnight autoresearch kept light cream-paper remaps so muted type and ring/sparkline Hot/Ok/Fair washes stop floating on Apple white.
+Overnight Track B kept shipping Standing P2 #14 light-cream remaps (digester empty; design-review grace; layout-daily Data Poster already marked).
 
-## Shipped
+## Shipped tonight (keeps)
 
-- **v0.1.2685** — Light / Material / Architect `.metric-card` + `.history-chart-container` Hot / Ok / Fair washes (opaque on `#f7f7fa` / `#ebe4d9` / `#f1f1f1`).
-- **v0.1.2684** — Light / Material / Architect power-strip / ring / sparkline kb-hints + LPM busy type on the same paper path.
-- **v0.1.2683** — Light / Material / Architect Disk Cleanup size lines, Perplexity setup lead/note (incl. error), Agent Ops filter caption, and AI Chat response-time.
-- Earlier same night (already on main): v0.1.2662–v0.1.2682 light glance / filter-miss / kb-hint / muted label remaps along the same paper path.
+- **v0.1.2686** — Light / Material / Architect metric-strip flash highlights (RAM · CPU · GPU · Temp · Freq · Disk · Uptime) onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1`.
+- **v0.1.2685** — metric-card + history Hot/Ok/Fair washes.
+- **v0.1.2684** — metrics kb-hint + LPM busy type.
+- **v0.1.2683** — setup/stat/caption type.
+- **v0.1.2682** — muted labels (Force Quit · Disk Cleanup meta · Process Detail · Perplexity).
+- Earlier overnight: path/meta captions, section kb-hints, Settings credential toolbars, Perplexity last/attention, Disk Cleanup attention, Logs/Processes glances, Monitors/Agent Ops, Top Processes, filter-miss shells, AI Chat chrome, Ops health — continuous P2 #14 cream catch-up.
 
-## Tried / notes
+## Tried / discarded
 
-- Digester empty (no Werner runs in window). Design-review still in grace. Layout-daily Data Poster already marked today.
-- 05:15 CET tick: standing Next after 2684 → metric-card / history soft-state remaps; keep logged; pushed.
-- Next leftover: scan Light/Material/Architect muted type / metric-card highlights still mixed on Apple `#ffffff`, or Dark layout-daily next calendar day.
+- One parallel race earlier (local 2673 overlapped origin) → discard + re-pick Perplexity attention as **v0.1.2674**.
+
+## Still open
+
+- Dark / Neon / Futuristic **layout-daily** next calendar day (today’s quota used by Data Poster).
+- Mac window-only capture when TCC allows (design-review surfaces still in grace).
+- Leftover light cream `#ffffff` mixes: history sparkline focus · first-launch tip · update banner · other muted type — or sibling/product fuel. Not another keep-pNN clone.
 
 ## Fitness
 
-Cream shells read cleaner: setup copy, size stats, filter caption, latency ink, Bat/LPM hints, and Hot/Ok/Fair ring + sparkline washes match the paper, not a leftover Apple white mix.
+Jump-to metric flashes no longer paint Apple-white slabs on Light / Material / Architect cream paper.
