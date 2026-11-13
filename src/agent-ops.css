@@ -33791,3 +33791,184 @@ body.theme-architect .monitors-attention-glance.has-slow {
   background: color-mix(in srgb, #ff9f0a 7%, #f1f1f1);
   color: color-mix(in srgb, #ff9f0a 48%, currentColor);
 }
+
+
+/*
+ * Light / Material / Architect: Monitors filter-attention + Logs attention
+ * glances still mixed Apple `#ffffff` (`.monitors-filter-attention-glance`
+ * resting · hover · `:focus-visible` · filter · Up · Down · Slow;
+ * `.logs-attention-glance` resting · hover · `:focus-visible` · errors ·
+ * warns-only) while Data Poster / Dark / Neon / Futuristic remaps already
+ * exist. Opaque washes on cream paper so attention glances match light
+ * shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
+ * Agent Ops collapsed + Monitors attention remaps v0.1.2671.
+ */
+/* OVERNIGHT v0.1.2672: light Monitors filter-attention + Logs attention remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .monitors-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .monitors-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-light .monitors-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+}
+body.theme-light .monitors-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #f7f7fa);
+  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+}
+body.theme-light .monitors-filter-attention-glance.is-up-filter {
+  border-color: color-mix(in srgb, #30d158 28%, #f7f7fa);
+  background: color-mix(in srgb, #30d158 7%, #f7f7fa);
+  color: color-mix(in srgb, #30d158 45%, currentColor);
+}
+body.theme-light .monitors-filter-attention-glance.is-down-filter {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-light .monitors-filter-attention-glance.is-slow-filter {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff9f0a 7%, #f7f7fa);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
+}
+body.theme-light .logs-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .logs-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-light .logs-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+}
+body.theme-light .logs-attention-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-light .logs-attention-glance.has-warns-only {
+  border-color: color-mix(in srgb, #ff9500 26%, #f7f7fa);
+  background: color-mix(in srgb, #ff9500 7%, #f7f7fa);
+  color: color-mix(in srgb, #ff9500 42%, currentColor);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .monitors-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .monitors-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-material .monitors-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+}
+body.theme-material .monitors-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #ebe4d9);
+  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+}
+body.theme-material .monitors-filter-attention-glance.is-up-filter {
+  border-color: color-mix(in srgb, #30d158 28%, #ebe4d9);
+  background: color-mix(in srgb, #30d158 7%, #ebe4d9);
+  color: color-mix(in srgb, #30d158 45%, currentColor);
+}
+body.theme-material .monitors-filter-attention-glance.is-down-filter {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-material .monitors-filter-attention-glance.is-slow-filter {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff9f0a 7%, #ebe4d9);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
+}
+body.theme-material .logs-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .logs-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-material .logs-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+}
+body.theme-material .logs-attention-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-material .logs-attention-glance.has-warns-only {
+  border-color: color-mix(in srgb, #ff9500 26%, #ebe4d9);
+  background: color-mix(in srgb, #ff9500 7%, #ebe4d9);
+  color: color-mix(in srgb, #ff9500 42%, currentColor);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .monitors-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .monitors-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+}
+body.theme-architect .monitors-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #f1f1f1);
+  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+}
+body.theme-architect .monitors-filter-attention-glance.is-up-filter {
+  border-color: color-mix(in srgb, #30d158 28%, #f1f1f1);
+  background: color-mix(in srgb, #30d158 7%, #f1f1f1);
+  color: color-mix(in srgb, #30d158 45%, currentColor);
+}
+body.theme-architect .monitors-filter-attention-glance.is-down-filter {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-architect .monitors-filter-attention-glance.is-slow-filter {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff9f0a 7%, #f1f1f1);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
+}
+body.theme-architect .logs-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .logs-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+body.theme-architect .logs-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+}
+body.theme-architect .logs-attention-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-architect .logs-attention-glance.has-warns-only {
+  border-color: color-mix(in srgb, #ff9500 26%, #f1f1f1);
+  background: color-mix(in srgb, #ff9500 7%, #f1f1f1);
+  color: color-mix(in srgb, #ff9500 42%, currentColor);
+}

@@ -1,6 +1,12 @@
 ## [Unreleased]
 
 
+## [0.1.2672] - 2026-11-13
+
+### Changed
+
+- **Light Monitors filter-attention + Logs attention washes:** Light / Material / Architect `.monitors-filter-attention-glance` (resting · hover · `:focus-visible` · filter · Up · Down · Slow) and `.logs-attention-glance` (resting · hover · `:focus-visible` · errors · warns-only) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so attention glances match cream shells (after Agent Ops collapsed + Monitors attention remaps v0.1.2671).
+
 ## [0.1.2671] - 2026-11-13
 
 ### Changed
