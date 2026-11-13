@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2690] - 2026-11-13
+
+### Changed
+
+- **Light Monitors summary + muted caption washes:** Light / Material / Architect `.monitors-summary` (resting · hover · `:focus-visible` · Down · all-up · slowest · empty) · `.monitor-latency` · `.monitor-detail-k` · `.monitor-backoff-hint` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Monitors strip and latency/detail captions match cream shells (after Processes + Disk Cleanup path focus remaps v0.1.2689).
+
+
 ## [0.1.2689] - 2026-11-13
 
 ### Changed

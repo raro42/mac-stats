@@ -35454,3 +35454,127 @@ body.theme-architect .disk-cleanup-item-path:focus-visible,
 body.theme-architect .disk-cleanup-scope-path:focus-visible {
   outline-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Monitors summary soft-state + muted captions still
+ * mix Apple `#ffffff` (`.monitors-summary` resting · hover · `:focus-visible` ·
+ * `.has-down` · `.is-all-up` · `.has-slowest-hint` · `.is-empty` · `.monitor-latency` ·
+ * `.monitor-detail-k` · `.monitor-backoff-hint`) while CRT remaps already mix on
+ * dark shells. Opaque washes on cream paper (Swiss / Apple keep shared `#ffffff`).
+ * Standing P2 #14 after light Processes + Disk Cleanup path focus remaps v0.1.2689.
+ */
+/* OVERNIGHT v0.1.2690: light Monitors summary + muted caption remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .monitors-summary {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+}
+body.theme-light .monitors-summary:hover {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-light .monitors-summary:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #f7f7fa);
+}
+body.theme-light .monitors-summary.has-down {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
+}
+body.theme-light .monitors-summary.is-all-up {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+body.theme-light .monitors-summary.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 26%, #f7f7fa);
+  background: color-mix(in srgb, #ff9500 6%, #f7f7fa);
+}
+body.theme-light .monitors-summary.is-empty {
+  color: color-mix(in srgb, #0c0c10 75%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .monitor-latency {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .monitor-detail-k,
+body.theme-light .monitor-backoff-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 78%, #f7f7fa);
+  opacity: 1;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .monitors-summary {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+}
+body.theme-material .monitors-summary:hover {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-material .monitors-summary:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #ebe4d9);
+}
+body.theme-material .monitors-summary.has-down {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
+}
+body.theme-material .monitors-summary.is-all-up {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+body.theme-material .monitors-summary.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 26%, #ebe4d9);
+  background: color-mix(in srgb, #ff9500 6%, #ebe4d9);
+}
+body.theme-material .monitors-summary.is-empty {
+  color: color-mix(in srgb, #0c0c10 75%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .monitor-latency {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .monitor-detail-k,
+body.theme-material .monitor-backoff-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 78%, #ebe4d9);
+  opacity: 1;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .monitors-summary {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+}
+body.theme-architect .monitors-summary:hover {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+body.theme-architect .monitors-summary:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #f1f1f1);
+}
+body.theme-architect .monitors-summary.has-down {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+}
+body.theme-architect .monitors-summary.is-all-up {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}
+body.theme-architect .monitors-summary.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 26%, #f1f1f1);
+  background: color-mix(in srgb, #ff9500 6%, #f1f1f1);
+}
+body.theme-architect .monitors-summary.is-empty {
+  color: color-mix(in srgb, #0c0c10 75%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .monitor-latency {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .monitor-detail-k,
+body.theme-architect .monitor-backoff-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 78%, #f1f1f1);
+  opacity: 1;
+}
