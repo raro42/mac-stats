@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2687] - 2026-11-13
+
+### Changed
+
+- **Light history sparkline focus + first-launch tip / update banner washes:** Light / Material / Architect `.history-chart-container[role="button"]:focus-visible` · `#mac-stats-update-banner` · tip-glyph · tip-dismiss · code chip · update-banner link underline still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so sparkline focus rings and tip/update banners match cream shells (after metric-strip flash highlight remaps v0.1.2686).
+
+
 ## [0.1.2686] - 2026-11-13
 
 ### Changed

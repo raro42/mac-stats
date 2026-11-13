@@ -35259,3 +35259,119 @@ body.theme-architect .disk-cleanup-section.is-disk-highlight {
   background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #f1f1f1);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: history sparkline focus + first-launch tip /
+ * update banner still mixed Apple `#ffffff` (`.history-chart-container[role="button"]:focus-visible`
+ * · `#mac-stats-update-banner` border/wash · tip-glyph · tip-dismiss · code chip ·
+ * update-banner link underline) while Data Poster / Dark / Neon / Futuristic remaps
+ * already existed (v0.1.2526–2527). Opaque washes on cream paper
+ * `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (Swiss / Apple keep shared white). Standing P2 #14
+ * after light metric-strip flash highlight remaps v0.1.2686.
+ */
+/* OVERNIGHT v0.1.2687: light history sparkline focus + first-launch/update-banner remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .history-chart-container[role="button"]:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #f7f7fa);
+}
+body.theme-light #mac-stats-update-banner {
+  background: color-mix(in srgb, var(--accent, #8bb4e8) 22%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #8bb4e8) 35%, #f7f7fa);
+}
+body.theme-light #mac-stats-first-launch-tip .tip-glyph,
+body.theme-light #mac-stats-update-banner .tip-glyph {
+  background: color-mix(in srgb, #ffffff 45%, #f7f7fa);
+  border-color: color-mix(in srgb, #ffffff 55%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 50%, #f7f7fa);
+}
+body.theme-light #mac-stats-first-launch-tip code,
+body.theme-light #mac-stats-update-banner code {
+  background: color-mix(in srgb, #0c0c10 6%, #f7f7fa);
+  border-color: color-mix(in srgb, #0c0c10 4%, #f7f7fa);
+}
+body.theme-light #mac-stats-first-launch-tip .tip-dismiss,
+body.theme-light #mac-stats-update-banner .tip-dismiss {
+  border-color: color-mix(in srgb, #0c0c10 8%, #f7f7fa);
+  background: color-mix(in srgb, #ffffff 35%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 45%, #f7f7fa);
+}
+body.theme-light #mac-stats-first-launch-tip .tip-dismiss:hover,
+body.theme-light #mac-stats-update-banner .tip-dismiss:hover {
+  border-color: color-mix(in srgb, #0c0c10 12%, #f7f7fa);
+  background: color-mix(in srgb, #ffffff 55%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 80%, #f7f7fa);
+}
+body.theme-light #mac-stats-update-banner a {
+  text-decoration-color: color-mix(in srgb, currentColor 35%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .history-chart-container[role="button"]:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #ebe4d9);
+}
+body.theme-material #mac-stats-update-banner {
+  background: color-mix(in srgb, var(--accent, #8bb4e8) 22%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #8bb4e8) 35%, #ebe4d9);
+}
+body.theme-material #mac-stats-first-launch-tip .tip-glyph,
+body.theme-material #mac-stats-update-banner .tip-glyph {
+  background: color-mix(in srgb, #ffffff 45%, #ebe4d9);
+  border-color: color-mix(in srgb, #ffffff 55%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 50%, #ebe4d9);
+}
+body.theme-material #mac-stats-first-launch-tip code,
+body.theme-material #mac-stats-update-banner code {
+  background: color-mix(in srgb, #0c0c10 6%, #ebe4d9);
+  border-color: color-mix(in srgb, #0c0c10 4%, #ebe4d9);
+}
+body.theme-material #mac-stats-first-launch-tip .tip-dismiss,
+body.theme-material #mac-stats-update-banner .tip-dismiss {
+  border-color: color-mix(in srgb, #0c0c10 8%, #ebe4d9);
+  background: color-mix(in srgb, #ffffff 35%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 45%, #ebe4d9);
+}
+body.theme-material #mac-stats-first-launch-tip .tip-dismiss:hover,
+body.theme-material #mac-stats-update-banner .tip-dismiss:hover {
+  border-color: color-mix(in srgb, #0c0c10 12%, #ebe4d9);
+  background: color-mix(in srgb, #ffffff 55%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 80%, #ebe4d9);
+}
+body.theme-material #mac-stats-update-banner a {
+  text-decoration-color: color-mix(in srgb, currentColor 35%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .history-chart-container[role="button"]:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #f1f1f1);
+}
+body.theme-architect #mac-stats-update-banner {
+  background: color-mix(in srgb, var(--accent, #8bb4e8) 22%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #8bb4e8) 35%, #f1f1f1);
+}
+body.theme-architect #mac-stats-first-launch-tip .tip-glyph,
+body.theme-architect #mac-stats-update-banner .tip-glyph {
+  background: color-mix(in srgb, #ffffff 45%, #f1f1f1);
+  border-color: color-mix(in srgb, #ffffff 55%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 50%, #f1f1f1);
+}
+body.theme-architect #mac-stats-first-launch-tip code,
+body.theme-architect #mac-stats-update-banner code {
+  background: color-mix(in srgb, #0c0c10 6%, #f1f1f1);
+  border-color: color-mix(in srgb, #0c0c10 4%, #f1f1f1);
+}
+body.theme-architect #mac-stats-first-launch-tip .tip-dismiss,
+body.theme-architect #mac-stats-update-banner .tip-dismiss {
+  border-color: color-mix(in srgb, #0c0c10 8%, #f1f1f1);
+  background: color-mix(in srgb, #ffffff 35%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 45%, #f1f1f1);
+}
+body.theme-architect #mac-stats-first-launch-tip .tip-dismiss:hover,
+body.theme-architect #mac-stats-update-banner .tip-dismiss:hover {
+  border-color: color-mix(in srgb, #0c0c10 12%, #f1f1f1);
+  background: color-mix(in srgb, #ffffff 55%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 80%, #f1f1f1);
+}
+body.theme-architect #mac-stats-update-banner a {
+  text-decoration-color: color-mix(in srgb, currentColor 35%, #f1f1f1);
+}
