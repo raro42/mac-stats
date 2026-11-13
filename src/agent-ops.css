@@ -570,7 +570,7 @@ body.theme-swiss-minimalistic .icon-line-item.is-ai-off:not(.status-good):not(.s
 body.theme-architect .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
   background: color-mix(in srgb, #ffffff 55%, #f1f1f1);
   border-color: color-mix(in srgb, #e6e6ea 55%, #f1f1f1);
-  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 42%, #ffffff) 55%, #f1f1f1);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 42%, #f1f1f1) 55%, #f1f1f1);
 }
 body.theme-architect .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
   background: color-mix(in srgb, #ececf1 55%, #f1f1f1);
@@ -581,7 +581,7 @@ body.theme-architect .icon-line-item.is-ai-off:not(.status-good):not(.status-war
 body.theme-material .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
   background: color-mix(in srgb, #ffffff 55%, #ebe4d9);
   border-color: color-mix(in srgb, #e6e6ea 55%, #ebe4d9);
-  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 42%, #ffffff) 55%, #ebe4d9);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 42%, #ebe4d9) 55%, #ebe4d9);
 }
 body.theme-material .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
   background: color-mix(in srgb, #ececf1 55%, #ebe4d9);
@@ -36239,4 +36239,130 @@ body.theme-architect .ops-insight-sub {
 body.theme-architect .ops-filter-row-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
   opacity: 1;
+}
+
+/*
+ * Light / Material / Architect: Ops Insights card + clickable insight lines +
+ * preview pane still mix Apple `#ffffff` (`.ops-insights-card` ·
+ * `.ops-insight-line` resting / clickable / hover / focus / selected / `em` ·
+ * `.ops-preview`) while Data Poster / Dark / Neon / Futuristic remaps already
+ * exist. Opaque washes on cream paper so Insights Slowest/Candidates rows and
+ * preview match light shells (Swiss / Apple keep shared `#ffffff`). Standing
+ * P2 #14 after light refresh dim + Ops Insights muted remaps v0.1.2699.
+ * Also: `.icon-line-item.is-ai-off` nested glyph mix on paper (above).
+ */
+/* OVERNIGHT v0.1.2700: light Ops Insights card / insight-line / preview remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 42%, #f7f7fa) 55%, #f7f7fa);
+}
+body.theme-light .ops-insights-card {
+  border-color: color-mix(in srgb, currentColor 12%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 5%, #f7f7fa);
+}
+body.theme-light .ops-insight-line:not(.is-clickable) {
+  color: color-mix(in srgb, #0c0c10 70%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .ops-insight-line.is-clickable {
+  color: color-mix(in srgb, #0c0c10 79%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .ops-insight-line.is-clickable:hover {
+  background: color-mix(in srgb, currentColor 8%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 14%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .ops-insight-line.is-clickable:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #f7f7fa);
+}
+body.theme-light .ops-insight-line.is-clickable.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .ops-insight-line em {
+  color: color-mix(in srgb, currentColor 70%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .ops-preview {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .ops-insights-card {
+  border-color: color-mix(in srgb, currentColor 12%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 5%, #ebe4d9);
+}
+body.theme-material .ops-insight-line:not(.is-clickable) {
+  color: color-mix(in srgb, #0c0c10 70%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .ops-insight-line.is-clickable {
+  color: color-mix(in srgb, #0c0c10 79%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .ops-insight-line.is-clickable:hover {
+  background: color-mix(in srgb, currentColor 8%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 14%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .ops-insight-line.is-clickable:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #ebe4d9);
+}
+body.theme-material .ops-insight-line.is-clickable.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .ops-insight-line em {
+  color: color-mix(in srgb, currentColor 70%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .ops-preview {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .ops-insights-card {
+  border-color: color-mix(in srgb, currentColor 12%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 5%, #f1f1f1);
+}
+body.theme-architect .ops-insight-line:not(.is-clickable) {
+  color: color-mix(in srgb, #0c0c10 70%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .ops-insight-line.is-clickable {
+  color: color-mix(in srgb, #0c0c10 79%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .ops-insight-line.is-clickable:hover {
+  background: color-mix(in srgb, currentColor 8%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 14%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .ops-insight-line.is-clickable:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
+}
+body.theme-architect .ops-insight-line.is-clickable.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .ops-insight-line em {
+  color: color-mix(in srgb, currentColor 70%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .ops-preview {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
 }

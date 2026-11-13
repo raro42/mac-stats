@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2700] - 2026-11-13
+
+### Changed
+
+- **Light Ops Insights card + insight-line + preview washes:** Light / Material / Architect `.ops-insights-card` · `.ops-insight-line` (resting · clickable · hover · `:focus-visible` · `.is-selected` · `em`) · `.ops-preview` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Insights Slowest/Candidates rows and preview match cream shells; `.icon-line-item.is-ai-off` nested glyph mix on paper (after refresh dim + Ops Insights muted remaps v0.1.2699).
+
 ## [0.1.2699] - 2026-11-13
 
 ### Changed
