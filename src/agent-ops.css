@@ -36592,3 +36592,319 @@ body.theme-architect .monitors-settings-popover .popover-btn-primary:focus-visib
   outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
   outline-offset: 2px;
 }
+
+/*
+ * Light / Material / Architect: Disk Cleanup meta-card + last-run strip still
+ * mix Apple `#ffffff` (`.disk-cleanup-meta-card` resting · hover · `:focus-within`
+ * · reclaim/clean/scopes-off/all-on/due/ok/periodic-off · matching
+ * `.is-action:focus-visible` · `.disk-cleanup-last` resting · hover ·
+ * `:focus-visible` · has-last-run · has-skip · is-ok) while Data Poster /
+ * Dark / Neon / Futuristic remaps already exist. Opaque washes on cream paper
+ * so Disk Cleanup status chrome matches light shells (Swiss / Apple keep
+ * shared `#ffffff`). Standing P2 #14 after light leftover focus rings +
+ * process-pin remaps v0.1.2702.
+ */
+/* OVERNIGHT v0.1.2703: light Disk Cleanup meta-card + last remaps */
+/* --- light (#f7f7fa) --- */
+body.theme-light .disk-cleanup-meta-card {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card:hover {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card:focus-within {
+  border-color: color-mix(in srgb, #0a84ff 36%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff9f0a 7%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card.is-clean:not(.has-reclaim) {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card.is-action:focus-visible {
+  border-color: color-mix(in srgb, #0a84ff 36%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card.is-action.has-reclaim:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card.is-action.is-clean:not(.has-reclaim):focus-visible {
+  border-color: color-mix(in srgb, #34c759 48%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card.has-scopes-off {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #f7f7fa);
+  background: color-mix(in srgb, #ff9f0a 7%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card.is-action.has-scopes-off:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card.is-all-on:not(.has-scopes-off) {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card.is-action.is-all-on:not(.has-scopes-off):focus-visible {
+  border-color: color-mix(in srgb, #34c759 48%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card.has-due {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff9f0a 7%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card.is-action.has-due:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card.is-ok:not(.has-due):not(.has-periodic-off) {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card.is-action.is-ok:not(.has-due):not(.has-periodic-off):focus-visible {
+  border-color: color-mix(in srgb, #34c759 48%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card.has-periodic-off {
+  border-color: color-mix(in srgb, #64d2ff 28%, #f7f7fa);
+  background: color-mix(in srgb, #64d2ff 7%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-meta-card.is-action.has-periodic-off:focus-visible {
+  border-color: color-mix(in srgb, #64d2ff 48%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #64d2ff 22%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-last {
+  border-color: color-mix(in srgb, currentColor 14%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 2%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-last.is-action:hover {
+  background: color-mix(in srgb, currentColor 5%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 22%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-last.is-action:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #0a84ff) 55%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-last.is-action.has-last-run {
+  border-color: color-mix(in srgb, currentColor 18%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-last.is-action.has-skip {
+  background: color-mix(in srgb, #ff9f0a 7%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-last.is-action.has-skip:focus-visible {
+  outline-color: color-mix(in srgb, #ff9f0a 55%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-last.is-action.is-ok:not(.has-skip) {
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-last.is-action.is-ok:not(.has-skip):focus-visible {
+  outline-color: color-mix(in srgb, #34c759 55%, #f7f7fa);
+}
+/* --- material (#ebe4d9) --- */
+body.theme-material .disk-cleanup-meta-card {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card:hover {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card:focus-within {
+  border-color: color-mix(in srgb, #0a84ff 36%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff9f0a 7%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card.is-clean:not(.has-reclaim) {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card.is-action:focus-visible {
+  border-color: color-mix(in srgb, #0a84ff 36%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card.is-action.has-reclaim:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card.is-action.is-clean:not(.has-reclaim):focus-visible {
+  border-color: color-mix(in srgb, #34c759 48%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card.has-scopes-off {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #ebe4d9);
+  background: color-mix(in srgb, #ff9f0a 7%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card.is-action.has-scopes-off:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card.is-all-on:not(.has-scopes-off) {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card.is-action.is-all-on:not(.has-scopes-off):focus-visible {
+  border-color: color-mix(in srgb, #34c759 48%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card.has-due {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff9f0a 7%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card.is-action.has-due:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card.is-ok:not(.has-due):not(.has-periodic-off) {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card.is-action.is-ok:not(.has-due):not(.has-periodic-off):focus-visible {
+  border-color: color-mix(in srgb, #34c759 48%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card.has-periodic-off {
+  border-color: color-mix(in srgb, #64d2ff 28%, #ebe4d9);
+  background: color-mix(in srgb, #64d2ff 7%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-meta-card.is-action.has-periodic-off:focus-visible {
+  border-color: color-mix(in srgb, #64d2ff 48%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #64d2ff 22%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-last {
+  border-color: color-mix(in srgb, currentColor 14%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 2%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-last.is-action:hover {
+  background: color-mix(in srgb, currentColor 5%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 22%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-last.is-action:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #0a84ff) 55%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-last.is-action.has-last-run {
+  border-color: color-mix(in srgb, currentColor 18%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-last.is-action.has-skip {
+  background: color-mix(in srgb, #ff9f0a 7%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-last.is-action.has-skip:focus-visible {
+  outline-color: color-mix(in srgb, #ff9f0a 55%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-last.is-action.is-ok:not(.has-skip) {
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-last.is-action.is-ok:not(.has-skip):focus-visible {
+  outline-color: color-mix(in srgb, #34c759 55%, #ebe4d9);
+}
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .disk-cleanup-meta-card {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card:hover {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card:focus-within {
+  border-color: color-mix(in srgb, #0a84ff 36%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff9f0a 7%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card.is-clean:not(.has-reclaim) {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card.is-action:focus-visible {
+  border-color: color-mix(in srgb, #0a84ff 36%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card.is-action.has-reclaim:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card.is-action.is-clean:not(.has-reclaim):focus-visible {
+  border-color: color-mix(in srgb, #34c759 48%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card.has-scopes-off {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #f1f1f1);
+  background: color-mix(in srgb, #ff9f0a 7%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card.is-action.has-scopes-off:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card.is-all-on:not(.has-scopes-off) {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card.is-action.is-all-on:not(.has-scopes-off):focus-visible {
+  border-color: color-mix(in srgb, #34c759 48%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card.has-due {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff9f0a 7%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card.is-action.has-due:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card.is-ok:not(.has-due):not(.has-periodic-off) {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card.is-action.is-ok:not(.has-due):not(.has-periodic-off):focus-visible {
+  border-color: color-mix(in srgb, #34c759 48%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card.has-periodic-off {
+  border-color: color-mix(in srgb, #64d2ff 28%, #f1f1f1);
+  background: color-mix(in srgb, #64d2ff 7%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-meta-card.is-action.has-periodic-off:focus-visible {
+  border-color: color-mix(in srgb, #64d2ff 48%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #64d2ff 22%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-last {
+  border-color: color-mix(in srgb, currentColor 14%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 2%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-last.is-action:hover {
+  background: color-mix(in srgb, currentColor 5%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 22%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-last.is-action:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #0a84ff) 55%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-last.is-action.has-last-run {
+  border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-last.is-action.has-skip {
+  background: color-mix(in srgb, #ff9f0a 7%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-last.is-action.has-skip:focus-visible {
+  outline-color: color-mix(in srgb, #ff9f0a 55%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-last.is-action.is-ok:not(.has-skip) {
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-last.is-action.is-ok:not(.has-skip):focus-visible {
+  outline-color: color-mix(in srgb, #34c759 55%, #f1f1f1);
+}

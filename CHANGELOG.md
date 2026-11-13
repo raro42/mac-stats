@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2703] - 2026-11-13
+
+### Changed
+
+- **Light Disk Cleanup meta-card + last washes:** Light / Material / Architect `.disk-cleanup-meta-card` (resting · hover · `:focus-within` · reclaim/clean/scopes-off/all-on/due/ok/periodic-off · matching `.is-action:focus-visible`) · `.disk-cleanup-last` (resting · hover · `:focus-visible` · has-last-run · has-skip · is-ok) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Disk Cleanup status chrome matches cream shells (after leftover focus rings + process-pin remaps v0.1.2702).
+
 ## [0.1.2702] - 2026-11-13
 
 ### Changed
