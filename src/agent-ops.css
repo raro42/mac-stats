@@ -36485,3 +36485,110 @@ body.theme-architect .icon-line-item.is-ai-off:not(.status-good):not(.status-war
   border-color: color-mix(in srgb, #dcdce2 55%, #f1f1f1);
   color: color-mix(in srgb, color-mix(in srgb, #0c0c10 72%, #f1f1f1) 55%, #f1f1f1);
 }
+
+
+/*
+ * Light / Material / Architect: leftover focus rings + process-pin washes still
+ * mix Apple `#ffffff` (`#perplexity-search-btn:focus-visible` · `.process-pin`
+ * resting/hover/focus-visible/is-just-saved · `.disk-cleanup-scope-remove:focus-visible` ·
+ * `.disk-cleanup-toolbar .popover-btn-secondary:focus-visible` ·
+ * `.monitors-settings-popover .popover-btn-primary:focus-visible`) while Data Poster /
+ * Dark / Neon / Futuristic remaps already exist. Opaque washes on cream paper so
+ * keyboard focus / pin chrome match light shells (Swiss / Apple keep shared
+ * `#ffffff`). Standing P2 #14 after light focus rings + Perplexity disabled +
+ * AI-off remaps v0.1.2701.
+ */
+/* OVERNIGHT v0.1.2702: light leftover focus rings + process-pin remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light #perplexity-search-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
+  outline-offset: 2px;
+}
+body.theme-light .process-pin {
+  color: color-mix(in srgb, #0c0c10 40%, #f7f7fa);
+}
+body.theme-light .process-pin:hover {
+  color: color-mix(in srgb, #0c0c10 84%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 10%, #f7f7fa);
+}
+body.theme-light .process-pin:focus-visible {
+  color: color-mix(in srgb, #0c0c10 84%, #f7f7fa);
+  background: color-mix(in srgb, #0a84ff 12%, #f7f7fa);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 40%, #f7f7fa);
+}
+body.theme-light .process-pin.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #f7f7fa) !important;
+}
+body.theme-light .disk-cleanup-scope-remove:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #f7f7fa);
+}
+body.theme-light .monitors-settings-popover .popover-btn-primary:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
+  outline-offset: 2px;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material #perplexity-search-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
+  outline-offset: 2px;
+}
+body.theme-material .process-pin {
+  color: color-mix(in srgb, #0c0c10 40%, #ebe4d9);
+}
+body.theme-material .process-pin:hover {
+  color: color-mix(in srgb, #0c0c10 84%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 10%, #ebe4d9);
+}
+body.theme-material .process-pin:focus-visible {
+  color: color-mix(in srgb, #0c0c10 84%, #ebe4d9);
+  background: color-mix(in srgb, #0a84ff 12%, #ebe4d9);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 40%, #ebe4d9);
+}
+body.theme-material .process-pin.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #ebe4d9) !important;
+}
+body.theme-material .disk-cleanup-scope-remove:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #ebe4d9);
+}
+body.theme-material .monitors-settings-popover .popover-btn-primary:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
+  outline-offset: 2px;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect #perplexity-search-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+  outline-offset: 2px;
+}
+body.theme-architect .process-pin {
+  color: color-mix(in srgb, #0c0c10 40%, #f1f1f1);
+}
+body.theme-architect .process-pin:hover {
+  color: color-mix(in srgb, #0c0c10 84%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 10%, #f1f1f1);
+}
+body.theme-architect .process-pin:focus-visible {
+  color: color-mix(in srgb, #0c0c10 84%, #f1f1f1);
+  background: color-mix(in srgb, #0a84ff 12%, #f1f1f1);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 40%, #f1f1f1);
+}
+body.theme-architect .process-pin.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #f1f1f1) !important;
+}
+body.theme-architect .disk-cleanup-scope-remove:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #f1f1f1);
+}
+body.theme-architect .monitors-settings-popover .popover-btn-primary:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+  outline-offset: 2px;
+}

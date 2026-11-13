@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2702] - 2026-11-13
+
+### Changed
+
+- **Light leftover focus rings + process-pin washes:** Light / Material / Architect `#perplexity-search-btn:focus-visible` · `.process-pin` (resting · hover · `:focus-visible` · `.is-just-saved`) · `.disk-cleanup-scope-remove:focus-visible` · `.disk-cleanup-toolbar .popover-btn-secondary:focus-visible` · `.monitors-settings-popover .popover-btn-primary:focus-visible` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so keyboard focus / pin chrome match cream shells (after focus rings + Perplexity disabled + AI-off remaps v0.1.2701).
+
 ## [0.1.2701] - 2026-11-13
 
 ### Changed
