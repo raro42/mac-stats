@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2692] - 2026-11-13
+
+### Changed
+
+- **Light Monitors row soft-state washes:** Light / Material / Architect `.monitor-item.is-selected` · `.is-down` · `.is-down:hover` · `.is-slow` · `.is-slow:hover` · `:focus-visible` · `.is-just-copied` · Copied badge still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Monitors selected / Down / Slow / focus / Copied match cream shells (after Monitors URL/detail + logs-path-hint focus remaps v0.1.2691).
+
 ## [0.1.2691] - 2026-11-13
 
 ### Changed

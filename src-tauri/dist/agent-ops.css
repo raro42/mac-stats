@@ -35624,3 +35624,116 @@ body.theme-architect .monitor-detail-remove:focus-visible {
 body.theme-architect .logs-path-hint:focus-visible {
   outline-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Monitors row soft-states still mix Apple `#ffffff`
+ * (`.monitor-item.is-selected` · `.is-down` · `.is-down:hover` · `.is-slow` ·
+ * `.is-slow:hover` · `:focus-visible` · `.is-just-copied` · Copied badge) while
+ * Data Poster / Dark / Neon / Futuristic remaps already exist. Opaque washes on
+ * cream paper so selected / Down / Slow / focus / Copied match light shells
+ * (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light Monitors
+ * URL/detail + logs-path-hint focus remaps v0.1.2691.
+ */
+/* OVERNIGHT v0.1.2692: light Monitors row soft-state remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .monitor-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #007aff) 5%, #f7f7fa);
+}
+body.theme-light .monitor-item.is-down {
+  border-color: color-mix(in srgb, #ff3b30 28%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 6%, #f7f7fa);
+}
+body.theme-light .monitor-item.is-down:hover {
+  border-color: color-mix(in srgb, #ff3b30 40%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 10%, #f7f7fa);
+}
+body.theme-light .monitor-item.is-slow:not(.is-down):not(.is-pending) {
+  border-color: color-mix(in srgb, #ff9500 28%, #f7f7fa);
+  background: color-mix(in srgb, #ff9500 6%, #f7f7fa);
+}
+body.theme-light .monitor-item.is-slow:not(.is-down):not(.is-pending):hover {
+  border-color: color-mix(in srgb, #ff9500 40%, #f7f7fa);
+  background: color-mix(in srgb, #ff9500 10%, #f7f7fa);
+}
+body.theme-light .monitor-item:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, #f7f7fa);
+}
+body.theme-light .monitor-item.is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #f7f7fa);
+  border-color: color-mix(in srgb, #34c759 32%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .monitor-item.is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .monitor-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #007aff) 5%, #ebe4d9);
+}
+body.theme-material .monitor-item.is-down {
+  border-color: color-mix(in srgb, #ff3b30 28%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 6%, #ebe4d9);
+}
+body.theme-material .monitor-item.is-down:hover {
+  border-color: color-mix(in srgb, #ff3b30 40%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 10%, #ebe4d9);
+}
+body.theme-material .monitor-item.is-slow:not(.is-down):not(.is-pending) {
+  border-color: color-mix(in srgb, #ff9500 28%, #ebe4d9);
+  background: color-mix(in srgb, #ff9500 6%, #ebe4d9);
+}
+body.theme-material .monitor-item.is-slow:not(.is-down):not(.is-pending):hover {
+  border-color: color-mix(in srgb, #ff9500 40%, #ebe4d9);
+  background: color-mix(in srgb, #ff9500 10%, #ebe4d9);
+}
+body.theme-material .monitor-item:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, #ebe4d9);
+}
+body.theme-material .monitor-item.is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #ebe4d9);
+  border-color: color-mix(in srgb, #34c759 32%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .monitor-item.is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .monitor-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 5%, #f1f1f1);
+}
+body.theme-architect .monitor-item.is-down {
+  border-color: color-mix(in srgb, #ff3b30 28%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 6%, #f1f1f1);
+}
+body.theme-architect .monitor-item.is-down:hover {
+  border-color: color-mix(in srgb, #ff3b30 40%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 10%, #f1f1f1);
+}
+body.theme-architect .monitor-item.is-slow:not(.is-down):not(.is-pending) {
+  border-color: color-mix(in srgb, #ff9500 28%, #f1f1f1);
+  background: color-mix(in srgb, #ff9500 6%, #f1f1f1);
+}
+body.theme-architect .monitor-item.is-slow:not(.is-down):not(.is-pending):hover {
+  border-color: color-mix(in srgb, #ff9500 40%, #f1f1f1);
+  background: color-mix(in srgb, #ff9500 10%, #f1f1f1);
+}
+body.theme-architect .monitor-item:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, #f1f1f1);
+}
+body.theme-architect .monitor-item.is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #f1f1f1);
+  border-color: color-mix(in srgb, #34c759 32%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .monitor-item.is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #f1f1f1);
+}
