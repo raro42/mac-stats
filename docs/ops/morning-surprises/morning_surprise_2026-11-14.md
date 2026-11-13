@@ -1,21 +1,24 @@
 # Morning surprise — 2026-11-14
 
-Overnight autoresearch (Track B) kept cream remaps on Light / Material / Architect so Ops action chrome matches paper shells instead of Apple white.
+Overnight Track B kept shipping Light/Material/Architect cream remaps (Standing P2 #14) while digester open stayed empty and design-review stayed in grace.
 
-## Shipped
+## Shipped tonight (latest)
 
-- **v0.1.2696** (`b560c470`): Ops `.btn-primary:disabled` + `.btn-secondary.ops-refresh` / `.agent-ops-section .btn-secondary` (resting · hover · focus) → paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`.
-- **v0.1.2695** (`3757b874`): Monitors `.is-removing` · remove-btn focus + Ops editor focus/dirty/save-status/detail-meta.
-- **v0.1.2694** (`69107850`): Monitors checking/pending + Ops file/edit/preview/insights kb-hints.
-- Earlier same night window: Ops tab chrome, Monitors soft-states/summary, Processes/Disk path focus, and more P2 #14 cream remaps (see `loop_backlog.md`).
+- **v0.1.2697** — Ops Close (`.ops-close-btn` resting · hover · `:focus-visible`) onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1`.
+- **v0.1.2696** — Ops disabled Save + secondary Refresh washes.
+- **v0.1.2695** — Monitors removing + Ops editor meta/focus washes.
+- Earlier tonight (same P2 #14 chain): Ops tab chrome, Monitors checking/pending + kb-hints, URL/detail focus, Processes/Disk path focus, and more cream opacity remaps through ~v0.1.2689+.
 
-## Context
+## Tried / discarded
 
-- Digester empty; design-review still in grace; layout-daily already marked for 2026-11-13 (Dark due next calendar day).
-- Linux rack: CSS + sync-dist only (no /Applications install).
+- Parallel race discard on a local v0.1.2694 clone (origin already had the same fuel); re-picked next leftover → v0.1.2695.
 
-## Next fuel
+## Fuel note
 
-- Dark layout-daily when the calendar flips.
-- Leftover light cream: `.ops-close-btn` resting/hover/focus-visible / other muted type / focus rings if still muddy.
-- Sibling / product fuel when digester has open candidates — not another keep-pNN clone.
+- Digester open: empty. Design-review: grace. Layout-daily: Data Poster marked for 2026-11-13; Dark/Neon/Futuristic wait for next calendar day + Mac capture when TCC allows.
+- Debug.log: content/soul clusters only — no product ERROR/panic this tick.
+
+## Next
+
+- Dark layout-daily when the day quota opens.
+- Leftover light cream `#ffffff` mixes (muted type / focus rings) or sibling/product fuel — not another keep-pNN clone.
