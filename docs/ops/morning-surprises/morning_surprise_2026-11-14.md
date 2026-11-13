@@ -1,20 +1,23 @@
 # Morning surprise — 2026-11-14
 
-Generated: 2026-11-13T23:25:01+01:00
+Overnight autoresearch (Track B) kept shipping Light / Material / Architect cream-paper remaps (Standing P2 #14). Digester stayed empty; design-review and layout-daily were not due.
 
-## Shipped overnight (Track B)
+## Shipped
 
-- **v0.1.2705** — Light / Material / Architect Perplexity Search + Clear/Send saved-flash remaps onto cream paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1`). Standing P2 #14 after Clear/GitHub + Disk Cleanup Scan v0.1.2704 (race-discard re-pick).
-- Earlier in the window: v0.1.2667–v0.1.2704 cream-paper remaps (filter-miss → attention glances → kb-hints → muted type → focus rings → Ops chrome → Disk Cleanup meta/last → Clear/GitHub + Scan).
+- **v0.1.2706** — Top Processes row soft-states: `.process-row:hover` / `:active` / `.is-pinned` / `.is-just-copied` / Copied badge / `.process-name.is-just-saved` / `.process-detail-name` / `.process-detail-pid.is-just-saved` Apple `#ffffff` → paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (keep `31ae1526`).
+- **v0.1.2705** — Perplexity Search chrome + Clear/Send saved-flash washes (keep `d37c99c6`).
+- **v0.1.2704** — `#chat-clear-btn` resting/hover/disabled · `#github-link:hover` / busy-disabled · Disk Cleanup Scan primary (keep `a4859470`).
+- Earlier tonight (already on main): meta-card/last **v0.1.2703**, leftover focus rings + process-pin **v0.1.2702**, and the Ops Insights / Details soft-state chain through **v0.1.2696+**.
 
-## Tried / discarded
+## Tried / context
 
-- Local **v0.1.2704** Clear/Perplexity/GitHub soft-states — parallel race vs origin Clear/GitHub + Disk Cleanup Scan (same patch lane).
+- Digester: 0 turns / 7d.
+- Design review: grace (recommended feature-agent-ops ~59d).
+- Layout daily: due=false today (Dark still recommended next calendar day).
+- Sibling harness: OpenClaw/Hermes missing on rack.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- ~23:00 `overnight_git_flush.py`: clean; `maybe_run_ci` / `maybe_cut_github_release`: already done today.
 
-## Fuel note
+## Next fuel
 
-- Digester open empty; design-review grace; layout-daily day quota already used (Data Poster). Nightly keep-or-discard satisfied many times over.
-
-## Next
-
-- Dark layout-daily next calendar day; Mac capture when TCC allows; leftover light cream `#ffffff` mixes; sibling/product fuel — not keep-pNN clones.
+Dark layout-daily next calendar day; Mac capture when TCC allows; leftover light cream `#ffffff` mixes (logs-line soft-states · disk-cleanup soft-delete / empty · force-quit confirming · other muted type / remaining soft-states) if still muddy; sibling/product fuel — not keep-pNN.
