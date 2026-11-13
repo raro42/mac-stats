@@ -33623,3 +33623,171 @@ body.theme-architect .processes-top-ram-glance.is-ok {
   border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
   background: color-mix(in srgb, #34c759 7%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Agent Ops collapsed + Monitors Down/Slow
+ * attention glances still mixed Apple `#ffffff` (`.agent-ops-collapsed-glance`
+ * resting · hover · `:focus-visible` · ready · warn · offline · empty;
+ * `.monitors-attention-glance` resting · hover · `:focus-visible` · Down · Slow)
+ * while Data Poster / Dark / Neon / Futuristic remaps already exist. Opaque
+ * washes on cream paper so keep-header glances match light shells (Swiss /
+ * Apple keep shared `#ffffff`). Standing P2 #14 after light Top Processes
+ * glance remaps v0.1.2670.
+ */
+/* OVERNIGHT v0.1.2671: light Agent Ops collapsed + Monitors attention remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .agent-ops-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .agent-ops-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-light .agent-ops-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+}
+body.theme-light .agent-ops-collapsed-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+body.theme-light .agent-ops-collapsed-glance.is-warn {
+  border-color: color-mix(in srgb, #ff9500 28%, #f7f7fa);
+  background: color-mix(in srgb, #ff9500 7%, #f7f7fa);
+}
+body.theme-light .agent-ops-collapsed-glance.is-offline {
+  border-color: color-mix(in srgb, #ff3b30 28%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
+}
+body.theme-light .agent-ops-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #0c0c10 75%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .monitors-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .monitors-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-light .monitors-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+}
+body.theme-light .monitors-attention-glance.has-down {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-light .monitors-attention-glance.has-slow {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff9f0a 7%, #f7f7fa);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .agent-ops-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .agent-ops-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-material .agent-ops-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+}
+body.theme-material .agent-ops-collapsed-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+body.theme-material .agent-ops-collapsed-glance.is-warn {
+  border-color: color-mix(in srgb, #ff9500 28%, #ebe4d9);
+  background: color-mix(in srgb, #ff9500 7%, #ebe4d9);
+}
+body.theme-material .agent-ops-collapsed-glance.is-offline {
+  border-color: color-mix(in srgb, #ff3b30 28%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
+}
+body.theme-material .agent-ops-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #0c0c10 75%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .monitors-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .monitors-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-material .monitors-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+}
+body.theme-material .monitors-attention-glance.has-down {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-material .monitors-attention-glance.has-slow {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff9f0a 7%, #ebe4d9);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .agent-ops-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .agent-ops-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+body.theme-architect .agent-ops-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+}
+body.theme-architect .agent-ops-collapsed-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}
+body.theme-architect .agent-ops-collapsed-glance.is-warn {
+  border-color: color-mix(in srgb, #ff9500 28%, #f1f1f1);
+  background: color-mix(in srgb, #ff9500 7%, #f1f1f1);
+}
+body.theme-architect .agent-ops-collapsed-glance.is-offline {
+  border-color: color-mix(in srgb, #ff3b30 28%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+}
+body.theme-architect .agent-ops-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #0c0c10 75%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .monitors-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .monitors-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+body.theme-architect .monitors-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+}
+body.theme-architect .monitors-attention-glance.has-down {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-architect .monitors-attention-glance.has-slow {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff9f0a 7%, #f1f1f1);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
+}

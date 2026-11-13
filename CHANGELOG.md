@@ -1,6 +1,12 @@
 ## [Unreleased]
 
 
+## [0.1.2671] - 2026-11-13
+
+### Changed
+
+- **Light Agent Ops collapsed + Monitors attention washes:** Light / Material / Architect `.agent-ops-collapsed-glance` (resting · hover · `:focus-visible` · ready · warn · offline · empty) and `.monitors-attention-glance` (resting · hover · `:focus-visible` · Down · Slow) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so keep-header glances match cream shells (after Top Processes glance remaps v0.1.2670).
+
 ### Added
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
