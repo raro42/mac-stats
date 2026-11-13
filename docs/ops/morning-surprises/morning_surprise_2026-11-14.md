@@ -1,18 +1,16 @@
 # Morning surprise — 2026-11-14
 
-Overnight autoresearch (Track B) kept product polish on Standing P2 #14 cream remaps.
+Overnight autoresearch (Track B) kept **v0.1.2692**.
 
 ## Shipped
 
-- **v0.1.2691** — Light / Material / Architect Monitors URL/detail + Debug Log path `:focus-visible` outlines onto cream paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1`).
-- Earlier same window: **v0.1.2690** Monitors summary + muted captions; **v0.1.2689** Processes + Disk Cleanup path focus (and prior light focus/caption remaps through the night).
+- **Light Monitors row soft-state washes** on Light / Material / Architect: `.monitor-item` selected · Down · Slow · focus · Copied no longer mix Apple `#ffffff` on cream paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1`). Data Poster / Dark / Neon / Futuristic already had remaps; Swiss / Apple keep shared white.
 
-## Tried / context
+## Context
 
-- Digester open empty; design-review grace; layout-daily Data Poster already marked for 2026-11-13.
-- Fuel: standing backlog leftover light `#ffffff` focus mixes (not keep-pNN).
+- Digester empty; design-review still in grace; layout-daily already marked for today.
+- Standing P2 #14 cream remaps continue; next leftovers include Ops tabs and checking/pending type mixes.
 
-## Next
+## Skip asking
 
-- Dark layout-daily when the next calendar day quota opens.
-- Leftover light monitor row hover / Ops tabs / other muted type if still muddy.
+Ralf: open Monitors on Light (or Material / Architect), select a row or hit a Down/Slow URL — the wash should sit on paper, not a white slab.
