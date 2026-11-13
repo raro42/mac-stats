@@ -37098,3 +37098,94 @@ body.theme-architect #chat-send-btn.is-just-saved {
   background: color-mix(in srgb, #34c759 95%, #f1f1f1) !important;
   border-color: color-mix(in srgb, #34c759 95%, #f1f1f1) !important;
 }
+
+/*
+ * Light / Material / Architect: Top Processes row soft-states still mix Apple
+ * `#ffffff` (`.process-row:hover` · `:active` · `.is-pinned` · `.is-just-copied`
+ * · Copied badge · `.process-name.is-just-saved` · `.process-detail-name` /
+ * `.process-detail-pid.is-just-saved`) while Data Poster / Dark / Neon /
+ * Futuristic remaps already exist (focus-visible already paper in v0.1.2689;
+ * process-pin remapped in v0.1.2702). Opaque washes on cream paper so row
+ * hover / pin / Copied / Saved flashes match light shells (Swiss / Apple keep
+ * shared `#ffffff`). Standing P2 #14 after Perplexity Search + Clear/Send
+ * saved-flash remaps v0.1.2705.
+ */
+/* OVERNIGHT v0.1.2706: light process-row soft-state remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .process-row:hover {
+  background: color-mix(in srgb, currentColor 8%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .process-row:active {
+  background: color-mix(in srgb, currentColor 12%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .process-row.is-pinned {
+  background: color-mix(in srgb, #0a84ff 6%, #f7f7fa);
+}
+body.theme-light .process-row.is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .process-row.is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #f7f7fa);
+}
+body.theme-light .process-name.is-just-saved,
+body.theme-light .process-detail-name.is-just-saved,
+body.theme-light .process-detail-pid.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #f7f7fa);
+  box-shadow: none;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .process-row:hover {
+  background: color-mix(in srgb, currentColor 8%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .process-row:active {
+  background: color-mix(in srgb, currentColor 12%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .process-row.is-pinned {
+  background: color-mix(in srgb, #0a84ff 6%, #ebe4d9);
+}
+body.theme-material .process-row.is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .process-row.is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #ebe4d9);
+}
+body.theme-material .process-name.is-just-saved,
+body.theme-material .process-detail-name.is-just-saved,
+body.theme-material .process-detail-pid.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #ebe4d9);
+  box-shadow: none;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .process-row:hover {
+  background: color-mix(in srgb, currentColor 8%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .process-row:active {
+  background: color-mix(in srgb, currentColor 12%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .process-row.is-pinned {
+  background: color-mix(in srgb, #0a84ff 6%, #f1f1f1);
+}
+body.theme-architect .process-row.is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .process-row.is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #f1f1f1);
+}
+body.theme-architect .process-name.is-just-saved,
+body.theme-architect .process-detail-name.is-just-saved,
+body.theme-architect .process-detail-pid.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #f1f1f1);
+  box-shadow: none;
+}

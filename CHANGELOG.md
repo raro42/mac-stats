@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2706] - 2026-11-13
+
+### Changed
+
+- **Light process-row soft-state washes:** Light / Material / Architect `.process-row:hover` · `:active` · `.is-pinned` · `.is-just-copied` · Copied badge · `.process-name.is-just-saved` · `.process-detail-name` / `.process-detail-pid.is-just-saved` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; focus-visible already paper in v0.1.2689; process-pin remapped in v0.1.2702; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Top Processes hover / pin / Copied / Saved flashes match cream shells (after Perplexity Search + Clear/Send saved-flash remaps v0.1.2705).
+
 ## [0.1.2705] - 2026-11-13
 
 ### Changed
