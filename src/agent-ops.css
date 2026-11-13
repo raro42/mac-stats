@@ -34895,3 +34895,73 @@ body.theme-architect .monitor-item.is-down .monitor-checked-ago {
   color: color-mix(in srgb, #0c0c10 75%, #f1f1f1);
   opacity: 1;
 }
+
+/*
+ * Light / Material / Architect: remaining muted labels still mix Apple `#ffffff`
+ * (`.force-quit-hint` · `.disk-cleanup-soft-hint` · `.disk-cleanup-meta-label` ·
+ * `.process-detail-section .process-detail-label` · `.process-detail-pid` ·
+ * `.disk-cleanup-item-policy` · `.disk-cleanup-item-samples` ·
+ * `.disk-cleanup-scope-kind` · `.perplexity-result-meta` ·
+ * `.force-quit-advanced > summary`) while path/meta captions already mix on cream
+ * paper. Opaque type so Force Quit tip, Disk Cleanup meta, Process Detail rows,
+ * and Perplexity result meta match light shells (Swiss / Apple keep shared
+ * `#ffffff`). Standing P2 #14 after light muted path/meta remaps v0.1.2681.
+ */
+/* OVERNIGHT v0.1.2682: light muted label remaps (Force Quit · Disk Cleanup meta · Process Detail · Perplexity) */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .force-quit-hint,
+body.theme-light .disk-cleanup-soft-hint,
+body.theme-light .disk-cleanup-meta-label,
+body.theme-light .process-detail-section .process-detail-label,
+body.theme-light .process-detail-pid,
+body.theme-light .disk-cleanup-item-policy,
+body.theme-light .disk-cleanup-item-samples,
+body.theme-light .disk-cleanup-scope-kind,
+body.theme-light .perplexity-result-meta,
+body.theme-light .force-quit-advanced > summary {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .force-quit-advanced > summary::before {
+  color: color-mix(in srgb, #0c0c10 44%, #f7f7fa);
+  opacity: 1;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .force-quit-hint,
+body.theme-material .disk-cleanup-soft-hint,
+body.theme-material .disk-cleanup-meta-label,
+body.theme-material .process-detail-section .process-detail-label,
+body.theme-material .process-detail-pid,
+body.theme-material .disk-cleanup-item-policy,
+body.theme-material .disk-cleanup-item-samples,
+body.theme-material .disk-cleanup-scope-kind,
+body.theme-material .perplexity-result-meta,
+body.theme-material .force-quit-advanced > summary {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .force-quit-advanced > summary::before {
+  color: color-mix(in srgb, #0c0c10 44%, #ebe4d9);
+  opacity: 1;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .force-quit-hint,
+body.theme-architect .disk-cleanup-soft-hint,
+body.theme-architect .disk-cleanup-meta-label,
+body.theme-architect .process-detail-section .process-detail-label,
+body.theme-architect .process-detail-pid,
+body.theme-architect .disk-cleanup-item-policy,
+body.theme-architect .disk-cleanup-item-samples,
+body.theme-architect .disk-cleanup-scope-kind,
+body.theme-architect .perplexity-result-meta,
+body.theme-architect .force-quit-advanced > summary {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .force-quit-advanced > summary::before {
+  color: color-mix(in srgb, #0c0c10 44%, #f1f1f1);
+  opacity: 1;
+}

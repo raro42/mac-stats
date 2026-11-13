@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2682] - 2026-11-13
+
+### Changed
+
+- **Light muted label washes:** Light / Material / Architect `.force-quit-hint` · `.disk-cleanup-soft-hint` · `.disk-cleanup-meta-label` · `.process-detail-section .process-detail-label` · `.process-detail-pid` · `.disk-cleanup-item-policy` · `.disk-cleanup-item-samples` · `.disk-cleanup-scope-kind` · `.perplexity-result-meta` · `.force-quit-advanced > summary` (plus summary `::before`) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Force Quit tip, Disk Cleanup meta, Process Detail rows, and Perplexity result meta match cream shells (after muted path/meta remaps v0.1.2681).
+
 ## [0.1.2681] - 2026-11-13
 
 ### Changed
