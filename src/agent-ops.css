@@ -34344,3 +34344,137 @@ body.theme-architect .perplexity-key-attention-glance.is-not-set {
   background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
+
+/* OVERNIGHT v0.1.2675: light Disk Cleanup attention + filter-attention remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .disk-cleanup-attention-glance,
+body.theme-light .disk-cleanup-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .disk-cleanup-attention-glance:hover,
+body.theme-light .disk-cleanup-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-attention-glance:focus-visible,
+body.theme-light .disk-cleanup-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #f7f7fa);
+  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+}
+body.theme-light .disk-cleanup-filter-attention-glance.is-reclaim-filter,
+body.theme-light .disk-cleanup-attention-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #f7f7fa);
+  background: color-mix(in srgb, #ff9f0a 6%, #f7f7fa);
+  color: color-mix(in srgb, #ff9f0a 45%, currentColor);
+}
+body.theme-light .disk-cleanup-filter-attention-glance.is-big-filter,
+body.theme-light .disk-cleanup-attention-glance.has-big {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff9f0a 7%, #f7f7fa);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
+}
+body.theme-light .disk-cleanup-filter-attention-glance.is-clean-filter {
+  border-color: color-mix(in srgb, #30d158 28%, #f7f7fa);
+  background: color-mix(in srgb, #30d158 7%, #f7f7fa);
+  color: color-mix(in srgb, #30d158 45%, currentColor);
+}
+body.theme-light .disk-cleanup-attention-glance.is-due {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+  color: color-mix(in srgb, #34c759 50%, currentColor);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .disk-cleanup-attention-glance,
+body.theme-material .disk-cleanup-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .disk-cleanup-attention-glance:hover,
+body.theme-material .disk-cleanup-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-attention-glance:focus-visible,
+body.theme-material .disk-cleanup-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #ebe4d9);
+  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+}
+body.theme-material .disk-cleanup-filter-attention-glance.is-reclaim-filter,
+body.theme-material .disk-cleanup-attention-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #ebe4d9);
+  background: color-mix(in srgb, #ff9f0a 6%, #ebe4d9);
+  color: color-mix(in srgb, #ff9f0a 45%, currentColor);
+}
+body.theme-material .disk-cleanup-filter-attention-glance.is-big-filter,
+body.theme-material .disk-cleanup-attention-glance.has-big {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff9f0a 7%, #ebe4d9);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
+}
+body.theme-material .disk-cleanup-filter-attention-glance.is-clean-filter {
+  border-color: color-mix(in srgb, #30d158 28%, #ebe4d9);
+  background: color-mix(in srgb, #30d158 7%, #ebe4d9);
+  color: color-mix(in srgb, #30d158 45%, currentColor);
+}
+body.theme-material .disk-cleanup-attention-glance.is-due {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+  color: color-mix(in srgb, #34c759 50%, currentColor);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .disk-cleanup-attention-glance,
+body.theme-architect .disk-cleanup-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .disk-cleanup-attention-glance:hover,
+body.theme-architect .disk-cleanup-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-attention-glance:focus-visible,
+body.theme-architect .disk-cleanup-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #f1f1f1);
+  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+}
+body.theme-architect .disk-cleanup-filter-attention-glance.is-reclaim-filter,
+body.theme-architect .disk-cleanup-attention-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #f1f1f1);
+  background: color-mix(in srgb, #ff9f0a 6%, #f1f1f1);
+  color: color-mix(in srgb, #ff9f0a 45%, currentColor);
+}
+body.theme-architect .disk-cleanup-filter-attention-glance.is-big-filter,
+body.theme-architect .disk-cleanup-attention-glance.has-big {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff9f0a 7%, #f1f1f1);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
+}
+body.theme-architect .disk-cleanup-filter-attention-glance.is-clean-filter {
+  border-color: color-mix(in srgb, #30d158 28%, #f1f1f1);
+  background: color-mix(in srgb, #30d158 7%, #f1f1f1);
+  color: color-mix(in srgb, #30d158 45%, currentColor);
+}
+body.theme-architect .disk-cleanup-attention-glance.is-due {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+  color: color-mix(in srgb, #34c759 50%, currentColor);
+}

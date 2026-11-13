@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2675] - 2026-11-13
+
+### Changed
+
+- **Light Disk Cleanup attention washes:** Light / Material / Architect `.disk-cleanup-attention-glance` (resting · hover · `:focus-visible` · reclaim · big · due) and `.disk-cleanup-filter-attention-glance` (resting · hover · `:focus-visible` · filter · reclaim · big · clean) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Disk Cleanup attention matches cream shells (after Perplexity attention remaps v0.1.2674).
+
 
 ## [0.1.2674] - 2026-11-13
 
