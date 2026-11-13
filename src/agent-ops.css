@@ -36052,3 +36052,67 @@ body.theme-architect .btn-secondary.ops-refresh:focus-visible,
 body.theme-architect .agent-ops-section .btn-secondary:focus-visible {
   outline-color: color-mix(in srgb, currentColor 35%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Ops Close still mixes Apple `#ffffff`
+ * (`.ops-close-btn` resting · hover · `:focus-visible`) while Data Poster /
+ * Dark / Neon / Futuristic remaps already exist. Opaque washes on cream paper
+ * so Ops Close matches light shells (Swiss / Apple keep shared `#ffffff`).
+ * Standing P2 #14 after light Ops disabled Save + secondary Refresh remaps
+ * v0.1.2696.
+ */
+/* OVERNIGHT v0.1.2697: light Ops Close remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .ops-close-btn {
+  background: color-mix(in srgb, currentColor 4%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 14%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 62%, #f7f7fa);
+}
+body.theme-light .ops-close-btn:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 8%, #f7f7fa);
+}
+body.theme-light .ops-close-btn:focus-visible {
+  outline: none;
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 8%, #f7f7fa);
+  border-color: color-mix(in srgb, #0a84ff 55%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .ops-close-btn {
+  background: color-mix(in srgb, currentColor 4%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 14%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 62%, #ebe4d9);
+}
+body.theme-material .ops-close-btn:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 8%, #ebe4d9);
+}
+body.theme-material .ops-close-btn:focus-visible {
+  outline: none;
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 8%, #ebe4d9);
+  border-color: color-mix(in srgb, #0a84ff 55%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .ops-close-btn {
+  background: color-mix(in srgb, currentColor 4%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 14%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 62%, #f1f1f1);
+}
+body.theme-architect .ops-close-btn:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 8%, #f1f1f1);
+}
+body.theme-architect .ops-close-btn:focus-visible {
+  outline: none;
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 8%, #f1f1f1);
+  border-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f1f1f1);
+}

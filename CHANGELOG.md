@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2697] - 2026-11-13
+
+### Changed
+
+- **Light Ops Close washes:** Light / Material / Architect `.ops-close-btn` (resting · hover · `:focus-visible`) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Ops Close matches cream shells (after Ops disabled Save + secondary Refresh remaps v0.1.2696).
+
 ## [0.1.2696] - 2026-11-13
 
 ### Changed
