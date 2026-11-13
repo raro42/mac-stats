@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2696] - 2026-11-13
+
+### Changed
+
+- **Light Ops disabled Save + secondary Refresh washes:** Light / Material / Architect `.ops-agent-edit-actions .btn-primary:disabled` · `.btn-secondary.ops-refresh` / `.agent-ops-section .btn-secondary` (resting · hover · `:focus-visible`) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Ops action chrome matches cream shells (after removing + Ops editor meta/focus remaps v0.1.2695).
+
 ## [0.1.2695] - 2026-11-13
 
 ### Changed

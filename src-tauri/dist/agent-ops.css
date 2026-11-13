@@ -35981,3 +35981,74 @@ body.theme-architect .ops-agent-save-status {
 body.theme-architect .ops-detail-meta {
   color: color-mix(in srgb, #0c0c10 66%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Ops disabled Save + secondary Refresh still mix
+ * Apple `#ffffff` (`.ops-agent-edit-actions .btn-primary:disabled` ·
+ * `.btn-secondary.ops-refresh` / `.agent-ops-section .btn-secondary` resting ·
+ * hover · `:focus-visible`) while Data Poster / Dark / Neon / Futuristic remaps
+ * already exist. Opaque washes on cream paper so Ops action chrome matches light
+ * shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
+ * removing + Ops editor meta/focus remaps v0.1.2695.
+ */
+/* OVERNIGHT v0.1.2696: light Ops disabled primary + btn-secondary remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .ops-agent-edit-actions .btn-primary:disabled {
+  background: color-mix(in srgb, #2196f3 36%, #f7f7fa);
+  color: color-mix(in srgb, #f7f7fa 45%, #2196f3);
+}
+body.theme-light .btn-secondary.ops-refresh,
+body.theme-light .agent-ops-section .btn-secondary {
+  background: color-mix(in srgb, currentColor 8%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 14%, #f7f7fa);
+}
+body.theme-light .btn-secondary.ops-refresh:hover,
+body.theme-light .agent-ops-section .btn-secondary:hover {
+  background: color-mix(in srgb, currentColor 12%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 22%, #f7f7fa);
+}
+body.theme-light .btn-secondary.ops-refresh:focus-visible,
+body.theme-light .agent-ops-section .btn-secondary:focus-visible {
+  outline-color: color-mix(in srgb, currentColor 35%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .ops-agent-edit-actions .btn-primary:disabled {
+  background: color-mix(in srgb, #2196f3 36%, #ebe4d9);
+  color: color-mix(in srgb, #ebe4d9 45%, #2196f3);
+}
+body.theme-material .btn-secondary.ops-refresh,
+body.theme-material .agent-ops-section .btn-secondary {
+  background: color-mix(in srgb, currentColor 8%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 14%, #ebe4d9);
+}
+body.theme-material .btn-secondary.ops-refresh:hover,
+body.theme-material .agent-ops-section .btn-secondary:hover {
+  background: color-mix(in srgb, currentColor 12%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 22%, #ebe4d9);
+}
+body.theme-material .btn-secondary.ops-refresh:focus-visible,
+body.theme-material .agent-ops-section .btn-secondary:focus-visible {
+  outline-color: color-mix(in srgb, currentColor 35%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .ops-agent-edit-actions .btn-primary:disabled {
+  background: color-mix(in srgb, #2196f3 36%, #f1f1f1);
+  color: color-mix(in srgb, #f1f1f1 45%, #2196f3);
+}
+body.theme-architect .btn-secondary.ops-refresh,
+body.theme-architect .agent-ops-section .btn-secondary {
+  background: color-mix(in srgb, currentColor 8%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 14%, #f1f1f1);
+}
+body.theme-architect .btn-secondary.ops-refresh:hover,
+body.theme-architect .agent-ops-section .btn-secondary:hover {
+  background: color-mix(in srgb, currentColor 12%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 22%, #f1f1f1);
+}
+body.theme-architect .btn-secondary.ops-refresh:focus-visible,
+body.theme-architect .agent-ops-section .btn-secondary:focus-visible {
+  outline-color: color-mix(in srgb, currentColor 35%, #f1f1f1);
+}
