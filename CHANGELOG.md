@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2704] - 2026-11-13
+
+### Changed
+
+- **Light Clear / GitHub soft-states + Disk Cleanup Scan washes:** Light / Material / Architect `#chat-clear-btn` (resting · hover · `:disabled`) · `#github-link:hover` · `[aria-busy]` / `[aria-disabled]` · `.disk-cleanup-toolbar .disk-cleanup-primary` (resting · hover · `:disabled`) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Clear/GitHub focus rings already paper in v0.1.2701; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so composer Clear, footer GitHub busy/hover, and Disk Cleanup Scan match cream shells (after Disk Cleanup meta-card + last remaps v0.1.2703).
+
 ## [0.1.2703] - 2026-11-13
 
 ### Changed

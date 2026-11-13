@@ -36908,3 +36908,117 @@ body.theme-architect .disk-cleanup-last.is-action.is-ok:not(.has-skip) {
 body.theme-architect .disk-cleanup-last.is-action.is-ok:not(.has-skip):focus-visible {
   outline-color: color-mix(in srgb, #34c759 55%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Clear / GitHub soft-states + Disk Cleanup Scan
+ * primary still mix Apple `#ffffff` (`#chat-clear-btn` resting · hover ·
+ * `:disabled`; `#github-link:hover` · `[aria-busy]` / `[aria-disabled]`;
+ * `.disk-cleanup-toolbar .disk-cleanup-primary` resting · hover · `:disabled`)
+ * while Data Poster / Dark / Neon / Futuristic remaps already exist (focus rings
+ * for Clear/GitHub already paper in v0.1.2701). Opaque washes on cream paper so
+ * composer Clear, footer GitHub busy/hover, and Disk Cleanup Scan match light
+ * shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
+ * Disk Cleanup meta-card + last remaps v0.1.2703.
+ */
+/* OVERNIGHT v0.1.2704: light Clear/GitHub soft-states + Disk Cleanup Scan */
+/* --- light (#f7f7fa) --- */
+body.theme-light #chat-clear-btn {
+  background: color-mix(in srgb, currentColor 8%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 18%, #f7f7fa);
+}
+body.theme-light #chat-clear-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 28%, #f7f7fa);
+}
+body.theme-light #chat-clear-btn:disabled {
+  color: color-mix(in srgb, #0c0c10 40%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light #github-link:hover {
+  background: color-mix(in srgb, currentColor 10%, #f7f7fa);
+}
+body.theme-light #github-link[aria-busy="true"],
+body.theme-light #github-link[aria-disabled="true"] {
+  color: color-mix(in srgb, #0c0c10 62%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .disk-cleanup-toolbar .disk-cleanup-primary {
+  background: color-mix(in srgb, #0a84ff 14%, #f7f7fa);
+  border-color: color-mix(in srgb, #0a84ff 30%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-toolbar .disk-cleanup-primary:hover {
+  background: color-mix(in srgb, #0a84ff 22%, #f7f7fa);
+  border-color: color-mix(in srgb, #0a84ff 42%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
+  color: color-mix(in srgb, #0c0c10 48%, #f7f7fa);
+  opacity: 1;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material #chat-clear-btn {
+  background: color-mix(in srgb, currentColor 8%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 18%, #ebe4d9);
+}
+body.theme-material #chat-clear-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 28%, #ebe4d9);
+}
+body.theme-material #chat-clear-btn:disabled {
+  color: color-mix(in srgb, #0c0c10 40%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material #github-link:hover {
+  background: color-mix(in srgb, currentColor 10%, #ebe4d9);
+}
+body.theme-material #github-link[aria-busy="true"],
+body.theme-material #github-link[aria-disabled="true"] {
+  color: color-mix(in srgb, #0c0c10 62%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .disk-cleanup-toolbar .disk-cleanup-primary {
+  background: color-mix(in srgb, #0a84ff 14%, #ebe4d9);
+  border-color: color-mix(in srgb, #0a84ff 30%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-toolbar .disk-cleanup-primary:hover {
+  background: color-mix(in srgb, #0a84ff 22%, #ebe4d9);
+  border-color: color-mix(in srgb, #0a84ff 42%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
+  color: color-mix(in srgb, #0c0c10 48%, #ebe4d9);
+  opacity: 1;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect #chat-clear-btn {
+  background: color-mix(in srgb, currentColor 8%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
+}
+body.theme-architect #chat-clear-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 28%, #f1f1f1);
+}
+body.theme-architect #chat-clear-btn:disabled {
+  color: color-mix(in srgb, #0c0c10 40%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect #github-link:hover {
+  background: color-mix(in srgb, currentColor 10%, #f1f1f1);
+}
+body.theme-architect #github-link[aria-busy="true"],
+body.theme-architect #github-link[aria-disabled="true"] {
+  color: color-mix(in srgb, #0c0c10 62%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .disk-cleanup-toolbar .disk-cleanup-primary {
+  background: color-mix(in srgb, #0a84ff 14%, #f1f1f1);
+  border-color: color-mix(in srgb, #0a84ff 30%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-toolbar .disk-cleanup-primary:hover {
+  background: color-mix(in srgb, #0a84ff 22%, #f1f1f1);
+  border-color: color-mix(in srgb, #0a84ff 42%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
+  color: color-mix(in srgb, #0c0c10 48%, #f1f1f1);
+  opacity: 1;
+}
