@@ -37491,3 +37491,27 @@ body.theme-architect .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
   color: color-mix(in srgb, #0c0c10 70%, #f1f1f1);
   opacity: 1;
 }
+/*
+ * Light / Material / Architect: Debug Log empty type still mixes Apple
+ * `#ffffff` (`.logs-viewer.is-empty:not(:has(.logs-filter-miss))`) while Data
+ * Poster / Dark / Neon / Futuristic remaps already exist. Opaque type on cream
+ * paper so empty Debug Log copy matches light shells (Swiss / Apple keep
+ * shared `#ffffff`). Standing P2 #14 after light Disk Cleanup empty +
+ * disabled/Recurse remaps v0.1.2710.
+ */
+/* OVERNIGHT v0.1.2711: light logs-viewer empty remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .logs-viewer.is-empty:not(:has(.logs-filter-miss)) {
+  color: color-mix(in srgb, #0c0c10 66%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .logs-viewer.is-empty:not(:has(.logs-filter-miss)) {
+  color: color-mix(in srgb, #0c0c10 66%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .logs-viewer.is-empty:not(:has(.logs-filter-miss)) {
+  color: color-mix(in srgb, #0c0c10 66%, #f1f1f1);
+}

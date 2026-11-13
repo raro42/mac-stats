@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2711] - 2026-11-14
+
+### Changed
+
+- **Light Debug Log empty type:** Light / Material / Architect `.logs-viewer.is-empty:not(:has(.logs-filter-miss))` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so empty Debug Log copy matches cream shells (after Disk Cleanup empty + disabled/Recurse remaps v0.1.2710; race-discard re-pick).
+
 ## [0.1.2710] - 2026-11-14
 
 ### Changed
