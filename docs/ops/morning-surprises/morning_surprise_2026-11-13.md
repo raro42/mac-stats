@@ -1,19 +1,20 @@
 # Morning surprise — 2026-11-13
 
-Overnight autoresearch kept product polish on Light / Material / Architect cream shells (Standing P2 #14). Digester stayed empty; design-review in grace; layout-daily Data Poster already marked for the day.
+Overnight autoresearch kept **v0.1.2680** (and earlier keeps this window through **v0.1.2679**).
 
-## Shipped tonight
+## Shipped this tick
 
-- **v0.1.2679** — Process Detail / Force Quit / Logs / Perplexity / Changelog kb-hint remaps (`#ffffff` → paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`) so those chrome hints match cream shells.
-- **v0.1.2678** — Settings credential toolbar kb-hint remaps (modal + Discord·…·Slack / Ollama) on the same paper mixes (shipped earlier this window; keep row backfilled).
-- Earlier keeps in-window include Settings chrome kb-hints (v0.1.2677), Disk Cleanup / Perplexity / Logs / Processes attention and filter-miss washes, and related light cream remaps.
+- **v0.1.2680** — Light / Material / Architect section kb-hint remaps onto cream paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1`):
+  - `.icon-line-kb-hint` · `.footer-toolbar-kb-hint` · `.header-toolbar-kb-hint`
+  - Disk Cleanup: `.disk-cleanup-meta-kb-hint` · `.disk-cleanup-toolbar-kb-hint` · `.disk-cleanup-list-kb-hint` · `.disk-cleanup-add-scope-toolbar-kb-hint` · `.disk-cleanup-kb-hint`
+  - Monitors / Processes / Details: `.monitors-kb-hint` · `.processes-kb-hint` · `.details-kb-hint` · `.monitor-add-toolbar-kb-hint` · `.monitor-detail-toolbar-kb-hint`
+- Standing P2 #14 after Process Detail / Force Quit / Logs / Perplexity / Changelog kb-hints (**v0.1.2679**).
+- Digester open empty; design-review grace; layout-daily Data Poster already marked today.
 
-## Tried / discarded
+## Fitness
 
-- Parallel-race discards earlier in the night (overlapping light remaps lost to origin); re-picked the standing Next each time.
+Keyboard hints on cream shells no longer mix Apple `#ffffff` against paper — section chrome matches the rest of the light remaps.
 
-## Not a digester-only night
+## Next fuel
 
-Empty digester alone was not the surprise. Standing backlog cream remaps moved the ratchet with keep rows in `results.tsv`.
-
-_Refreshed 2026-11-13 03:59 CET._
+Dark layout-daily next calendar day / Mac capture when TCC allows / leftover light cream `#ffffff` mixes (muted captions / path meta) / sibling-product — not keep-pNN.
