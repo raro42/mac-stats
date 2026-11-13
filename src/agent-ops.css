@@ -35037,3 +35037,69 @@ body.theme-architect .response-time {
   color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
   opacity: 1;
 }
+
+/*
+ * Light / Material / Architect: metrics kb-hints + LPM busy type still mix
+ * Apple `#ffffff` (`.power-strip-kb-hint` · `.ring-gauge-kb-hint` ·
+ * `.history-sparkline-kb-hint` · `.lpm-info.is-busy` · label · value ·
+ * `.lpm-info.is-on.is-busy .lpm-value`) while setup/stat/caption remaps
+ * already mix on cream paper. Opaque type so Bat/LPM/Power hints, ring /
+ * sparkline kb rows, and Low Power Mode busy wash match light shells
+ * (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
+ * setup/stat/caption remaps v0.1.2683.
+ */
+/* OVERNIGHT v0.1.2684: light metrics kb-hint + LPM busy remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .power-strip-kb-hint,
+body.theme-light .ring-gauge-kb-hint,
+body.theme-light .history-sparkline-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .lpm-info.is-busy,
+body.theme-light .lpm-info.is-busy .lpm-label,
+body.theme-light .lpm-info.is-busy .lpm-value {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .lpm-info.is-on.is-busy .lpm-value {
+  color: color-mix(in srgb, #248a3d 72%, #f7f7fa);
+  opacity: 1;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .power-strip-kb-hint,
+body.theme-material .ring-gauge-kb-hint,
+body.theme-material .history-sparkline-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .lpm-info.is-busy,
+body.theme-material .lpm-info.is-busy .lpm-label,
+body.theme-material .lpm-info.is-busy .lpm-value {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .lpm-info.is-on.is-busy .lpm-value {
+  color: color-mix(in srgb, #248a3d 72%, #ebe4d9);
+  opacity: 1;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .power-strip-kb-hint,
+body.theme-architect .ring-gauge-kb-hint,
+body.theme-architect .history-sparkline-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .lpm-info.is-busy,
+body.theme-architect .lpm-info.is-busy .lpm-label,
+body.theme-architect .lpm-info.is-busy .lpm-value {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .lpm-info.is-on.is-busy .lpm-value {
+  color: color-mix(in srgb, #248a3d 72%, #f1f1f1);
+  opacity: 1;
+}

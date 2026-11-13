@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2684] - 2026-11-13
+
+### Changed
+
+- **Light metrics kb-hint + LPM busy washes:** Light / Material / Architect `.power-strip-kb-hint` · `.ring-gauge-kb-hint` · `.history-sparkline-kb-hint` · `.lpm-info.is-busy` (label · value) · `.lpm-info.is-on.is-busy .lpm-value` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Bat/LPM/Power hints, ring / sparkline kb rows, and Low Power Mode busy wash match cream shells (after setup/stat/caption remaps v0.1.2683).
+
 ## [0.1.2683] - 2026-11-13
 
 ### Changed
