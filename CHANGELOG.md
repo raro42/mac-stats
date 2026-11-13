@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2694] - 2026-11-13
+
+### Changed
+
+- **Light Monitors checking/pending + Ops kb-hint washes:** Light / Material / Architect `.monitor-item.is-checking` · `.is-pending` · `.ops-file-tab-kb-hint` · `.ops-agent-edit-actions-kb-hint` · `.ops-preview-row-kb-hint` · `.ops-insights-kb-hint` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Monitors checking/pending and Ops file/edit/preview/insights hints match cream shells (after Ops tab chrome + digit remaps v0.1.2693).
+
+
 ## [0.1.2693] - 2026-11-13
 
 ### Changed

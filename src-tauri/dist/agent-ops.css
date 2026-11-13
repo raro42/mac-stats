@@ -35863,3 +35863,47 @@ body.theme-architect .ops-file-tab.active:hover {
   background: color-mix(in srgb, var(--accent, #007aff) 10%, #f1f1f1);
   border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f1f1f1);
 }
+
+/* OVERNIGHT v0.1.2694: light Monitors checking/pending + Ops file/edit/preview kb-hint remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .monitor-item.is-checking {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+}
+body.theme-light .monitor-item.is-pending {
+  color: color-mix(in srgb, #0c0c10 69%, #f7f7fa);
+}
+body.theme-light .ops-file-tab-kb-hint,
+body.theme-light .ops-agent-edit-actions-kb-hint,
+body.theme-light .ops-preview-row-kb-hint,
+body.theme-light .ops-insights-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .monitor-item.is-checking {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+}
+body.theme-material .monitor-item.is-pending {
+  color: color-mix(in srgb, #0c0c10 69%, #ebe4d9);
+}
+body.theme-material .ops-file-tab-kb-hint,
+body.theme-material .ops-agent-edit-actions-kb-hint,
+body.theme-material .ops-preview-row-kb-hint,
+body.theme-material .ops-insights-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .monitor-item.is-checking {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+}
+body.theme-architect .monitor-item.is-pending {
+  color: color-mix(in srgb, #0c0c10 69%, #f1f1f1);
+}
+body.theme-architect .ops-file-tab-kb-hint,
+body.theme-architect .ops-agent-edit-actions-kb-hint,
+body.theme-architect .ops-preview-row-kb-hint,
+body.theme-architect .ops-insights-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+}
