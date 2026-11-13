@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2701] - 2026-11-13
+
+### Changed
+
+- **Light focus rings + Perplexity disabled + AI-off washes:** Light / Material / Architect `#cpu-usage-card:focus-visible` · `#github-link:focus-visible` · `#chat-clear-btn:focus-visible` · `#chat-send-btn:focus-visible` · `.disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible` · `#perplexity-search-btn:disabled` · `.icon-line-item.is-ai-off` (Material / Architect nested white; Light chip wash) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so keyboard focus / disabled Search / AI-off chips match cream shells (after Ops Insights card/lines + preview remaps v0.1.2700).
+
 ## [0.1.2700] - 2026-11-13
 
 ### Changed

@@ -36366,3 +36366,122 @@ body.theme-architect .ops-preview {
   background: color-mix(in srgb, currentColor 6%, #f1f1f1);
   border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: leftover focus rings + Perplexity disabled +
+ * AI-off nested white still mix Apple `#ffffff` (`#cpu-usage-card:focus-visible` ·
+ * `#github-link:focus-visible` · `#chat-clear-btn:focus-visible` ·
+ * `#chat-send-btn:focus-visible` · `.disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible` ·
+ * `#perplexity-search-btn:disabled` · `.icon-line-item.is-ai-off` Material /
+ * Architect nested glyph) while Data Poster / Dark / Neon / Futuristic remaps
+ * already exist (Light AI-off color only in v0.1.2700). Opaque washes on cream
+ * paper so keyboard focus / disabled Search / AI-off chips match light shells
+ * (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light Ops Insights
+ * card/lines + preview remaps v0.1.2700.
+ */
+/* OVERNIGHT v0.1.2701: light focus rings + perplexity disabled + AI-off remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light #cpu-usage-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #f7f7fa);
+}
+body.theme-light #github-link:focus-visible {
+  outline: 2px solid color-mix(in srgb, currentColor 45%, #f7f7fa);
+  outline-offset: 2px;
+}
+body.theme-light #chat-clear-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, #f7f7fa);
+  outline-offset: 2px;
+}
+body.theme-light #chat-send-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #f7f7fa);
+  outline-offset: 2px;
+}
+body.theme-light .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #f7f7fa);
+}
+body.theme-light #perplexity-search-btn:disabled {
+  color: color-mix(in srgb, #0c0c10 48%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
+  background: color-mix(in srgb, #ececf1 55%, #f7f7fa);
+  border-color: color-mix(in srgb, #e6e6ea 55%, #f7f7fa);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 42%, #f7f7fa) 55%, #f7f7fa);
+}
+body.theme-light .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
+  background: color-mix(in srgb, #e0e0e6 55%, #f7f7fa);
+  border-color: color-mix(in srgb, #dcdce2 55%, #f7f7fa);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 72%, #f7f7fa) 55%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material #cpu-usage-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #ebe4d9);
+}
+body.theme-material #github-link:focus-visible {
+  outline: 2px solid color-mix(in srgb, currentColor 45%, #ebe4d9);
+  outline-offset: 2px;
+}
+body.theme-material #chat-clear-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, #ebe4d9);
+  outline-offset: 2px;
+}
+body.theme-material #chat-send-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ebe4d9);
+  outline-offset: 2px;
+}
+body.theme-material .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #ebe4d9);
+}
+body.theme-material #perplexity-search-btn:disabled {
+  color: color-mix(in srgb, #0c0c10 48%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
+  background: color-mix(in srgb, #e4ddd2 55%, #ebe4d9);
+  border-color: color-mix(in srgb, #e6e6ea 55%, #ebe4d9);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 42%, #ebe4d9) 55%, #ebe4d9);
+}
+body.theme-material .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
+  background: color-mix(in srgb, #ddd6cb 55%, #ebe4d9);
+  border-color: color-mix(in srgb, #dcdce2 55%, #ebe4d9);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 72%, #ebe4d9) 55%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect #cpu-usage-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #f1f1f1);
+}
+body.theme-architect #github-link:focus-visible {
+  outline: 2px solid color-mix(in srgb, currentColor 45%, #f1f1f1);
+  outline-offset: 2px;
+}
+body.theme-architect #chat-clear-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, #f1f1f1);
+  outline-offset: 2px;
+}
+body.theme-architect #chat-send-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #f1f1f1);
+  outline-offset: 2px;
+}
+body.theme-architect .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #f1f1f1);
+}
+body.theme-architect #perplexity-search-btn:disabled {
+  color: color-mix(in srgb, #0c0c10 48%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
+  background: color-mix(in srgb, #e8e8e8 55%, #f1f1f1);
+  border-color: color-mix(in srgb, #e6e6ea 55%, #f1f1f1);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 42%, #f1f1f1) 55%, #f1f1f1);
+}
+body.theme-architect .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
+  background: color-mix(in srgb, #e0e0e0 55%, #f1f1f1);
+  border-color: color-mix(in srgb, #dcdce2 55%, #f1f1f1);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 72%, #f1f1f1) 55%, #f1f1f1);
+}
