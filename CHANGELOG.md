@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2686] - 2026-11-13
+
+### Changed
+
+- **Light metric-strip flash highlight washes:** Light / Material / Architect RAM · CPU · GPU · Temp · Freq · Disk · Uptime jump flashes (`.detail-label/.detail-value.is-ram-highlight` · `#cpu-usage-card.is-cpu-highlight` · `.metric-card.is-gpu-highlight` · `#gpu-power.is-gpu-highlight` · `.metric-card.is-temp-highlight` · `.metric-card.is-freq-highlight` · `.detail-label/.detail-value.is-uptime-highlight` · `.disk-cleanup-section.is-disk-highlight`) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so metric-strip flashes match cream shells (after metric-card + history Hot/Ok/Fair remaps v0.1.2685).
+
 ## [0.1.2685] - 2026-11-13
 
 ### Changed

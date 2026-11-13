@@ -35192,3 +35192,70 @@ body.theme-architect .history-chart-container.is-fair:not(.is-hot) {
   background-color: color-mix(in srgb, #ff9500 5%, #f1f1f1);
   box-shadow: none;
 }
+
+/*
+ * Light / Material / Architect: metric-strip flash highlights still mix
+ * Apple `#ffffff` (`.detail-label/.detail-value.is-ram-highlight` ·
+ * `#cpu-usage-card.is-cpu-highlight` · `.metric-card.is-gpu-highlight` ·
+ * `#gpu-power.is-gpu-highlight` · `.metric-card.is-temp-highlight` ·
+ * `.metric-card.is-freq-highlight` · `.detail-label/.detail-value.is-uptime-highlight` ·
+ * `.disk-cleanup-section.is-disk-highlight`) while Hot/Ok/Fair remaps already
+ * mix on cream paper. Opaque washes so jump-to flashes match light shells
+ * (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
+ * metric-card + history Hot/Ok/Fair remaps v0.1.2685.
+ */
+/* OVERNIGHT v0.1.2686: light metric-strip flash highlight remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .detail-label.is-ram-highlight,
+body.theme-light .detail-value.is-ram-highlight,
+body.theme-light #cpu-usage-card.is-cpu-highlight,
+body.theme-light .metric-card.is-gpu-highlight,
+body.theme-light #gpu-power.is-gpu-highlight,
+body.theme-light .metric-card.is-temp-highlight,
+body.theme-light .metric-card.is-freq-highlight,
+body.theme-light .detail-label.is-uptime-highlight,
+body.theme-light .detail-value.is-uptime-highlight {
+  background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-section.is-disk-highlight {
+  background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #f7f7fa);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .detail-label.is-ram-highlight,
+body.theme-material .detail-value.is-ram-highlight,
+body.theme-material #cpu-usage-card.is-cpu-highlight,
+body.theme-material .metric-card.is-gpu-highlight,
+body.theme-material #gpu-power.is-gpu-highlight,
+body.theme-material .metric-card.is-temp-highlight,
+body.theme-material .metric-card.is-freq-highlight,
+body.theme-material .detail-label.is-uptime-highlight,
+body.theme-material .detail-value.is-uptime-highlight {
+  background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-section.is-disk-highlight {
+  background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #ebe4d9);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .detail-label.is-ram-highlight,
+body.theme-architect .detail-value.is-ram-highlight,
+body.theme-architect #cpu-usage-card.is-cpu-highlight,
+body.theme-architect .metric-card.is-gpu-highlight,
+body.theme-architect #gpu-power.is-gpu-highlight,
+body.theme-architect .metric-card.is-temp-highlight,
+body.theme-architect .metric-card.is-freq-highlight,
+body.theme-architect .detail-label.is-uptime-highlight,
+body.theme-architect .detail-value.is-uptime-highlight {
+  background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-section.is-disk-highlight {
+  background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #f1f1f1);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #f1f1f1);
+}
