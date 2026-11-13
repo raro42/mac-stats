@@ -37373,3 +37373,62 @@ body.theme-architect .disk-cleanup-soft-delete:focus-within {
   border-color: color-mix(in srgb, #0a84ff 34%, #f1f1f1);
   box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #f1f1f1);
 }
+/*
+ * Light / Material / Architect: Debug Log line soft-states still mix Apple
+ * `#ffffff` (`.logs-line[role='option']` hover · `.is-selected` ·
+ * `.is-just-copied` · Copied badge) while Data Poster / Dark / Neon /
+ * Futuristic remaps already exist. Opaque washes on cream paper so Debug Log
+ * hover / select / Copied chrome matches light shells (Swiss / Apple keep
+ * shared `#ffffff`). Standing P2 #14 after light Force Quit confirming + Disk Cleanup soft-delete remaps
+ * v0.1.2708. Layout-daily Data Poster marked today (remaps none —
+ * polish-without-capture).
+ */
+/* OVERNIGHT v0.1.2709: light logs-line soft-state remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .logs-line[role='option']:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 8%, #f7f7fa);
+}
+body.theme-light .logs-line[role='option'].is-selected {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 28%, #f7f7fa);
+}
+body.theme-light .logs-line[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 18%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .logs-line[role='option'].is-just-copied::after {
+  color: color-mix(in srgb, #34c759 96%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .logs-line[role='option']:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 8%, #ebe4d9);
+}
+body.theme-material .logs-line[role='option'].is-selected {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 28%, #ebe4d9);
+}
+body.theme-material .logs-line[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 18%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .logs-line[role='option'].is-just-copied::after {
+  color: color-mix(in srgb, #34c759 96%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .logs-line[role='option']:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 8%, #f1f1f1);
+}
+body.theme-architect .logs-line[role='option'].is-selected {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 28%, #f1f1f1);
+}
+body.theme-architect .logs-line[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 18%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .logs-line[role='option'].is-just-copied::after {
+  color: color-mix(in srgb, #34c759 96%, #f1f1f1);
+}

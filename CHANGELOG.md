@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2709] - 2026-11-14
+
+### Changed
+
+- **Light logs-line soft-state washes:** Light / Material / Architect `.logs-line[role='option']` hover · `.is-selected` · `.is-just-copied` · Copied badge still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Debug Log hover / select / Copied chrome matches cream shells (after Force Quit confirming + Disk Cleanup soft-delete remaps v0.1.2708; layout-daily Data Poster marked today — remaps none / polish-without-capture; race-discard re-pick).
+
+
 ## [0.1.2708] - 2026-11-14
 
 ### Changed
