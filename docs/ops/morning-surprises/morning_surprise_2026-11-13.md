@@ -1,21 +1,18 @@
 # Morning surprise — 2026-11-13
 
-Overnight autoresearch kept **v0.1.2682** (and earlier keeps this window through **v0.1.2681**).
+Overnight autoresearch kept light cream-paper remaps so muted type stops floating on Apple white.
 
-## Shipped this tick
+## Shipped
 
-- **v0.1.2682** — Light / Material / Architect muted label remaps onto cream paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1`):
-  - Force Quit: `.force-quit-hint` · `.force-quit-advanced > summary` (+ `::before`)
-  - Disk Cleanup: `.disk-cleanup-soft-hint` · `.disk-cleanup-meta-label` · `.disk-cleanup-item-policy` · `.disk-cleanup-item-samples` · `.disk-cleanup-scope-kind`
-  - Process Detail: `.process-detail-section .process-detail-label` · `.process-detail-pid`
-  - Perplexity: `.perplexity-result-meta`
-- Standing P2 #14 after muted path/meta captions (**v0.1.2681**).
-- Digester open empty; design-review grace; layout-daily Data Poster already marked today.
+- **v0.1.2683** — Light / Material / Architect Disk Cleanup size lines, Perplexity setup lead/note (incl. error), Agent Ops filter caption, and AI Chat response-time (opaque on `#f7f7fa` / `#ebe4d9` / `#f1f1f1`).
+- Earlier same night (already on main before this tick): v0.1.2662–v0.1.2682 light glance / filter-miss / kb-hint / muted label remaps along the same paper path.
+
+## Tried / notes
+
+- Digester empty (no Werner runs in window). Design-review still in grace. Layout-daily Data Poster already marked today.
+- Backfilled missing v0.1.2682 keep row in results.tsv.
+- Next leftover: scan Light/Material/Architect muted type still mixed on Apple `#ffffff`.
 
 ## Fitness
 
-Muted Force Quit / Disk Cleanup meta / Process Detail / Perplexity labels on cream shells no longer mix Apple `#ffffff` against paper — they match the path/meta remaps.
-
-## Next fuel
-
-Dark layout-daily next calendar day / Mac capture when TCC allows / leftover light cream `#ffffff` mixes (item-stat · Perplexity setup · ops-filter-caption · response-time · metric captions) / sibling-product — not keep-pNN.
+Cream shells read cleaner: setup copy, size stats, filter caption, and latency ink match the paper, not a leftover Apple white mix.
