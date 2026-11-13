@@ -35737,3 +35737,129 @@ body.theme-architect .monitor-item.is-just-copied {
 body.theme-architect .monitor-item.is-just-copied::after {
   background: color-mix(in srgb, #34c759 55%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Agent Ops tabs still mix Apple `#ffffff`
+ * (`.agent-ops-tab` / `.ops-file-tab` resting · hover · `:focus-visible` ·
+ * `.active` · `.active:hover` · `.ops-tab-digit` · digit hover) while
+ * Data Poster / Dark / Neon / Futuristic remaps already exist (tab-count +
+ * tab-bar kb-hint already cream in v0.1.2649 / v0.1.2652). Opaque washes on
+ * cream paper so Ops tabs match light shells (Swiss / Apple keep shared
+ * `#ffffff`). Standing P2 #14 after light Monitors row soft-state remaps
+ * v0.1.2692.
+ */
+/* OVERNIGHT v0.1.2693: light Ops tab chrome + digit remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .ops-tab-digit {
+  color: color-mix(in srgb, #0c0c10 37%, #f7f7fa);
+}
+body.theme-light .agent-ops-tab:hover .ops-tab-digit,
+body.theme-light .ops-file-tab:hover .ops-tab-digit {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+}
+body.theme-light .agent-ops-tab,
+body.theme-light .ops-file-tab {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 12%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 70%, #f7f7fa);
+}
+body.theme-light .agent-ops-tab:hover,
+body.theme-light .ops-file-tab:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 20%, #f7f7fa);
+}
+body.theme-light .agent-ops-tab:focus-visible,
+body.theme-light .ops-file-tab:focus-visible {
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  border-color: color-mix(in srgb, #0a84ff 55%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f7f7fa);
+}
+body.theme-light .agent-ops-tab.active,
+body.theme-light .ops-file-tab.active {
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f7f7fa);
+  color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+}
+body.theme-light .agent-ops-tab.active:hover,
+body.theme-light .ops-file-tab.active:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .ops-tab-digit {
+  color: color-mix(in srgb, #0c0c10 37%, #ebe4d9);
+}
+body.theme-material .agent-ops-tab:hover .ops-tab-digit,
+body.theme-material .ops-file-tab:hover .ops-tab-digit {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+}
+body.theme-material .agent-ops-tab,
+body.theme-material .ops-file-tab {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 12%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 70%, #ebe4d9);
+}
+body.theme-material .agent-ops-tab:hover,
+body.theme-material .ops-file-tab:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 20%, #ebe4d9);
+}
+body.theme-material .agent-ops-tab:focus-visible,
+body.theme-material .ops-file-tab:focus-visible {
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+  border-color: color-mix(in srgb, #0a84ff 55%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ebe4d9);
+}
+body.theme-material .agent-ops-tab.active,
+body.theme-material .ops-file-tab.active {
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ebe4d9);
+  color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
+}
+body.theme-material .agent-ops-tab.active:hover,
+body.theme-material .ops-file-tab.active:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .ops-tab-digit {
+  color: color-mix(in srgb, #0c0c10 37%, #f1f1f1);
+}
+body.theme-architect .agent-ops-tab:hover .ops-tab-digit,
+body.theme-architect .ops-file-tab:hover .ops-tab-digit {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+}
+body.theme-architect .agent-ops-tab,
+body.theme-architect .ops-file-tab {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 12%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 70%, #f1f1f1);
+}
+body.theme-architect .agent-ops-tab:hover,
+body.theme-architect .ops-file-tab:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 20%, #f1f1f1);
+}
+body.theme-architect .agent-ops-tab:focus-visible,
+body.theme-architect .ops-file-tab:focus-visible {
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+  border-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f1f1f1);
+}
+body.theme-architect .agent-ops-tab.active,
+body.theme-architect .ops-file-tab.active {
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
+  color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
+}
+body.theme-architect .agent-ops-tab.active:hover,
+body.theme-architect .ops-file-tab.active:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f1f1f1);
+}

@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2693] - 2026-11-13
+
+### Changed
+
+- **Light Ops tab chrome + digit washes:** Light / Material / Architect `.agent-ops-tab` / `.ops-file-tab` (resting · hover · `:focus-visible` · `.active` · `.active:hover`) · `.ops-tab-digit` (resting · hover) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; tab-count + tab-bar kb-hint already cream; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Agent Ops tabs match cream shells (after Monitors row soft-state remaps v0.1.2692).
+
 ## [0.1.2692] - 2026-11-13
 
 ### Changed
