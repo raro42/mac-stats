@@ -34640,3 +34640,69 @@ body.theme-architect .credentials-section-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
   opacity: 1;
 }
+
+/*
+ * Light / Material / Architect: Settings credential toolbar + modal-header
+ * kb-hints still mix Apple `#ffffff` (`.modal-header-kb-hint` ·
+ * `.discord-toolbar-kb-hint` · `.perplexity-settings-toolbar-kb-hint` ·
+ * `.brave-settings-toolbar-kb-hint` · `.redmine-settings-toolbar-kb-hint` ·
+ * `.mastodon-settings-toolbar-kb-hint` · `.mcp-settings-toolbar-kb-hint` ·
+ * `.browser-settings-toolbar-kb-hint` · `.cursor-agent-settings-toolbar-kb-hint` ·
+ * `.telegram-settings-toolbar-kb-hint` · `.slack-settings-toolbar-kb-hint` ·
+ * `.ollama-settings-toolbar-kb-hint`) while Data Poster / Dark / Neon /
+ * Futuristic remaps already exist. Opaque type on cream paper so credential
+ * row hints match light shells (Swiss / Apple keep shared `#ffffff`). Standing
+ * P2 #14 after light Settings chrome kb-hint remaps v0.1.2677.
+ */
+/* OVERNIGHT v0.1.2678: light Settings credential toolbar kb-hint remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .modal-header-kb-hint,
+body.theme-light .discord-toolbar-kb-hint,
+body.theme-light .perplexity-settings-toolbar-kb-hint,
+body.theme-light .brave-settings-toolbar-kb-hint,
+body.theme-light .redmine-settings-toolbar-kb-hint,
+body.theme-light .mastodon-settings-toolbar-kb-hint,
+body.theme-light .mcp-settings-toolbar-kb-hint,
+body.theme-light .browser-settings-toolbar-kb-hint,
+body.theme-light .cursor-agent-settings-toolbar-kb-hint,
+body.theme-light .telegram-settings-toolbar-kb-hint,
+body.theme-light .slack-settings-toolbar-kb-hint,
+body.theme-light .ollama-settings-toolbar-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+  opacity: 1;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .modal-header-kb-hint,
+body.theme-material .discord-toolbar-kb-hint,
+body.theme-material .perplexity-settings-toolbar-kb-hint,
+body.theme-material .brave-settings-toolbar-kb-hint,
+body.theme-material .redmine-settings-toolbar-kb-hint,
+body.theme-material .mastodon-settings-toolbar-kb-hint,
+body.theme-material .mcp-settings-toolbar-kb-hint,
+body.theme-material .browser-settings-toolbar-kb-hint,
+body.theme-material .cursor-agent-settings-toolbar-kb-hint,
+body.theme-material .telegram-settings-toolbar-kb-hint,
+body.theme-material .slack-settings-toolbar-kb-hint,
+body.theme-material .ollama-settings-toolbar-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+  opacity: 1;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .modal-header-kb-hint,
+body.theme-architect .discord-toolbar-kb-hint,
+body.theme-architect .perplexity-settings-toolbar-kb-hint,
+body.theme-architect .brave-settings-toolbar-kb-hint,
+body.theme-architect .redmine-settings-toolbar-kb-hint,
+body.theme-architect .mastodon-settings-toolbar-kb-hint,
+body.theme-architect .mcp-settings-toolbar-kb-hint,
+body.theme-architect .browser-settings-toolbar-kb-hint,
+body.theme-architect .cursor-agent-settings-toolbar-kb-hint,
+body.theme-architect .telegram-settings-toolbar-kb-hint,
+body.theme-architect .slack-settings-toolbar-kb-hint,
+body.theme-architect .ollama-settings-toolbar-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+  opacity: 1;
+}

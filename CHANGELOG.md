@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2678] - 2026-11-13
+
+### Changed
+
+- **Light Settings credential toolbar kb-hint washes:** Light / Material / Architect `.modal-header-kb-hint` · `.discord-toolbar-kb-hint` · `.perplexity-settings-toolbar-kb-hint` · `.brave-settings-toolbar-kb-hint` · `.redmine-settings-toolbar-kb-hint` · `.mastodon-settings-toolbar-kb-hint` · `.mcp-settings-toolbar-kb-hint` · `.browser-settings-toolbar-kb-hint` · `.cursor-agent-settings-toolbar-kb-hint` · `.telegram-settings-toolbar-kb-hint` · `.slack-settings-toolbar-kb-hint` · `.ollama-settings-toolbar-kb-hint` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Settings credential row hints match cream shells (after Settings chrome kb-hint remaps v0.1.2677).
+
 ## [0.1.2677] - 2026-11-13
 
 ### Changed
