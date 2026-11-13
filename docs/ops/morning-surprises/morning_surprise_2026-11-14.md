@@ -1,24 +1,26 @@
 # Morning surprise — 2026-11-14
 
-Overnight autoresearch (Track B) kept shipping Light / Material / Architect cream-paper remaps (Standing P2 #14). Digester stayed empty; design-review stayed in grace. Layout-daily Data Poster marked today (remaps already complete / polish-without-capture).
+Overnight Track B (product) for Ralf.
 
 ## Shipped
 
-- **v0.1.2708** — Force Quit confirming + Disk Cleanup soft-delete: `.force-quit-btn.is-confirming` · `.disk-cleanup-soft-delete` (resting · hover · `:focus-within`) Apple `#ffffff` → paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (keep `3b4c597a`).
-- **v0.1.2707** — Icon-line status soft-states: `.icon-line-item.status-good` / `.status-warning` / `.status-bad` (resting · hover) (keep `8ac00a96`; race-discard re-pick).
-- **v0.1.2706** — Top Processes row soft-states (keep `31ae1526`).
-- **v0.1.2705** — Perplexity Search chrome + Clear/Send saved-flash washes.
-- **v0.1.2704** — Clear / GitHub soft-states + Disk Cleanup Scan primary.
-- Earlier tonight (already on main): meta-card/last **v0.1.2703**, leftover focus rings + process-pin **v0.1.2702**, and the Ops Insights / Details soft-state chain through **v0.1.2696+**.
+- **v0.1.2709** — Light / Material / Architect Debug Log `.logs-line` soft-states (hover · selected · Copied) remapped onto cream paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (Standing P2 #14). Layout-daily Data Poster marked checked (remaps none / polish-without-capture).
+- **v0.1.2708** — Light Force Quit confirming + Disk Cleanup soft-delete onto cream paper.
+- **v0.1.2707** — Light icon-line status-good/warning/bad soft-states onto cream paper.
+- **v0.1.2706** — Light process-row soft-states onto cream paper.
+- **v0.1.2705** — Light Perplexity Search + Clear/Send saved flashes onto cream paper.
+- Earlier same night: Clear/GitHub, Disk Cleanup meta, focus rings, Ops Insights, and more cream remaps (see CHANGELOG).
 
-## Tried / context
+## Tried / discarded
 
-- Digester: 0 turns / 7d.
-- Design review: grace (recommended feature-agent-ops ~59d).
-- Layout daily: Data Poster marked 2026-11-14 (missing_remaps=none; polish-without-capture). Dark / Neon / Futuristic still due next.
-- Sibling harness: OpenClaw/Hermes scan only (no port this tick).
-- Debug.log: no ERROR/WARN/panic clusters in scan window.
+- Parallel-race discard of local v0.1.2708 logs-line (origin already shipped Force Quit + soft-delete as 2708); re-picked logs-line as **v0.1.2709**.
 
-## Next fuel
+## Digester
 
-Dark (or Neon/Futuristic) layout-daily next; Mac capture when TCC allows; leftover light cream `#ffffff` mixes (logs-line soft-states · other muted type / remaining soft-states) if still muddy; sibling/product fuel — not keep-pNN.
+- Open candidates: empty (noise filtered). Night moved the ratchet via standing P2 #14 + layout-daily mark.
+
+## Next
+
+- Dark / Neon / Futuristic layout-daily when the day quota opens again.
+- Leftover light cream `#ffffff` mixes: disk-cleanup empty · other muted type / soft-states.
+- Mac capture when TCC allows; sibling/product fuel — not keep-pNN clones.
