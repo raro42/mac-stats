@@ -1,21 +1,20 @@
 # Morning surprise — 2026-11-13
 
-Overnight autoresearch (Track B) kept product CSS remaps through the light cream P2 #14 trail.
+Overnight autoresearch kept light cream-paper remaps so muted type and ring/sparkline Hot/Ok/Fair washes stop floating on Apple white.
 
 ## Shipped
 
-- **v0.1.2684** — Light / Material / Architect metrics kb-hints + LPM busy type on cream paper (`.power-strip-kb-hint` · `.ring-gauge-kb-hint` · `.history-sparkline-kb-hint` · `.lpm-info.is-busy` · is-on busy value). Standing P2 #14 after v0.1.2683.
-- Earlier same night (selection): muted labels, setup/stat/caption, section kb-hints, Perplexity glances, filter-miss / attention washes — see `results.tsv` / CHANGELOG.
+- **v0.1.2685** — Light / Material / Architect `.metric-card` + `.history-chart-container` Hot / Ok / Fair washes (opaque on `#f7f7fa` / `#ebe4d9` / `#f1f1f1`).
+- **v0.1.2684** — Light / Material / Architect power-strip / ring / sparkline kb-hints + LPM busy type on the same paper path.
+- **v0.1.2683** — Light / Material / Architect Disk Cleanup size lines, Perplexity setup lead/note (incl. error), Agent Ops filter caption, and AI Chat response-time.
+- Earlier same night (already on main): v0.1.2662–v0.1.2682 light glance / filter-miss / kb-hint / muted label remaps along the same paper path.
 
-## Fuel / ratchet
+## Tried / notes
 
-- Digester open empty most of the night; design-review grace; layout-daily Data Poster already marked today.
-- Nightly minimum satisfied with many keep rows (plus one race discard → re-pick).
+- Digester empty (no Werner runs in window). Design-review still in grace. Layout-daily Data Poster already marked today.
+- 05:15 CET tick: standing Next after 2684 → metric-card / history soft-state remaps; keep logged; pushed.
+- Next leftover: scan Light/Material/Architect muted type / metric-card highlights still mixed on Apple `#ffffff`, or Dark layout-daily next calendar day.
 
-## Next
+## Fitness
 
-- Dark layout-daily when the calendar day quota opens.
-- Leftover light metric-card soft-state / history hot-caption if still Apple `#ffffff` on cream.
-- Mac capture when TCC allows; sibling/product fuel — not keep-pNN clones only.
-
-Generated: 2026-11-13T05:00:28+01:00
+Cream shells read cleaner: setup copy, size stats, filter caption, latency ink, Bat/LPM hints, and Hot/Ok/Fair ring + sparkline washes match the paper, not a leftover Apple white mix.
