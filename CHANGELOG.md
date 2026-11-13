@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2698] - 2026-11-13
+
+### Changed
+
+- **Light Details option soft-state washes:** Light / Material / Architect `.details-grid > .detail-value[role='option']` (hover · `:focus-visible` · `.is-selected` · `.is-just-copied` · Copied badge) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Details keyboard/copy chrome matches cream shells (after Ops Close remaps v0.1.2697).
+
 ## [0.1.2697] - 2026-11-13
 
 ### Changed

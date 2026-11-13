@@ -36116,3 +36116,71 @@ body.theme-architect .ops-close-btn:focus-visible {
   border-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
   box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Details option soft-states still mix Apple
+ * `#ffffff` (`.details-grid > .detail-value[role='option']` hover ·
+ * `:focus-visible` · `.is-selected` · `.is-just-copied` · Copied badge) while
+ * Data Poster / Dark / Neon / Futuristic remaps already exist. Opaque washes
+ * on cream paper so Details keyboard/copy chrome matches light shells
+ * (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light Ops
+ * Close remaps v0.1.2697.
+ */
+/* OVERNIGHT v0.1.2698: light Details option soft-state remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .details-grid > .detail-value[role='option']:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #f7f7fa);
+}
+body.theme-light .details-grid > .detail-value[role='option']:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #f7f7fa);
+}
+body.theme-light .details-grid > .detail-value[role='option'].is-selected {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #f7f7fa);
+}
+body.theme-light .details-grid > .detail-value[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .details-grid > .detail-value[role='option'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .details-grid > .detail-value[role='option']:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #ebe4d9);
+}
+body.theme-material .details-grid > .detail-value[role='option']:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #ebe4d9);
+}
+body.theme-material .details-grid > .detail-value[role='option'].is-selected {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #ebe4d9);
+}
+body.theme-material .details-grid > .detail-value[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .details-grid > .detail-value[role='option'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .details-grid > .detail-value[role='option']:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #f1f1f1);
+}
+body.theme-architect .details-grid > .detail-value[role='option']:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #f1f1f1);
+}
+body.theme-architect .details-grid > .detail-value[role='option'].is-selected {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #f1f1f1);
+}
+body.theme-architect .details-grid > .detail-value[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .details-grid > .detail-value[role='option'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #f1f1f1);
+}
