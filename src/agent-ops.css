@@ -33286,3 +33286,233 @@ body.theme-architect .perplexity-empty-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 22%, #f1f1f1);
 }
 
+
+/* OVERNIGHT v0.1.2669: light Monitors/Disk/Details collapsed-glance remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .monitors-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .monitors-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-light .monitors-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+}
+body.theme-light .monitors-collapsed-glance.has-down {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-light .monitors-collapsed-glance.is-all-up {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+body.theme-light .monitors-collapsed-glance.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 26%, #f7f7fa);
+  background: color-mix(in srgb, #ff9500 6%, #f7f7fa);
+}
+body.theme-light .monitors-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #0c0c10 75%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .disk-cleanup-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .disk-cleanup-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-collapsed-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9500 28%, #f7f7fa);
+  background: color-mix(in srgb, #ff9500 7%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-collapsed-glance.is-due,
+body.theme-light .disk-cleanup-collapsed-glance.is-clean {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-collapsed-glance.has-scopes-off {
+  border-color: color-mix(in srgb, #0a84ff 26%, #f7f7fa);
+  background: color-mix(in srgb, #0a84ff 6%, #f7f7fa);
+}
+body.theme-light .details-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .details-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-light .details-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+}
+body.theme-light .details-collapsed-glance.is-hot {
+  border-color: color-mix(in srgb, #ff9500 26%, #f7f7fa);
+  background: color-mix(in srgb, #ff9500 6%, #f7f7fa);
+}
+body.theme-light .details-collapsed-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .monitors-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .monitors-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-material .monitors-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+}
+body.theme-material .monitors-collapsed-glance.has-down {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-material .monitors-collapsed-glance.is-all-up {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+body.theme-material .monitors-collapsed-glance.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 26%, #ebe4d9);
+  background: color-mix(in srgb, #ff9500 6%, #ebe4d9);
+}
+body.theme-material .monitors-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #0c0c10 75%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .disk-cleanup-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .disk-cleanup-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-collapsed-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9500 28%, #ebe4d9);
+  background: color-mix(in srgb, #ff9500 7%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-collapsed-glance.is-due,
+body.theme-material .disk-cleanup-collapsed-glance.is-clean {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-collapsed-glance.has-scopes-off {
+  border-color: color-mix(in srgb, #0a84ff 26%, #ebe4d9);
+  background: color-mix(in srgb, #0a84ff 6%, #ebe4d9);
+}
+body.theme-material .details-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .details-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-material .details-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+}
+body.theme-material .details-collapsed-glance.is-hot {
+  border-color: color-mix(in srgb, #ff9500 26%, #ebe4d9);
+  background: color-mix(in srgb, #ff9500 6%, #ebe4d9);
+}
+body.theme-material .details-collapsed-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .monitors-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .monitors-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+body.theme-architect .monitors-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+}
+body.theme-architect .monitors-collapsed-glance.has-down {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-architect .monitors-collapsed-glance.is-all-up {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}
+body.theme-architect .monitors-collapsed-glance.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 26%, #f1f1f1);
+  background: color-mix(in srgb, #ff9500 6%, #f1f1f1);
+}
+body.theme-architect .monitors-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #0c0c10 75%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .disk-cleanup-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .disk-cleanup-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-collapsed-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9500 28%, #f1f1f1);
+  background: color-mix(in srgb, #ff9500 7%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-collapsed-glance.is-due,
+body.theme-architect .disk-cleanup-collapsed-glance.is-clean {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-collapsed-glance.has-scopes-off {
+  border-color: color-mix(in srgb, #0a84ff 26%, #f1f1f1);
+  background: color-mix(in srgb, #0a84ff 6%, #f1f1f1);
+}
+body.theme-architect .details-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .details-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+body.theme-architect .details-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+}
+body.theme-architect .details-collapsed-glance.is-hot {
+  border-color: color-mix(in srgb, #ff9500 26%, #f1f1f1);
+  background: color-mix(in srgb, #ff9500 6%, #f1f1f1);
+}
+body.theme-architect .details-collapsed-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}
