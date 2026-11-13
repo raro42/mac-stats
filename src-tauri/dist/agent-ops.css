@@ -34478,3 +34478,121 @@ body.theme-architect .disk-cleanup-attention-glance.is-due {
   background: color-mix(in srgb, #34c759 7%, #f1f1f1);
   color: color-mix(in srgb, #34c759 50%, currentColor);
 }
+
+/*
+ * Light / Material / Architect: Perplexity last-search glance still mixes Apple
+ * `#ffffff` washes (`.perplexity-last-glance` resting · hover · `:focus-visible`
+ * · has-results · is-searching · has-error · needs-key · is-ready) while Data
+ * Poster / Dark / Neon / Futuristic remaps already exist. Opaque washes on cream
+ * paper so the glance matches light shells (Swiss / Apple keep shared `#ffffff`).
+ * Standing P2 #14 after light Disk Cleanup attention remaps v0.1.2675.
+ */
+/* OVERNIGHT v0.1.2676: light Perplexity last-glance remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .perplexity-last-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .perplexity-last-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-light .perplexity-last-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+}
+body.theme-light .perplexity-last-glance.has-results {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 22%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5%, #f7f7fa);
+}
+body.theme-light .perplexity-last-glance.is-searching {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f7f7fa);
+}
+body.theme-light .perplexity-last-glance.has-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-light .perplexity-last-glance.needs-key {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #f7f7fa);
+  background: color-mix(in srgb, #ff9f0a 7%, #f7f7fa);
+  color: color-mix(in srgb, #ff9f0a 42%, var(--text, currentColor));
+}
+body.theme-light .perplexity-last-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .perplexity-last-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .perplexity-last-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-material .perplexity-last-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+}
+body.theme-material .perplexity-last-glance.has-results {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 22%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5%, #ebe4d9);
+}
+body.theme-material .perplexity-last-glance.is-searching {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #ebe4d9);
+}
+body.theme-material .perplexity-last-glance.has-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-material .perplexity-last-glance.needs-key {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #ebe4d9);
+  background: color-mix(in srgb, #ff9f0a 7%, #ebe4d9);
+  color: color-mix(in srgb, #ff9f0a 42%, var(--text, currentColor));
+}
+body.theme-material .perplexity-last-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .perplexity-last-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .perplexity-last-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+body.theme-architect .perplexity-last-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+}
+body.theme-architect .perplexity-last-glance.has-results {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 22%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5%, #f1f1f1);
+}
+body.theme-architect .perplexity-last-glance.is-searching {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f1f1f1);
+}
+body.theme-architect .perplexity-last-glance.has-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-architect .perplexity-last-glance.needs-key {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #f1f1f1);
+  background: color-mix(in srgb, #ff9f0a 7%, #f1f1f1);
+  color: color-mix(in srgb, #ff9f0a 42%, var(--text, currentColor));
+}
+body.theme-architect .perplexity-last-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+}

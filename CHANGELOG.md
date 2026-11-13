@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2676] - 2026-11-13
+
+### Changed
+
+- **Light Perplexity last-glance washes:** Light / Material / Architect `.perplexity-last-glance` (resting · hover · `:focus-visible` · has-results · is-searching · has-error · needs-key · is-ready) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Perplexity last-search matches cream shells (after Disk Cleanup attention remaps v0.1.2675).
+
 ## [0.1.2675] - 2026-11-13
 
 ### Changed
