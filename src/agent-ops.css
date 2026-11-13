@@ -37432,3 +37432,62 @@ body.theme-architect .logs-line[role='option'].is-just-copied {
 body.theme-architect .logs-line[role='option'].is-just-copied::after {
   color: color-mix(in srgb, #34c759 96%, #f1f1f1);
 }
+/*
+ * Light / Material / Architect: Disk Cleanup empty shell + disabled / Recurse
+ * muted type still mix Apple `#ffffff` (`.disk-cleanup-empty` border · fill ·
+ * load-error color · `.disk-cleanup-scope-row.is-disabled` ·
+ * `label.disk-cleanup-scope-rec`) while Data Poster / Dark / Neon / Futuristic
+ * remaps already exist. Opaque washes on cream paper so empty / disabled /
+ * Recurse chrome matches light shells (Swiss / Apple keep shared `#ffffff`).
+ * Standing P2 #14 after light logs-line soft-state remaps v0.1.2709.
+ * Layout-daily Data Poster marked today (remaps none — polish-without-capture).
+ */
+/* OVERNIGHT v0.1.2710: light Disk Cleanup empty + disabled/Recurse remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .disk-cleanup-empty {
+  border-color: color-mix(in srgb, currentColor 18%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-empty:not(.disk-cleanup-list-empty):not(.disk-cleanup-scopes-empty):not(.disk-cleanup-filter-miss):not(.disk-cleanup-scope-filter-miss) {
+  color: color-mix(in srgb, #0c0c10 66%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-scope-row.is-disabled {
+  color: color-mix(in srgb, #0c0c10 48%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
+  color: color-mix(in srgb, #0c0c10 70%, #f7f7fa);
+  opacity: 1;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .disk-cleanup-empty {
+  border-color: color-mix(in srgb, currentColor 18%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-empty:not(.disk-cleanup-list-empty):not(.disk-cleanup-scopes-empty):not(.disk-cleanup-filter-miss):not(.disk-cleanup-scope-filter-miss) {
+  color: color-mix(in srgb, #0c0c10 66%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-scope-row.is-disabled {
+  color: color-mix(in srgb, #0c0c10 48%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
+  color: color-mix(in srgb, #0c0c10 70%, #ebe4d9);
+  opacity: 1;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .disk-cleanup-empty {
+  border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-empty:not(.disk-cleanup-list-empty):not(.disk-cleanup-scopes-empty):not(.disk-cleanup-filter-miss):not(.disk-cleanup-scope-filter-miss) {
+  color: color-mix(in srgb, #0c0c10 66%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-scope-row.is-disabled {
+  color: color-mix(in srgb, #0c0c10 48%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
+  color: color-mix(in srgb, #0c0c10 70%, #f1f1f1);
+  opacity: 1;
+}

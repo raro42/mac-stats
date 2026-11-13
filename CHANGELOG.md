@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2710] - 2026-11-14
+
+### Changed
+
+- **Light Disk Cleanup empty + disabled/Recurse washes:** Light / Material / Architect `.disk-cleanup-empty` (border · fill · load-error color) · `.disk-cleanup-scope-row.is-disabled` · `label.disk-cleanup-scope-rec` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Disk Cleanup empty / disabled / Recurse chrome matches cream shells (after logs-line soft-state remaps v0.1.2709; layout-daily Data Poster marked today — remaps none / polish-without-capture).
+
 ## [0.1.2709] - 2026-11-14
 
 ### Changed
