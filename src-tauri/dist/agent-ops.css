@@ -34596,3 +34596,47 @@ body.theme-architect .perplexity-last-glance.is-ready {
   border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
   background: color-mix(in srgb, #34c759 7%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Settings chrome kb-hints still mix Apple
+ * `#ffffff` (`.settings-header-kb-hint` · `.ollama-settings-header-kb-hint` ·
+ * `.theme-list-kb-hint` · `.appearance-setting-kb-hint` · `.product-setting-kb-hint` ·
+ * `.credentials-section-kb-hint`) while Data Poster / Dark / Neon / Futuristic
+ * remaps already exist. Opaque type on cream paper so Settings title / Appearance /
+ * Product / credentials hints match light shells (Swiss / Apple keep shared
+ * `#ffffff`). Standing P2 #14 after light Perplexity last-glance remaps v0.1.2676.
+ */
+/* OVERNIGHT v0.1.2677: light Settings chrome kb-hint remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .settings-header-kb-hint,
+body.theme-light .ollama-settings-header-kb-hint,
+body.theme-light .theme-list-kb-hint,
+body.theme-light .appearance-setting-kb-hint,
+body.theme-light .product-setting-kb-hint,
+body.theme-light .credentials-section-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+  opacity: 1;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .settings-header-kb-hint,
+body.theme-material .ollama-settings-header-kb-hint,
+body.theme-material .theme-list-kb-hint,
+body.theme-material .appearance-setting-kb-hint,
+body.theme-material .product-setting-kb-hint,
+body.theme-material .credentials-section-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+  opacity: 1;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .settings-header-kb-hint,
+body.theme-architect .ollama-settings-header-kb-hint,
+body.theme-architect .theme-list-kb-hint,
+body.theme-architect .appearance-setting-kb-hint,
+body.theme-architect .product-setting-kb-hint,
+body.theme-architect .credentials-section-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+  opacity: 1;
+}

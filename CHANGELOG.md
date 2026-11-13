@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2677] - 2026-11-13
+
+### Changed
+
+- **Light Settings chrome kb-hint washes:** Light / Material / Architect `.settings-header-kb-hint` · `.ollama-settings-header-kb-hint` · `.theme-list-kb-hint` · `.appearance-setting-kb-hint` · `.product-setting-kb-hint` · `.credentials-section-kb-hint` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Settings title / Appearance / Product / credentials hints match cream shells (after Perplexity last-glance remaps v0.1.2676).
+
+
 ## [0.1.2676] - 2026-11-13
 
 ### Changed
