@@ -6,17 +6,18 @@ Overnight autoresearch kept shipping cream-paper remaps (Standing P2 #14). Diges
 
 - **v0.1.2668** — Light Rings / Disk Cleanup / Perplexity filter-miss washes
 - **v0.1.2669** — Light Monitors / Disk Cleanup / Details collapsed-glance washes
-- **v0.1.2670** — Light Top Processes CPU / GPU / RAM glance washes (`.processes-top-glance` · gpu · ram · hot · ok)
+- **v0.1.2670** — Light Top Processes CPU / GPU / RAM glance washes
+- **v0.1.2671** — Light Agent Ops collapsed-glance + Monitors Down/Slow attention washes (`.agent-ops-collapsed-glance` · ready/warn/offline/empty · `.monitors-attention-glance` · Down/Slow)
 
 ## Fitness
 
-Cream Light / Material / Architect shells no longer mix Apple `#ffffff` into keep-header Top Processes glances. Opaque paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` matches the rest of the night’s filter-miss / collapsed-glance work.
+Cream Light / Material / Architect shells no longer mix Apple `#ffffff` into Agent Ops keep-header or Monitors Down/Slow attention. Opaque paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` continues the night’s filter-miss / glance work.
 
 ## Next fuel
 
 - Dark layout-daily next calendar day
 - Mac capture when TCC allows
-- Leftover light Agent Ops collapsed-glance / Monitors attention glances
+- Leftover light Monitors filter-attention / Logs attention glances
 - Sibling / product — **not** keep-pNN
 
-Generated: 2026-11-13T02:10 local (overnight tick)
+Generated: 2026-11-13T02:14 local (overnight tick)
