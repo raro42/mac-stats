@@ -34765,3 +34765,73 @@ body.theme-architect .changelog-body-toolbar-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
   opacity: 1;
 }
+
+/*
+ * Light / Material / Architect: section kb-hints still mix Apple `#ffffff`
+ * (`.icon-line-kb-hint` · `.footer-toolbar-kb-hint` · `.header-toolbar-kb-hint` ·
+ * `.disk-cleanup-meta-kb-hint` · `.disk-cleanup-toolbar-kb-hint` ·
+ * `.disk-cleanup-list-kb-hint` · `.disk-cleanup-add-scope-toolbar-kb-hint` ·
+ * `.disk-cleanup-kb-hint` · `.monitors-kb-hint` · `.processes-kb-hint` ·
+ * `.details-kb-hint` · `.monitor-add-toolbar-kb-hint` ·
+ * `.monitor-detail-toolbar-kb-hint`) while Data Poster / Dark / Neon /
+ * Futuristic remaps already exist. Opaque type on cream paper so Disk Cleanup /
+ * Monitors / Processes / Details / header·footer / icon-line hints match light
+ * shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
+ * Process Detail / Force Quit / Logs / Perplexity / Changelog kb-hint remaps
+ * v0.1.2679.
+ */
+/* OVERNIGHT v0.1.2680: light section kb-hint remaps (Disk Cleanup · Monitors · Processes · Details · header/footer · icon-line) */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .icon-line-kb-hint,
+body.theme-light .footer-toolbar-kb-hint,
+body.theme-light .header-toolbar-kb-hint,
+body.theme-light .disk-cleanup-meta-kb-hint,
+body.theme-light .disk-cleanup-toolbar-kb-hint,
+body.theme-light .disk-cleanup-list-kb-hint,
+body.theme-light .disk-cleanup-add-scope-toolbar-kb-hint,
+body.theme-light .disk-cleanup-kb-hint,
+body.theme-light .monitors-kb-hint,
+body.theme-light .processes-kb-hint,
+body.theme-light .details-kb-hint,
+body.theme-light .monitor-add-toolbar-kb-hint,
+body.theme-light .monitor-detail-toolbar-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+  opacity: 1;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .icon-line-kb-hint,
+body.theme-material .footer-toolbar-kb-hint,
+body.theme-material .header-toolbar-kb-hint,
+body.theme-material .disk-cleanup-meta-kb-hint,
+body.theme-material .disk-cleanup-toolbar-kb-hint,
+body.theme-material .disk-cleanup-list-kb-hint,
+body.theme-material .disk-cleanup-add-scope-toolbar-kb-hint,
+body.theme-material .disk-cleanup-kb-hint,
+body.theme-material .monitors-kb-hint,
+body.theme-material .processes-kb-hint,
+body.theme-material .details-kb-hint,
+body.theme-material .monitor-add-toolbar-kb-hint,
+body.theme-material .monitor-detail-toolbar-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+  opacity: 1;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .icon-line-kb-hint,
+body.theme-architect .footer-toolbar-kb-hint,
+body.theme-architect .header-toolbar-kb-hint,
+body.theme-architect .disk-cleanup-meta-kb-hint,
+body.theme-architect .disk-cleanup-toolbar-kb-hint,
+body.theme-architect .disk-cleanup-list-kb-hint,
+body.theme-architect .disk-cleanup-add-scope-toolbar-kb-hint,
+body.theme-architect .disk-cleanup-kb-hint,
+body.theme-architect .monitors-kb-hint,
+body.theme-architect .processes-kb-hint,
+body.theme-architect .details-kb-hint,
+body.theme-architect .monitor-add-toolbar-kb-hint,
+body.theme-architect .monitor-detail-toolbar-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+  opacity: 1;
+}

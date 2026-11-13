@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2680] - 2026-11-13
+
+### Changed
+
+- **Light section kb-hint washes:** Light / Material / Architect `.icon-line-kb-hint` · `.footer-toolbar-kb-hint` · `.header-toolbar-kb-hint` · `.disk-cleanup-meta-kb-hint` · `.disk-cleanup-toolbar-kb-hint` · `.disk-cleanup-list-kb-hint` · `.disk-cleanup-add-scope-toolbar-kb-hint` · `.disk-cleanup-kb-hint` · `.monitors-kb-hint` · `.processes-kb-hint` · `.details-kb-hint` · `.monitor-add-toolbar-kb-hint` · `.monitor-detail-toolbar-kb-hint` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Disk Cleanup / Monitors / Processes / Details / header·footer / icon-line hints match cream shells (after Process Detail / Force Quit / Logs / Perplexity / Changelog kb-hint remaps v0.1.2679).
+
 ## [0.1.2679] - 2026-11-13
 
 ### Changed
