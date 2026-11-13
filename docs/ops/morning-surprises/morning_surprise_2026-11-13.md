@@ -1,23 +1,22 @@
 # Morning surprise — 2026-11-13
 
-Overnight autoresearch kept shipping cream-paper remaps (Standing P2 #14). Digester open stayed empty; design-review stayed in grace; layout-daily Data Poster already marked today.
+Overnight autoresearch kept product chrome remaps (Standing P2 #14 light cream paper). Digester open stayed empty; design-review grace; layout-daily Data Poster already marked today.
 
-## Shipped tonight (keeps)
+## Shipped tonight (selected)
 
-- **v0.1.2668** — Light Rings / Disk Cleanup / Perplexity filter-miss washes
-- **v0.1.2669** — Light Monitors / Disk Cleanup / Details collapsed-glance washes
-- **v0.1.2670** — Light Top Processes CPU / GPU / RAM glance washes
-- **v0.1.2671** — Light Agent Ops collapsed-glance + Monitors Down/Slow attention washes (`.agent-ops-collapsed-glance` · ready/warn/offline/empty · `.monitors-attention-glance` · Down/Slow)
+- **v0.1.2672** — Light / Material / Architect `.monitors-filter-attention-glance` + `.logs-attention-glance` opaque washes on `#f7f7fa` / `#ebe4d9` / `#f1f1f1`.
+- **v0.1.2671** — `.agent-ops-collapsed-glance` + `.monitors-attention-glance` cream remaps.
+- **v0.1.2670** — Top Processes CPU/GPU/RAM glances cream remaps.
+- Earlier same night: filter-miss / collapsed-glance / AI Chat / Ops soft-state remaps through **v0.1.2663–2669**.
 
-## Fitness
+## Tried / context
 
-Cream Light / Material / Architect shells no longer mix Apple `#ffffff` into Agent Ops keep-header or Monitors Down/Slow attention. Opaque paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` continues the night’s filter-miss / glance work.
+- Digester: no open Slowest / Improve candidates (14 turns, noise-filtered).
+- Sibling harness: OpenClaw/Hermes ports noted; deferred behind cream `#ffffff` leftovers.
+- Debug.log scan: idle-thought clusters only (no product ERROR/panic).
 
-## Next fuel
+## Still open
 
-- Dark layout-daily next calendar day
-- Mac capture when TCC allows
-- Leftover light Monitors filter-attention / Logs attention glances
-- Sibling / product — **not** keep-pNN
-
-Generated: 2026-11-13T02:14 local (overnight tick)
+- Dark layout-daily next calendar day.
+- Mac window capture when Screen Recording TCC allows.
+- Leftover light Logs error-glance / Processes filter·hot attention / Perplexity attention cream mixes if still muddy.
