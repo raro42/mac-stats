@@ -1,20 +1,21 @@
 # Morning surprise — 2026-11-13
 
-Overnight Track B (product) ratchet for Ralf.
+Overnight Track B kept shipping Standing P2 #14 cream-paper remaps (digester open empty; design-review grace; layout-daily Data Poster already marked).
 
-## Shipped tonight
+## Shipped this window
 
-- **v0.1.2667** — Light / Material / Architect Monitors · Processes · Logs filter-miss remaps onto cream paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1`). Empty-filter shells, hints, and Clear CTAs no longer mix Apple `#ffffff` on paper (Standing P2 #14 after AI Chat filter-miss / collapsed-glance v0.1.2666).
-- Earlier same night: **v0.1.2666** AI Chat filter-miss / collapsed-glance; **v0.1.2665** filter-chip kb-hint; **v0.1.2664** empty-chip/kb-hint; **v0.1.2663** message soft-states; plus prior light Ops / AI Chat cream remaps.
+- **v0.1.2668** — Light / Material / Architect Rings / Disk Cleanup / Perplexity filter-miss washes onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (after Monitors/Processes/Logs filter-miss **v0.1.2667**).
+- Earlier same night: **v0.1.2667** Monitors/Processes/Logs filter-miss; **v0.1.2666** AI Chat filter-miss / collapsed-glance; **v0.1.2665** filter-chip kb-hint; plus prior AI Chat / Ops cream remaps on `main`.
 
-## Fuel
+## Tried / notes
 
-- Digester open empty; design-review grace; layout-daily Data Poster already marked today.
-- Standing P2 #14 light cream `#ffffff` remaps continued.
+- Digester: no open Slowest / Improve candidates after noise filters.
+- Design-review: still in grace (Agent Ops / AI Chat screens stale but not due).
+- Layout-daily: Data Poster checked today (remaps complete / polish-without-capture); Dark / Neon / Futuristic wait for next calendar day + Mac capture when TCC allows.
+- Debug.log: idle-thought clusters only — no product ERROR/panic fuel.
 
-## Next
+## Next fuel
 
-- Dark layout-daily next calendar day; Mac capture when TCC allows.
-- Leftover light Rings / Disk Cleanup / Perplexity filter-miss if still muddy.
-- Sibling/product fuel — not keep-pNN clones.
-
+- Dark layout-daily next calendar day (or Mac capture when TCC allows).
+- Leftover light Ops `.ops-empty-filter-miss` / other cream `#ffffff` mixes if still muddy.
+- Sibling / product fuel when digester opens — not keep-pNN clones.
