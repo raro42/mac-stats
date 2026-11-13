@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2707] - 2026-11-13
+
+### Changed
+
+- **Light icon-line status soft-state washes:** Light / Material / Architect `.icon-line-item.status-good` · `.status-warning` · `.status-bad` (resting · hover) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Ready / Slow / Down chips match cream shells (after process-row soft-state remaps v0.1.2706; race-discard re-pick).
+
 ## [0.1.2706] - 2026-11-13
 
 ### Changed

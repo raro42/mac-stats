@@ -37189,3 +37189,110 @@ body.theme-architect .process-detail-pid.is-just-saved {
   background: color-mix(in srgb, #34c759 12%, #f1f1f1);
   box-shadow: none;
 }
+
+/*
+ * Light / Material / Architect: icon-line status soft-states still mix Apple
+ * `#ffffff` (`.icon-line-item.status-good` · `.status-warning` · `.status-bad`
+ * resting · hover background/border; Light also mixes status type on white)
+ * while Data Poster / Dark / Neon / Futuristic remaps already exist on shell
+ * paper. Opaque washes on cream paper so Ready / Slow / Down chips match light
+ * shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
+ * process-row soft-state remaps v0.1.2706.
+ */
+/* OVERNIGHT v0.1.2707: light icon-line status-good/warning/bad remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .icon-line-item.status-good {
+  color: color-mix(in srgb, #24a05a 78%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 7%, #f7f7fa);
+  border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
+}
+body.theme-light .icon-line-item.status-good:hover {
+  color: color-mix(in srgb, #24a05a 92%, #f7f7fa);
+  background: color-mix(in srgb, #34c759 10%, #f7f7fa);
+  border-color: color-mix(in srgb, #34c759 36%, #f7f7fa);
+}
+body.theme-light .icon-line-item.status-warning {
+  color: color-mix(in srgb, #c88214 72%, #f7f7fa);
+  background: color-mix(in srgb, #ff9f0a 7%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f7f7fa);
+}
+body.theme-light .icon-line-item.status-warning:hover {
+  color: color-mix(in srgb, #c88214 88%, #f7f7fa);
+  background: color-mix(in srgb, #ff9f0a 10%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff9f0a 36%, #f7f7fa);
+}
+body.theme-light .icon-line-item.status-bad {
+  color: color-mix(in srgb, #c83732 78%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
+}
+body.theme-light .icon-line-item.status-bad:hover {
+  color: color-mix(in srgb, #c83732 92%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 10%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff3b30 36%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .icon-line-item.status-good {
+  color: color-mix(in srgb, #24a05a 78%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 7%, #ebe4d9);
+  border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
+}
+body.theme-material .icon-line-item.status-good:hover {
+  color: color-mix(in srgb, #24a05a 92%, #ebe4d9);
+  background: color-mix(in srgb, #34c759 10%, #ebe4d9);
+  border-color: color-mix(in srgb, #34c759 36%, #ebe4d9);
+}
+body.theme-material .icon-line-item.status-warning {
+  color: color-mix(in srgb, #c88214 72%, #ebe4d9);
+  background: color-mix(in srgb, #ff9f0a 7%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ebe4d9);
+}
+body.theme-material .icon-line-item.status-warning:hover {
+  color: color-mix(in srgb, #c88214 88%, #ebe4d9);
+  background: color-mix(in srgb, #ff9f0a 10%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff9f0a 36%, #ebe4d9);
+}
+body.theme-material .icon-line-item.status-bad {
+  color: color-mix(in srgb, #c83732 78%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
+}
+body.theme-material .icon-line-item.status-bad:hover {
+  color: color-mix(in srgb, #c83732 92%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 10%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff3b30 36%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .icon-line-item.status-good {
+  color: color-mix(in srgb, #24a05a 78%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
+}
+body.theme-architect .icon-line-item.status-good:hover {
+  color: color-mix(in srgb, #24a05a 92%, #f1f1f1);
+  background: color-mix(in srgb, #34c759 10%, #f1f1f1);
+  border-color: color-mix(in srgb, #34c759 36%, #f1f1f1);
+}
+body.theme-architect .icon-line-item.status-warning {
+  color: color-mix(in srgb, #c88214 72%, #f1f1f1);
+  background: color-mix(in srgb, #ff9f0a 7%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f1f1f1);
+}
+body.theme-architect .icon-line-item.status-warning:hover {
+  color: color-mix(in srgb, #c88214 88%, #f1f1f1);
+  background: color-mix(in srgb, #ff9f0a 10%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9f0a 36%, #f1f1f1);
+}
+body.theme-architect .icon-line-item.status-bad {
+  color: color-mix(in srgb, #c83732 78%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
+}
+body.theme-architect .icon-line-item.status-bad:hover {
+  color: color-mix(in srgb, #c83732 92%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 10%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff3b30 36%, #f1f1f1);
+}
