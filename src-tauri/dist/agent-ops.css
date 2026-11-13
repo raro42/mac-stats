@@ -34706,3 +34706,62 @@ body.theme-architect .ollama-settings-toolbar-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
   opacity: 1;
 }
+
+/*
+ * Light / Material / Architect: Process Detail / Force Quit / Logs / Perplexity /
+ * Changelog kb-hints still mix Apple `#ffffff` (`.process-detail-hero-toolbar-kb-hint` ·
+ * `.process-details-header-kb-hint` · `.force-quit-toolbar-kb-hint` · `.logs-kb-hint` ·
+ * `.logs-toolbar-kb-hint` · `.perplexity-kb-hint` · `.perplexity-search-kb-hint` ·
+ * `.perplexity-setup-kb-hint` · `.changelog-header-kb-hint` ·
+ * `.changelog-body-toolbar-kb-hint`) while Data Poster / Dark / Neon / Futuristic
+ * remaps already exist. Opaque type on cream paper so Process Detail / Force Quit /
+ * Debug Log / Perplexity / What's new hints match light shells (Swiss / Apple keep
+ * shared `#ffffff`). Standing P2 #14 after light Settings credential toolbar kb-hint
+ * remaps v0.1.2678.
+ */
+/* OVERNIGHT v0.1.2679: light Process Detail / Force Quit / Logs / Perplexity / Changelog kb-hint remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .process-detail-hero-toolbar-kb-hint,
+body.theme-light .process-details-header-kb-hint,
+body.theme-light .force-quit-toolbar-kb-hint,
+body.theme-light .logs-kb-hint,
+body.theme-light .logs-toolbar-kb-hint,
+body.theme-light .perplexity-kb-hint,
+body.theme-light .perplexity-search-kb-hint,
+body.theme-light .perplexity-setup-kb-hint,
+body.theme-light .changelog-header-kb-hint,
+body.theme-light .changelog-body-toolbar-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+  opacity: 1;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .process-detail-hero-toolbar-kb-hint,
+body.theme-material .process-details-header-kb-hint,
+body.theme-material .force-quit-toolbar-kb-hint,
+body.theme-material .logs-kb-hint,
+body.theme-material .logs-toolbar-kb-hint,
+body.theme-material .perplexity-kb-hint,
+body.theme-material .perplexity-search-kb-hint,
+body.theme-material .perplexity-setup-kb-hint,
+body.theme-material .changelog-header-kb-hint,
+body.theme-material .changelog-body-toolbar-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+  opacity: 1;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .process-detail-hero-toolbar-kb-hint,
+body.theme-architect .process-details-header-kb-hint,
+body.theme-architect .force-quit-toolbar-kb-hint,
+body.theme-architect .logs-kb-hint,
+body.theme-architect .logs-toolbar-kb-hint,
+body.theme-architect .perplexity-kb-hint,
+body.theme-architect .perplexity-search-kb-hint,
+body.theme-architect .perplexity-setup-kb-hint,
+body.theme-architect .changelog-header-kb-hint,
+body.theme-architect .changelog-body-toolbar-kb-hint {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+  opacity: 1;
+}

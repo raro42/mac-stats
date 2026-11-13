@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2679] - 2026-11-13
+
+### Changed
+
+- **Light Process Detail / Force Quit / Logs / Perplexity / Changelog kb-hint washes:** Light / Material / Architect `.process-detail-hero-toolbar-kb-hint` · `.process-details-header-kb-hint` · `.force-quit-toolbar-kb-hint` · `.logs-kb-hint` · `.logs-toolbar-kb-hint` · `.perplexity-kb-hint` · `.perplexity-search-kb-hint` · `.perplexity-setup-kb-hint` · `.changelog-header-kb-hint` · `.changelog-body-toolbar-kb-hint` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Process Detail / Force Quit / Debug Log / Perplexity / What's new hints match cream shells (after Settings credential toolbar kb-hint remaps v0.1.2678).
+
 ## [0.1.2678] - 2026-11-13
 
 ### Changed
