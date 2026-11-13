@@ -1,21 +1,22 @@
 # Morning surprise — 2026-11-14
 
-Overnight autoresearch kept shipping Light/Material/Architect cream remaps (standing P2 #14). Digester stayed empty; design-review grace; layout-daily Data Poster marked today (polish-without-capture).
+Overnight Track B kept moving cream remaps on Light / Material / Architect (Standing P2 #14). Digester open stayed empty; design-review stayed in grace; layout-daily already marked Data Poster for today.
 
-## Shipped tonight
+## Shipped (keep)
 
-- **v0.1.2710** — Disk Cleanup empty shell + disabled/Recurse muted type onto paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1`).
-- **v0.1.2709** — Debug Log `.logs-line` hover / selected / Copied soft-states onto paper.
-- **v0.1.2708** — Force Quit confirming + Disk Cleanup soft-delete washes onto paper.
+- **v0.1.2711** — Debug Log empty type (`.logs-viewer.is-empty` without filter-miss) onto cream paper.
+- **v0.1.2710** — Disk Cleanup empty shell + disabled/Recurse muted type (origin parallel keep).
+- **v0.1.2709** — Debug Log line soft-states (hover / selected / Copied).
+- **v0.1.2708** and earlier same night: Force Quit confirming, soft-delete, icon-line status, process-row, Perplexity/Clear flashes, Ops Insights, and more cream remaps.
 
-## Why it matters
+## Tried / discarded
 
-Light cream themes were still mixing Apple `#ffffff` under opaque paper shells for empty Disk Cleanup chrome and a few soft-states. Opaque remaps stop the muddy white slab without touching Swiss/Apple shared white.
+- Local empty-only **v0.1.2710** discarded (origin already shipped empty + disabled/Recurse). Re-picked Debug Log empty as **v0.1.2711**.
 
-## Still open
+## Not a quiet night
 
-- Dark layout-daily next calendar day (neon/futuristic still due too).
-- Mac window-only capture when TCC allows (screens stale).
-- Scan leftover light cream `#ffffff` mixes (other muted type / remaining soft-states).
+`results.tsv` has multiple keep/discard rows for the 20:00–06:00 window. Empty digester was not treated as success.
 
-Generated: 2026-11-14T00:39:48+01:00
+## Next fuel
+
+Dark layout-daily on the next calendar day; leftover light cream mixes (monitors-summary empty · other muted type); sibling/product when digester opens.
