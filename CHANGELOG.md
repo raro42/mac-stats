@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2689] - 2026-11-13
+
+### Changed
+
+- **Light Processes + Disk Cleanup path focus washes:** Light / Material / Architect `.process-row:focus-visible` · `.process-name:focus-visible` · `.process-detail-name:focus-visible` · `.process-detail-pid:focus-visible` · `.disk-cleanup-item-path:focus-visible` · `.disk-cleanup-scope-path:focus-visible` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque outline mixes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so process and Disk Cleanup path keyboard focus match cream shells (after Changelog + Settings header focus remaps v0.1.2688).
+
 ## [0.1.2688] - 2026-11-13
 
 ### Changed

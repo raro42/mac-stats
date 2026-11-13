@@ -35413,3 +35413,44 @@ body.theme-architect .settings-header h2[tabindex]:focus,
 body.theme-architect .ollama-settings-popover .popover-header h3[tabindex]:focus {
   outline-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Processes + Disk Cleanup path/name focus still
+ * mix Apple `#ffffff` (`.process-row:focus-visible` · `.process-name:focus-visible` ·
+ * `.process-detail-name:focus-visible` · `.process-detail-pid:focus-visible` ·
+ * `.disk-cleanup-item-path:focus-visible` · `.disk-cleanup-scope-path:focus-visible`)
+ * while CRT remaps already mix on dark shells. Opaque outline mixes so keyboard
+ * focus matches cream paper (Swiss / Apple keep shared `#ffffff`). Standing P2 #14
+ * after light Changelog + Settings header focus remaps v0.1.2688.
+ */
+/* OVERNIGHT v0.1.2689: light Processes + Disk Cleanup path focus remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .process-row:focus-visible,
+body.theme-light .process-name:focus-visible,
+body.theme-light .process-detail-name:focus-visible,
+body.theme-light .process-detail-pid:focus-visible,
+body.theme-light .disk-cleanup-item-path:focus-visible,
+body.theme-light .disk-cleanup-scope-path:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .process-row:focus-visible,
+body.theme-material .process-name:focus-visible,
+body.theme-material .process-detail-name:focus-visible,
+body.theme-material .process-detail-pid:focus-visible,
+body.theme-material .disk-cleanup-item-path:focus-visible,
+body.theme-material .disk-cleanup-scope-path:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .process-row:focus-visible,
+body.theme-architect .process-name:focus-visible,
+body.theme-architect .process-detail-name:focus-visible,
+body.theme-architect .process-detail-pid:focus-visible,
+body.theme-architect .disk-cleanup-item-path:focus-visible,
+body.theme-architect .disk-cleanup-scope-path:focus-visible {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
+}
