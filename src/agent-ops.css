@@ -34965,3 +34965,75 @@ body.theme-architect .force-quit-advanced > summary::before {
   color: color-mix(in srgb, #0c0c10 44%, #f1f1f1);
   opacity: 1;
 }
+
+/*
+ * Light / Material / Architect: leftover cream muted leads still mix Apple `#ffffff`
+ * (`.disk-cleanup-item-stat` · `.perplexity-setup-lead` · `.perplexity-setup-note`
+ * resting · error `:not([hidden])` · `.ops-filter-caption` · `.response-time`)
+ * while muted labels / path captions already mix on cream paper. Opaque type so
+ * Disk Cleanup size lines, Perplexity setup copy, Agent Ops filter caption, and
+ * AI Chat latency match light shells (Swiss / Apple keep shared `#ffffff`).
+ * Standing P2 #14 after light muted label remaps v0.1.2682.
+ * (`.response-time` had no light remap — prior "theme cpu.css" note was stale.)
+ */
+/* OVERNIGHT v0.1.2683: light setup/stat/caption remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .disk-cleanup-item-stat,
+body.theme-light .perplexity-setup-lead,
+body.theme-light .perplexity-setup-note {
+  color: color-mix(in srgb, #0c0c10 75%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .perplexity-setup-note:not([hidden]) {
+  color: color-mix(in srgb, color-mix(in srgb, #c44 70%, #0c0c10) 55%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .ops-filter-caption {
+  color: color-mix(in srgb, #0c0c10 66%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .response-time {
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+  opacity: 1;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .disk-cleanup-item-stat,
+body.theme-material .perplexity-setup-lead,
+body.theme-material .perplexity-setup-note {
+  color: color-mix(in srgb, #0c0c10 75%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .perplexity-setup-note:not([hidden]) {
+  color: color-mix(in srgb, color-mix(in srgb, #c44 70%, #0c0c10) 55%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .ops-filter-caption {
+  color: color-mix(in srgb, #0c0c10 66%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .response-time {
+  color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+  opacity: 1;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .disk-cleanup-item-stat,
+body.theme-architect .perplexity-setup-lead,
+body.theme-architect .perplexity-setup-note {
+  color: color-mix(in srgb, #0c0c10 75%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .perplexity-setup-note:not([hidden]) {
+  color: color-mix(in srgb, color-mix(in srgb, #c44 70%, #0c0c10) 55%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .ops-filter-caption {
+  color: color-mix(in srgb, #0c0c10 66%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .response-time {
+  color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+  opacity: 1;
+}

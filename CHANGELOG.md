@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2683] - 2026-11-13
+
+### Changed
+
+- **Light setup/stat/caption washes:** Light / Material / Architect `.disk-cleanup-item-stat` · `.perplexity-setup-lead` · `.perplexity-setup-note` (resting · error `:not([hidden])`) · `.ops-filter-caption` · `.response-time` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Disk Cleanup size lines, Perplexity setup copy, Agent Ops filter caption, and AI Chat latency match cream shells (after muted label remaps v0.1.2682).
+
+
 ## [0.1.2682] - 2026-11-13
 
 ### Changed
