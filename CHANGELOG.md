@@ -1,6 +1,14 @@
 ## [Unreleased]
 
 
+## [0.1.2674] - 2026-11-13
+
+### Changed
+
+- **Light Perplexity attention washes:** Light / Material / Architect `.perplexity-attention-glance` (resting · hover · `:focus-visible` · error · Top · filter) and `.perplexity-key-attention-glance` (resting · hover · `:focus-visible` · not-set) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Perplexity attention matches cream shells (after Logs error-glance + Processes filter/hot remaps v0.1.2673; race-discard re-pick).
+
+
+
 ## [0.1.2673] - 2026-11-13
 
 ### Changed

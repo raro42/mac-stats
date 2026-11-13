@@ -34196,3 +34196,151 @@ body.theme-architect .processes-hot-attention-glance.has-hot {
   background: color-mix(in srgb, #ff9f0a 7%, #f1f1f1);
   color: color-mix(in srgb, #ff9f0a 48%, currentColor);
 }
+
+/*
+ * Light / Material / Architect Perplexity attention remaps: shared Apple
+ * `#ffffff` mixes on `.perplexity-attention-glance` (resting · hover ·
+ * `:focus-visible` · error · Top · filter) and `.perplexity-key-attention-glance`
+ * (resting · hover · `:focus-visible` · not-set) while Data Poster / Dark /
+ * Neon / Futuristic remaps already exist. Opaque washes on cream paper so
+ * glances match light shells (Swiss / Apple keep shared `#ffffff`). Standing
+ * P2 #14 after light Logs error-glance + Processes filter/hot remaps v0.1.2673
+ * (race-discard re-pick).
+ */
+/* OVERNIGHT v0.1.2674: light Perplexity attention + key-attention remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .perplexity-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .perplexity-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-light .perplexity-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+}
+body.theme-light .perplexity-attention-glance.has-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+body.theme-light .perplexity-attention-glance.has-top {
+  border-color: color-mix(in srgb, #ff9500 26%, #f7f7fa);
+  background: color-mix(in srgb, #ff9500 7%, #f7f7fa);
+  color: color-mix(in srgb, #ff9500 42%, currentColor);
+}
+body.theme-light .perplexity-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #f7f7fa);
+  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+}
+body.theme-light .perplexity-key-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+}
+body.theme-light .perplexity-key-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f7f7fa);
+  border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
+}
+body.theme-light .perplexity-key-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+}
+body.theme-light .perplexity-key-attention-glance.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+/* --- material (#ebe4d9) --- */
+body.theme-material .perplexity-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .perplexity-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-material .perplexity-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+}
+body.theme-material .perplexity-attention-glance.has-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+body.theme-material .perplexity-attention-glance.has-top {
+  border-color: color-mix(in srgb, #ff9500 26%, #ebe4d9);
+  background: color-mix(in srgb, #ff9500 7%, #ebe4d9);
+  color: color-mix(in srgb, #ff9500 42%, currentColor);
+}
+body.theme-material .perplexity-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #ebe4d9);
+  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+}
+body.theme-material .perplexity-key-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+}
+body.theme-material .perplexity-key-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ebe4d9);
+  border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
+}
+body.theme-material .perplexity-key-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+}
+body.theme-material .perplexity-key-attention-glance.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .perplexity-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .perplexity-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+body.theme-architect .perplexity-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+}
+body.theme-architect .perplexity-attention-glance.has-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+body.theme-architect .perplexity-attention-glance.has-top {
+  border-color: color-mix(in srgb, #ff9500 26%, #f1f1f1);
+  background: color-mix(in srgb, #ff9500 7%, #f1f1f1);
+  color: color-mix(in srgb, #ff9500 42%, currentColor);
+}
+body.theme-architect .perplexity-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #f1f1f1);
+  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+}
+body.theme-architect .perplexity-key-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+}
+body.theme-architect .perplexity-key-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #f1f1f1);
+  border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
+}
+body.theme-architect .perplexity-key-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+}
+body.theme-architect .perplexity-key-attention-glance.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
