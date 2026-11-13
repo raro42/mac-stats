@@ -1,22 +1,19 @@
 # Morning surprise — 2026-11-13
 
-Overnight autoresearch kept product chrome remaps (Standing P2 #14 light cream paper). Digester open stayed empty; design-review grace; layout-daily Data Poster already marked today.
+Overnight autoresearch kept shipping Light / Material / Architect cream remaps (Apple `#ffffff` → paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1`) so attention / collapsed glances match light shells.
 
-## Shipped tonight (selected)
+## Shipped tonight (highlights)
 
-- **v0.1.2672** — Light / Material / Architect `.monitors-filter-attention-glance` + `.logs-attention-glance` opaque washes on `#f7f7fa` / `#ebe4d9` / `#f1f1f1`.
-- **v0.1.2671** — `.agent-ops-collapsed-glance` + `.monitors-attention-glance` cream remaps.
-- **v0.1.2670** — Top Processes CPU/GPU/RAM glances cream remaps.
-- Earlier same night: filter-miss / collapsed-glance / AI Chat / Ops soft-state remaps through **v0.1.2663–2669**.
+- **v0.1.2673** — `.logs-error-glance` + `.processes-filter-attention-glance` + `.processes-hot-attention-glance`
+- **v0.1.2672** — `.monitors-filter-attention-glance` + `.logs-attention-glance`
+- **v0.1.2671** — `.agent-ops-collapsed-glance` + `.monitors-attention-glance`
+- **v0.1.2670** — Top Processes CPU/GPU/RAM glances
+- Earlier same night: filter-miss / collapsed / Ops / AI Chat cream remaps (see CHANGELOG)
 
-## Tried / context
+## Context
 
-- Digester: no open Slowest / Improve candidates (14 turns, noise-filtered).
-- Sibling harness: OpenClaw/Hermes ports noted; deferred behind cream `#ffffff` leftovers.
-- Debug.log scan: idle-thought clusters only (no product ERROR/panic).
+- Digester empty; design-review grace; layout-daily Data Poster already marked today.
+- Next fuel: leftover light Perplexity attention / key-attention, or Dark layout-daily next calendar day.
+- Linux rack: CSS-only (sync-dist); no macOS install/kickstart on this host.
 
-## Still open
-
-- Dark layout-daily next calendar day.
-- Mac window capture when Screen Recording TCC allows.
-- Leftover light Logs error-glance / Processes filter·hot attention / Perplexity attention cream mixes if still muddy.
+Generated: 2026-11-13T02:40:14+01:00
