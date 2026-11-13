@@ -1,16 +1,14 @@
 # Morning surprise — 2026-11-14
 
-Overnight autoresearch (Track B) kept **v0.1.2692**.
+Overnight Track B kept product CSS (Standing P2 #14 cream remaps). Digester open stayed empty; design-review grace; layout-daily already marked for Data Poster today.
 
 ## Shipped
 
-- **Light Monitors row soft-state washes** on Light / Material / Architect: `.monitor-item` selected · Down · Slow · focus · Copied no longer mix Apple `#ffffff` on cream paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1`). Data Poster / Dark / Neon / Futuristic already had remaps; Swiss / Apple keep shared white.
+- **v0.1.2693** — Light / Material / Architect Agent Ops tab chrome + digit washes (`.agent-ops-tab` / `.ops-file-tab` resting · hover · focus · active · `.ops-tab-digit`) onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1`.
+- Earlier same window: **v0.1.2692** Monitors row soft-states; **v0.1.2691** Monitors URL/detail + logs-path-hint focus; **v0.1.2690** Monitors summary + muted captions (and earlier light cream remaps through the night).
 
-## Context
+## Tried / next
 
-- Digester empty; design-review still in grace; layout-daily already marked for today.
-- Standing P2 #14 cream remaps continue; next leftovers include Ops tabs and checking/pending type mixes.
+- Next fuel: Dark layout-daily when the day quota opens; leftover light monitor checking·pending type / ops-file kb-hints / other muted type; sibling/product — not another keep-pNN clone.
 
-## Skip asking
-
-Ralf: open Monitors on Light (or Material / Architect), select a row or hit a Down/Slow URL — the wash should sit on paper, not a white slab.
+Generated: 2026-11-13T20:50 CET (overnight tick keep).
