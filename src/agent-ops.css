@@ -35375,3 +35375,41 @@ body.theme-architect #mac-stats-update-banner .tip-dismiss:hover {
 body.theme-architect #mac-stats-update-banner a {
   text-decoration-color: color-mix(in srgb, currentColor 35%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Changelog + Settings/Ollama header focus still
+ * mix Apple `#ffffff` (`.changelog-h2[tabindex]:focus` · `.changelog-loading` ·
+ * `.changelog-error` · `.settings-header h2[tabindex]:focus` ·
+ * `.ollama-settings-popover .popover-header h3[tabindex]:focus`) while CRT
+ * remaps already mix on dark shells. Opaque outline mixes so keyboard focus
+ * matches cream paper (Swiss / Apple keep shared `#ffffff`). Standing P2 #14
+ * after light history sparkline focus + tip/banner remaps v0.1.2687.
+ */
+/* OVERNIGHT v0.1.2688: light Changelog + Settings header focus remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .changelog-h2[tabindex]:focus,
+body.theme-light .changelog-loading[tabindex]:focus,
+body.theme-light .changelog-error[tabindex]:focus,
+body.theme-light .settings-header h2[tabindex]:focus,
+body.theme-light .ollama-settings-popover .popover-header h3[tabindex]:focus {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .changelog-h2[tabindex]:focus,
+body.theme-material .changelog-loading[tabindex]:focus,
+body.theme-material .changelog-error[tabindex]:focus,
+body.theme-material .settings-header h2[tabindex]:focus,
+body.theme-material .ollama-settings-popover .popover-header h3[tabindex]:focus {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .changelog-h2[tabindex]:focus,
+body.theme-architect .changelog-loading[tabindex]:focus,
+body.theme-architect .changelog-error[tabindex]:focus,
+body.theme-architect .settings-header h2[tabindex]:focus,
+body.theme-architect .ollama-settings-popover .popover-header h3[tabindex]:focus {
+  outline-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
+}

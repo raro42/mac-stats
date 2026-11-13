@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2688] - 2026-11-13
+
+### Changed
+
+- **Light Changelog + Settings header focus washes:** Light / Material / Architect `.changelog-h2[tabindex]:focus` · `.changelog-loading` · `.changelog-error` · `.settings-header h2[tabindex]:focus` · `.ollama-settings-popover .popover-header h3[tabindex]:focus` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque outline mixes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Changelog and Settings keyboard focus match cream shells (after history sparkline focus + tip/banner remaps v0.1.2687).
+
 ## [0.1.2687] - 2026-11-13
 
 ### Changed
