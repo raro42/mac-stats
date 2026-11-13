@@ -1,20 +1,17 @@
 # Morning surprise — 2026-11-13
 
-Overnight autoresearch kept **v0.1.2680** (and earlier keeps this window through **v0.1.2679**).
+Overnight autoresearch kept light cream-paper remaps so muted type stops floating on Apple white.
 
-## Shipped this tick
+## Shipped
 
-- **v0.1.2680** — Light / Material / Architect section kb-hint remaps onto cream paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1`):
-  - `.icon-line-kb-hint` · `.footer-toolbar-kb-hint` · `.header-toolbar-kb-hint`
-  - Disk Cleanup: `.disk-cleanup-meta-kb-hint` · `.disk-cleanup-toolbar-kb-hint` · `.disk-cleanup-list-kb-hint` · `.disk-cleanup-add-scope-toolbar-kb-hint` · `.disk-cleanup-kb-hint`
-  - Monitors / Processes / Details: `.monitors-kb-hint` · `.processes-kb-hint` · `.details-kb-hint` · `.monitor-add-toolbar-kb-hint` · `.monitor-detail-toolbar-kb-hint`
-- Standing P2 #14 after Process Detail / Force Quit / Logs / Perplexity / Changelog kb-hints (**v0.1.2679**).
-- Digester open empty; design-review grace; layout-daily Data Poster already marked today.
+- **v0.1.2681** — Light / Material / Architect muted path/meta captions: Debug Log prefix, Monitors age, sparkline captions, Disk Cleanup summary + paths (opaque on  /  / ).
+- Earlier same night (already on main before this tick): v0.1.2662–v0.1.2680 light glance / filter-miss / kb-hint remaps along the same paper path.
+
+## Tried / notes
+
+- Digester empty (no Werner runs in window). Design-review still in grace. Layout-daily Data Poster already marked today.
+- Next leftover: light muted labels (Force Quit hint, Disk Cleanup meta/policy, process list header, Perplexity result meta, …).
 
 ## Fitness
 
-Keyboard hints on cream shells no longer mix Apple `#ffffff` against paper — section chrome matches the rest of the light remaps.
-
-## Next fuel
-
-Dark layout-daily next calendar day / Mac capture when TCC allows / leftover light cream `#ffffff` mixes (muted captions / path meta) / sibling-product — not keep-pNN.
+Cream shells read cleaner: path and caption ink matches the paper, not a leftover Apple white mix.
