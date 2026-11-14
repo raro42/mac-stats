@@ -4,6 +4,7 @@ Overnight Track B kept moving cream remaps on Light / Material / Architect (Stan
 
 ## Shipped (keep)
 
+- **v0.1.2712** — Top Processes empty shell (`.process-empty` type · border · fill) onto cream paper.
 - **v0.1.2711** — Debug Log empty type (`.logs-viewer.is-empty` without filter-miss) onto cream paper.
 - **v0.1.2710** — Disk Cleanup empty shell + disabled/Recurse muted type (origin parallel keep).
 - **v0.1.2709** — Debug Log line soft-states (hover / selected / Copied).
@@ -12,6 +13,7 @@ Overnight Track B kept moving cream remaps on Light / Material / Architect (Stan
 ## Tried / discarded
 
 - Local empty-only **v0.1.2710** discarded (origin already shipped empty + disabled/Recurse). Re-picked Debug Log empty as **v0.1.2711**.
+- `monitors-summary.is-empty` type was already paper from v0.1.2690, so this tick took `.process-empty` instead.
 
 ## Not a quiet night
 
@@ -19,4 +21,6 @@ Overnight Track B kept moving cream remaps on Light / Material / Architect (Stan
 
 ## Next fuel
 
-Dark layout-daily on the next calendar day; leftover light cream mixes (monitors-summary empty · other muted type); sibling/product when digester opens.
+Dark layout-daily on the next calendar day; leftover light cream mixes (other muted type / remaining soft-states); sibling/product when digester opens.
+
+Generated: 2026-11-14T01:06:30+01:00
