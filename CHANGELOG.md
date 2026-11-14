@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2742] - 2026-11-14
+
+### Changed
+
+- **Neon / Futuristic LPM track + knob field remaps:** Neon / Futuristic `.lpm-toggle` track still mixed Apple `#ececf1` and `.lpm-toggle::after` knob still used Apple `#fff` while Dark / Data Poster already sat on dark field for Low Power Mode (Light / Material / Architect cream remaps in v0.1.2735–2740; Dark field remaps in v0.1.2741; Swiss / Apple keep shared white). Opaque mixes on Neon field `#08120c` and Futuristic field `#0b0b10` so the LPM control matches each dark shell.
+
 ## [0.1.2741] - 2026-11-14
 
 ### Changed
