@@ -1533,8 +1533,8 @@ body {
 
 .monitors-menu {
   position: fixed;
-  /* Opaque panel — was white glass rgba(255,255,255,0.95) fallback (#14). */
-  background: var(--panel, color-mix(in srgb, #ffffff 95%, #f1f1f1));
+  /* Opaque wash — Apple #ffffff → Architect paper pigments (#14 / P2). */
+  background: var(--panel, color-mix(in srgb, #fafaf8 95%, #f1f1f1));
   border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #f1f1f1));
   border-radius: 8px;
   padding: 4px 0;
@@ -1583,8 +1583,8 @@ body {
   width: min(600px, 90vw);
   max-height: 80vh;
   border-radius: 16px;
-  /* Opaque panel — was white glass rgba(255,255,255,0.95) fallback (#14). */
-  background: var(--panel, color-mix(in srgb, #ffffff 95%, #f1f1f1));
+  /* Opaque wash — Apple #ffffff → Architect paper pigments (#14 / P2). */
+  background: var(--panel, color-mix(in srgb, #fafaf8 95%, #f1f1f1));
   border: 1px solid var(--panel-border, color-mix(in srgb, #000000 10%, #f1f1f1));
   box-shadow: var(--panel-shadow, 0 32px 100px color-mix(in srgb, #000000 20%, #f1f1f1));
   padding: 0;
@@ -1677,15 +1677,15 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  /* Opaque wash — was white glass rgba(255,255,255,0.5) fallback (#14). */
-  background: color-mix(in srgb, #ffffff 50%, #f1f1f1);
+  /* Opaque wash — Apple #ffffff → Architect paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #fafaf8 50%, #f1f1f1);
   border: 1px solid color-mix(in srgb, #000000 10%, #f1f1f1);
   border-radius: 8px;
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .monitor-settings-item:hover {
-  background: color-mix(in srgb, #ffffff 70%, #f1f1f1);
+  background: color-mix(in srgb, #fafaf8 70%, #f1f1f1);
 }
 
 .monitor-settings-item-info {
@@ -1767,7 +1767,7 @@ body {
   font-size: 13px;
   font-family: inherit;
   color: var(--text, var(--ink, inherit));
-  background: color-mix(in srgb, #ffffff 70%, #f1f1f1);
+  background: color-mix(in srgb, #fafaf8 70%, #f1f1f1);
   box-sizing: border-box;
   margin-bottom: 16px;
 }
@@ -1775,12 +1775,12 @@ body {
 .add-monitor-form input:focus {
   outline: none;
   border-color: color-mix(in srgb, #007aff 30%, #f1f1f1);
-  background: color-mix(in srgb, #ffffff 90%, #f1f1f1);
+  background: color-mix(in srgb, #fafaf8 90%, #f1f1f1);
 }
 
 .add-btn-small {
-  /* Opaque wash — was white glass rgba(255,255,255,0.3) fallback (#14). */
-  background: color-mix(in srgb, #ffffff 30%, #f1f1f1);
+  /* Opaque wash — Apple #ffffff → Architect paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #fafaf8 30%, #f1f1f1);
   border: 1px solid color-mix(in srgb, #000000 10%, #f1f1f1);
   border-radius: 6px;
   color: var(--muted, color-mix(in srgb, #808080 60%, #f1f1f1));
@@ -1794,7 +1794,7 @@ body {
 }
 
 .add-btn-small:hover {
-  background: color-mix(in srgb, #ffffff 40%, #f1f1f1);
+  background: color-mix(in srgb, #fafaf8 40%, #f1f1f1);
   border-color: color-mix(in srgb, #000000 15%, #f1f1f1);
   color: var(--text, var(--ink, inherit));
 }
@@ -1806,7 +1806,7 @@ body {
 }
 
 .add-btn-small:active {
-  background: color-mix(in srgb, #ffffff 50%, #f1f1f1);
+  background: color-mix(in srgb, #fafaf8 50%, #f1f1f1);
 }
 
 .monitors-list {
@@ -1814,8 +1814,8 @@ body {
 }
 
 .monitor-item {
-  /* Opaque wash — was white glass rgba(255,255,255,0.3) fallback (#14). */
-  background: color-mix(in srgb, #ffffff 30%, #f1f1f1);
+  /* Opaque wash — Apple #ffffff → Architect paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #fafaf8 30%, #f1f1f1);
   border: 1px solid color-mix(in srgb, #000000 10%, #f1f1f1);
   border-radius: 8px;
   padding: 10px 12px;
@@ -1974,8 +1974,8 @@ body {
 
 .ollama-menu {
   position: fixed;
-  /* Opaque panel — was white glass rgba(255,255,255,0.95) fallback (#14). */
-  background: var(--panel, color-mix(in srgb, #ffffff 95%, #f1f1f1));
+  /* Opaque wash — Apple #ffffff → Architect paper pigments (#14 / P2). */
+  background: var(--panel, color-mix(in srgb, #fafaf8 95%, #f1f1f1));
   border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #f1f1f1));
   border-radius: 8px;
   padding: 4px 0;
@@ -2214,8 +2214,8 @@ body {
 
 .model-select-dropdown {
   position: absolute;
-  /* Opaque panel — was white glass rgba(255,255,255,0.95) fallback (#14). */
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #ffffff 95%, #f1f1f1)))));
+  /* Opaque wash — Apple #ffffff → Architect paper pigments (#14 / P2). */
+  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #fafaf8 95%, #f1f1f1)))));
   /* Opaque hairline — was black glass rgba(0,0,0,0.1) fallback (#14). */
   border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #f1f1f1));
   border-radius: 8px;
@@ -2256,8 +2256,8 @@ body {
 
 .model-select {
   flex: 1;
-  /* Opaque wash — was white glass rgba(255,255,255,0.5) fallback (#14). */
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #ffffff 50%, #f1f1f1)))));
+  /* Opaque wash — Apple #ffffff → Architect paper pigments (#14 / P2). */
+  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #fafaf8 50%, #f1f1f1)))));
   /* Opaque hairline — was black glass rgba(0,0,0,0.1) fallback (#14). */
   border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #f1f1f1));
   border-radius: 8px;
@@ -2271,9 +2271,9 @@ body {
 
 .model-select:focus {
   outline: none;
-  /* Opaque accent / wash — was Apple rgba glass fallback (#14). */
+  /* Opaque wash — Apple #ffffff → Architect paper pigments (#14 / P2). */
   border-color: var(--accent, color-mix(in srgb, #007aff 30%, #f1f1f1));
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #ffffff 70%, #f1f1f1)))));
+  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #fafaf8 70%, #f1f1f1)))));
 }
 
 .model-select:focus-visible {
@@ -2284,8 +2284,8 @@ body {
 
 
 .model-select:hover {
-  /* Opaque wash — was white glass rgba(255,255,255,0.6) fallback (#14). */
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #ffffff 60%, #f1f1f1)))));
+  /* Opaque wash — Apple #ffffff → Architect paper pigments (#14 / P2). */
+  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #fafaf8 60%, #f1f1f1)))));
 }
 
 .ollama-chat {
@@ -2297,8 +2297,8 @@ body {
   overflow-y: auto;
   margin-bottom: 12px;
   padding: 12px;
-  /* Opaque wash — was white glass rgba(255,255,255,0.3) fallback (#14). */
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #ffffff 30%, #f1f1f1)))));
+  /* Opaque wash — Apple #ffffff → Architect paper pigments (#14 / P2). */
+  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #fafaf8 30%, #f1f1f1)))));
   /* Opaque hairline — was black glass rgba(0,0,0,0.1) fallback (#14). */
   border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #f1f1f1));
   border-radius: 8px;
@@ -2321,8 +2321,8 @@ body {
 }
 
 .chat-message.assistant {
-  /* Opaque wash — was white glass rgba(255,255,255,0.5) fallback (#14). */
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #ffffff 50%, #f1f1f1)))));
+  /* Opaque wash — Apple #ffffff → Architect paper pigments (#14 / P2). */
+  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, color-mix(in srgb, #fafaf8 50%, #f1f1f1)))));
   margin-right: 20px;
   color: var(--text, var(--ink, inherit));
 }

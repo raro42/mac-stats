@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2753] - 2026-11-14
+
+### Changed
+- Material / Architect cream pigments: Material / Architect Monitors menu/popover · settings items · add-form inputs · add-btn · monitor-item, and AI Chat `.ollama-menu` · model-select · chat-messages · assistant bubble remap Apple `#ffffff` mixes to paper pigments on `#e7e2d9` / `#f1f1f1` (Material body radial wash remapped in 0.1.2752; Swiss / Apple keep shared white; Send white-on-blue intentional).
+
 ## [0.1.2752] - 2026-11-14
 
 ### Changed
