@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2755] - 2026-11-15
+
+### Changed
+- Data Poster layout-daily: base `.lpm-toggle` track remaps Apple `#ececf1` to poster shell `#0b0b10` (parity with Dark / Neon / Futuristic base remaps). Removes the white-chip base rule that only `.lpm-info .lpm-toggle` previously overrode.
+
 ## [0.1.2754] - 2026-11-14
 
 ### Changed

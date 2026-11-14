@@ -1122,17 +1122,11 @@ body {
   width: 34px;
   height: 18px;
   border-radius: 999px;
-  /* Opaque track — alpha mix + inset shadow stay in Graphics and Media (#14). */
-  background: color-mix(in srgb, var(--muted, #888) 22%, #ececf1);
-  border: 1px solid color-mix(in srgb, var(--muted, #888) 28%, #ececf1);
-  box-shadow: none;
-}
-
-.lpm-info .lpm-toggle {
-  /* Opaque dark track — mix against poster shell #0b0b10 (not early #0e0e14). */
-  /* Shared Apple #ececf1 wash reads as a white chip here (#14 / #15). */
+  /* Opaque poster track — Apple #ececf1 wash → poster shell #0b0b10 (#14 / P2; layout-daily). */
+  /* Was base #ececf1 with only .lpm-info override — white chip if toggle renders outside .lpm-info. */
   background: color-mix(in srgb, var(--muted, #888) 28%, #0b0b10);
-  border-color: color-mix(in srgb, var(--muted, #888) 36%, #0b0b10);
+  border: 1px solid color-mix(in srgb, var(--muted, #888) 36%, #0b0b10);
+  box-shadow: none;
 }
 
 .lpm-toggle::after {
