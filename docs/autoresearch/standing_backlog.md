@@ -1,3 +1,8 @@
+## Overnight merge — v0.1.2726
+
+- Light History time-range cream remaps: Light `.history-controls label` · `.time-range-dropdown` (resting · hover · `:focus` · `option`) still mixed Apple `#ffffff` while Material / Architect already sat on cream paper (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa`. Standing P2 #14 after light Force Quit soft-states remaps v0.1.2725; product fuel (digester empty; design-review grace; layout-daily due=false today — Data Poster marked; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover light cream `#ffffff` mixes (Settings inputs/buttons/theme-item · Changelog muted · process-bar-fill · other muted type / remaining soft-states still on Apple white) if still muddy, or sibling/product fuel — not another keep-pNN clone.
+
+
 ## Overnight merge — v0.1.2725
 
 - Light Force Quit soft-states: Light theme `.force-quit-btn` resting / hover / `:active` still mixed Apple `#ffffff` while `:focus-visible` and confirming already sat on paper `#f7f7fa` (Material / Architect already paper; Swiss / Apple keep shared white). Opaque red washes on `#f7f7fa`. Standing P2 #14 after light generic Soft Save remaps v0.1.2724; product fuel (digester empty; design-review grace; layout-daily due=false today — Data Poster marked; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover light cream `#ffffff` mixes (history `.time-range-dropdown` resting/hover/focus · other muted type / remaining soft-states still on Apple white) if still muddy, or sibling/product fuel — not another keep-pNN clone.

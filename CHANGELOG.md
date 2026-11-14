@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2726] - 2026-11-14
+
+### Changed
+
+- **Light History time-range cream remaps:** Light `.history-controls label` · `.time-range-dropdown` (resting · hover · `:focus` · `option`) still mixed Apple `#ffffff` while Material / Architect already sat on cream paper (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` so History time-range matches the cream shell (after Force Quit soft-states remaps v0.1.2725).
+
 ## [0.1.2725] - 2026-11-14
 
 ### Changed

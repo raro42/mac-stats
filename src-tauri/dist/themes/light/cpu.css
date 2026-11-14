@@ -988,14 +988,14 @@ body {
 
 .history-controls label {
   /* Opaque type — was gray glass rgba(128,…) fallback (#14). */
-  color: var(--muted, color-mix(in srgb, #808080 80%, #ffffff));
+  color: var(--muted, color-mix(in srgb, #808080 80%, #f7f7fa));
   font-weight: 500;
 }
 
 .time-range-dropdown {
   /* Opaque wash / hairline — was Light accent glass rgba(106,166,223,…) (#14). */
-  background: color-mix(in srgb, #6aa6df 5%, #ffffff);
-  border: 1px solid color-mix(in srgb, #6aa6df 30%, #ffffff);
+  background: color-mix(in srgb, #6aa6df 5%, #f7f7fa);
+  border: 1px solid color-mix(in srgb, #6aa6df 30%, #f7f7fa);
   border-radius: 4px;
   color: #6aa6df;
   padding: 4px 8px;
@@ -1006,20 +1006,20 @@ body {
 }
 
 .time-range-dropdown:hover {
-  background: color-mix(in srgb, #6aa6df 10%, #ffffff);
-  border-color: color-mix(in srgb, #6aa6df 50%, #ffffff);
+  background: color-mix(in srgb, #6aa6df 10%, #f7f7fa);
+  border-color: color-mix(in srgb, #6aa6df 50%, #f7f7fa);
 }
 
 .time-range-dropdown:focus {
   outline: none;
-  background: color-mix(in srgb, #6aa6df 15%, #ffffff);
-  border-color: color-mix(in srgb, #6aa6df 70%, #ffffff);
-  box-shadow: 0 0 0 2px color-mix(in srgb, #6aa6df 10%, #ffffff);
+  background: color-mix(in srgb, #6aa6df 15%, #f7f7fa);
+  border-color: color-mix(in srgb, #6aa6df 70%, #f7f7fa);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #6aa6df 10%, #f7f7fa);
 }
 
 .time-range-dropdown option {
   /* Opaque option panel — was dark #1a1a1a glass hole on Light paper (#14). */
-  background: color-mix(in srgb, #f7f7fa 94%, #ffffff);
+  background: color-mix(in srgb, #f7f7fa 94%, #f7f7fa);
   color: #6aa6df;
 }
 
