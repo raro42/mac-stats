@@ -4,6 +4,7 @@ Overnight autoresearch kept shipping Light / Material / Architect cream-paper re
 
 ## Shipped tonight
 
+- **v0.1.2717** — Force Quit section hairline · Perplexity search input / inline-key · Ops filter just-cleared washes on cream paper.
 - **v0.1.2716** — Disk Cleanup add/remove + Force Quit Saved washes on cream paper.
 - **v0.1.2715** — Perplexity result Copied washes on cream paper.
 - **v0.1.2714** — Perplexity muted type (result list / snippet / config status).
@@ -13,10 +14,11 @@ Overnight autoresearch kept shipping Light / Material / Architect cream-paper re
 - **v0.1.2710** — Disk Cleanup empty + disabled/Recurse.
 - Earlier tonight: logs-line soft-states, Force Quit confirming + soft-delete, icon-line status, process-row soft-states, Perplexity Search + Clear/Send saved flashes, and more Standing P2 #14 remaps through the 20:00 window.
 
-## Fuel note
+## Tried / discarded
 
-Digester open empty all night. Standing backlog P2 #14 (opaque `#ffffff` → cream paper) drove keeps. Dark / Neon / Futuristic layout-daily still due next calendar day; Mac capture blocked by TCC.
+- Local Copied-as-2714 raced vs origin muted-type 2714 → discard, then kept as 2715.
 
-## Next leftovers
+## Next fuel
 
-Force Quit section hairline · Perplexity inline-key · Send active/disabled · other muted type / remaining soft-states — or sibling/product fuel (not another keep-pNN clone).
+- Dark layout-daily next calendar day; Mac capture when TCC allows.
+- Leftover light cream `#ffffff` mixes: other muted type / remaining soft-states still on Apple white.
