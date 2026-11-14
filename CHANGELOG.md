@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2728] - 2026-11-14
+
+### Changed
+
+- **Light setting-toggle track cream remaps:** Light `.setting-toggle input[type="checkbox"]` (both track blocks: resting · `:checked` · knob shadow) · matching `.toggle-label` type still mixed Apple `#ffffff` while Material / Architect already sat on cream paper (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` so Settings toggles match the cream shell (after Settings / Changelog / process-bar remaps v0.1.2727).
+
 ## [0.1.2727] - 2026-11-14
 
 ### Changed

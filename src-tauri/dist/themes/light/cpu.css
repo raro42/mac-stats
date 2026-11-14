@@ -775,9 +775,9 @@ body {
   width: 44px;
   height: 24px;
   border-radius: 12px;
-  /* Opaque track — was Apple rgba(0,0,0,…) glass (#14). */
-  border: 1px solid color-mix(in srgb, #000000 10%, #ffffff);
-  background: color-mix(in srgb, #000000 8%, #ffffff);
+  /* Opaque track — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  border: 1px solid color-mix(in srgb, #000000 10%, #f7f7fa);
+  background: color-mix(in srgb, #000000 8%, #f7f7fa);
   appearance: none;
   cursor: pointer;
   position: relative;
@@ -786,9 +786,9 @@ body {
 }
 
 .setting-toggle input[type="checkbox"]:checked {
-  /* Opaque accent — was Apple rgba(59,130,246,…) glass (#14). */
-  background: color-mix(in srgb, #3b82f6 80%, #ffffff);
-  border-color: color-mix(in srgb, #3b82f6 60%, #ffffff);
+  /* Opaque accent — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, #3b82f6 80%, #f7f7fa);
+  border-color: color-mix(in srgb, #3b82f6 60%, #f7f7fa);
 }
 
 .setting-toggle input[type="checkbox"]::before {
@@ -801,7 +801,7 @@ body {
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  box-shadow: 0 2px 4px color-mix(in srgb, #000000 20%, #ffffff);
+  box-shadow: 0 2px 4px color-mix(in srgb, #000000 20%, #f7f7fa);
 }
 
 .setting-toggle input[type="checkbox"]:checked::before {
@@ -905,9 +905,9 @@ body {
   width: 44px;
   height: 24px;
   border-radius: 12px;
-  /* Opaque track — was rgba(0,0,0,…) glass (#14). */
-  border: 1px solid color-mix(in srgb, #000000 10%, #ffffff);
-  background: color-mix(in srgb, #000000 8%, #ffffff);
+  /* Opaque track — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  border: 1px solid color-mix(in srgb, #000000 10%, #f7f7fa);
+  background: color-mix(in srgb, #000000 8%, #f7f7fa);
   appearance: none;
   cursor: pointer;
   position: relative;
@@ -915,9 +915,9 @@ body {
 }
 
 .setting-toggle input[type="checkbox"]:checked {
-  /* Opaque accent — was Light rgba(106,166,223,…) glass (#14). */
-  background: color-mix(in srgb, #6aa6df 80%, #ffffff);
-  border-color: color-mix(in srgb, #6aa6df 60%, #ffffff);
+  /* Opaque accent — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, #6aa6df 80%, #f7f7fa);
+  border-color: color-mix(in srgb, #6aa6df 60%, #f7f7fa);
 }
 
 .setting-toggle input[type="checkbox"]::before {
@@ -930,7 +930,7 @@ body {
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  box-shadow: 0 2px 4px color-mix(in srgb, #000000 20%, #ffffff);
+  box-shadow: 0 2px 4px color-mix(in srgb, #000000 20%, #f7f7fa);
 }
 
 .setting-toggle input[type="checkbox"]:checked::before {
@@ -941,8 +941,8 @@ body {
 .toggle-label {
   font-size: 14px;
   font-weight: 500;
-  /* Opaque type — was rgba(10,10,12,0.78) glass (#14). */
-  color: color-mix(in srgb, #0a0a0c 78%, #ffffff);
+  /* Opaque type — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #0a0a0c 78%, #f7f7fa);
 }
 
 
