@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2715] - 2026-11-14
+
+### Changed
+
+- **Light Perplexity result Copied washes:** Light / Material / Architect `.perplexity-result-item[role='option'].is-just-copied` · Copied badge still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Perplexity Copied chrome matches cream shells (after Perplexity muted type remaps v0.1.2714; race-discard re-pick).
+
+
 ## [0.1.2714] - 2026-11-14
 
 ### Changed

@@ -37637,3 +37637,41 @@ body.theme-architect .perplexity-config-status {
   color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 70%, #f1f1f1);
   opacity: 1;
 }
+
+/*
+ * Light / Material / Architect: Perplexity result Copied flash still mixes
+ * Apple `#ffffff` (`.perplexity-result-item[role='option'].is-just-copied` ·
+ * Copied badge `::after`) while Data Poster / Dark / Neon / Futuristic remaps
+ * already exist. Opaque washes on cream paper so Copied chrome matches light
+ * shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
+ * Perplexity muted type remaps v0.1.2714; race-discard re-pick after local
+ * Copied-as-2714 lost to origin muted type.
+ */
+/* OVERNIGHT v0.1.2715: light Perplexity result Copied remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .perplexity-result-item[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .perplexity-result-item[role='option'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .perplexity-result-item[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .perplexity-result-item[role='option'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .perplexity-result-item[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .perplexity-result-item[role='option'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #f1f1f1);
+}
