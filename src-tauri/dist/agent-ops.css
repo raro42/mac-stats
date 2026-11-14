@@ -37772,3 +37772,61 @@ body.theme-architect #force-quit-process-btn.is-just-saved {
   animation: none;
   box-shadow: none;
 }
+
+/*
+ * Light / Material / Architect: Force Quit section hairline · Perplexity
+ * inline-key / search input resting · Ops filter just-cleared still mix Apple
+ * `#ffffff` (`.force-quit-section` · `.perplexity-search-box input` ·
+ * `.perplexity-inline-key` · `.ops-filter-input.ops-filter-just-cleared`) while
+ * Data Poster / Dark / Neon / Futuristic remaps already exist (search input
+ * focus-visible already paper). Opaque washes on cream paper so Force Quit /
+ * Perplexity / Ops Clear flash match light shells (Swiss / Apple keep shared
+ * `#ffffff`). Standing P2 #14 after light Disk Cleanup add/remove + Force Quit
+ * Saved remaps v0.1.2716.
+ */
+/* OVERNIGHT v0.1.2717: light Force Quit section + Perplexity inline-key + Ops just-cleared remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .force-quit-section {
+  border-top-color: color-mix(in srgb, #000000 10%, #f7f7fa);
+}
+body.theme-light .perplexity-search-box input,
+body.theme-light .perplexity-inline-key {
+  border-color: color-mix(in srgb, currentColor 18%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 4%, #f7f7fa);
+}
+body.theme-light .ops-filter-input.ops-filter-just-cleared {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .force-quit-section {
+  border-top-color: color-mix(in srgb, #000000 10%, #ebe4d9);
+}
+body.theme-material .perplexity-search-box input,
+body.theme-material .perplexity-inline-key {
+  border-color: color-mix(in srgb, currentColor 18%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 4%, #ebe4d9);
+}
+body.theme-material .ops-filter-input.ops-filter-just-cleared {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .force-quit-section {
+  border-top-color: color-mix(in srgb, #232d41 10%, #f1f1f1);
+}
+body.theme-architect .perplexity-search-box input,
+body.theme-architect .perplexity-inline-key {
+  border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 4%, #f1f1f1);
+}
+body.theme-architect .ops-filter-input.ops-filter-just-cleared {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, #f1f1f1);
+}

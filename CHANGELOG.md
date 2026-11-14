@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2717] - 2026-11-14
+
+### Changed
+
+- **Light Force Quit section + Perplexity inline-key + Ops just-cleared washes:** Light / Material / Architect `.force-quit-section` · `.perplexity-search-box input` · `.perplexity-inline-key` · `.ops-filter-input.ops-filter-just-cleared` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Force Quit / Perplexity / Ops Clear flash match cream shells (after Disk Cleanup add/remove + Force Quit Saved remaps v0.1.2716).
+
+
 ## [0.1.2716] - 2026-11-14
 
 ### Changed
