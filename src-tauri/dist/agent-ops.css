@@ -35285,8 +35285,9 @@ body.theme-light #mac-stats-update-banner {
 }
 body.theme-light #mac-stats-first-launch-tip .tip-glyph,
 body.theme-light #mac-stats-update-banner .tip-glyph {
-  background: color-mix(in srgb, #ffffff 45%, #f7f7fa);
-  border-color: color-mix(in srgb, #ffffff 55%, #f7f7fa);
+  /* Opaque chrome — Apple #ffffff → Light paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #e8e8ee 45%, #f7f7fa);
+  border-color: color-mix(in srgb, #e0e0e6 55%, #f7f7fa);
   color: color-mix(in srgb, #0c0c10 50%, #f7f7fa);
 }
 body.theme-light #mac-stats-first-launch-tip code,
@@ -35297,13 +35298,14 @@ body.theme-light #mac-stats-update-banner code {
 body.theme-light #mac-stats-first-launch-tip .tip-dismiss,
 body.theme-light #mac-stats-update-banner .tip-dismiss {
   border-color: color-mix(in srgb, #0c0c10 8%, #f7f7fa);
-  background: color-mix(in srgb, #ffffff 35%, #f7f7fa);
+  /* Opaque chrome — Apple #ffffff → Light paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #e8e8ee 35%, #f7f7fa);
   color: color-mix(in srgb, #0c0c10 45%, #f7f7fa);
 }
 body.theme-light #mac-stats-first-launch-tip .tip-dismiss:hover,
 body.theme-light #mac-stats-update-banner .tip-dismiss:hover {
   border-color: color-mix(in srgb, #0c0c10 12%, #f7f7fa);
-  background: color-mix(in srgb, #ffffff 55%, #f7f7fa);
+  background: color-mix(in srgb, #e0e0e6 55%, #f7f7fa);
   color: color-mix(in srgb, #0c0c10 80%, #f7f7fa);
 }
 body.theme-light #mac-stats-update-banner a {
@@ -35320,8 +35322,9 @@ body.theme-material #mac-stats-update-banner {
 }
 body.theme-material #mac-stats-first-launch-tip .tip-glyph,
 body.theme-material #mac-stats-update-banner .tip-glyph {
-  background: color-mix(in srgb, #ffffff 45%, #ebe4d9);
-  border-color: color-mix(in srgb, #ffffff 55%, #ebe4d9);
+  /* Opaque chrome — Apple #ffffff → Material paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #e4ddd2 45%, #ebe4d9);
+  border-color: color-mix(in srgb, #ddd6cb 55%, #ebe4d9);
   color: color-mix(in srgb, #0c0c10 50%, #ebe4d9);
 }
 body.theme-material #mac-stats-first-launch-tip code,
@@ -35332,13 +35335,14 @@ body.theme-material #mac-stats-update-banner code {
 body.theme-material #mac-stats-first-launch-tip .tip-dismiss,
 body.theme-material #mac-stats-update-banner .tip-dismiss {
   border-color: color-mix(in srgb, #0c0c10 8%, #ebe4d9);
-  background: color-mix(in srgb, #ffffff 35%, #ebe4d9);
+  /* Opaque chrome — Apple #ffffff → Material paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #e4ddd2 35%, #ebe4d9);
   color: color-mix(in srgb, #0c0c10 45%, #ebe4d9);
 }
 body.theme-material #mac-stats-first-launch-tip .tip-dismiss:hover,
 body.theme-material #mac-stats-update-banner .tip-dismiss:hover {
   border-color: color-mix(in srgb, #0c0c10 12%, #ebe4d9);
-  background: color-mix(in srgb, #ffffff 55%, #ebe4d9);
+  background: color-mix(in srgb, #ddd6cb 55%, #ebe4d9);
   color: color-mix(in srgb, #0c0c10 80%, #ebe4d9);
 }
 body.theme-material #mac-stats-update-banner a {
@@ -35355,8 +35359,9 @@ body.theme-architect #mac-stats-update-banner {
 }
 body.theme-architect #mac-stats-first-launch-tip .tip-glyph,
 body.theme-architect #mac-stats-update-banner .tip-glyph {
-  background: color-mix(in srgb, #ffffff 45%, #f1f1f1);
-  border-color: color-mix(in srgb, #ffffff 55%, #f1f1f1);
+  /* Opaque chrome — Apple #ffffff → Architect paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #e8e8e8 45%, #f1f1f1);
+  border-color: color-mix(in srgb, #e0e0e0 55%, #f1f1f1);
   color: color-mix(in srgb, #0c0c10 50%, #f1f1f1);
 }
 body.theme-architect #mac-stats-first-launch-tip code,
@@ -35367,13 +35372,14 @@ body.theme-architect #mac-stats-update-banner code {
 body.theme-architect #mac-stats-first-launch-tip .tip-dismiss,
 body.theme-architect #mac-stats-update-banner .tip-dismiss {
   border-color: color-mix(in srgb, #0c0c10 8%, #f1f1f1);
-  background: color-mix(in srgb, #ffffff 35%, #f1f1f1);
+  /* Opaque chrome — Apple #ffffff → Architect paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #e8e8e8 35%, #f1f1f1);
   color: color-mix(in srgb, #0c0c10 45%, #f1f1f1);
 }
 body.theme-architect #mac-stats-first-launch-tip .tip-dismiss:hover,
 body.theme-architect #mac-stats-update-banner .tip-dismiss:hover {
   border-color: color-mix(in srgb, #0c0c10 12%, #f1f1f1);
-  background: color-mix(in srgb, #ffffff 55%, #f1f1f1);
+  background: color-mix(in srgb, #e0e0e0 55%, #f1f1f1);
   color: color-mix(in srgb, #0c0c10 80%, #f1f1f1);
 }
 body.theme-architect #mac-stats-update-banner a {

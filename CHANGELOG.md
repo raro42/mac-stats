@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2748] - 2026-11-14
+
+### Changed
+
+- **Light / Material / Architect tip chrome cream remaps:** Light / Material / Architect first-launch / update-banner `.tip-glyph` · `.tip-dismiss` (resting · hover) still mixed Apple `#ffffff` while AI-off chips already sat on cream paper pigments (AI-off remapped in v0.1.2747; Swiss / Apple keep shared white). Opaque mixes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so tip glyph and dismiss controls match each cream shell.
+
 ## [0.1.2747] - 2026-11-14
 
 ### Changed
