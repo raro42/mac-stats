@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2731] - 2026-11-14
+
+### Changed
+
+- **Light process-row / process-name cream remaps:** Light `.process-row` hairline · `.process-name` muted type still mixed Apple `#ffffff` while Material / Architect already sat on cream paper (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque hairline and type on paper `#f7f7fa` so Top Processes rows match the cream shell (after metric / section / details remaps v0.1.2730).
+
 ## [0.1.2730] - 2026-11-14
 
 ### Changed

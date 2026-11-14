@@ -468,15 +468,15 @@ body {
   gap: 12px;
   align-items: center;
   padding: 4px 0;
-  /* Opaque hairline — was rgba(0,0,0,0.06) glass (#14). */
-  border-bottom: 1px solid color-mix(in srgb, #000000 6%, #ffffff);
+  /* Opaque hairline — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  border-bottom: 1px solid color-mix(in srgb, #000000 6%, #f7f7fa);
 }
 
 .process-name {
   font-size: 13px;
   font-weight: 400;
-  /* Opaque type — was rgba(30,30,34,0.72) glass (#14). */
-  color: color-mix(in srgb, #1e1e22 72%, #ffffff);
+  /* Opaque type — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #1e1e22 72%, #f7f7fa);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
