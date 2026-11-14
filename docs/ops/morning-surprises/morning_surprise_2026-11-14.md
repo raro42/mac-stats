@@ -1,24 +1,23 @@
 # Morning surprise — 2026-11-14
 
-Overnight autoresearch kept shipping Light cream paper remaps (standing P2 #14). Digester stayed empty; design-review grace; layout-daily Data Poster already marked.
+Overnight ratchet kept Light cream remaps through **v0.1.2729**.
 
-## Shipped tonight (latest first)
+## Shipped this window
 
-- **v0.1.2728** — Light Settings `.setting-toggle` track blocks (resting / checked / knob shadow) + `.toggle-label` Apple `#ffffff` → paper `#f7f7fa` (Material / Architect already paper). Race-discard re-pick after local Settings-as-2727 lost to origin.
-- **v0.1.2727** — Light Settings / Changelog / process-bar cream remaps (origin ship; broader than the raced local Settings-only attempt).
+- **v0.1.2729** — Light battery + icon-line muted cream: `.battery-icon` / `.charging` · `.icon-line-item` / `:hover` type onto `#f7f7fa`.
+- **v0.1.2728** — Light setting-toggle track cream remaps.
+- **v0.1.2727** — Light Settings / Changelog / process-bar cream remaps.
 - **v0.1.2726** — Light History time-range cream remaps.
-- **v0.1.2725** — Light Force Quit `.force-quit-btn` resting / hover / `:active`.
-- Earlier keeps same night: Soft Save cascade + Ops / Monitors / Perplexity / Processes cream remaps (see `results.tsv` / loop_backlog).
+- Earlier same night: Soft Save, Force Quit, Disk Cleanup, Perplexity, Ops, Monitors cream catch-up (see CHANGELOG).
 
 ## Tried / discarded
 
-- Parallel-race discard: local Settings inputs/buttons/theme-item as 2727 lost to origin Settings/Changelog/process-bar 2727; re-picked setting-toggle as 2728.
+- Parallel-race discards when origin already owned a patch number (local work re-picked next leftover).
 
-## Not a digester night
+## Fuel note
 
-- Digester open stayed empty (0 turns / 7d). Fuel came from standing backlog P2 #14.
+Digester open stayed empty. Design-review still in grace. Layout-daily Data Poster marked today (Dark/Neon/Futuristic wait for next calendar day). Standing P2 #14 Light cream leftover continues: metric muted type / remaining soft-states.
 
-## Next
+## Fitness
 
-- Dark layout-daily next calendar day (Mac capture when TCC allows).
-- Leftover Light cream mixes: other muted type / remaining soft-states still on Apple white.
+Power strip battery glyphs and icon-line resting/hover type no longer mix Apple white on the Light cream shell.
