@@ -38006,3 +38006,86 @@ body.theme-material #process-list .process-bar {
 body.theme-architect #process-list .process-bar {
   background: color-mix(in srgb, currentColor 12%, #f1f1f1);
 }
+
+
+/*
+ * Light / Material / Architect: Monitors Check/Remove Saved flashes still mix
+ * Apple `#ffffff` via shared `button.is-just-saved` (`.monitor-detail-check` ·
+ * `.monitor-detail-remove` · `.monitor-remove-btn` `.is-just-saved`); Disk
+ * Cleanup soft-delete Saved lacked the green wash on cream
+ * (`.disk-cleanup-soft-delete-label.is-just-saved`); Ops refresh-row hairline
+ * (`.ops-refresh-row.ops-refresh-row-top`) and Settings Judge-off muted type
+ * (`.setting-toggle .toggle-label.is-judge-off`) still mix Apple `#ffffff`
+ * while Data Poster / Dark / Neon / Futuristic remaps already exist (Clear
+ * Saved paper in v0.1.2705; soft-delete shell in v0.1.2708). Opaque washes on
+ * cream paper so Monitors Saved / soft-delete Saved / Ops hairline / Judge-off
+ * match light shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14
+ * after light Top Processes bar track remaps v0.1.2720.
+ */
+/* OVERNIGHT v0.1.2721: light Monitors Saved + soft-delete Saved + Ops hairline + Judge-off remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .monitor-detail-check.is-just-saved,
+body.theme-light .monitor-detail-remove.is-just-saved,
+body.theme-light .monitor-remove-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #f7f7fa) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #f7f7fa) !important;
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f7f7fa));
+  box-shadow: none;
+}
+body.theme-light .disk-cleanup-soft-delete-label.is-just-saved {
+  color: #34c759;
+  background: color-mix(in srgb, #34c759 12%, #f7f7fa);
+  box-shadow: none;
+}
+body.theme-light .ops-refresh-row.ops-refresh-row-top {
+  border-bottom-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+}
+body.theme-light .setting-toggle .toggle-label.is-judge-off {
+  color: color-mix(in srgb, #0c0c10 48%, #f7f7fa);
+  opacity: 1;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .monitor-detail-check.is-just-saved,
+body.theme-material .monitor-detail-remove.is-just-saved,
+body.theme-material .monitor-remove-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #ebe4d9) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #ebe4d9) !important;
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ebe4d9));
+  box-shadow: none;
+}
+body.theme-material .disk-cleanup-soft-delete-label.is-just-saved {
+  color: #34c759;
+  background: color-mix(in srgb, #34c759 12%, #ebe4d9);
+  box-shadow: none;
+}
+body.theme-material .ops-refresh-row.ops-refresh-row-top {
+  border-bottom-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+}
+body.theme-material .setting-toggle .toggle-label.is-judge-off {
+  color: color-mix(in srgb, #0c0c10 48%, #ebe4d9);
+  opacity: 1;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .monitor-detail-check.is-just-saved,
+body.theme-architect .monitor-detail-remove.is-just-saved,
+body.theme-architect .monitor-remove-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #f1f1f1) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #f1f1f1) !important;
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
+  box-shadow: none;
+}
+body.theme-architect .disk-cleanup-soft-delete-label.is-just-saved {
+  color: #34c759;
+  background: color-mix(in srgb, #34c759 12%, #f1f1f1);
+  box-shadow: none;
+}
+body.theme-architect .ops-refresh-row.ops-refresh-row-top {
+  border-bottom-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+}
+body.theme-architect .setting-toggle .toggle-label.is-judge-off {
+  color: color-mix(in srgb, #0c0c10 48%, #f1f1f1);
+  opacity: 1;
+}

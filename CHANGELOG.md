@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2721] - 2026-11-14
+
+### Changed
+
+- **Light Monitors Saved + soft-delete Saved + Ops hairline + Judge-off washes:** Light / Material / Architect `.monitor-detail-check` · `.monitor-detail-remove` · `.monitor-remove-btn` `.is-just-saved` · `.disk-cleanup-soft-delete-label.is-just-saved` · `.ops-refresh-row.ops-refresh-row-top` · `.setting-toggle .toggle-label.is-judge-off` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Monitors Saved / soft-delete Saved / Ops hairline / Judge-off match cream shells (after Top Processes bar track remaps v0.1.2720).
+
+
 ## [0.1.2720] - 2026-11-14
 
 ### Changed
