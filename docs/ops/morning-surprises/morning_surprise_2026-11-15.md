@@ -1,27 +1,27 @@
 # Morning surprise — 2026-11-15
 
-Overnight cream-pigment ratchet kept moving on Light / Material / Architect shells.
+Overnight Track B (product code) kept shipping cream-shell pigment remaps (Standing P2 #14). Digester open stayed empty; design-review stayed in grace; layout-daily Data Poster already marked for 2026-11-14.
 
-## Shipped
+## Shipped tonight (keep)
 
-- **v0.1.2752** — Material `body` dual radial wash: Apple `#ffffff` → paper pigments on `#e7e2d9` (`#e4ddd2` mixes).
-- **v0.1.2751** — Material `.dial` pad + inset · `.battery-power-strip` · `.battery-icon.no-battery`, and Architect `.arch-sheet` · `.metric-box` · `.battery-power-strip` · `.battery-icon.no-battery`: Apple `#ffffff` → paper pigments (`#e4ddd2`/`#e7e2d9`, `#e8e8e8`/`#f1f1f1`).
-- **v0.1.2750** — Light `.icon-btn` · `.metric-card`, Material `.icon-btn`, Architect `.arch-actions` cream remaps.
-- **v0.1.2749** — Light / Material / Architect `.history-chart-container` fill + inset cream pigments.
-- **v0.1.2748** — tip glyph / dismiss cream remaps.
-- Earlier same night: AI-off chips, LPM / setting-toggle knobs, battery strip, and more P2 #14 cream parity (see CHANGELOG).
+| Version | What |
+|---|---|
+| **v0.1.2753** | Material / Architect Monitors + AI Chat leftover Apple `#ffffff` → panel pigments `#f5f1ea` / `#fafaf8` on paper `#e7e2d9` / `#f1f1f1` (menus, settings items, add-form, monitor tiles, ollama menu, model select, chat pane, assistant bubble). Send white-on-blue left intentional. |
+| **v0.1.2752** | Material `body` dual radial wash Apple `#ffffff` → `#e4ddd2` on `#e7e2d9`. |
+| **v0.1.2751** | Material dial + battery strip; Architect sheet / metric-box / battery strip cream remaps. |
+| earlier 20:00–23:00 | Continues the cream opaque-wash ladder (history-chart, tip chrome, AI-off chips, LPM, setting-toggle knobs, …) — see `results.tsv` / `loop_backlog.md`. |
 
 ## Tried / discarded
 
-- Parallel-race discards when origin landed the same surface first (re-picked leftovers as next patch).
-- Design review due for `feature-agent-ops.png` (~60d stale); Linux rack cannot Mac window-only capture this tick — deferred polish-without-capture / Mac TCC.
+- Parallel-race discards earlier in the night when origin already held the local pick (cpu-actions-as-2746, tip+AI-off-as-2747, etc.). Re-picked next leftover each time.
 
-## Why it matters
+## Next fuel
 
-Cream Material shells no longer flash Apple-white glass in the window radial wash behind the dial and cards. Dial pad, Architect sheet / metric tiles, battery strips, and earlier pills already match the same paper stack.
+- Dark / Neon / Futuristic **layout-daily** when the calendar day quota opens (Data Poster done for 2026-11-14).
+- Mac capture for `feature-agent-ops.png` when TCC allows (design-review recommended surface).
+- Light Monitors leftover `#ffffff` first-color mixes (AI Chat already remapped on Light).
+- Send white-on-blue intentional — leave alone.
 
-## Still open
+## Nightly minimum
 
-- Dark layout-daily (next calendar day).
-- Mac window-only Agent Ops screenshot when TCC allows (design-review due).
-- Leftover cream soft-states: Material/Architect Monitors/AI Chat leftover `#ffffff` panels if muddy · Send white-on-blue intentional.
+Satisfied: multiple `keep` rows in `~/.mac-stats/improvements/autoresearch/results.tsv` for the 20:00–06:00 window (including **v0.1.2753**).
