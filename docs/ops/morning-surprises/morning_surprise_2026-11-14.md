@@ -1,26 +1,26 @@
 # Morning surprise — 2026-11-14
 
-Overnight Track B kept cream-paper remaps on Light / Material / Architect (Standing P2 #14). Digester open stayed empty; design-review grace; layout-daily Data Poster already marked for today.
+Overnight autoresearch (Track B) kept moving the Light / Material / Architect cream remaps (standing P2 #14). Digester stayed empty; design-review and layout-daily were not due.
 
-## Shipped (latest)
+## Shipped this night (highlights)
 
-- **v0.1.2718** — Process Details `.process-detail-hero` · `.process-detail-section` · row hairlines onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1`.
+- **v0.1.2719** — Disk Cleanup add-scope text/number + focus, Monitors `.monitor-detail-log`, Disk Cleanup / Debug Log toolbar Saved flashes → paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` (`8816979c`).
+- **v0.1.2718** — Process Details hero / section / row hairlines on cream paper.
+- **v0.1.2717** — Force Quit section + Perplexity inline-key + Ops filter just-cleared.
+- Earlier in the window: 2710–2716 chain (empty shells, Perplexity, Disk Cleanup, Force Quit Saved, soft-states).
 
-## Earlier tonight (selected)
+## Tried / context
 
-- **v0.1.2717** — Force Quit section + Perplexity inline-key + Ops just-cleared
-- **v0.1.2716** — Disk Cleanup add/remove + Force Quit Saved
-- **v0.1.2715** — Perplexity result Copied
-- **v0.1.2714** — Perplexity muted type
-- **v0.1.2713** — Perplexity empty + error
-- **v0.1.2712…2694** — more cream remaps through the window (see `loop_backlog.md` / `results.tsv`)
+- Digester: 0 turns / 7d (not a surprise by itself).
+- Design-review: grace (recommended Agent Ops ~59d).
+- Layout-daily: Data Poster already marked today; Dark next calendar day.
+- Sibling OpenClaw/Hermes missing on rack.
+- Debug.log: quiet (no ERROR/WARN clusters in 180m).
 
-## Tried / discarded
+## Next fuel
 
-- Parallel-race discards when origin already owned the same leftover (re-picked next fuel).
+- Dark layout-daily next calendar day (Mac capture when TCC allows).
+- Leftover light cream mixes: `#process-list .process-bar` · other muted type / soft-states still on Apple white.
+- Product / sibling fuel when digester opens — not another keep-pNN clone.
 
-## Next
-
-- Dark layout-daily next calendar day (Neon / Futuristic still due).
-- Leftover cream mixes: Disk Cleanup add-scope number/focus · monitor-detail-log · logs-open Saved · other muted type / soft-states.
-- Sibling/product fuel when digester opens — not another keep-pNN clone.
+Generated: 2026-11-14 02:29 CET
