@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2747] - 2026-11-14
+
+### Changed
+
+- **Light / Material / Architect AI-off chip cream remaps:** Light `.icon-line-item.is-ai-off` resting still mixed Apple `#ececf1`, and Material / Architect early is-ai-off resting/hover still mixed Apple white / `#ececf1`, while later Material / Architect remaps already sat on cream paper (Swiss / Apple keep shared `#ececf1`). Opaque chips on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so dimmed AI icons match each cream shell.
+
 ## [0.1.2746] - 2026-11-14
 
 ### Changed

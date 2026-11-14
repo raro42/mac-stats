@@ -568,25 +568,29 @@ body.theme-swiss-minimalistic .icon-line-item.is-ai-off:not(.status-good):not(.s
 }
 
 body.theme-architect .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
-  background: color-mix(in srgb, #ffffff 55%, #f1f1f1);
+  /* Opaque chip — Apple white/#ececf1 → Architect paper #f1f1f1 (#14 / P2). */
+  background: color-mix(in srgb, #e8e8e8 55%, #f1f1f1);
   border-color: color-mix(in srgb, #e6e6ea 55%, #f1f1f1);
   color: color-mix(in srgb, color-mix(in srgb, #0c0c10 42%, #f1f1f1) 55%, #f1f1f1);
 }
 body.theme-architect .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
-  background: color-mix(in srgb, #ececf1 55%, #f1f1f1);
+  /* Opaque hover — Apple #ececf1 → Architect paper #f1f1f1 (#14 / P2). */
+  background: color-mix(in srgb, #e0e0e0 55%, #f1f1f1);
   border-color: color-mix(in srgb, #dcdce2 55%, #f1f1f1);
-  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 72%, #ececf1) 55%, #f1f1f1);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 72%, #f1f1f1) 55%, #f1f1f1);
 }
 
 body.theme-material .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
-  background: color-mix(in srgb, #ffffff 55%, #ebe4d9);
+  /* Opaque chip — Apple white/#ececf1 → Material paper #ebe4d9 (#14 / P2). */
+  background: color-mix(in srgb, #e4ddd2 55%, #ebe4d9);
   border-color: color-mix(in srgb, #e6e6ea 55%, #ebe4d9);
   color: color-mix(in srgb, color-mix(in srgb, #0c0c10 42%, #ebe4d9) 55%, #ebe4d9);
 }
 body.theme-material .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
-  background: color-mix(in srgb, #ececf1 55%, #ebe4d9);
+  /* Opaque hover — Apple #ececf1 → Material paper #ebe4d9 (#14 / P2). */
+  background: color-mix(in srgb, #ddd6cb 55%, #ebe4d9);
   border-color: color-mix(in srgb, #dcdce2 55%, #ebe4d9);
-  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 72%, #ececf1) 55%, #ebe4d9);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 72%, #ebe4d9) 55%, #ebe4d9);
 }
 
 body.theme-data-poster .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
@@ -36406,11 +36410,13 @@ body.theme-light #perplexity-search-btn:disabled {
   opacity: 1;
 }
 body.theme-light .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
-  background: color-mix(in srgb, #ececf1 55%, #f7f7fa);
+  /* Opaque chip — Apple #ececf1 → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, #e8e8ee 55%, #f7f7fa);
   border-color: color-mix(in srgb, #e6e6ea 55%, #f7f7fa);
   color: color-mix(in srgb, color-mix(in srgb, #0c0c10 42%, #f7f7fa) 55%, #f7f7fa);
 }
 body.theme-light .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
+  /* Opaque hover — cream soft-state on Light paper (#14 / P2). */
   background: color-mix(in srgb, #e0e0e6 55%, #f7f7fa);
   border-color: color-mix(in srgb, #dcdce2 55%, #f7f7fa);
   color: color-mix(in srgb, color-mix(in srgb, #0c0c10 72%, #f7f7fa) 55%, #f7f7fa);
