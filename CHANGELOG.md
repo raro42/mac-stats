@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2737] - 2026-11-14
+
+### Changed
+
+- **Light AI Chat collapse / model / messages cream remaps:** Light `.collapse-btn` · `.ollama-menu` panel · `.ollama-settings-popover` backdrop / close muted · `.model-text` · `.model-select-dropdown` · `.model-select` · `.chat-messages` · `.chat-message.user` / `.assistant` still mixed Apple `#ffffff` while Material / Architect already sat on cream paper (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque chrome on paper `#f7f7fa` so AI Chat chrome matches the cream shell (after Monitors menu/popover remaps v0.1.2736).
+
+
 ## [0.1.2736] - 2026-11-14
 
 ### Changed
