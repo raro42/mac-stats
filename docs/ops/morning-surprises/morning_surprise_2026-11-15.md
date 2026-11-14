@@ -1,20 +1,22 @@
 # Morning surprise — 2026-11-15
 
-Overnight autoresearch (Track B) kept shipping cream-paper remaps after an empty digester window.
+Overnight autoresearch (Track B) kept product polish while digester stayed empty.
 
 ## Shipped
 
-- **v0.1.2740** — Material / Architect icon-line resting chips + Ready/Slow/Down status washes + Low Power Mode knob onto cream paper (`#e7e2d9` / `#f1f1f1`).
-- **v0.1.2739** — Light history-tooltip dark panel mixes onto `#f7f7fa`.
-- **v0.1.2738** — Light chat markdown / thinking-dots / Debug Log chrome onto `#f7f7fa`.
-- Earlier same night: Light Monitors / AI Chat / root tokens / shell cream catch-up (v0.1.2736–2737 and prior overnight keeps).
+- **v0.1.2741** — Dark Low Power Mode track + knob remaps: Apple  /  → Dark field  (Data Poster parity). Neon / Futuristic LPM leftovers next.
+- **v0.1.2740** — Material / Architect icon-line + LPM knob cream remaps (backfilled keep row).
 
-## Tried / discarded
+## Context
 
-- Parallel race discard when a sibling tick already landed Light AI Chat collapse/model/messages as v0.1.2737 — re-picked markdown/logs leftovers as v0.1.2738.
+- Digester open: empty (0 turns / 7d).
+- Design review: grace (not due).
+- Layout daily: Data Poster marked today; Dark recommended next calendar day.
+- Sibling harnesses: missing on Linux rack.
+- Debug.log: no ERROR/WARN clusters.
 
-## Fuel notes
+## Next
 
-- Digester open stayed empty.
-- Design-review grace; layout-daily Data Poster already marked for 2026-11-14.
-- Next: Dark layout-daily when the calendar day opens, Mac capture when TCC allows, leftover cream soft-states or sibling/product fuel — not another keep-pNN clone.
+- Neon / Futuristic LPM track+knob field remaps.
+- Dark layout-daily when the day quota opens / Mac capture when TCC allows.
+- Not another keep-pNN clone.
