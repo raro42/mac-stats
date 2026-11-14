@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2713] - 2026-11-14
+
+### Changed
+
+- **Light Perplexity empty + error washes:** Light / Material / Architect `.perplexity-empty` (border · fill) · `.perplexity-empty-error` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so empty / error Perplexity chrome matches cream shells (after Top Processes empty remaps v0.1.2712; hint / CTA already paper).
+
 ## [0.1.2712] - 2026-11-14
 
 ### Changed

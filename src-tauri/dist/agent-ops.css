@@ -37545,3 +37545,43 @@ body.theme-architect .process-empty {
   border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
   background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Perplexity empty shell + error wash still mix
+ * Apple `#ffffff` (`.perplexity-empty` border · fill · `.perplexity-empty-error`)
+ * while Data Poster / Dark / Neon / Futuristic remaps already exist. Opaque
+ * washes on cream paper so empty / error Perplexity chrome matches light shells
+ * (Swiss / Apple keep shared `#ffffff`). Hint / CTA already paper; Standing P2
+ * #14 after light Top Processes empty remaps v0.1.2712.
+ */
+/* OVERNIGHT v0.1.2713: light Perplexity empty + empty-error remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .perplexity-empty {
+  border-color: color-mix(in srgb, currentColor 22%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 4%, #f7f7fa);
+}
+body.theme-light .perplexity-empty-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
+  background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .perplexity-empty {
+  border-color: color-mix(in srgb, currentColor 22%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 4%, #ebe4d9);
+}
+body.theme-material .perplexity-empty-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
+  background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .perplexity-empty {
+  border-color: color-mix(in srgb, currentColor 22%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 4%, #f1f1f1);
+}
+body.theme-architect .perplexity-empty-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+}
