@@ -37830,3 +37830,53 @@ body.theme-architect .ops-filter-input.ops-filter-just-cleared {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, #f1f1f1);
   background: color-mix(in srgb, var(--accent, #007aff) 8%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Process Details hero + section + row hairlines
+ * still mix Apple `#ffffff` (`.process-detail-hero` · `.process-detail-section` ·
+ * `.process-detail-section .process-detail-row`) while Data Poster / Dark / Neon /
+ * Futuristic remaps already exist (kb-hint / label / Saved flashes already paper).
+ * Opaque washes on cream paper so Process Details chrome matches light shells
+ * (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light Force Quit
+ * section + Perplexity inline-key + Ops just-cleared remaps v0.1.2717.
+ */
+/* OVERNIGHT v0.1.2718: light Process Details hero/section/row remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .process-detail-hero {
+  border-color: color-mix(in srgb, currentColor 12%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 5%, #f7f7fa);
+}
+body.theme-light .process-detail-section {
+  border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+}
+body.theme-light .process-detail-section .process-detail-row {
+  border-bottom-color: color-mix(in srgb, currentColor 8%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .process-detail-hero {
+  border-color: color-mix(in srgb, currentColor 12%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 5%, #ebe4d9);
+}
+body.theme-material .process-detail-section {
+  border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+}
+body.theme-material .process-detail-section .process-detail-row {
+  border-bottom-color: color-mix(in srgb, currentColor 8%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .process-detail-hero {
+  border-color: color-mix(in srgb, currentColor 12%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 5%, #f1f1f1);
+}
+body.theme-architect .process-detail-section {
+  border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+}
+body.theme-architect .process-detail-section .process-detail-row {
+  border-bottom-color: color-mix(in srgb, currentColor 8%, #f1f1f1);
+}

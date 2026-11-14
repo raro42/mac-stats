@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2718] - 2026-11-14
+
+### Changed
+
+- **Light Process Details hero/section/row washes:** Light / Material / Architect `.process-detail-hero` · `.process-detail-section` · `.process-detail-section .process-detail-row` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Process Details chrome matches cream shells (after Force Quit section + Perplexity inline-key + Ops just-cleared remaps v0.1.2717).
+
 ## [0.1.2717] - 2026-11-14
 
 ### Changed
