@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2719] - 2026-11-14
+
+### Changed
+
+- **Light Disk Cleanup add-scope fields + Monitors detail-log + toolbar Saved washes:** Light / Material / Architect `.disk-cleanup-scope-row input[type="number"]` · `.disk-cleanup-add-scope` text/number inputs · matching `:focus-visible` · `.monitor-detail-log` · Disk Cleanup / Debug Log toolbar `.is-just-saved` (`#disk-cleanup-refresh-btn` · `#disk-cleanup-run-btn` · `#disk-cleanup-save-scopes-btn` · `#disk-cleanup-add-btn` · `#logs-refresh-btn` · `#logs-open-btn`) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so add-scope fields / Monitors log / toolbar Saved match cream shells (after Process Details hero/section/row remaps v0.1.2718).
+
+
 ## [0.1.2718] - 2026-11-14
 
 ### Changed

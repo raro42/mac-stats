@@ -37880,3 +37880,103 @@ body.theme-architect .process-detail-section {
 body.theme-architect .process-detail-section .process-detail-row {
   border-bottom-color: color-mix(in srgb, currentColor 8%, #f1f1f1);
 }
+
+
+/*
+ * Light / Material / Architect: Disk Cleanup add-scope / scope number fields +
+ * focus, Monitors detail response log, and Disk Cleanup / Debug Log toolbar
+ * Saved flashes still mix Apple `#ffffff`
+ * (`.disk-cleanup-scope-row input[type="number"]` ·
+ * `.disk-cleanup-add-scope input[type="text"|"number"]` · matching
+ * `:focus-visible` · `.monitor-detail-log` · `#disk-cleanup-refresh-btn` /
+ * `#disk-cleanup-run-btn` / `#disk-cleanup-save-scopes-btn` /
+ * `#disk-cleanup-add-btn` / `#logs-refresh-btn` / `#logs-open-btn`
+ * `.is-just-saved`) while Data Poster / Dark / Neon / Futuristic remaps
+ * already exist (Add button resting/hover/active already paper in v0.1.2716;
+ * Process Details hero/section/row in v0.1.2718). Opaque washes on cream
+ * paper so add-scope fields / Monitors log / toolbar Saved match light shells
+ * (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light Process
+ * Details hero/section/row remaps v0.1.2718.
+ */
+/* OVERNIGHT v0.1.2719: light Disk Cleanup add-scope fields + monitor-detail-log + toolbar Saved remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .disk-cleanup-scope-row input[type="number"],
+body.theme-light .disk-cleanup-add-scope input[type="text"],
+body.theme-light .disk-cleanup-add-scope input[type="number"] {
+  border-color: color-mix(in srgb, currentColor 14%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 4%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-scope-row input[type="number"]:focus-visible,
+body.theme-light .disk-cleanup-add-scope input:focus-visible {
+  border-color: color-mix(in srgb, #0a84ff 40%, #f7f7fa);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 18%, #f7f7fa);
+}
+body.theme-light .monitor-detail-log {
+  background: color-mix(in srgb, #000 6%, #f7f7fa);
+}
+body.theme-light #disk-cleanup-refresh-btn.is-just-saved,
+body.theme-light #disk-cleanup-run-btn.is-just-saved,
+body.theme-light #disk-cleanup-save-scopes-btn.is-just-saved,
+body.theme-light #disk-cleanup-add-btn.is-just-saved,
+body.theme-light #logs-refresh-btn.is-just-saved,
+body.theme-light #logs-open-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #f7f7fa) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #f7f7fa) !important;
+  color: inherit;
+  box-shadow: none;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .disk-cleanup-scope-row input[type="number"],
+body.theme-material .disk-cleanup-add-scope input[type="text"],
+body.theme-material .disk-cleanup-add-scope input[type="number"] {
+  border-color: color-mix(in srgb, currentColor 14%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 4%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-scope-row input[type="number"]:focus-visible,
+body.theme-material .disk-cleanup-add-scope input:focus-visible {
+  border-color: color-mix(in srgb, #0a84ff 40%, #ebe4d9);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 18%, #ebe4d9);
+}
+body.theme-material .monitor-detail-log {
+  background: color-mix(in srgb, #000 6%, #ebe4d9);
+}
+body.theme-material #disk-cleanup-refresh-btn.is-just-saved,
+body.theme-material #disk-cleanup-run-btn.is-just-saved,
+body.theme-material #disk-cleanup-save-scopes-btn.is-just-saved,
+body.theme-material #disk-cleanup-add-btn.is-just-saved,
+body.theme-material #logs-refresh-btn.is-just-saved,
+body.theme-material #logs-open-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #ebe4d9) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #ebe4d9) !important;
+  color: inherit;
+  box-shadow: none;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .disk-cleanup-scope-row input[type="number"],
+body.theme-architect .disk-cleanup-add-scope input[type="text"],
+body.theme-architect .disk-cleanup-add-scope input[type="number"] {
+  border-color: color-mix(in srgb, currentColor 14%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 4%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-scope-row input[type="number"]:focus-visible,
+body.theme-architect .disk-cleanup-add-scope input:focus-visible {
+  border-color: color-mix(in srgb, #0a84ff 40%, #f1f1f1);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 18%, #f1f1f1);
+}
+body.theme-architect .monitor-detail-log {
+  background: color-mix(in srgb, #000 6%, #f1f1f1);
+}
+body.theme-architect #disk-cleanup-refresh-btn.is-just-saved,
+body.theme-architect #disk-cleanup-run-btn.is-just-saved,
+body.theme-architect #disk-cleanup-save-scopes-btn.is-just-saved,
+body.theme-architect #disk-cleanup-add-btn.is-just-saved,
+body.theme-architect #logs-refresh-btn.is-just-saved,
+body.theme-architect #logs-open-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #f1f1f1) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #f1f1f1) !important;
+  color: inherit;
+  box-shadow: none;
+}
