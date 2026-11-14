@@ -854,7 +854,8 @@ body {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: white;
+  /* Opaque knob — Apple white slab → Material paper #e7e2d9 (#14 / P2). */
+  background: #e7e2d9;
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
@@ -983,7 +984,8 @@ body {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: white;
+  /* Opaque knob — Apple white slab → Material paper #e7e2d9 (#14 / P2). */
+  background: #e7e2d9;
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */

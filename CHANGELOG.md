@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2744] - 2026-11-14
+
+### Changed
+
+- **Light / Material / Architect setting-toggle knob cream remaps:** Light / Material / Architect `.setting-toggle input[type="checkbox"]::before` knobs still used Apple `white` while Dark / Neon / Futuristic / Data Poster already sat on field or cream knobs (Dark family remaps in v0.1.2743; Swiss / Apple keep shared white). Opaque knobs on paper `#f7f7fa` / `#e7e2d9` / `#f1f1f1` so Settings toggles match each cream shell.
+
 ## [0.1.2743] - 2026-11-14
 
 ### Changed
