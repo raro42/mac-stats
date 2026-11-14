@@ -1,22 +1,19 @@
 # Morning surprise — 2026-11-14
 
-Overnight autoresearch (Track B) for Ralf.
+Overnight Track B kept product cream remaps on the Light theme (digester open stayed empty).
 
 ## Shipped
 
-- **v0.1.2726** — Light History time-range cream remaps: `.history-controls label` · `.time-range-dropdown` (resting · hover · `:focus` · `option`) `#ffffff` → paper `#f7f7fa` (Material / Architect already paper). Standing P2 #14.
-- **v0.1.2725** (parallel tick) — Light Force Quit resting/hover/active paper remaps.
-- Earlier tonight: Soft Save generic flashes, Disk Cleanup path hover + Process Details PID hover, and prior Light cream catch-ups through v0.1.2724.
+- **v0.1.2727** — Light Settings / Changelog / process-bar cream remaps ( → paper ): Settings note link, theme chips, inputs, buttons, help sheet, Changelog muted accents, process bar fill + percent.
+- Earlier tonight: **v0.1.2726** History time-range; **v0.1.2725** Force Quit soft-states; plus Soft Save / Monitors / Disk Cleanup / process-row series down through ~v0.1.2700+.
 
 ## Tried / discarded
 
-- Local **v0.1.2725** Settings + Changelog + History cream catch-up — **discard** (race: origin already cut Force Quit as 2725). Re-picked History time-range as **v0.1.2726**.
+- Parallel race earlier: local Settings cream as **v0.1.2725** lost to origin Force Quit soft-states → re-picked History, then Settings/Changelog/process-bar as **v0.1.2727**.
 
-## Fuel notes
+## Still open
 
-- Digester open empty; design-review grace; layout-daily Data Poster marked (Dark/Neon/Futuristic due next calendar day).
-- Next leftovers: Light Settings inputs/buttons/theme-item · Changelog muted · process-bar-fill, or sibling/product fuel — not keep-pNN clones.
+- Dark / Neon / Futuristic layout-daily when the calendar day quota opens.
+- Leftover Light cream mixes: setting-toggle track / other muted type / remaining soft-states.
+- Mac window capture when TCC allows (design-review still in grace).
 
-## Verify
-
-- `python3 scripts/autoresearch_ratchet.py verify` OK; keep logged; pushed `main` @ v0.1.2726.
