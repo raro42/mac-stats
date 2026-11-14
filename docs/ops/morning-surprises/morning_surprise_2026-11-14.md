@@ -1,24 +1,26 @@
 # Morning surprise — 2026-11-14
 
-Overnight autoresearch kept shipping Light / Material / Architect cream-paper remaps (Standing P2 #14). Digester open stayed empty; design-review stayed in grace; layout-daily Data Poster already marked for the day.
+Overnight Track B kept cream-paper remaps on Light / Material / Architect (Standing P2 #14). Digester open stayed empty; design-review grace; layout-daily Data Poster already marked for today.
 
-## Shipped tonight
+## Shipped (latest)
 
-- **v0.1.2717** — Force Quit section hairline · Perplexity search input / inline-key · Ops filter just-cleared washes on cream paper.
-- **v0.1.2716** — Disk Cleanup add/remove + Force Quit Saved washes on cream paper.
-- **v0.1.2715** — Perplexity result Copied washes on cream paper.
-- **v0.1.2714** — Perplexity muted type (result list / snippet / config status).
-- **v0.1.2713** — Perplexity empty + empty-error washes.
-- **v0.1.2712** — Top Processes empty shell.
-- **v0.1.2711** — Debug Log empty type.
-- **v0.1.2710** — Disk Cleanup empty + disabled/Recurse.
-- Earlier tonight: logs-line soft-states, Force Quit confirming + soft-delete, icon-line status, process-row soft-states, Perplexity Search + Clear/Send saved flashes, and more Standing P2 #14 remaps through the 20:00 window.
+- **v0.1.2718** — Process Details `.process-detail-hero` · `.process-detail-section` · row hairlines onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1`.
+
+## Earlier tonight (selected)
+
+- **v0.1.2717** — Force Quit section + Perplexity inline-key + Ops just-cleared
+- **v0.1.2716** — Disk Cleanup add/remove + Force Quit Saved
+- **v0.1.2715** — Perplexity result Copied
+- **v0.1.2714** — Perplexity muted type
+- **v0.1.2713** — Perplexity empty + error
+- **v0.1.2712…2694** — more cream remaps through the window (see `loop_backlog.md` / `results.tsv`)
 
 ## Tried / discarded
 
-- Local Copied-as-2714 raced vs origin muted-type 2714 → discard, then kept as 2715.
+- Parallel-race discards when origin already owned the same leftover (re-picked next fuel).
 
-## Next fuel
+## Next
 
-- Dark layout-daily next calendar day; Mac capture when TCC allows.
-- Leftover light cream `#ffffff` mixes: other muted type / remaining soft-states still on Apple white.
+- Dark layout-daily next calendar day (Neon / Futuristic still due).
+- Leftover cream mixes: Disk Cleanup add-scope number/focus · monitor-detail-log · logs-open Saved · other muted type / soft-states.
+- Sibling/product fuel when digester opens — not another keep-pNN clone.
