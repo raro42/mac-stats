@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2727] - 2026-11-14
+
+### Changed
+
+- **Light Settings / Changelog / process-bar cream remaps:** Light `.setting-note a` · `.theme-item` (resting · hover · current) · `.settings-input` / `.discord-token-input` (+ focus) · `.settings-btn` / `.settings-btn-primary` (+ hover) · `.settings-help-sheet` · `.changelog-error` / `.changelog-version` / `.changelog-item::before` / `.changelog-code` · `.process-bar-fill` / `.process-percent` still mixed Apple `#ffffff` while Material / Architect already sat on cream paper (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` so Settings, Changelog, and process bars match the cream shell (after History time-range remaps v0.1.2726).
+
+
 ## [0.1.2726] - 2026-11-14
 
 ### Changed

@@ -500,11 +500,11 @@ body {
 .process-bar-fill {
   height: 100%;
   width: 0;
-  /* Opaque fill — was blue glass rgba(110/140,…,0.95) gradient (#14). */
+  /* Opaque fill — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
   background: linear-gradient(
     90deg,
-    color-mix(in srgb, #6eaae6 95%, #ffffff),
-    color-mix(in srgb, #8cbef0 95%, #ffffff)
+    color-mix(in srgb, #6eaae6 95%, #f7f7fa),
+    color-mix(in srgb, #8cbef0 95%, #f7f7fa)
   );
   border-radius: 99px;
 }
@@ -514,8 +514,8 @@ body {
   text-align: right;
   font-size: 13px;
   font-weight: 400;
-  /* Opaque type — was rgba(30,30,34,0.72) glass (#14). */
-  color: color-mix(in srgb, #1e1e22 72%, #ffffff);
+  /* Opaque type — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #1e1e22 72%, #f7f7fa);
 }
 
 .process-empty {
@@ -627,8 +627,8 @@ body {
 .setting-note a {
   color: var(--text);
   text-decoration: underline;
-  /* Opaque underline — was color-mix(…, transparent) glass (#14). */
-  text-decoration-color: color-mix(in srgb, currentColor 35%, #ffffff);
+  /* Opaque underline — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  text-decoration-color: color-mix(in srgb, currentColor 35%, #f7f7fa);
   text-underline-offset: 2px;
 }
 
@@ -646,11 +646,11 @@ body {
 .theme-item {
   height: 32px;
   border-radius: 9px;
-  /* Opaque hairline + type — was Apple rgba glass (#14). */
-  border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #ffffff));
-  /* Opaque wash — was color-mix(…, transparent) glass (#14). */
-  background: color-mix(in srgb, var(--text, #0c0c10) 6%, #ffffff);
-  color: var(--text, color-mix(in srgb, #0a0a0c 78%, #ffffff));
+  /* Opaque hairline + type — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #f7f7fa));
+  /* Opaque wash — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, var(--text, #0c0c10) 6%, #f7f7fa);
+  color: var(--text, color-mix(in srgb, #0a0a0c 78%, #f7f7fa));
   font-size: 12px;
   font-weight: 550;
   cursor: pointer;
@@ -662,9 +662,9 @@ body {
 
 .theme-item:hover {
   transform: none;
-  /* Opaque wash — was color-mix(…, transparent) glass (#14). */
-  background: color-mix(in srgb, var(--text, #0c0c10) 10%, #ffffff);
-  border-color: color-mix(in srgb, var(--text, #0c0c10) 16%, #ffffff);
+  /* Opaque wash — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, var(--text, #0c0c10) 10%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--text, #0c0c10) 16%, #f7f7fa);
   box-shadow: none;
 }
 
@@ -674,10 +674,10 @@ body {
 }
 
 .theme-item[aria-current="true"] {
-  /* Opaque accent wash — was color-mix(…, transparent) glass (#14). */
-  border-color: color-mix(in srgb, var(--accent, #8bb4e8) 55%, #ffffff);
-  background: color-mix(in srgb, var(--accent, #8bb4e8) 18%, #ffffff);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #8bb4e8) 22%, #ffffff);
+  /* Opaque accent wash — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  border-color: color-mix(in srgb, var(--accent, #8bb4e8) 55%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #8bb4e8) 18%, #f7f7fa);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #8bb4e8) 22%, #f7f7fa);
 }
 
 .settings-input,
@@ -688,10 +688,10 @@ body {
   margin: 0;
   padding: 6px 10px;
   border-radius: 9px;
-  /* Opaque hairline — was Apple rgba(0,0,0,0.10) glass (#14). */
-  border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #ffffff));
-  /* Opaque wash — was color-mix(…, transparent) glass (#14). */
-  background: color-mix(in srgb, var(--text, #0c0c10) 5%, #ffffff);
+  /* Opaque hairline — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #f7f7fa));
+  /* Opaque wash — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, var(--text, #0c0c10) 5%, #f7f7fa);
   color: var(--text);
   font-size: 13px;
   outline: none;
@@ -699,9 +699,9 @@ body {
 
 .settings-input:focus,
 .discord-token-input:focus {
-  /* Opaque accent wash — was color-mix(…, transparent) glass (#14). */
-  border-color: color-mix(in srgb, var(--accent, #8bb4e8) 50%, #ffffff);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #8bb4e8) 18%, #ffffff);
+  /* Opaque accent wash — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  border-color: color-mix(in srgb, var(--accent, #8bb4e8) 50%, #f7f7fa);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #8bb4e8) 18%, #f7f7fa);
 }
 
 .settings-actions {
@@ -715,10 +715,10 @@ body {
   height: 30px;
   padding: 0 11px;
   border-radius: 8px;
-  /* Opaque hairline — was Apple rgba(0,0,0,0.10) glass (#14). */
-  border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #ffffff));
-  /* Opaque wash — was color-mix(…, transparent) glass (#14). */
-  background: color-mix(in srgb, var(--text, #0c0c10) 6%, #ffffff);
+  /* Opaque hairline — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #f7f7fa));
+  /* Opaque wash — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, var(--text, #0c0c10) 6%, #f7f7fa);
   color: var(--text);
   font-size: 12px;
   font-weight: 550;
@@ -728,19 +728,19 @@ body {
 }
 
 .settings-btn:hover {
-  /* Opaque wash — was color-mix(…, transparent) glass (#14). */
-  background: color-mix(in srgb, var(--text, #0c0c10) 11%, #ffffff);
-  border-color: color-mix(in srgb, var(--text, #0c0c10) 18%, #ffffff);
+  /* Opaque wash — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, var(--text, #0c0c10) 11%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--text, #0c0c10) 18%, #f7f7fa);
 }
 
 .settings-btn-primary {
-  /* Opaque accent wash — was color-mix(…, transparent) glass (#14). */
-  background: color-mix(in srgb, var(--accent, #8bb4e8) 28%, #ffffff);
-  border-color: color-mix(in srgb, var(--accent, #8bb4e8) 40%, #ffffff);
+  /* Opaque accent wash — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, var(--accent, #8bb4e8) 28%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #8bb4e8) 40%, #f7f7fa);
 }
 
 .settings-btn-primary:hover {
-  background: color-mix(in srgb, var(--accent, #8bb4e8) 38%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #8bb4e8) 38%, #f7f7fa);
 }
 
 .settings-help-sheet {
@@ -749,10 +749,10 @@ body {
   max-height: 160px;
   overflow: auto;
   border-radius: 10px;
-  /* Opaque hairline — was Apple rgba(0,0,0,0.08) glass (#14). */
-  border: 1px solid var(--hairline, color-mix(in srgb, #000000 8%, #ffffff));
-  /* Opaque wash — was color-mix(…, transparent) glass (#14). */
-  background: color-mix(in srgb, var(--text, #0c0c10) 5%, #ffffff);
+  /* Opaque hairline — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  border: 1px solid var(--hairline, color-mix(in srgb, #000000 8%, #f7f7fa));
+  /* Opaque wash — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, var(--text, #0c0c10) 5%, #f7f7fa);
   font-size: 11px;
   line-height: 1.45;
   white-space: pre-wrap;
@@ -1209,8 +1209,8 @@ body {
 }
 
 .changelog-error {
-  /* Opaque error type — was red glass rgba (#14). */
-  color: color-mix(in srgb, #ff3b30 80%, #ffffff);
+  /* Opaque error type — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #ff3b30 80%, #f7f7fa);
 }
 
 .changelog-h2 {
@@ -1229,8 +1229,8 @@ body {
 }
 
 .changelog-version {
-  /* Opaque accent — was rgba(0,122,255,0.9) glass (#14). */
-  color: color-mix(in srgb, #007aff 90%, #ffffff);
+  /* Opaque accent — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #007aff 90%, #f7f7fa);
   font-weight: 800;
 }
 
@@ -1286,8 +1286,8 @@ body {
   content: "•";
   position: absolute;
   left: 0;
-  /* Opaque accent — was rgba(0,122,255,0.6) glass (#14). */
-  color: color-mix(in srgb, #007aff 60%, #ffffff);
+  /* Opaque accent — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #007aff 60%, #f7f7fa);
   font-weight: bold;
 }
 
@@ -1302,8 +1302,8 @@ body {
 }
 
 .changelog-code {
-  /* Opaque code wash — was rgba(0,0,0,0.06) glass (#14). */
-  background: color-mix(in srgb, #000000 6%, #ffffff);
+  /* Opaque code wash — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, #000000 6%, #f7f7fa);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: "SF Mono", "Monaco", "Menlo", monospace;
