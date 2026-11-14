@@ -37675,3 +37675,100 @@ body.theme-architect .perplexity-result-item[role='option'].is-just-copied {
 body.theme-architect .perplexity-result-item[role='option'].is-just-copied::after {
   background: color-mix(in srgb, #34c759 55%, #f1f1f1);
 }
+
+
+/*
+ * Light / Material / Architect: Disk Cleanup add/remove + Force Quit Saved
+ * still mix Apple `#ffffff` (`.disk-cleanup-scope-remove` resting · hover ·
+ * `.disk-cleanup-add-scope #disk-cleanup-add-btn` resting · hover · active ·
+ * `#force-quit-process-btn.is-just-saved`) while Data Poster / Dark / Neon /
+ * Futuristic remaps already exist (focus-visible already paper in v0.1.2701–
+ * 2702). Opaque washes on cream paper so Add / Remove / Quit-saved chrome
+ * match light shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14
+ * after light Perplexity result Copied remaps v0.1.2715.
+ */
+/* OVERNIGHT v0.1.2716: light Disk Cleanup add/remove + Force Quit Saved remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .disk-cleanup-scope-remove {
+  border-color: color-mix(in srgb, currentColor 14%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 2%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-scope-remove:hover {
+  background: color-mix(in srgb, #ff453a 12%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff453a 32%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-add-scope #disk-cleanup-add-btn {
+  background: color-mix(in srgb, #0a84ff 16%, #f7f7fa);
+  border-color: color-mix(in srgb, #0a84ff 32%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
+  background: color-mix(in srgb, #0a84ff 24%, #f7f7fa);
+  border-color: color-mix(in srgb, #0a84ff 46%, #f7f7fa);
+}
+body.theme-light .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
+  background: color-mix(in srgb, #0a84ff 28%, #f7f7fa);
+}
+body.theme-light #force-quit-process-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #f7f7fa) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #f7f7fa) !important;
+  color: #fff !important;
+  animation: none;
+  box-shadow: none;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .disk-cleanup-scope-remove {
+  border-color: color-mix(in srgb, currentColor 14%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 2%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-scope-remove:hover {
+  background: color-mix(in srgb, #ff453a 12%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff453a 32%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-add-scope #disk-cleanup-add-btn {
+  background: color-mix(in srgb, #0a84ff 16%, #ebe4d9);
+  border-color: color-mix(in srgb, #0a84ff 32%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
+  background: color-mix(in srgb, #0a84ff 24%, #ebe4d9);
+  border-color: color-mix(in srgb, #0a84ff 46%, #ebe4d9);
+}
+body.theme-material .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
+  background: color-mix(in srgb, #0a84ff 28%, #ebe4d9);
+}
+body.theme-material #force-quit-process-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #ebe4d9) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #ebe4d9) !important;
+  color: #fff !important;
+  animation: none;
+  box-shadow: none;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .disk-cleanup-scope-remove {
+  border-color: color-mix(in srgb, currentColor 14%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 2%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-scope-remove:hover {
+  background: color-mix(in srgb, #ff453a 12%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff453a 32%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-add-scope #disk-cleanup-add-btn {
+  background: color-mix(in srgb, #0a84ff 16%, #f1f1f1);
+  border-color: color-mix(in srgb, #0a84ff 32%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
+  background: color-mix(in srgb, #0a84ff 24%, #f1f1f1);
+  border-color: color-mix(in srgb, #0a84ff 46%, #f1f1f1);
+}
+body.theme-architect .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
+  background: color-mix(in srgb, #0a84ff 28%, #f1f1f1);
+}
+body.theme-architect #force-quit-process-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #f1f1f1) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #f1f1f1) !important;
+  color: #fff !important;
+  animation: none;
+  box-shadow: none;
+}

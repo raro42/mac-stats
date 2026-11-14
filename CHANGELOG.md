@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2716] - 2026-11-14
+
+### Changed
+
+- **Light Disk Cleanup add/remove + Force Quit Saved washes:** Light / Material / Architect `.disk-cleanup-scope-remove` (resting · hover) · `.disk-cleanup-add-scope #disk-cleanup-add-btn` (resting · hover · active) · `#force-quit-process-btn.is-just-saved` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Add / Remove / Quit-saved chrome matches cream shells (after Perplexity result Copied remaps v0.1.2715).
+
+
 ## [0.1.2715] - 2026-11-14
 
 ### Changed
