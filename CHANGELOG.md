@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2712] - 2026-11-14
+
+### Changed
+
+- **Light Top Processes empty shell:** Light / Material / Architect `.process-empty` (type · border · fill) still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so empty process list matches cream shells (after Debug Log empty type remaps v0.1.2711).
+
+
 ## [0.1.2711] - 2026-11-14
 
 ### Changed

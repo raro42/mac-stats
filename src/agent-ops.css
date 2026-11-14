@@ -37515,3 +37515,33 @@ body.theme-material .logs-viewer.is-empty:not(:has(.logs-filter-miss)) {
 body.theme-architect .logs-viewer.is-empty:not(:has(.logs-filter-miss)) {
   color: color-mix(in srgb, #0c0c10 66%, #f1f1f1);
 }
+/*
+ * Light / Material / Architect: Top Processes empty shell still mixes Apple
+ * `#ffffff` (`.process-empty` type · border · fill) while Data Poster / Dark /
+ * Neon / Futuristic remaps already exist. Opaque type/washes on cream paper so
+ * empty process list matches light shells (Swiss / Apple keep shared
+ * `#ffffff`). Standing P2 #14 after light Debug Log empty type remaps
+ * v0.1.2711. (monitors-summary.is-empty type already paper in v0.1.2690.)
+ */
+/* OVERNIGHT v0.1.2712: light process-empty remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .process-empty {
+  color: color-mix(in srgb, #0c0c10 69%, #f7f7fa) !important;
+  border-color: color-mix(in srgb, currentColor 18%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 3.5%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .process-empty {
+  color: color-mix(in srgb, #0c0c10 69%, #ebe4d9) !important;
+  border-color: color-mix(in srgb, currentColor 18%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 3.5%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .process-empty {
+  color: color-mix(in srgb, #0c0c10 69%, #f1f1f1) !important;
+  border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 3.5%, #f1f1f1);
+}
