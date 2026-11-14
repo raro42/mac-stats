@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2733] - 2026-11-14
+
+### Changed
+
+- **Light divider / metric-card / ring-track / scrollbar cream remaps:** Light `.cpu-divider` · `.metric-card` fill/hairline · `--ring-track` / `.ring-track` · Details/Processes + Changelog scrollbar thumbs still mixed Apple `#ffffff` while Material / Architect already sat on cream paper (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque chrome on paper `#f7f7fa` so dividers, gauge cards, ring tracks, and scroll thumbs match the cream shell (after cpu-title / icon-btn remaps v0.1.2732).
+
 ## [0.1.2732] - 2026-11-14
 
 ### Changed

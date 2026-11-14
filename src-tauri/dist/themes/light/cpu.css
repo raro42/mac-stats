@@ -26,7 +26,8 @@
   --panel-shadow: 0 28px 110px color-mix(in srgb, #000000 12%, #ffffff);
 
   --accent: #6aa6df;
-  --ring-track: color-mix(in srgb, #000000 8%, #ffffff);
+  /* Opaque ring track — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  --ring-track: color-mix(in srgb, #000000 8%, #f7f7fa);
 
   /* Opaque modal token — was black glass rgba over Light paper (#14). */
   --modal-backdrop: color-mix(in srgb, #000000 35%, #ffffff);
@@ -93,15 +94,15 @@ body {
 
 .cpu-details::-webkit-scrollbar-thumb,
 .cpu-processes::-webkit-scrollbar-thumb {
-  /* Opaque thumb — was rgba(0,0,0,0.15) glass (#14). */
-  background: color-mix(in srgb, #000000 15%, #ffffff);
+  /* Opaque thumb — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, #000000 15%, #f7f7fa);
   border-radius: 3px;
 }
 
 .cpu-details::-webkit-scrollbar-thumb:hover,
 .cpu-processes::-webkit-scrollbar-thumb:hover {
-  /* Opaque hover — was rgba(0,0,0,0.25) glass (#14). */
-  background: color-mix(in srgb, #000000 25%, #ffffff);
+  /* Opaque hover — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, #000000 25%, #f7f7fa);
 }
 
 .cpu-header {
@@ -196,8 +197,8 @@ body {
 
 .cpu-divider {
   height: 1px;
-  /* Opaque hairline — was opacity 0.9 on --hairline (~10% ink) → ~9% ink on paper (#14). */
-  background: color-mix(in srgb, #0c0c10 9%, #ffffff);
+  /* Opaque hairline — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, #0c0c10 9%, #f7f7fa);
   opacity: 1;
   flex-shrink: 0; /* Don't shrink dividers */
 }
@@ -213,10 +214,10 @@ body {
   contain: layout paint style;
   position: relative;
   border-radius: var(--radius-card);
-  /* Opaque flat card — soft shadow + radial wash kept Graphics and Media busy (#14). */
-  background: #ffffff;
-  /* Opaque hairline — was rgba(0,0,0,0.06) glass (#14). */
-  border: 1px solid color-mix(in srgb, #000000 6%, #ffffff);
+  /* Opaque flat card — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, #ffffff 78%, #f7f7fa);
+  /* Opaque hairline — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  border: 1px solid color-mix(in srgb, #000000 6%, #f7f7fa);
   box-shadow: none;
 
   padding: 14px 6px 12px;
@@ -396,8 +397,8 @@ body {
 
 .ring-track {
   fill: none;
-  /* Opaque stroke — was rgba(0,0,0,0.10) glass (#14). */
-  stroke: color-mix(in srgb, #000000 10%, #ffffff);
+  /* Opaque stroke — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  stroke: color-mix(in srgb, #000000 10%, #f7f7fa);
   stroke-width: 6;
   stroke-linecap: round;
 }
@@ -1184,20 +1185,20 @@ body {
 }
 
 .changelog-body::-webkit-scrollbar-track {
-  /* Opaque track — was black glass rgba (#14). */
-  background: color-mix(in srgb, #000000 5%, #ffffff);
+  /* Opaque track — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, #000000 5%, #f7f7fa);
   border-radius: 3px;
 }
 
 .changelog-body::-webkit-scrollbar-thumb {
-  /* Opaque thumb — was Light ink glass rgba (#14). */
-  background: color-mix(in srgb, #121216 30%, #ffffff);
+  /* Opaque thumb — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, #121216 30%, #f7f7fa);
   border-radius: 3px;
 }
 
 .changelog-body::-webkit-scrollbar-thumb:hover {
-  /* Opaque hover — was Light ink glass rgba (#14). */
-  background: color-mix(in srgb, #121216 50%, #ffffff);
+  /* Opaque hover — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, #121216 50%, #f7f7fa);
 }
 
 .changelog-loading,
