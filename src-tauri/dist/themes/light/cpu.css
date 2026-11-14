@@ -1387,8 +1387,8 @@ body {
 .battery-icon {
   width: 16px;
   height: 16px;
-  /* Opaque type — was rgba(12,12,16,0.50) glass (#14). */
-  color: color-mix(in srgb, #0c0c10 50%, #ffffff);
+  /* Opaque type — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #0c0c10 50%, #f7f7fa);
   flex-shrink: 0;
   display: inline-block;
   vertical-align: middle;
@@ -1396,8 +1396,8 @@ body {
 }
 
 .battery-icon.charging {
-  /* Opaque type — was rgba(52,199,89,0.8) glass (#14). */
-  color: color-mix(in srgb, #34c759 80%, #ffffff);
+  /* Opaque type — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #34c759 80%, #f7f7fa);
 }
 
 .battery-icon.no-battery {
@@ -1455,8 +1455,8 @@ body {
   box-shadow: none;
   padding: 0;
   cursor: pointer;
-  /* Opaque type — was rgba(12,12,16,0.42) glass (#14). */
-  color: color-mix(in srgb, #0c0c10 42%, #ffffff);
+  /* Opaque type — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #0c0c10 42%, #f7f7fa);
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
   transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
   border-radius: 9px;
@@ -1466,8 +1466,8 @@ body {
 }
 
 .icon-line-item:hover {
-  /* Opaque type — was rgba(12,12,16,0.72) glass (#14). */
-  color: color-mix(in srgb, #0c0c10 72%, #ffffff);
+  /* Opaque type — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #0c0c10 72%, #f7f7fa);
   background: #ececf1;
   border-color: #dcdce2;
 }

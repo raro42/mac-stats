@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2729] - 2026-11-14
+
+### Changed
+
+- **Light battery + icon-line muted cream remaps:** Light `.battery-icon` / `.battery-icon.charging` · `.icon-line-item` / `:hover` muted type still mixed Apple `#ffffff` while Material / Architect already sat on cream paper (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` so the power strip and icon line match the cream shell (after setting-toggle track remaps v0.1.2728).
+
 ## [0.1.2728] - 2026-11-14
 
 ### Changed
