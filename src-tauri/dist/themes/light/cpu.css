@@ -123,8 +123,8 @@ body {
   font-weight: 400;
   letter-spacing: -0.01em;
   line-height: 1.05;
-  /* Opaque type — was rgba(28,28,30,0.92) glass (#14). */
-  color: color-mix(in srgb, #1c1c1e 92%, #ffffff);
+  /* Opaque type — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #1c1c1e 92%, #f7f7fa);
 }
 
 .cpu-subtitle {
@@ -144,8 +144,8 @@ body {
 
   padding: 6px;
   border-radius: 22px;
-  /* Opaque hairline — was rgba(0,0,0,0.08) glass (#14). */
-  border: 1px solid color-mix(in srgb, #000000 8%, #ffffff);
+  /* Opaque hairline — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  border: 1px solid color-mix(in srgb, #000000 8%, #f7f7fa);
   /* Opaque — translucent action chrome re-blends every tick (#14). */
   background: #ececf1;
   box-shadow: none;
@@ -155,11 +155,11 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 999px;
-  /* Opaque chrome / wash / type / shadow — was white/black glass rgba (#14). */
-  border: 1px solid color-mix(in srgb, #000000 6%, #ffffff);
+  /* Opaque chrome / wash / type / shadow — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  border: 1px solid color-mix(in srgb, #000000 6%, #f7f7fa);
   background: color-mix(in srgb, #ffffff 55%, #f7f7fa);
 
-  color: color-mix(in srgb, #1e1e22 62%, #ffffff);
+  color: color-mix(in srgb, #1e1e22 62%, #f7f7fa);
   font-size: 18px;
   cursor: pointer;
 
@@ -167,7 +167,7 @@ body {
   align-items: center;
   justify-content: center;
 
-  box-shadow: 0 10px 24px color-mix(in srgb, #000000 12%, #ffffff);
+  box-shadow: 0 10px 24px color-mix(in srgb, #000000 12%, #f7f7fa);
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
   transition: box-shadow 0.15s ease;
 }
@@ -179,8 +179,8 @@ body {
 
 .icon-btn:hover {
   transform: none;
-  /* Opaque hover shadow — was rgba(0,0,0,0.14) glass (#14). */
-  box-shadow: 0 14px 30px color-mix(in srgb, #000000 14%, #ffffff);
+  /* Opaque hover shadow — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  box-shadow: 0 14px 30px color-mix(in srgb, #000000 14%, #f7f7fa);
 }
 
 /* Opaque focus ring — was missing (Apple / Data Poster / CRT already had it) (#14). */

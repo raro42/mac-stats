@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2732] - 2026-11-14
+
+### Changed
+
+- **Light cpu-title / icon-btn cream remaps:** Light `.cpu-title h1` muted type · `.cpu-actions` hairline · `.icon-btn` border / muted type / resting+hover shadow still mixed Apple `#ffffff` while Material / Architect already sat on cream paper (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque type and chrome on paper `#f7f7fa` so the window title and header action buttons match the cream shell (after process-row / process-name remaps v0.1.2731).
+
+
 ## [0.1.2731] - 2026-11-14
 
 ### Changed
