@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2725] - 2026-11-14
+
+### Changed
+
+- **Light Force Quit soft-states:** Light theme `.force-quit-btn` resting / hover / `:active` still mixed Apple `#ffffff` while `:focus-visible` and confirming already sat on paper `#f7f7fa` (Material / Architect already paper; Swiss / Apple keep shared white). Opaque red washes on `#f7f7fa` so Force Quit matches the cream shell (after generic Soft Save remaps v0.1.2724).
+
 ## [0.1.2724] - 2026-11-14
 
 ### Changed

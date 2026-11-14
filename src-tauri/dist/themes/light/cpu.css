@@ -861,11 +861,11 @@ body {
 .force-quit-btn {
   width: 100%;
   padding: 10px;
-  /* Opaque wash — was rgba(255,59,48,…) glass (#14). */
-  background: color-mix(in srgb, #ff3b30 10%, #ffffff);
-  border: 1px solid color-mix(in srgb, #ff3b30 30%, #ffffff);
+  /* Opaque wash — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, #ff3b30 10%, #f7f7fa);
+  border: 1px solid color-mix(in srgb, #ff3b30 30%, #f7f7fa);
   border-radius: 8px;
-  color: color-mix(in srgb, #ff3b30 90%, #ffffff);
+  color: color-mix(in srgb, #ff3b30 90%, #f7f7fa);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -874,8 +874,8 @@ body {
 }
 
 .force-quit-btn:hover {
-  background: color-mix(in srgb, #ff3b30 15%, #ffffff);
-  border-color: color-mix(in srgb, #ff3b30 40%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 15%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff3b30 40%, #f7f7fa);
 }
 
 .force-quit-btn:focus-visible {
@@ -884,7 +884,7 @@ body {
 }
 
 .force-quit-btn:active {
-  background: color-mix(in srgb, #ff3b30 20%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 20%, #f7f7fa);
 }
 
 .force-quit-btn:disabled {
