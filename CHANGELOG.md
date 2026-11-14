@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2720] - 2026-11-14
+
+### Changed
+
+- **Light Top Processes bar track washes:** Light / Material / Architect `#process-list .process-bar` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so process usage tracks match cream shells (after Disk Cleanup add-scope + monitor-detail-log + toolbar Saved remaps v0.1.2719).
+
 ## [0.1.2719] - 2026-11-14
 
 ### Changed

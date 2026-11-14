@@ -37980,3 +37980,29 @@ body.theme-architect #logs-open-btn.is-just-saved {
   color: inherit;
   box-shadow: none;
 }
+
+
+/*
+ * Light / Material / Architect: Top Processes usage bar track still mixes Apple
+ * `#ffffff` wash (`#process-list .process-bar`) while Data Poster / Dark / Neon /
+ * Futuristic remaps already exist (v0.1.2468-ish). Opaque washes on cream paper
+ * so process bars match light shells (Swiss / Apple keep shared `#ffffff`).
+ * Standing P2 #14 after light Disk Cleanup add-scope + monitor-detail-log +
+ * toolbar Saved remaps v0.1.2719.
+ */
+/* OVERNIGHT v0.1.2720: light #process-list .process-bar remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light #process-list .process-bar {
+  background: color-mix(in srgb, currentColor 12%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material #process-list .process-bar {
+  background: color-mix(in srgb, currentColor 12%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect #process-list .process-bar {
+  background: color-mix(in srgb, currentColor 12%, #f1f1f1);
+}
