@@ -1,20 +1,23 @@
 # Morning surprise — 2026-11-14
 
-Overnight Track B (product) kept **v0.1.2724** (and earlier keeps this window through **v0.1.2723**).
+Overnight autoresearch kept shipping Light cream paper remaps (standing P2 #14).
 
-## Shipped this tick
+## Shipped tonight (latest first)
 
-- **v0.1.2724** — Light / Material / Architect generic Soft Save: shared `button.is-just-saved` / `.popover-btn-secondary.is-just-saved` onto cream paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1`). Standing P2 #14 after Disk Cleanup path hover + Process Details PID hover (**v0.1.2723**).
+- **v0.1.2725** — Light Force Quit `.force-quit-btn` resting / hover / `:active` Apple `#ffffff` → paper `#f7f7fa` (focus + confirming already paper; Material / Architect already paper).
+- **v0.1.2724** — Light / Material / Architect generic Soft Save (`button.is-just-saved` / `.popover-btn-secondary.is-just-saved`).
+- **v0.1.2723** — Light Disk Cleanup path hover + Process Details PID hover.
+- Earlier keeps same night: Soft Save cascade + Ops / Monitors / Perplexity / Processes cream remaps (see `results.tsv` / loop_backlog).
 
-## Context
+## Tried / discarded
 
-- Digester open: empty (noise filters).
-- Design-review: grace (screenshots stale but not due).
-- Layout-daily: Data Poster marked today; Dark / Neon / Futuristic wait for next calendar day.
-- Fuel: standing backlog leftover Soft Save generic flash (not quiet; not keep-pNN).
+- Parallel-race discards earlier in the window when origin landed first (re-picked next soft-state).
+
+## Not a digester night
+
+- Digester open stayed empty (0 turns / 7d). Fuel came from standing backlog P2 #14.
 
 ## Next
 
-- Dark layout-daily when the day quota opens.
-- Mac capture when TCC allows.
-- Leftover light cream `#ffffff` mixes (muted type / remaining soft-states), or sibling/product fuel.
+- Dark layout-daily next calendar day (Mac capture when TCC allows).
+- Leftover Light cream mixes: history `.time-range-dropdown` resting/hover/focus, other muted type / soft-states still on Apple white.
