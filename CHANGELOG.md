@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2740] - 2026-11-14
+
+### Changed
+
+- **Material / Architect icon-line + LPM knob cream remaps:** Material / Architect `.lpm-toggle::after` knob · `.icon-line-item` resting chip · `.icon-line-item.status-good` / `.status-warning` / `.status-bad` (resting · hover) still mixed Apple `#ffffff` / `#fff` while Light already sat on cream paper for icon-line status and LPM knob (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque chrome on paper `#e7e2d9` / `#f1f1f1` so Ready / Slow / Down chips and the Low Power Mode knob match the cream shell (after Light history-tooltip remaps v0.1.2739).
+
 ## [0.1.2739] - 2026-11-14
 
 ### Changed

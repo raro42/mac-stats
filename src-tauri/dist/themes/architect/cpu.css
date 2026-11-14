@@ -1183,7 +1183,8 @@ body {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #fff;
+  /* Opaque knob — Apple #fff → Architect paper #f1f1f1 (#14 / P2). */
+  background: #f1f1f1;
   box-shadow: none;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
 }
@@ -1258,9 +1259,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Opaque chips — glass alpha + inset shadow stay in Graphics and Media (#14). */
-  background: #ffffff;
-  border: 1px solid #e6e6ea;
+  /* Opaque chips — Apple #ffffff → Architect paper #f1f1f1 (#14 / P2). */
+  background: #f1f1f1;
+  border: 1px solid color-mix(in srgb, #e6e6ea 70%, #f1f1f1);
   box-shadow: none;
   padding: 0;
   cursor: pointer;
@@ -1318,18 +1319,18 @@ body {
 
 /* Soft ok (apple Ready calm / Monitors all-up 7%/28% parity). */
 .icon-line-item.status-good {
-  /* Opaque type — was rgba(36,160,90,0.78) glass (#14). */
+  /* Opaque type/wash — Apple #ffffff → Architect paper #f1f1f1 (#14 / P2). */
   color: color-mix(in srgb, #24a05a 78%, #f1f1f1);
-  background: color-mix(in srgb, #34c759 7%, #ffffff);
-  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #f1f1f1);
+  border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
   box-shadow: none;
 }
 
 .icon-line-item.status-good:hover {
-  /* Opaque type — was rgba(36,160,90,0.92) glass (#14). */
+  /* Opaque type/wash — Apple #ffffff → Architect paper #f1f1f1 (#14 / P2). */
   color: color-mix(in srgb, #24a05a 92%, #f1f1f1);
-  background: color-mix(in srgb, #34c759 10%, #ffffff);
-  border-color: color-mix(in srgb, #34c759 36%, #ffffff);
+  background: color-mix(in srgb, #34c759 10%, #f1f1f1);
+  border-color: color-mix(in srgb, #34c759 36%, #f1f1f1);
   box-shadow: none;
 }
 
@@ -1353,18 +1354,18 @@ body {
 
 /* Soft alert (apple Monitors Slow / Ops health-warn 7%/30% parity). */
 .icon-line-item.status-warning {
-  /* Opaque type — was rgba(200,130,20,0.72) glass (#14). */
+  /* Opaque type/wash — Apple #ffffff → Architect paper #f1f1f1 (#14 / P2). */
   color: color-mix(in srgb, #c88214 72%, #f1f1f1);
-  background: color-mix(in srgb, #ff9f0a 7%, #ffffff);
-  border-color: color-mix(in srgb, #ff9f0a 30%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 7%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #f1f1f1);
   box-shadow: none;
 }
 
 .icon-line-item.status-warning:hover {
-  /* Opaque type — was rgba(200,130,20,0.88) glass (#14). */
+  /* Opaque type/wash — Apple #ffffff → Architect paper #f1f1f1 (#14 / P2). */
   color: color-mix(in srgb, #c88214 88%, #f1f1f1);
-  background: color-mix(in srgb, #ff9f0a 10%, #ffffff);
-  border-color: color-mix(in srgb, #ff9f0a 36%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 10%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9f0a 36%, #f1f1f1);
 }
 
 .icon-line-item.status-warning img {
@@ -1381,18 +1382,18 @@ body {
 
 /* Soft alert (apple Monitors Down / Ops health-bad 7%/30% parity). */
 .icon-line-item.status-bad {
-  /* Opaque type — was rgba(200,55,50,0.78) glass (#14). */
+  /* Opaque type/wash — Apple #ffffff → Architect paper #f1f1f1 (#14 / P2). */
   color: color-mix(in srgb, #c83732 78%, #f1f1f1);
-  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
-  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
   box-shadow: none;
 }
 
 .icon-line-item.status-bad:hover {
-  /* Opaque type — was rgba(200,55,50,0.92) glass (#14). */
+  /* Opaque type/wash — Apple #ffffff → Architect paper #f1f1f1 (#14 / P2). */
   color: color-mix(in srgb, #c83732 92%, #f1f1f1);
-  background: color-mix(in srgb, #ff3b30 10%, #ffffff);
-  border-color: color-mix(in srgb, #ff3b30 36%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 10%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff3b30 36%, #f1f1f1);
 }
 
 .icon-line-item.status-bad svg {
