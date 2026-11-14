@@ -1,10 +1,16 @@
 ## [Unreleased]
 
+## [0.1.2741] - 2026-11-14
+
+### Changed
+
+- **Dark LPM track + knob field remaps:** Dark `.lpm-toggle` track still mixed Apple `#ececf1` and `.lpm-toggle::after` knob still used Apple `#fff` while Data Poster already sat on dark field for Low Power Mode (Light / Material / Architect cream remaps in v0.1.2735–2740; Neon / Futuristic still on Apple white). Opaque mixes on Dark field `#0a0a0a` so the LPM control matches the dark shell (after Material / Architect icon-line + LPM knob cream remaps v0.1.2740).
+
 ## [0.1.2740] - 2026-11-14
 
 ### Changed
 
-- **Material / Architect icon-line + LPM knob cream remaps:** Material / Architect `.lpm-toggle::after` knob · `.icon-line-item` resting chip · `.icon-line-item.status-good` / `.status-warning` / `.status-bad` (resting · hover) still mixed Apple `#ffffff` / `#fff` while Light already sat on cream paper for icon-line status and LPM knob (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque chrome on paper `#e7e2d9` / `#f1f1f1` so Ready / Slow / Down chips and the Low Power Mode knob match the cream shell (after Light history-tooltip remaps v0.1.2739).
+- **Material / Architect icon-line + LPM knob cream remaps:** Material / Architect `.lpm-toggle::after` knob · `.icon-line-item` resting chip · `.icon-line-item.status-good` / `.status-warning` / `.status-bad` (resting · hover) still mixed Apple `#ffffff` / `#fff` while Light already sat on cream paper for icon-line status and LPM knob (Data Poster keep field remaps; Dark / Neon / Futuristic LPM leftovers deferred; Swiss / Apple keep shared white). Opaque chrome on paper `#e7e2d9` / `#f1f1f1` so Ready / Slow / Down chips and the Low Power Mode knob match the cream shell (after Light history-tooltip remaps v0.1.2739).
 
 ## [0.1.2739] - 2026-11-14
 

@@ -1110,9 +1110,9 @@ body {
   width: 34px;
   height: 18px;
   border-radius: 999px;
-  /* Opaque track — alpha mix + inset shadow stay in Graphics and Media (#14). */
-  background: color-mix(in srgb, var(--muted, #888) 22%, #ececf1);
-  border: 1px solid color-mix(in srgb, var(--muted, #888) 28%, #ececf1);
+  /* Opaque dark track — Apple #ececf1 wash → Dark field #0a0a0a (#14 / P2). */
+  background: color-mix(in srgb, var(--muted, #888) 28%, #0a0a0a);
+  border: 1px solid color-mix(in srgb, var(--muted, #888) 36%, #0a0a0a);
   box-shadow: none;
 }
 
@@ -1124,7 +1124,8 @@ body {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #fff;
+  /* Opaque knob — Apple #fff slab → Dark field #0a0a0a (Data Poster parity; #14 / P2). */
+  background: color-mix(in srgb, #ffffff 92%, #0a0a0a);
   box-shadow: none;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
 }
