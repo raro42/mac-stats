@@ -1,14 +1,14 @@
 # Morning surprise — 2026-11-14
 
-Overnight ratchet kept Light cream remaps through **v0.1.2732**.
+Overnight ratchet kept Light cream remaps through **v0.1.2733**.
 
 ## Shipped this window
 
+- **v0.1.2733** — Light divider / metric-card / ring-track / scrollbar cream: `.cpu-divider` · `.metric-card` fill/hairline · `--ring-track` / `.ring-track` · Details/Processes + Changelog scrollbar thumbs onto `#f7f7fa`.
 - **v0.1.2732** — Light cpu-title / icon-btn cream: `.cpu-title h1` type · `.cpu-actions` hairline · `.icon-btn` border / muted type / resting+hover shadow onto `#f7f7fa`.
 - **v0.1.2731** — Light process-row / process-name cream: hairline + name type onto `#f7f7fa`.
 - **v0.1.2730** — Light metric / section / details muted cream.
 - **v0.1.2729** — Light battery + icon-line muted cream.
-- **v0.1.2728** — Light setting-toggle track cream remaps.
 - Earlier same night: Settings / History / Force Quit / Soft Save / Disk Cleanup / Perplexity / Ops / Monitors cream catch-up (see CHANGELOG).
 
 ## Tried / discarded
@@ -17,8 +17,8 @@ Overnight ratchet kept Light cream remaps through **v0.1.2732**.
 
 ## Fuel note
 
-Digester open stayed empty. Design-review still in grace. Layout-daily Data Poster marked today (Dark/Neon/Futuristic wait for next calendar day). Standing P2 #14 Light cream leftover continues: cpu-divider / metric-card hairline / ring-track / scrollbar thumbs / remaining soft-states.
+Digester open stayed empty. Design-review still in grace. Layout-daily Data Poster marked today (Dark/Neon/Futuristic wait for next calendar day). Standing P2 #14 Light cream leftover continues: history-chart residual shadows / process-bar track / remaining soft-states.
 
 ## Fitness
 
-Window title type and header action buttons no longer mix Apple white on the Light cream shell.
+Dividers, gauge cards, ring tracks, and scroll thumbs no longer mix Apple white on the Light cream shell.
