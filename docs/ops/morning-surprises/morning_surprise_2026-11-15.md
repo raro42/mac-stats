@@ -1,21 +1,20 @@
 # Morning surprise — 2026-11-15
 
-Overnight autoresearch (Track B) kept shipping Light cream remaps (Standing P2 #14).
+Overnight autoresearch (Track B) kept shipping cream-paper remaps after an empty digester window.
 
 ## Shipped
 
-- **v0.1.2736** — Light Monitors menu / settings popover cream remaps (hairline + muted fallbacks onto paper `#f7f7fa`).
-- **v0.1.2737** — Light AI Chat collapse / model selector / chat messages cream remaps (collapse-btn, ollama menu/popover leftovers, model-text/select, chat-messages, user/assistant washes onto paper `#f7f7fa`).
-- **v0.1.2738** — Light chat markdown / thinking-dots / Debug Log toolbar cream remaps onto paper `#f7f7fa`.
-- **v0.1.2739** — Light `.history-tooltip` background / border / box-shadow cream remaps onto paper `#f7f7fa`.
+- **v0.1.2740** — Material / Architect icon-line resting chips + Ready/Slow/Down status washes + Low Power Mode knob onto cream paper (`#e7e2d9` / `#f1f1f1`).
+- **v0.1.2739** — Light history-tooltip dark panel mixes onto `#f7f7fa`.
+- **v0.1.2738** — Light chat markdown / thinking-dots / Debug Log chrome onto `#f7f7fa`.
+- Earlier same night: Light Monitors / AI Chat / root tokens / shell cream catch-up (v0.1.2736–2737 and prior overnight keeps).
 
-## Also this tick (~20:45)
+## Tried / discarded
 
-- Digester empty; design-review grace; layout-daily due=false (Data Poster marked today).
-- Sibling harnesses missing on rack; debug.log quiet.
-- Ratchet keep @ 1c4e645bf for 2739.
+- Parallel race discard when a sibling tick already landed Light AI Chat collapse/model/messages as v0.1.2737 — re-picked markdown/logs leftovers as v0.1.2738.
 
-## Next
+## Fuel notes
 
-- Dark layout-daily next calendar day (when due).
-- Leftover Light cream: intentional primary-button white type on Send / popover-primary · Disk Cleanup residual soft-states if any still muddy.
+- Digester open stayed empty.
+- Design-review grace; layout-daily Data Poster already marked for 2026-11-14.
+- Next: Dark layout-daily when the calendar day opens, Mac capture when TCC allows, leftover cream soft-states or sibling/product fuel — not another keep-pNN clone.
