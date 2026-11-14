@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2749] - 2026-11-14
+
+### Changed
+
+- **Light / Material / Architect history-chart cream pigment remaps:** Light / Material / Architect `.history-chart-container` fill + inset highlight (early and late blocks) still mixed Apple `#ffffff` while tip chrome already sat on cream paper pigments (tip remapped in v0.1.2748; Swiss / Apple keep shared white). Opaque mixes on paper `#f7f7fa` / `#e7e2d9` / `#f1f1f1` so sparkline tiles match each cream shell.
+
 ## [0.1.2748] - 2026-11-14
 
 ### Changed

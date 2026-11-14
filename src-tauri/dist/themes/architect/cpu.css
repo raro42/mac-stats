@@ -208,11 +208,11 @@ body {
   height: 40px;
   border-radius: 12px;
   overflow: hidden;
-  /* Opaque wash + inset — was white/black glass rgba (#14). */
-  background: color-mix(in srgb, #ffffff 20%, #f1f1f1);
+  /* Opaque wash + inset — Apple #ffffff → Architect paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #e8e8e8 20%, #f1f1f1);
   border: none;
   box-shadow:
-    inset 0 1px 0 color-mix(in srgb, #ffffff 50%, #f1f1f1),
+    inset 0 1px 0 color-mix(in srgb, #e0e0e0 50%, #f1f1f1),
     inset 0 -1px 0 color-mix(in srgb, #000000 2%, #f1f1f1),
     0 2px 8px color-mix(in srgb, #000000 6%, #f1f1f1);
 }
@@ -2606,11 +2606,11 @@ body {
   height: 40px;
   border-radius: 12px;
   overflow: hidden;
-  /* Opaque inset wash — was rgba black/white glass (late duplicate of early #14). */
-  background: color-mix(in srgb, #ffffff 12%, #f1f1f1);
+  /* Opaque inset wash — Apple #ffffff → Architect paper pigments (late duplicate; #14 / P2). */
+  background: color-mix(in srgb, #e8e8e8 12%, #f1f1f1);
   border: none;
   box-shadow:
-    inset 0 1px 0 color-mix(in srgb, #ffffff 35%, #f1f1f1),
+    inset 0 1px 0 color-mix(in srgb, #e0e0e0 35%, #f1f1f1),
     inset 0 -1px 0 color-mix(in srgb, #000000 8%, #f1f1f1),
     0 2px 8px color-mix(in srgb, #000000 10%, #f1f1f1);
 }
