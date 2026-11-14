@@ -1,14 +1,14 @@
 # Morning surprise — 2026-11-14
 
-Overnight ratchet kept Light cream remaps through **v0.1.2734**.
+Overnight ratchet kept Light cream remaps through **v0.1.2735**.
 
 ## Shipped this window
 
-- **v0.1.2734** — Light history-chart residual shadows / process-bar track / icon-line status cream: `.history-chart-container` bottom inset + drop shadow (early + late) · `.process-bar` track · Ready / Slow / Down chips onto `#f7f7fa`.
+- **v0.1.2735** — Light root tokens / shell / Settings / icon-line chip cream: `:root` `--text` / `--muted` / `--hairline` / `--panel` / `--panel-border` / `--panel-shadow` / `--modal-backdrop` · `.cpu-shell` hairline · `.force-quit-section` · Settings card/header fallbacks · `.icon-line-item` resting chip · LPM knob onto `#f7f7fa`.
+- **v0.1.2734** — Light history-chart residual shadows / process-bar track / icon-line status cream.
 - **v0.1.2733** — Light divider / metric-card / ring-track / scrollbar cream.
 - **v0.1.2732** — Light cpu-title / icon-btn cream.
 - **v0.1.2731** — Light process-row / process-name cream.
-- **v0.1.2730** — Light metric / section / details muted cream.
 - Earlier same night: Settings / History / Force Quit / Soft Save / Disk Cleanup / Perplexity / Ops / Monitors cream catch-up (see CHANGELOG).
 
 ## Tried / discarded
@@ -17,8 +17,8 @@ Overnight ratchet kept Light cream remaps through **v0.1.2734**.
 
 ## Fuel note
 
-Digester open stayed empty. Design-review still in grace. Layout-daily Data Poster marked today (Dark/Neon/Futuristic wait for next calendar day). Standing P2 #14 Light cream leftover continues: root `--text` / `--muted` / `--hairline` / `--panel` tokens · `.cpu-panel` hairline · Settings/Force Quit residual hairlines · icon-line resting chip `#ffffff` if still muddy.
+Digester open stayed empty. Design-review still in grace. Layout-daily Data Poster marked today (Dark/Neon/Futuristic wait for next calendar day). Standing P2 #14 Light cream leftover continues: Monitors menu/popover residual hairline fallbacks · AI Chat / Disk Cleanup residual hairlines / soft-states still on Apple white.
 
 ## Fitness
 
-Sparkline tiles, usage bars, and Ready / Slow / Down chips no longer mix Apple white on the Light cream shell.
+Shell type tokens, outer hairline, Settings glass fallbacks, Force Quit divider, resting icon chips, and the LPM knob no longer mix Apple white on the Light cream shell.
