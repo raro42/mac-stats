@@ -687,9 +687,9 @@ body {
   width: 44px;
   height: 24px;
   border-radius: 12px;
-  /* Opaque track — was Apple rgba(0,0,0,…) glass (#14). */
-  border: 1px solid color-mix(in srgb, #000000 10%, #0a0a0a);
-  background: color-mix(in srgb, #000000 8%, #0a0a0a);
+  /* Opaque Dark track — black-on-#0a0a0a was invisible; white hairline like Data Poster (#14 / P2; layout-daily). */
+  border: 1px solid color-mix(in srgb, #ffffff 16%, #0a0a0a);
+  background: color-mix(in srgb, #ffffff 8%, #0a0a0a);
   appearance: none;
   cursor: pointer;
   position: relative;
@@ -817,9 +817,9 @@ body {
   width: 44px;
   height: 24px;
   border-radius: 12px;
-  /* Opaque track — was green/black glass rgba (#14). */
-  border: 1px solid color-mix(in srgb, #00ff00 20%, #0a0a0a);
-  background: color-mix(in srgb, #000000 30%, #0a0a0a);
+  /* Opaque Matrix track — black-on-#0a0a0a fill was invisible; green hairline + tint like Neon/LPM (#14 / P2; layout-daily). */
+  border: 1px solid color-mix(in srgb, #00ff00 28%, #0a0a0a);
+  background: color-mix(in srgb, #00ff00 8%, #0a0a0a);
   appearance: none;
   cursor: pointer;
   position: relative;

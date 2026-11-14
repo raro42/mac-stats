@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2756] - 2026-11-15
+
+### Changed
+- Dark layout-daily: Settings `.setting-toggle` resting track remaps invisible black-on-`#0a0a0a` fill to a visible green hairline + tint (Matrix late block wins cascade; early block gets Data Poster white hairline parity). Keeps knobs already on field-mixed white.
+
 ## [0.1.2755] - 2026-11-15
 
 ### Changed
