@@ -147,8 +147,8 @@ body {
   border-radius: 22px;
   /* Opaque hairline — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
   border: 1px solid color-mix(in srgb, #000000 8%, #f7f7fa);
-  /* Opaque — translucent action chrome re-blends every tick (#14). */
-  background: #ececf1;
+  /* Opaque chrome — Apple #ececf1 wash → Light paper #f7f7fa (#14 / P2). */
+  background: #f7f7fa;
   box-shadow: none;
 }
 
@@ -1328,8 +1328,8 @@ body {
   align-items: center;
   padding: 12px 16px;
   margin: 0;
-  /* Opaque flat strip (#14). */
-  background: #ececf1;
+  /* Opaque flat strip — Apple #ececf1 wash → Light paper #f7f7fa (#14 / P2). */
+  background: #f7f7fa;
   border: 1px solid var(--hairline);
   border-radius: 12px;
   font-size: 13px;
@@ -1405,9 +1405,9 @@ body {
 }
 
 .battery-icon.no-battery {
-  /* Was opacity 0.4 on rgba(12, 12, 16, 0.50) over the strip #ececf1. */
+  /* Opaque type — Apple #ececf1 strip mix → Light paper #f7f7fa (#14 / P2). */
   opacity: 1;
-  color: color-mix(in srgb, #0c0c10 20%, #ececf1);
+  color: color-mix(in srgb, #0c0c10 20%, #f7f7fa);
 }
 
 .battery-level {

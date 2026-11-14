@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2746] - 2026-11-14
+
+### Changed
+
+- **Light cpu-actions / battery-power-strip cream remaps:** Light `.cpu-actions` · `.battery-power-strip` · `.battery-icon.no-battery` still used Apple `#ececf1` while Material / Architect already sat on cream paper for the battery strip (LPM track + icon-line hover remapped in v0.1.2745; Swiss / Apple keep shared `#ececf1`). Opaque chrome on paper `#f7f7fa` so the action pill and power strip match the Light shell.
+
 ## [0.1.2745] - 2026-11-14
 
 ### Changed
