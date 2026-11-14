@@ -1,19 +1,20 @@
 # Morning surprise — 2026-11-14
 
-Overnight Track B kept real UI polish (not digester-empty quiet).
+Overnight Track B (product) kept **v0.1.2724** (and earlier keeps this window through **v0.1.2723**).
 
-## Shipped
+## Shipped this tick
 
-- **v0.1.2723** — Light / Material / Architect Disk Cleanup path hover + Process Details PID hover/focus type on cream paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1`), matching Data Poster / Dark / Neon / Futuristic remaps already on disk.
-- Earlier tonight (same window): v0.1.2708–v0.1.2722 cream soft-state / focus / empty-shell remaps (Force Quit · soft-delete · Disk Cleanup · Debug Log · Processes · Perplexity · Ops · Monitors · Settings washes).
+- **v0.1.2724** — Light / Material / Architect generic Soft Save: shared `button.is-just-saved` / `.popover-btn-secondary.is-just-saved` onto cream paper (`#f7f7fa` / `#ebe4d9` / `#f1f1f1`). Standing P2 #14 after Disk Cleanup path hover + Process Details PID hover (**v0.1.2723**).
 
-## Tried / context
+## Context
 
-- Digester empty (0 turns / 7d). Design-review grace. Layout-daily Data Poster already marked today.
-- Sibling harnesses unavailable on this Linux rack (OpenClaw / Hermes paths missing git).
-- Debug log: no ERROR/WARN/panic clusters in the scan window.
+- Digester open: empty (noise filters).
+- Design-review: grace (screenshots stale but not due).
+- Layout-daily: Data Poster marked today; Dark / Neon / Futuristic wait for next calendar day.
+- Fuel: standing backlog leftover Soft Save generic flash (not quiet; not keep-pNN).
 
-## Next fuel
+## Next
 
-- Dark layout-daily next calendar day; Mac window-only capture when TCC allows.
-- Leftover light cream mixes: generic `button.is-just-saved` / `.popover-btn-secondary.is-just-saved` outside Settings card, other muted type / soft-states still on Apple white — or sibling/product fuel.
+- Dark layout-daily when the day quota opens.
+- Mac capture when TCC allows.
+- Leftover light cream `#ffffff` mixes (muted type / remaining soft-states), or sibling/product fuel.
