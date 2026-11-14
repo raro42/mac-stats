@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2743] - 2026-11-14
+
+### Changed
+
+- **Dark / Neon / Futuristic setting-toggle knob field remaps:** Dark / Neon / Futuristic `.setting-toggle input[type="checkbox"]::before` knobs still used Apple `white` while Data Poster already sat on field-mixed knobs (LPM knobs remapped in v0.1.2741–2742; Swiss / Apple keep shared white). Opaque mixes on Dark `#0a0a0a`, Neon `#08120c`, and Futuristic `#0b0b10` so Settings toggles match each dark shell.
+
 ## [0.1.2742] - 2026-11-14
 
 ### Changed
