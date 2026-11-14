@@ -1027,11 +1027,11 @@ body {
 /* History tooltip */
 .history-tooltip {
   position: fixed;
-  /* Opaque panel — was black/accent glass rgba (#14). */
-  background: color-mix(in srgb, #000000 95%, #ffffff);
+  /* Opaque panel — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: color-mix(in srgb, #000000 95%, #f7f7fa);
   color: #6aa6df;
   padding: 8px 12px;
-  border: 1px solid color-mix(in srgb, #6aa6df 50%, #ffffff);
+  border: 1px solid color-mix(in srgb, #6aa6df 50%, #f7f7fa);
   border-radius: 4px;
   font-size: 11px;
   font-family: monospace;
@@ -1040,7 +1040,7 @@ body {
   display: none;
   white-space: pre;
   line-height: 1.4;
-  box-shadow: 0 4px 12px color-mix(in srgb, #000000 80%, #ffffff);
+  box-shadow: 0 4px 12px color-mix(in srgb, #000000 80%, #f7f7fa);
 }
 
 @media (max-width: 560px) {

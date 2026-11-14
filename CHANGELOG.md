@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2739] - 2026-11-14
+
+### Changed
+
+- **Light history-tooltip cream remaps:** Light `.history-tooltip` background / border / box-shadow still mixed Apple `#ffffff` while Material / Architect already sat on cream paper for the dark history hover panel (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque mixes on paper `#f7f7fa` so the history sparkline tooltip matches the cream shell (after chat markdown / thinking-dots / logs remaps v0.1.2738).
+
 ## [0.1.2738] - 2026-11-14
 
 ### Changed
