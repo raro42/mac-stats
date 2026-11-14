@@ -1723,8 +1723,8 @@ body {
 
 .monitors-menu {
   position: fixed;
-  /* Opaque panel — was white glass rgba(255,255,255,0.95) fallback (#14). */
-  background: var(--panel, color-mix(in srgb, #ffffff 95%, #f7f7fa));
+  /* Opaque wash — Apple #ffffff → Light paper pigments (#14 / P2). */
+  background: var(--panel, color-mix(in srgb, #f5f5fa 95%, #f7f7fa));
   border: 1px solid var(--hairline, color-mix(in srgb, #000000 10%, #f7f7fa));
   border-radius: 8px;
   padding: 4px 0;
@@ -1773,8 +1773,8 @@ body {
   width: min(600px, 90vw);
   max-height: 80vh;
   border-radius: 16px;
-  /* Opaque panel — was white glass rgba(255,255,255,0.95) fallback (#14). */
-  background: var(--panel, color-mix(in srgb, #ffffff 95%, #f7f7fa));
+  /* Opaque wash — Apple #ffffff → Light paper pigments (#14 / P2). */
+  background: var(--panel, color-mix(in srgb, #f5f5fa 95%, #f7f7fa));
   border: 1px solid var(--panel-border, color-mix(in srgb, #000000 10%, #f7f7fa));
   box-shadow: var(--panel-shadow, 0 32px 100px color-mix(in srgb, #000000 20%, #f7f7fa));
   padding: 0;
@@ -1867,15 +1867,15 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  /* Opaque wash — was white glass rgba(255,255,255,0.5) fallback (#14). */
-  background: color-mix(in srgb, #ffffff 50%, #f7f7fa);
+  /* Opaque wash — Apple #ffffff → Light paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #f5f5fa 50%, #f7f7fa);
   border: 1px solid color-mix(in srgb, #000000 10%, #f7f7fa);
   border-radius: 8px;
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .monitor-settings-item:hover {
-  background: color-mix(in srgb, #ffffff 70%, #f7f7fa);
+  background: color-mix(in srgb, #f5f5fa 70%, #f7f7fa);
 }
 
 .monitor-settings-item-info {
@@ -1951,13 +1951,13 @@ body {
 .add-monitor-form input {
   width: 100%;
   padding: 10px;
-  /* Opaque wash — was white glass rgba(255,255,255,0.7) fallback (#14). */
+  /* Opaque wash — Apple #ffffff → Light paper pigments (#14 / P2). */
   border: 1px solid color-mix(in srgb, #000000 10%, #f7f7fa);
   border-radius: 8px;
   font-size: 13px;
   font-family: inherit;
   color: var(--text, var(--ink, inherit));
-  background: color-mix(in srgb, #ffffff 70%, #f7f7fa);
+  background: color-mix(in srgb, #f5f5fa 70%, #f7f7fa);
   box-sizing: border-box;
   margin-bottom: 16px;
 }
@@ -1965,12 +1965,12 @@ body {
 .add-monitor-form input:focus {
   outline: none;
   border-color: color-mix(in srgb, #007aff 30%, #f7f7fa);
-  background: color-mix(in srgb, #ffffff 90%, #f7f7fa);
+  background: color-mix(in srgb, #f5f5fa 90%, #f7f7fa);
 }
 
 .add-btn-small {
-  /* Opaque wash — was white glass rgba(255,255,255,0.3) fallback (#14). */
-  background: color-mix(in srgb, #ffffff 30%, #f7f7fa);
+  /* Opaque wash — Apple #ffffff → Light paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #f5f5fa 30%, #f7f7fa);
   border: 1px solid color-mix(in srgb, #000000 10%, #f7f7fa);
   border-radius: 6px;
   color: var(--muted, color-mix(in srgb, #808080 60%, #f7f7fa));
@@ -1984,7 +1984,7 @@ body {
 }
 
 .add-btn-small:hover {
-  background: color-mix(in srgb, #ffffff 40%, #f7f7fa);
+  background: color-mix(in srgb, #f5f5fa 40%, #f7f7fa);
   border-color: color-mix(in srgb, #000000 15%, #f7f7fa);
   color: var(--text, var(--ink, inherit));
 }
@@ -1996,7 +1996,7 @@ body {
 }
 
 .add-btn-small:active {
-  background: color-mix(in srgb, #ffffff 50%, #f7f7fa);
+  background: color-mix(in srgb, #f5f5fa 50%, #f7f7fa);
 }
 
 .monitors-list {
@@ -2004,8 +2004,8 @@ body {
 }
 
 .monitor-item {
-  /* Opaque wash — was white glass rgba(255,255,255,0.3) fallback (#14). */
-  background: color-mix(in srgb, #ffffff 30%, #f7f7fa);
+  /* Opaque wash — Apple #ffffff → Light paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #f5f5fa 30%, #f7f7fa);
   border: 1px solid color-mix(in srgb, #000000 10%, #f7f7fa);
   border-radius: 8px;
   padding: 10px 12px;

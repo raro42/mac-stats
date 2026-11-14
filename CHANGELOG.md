@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2754] - 2026-11-14
+
+### Changed
+- Light cream pigments: Light Monitors `.monitors-menu` · `.popover-content` · `.monitor-settings-item` (resting · hover) · `.add-monitor-form input` (resting · focus) · `.add-btn-small` (resting · hover · active) · `.monitor-item` remap Apple `#ffffff` mixes to paper pigments `#f5f5fa` on `#f7f7fa` (Material / Architect Monitors remapped in 0.1.2753; AI Chat Light already on `#f5f5fa`; Swiss / Apple keep shared white; Send white-on-blue intentional).
+
 ## [0.1.2753] - 2026-11-14
 
 ### Changed
