@@ -38089,3 +38089,57 @@ body.theme-architect .setting-toggle .toggle-label.is-judge-off {
   color: color-mix(in srgb, #0c0c10 48%, #f1f1f1);
   opacity: 1;
 }
+
+/*
+ * Light / Material / Architect: Monitors settings row focus-within, Disk Cleanup
+ * badge halo, and Perplexity search-box button still mix Apple `#ffffff`
+ * (`.monitor-settings-item:focus-within` · `#icon-disk-cleanup .disk-cleanup-badge`
+ * · `.perplexity-search-box button`) while Data Poster / Dark / Neon / Futuristic
+ * remaps already exist (`#perplexity-search-btn` / `.perplexity-inline-save`
+ * already paper in v0.1.2705; Monitors Saved / soft-delete Saved / Ops hairline /
+ * Judge-off in v0.1.2721). Opaque washes on cream paper so Monitors settings
+ * focus / Disk Cleanup badge / Perplexity box buttons match light shells
+ * (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light Monitors
+ * Saved + soft-delete Saved + Ops hairline + Judge-off remaps v0.1.2721.
+ */
+/* OVERNIGHT v0.1.2722: light Monitors settings focus-within + Disk Cleanup badge + Perplexity search-box button remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .monitor-settings-item:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, #f7f7fa);
+}
+body.theme-light #icon-disk-cleanup .disk-cleanup-badge {
+  box-shadow: 0 0 0 2px color-mix(in srgb, #000 12%, #f7f7fa);
+}
+body.theme-light .perplexity-search-box button {
+  border-color: color-mix(in srgb, currentColor 18%, #f7f7fa);
+  background: color-mix(in srgb, currentColor 8%, #f7f7fa);
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .monitor-settings-item:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, #ebe4d9);
+}
+body.theme-material #icon-disk-cleanup .disk-cleanup-badge {
+  box-shadow: 0 0 0 2px color-mix(in srgb, #000 12%, #ebe4d9);
+}
+body.theme-material .perplexity-search-box button {
+  border-color: color-mix(in srgb, currentColor 18%, #ebe4d9);
+  background: color-mix(in srgb, currentColor 8%, #ebe4d9);
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .monitor-settings-item:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, #f1f1f1);
+}
+body.theme-architect #icon-disk-cleanup .disk-cleanup-badge {
+  box-shadow: 0 0 0 2px color-mix(in srgb, #000 12%, #f1f1f1);
+}
+body.theme-architect .perplexity-search-box button {
+  border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
+  background: color-mix(in srgb, currentColor 8%, #f1f1f1);
+}
+

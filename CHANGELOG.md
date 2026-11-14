@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2722] - 2026-11-14
+
+### Changed
+
+- **Light Monitors settings focus + Disk Cleanup badge + Perplexity box button washes:** Light / Material / Architect `.monitor-settings-item:focus-within` · `#icon-disk-cleanup .disk-cleanup-badge` · `.perplexity-search-box button` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; `#perplexity-search-btn` already paper in v0.1.2705; Swiss / Apple keep shared white). Opaque washes on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Monitors settings focus / Disk Cleanup badge / Perplexity box buttons match cream shells (after Monitors Saved + soft-delete Saved + Ops hairline + Judge-off remaps v0.1.2721).
+
 ## [0.1.2721] - 2026-11-14
 
 ### Changed
