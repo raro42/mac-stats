@@ -274,8 +274,8 @@ body {
   text-transform: none;
   text-align: center;
   margin-bottom: 6px;
-  /* Opaque type — was rgba(12,12,16,0.62) glass (#14). */
-  color: color-mix(in srgb, #0c0c10 62%, #ffffff);
+  /* Opaque type — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #0c0c10 62%, #f7f7fa);
   overflow: visible;
   text-overflow: clip;
   white-space: nowrap;
@@ -317,8 +317,8 @@ body {
   position: relative;
   top: 0;
   margin-left: 1px;
-  /* Was opacity 0.68 on inherit (~86% ink via --text) → ~58% ink on paper (#14). */
-  color: color-mix(in srgb, #0c0c10 58%, #ffffff);
+  /* Opaque type — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #0c0c10 58%, #f7f7fa);
   opacity: 1;
 }
 
@@ -336,8 +336,8 @@ body {
 
   font-size: 10px;
   font-weight: 500;
-  /* Opaque type — was rgba(12,12,16,0.48) glass (#14). */
-  color: color-mix(in srgb, #0c0c10 48%, #ffffff);
+  /* Opaque type — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #0c0c10 48%, #f7f7fa);
   white-space: nowrap;
   max-width: 94%;
   overflow: hidden;
@@ -418,8 +418,8 @@ body {
   font-weight: 400;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
-  /* Opaque type — was rgb(1,1,1,0.75) glass (#14). */
-  color: color-mix(in srgb, #010101 75%, #ffffff);
+  /* Opaque type — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #010101 75%, #f7f7fa);
   text-transform: uppercase;
 }
 
@@ -437,8 +437,8 @@ body {
   font-size: 14px;
   font-weight: 400;
   line-height: 1.35;
-  /* Opaque type — was rgba(60,60,67,0.72) glass (#14). */
-  color: color-mix(in srgb, #3c3c43 72%, #ffffff);
+  /* Opaque type — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  color: color-mix(in srgb, #3c3c43 72%, #f7f7fa);
 }
 
 .detail-label {

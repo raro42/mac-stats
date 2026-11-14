@@ -1,3 +1,8 @@
+## Overnight merge — v0.1.2730
+
+- Light metric / section / details muted cream remaps: Light `.metric-label` · `.metric-unit` · `.metric-subtext` · `.section-title` · `.details-grid` muted type still mixed Apple `#ffffff` while Material / Architect already sat on cream paper (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa`. Standing P2 #14 after light battery + icon-line remaps v0.1.2729; product fuel (digester empty; design-review grace; layout-daily due=false today — Data Poster marked; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover light cream `#ffffff` mixes (process-name / process-row hairlines / remaining muted type / soft-states still on Apple white) if still muddy, or sibling/product fuel — not another keep-pNN clone.
+
+
 ## Overnight merge — v0.1.2729
 
 - Light battery + icon-line muted cream remaps: Light `.battery-icon` / `.battery-icon.charging` · `.icon-line-item` / `:hover` muted type still mixed Apple `#ffffff` while Material / Architect already sat on cream paper (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa`. Standing P2 #14 after light setting-toggle track remaps v0.1.2728; product fuel (digester empty; design-review grace; layout-daily due=false today — Data Poster marked; not keep-pNN). Next: Dark layout-daily next calendar day, Mac capture when TCC allows, leftover light cream `#ffffff` mixes (metric-label / metric-unit / metric-subtext / section-title / details-grid muted type / remaining soft-states still on Apple white) if still muddy, or sibling/product fuel — not another keep-pNN clone.

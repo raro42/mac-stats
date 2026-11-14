@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2730] - 2026-11-14
+
+### Changed
+
+- **Light metric / section / details muted cream remaps:** Light `.metric-label` · `.metric-unit` · `.metric-subtext` · `.section-title` · `.details-grid` muted type still mixed Apple `#ffffff` while Material / Architect already sat on cream paper (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` so ring labels and Details rows match the cream shell (after battery + icon-line remaps v0.1.2729).
+
 ## [0.1.2729] - 2026-11-14
 
 ### Changed
