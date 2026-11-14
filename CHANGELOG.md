@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2736] - 2026-11-14
+
+### Changed
+
+- **Light Monitors menu/popover cream remaps:** Light `.monitors-menu-btn` / `:hover` · `.monitors-menu` hairline/shadow · `.monitors-menu-item:hover` · `.monitors-settings-popover` backdrop · `.popover-content` hairline/shadow · `.popover-header` · `.popover-close` · `.monitor-settings-item` border · URL muted type · `.monitor-remove-btn` · `.add-monitor-form` · inputs · `.add-btn-small` · `.monitor-item` hairlines still mixed Apple `#ffffff` while Material / Architect already sat on cream paper for Monitors chrome (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque hairlines on paper `#f7f7fa` so the Monitors menu and settings popover match the cream shell (after root tokens / shell / Settings remaps v0.1.2735).
+
+
 ## [0.1.2735] - 2026-11-14
 
 ### Changed
