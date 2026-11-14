@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2758] - 2026-11-15
+
+### Changed
+- Dark design-review (Agent Ops icon line): `.icon-line-item` resting/hover borders remap near-invisible `#004400` / `#006600` on `#0a0a0a` to visible Matrix green hairlines (setting-toggle / process-bar parity; polish-without-capture while Mac TCC blocks `feature-agent-ops.png`).
+
 ## [0.1.2757] - 2026-11-15
 
 ### Changed

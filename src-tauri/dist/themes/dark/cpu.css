@@ -1205,7 +1205,8 @@ body {
   justify-content: center;
   /* Opaque chips — glass alpha stays in Graphics and Media (#14). */
   background: #0a0a0a;
-  border: 1px solid #004400;
+  /* Opaque Matrix chip border — #004400 was near-invisible on #0a0a0a; green hairline like setting-toggle (#14 / P2; design-review Agent Ops icon). */
+  border: 1px solid color-mix(in srgb, #00ff00 28%, #0a0a0a);
   box-shadow: none;
   padding: 0;
   cursor: pointer;
@@ -1223,7 +1224,8 @@ body {
   /* Opaque type — was rgba(235,235,245,0.85) glass (#14). */
   color: color-mix(in srgb, #ebebf5 85%, #0a0a0a);
   background: #121212;
-  border-color: #006600;
+  /* Opaque hover border — #006600 was still muddy on #0a0a0a; brighter Matrix hairline (#14 / P2). */
+  border-color: color-mix(in srgb, #00ff00 40%, #0a0a0a);
 }
 
 .icon-line-item:focus-visible {
