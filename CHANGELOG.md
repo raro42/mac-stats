@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2735] - 2026-11-14
+
+### Changed
+
+- **Light root tokens / shell / Settings / icon-line chip cream remaps:** Light `:root` `--text` / `--muted` / `--hairline` / `--panel` / `--panel-border` / `--panel-shadow` / `--modal-backdrop` · `.cpu-shell` hairline · `.force-quit-section` divider · Settings card/header fallbacks · `.icon-line-item` resting chip · Low Power Mode toggle knob still mixed Apple `#ffffff` while Material / Architect already sat on cream paper for root tokens (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque chrome on paper `#f7f7fa` so shell type, hairlines, Settings glass fallbacks, and resting icon chips match the cream shell (after history-chart / process-bar / icon-line status remaps v0.1.2734).
+
 ## [0.1.2734] - 2026-11-14
 
 ### Changed

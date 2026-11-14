@@ -14,23 +14,23 @@
   --radius-shell: 44px;
   --radius-card: 28px;
 
-  /* Opaque type / line tokens — was ink glass rgba over Light paper (#14). */
-  --text: color-mix(in srgb, #0c0c10 86%, #ffffff);
-  --muted: color-mix(in srgb, #0c0c10 55%, #ffffff);
-  --hairline: color-mix(in srgb, #0c0c10 10%, #ffffff);
+  /* Opaque type / line tokens — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  --text: color-mix(in srgb, #0c0c10 86%, #f7f7fa);
+  --muted: color-mix(in srgb, #0c0c10 55%, #f7f7fa);
+  --hairline: color-mix(in srgb, #0c0c10 10%, #f7f7fa);
 
-  /* Opaque panel tokens — was lavender/white glass rgba over Light paper (#14). */
+  /* Opaque panel tokens — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
   --panel-bg: color-mix(in srgb, #f5f5fa 55%, #f7f7fa);
-  --panel: color-mix(in srgb, #f5f5fa 94%, #ffffff);
-  --panel-border: color-mix(in srgb, #ffffff 70%, #f7f7fa);
-  --panel-shadow: 0 28px 110px color-mix(in srgb, #000000 12%, #ffffff);
+  --panel: color-mix(in srgb, #f5f5fa 94%, #f7f7fa);
+  --panel-border: color-mix(in srgb, #0c0c10 10%, #f7f7fa);
+  --panel-shadow: 0 28px 110px color-mix(in srgb, #000000 12%, #f7f7fa);
 
   --accent: #6aa6df;
   /* Opaque ring track — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
   --ring-track: color-mix(in srgb, #000000 8%, #f7f7fa);
 
-  /* Opaque modal token — was black glass rgba over Light paper (#14). */
-  --modal-backdrop: color-mix(in srgb, #000000 35%, #ffffff);
+  /* Opaque modal token — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  --modal-backdrop: color-mix(in srgb, #000000 35%, #f7f7fa);
 }
 
 body {
@@ -56,8 +56,8 @@ body {
   border-radius: var(--radius-shell);
   /* Opaque shell — gradient wash + soft shadow re-blend every tick (#14). */
   background: #f7f7fa;
-  /* Opaque hairline — was rgba(0,0,0,0.06) glass (#14). */
-  border: 1px solid color-mix(in srgb, #000000 6%, #ffffff);
+  /* Opaque hairline — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  border: 1px solid color-mix(in srgb, #000000 6%, #f7f7fa);
   box-shadow: none;
 
 
@@ -556,10 +556,10 @@ body {
   display: flex;
   flex-direction: column;
   border-radius: 22px;
-  /* Opaque panel fallback — was white glass rgba(255,255,255,…) (#14). */
-  background: var(--panel, color-mix(in srgb, #ffffff 86%, #f7f7fa));
-  border: 1px solid var(--panel-border, color-mix(in srgb, #ffffff 65%, #f7f7fa));
-  box-shadow: var(--panel-shadow, 0 32px 100px color-mix(in srgb, #000000 20%, #ffffff));
+  /* Opaque panel fallback — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: var(--panel, color-mix(in srgb, #f5f5fa 86%, #f7f7fa));
+  border: 1px solid var(--panel-border, color-mix(in srgb, #0c0c10 10%, #f7f7fa));
+  box-shadow: var(--panel-shadow, 0 32px 100px color-mix(in srgb, #000000 20%, #f7f7fa));
   padding: 18px 18px 16px;
   overflow: hidden;
 }
@@ -570,8 +570,8 @@ body {
   align-items: center;
   gap: 12px;
   padding-bottom: 12px;
-  /* Opaque hairline — was Apple rgba(0,0,0,0.08) glass (#14). */
-  border-bottom: 1px solid var(--hairline, color-mix(in srgb, #000000 8%, #ffffff));
+  /* Opaque hairline — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  border-bottom: 1px solid var(--hairline, color-mix(in srgb, #000000 8%, #f7f7fa));
   margin-bottom: 12px;
   flex-shrink: 0;
 }
@@ -855,8 +855,8 @@ body {
 .force-quit-section {
   margin-top: 20px;
   padding-top: 16px;
-  /* Opaque hairline — was rgba(0,0,0,0.1) glass (#14). */
-  border-top: 1px solid color-mix(in srgb, #000000 10%, #ffffff);
+  /* Opaque hairline — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  border-top: 1px solid color-mix(in srgb, #000000 10%, #f7f7fa);
 }
 
 .force-quit-btn {
@@ -1375,7 +1375,8 @@ body {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #fff;
+  /* Opaque knob — Apple #fff → Light paper #f7f7fa (#14 / P2). */
+  background: #f7f7fa;
   box-shadow: none;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
 }
@@ -1450,9 +1451,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Opaque chips — glass alpha + inset shadow stay in Graphics and Media (#14). */
-  background: #ffffff;
-  border: 1px solid #e6e6ea;
+  /* Opaque chips — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  background: #f7f7fa;
+  border: 1px solid color-mix(in srgb, #e6e6ea 70%, #f7f7fa);
   box-shadow: none;
   padding: 0;
   cursor: pointer;
