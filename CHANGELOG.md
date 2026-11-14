@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.2723] - 2026-11-14
+
+### Changed
+
+- **Light Disk Cleanup path hover + Process Details PID hover washes:** Light / Material / Architect `.disk-cleanup-item-path:hover` · `.disk-cleanup-scope-path:hover` · `.process-detail-pid:hover` / `:focus-visible` still inherited shared glass type while resting muted remaps already sat on cream paper (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque fuller type on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so Disk Cleanup paths / Process Details PID hover match cream shells (after Monitors settings focus + Disk Cleanup badge + Perplexity box button remaps v0.1.2722).
+
+
 ## [0.1.2722] - 2026-11-14
 
 ### Changed
