@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2751] - 2026-11-14
+
+### Changed
+- Material / Architect cream pigments: Material `.dial` pad + inset highlight · `.battery-power-strip` · `.battery-icon.no-battery`, and Architect `.arch-sheet` · `.metric-box` · `.battery-power-strip` · `.battery-icon.no-battery` remap Apple `#ffffff` mixes to paper pigments on `#e7e2d9` / `#f1f1f1` (icon-btn / metric-card / arch-actions remapped in 0.1.2750; Swiss / Apple keep shared white).
+
 ## [0.1.2750] - 2026-11-14
 
 ### Changed
