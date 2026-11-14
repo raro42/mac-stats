@@ -1,19 +1,21 @@
 # Morning surprise — 2026-11-14
 
-Overnight Track B kept light cream remaps (Standing P2 #14). Digester open stayed empty; design-review stayed in grace; layout-daily already marked Data Poster for the day.
+Overnight autoresearch kept shipping Light / Material / Architect cream-paper remaps (Standing P2 #14). Digester open stayed empty; design-review stayed in grace; layout-daily Data Poster already marked for the day.
 
-## Shipped
+## Shipped tonight
 
-- **v0.1.2713** — Light / Material / Architect Perplexity empty + error washes (`.perplexity-empty` · `.perplexity-empty-error`) onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1`.
-- **v0.1.2712** — Light Top Processes empty shell (`.process-empty`).
-- **v0.1.2711** — Light Debug Log empty type (`.logs-viewer.is-empty`).
-- Earlier same night: **v0.1.2709–v0.1.2710** Disk Cleanup / logs-line soft-states (see CHANGELOG).
+- **v0.1.2714** — Perplexity muted type: `.perplexity-result-list` · `.perplexity-result-snippet` · `.perplexity-config-status` onto `#f7f7fa` / `#ebe4d9` / `#f1f1f1`.
+- **v0.1.2713** — Perplexity empty + empty-error washes.
+- **v0.1.2712** — Top Processes empty shell.
+- **v0.1.2711** — Debug Log empty type (after race-discard of local empty-only 2710).
+- **v0.1.2710** — Disk Cleanup empty + disabled/Recurse (origin).
+- **v0.1.2709** — logs-line soft-states (after race-discard).
 
 ## Tried / discarded
 
-- Parallel-race discards when origin already landed the same leftover (re-pick next).
+- Parallel races on Disk Cleanup empty and earlier soft-state clones — discarded and re-picked next leftovers.
 
-## Next fuel
+## Still open
 
-- Dark layout-daily next calendar day (Neon / Futuristic still due).
-- Leftover light cream `#ffffff` mixes (muted type / soft-states), or sibling / product fuel — not another keep-pNN clone.
+- Dark / Neon / Futuristic layout-daily next calendar day (Mac capture when TCC allows).
+- Leftover light cream `#ffffff` mixes: Send active/disabled · Force Quit section/Saved · Perplexity inline-key · other muted type / remaining soft-states.
