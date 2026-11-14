@@ -39,9 +39,9 @@ body {
   color: var(--text);
 
   background:
-    /* Opaque wash — was white glass rgba over the Material paper (#14). */
-    radial-gradient(1000px 800px at 20% 15%, color-mix(in srgb, #ffffff 40%, #e7e2d9), transparent 55%),
-    radial-gradient(1000px 800px at 80% 20%, color-mix(in srgb, #ffffff 32%, #e7e2d9), transparent 55%),
+    /* Opaque wash — Apple #ffffff → Material paper pigments (#14 / P2). */
+    radial-gradient(1000px 800px at 20% 15%, color-mix(in srgb, #e4ddd2 40%, #e7e2d9), transparent 55%),
+    radial-gradient(1000px 800px at 80% 20%, color-mix(in srgb, #e4ddd2 32%, #e7e2d9), transparent 55%),
     linear-gradient(180deg, var(--paper2), var(--paper));
 }
 

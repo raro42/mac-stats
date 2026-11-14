@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2752] - 2026-11-14
+
+### Changed
+- Material cream pigments: Material `body` radial wash remaps Apple `#ffffff` mixes to paper pigments on `#e7e2d9` (dial / battery strip remapped in 0.1.2751; Swiss / Apple keep shared white).
+
 ## [0.1.2751] - 2026-11-14
 
 ### Changed
