@@ -1,19 +1,22 @@
 # Morning surprise — 2026-11-15
 
-Overnight autoresearch (Track B) kept shipping Light cream remaps (Standing P2 #14).
+Overnight Track B (20:00–06:00 local) for Ralf.
 
 ## Shipped
 
-- **v0.1.2736** — Light Monitors menu / settings popover cream remaps (hairline + muted fallbacks onto paper `#f7f7fa`).
-- **v0.1.2737** — Light AI Chat collapse / model selector / chat messages cream remaps (collapse-btn, ollama menu/popover leftovers, model-text/select, chat-messages, user/assistant washes onto paper `#f7f7fa`).
+- **v0.1.2738** — Light chat markdown / thinking-dots / logs cream remaps (Standing P2 #14).
+  - Markdown blockquote/code/pre/table/hr/links, thinking-dots, and Debug Log toolbar/viewer now mix onto Light paper `#f7f7fa` instead of Apple `#ffffff`.
+- **v0.1.2737** — Light AI Chat collapse / model / messages cream remaps (Standing P2 #14; parallel tick).
+- **v0.1.2736** — Light Monitors menu/popover cream remaps (Standing P2 #14).
 
-## Also this tick
+## Tried / context
 
-- Digester empty; design-review grace; layout-daily due=false (Data Poster marked today).
-- Parallel-race discard: local Monitors-as-2736 lost to origin, then re-picked AI Chat chrome as 2737.
-- Sibling harnesses missing on rack; debug.log quiet.
+- Digester open: empty.
+- Design-review: grace.
+- Layout-daily: Data Poster marked for 2026-11-14.
+- Race: local AI-Chat-as-2737 discarded; re-picked markdown/logs as 2738.
 
 ## Next
 
-- Dark layout-daily next calendar day (when due).
-- Leftover Light cream: chat markdown / Disk Cleanup / logs toolbar if still muddy.
+- Dark layout-daily when the day quota opens.
+- Leftover Light cream: history-tooltip · Disk Cleanup residual soft-states.

@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2738] - 2026-11-14
+
+### Changed
+
+- **Light chat markdown / thinking-dots / logs cream remaps:** Light markdown blockquote / code / pre / table / hr / links · thinking-dots · `.logs-toolbar` button · `.logs-autorefresh` · `.logs-viewer` still mixed Apple `#ffffff` while Material / Architect already sat on cream paper for chat markdown and Debug Log chrome (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white). Opaque chrome on paper `#f7f7fa` so AI Chat markdown and Debug Log chrome match the cream shell (after AI Chat collapse/model/messages remaps v0.1.2737).
+
 ## [0.1.2737] - 2026-11-14
 
 ### Changed
