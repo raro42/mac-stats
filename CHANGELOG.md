@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2759] - 2026-11-15
+
+### Changed
+- Dark AI Chat: `#chat-input` resting border remaps near-invisible `#004400` on `#0a0a0a` to a visible Matrix green hairline (icon-line / setting-toggle parity; after Dark icon-line contrast in 0.1.2758).
+
 ## [0.1.2758] - 2026-11-15
 
 ### Changed
