@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2714] - 2026-11-14
+
+### Changed
+
+- **Light Perplexity muted type:** Light / Material / Architect `.perplexity-result-list` · `.perplexity-result-snippet` · `.perplexity-config-status` still mixed Apple `#ffffff` (Data Poster / Dark / Neon / Futuristic remaps already existed; Swiss / Apple keep shared white). Opaque type on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so result list / snippet / API-key status match cream shells (after Perplexity empty + error remaps v0.1.2713).
+
 ## [0.1.2713] - 2026-11-14
 
 ### Changed

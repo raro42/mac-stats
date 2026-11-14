@@ -37585,3 +37585,55 @@ body.theme-architect .perplexity-empty-error {
   border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
   background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
 }
+
+/*
+ * Light / Material / Architect: Perplexity muted type still mixes Apple
+ * `#ffffff` (`.perplexity-result-list` · `.perplexity-result-snippet` ·
+ * `.perplexity-config-status`) while Data Poster / Dark / Neon / Futuristic
+ * remaps already exist. Opaque type on cream paper so result list / snippet /
+ * API-key status match light shells (Swiss / Apple keep shared `#ffffff`).
+ * Standing P2 #14 after light Perplexity empty + error remaps v0.1.2713.
+ */
+/* OVERNIGHT v0.1.2714: light Perplexity muted type remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light .perplexity-result-list {
+  color: color-mix(in srgb, #0c0c10 69%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .perplexity-result-snippet {
+  color: color-mix(in srgb, #0c0c10 62%, #f7f7fa);
+  opacity: 1;
+}
+body.theme-light .perplexity-config-status {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 70%, #f7f7fa);
+  opacity: 1;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material .perplexity-result-list {
+  color: color-mix(in srgb, #0c0c10 69%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .perplexity-result-snippet {
+  color: color-mix(in srgb, #0c0c10 62%, #ebe4d9);
+  opacity: 1;
+}
+body.theme-material .perplexity-config-status {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 70%, #ebe4d9);
+  opacity: 1;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect .perplexity-result-list {
+  color: color-mix(in srgb, #0c0c10 69%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .perplexity-result-snippet {
+  color: color-mix(in srgb, #0c0c10 62%, #f1f1f1);
+  opacity: 1;
+}
+body.theme-architect .perplexity-config-status {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 70%, #f1f1f1);
+  opacity: 1;
+}
