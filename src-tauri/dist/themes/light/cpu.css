@@ -156,9 +156,9 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 999px;
-  /* Opaque chrome / wash / type / shadow — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
+  /* Opaque chrome / wash / type / shadow — Apple #ffffff → Light paper pigments (#14 / P2). */
   border: 1px solid color-mix(in srgb, #000000 6%, #f7f7fa);
-  background: color-mix(in srgb, #ffffff 55%, #f7f7fa);
+  background: color-mix(in srgb, #e8e8ee 55%, #f7f7fa);
 
   color: color-mix(in srgb, #1e1e22 62%, #f7f7fa);
   font-size: 18px;
@@ -214,8 +214,8 @@ body {
   contain: layout paint style;
   position: relative;
   border-radius: var(--radius-card);
-  /* Opaque flat card — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
-  background: color-mix(in srgb, #ffffff 78%, #f7f7fa);
+  /* Opaque flat card — Apple #ffffff → Light paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #e8e8ee 78%, #f7f7fa);
   /* Opaque hairline — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
   border: 1px solid color-mix(in srgb, #000000 6%, #f7f7fa);
   box-shadow: none;

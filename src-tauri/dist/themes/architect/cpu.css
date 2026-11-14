@@ -137,8 +137,8 @@ body {
   gap: 0;
   border: 1px solid var(--line-strong);
   padding: 2px;
-  /* Opaque wash — was rgba(255,255,255,0.42) glass (#14). */
-  background: color-mix(in srgb, #ffffff 42%, #f1f1f1);
+  /* Opaque wash — Apple #ffffff → Architect paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #e8e8e8 42%, #f1f1f1);
   border-radius: 10px;
 }
 

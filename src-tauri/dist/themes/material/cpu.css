@@ -144,9 +144,9 @@ body {
   width: 56px;
   height: 56px;
   border-radius: 999px;
-  /* Opaque chrome — was white / ink glass rgba (#14). */
+  /* Opaque chrome — Apple #ffffff → Material paper pigments (#14 / P2). */
   border: 1px solid color-mix(in srgb, #000000 12%, #e7e2d9);
-  background: color-mix(in srgb, #ffffff 40%, #e7e2d9);
+  background: color-mix(in srgb, #e4ddd2 40%, #e7e2d9);
   color: color-mix(in srgb, #18181a 55%, #e7e2d9);
   font-size: 22px;
   cursor: pointer;

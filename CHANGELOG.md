@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2750] - 2026-11-14
+
+### Changed
+- Light / Material / Architect cream pigments: Light `.icon-btn` · `.metric-card`, Material `.icon-btn`, and Architect `.arch-actions` remap Apple `#ffffff` mixes to paper pigments on `#f7f7fa` / `#e7e2d9` / `#f1f1f1` (history-chart remapped in 0.1.2749; Swiss / Apple keep shared white).
+
 ## [0.1.2749] - 2026-11-14
 
 ### Changed
