@@ -6,12 +6,12 @@ Overnight autoresearch (20:00–06:00 CET window into 15 Nov).
 
 | Version | What |
 |---------|------|
-| **v0.1.2744** | Light / Material / Architect setting-toggle knob cream remaps onto `#f7f7fa` / `#e7e2d9` / `#f1f1f1` (Standing P2 #14; after Dark family knobs v0.1.2743) |
+| **v0.1.2745** | Light / Material / Architect LPM track + icon-line hover cream remaps onto `#f7f7fa` / `#e7e2d9` / `#f1f1f1` (Standing P2 #14; after setting-toggle knobs v0.1.2744) |
+| **v0.1.2744** | Light / Material / Architect setting-toggle knob cream remaps onto `#f7f7fa` / `#e7e2d9` / `#f1f1f1` |
 | **v0.1.2743** | Dark / Neon / Futuristic setting-toggle knob field remaps onto `#0a0a0a` / `#08120c` / `#0b0b10` |
 | **v0.1.2742** | Neon / Futuristic LPM track + knob field remaps onto `#08120c` / `#0b0b10` |
 | **v0.1.2741** | Dark LPM track + knob field remaps onto `#0a0a0a` |
 | **v0.1.2740** | Material / Architect icon-line + LPM knob cream remaps |
-| **v0.1.2739** | Light history-tooltip cream remaps |
 
 ## Fuel
 
@@ -23,5 +23,5 @@ Overnight autoresearch (20:00–06:00 CET window into 15 Nov).
 ## Next
 
 - Dark layout-daily when the calendar day quota opens.
-- Leftover cream `#ececf1` mixes (LPM track · icon-line hover) if muddy.
+- Leftover cream `#ececf1` mixes (`.cpu-actions` · `.battery-power-strip` · `.battery-icon.no-battery` · agent-ops is-ai-off hover) if muddy.
 - Sibling/product fuel — not another keep-pNN clone.

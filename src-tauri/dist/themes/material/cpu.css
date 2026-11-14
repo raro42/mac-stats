@@ -1196,9 +1196,9 @@ body {
   width: 34px;
   height: 18px;
   border-radius: 999px;
-  /* Opaque track — alpha mix + inset shadow stay in Graphics and Media (#14). */
-  background: color-mix(in srgb, var(--muted, #888) 22%, #ececf1);
-  border: 1px solid color-mix(in srgb, var(--muted, #888) 28%, #ececf1);
+  /* Opaque track — Apple #ececf1 wash → Material paper #e7e2d9 (#14 / P2). */
+  background: color-mix(in srgb, var(--muted, #888) 22%, #e7e2d9);
+  border: 1px solid color-mix(in srgb, var(--muted, #888) 28%, #e7e2d9);
   box-shadow: none;
 }
 
@@ -1303,10 +1303,10 @@ body {
 }
 
 .icon-line-item:hover {
-  /* Opaque type — was rgba(12,12,16,0.72) glass (#14). */
+  /* Opaque hover — Apple #ececf1 chip → Material paper #e7e2d9 (#14 / P2). */
   color: color-mix(in srgb, #0c0c10 72%, #e7e2d9);
-  background: #ececf1;
-  border-color: #dcdce2;
+  background: color-mix(in srgb, #0c0c10 6%, #e7e2d9);
+  border-color: color-mix(in srgb, #0c0c10 12%, #e7e2d9);
 }
 
 .icon-line-item:focus-visible {

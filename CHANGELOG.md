@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2745] - 2026-11-14
+
+### Changed
+
+- **Light / Material / Architect LPM track + icon-line hover cream remaps:** Light / Material / Architect `.lpm-toggle` track and `.icon-line-item:hover` still mixed Apple `#ececf1` while knobs / resting chips already sat on cream paper (Dark / Neon / Futuristic LPM tracks remapped in v0.1.2741–2742; Swiss / Apple keep shared `#ececf1`). Opaque mixes on paper `#f7f7fa` / `#e7e2d9` / `#f1f1f1` so Low Power Mode and icon-line hover match each cream shell.
+
 ## [0.1.2744] - 2026-11-14
 
 ### Changed
