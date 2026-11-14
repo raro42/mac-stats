@@ -1,26 +1,20 @@
 # Morning surprise — 2026-11-15
 
-Overnight Track B kept shipping. Digester open stayed empty; design-review stayed in grace. **Layout-daily opened** on the new calendar day (2026-11-15) and took Data Poster.
+Overnight cream-pigment ratchet kept moving, then Dark layout-daily fixed an invisible Settings toggle.
 
-## Shipped tonight (keep)
+## Shipped
 
-| Version | What |
-|---|---|
-| **v0.1.2755** | Data Poster layout-daily: base `.lpm-toggle` Apple `#ececf1` → poster shell `#0b0b10` (parity with Dark / Neon / Futuristic). |
-| **v0.1.2754** | Light Monitors leftover Apple `#ffffff` → panel pigment `#f5f5fa` on paper `#f7f7fa`. |
-| **v0.1.2753** | Material / Architect Monitors + AI Chat leftover cream remaps. |
-| earlier 20:00–23:45 | Cream opaque-wash ladder (history-chart, tip chrome, AI-off, LPM, knobs, …) — see `results.tsv` / `loop_backlog.md`. |
+- **v0.1.2756** — Dark Settings `.setting-toggle` resting track: invisible black-on-`#0a0a0a` → visible green hairline + tint (Matrix cascade winner; early block Data Poster white hairline parity).
+- **v0.1.2755** — Data Poster base `.lpm-toggle` track: Apple `#ececf1` → poster shell `#0b0b10`.
+- **v0.1.2754** — Light Monitors menu/popover/add-form cream pigments on `#f7f7fa`.
+- **v0.1.2753** — Material / Architect Monitors + AI Chat leftover cream remaps.
+- Earlier same night: Material body wash, dial/battery, icon-btn/metric-card, history-chart, tip chrome, AI-off, LPM / setting-toggle knobs, and more P2 #14 cream parity (see CHANGELOG).
 
 ## Tried / discarded
 
-- Parallel-race discards earlier in the night when origin already held the local pick. Re-picked next leftover each time.
+- Parallel-race discards when origin landed the same surface first (re-picked leftovers as next patch).
+- Design review due for `feature-agent-ops.png` (~60d stale); Linux rack cannot Mac window-only capture this tick — deferred polish-without-capture / Mac TCC.
 
-## Next fuel
+## Why it matters
 
-- Dark / Neon / Futuristic **layout-daily** on later calendar days (Data Poster marked for 2026-11-15).
-- Mac capture for `feature-agent-ops.png` when TCC allows.
-- Light AI Chat residual if any · Send white-on-blue intentional — leave alone.
-
-## Nightly minimum
-
-Satisfied: multiple `keep` rows in `~/.mac-stats/improvements/autoresearch/results.tsv` for the 20:00–06:00 window (including **v0.1.2755**).
+Cream shells stop flashing Apple-white glass on Monitors and chat chrome. Dark Settings toggles are readable again instead of vanishing into the Matrix field.
