@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2734] - 2026-11-14
+
+### Changed
+
+- **Light history-chart residual shadows / process-bar track / icon-line status cream remaps:** Light `.history-chart-container` bottom inset + drop shadow (both early and late blocks) · `.process-bar` track · `.icon-line-item.status-good` / `.status-warning` / `.status-bad` (resting · hover) still mixed Apple `#ffffff` while Material / Architect already sat on cream paper for chart shadows / bar track (Data Poster / Dark / Neon / Futuristic keep field remaps; Swiss / Apple keep shared white; agent-ops status overrides already paper since v0.1.2707). Opaque chrome on paper `#f7f7fa` so sparkline tiles, usage bars, and Ready / Slow / Down chips match the cream shell (after divider / card / ring / scrollbar remaps v0.1.2733).
+
 ## [0.1.2733] - 2026-11-14
 
 ### Changed
