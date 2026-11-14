@@ -412,7 +412,8 @@ body {
 .process-bar {
   width: 44px;
   height: 3px;
-  background: var(--ring-inactive);
+  /* Opaque Matrix track — --ring-inactive #003300 was near-invisible on #0a0a0a; green tint like Neon (#14 / P2). */
+  background: color-mix(in srgb, #00ff00 12%, #0a0a0a);
   border-radius: 2px;
   overflow: hidden;
 }

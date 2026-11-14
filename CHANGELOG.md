@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2757] - 2026-11-15
+
+### Changed
+- Dark Top Processes: `.process-bar` track remaps near-invisible `--ring-inactive` `#003300` on `#0a0a0a` to a visible Matrix green 12% tint (Neon process-bar parity; after Dark setting-toggle track contrast in 0.1.2756).
+
 ## [0.1.2756] - 2026-11-15
 
 ### Changed
