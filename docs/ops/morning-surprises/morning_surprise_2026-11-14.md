@@ -1,23 +1,22 @@
 # Morning surprise — 2026-11-14
 
-Overnight autoresearch kept shipping Light cream paper remaps (standing P2 #14).
+Overnight autoresearch (Track B) for Ralf.
 
-## Shipped tonight (latest first)
+## Shipped
 
-- **v0.1.2725** — Light Force Quit `.force-quit-btn` resting / hover / `:active` Apple `#ffffff` → paper `#f7f7fa` (focus + confirming already paper; Material / Architect already paper).
-- **v0.1.2724** — Light / Material / Architect generic Soft Save (`button.is-just-saved` / `.popover-btn-secondary.is-just-saved`).
-- **v0.1.2723** — Light Disk Cleanup path hover + Process Details PID hover.
-- Earlier keeps same night: Soft Save cascade + Ops / Monitors / Perplexity / Processes cream remaps (see `results.tsv` / loop_backlog).
+- **v0.1.2726** — Light History time-range cream remaps: `.history-controls label` · `.time-range-dropdown` (resting · hover · `:focus` · `option`) `#ffffff` → paper `#f7f7fa` (Material / Architect already paper). Standing P2 #14.
+- **v0.1.2725** (parallel tick) — Light Force Quit resting/hover/active paper remaps.
+- Earlier tonight: Soft Save generic flashes, Disk Cleanup path hover + Process Details PID hover, and prior Light cream catch-ups through v0.1.2724.
 
 ## Tried / discarded
 
-- Parallel-race discards earlier in the window when origin landed first (re-picked next soft-state).
+- Local **v0.1.2725** Settings + Changelog + History cream catch-up — **discard** (race: origin already cut Force Quit as 2725). Re-picked History time-range as **v0.1.2726**.
 
-## Not a digester night
+## Fuel notes
 
-- Digester open stayed empty (0 turns / 7d). Fuel came from standing backlog P2 #14.
+- Digester open empty; design-review grace; layout-daily Data Poster marked (Dark/Neon/Futuristic due next calendar day).
+- Next leftovers: Light Settings inputs/buttons/theme-item · Changelog muted · process-bar-fill, or sibling/product fuel — not keep-pNN clones.
 
-## Next
+## Verify
 
-- Dark layout-daily next calendar day (Mac capture when TCC allows).
-- Leftover Light cream mixes: history `.time-range-dropdown` resting/hover/focus, other muted type / soft-states still on Apple white.
+- `python3 scripts/autoresearch_ratchet.py verify` OK; keep logged; pushed `main` @ v0.1.2726.
