@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2724] - 2026-11-14
+
+### Changed
+
+- **Light generic Soft Save washes:** Light / Material / Architect shared `button.is-just-saved` / `.popover-btn-secondary.is-just-saved` still mixed Apple `#ffffff` outside Settings-card remaps (Data Poster / Dark / Neon / Futuristic keep per-control remaps; Swiss / Apple keep shared white). Opaque 18%/40% green on paper `#f7f7fa` / `#ebe4d9` / `#f1f1f1` so leftover Soft Save flashes match cream shells (after Disk Cleanup path hover + Process Details PID hover remaps v0.1.2723).
+
 ## [0.1.2723] - 2026-11-14
 
 ### Changed

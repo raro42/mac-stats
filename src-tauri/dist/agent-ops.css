@@ -38184,3 +38184,41 @@ body.theme-architect .process-detail-pid:hover,
 body.theme-architect .process-detail-pid:focus-visible {
   color: var(--text, color-mix(in srgb, #0c0c10 92%, #f1f1f1));
 }
+
+/*
+ * Light / Material / Architect: generic Soft Save flashes outside Settings card
+ * still mix Apple `#ffffff` via shared `button.is-just-saved` /
+ * `.popover-btn-secondary.is-just-saved` (Settings-card / Reset / View logs already
+ * paper in v0.1.2624; named primary Saves already paper). Opaque 18%/40% green on
+ * cream paper so leftover Soft Save buttons match light shells (Swiss / Apple keep
+ * shared `#ffffff`). Standing P2 #14 after light Disk Cleanup path hover + Process
+ * Details PID hover remaps v0.1.2723.
+ */
+/* OVERNIGHT v0.1.2724: light generic Soft Save (button / popover-btn-secondary) remaps */
+
+/* --- light (#f7f7fa) --- */
+body.theme-light button.is-just-saved,
+body.theme-light .popover-btn-secondary.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #f7f7fa) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #f7f7fa) !important;
+  color: inherit;
+  box-shadow: none;
+}
+
+/* --- material (#ebe4d9) --- */
+body.theme-material button.is-just-saved,
+body.theme-material .popover-btn-secondary.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #ebe4d9) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #ebe4d9) !important;
+  color: inherit;
+  box-shadow: none;
+}
+
+/* --- architect (#f1f1f1) --- */
+body.theme-architect button.is-just-saved,
+body.theme-architect .popover-btn-secondary.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #f1f1f1) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #f1f1f1) !important;
+  color: inherit;
+  box-shadow: none;
+}
