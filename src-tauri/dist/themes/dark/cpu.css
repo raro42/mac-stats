@@ -16,11 +16,12 @@
   --text-muted: #008800;
   --muted: #008800;
   --accent: #00cc66;
-  --hairline: #004400;
-  --panel-border: #004400;
+  /* Opaque Matrix chrome — raw #004400 was near-invisible on #0a0a0a; Neon hairline/panel-border already field-tinted (#14 / P2; design-review Agent Ops). */
+  --hairline: color-mix(in srgb, #00ff00 18%, #0a0a0a);
+  --panel-border: color-mix(in srgb, #00ff00 22%, #0a0a0a);
   /* Opaque shadow — was black glass rgba(0,0,0,0.85) (#14). */
   --panel-shadow: 0 24px 80px color-mix(in srgb, #000000 85%, #0a0a0a);
-  --border: #004400;
+  --border: color-mix(in srgb, #00ff00 22%, #0a0a0a);
   --ring-active: #00ff00;
   --ring-inactive: #003300;
   --hint: #006600;

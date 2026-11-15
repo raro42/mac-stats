@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2762] - 2026-11-15
+
+### Changed
+- Dark design-review (Agent Ops chrome tokens): `:root` `--hairline` / `--panel-border` / `--border` remap near-invisible `#004400` on `#0a0a0a` to visible Matrix green field mixes (Neon token parity; glass-panel, Settings, Disk Cleanup, and other `var(--hairline|--border)` chrome; polish-without-capture while Mac TCC blocks `feature-agent-ops.png`).
+
 ## [0.1.2761] - 2026-11-15
 
 ### Changed
