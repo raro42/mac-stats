@@ -1,21 +1,21 @@
 # Morning surprise — 2026-11-15
 
-Overnight Track B kept shipping dark-theme contrast remaps (design-review due; Mac TCC blocked fresh `feature-*.png` captures — polish-without-capture).
+Overnight autoresearch kept shipping theme contrast polish (design-review due; digester empty; Mac TCC blocks fresh feature screenshots).
 
-## Shipped tonight (selected)
+## Shipped
 
-- **v0.1.2796** — Debug Log path + CPU card focus: `.logs-path-hint:focus-visible` / `#cpu-usage-card:focus-visible` Apple `#0a84ff` → theme `--accent` on Dark / Neon / Futuristic / Data Poster (other CRT focus rings already accent).
-- **v0.1.2795** — Perplexity result hover + weather card Apple `#0a84ff` → theme `--accent` (selected / is-top parity; Data Poster fallbacks `#55c7ff`).
-- **v0.1.2794** — Agent Ops Insights clickable lines: focus outline Apple `#0a84ff` → theme `--accent` (Data Poster selected fallback `#55c7ff`).
-- **v0.1.2793** — Disk Cleanup collapsed glance `.has-scopes-off` Apple `#0a84ff` → amber `#ff9f0a` (meta-card scopes-off parity).
-- Earlier same night: Neon model-select / Ollama popover / Force Quit disabled / process-row selected / Disk Cleanup primary·add-scope / AI Chat bubbles / Agent Ops chrome (see CHANGELOG 0.1.2783–2792).
+- **v0.1.2797** — Light / Material / Architect Disk Cleanup collapsed glance `.has-scopes-off`: leftover Apple `#0a84ff` → amber `#ff9f0a`, matching meta-card scopes-off (CRT remaps were v0.1.2793).
+- **v0.1.2796** — Dark / Neon / Futuristic / Data Poster Debug Log path + CPU card focus rings onto theme accent.
+- Earlier same night: Perplexity hover/weather, Agent Ops insight focus, Disk Cleanup scopes-off (CRT), Neon model-select, Ollama popover, Force Quit disabled, process-row selected, and more CRT accent remaps through the evening window.
 
-## Tried / blocked
+## Tried / notes
 
-- Fresh window-only screenshots for `feature-processes.png` / `feature-cpu-metrics.png` / `feature-ai-chat.png`: CPU window not on-screen (menu-bar Control Center chip only) or blank WebView layer — did not ship blanks.
+- Digester: empty (0 turns / 7d) — not a surprise by itself.
+- Design review still due (`feature-agent-ops` ~61d, also processes/disk-cleanup/AI Chat) — polish-without-capture on Linux rack.
+- Layout daily: Data Poster + Dark marked today; Neon/Futuristic later calendar days.
+- Sibling harnesses missing on rack.
+- 23:00 flush clean; CI/release already cut today (skipped).
 
 ## Next fuel
 
-- Neon / Futuristic layout-daily on a later calendar day.
-- Mac capture when TCC / CPU window allows.
-- Leftover soft-states: Light/Material/Architect collapsed-glance `.has-scopes-off` Apple `#0a84ff` if muddy; Send white-on-blue intentional.
+Neon / Futuristic layout-daily on later days; Mac capture when TCC allows; leftover soft-states (Light/Material/Architect meta-card focus Apple blue is intentional shared chrome; Send white-on-blue intentional).
