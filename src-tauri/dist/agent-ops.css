@@ -594,15 +594,17 @@ body.theme-material .icon-line-item.is-ai-off:not(.status-good):not(.status-warn
 }
 
 body.theme-data-poster .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
-  /* Chip #16161e over the poster field #0b0b10. Glyph was 95% white on the chip. */
+  /* Chip #16161e over the poster field #0b0b10. */
   background: color-mix(in srgb, #16161e 55%, #0b0b10);
   border-color: color-mix(in srgb, #3a3a44 55%, #0b0b10);
-  color: color-mix(in srgb, color-mix(in srgb, #ffffff 95%, #16161e) 55%, #0b0b10);
+  /* Opaque glyph — double-mix (95% then 55%) left muddy type on #0b0b10; match Dark AI-off / resting icon-line 45% (#14 / P2; design-review Agent Ops). */
+  color: color-mix(in srgb, #ebebf5 45%, #0b0b10);
 }
 body.theme-data-poster .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
   background: color-mix(in srgb, #1e1e28 55%, #0b0b10);
   border-color: color-mix(in srgb, #4a4a54 55%, #0b0b10);
-  color: color-mix(in srgb, #ffffff 55%, #0b0b10);
+  /* Opaque hover glyph — drop muddy 55% white; match Dark AI-off / resting icon-line hover 85% (#14 / P2). */
+  color: color-mix(in srgb, #ebebf5 85%, #0b0b10);
 }
 
 body.theme-dark .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {

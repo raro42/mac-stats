@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2771] - 2026-11-15
+
+### Changed
+- Data Poster design-review (Agent Ops AI-off chip glyphs): `.icon-line-item.is-ai-off` resting/hover type drops the double-mix dim on `#0b0b10`, matching Dark / Neon / Futuristic AI-off and resting icon-line glyph strength (polish-without-capture while Mac TCC blocks `feature-agent-ops.png`).
+
 ## [0.1.2770] - 2026-11-15
 
 ### Changed
