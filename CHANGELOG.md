@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2792] - 2026-11-15
+
+### Changed
+- Neon design-review (AI Chat model picker): `.model-select:focus` remaps leftover Apple `#007aff` border onto theme `--accent` green, matching `:focus-visible` / Dark·Futuristic·Data Poster (polish-without-capture while Mac TCC blocks `feature-ai-chat.png` / `feature-processes.png`).
+
 ## [0.1.2791] - 2026-11-15
 
 ### Changed

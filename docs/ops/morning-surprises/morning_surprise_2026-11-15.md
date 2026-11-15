@@ -1,20 +1,15 @@
 # Morning surprise — 2026-11-15
 
-Overnight Track B (Linux rack, polish-without-capture). Digester empty; design-review due Agent Ops / AI Chat / processes.
+## Shipped overnight
+- **v0.1.2792** — Neon AI Chat `.model-select:focus` Apple `#007aff` → theme `--accent` green (focus-visible / Dark·Futuristic·Data Poster parity). Design-review polish-without-capture (`feature-processes` / AI Chat still TCC-blocked).
+- Earlier same night: v0.1.2791 Ollama settings popover primary/textarea; v0.1.2790 Force Quit disabled opaque; v0.1.2789 process-row selected; plus prior AI Chat / Disk Cleanup accent remaps on CRT themes.
 
-## Shipped tonight
+## Tried / deferred
+- Window-only recapture of `feature-processes.png` — only Control Center chip on-screen; TCC / no CPU window id → polish-without-capture (do not ship blank).
+- Layout-daily Dark/Neon/Futuristic still due next calendar day (Data Poster/Dark marked today).
 
-- **v0.1.2791** — Dark / Neon / Futuristic / Data Poster: Ollama settings popover primary + textarea focus leave Apple `#007aff` for theme accent (Matrix green / neon green / futuristic·poster cyan). Save / API key chrome matches the rest of the CRT AI Chat shell.
-- **v0.1.2790** — Dark / Neon Force Quit disabled: drop glass opacity 0.7 for opaque red type (Futuristic / Data Poster parity).
-- Earlier same night: process-row selected (2789), Disk Cleanup add-scope / primary (2788 / 2787), AI Chat assistant bubbles (2786), Agent Ops editor focus (2785), …
-
-## Tried / notes
-
-- Mac TCC still blocks fresh `feature-*.png` captures on this rack — polish without recapture.
-- Layout-daily already marked for Data Poster / Dark today.
-- Sibling OpenClaw / Hermes missing on rack.
-- Next leftovers: Neon `model-select:focus` Apple blue · Disk Cleanup collapsed-glance `.has-scopes-off` if muddy · Send stays white-on-blue on purpose.
-
-## Not a digester-only night
-
-Real keep in `results.tsv` (2791 + 2790 backfill). Empty digester was not the surprise.
+## Next fuel
+- Disk Cleanup collapsed-glance `.has-scopes-off` Apple `#0a84ff` on CRT if muddy
+- Mac capture when TCC allows
+- Neon / Futuristic layout-daily later days
+- Sibling/product — not keep-pNN clones
