@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2776] - 2026-11-15
+
+### Changed
+- Dark / Futuristic design-review (AI Chat): `.chat-message .markdown code` remaps leftover Apple white 8% washes onto Matrix green / cyan field mixes (Neon parity); Futuristic markdown table `th` wash white 5%→cyan 5% matching Dark/Neon th tint (polish-without-capture while Mac TCC blocks `feature-ai-chat.png`).
+
 ## [0.1.2775] - 2026-11-15
 
 ### Changed
