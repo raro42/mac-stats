@@ -2506,8 +2506,8 @@ body {
 }
 
 .chat-message.user {
-  /* Opaque wash — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
-  background: color-mix(in srgb, #007aff 10%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff lagged --accent / Dark·Neon user bubbles (#14 / P2; design-review AI Chat). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 10%, #f7f7fa);
   margin-left: 20px;
   color: var(--text, var(--ink, inherit));
 }

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2799] - 2026-11-15
+
+### Changed
+- Light / Material / Architect design-review (AI Chat user bubbles): `.chat-message.user` remap leftover Apple `#007aff` onto theme `--accent` (Light soft blue / Material taupe / Architect slate), matching Dark / Neon user-bubble remaps in v0.1.2784 and cream Ollama popover accents in v0.1.2798 (polish-without-capture while Mac TCC blocks `feature-ai-chat.png` / `feature-agent-ops.png`).
+
 ## [0.1.2798] - 2026-11-15
 
 ### Changed
