@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2794] - 2026-11-15
+
+### Changed
+- Dark / Neon / Futuristic / Data Poster design-review (Agent Ops Insights): `.ops-insight-line.is-clickable:focus-visible` remaps leftover Apple `#0a84ff` onto theme `--accent` (Matrix green / neon green / poster·futuristic cyan), matching `.is-selected`; Data Poster selected fallback `#007aff` → `#55c7ff` (polish-without-capture while Mac TCC blocks `feature-agent-ops.png` / `feature-processes.png`).
+
 ## [0.1.2793] - 2026-11-15
 
 ### Changed

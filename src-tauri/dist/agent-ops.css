@@ -25304,10 +25304,11 @@ body.theme-futuristic .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visibl
 
 /*
  * Data Poster / Dark / Neon / Futuristic: Agent Ops Insights card + clickable insight
- * lines still mixed Apple `#ffffff` after shared opaque pass (`.ops-insights-card` ·
- * `.ops-insight-line.is-clickable` hover / focus / selected). Remap onto CRT shells.
- * Standing P2 #14 after Disk Cleanup add-scope v0.1.2517; design-review
- * feature-agent-ops adjacent (polish-without-capture; Mac capture TCC-blocked).
+ * lines remapped onto CRT shells (`.ops-insights-card` · hover / selected). Focus
+ * outline still used bare Apple `#0a84ff` while `.is-selected` already sat on
+ * theme `--accent` — remap focus (+ Data Poster selected fallback `#007aff` →
+ * `#55c7ff`) in overnight v0.1.2794. Standing P2 #14; design-review
+ * feature-agent-ops / processes adjacent (polish-without-capture; Mac TCC).
  */
 /* OVERNIGHT v0.1.2518: agent-ops insights CRT */
 body.theme-data-poster .ops-insights-card {
@@ -25345,21 +25346,21 @@ body.theme-futuristic .ops-insight-line.is-clickable:hover {
 }
 
 body.theme-data-poster .ops-insight-line.is-clickable:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
 }
 body.theme-dark .ops-insight-line.is-clickable:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #0a0a0a);
+  outline-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
 }
 body.theme-neon .ops-insight-line.is-clickable:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #08120c);
+  outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
 }
 body.theme-futuristic .ops-insight-line.is-clickable:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
 }
 
 body.theme-data-poster .ops-insight-line.is-clickable.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 42%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
 }
 body.theme-dark .ops-insight-line.is-clickable.is-selected {
   border-color: color-mix(in srgb, var(--accent, #00cc66) 42%, #0a0a0a);
