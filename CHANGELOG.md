@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2774] - 2026-11-15
+
+### Changed
+- Dark / Futuristic design-review (AI Chat): `.chat-message .markdown table` cell borders and `hr` remap leftover Apple white 12% / `--hairline` hairlines onto Matrix green / cyan field mixes, matching each theme’s markdown `pre` (Dark table `th` wash to green 5% Neon parity; polish-without-capture while Mac TCC blocks `feature-ai-chat.png`).
+
 ## [0.1.2773] - 2026-11-15
 
 ### Changed

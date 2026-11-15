@@ -2372,19 +2372,22 @@ body {
 
 .chat-message .markdown table th,
 .chat-message .markdown table td {
-  border: 1px solid var(--hairline, color-mix(in srgb, #ffffff 12%, #0a0a0a));
+  /* Opaque Matrix hairline — Apple white 12% fallback lagged markdown pre / --hairline green (#14 / P2; design-review AI Chat). */
+  border: 1px solid color-mix(in srgb, #00ff00 18%, #0a0a0a);
   padding: 6px 10px;
   text-align: left;
 }
 
 .chat-message .markdown table th {
-  background: var(--hairline, color-mix(in srgb, #ffffff 5%, #0a0a0a));
+  /* Opaque Matrix wash — was white/--hairline 18% slab; match Neon pre-tint 5% (#14 / P2; design-review AI Chat). */
+  background: color-mix(in srgb, #00ff00 5%, #0a0a0a);
   font-weight: 600;
 }
 
 .chat-message .markdown hr {
   border: none;
-  border-top: 1px solid var(--hairline, color-mix(in srgb, #ffffff 12%, #0a0a0a));
+  /* Opaque Matrix hairline — Apple white 12% fallback lagged markdown pre green (#14 / P2; design-review AI Chat). */
+  border-top: 1px solid color-mix(in srgb, #00ff00 18%, #0a0a0a);
   margin: 16px 0;
 }
 

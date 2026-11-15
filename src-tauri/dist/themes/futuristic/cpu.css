@@ -2358,8 +2358,8 @@ body {
 
 .chat-message .markdown table th,
 .chat-message .markdown table td {
-  /* Opaque hairline — was black glass rgba(0,0,0,0.1) fallback (#14). */
-  border: 1px solid var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
+  /* Opaque cyan hairline — Apple white --hairline 12% lagged markdown pre / model-select cyan (#14 / P2; design-review AI Chat). */
+  border: 1px solid color-mix(in srgb, #3bd6ff 18%, #0b0b10);
   padding: 6px 10px;
   text-align: left;
 }
@@ -2372,8 +2372,8 @@ body {
 
 .chat-message .markdown hr {
   border: none;
-  /* Opaque hairline — was black glass rgba(0,0,0,0.1) fallback (#14). */
-  border-top: 1px solid var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
+  /* Opaque cyan hairline — Apple white --hairline 12% lagged markdown pre cyan (#14 / P2; design-review AI Chat). */
+  border-top: 1px solid color-mix(in srgb, #3bd6ff 18%, #0b0b10);
   margin: 16px 0;
 }
 
