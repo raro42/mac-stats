@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2790] - 2026-11-15
+
+### Changed
+- Dark / Neon design-review (Top Processes Force Quit): `.force-quit-btn:disabled` drops leftover glass `opacity: 0.7` for opaque red type mixes on `#0a0a0a` / `#08120c`, matching Futuristic / Data Poster / Apple (polish-without-capture while Mac TCC blocks `feature-processes.png`).
+
 ## [0.1.2789] - 2026-11-15
 
 ### Changed

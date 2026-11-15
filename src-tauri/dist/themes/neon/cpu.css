@@ -974,8 +974,11 @@ body::before {
   background: color-mix(in srgb, #ff3b30 35%, #08120c);
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14 / P2; design-review processes). */
+/* Was opacity 0.7 on inherit → muted red glass on #08120c; Futuristic/Data Poster already opaque. */
 .force-quit-btn:disabled {
-  opacity: 0.7;
+  color: color-mix(in srgb, #ff3b30 63%, #08120c);
+  opacity: 1;
   cursor: wait;
   animation: none;
 }
