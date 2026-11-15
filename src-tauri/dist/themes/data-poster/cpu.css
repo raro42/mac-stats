@@ -1423,7 +1423,8 @@ body {
 }
 
 .collapse-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, #007aff 55%, #0b0b10);
+  /* Opaque poster accent — bare Apple #007aff lagged icon-line / --accent cyan (#14 / P2; design-review Agent Ops). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
   outline-offset: 2px;
   color: color-mix(in srgb, #ffffff 92%, #0b0b10);
 }
@@ -1489,7 +1490,8 @@ body {
 }
 
 .monitors-menu-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, #007aff 55%, #0b0b10);
+  /* Opaque poster accent — bare Apple #007aff lagged icon-line / --accent cyan (#14 / P2; design-review Agent Ops). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
   outline-offset: 2px;
   color: color-mix(in srgb, #ffffff 92%, #0b0b10);
 }
@@ -1941,7 +1943,8 @@ body {
 }
 
 .ollama-menu-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, #007aff 55%, #0b0b10);
+  /* Opaque poster accent — bare Apple #007aff lagged icon-line / --accent cyan (#14 / P2; design-review Agent Ops). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
   outline-offset: 2px;
   color: color-mix(in srgb, #ffffff 92%, #0b0b10);
 }

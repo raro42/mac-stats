@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2783] - 2026-11-15
+
+### Changed
+- Data Poster design-review (Agent Ops chrome): `.collapse-btn` / `.monitors-menu-btn` / `.ollama-menu-btn` `:focus-visible` remaps leftover Apple `#007aff` onto poster `--accent` cyan (`#55c7ff`), matching icon-line focus (polish-without-capture — `screencapture -l` returned a blank WebView layer after restart).
+
 ## [0.1.2782] - 2026-11-15
 
 ### Changed
