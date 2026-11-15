@@ -25,7 +25,8 @@
   --ring-active: #00ff00;
   /* Opaque Matrix ring well — plain #003300 was near-invisible on #0a0a0a; Neon ring-track already field-mix green (#14 / P2). */
   --ring-inactive: color-mix(in srgb, #00ff00 18%, #0a0a0a);
-  --hint: #006600;
+  /* Opaque Matrix hint type — raw #006600 was near-invisible on #0a0a0a; match --muted / Neon metric-hint readability (#14 / P2; design-review cpu-metrics). */
+  --hint: #008800;
   /* Opaque backdrop — was black glass rgba(0,0,0,0.80) (#14). */
   --modal-backdrop: color-mix(in srgb, #000000 80%, #0a0a0a);
 }

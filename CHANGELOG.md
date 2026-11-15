@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2765] - 2026-11-15
+
+### Changed
+- Dark design-review (CPU metric hints): `:root` `--hint` remaps near-invisible `#006600` on `#0a0a0a` to readable Matrix muted green `#008800` (match `--muted` / Neon metric-hint readability; polish-without-capture while Mac TCC blocks `feature-cpu-metrics.png`).
+
 ## [0.1.2764] - 2026-11-15
 
 ### Changed
