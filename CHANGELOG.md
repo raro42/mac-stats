@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2803] - 2026-11-16
+
+### Changed
+- Swiss Minimalistic design-review (Top Processes Force Quit disabled): `.force-quit-btn:disabled` drops glass `opacity: 0.7` for opaque red 63% on `#ffffff`, matching Apple / Light / Material / Architect after v0.1.2802 (polish-without-capture while Mac TCC blocks `feature-processes.png`).
+
 ## [0.1.2802] - 2026-11-16
 
 ### Changed
