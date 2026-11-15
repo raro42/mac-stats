@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2796] - 2026-11-15
+
+### Changed
+- Dark / Neon / Futuristic / Data Poster design-review (Debug Log path + CPU card focus): `.logs-path-hint:focus-visible` and `#cpu-usage-card:focus-visible` remap leftover Apple `#0a84ff` onto theme `--accent` (Matrix green / neon green / poster·futuristic cyan), matching other CRT focus rings (polish-without-capture while Mac TCC blocks `feature-processes.png` / `feature-cpu-metrics.png`).
+
 ## [0.1.2795] - 2026-11-15
 
 ### Changed
