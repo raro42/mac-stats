@@ -2197,7 +2197,8 @@ body {
   flex: 1;
   /* Opaque wash — was white glass rgba(255,255,255,0.5) fallback (#14). */
   background: color-mix(in srgb, #ffffff 5%, #0b0b10);
-  border: 1px solid color-mix(in srgb, #ffffff 12%, #0b0b10);
+  /* Opaque cyan hairline — Apple white 12% lagged #chat-input cyan (#14 / P2; design-review AI Chat). */
+  border: 1px solid color-mix(in srgb, #3bd6ff 18%, #0b0b10);
   border-radius: 8px;
   padding: 6px 10px;
   color: var(--text, var(--ink, inherit));
@@ -2236,7 +2237,8 @@ body {
   padding: 12px;
   /* Opaque wash — was white glass rgba(255,255,255,0.3) fallback (#14). */
   background: color-mix(in srgb, #ffffff 5%, #0b0b10);
-  border: 1px solid color-mix(in srgb, #ffffff 12%, #0b0b10);
+  /* Opaque cyan hairline — Apple white 12% lagged #chat-input cyan / Neon pane (#14 / P2; design-review AI Chat). */
+  border: 1px solid color-mix(in srgb, #3bd6ff 18%, #0b0b10);
   border-radius: 8px;
   font-size: 13px;
 }
