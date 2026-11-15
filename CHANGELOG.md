@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2760] - 2026-11-15
+
+### Changed
+- Dark design-review (Agent Ops AI-off chip): `.icon-line-item.is-ai-off` resting/hover borders remap near-invisible `#004400` / `#006600` mixes on `#0a0a0a` to visible Matrix green hairlines (icon-line parity from 0.1.2758; polish-without-capture while Mac TCC blocks `feature-agent-ops.png`).
+
 ## [0.1.2759] - 2026-11-15
 
 ### Changed
