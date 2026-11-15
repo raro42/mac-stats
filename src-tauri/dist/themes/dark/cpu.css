@@ -2327,9 +2327,9 @@ body {
 .chat-message .markdown blockquote {
   margin: 12px 0;
   padding: 8px 12px;
-  /* Opaque hairline — was black glass rgba(0,0,0,…) fallback (#14). */
-  border-left: 3px solid var(--hairline, color-mix(in srgb, #ffffff 16%, #0a0a0a));
-  background: var(--hairline, color-mix(in srgb, #ffffff 4%, #0a0a0a));
+  /* Opaque Matrix hairline/wash — white/--hairline-as-fill lagged Neon blockquote green 18%/4% (#14 / P2; design-review AI Chat). */
+  border-left: 3px solid color-mix(in srgb, #00ff00 18%, #0a0a0a);
+  background: color-mix(in srgb, #00ff00 4%, #0a0a0a);
   border-radius: 4px;
   font-style: italic;
 }
@@ -2393,8 +2393,8 @@ body {
 }
 
 .chat-message .markdown a {
-  /* Opaque accent — was rgba(0,122,255,0.9) glass (#14). */
-  color: var(--accent, color-mix(in srgb, #007aff 90%, #0a0a0a));
+  /* Opaque Matrix accent — Apple #007aff fallback lagged --accent / Neon markdown links (#14 / P2; design-review AI Chat). */
+  color: var(--accent, color-mix(in srgb, #00cc66 90%, #0a0a0a));
   text-decoration: none;
 }
 

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2777] - 2026-11-15
+
+### Changed
+- Dark / Futuristic design-review (AI Chat): `.chat-message .markdown blockquote` remaps leftover white / `--hairline`-as-fill washes onto Matrix green / cyan field mixes matching Neon blockquote and markdown `pre`; Dark markdown link fallback drops Apple `#007aff` for Matrix `--accent` green (polish-without-capture while Mac TCC blocks `feature-ai-chat.png`).
+
 ## [0.1.2776] - 2026-11-15
 
 ### Changed

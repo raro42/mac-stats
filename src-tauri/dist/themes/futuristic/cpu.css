@@ -2311,9 +2311,9 @@ body {
 .chat-message .markdown blockquote {
   margin: 12px 0;
   padding: 8px 12px;
-  /* Opaque hairline / wash — was black glass rgba fallback (#14). */
-  border-left: 3px solid var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
-  background: color-mix(in srgb, #ffffff 3%, #0b0b10);
+  /* Opaque cyan hairline/wash — white --hairline 12%/3% lagged markdown pre cyan 18% (#14 / P2; design-review AI Chat). */
+  border-left: 3px solid color-mix(in srgb, #3bd6ff 18%, #0b0b10);
+  background: color-mix(in srgb, #3bd6ff 4%, #0b0b10);
   border-radius: 4px;
   font-style: italic;
 }
