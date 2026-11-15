@@ -1964,7 +1964,8 @@ body {
 
 .add-monitor-form input:focus {
   outline: none;
-  border-color: color-mix(in srgb, #007aff 30%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff lagged --accent / CRT add-monitor focus (#14 / P2; design-review Monitors). */
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 30%, #f7f7fa);
   background: color-mix(in srgb, #f5f5fa 90%, #f7f7fa);
 }
 

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2800] - 2026-11-15
+
+### Changed
+- Light / Material / Architect design-review (Monitors add form): `.add-monitor-form input:focus` remap leftover Apple `#007aff` onto theme `--accent` (Light soft blue / Material taupe / Architect slate), matching CRT add-monitor focus remaps (polish-without-capture while Mac TCC blocks `feature-monitors.png` / `feature-processes.png`).
+
 ## [0.1.2799] - 2026-11-15
 
 ### Changed
