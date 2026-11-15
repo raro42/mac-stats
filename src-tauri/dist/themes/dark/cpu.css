@@ -23,7 +23,8 @@
   --panel-shadow: 0 24px 80px color-mix(in srgb, #000000 85%, #0a0a0a);
   --border: color-mix(in srgb, #00ff00 22%, #0a0a0a);
   --ring-active: #00ff00;
-  --ring-inactive: #003300;
+  /* Opaque Matrix ring well — plain #003300 was near-invisible on #0a0a0a; Neon ring-track already field-mix green (#14 / P2). */
+  --ring-inactive: color-mix(in srgb, #00ff00 18%, #0a0a0a);
   --hint: #006600;
   /* Opaque backdrop — was black glass rgba(0,0,0,0.80) (#14). */
   --modal-backdrop: color-mix(in srgb, #000000 80%, #0a0a0a);
@@ -296,8 +297,8 @@ body {
 
 .ring-track {
   fill: none;
-  /* Was opacity 0.7 on --ring-inactive #003300 → ~70% green; mix on #0a0a0a (#14). */
-  stroke: color-mix(in srgb, #003300 70%, #0a0a0a);
+  /* Opaque Matrix ring track — #003300@70% was still muddy on #0a0a0a; Neon uses ~18% green field mix (#14 / P2; design-review cpu-metrics). */
+  stroke: var(--ring-inactive, color-mix(in srgb, #00ff00 18%, #0a0a0a));
   stroke-width: 3;
   opacity: 1;
 }

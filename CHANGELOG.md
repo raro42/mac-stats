@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2763] - 2026-11-15
+
+### Changed
+- Dark design-review (CPU metric rings): `:root` `--ring-inactive` and `.ring-track` remap near-invisible `#003300` mixes on `#0a0a0a` to a visible Matrix green 18% field mix (Neon ring-track parity; polish-without-capture while Mac TCC blocks `feature-cpu-metrics.png`).
+
 ## [0.1.2762] - 2026-11-15
 
 ### Changed
