@@ -2351,9 +2351,9 @@ body {
   font-style: italic;
 }
 
-/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-message .markdown code {
-  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
+  /* Opaque poster accent — white 8% lagged Neon/Dark/Futuristic markdown code accent 8% (#14 / P2; design-review AI Chat). */
+  background: color-mix(in srgb, #55c7ff 8%, #0b0b10);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas', monospace;
@@ -2397,9 +2397,9 @@ body {
   text-align: left;
 }
 
-/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-message .markdown table th {
-  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
+  /* Opaque poster accent — white 5% lagged Neon/Dark/Futuristic markdown th accent 5% (#14 / P2; design-review AI Chat). */
+  background: color-mix(in srgb, #55c7ff 5%, #0b0b10);
   font-weight: 600;
 }
 

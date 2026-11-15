@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2780] - 2026-11-15
+
+### Changed
+- Data Poster design-review (AI Chat): `.chat-message .markdown code` and table `th` remap leftover white 8%/5% washes onto poster `--accent` cyan field mixes (`#55c7ff` 8%/5%), matching Neon / Dark / Futuristic markdown chrome (polish-without-capture while Mac TCC blocks `feature-agent-ops.png` / `feature-ai-chat.png`).
+
 ## [0.1.2779] - 2026-11-15
 
 ### Changed
