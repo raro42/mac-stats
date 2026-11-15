@@ -1,12 +1,13 @@
 # Morning surprise — 2026-11-15
 
-Overnight Track B kept shipping. Digester open stayed empty. Design-review for `feature-agent-ops` stayed due (~60d); Linux rack cannot Mac window-only capture, so ticks did polish-without-capture on Agent Ops / Dark Matrix chrome. Layout-daily already marked Data Poster + Dark earlier tonight.
+Overnight Track B kept shipping. Digester opened **design-review** for stale `feature-processes.png` (~93d); `feature-cpu-metrics.png` also stale (~69d). Mac Screen Recording TCC still blocks `screencapture -l`, so polish shipped as polish-without-capture. **Layout-daily** took Data Poster + Dark earlier; Neon / Futuristic wait for a later calendar day.
 
 ## Shipped tonight (keep)
 
 | Version | What |
 |---|---|
-| **v0.1.2762** | Dark Agent Ops chrome tokens: `:root` `--hairline` / `--panel-border` / `--border` `#004400` → visible Matrix green field mixes 18%/22%/22% (Neon token parity; glass-panel, Settings, Disk Cleanup, inherited Agent Ops chrome). |
+| **v0.1.2763** | Dark design-review CPU metric rings: `--ring-inactive` / `.ring-track` `#003300` → Matrix green 18% field mix (Neon ring-track parity; TCC polish-without-capture). |
+| **v0.1.2762** | Dark Agent Ops chrome tokens: `:root` `--hairline` / `--panel-border` / `--border` `#004400` → Matrix green field mixes 18%/22%/22%. |
 | **v0.1.2761** | Dark Top Processes Force Quit: `.force-quit-section` border → Matrix green 28% hairline. |
 | **v0.1.2760** | Dark Agent Ops AI-off chip: `.icon-line-item.is-ai-off` borders → Matrix green hairlines 28%/40%. |
 | **v0.1.2759** | Dark AI Chat `#chat-input` resting border → Matrix green hairline 28%. |
@@ -18,19 +19,19 @@ Overnight Track B kept shipping. Digester open stayed empty. Design-review for `
 
 ## Tried / discarded
 
-- Parallel-race discards earlier in the night when origin already held the local pick. Re-picked next leftover each time.
-- Mac capture for `feature-agent-ops.png` still blocked (TCC / Linux rack) — polish-without-capture used instead.
+- Parallel-race discards when origin already held the local pick (including a token-remap race against origin **v0.1.2762**). Re-picked next leftover each time.
+- Mac capture for feature screens still blocked (TCC) — polish-without-capture used instead.
 
 ## Why it matters
 
-Dark Matrix chrome stops vanishing into `#0a0a0a`. Remapping the root tokens fixes the glass shell and every control that still inherited muddy `#004400`, so Agent Ops / Settings / Disk Cleanup read as green on black again instead of nearly blank.
+Dark Matrix chrome and gauge wells stop vanishing into `#0a0a0a`. Token remaps fix the glass shell; the ring-track remap makes CPU · GPU · FREQ · TEMP wells readable again instead of a near-blank circle.
 
 ## Next fuel
 
 - Neon / Futuristic **layout-daily** on later calendar days.
-- Mac capture for `feature-agent-ops.png` when TCC allows.
-- Leftover dark soft-states (`--ring-inactive` `#003300` if muddy) · Send white-on-blue intentional — leave alone.
+- Mac capture for `feature-cpu-metrics.png` / `feature-processes.png` when TCC allows.
+- Leftover dark soft-states (`--hint` `#006600` if muddy) · Send white-on-blue intentional — leave alone.
 
 ## Nightly minimum
 
-Satisfied: multiple `keep` rows in `~/.mac-stats/improvements/autoresearch/results.tsv` for the 20:00–06:00 window (including **v0.1.2762**).
+Satisfied: multiple `keep` rows in `~/.mac-stats/improvements/autoresearch/results.tsv` for the 20:00–06:00 window (including **v0.1.2763**).
