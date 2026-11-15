@@ -1,22 +1,21 @@
 # Morning surprise — 2026-11-15
 
-Overnight autoresearch kept shipping theme contrast polish (Linux rack; Mac TCC still blocks window-only feature screens).
+Overnight Track B kept shipping Disk Cleanup / theme accent soft-states (polish-without-capture while Mac Screen Recording TCC / blank WebView blocks fresh `feature-*.png`).
 
-## Shipped tonight (latest)
+## Shipped tonight (highlight)
 
-- **v0.1.2787** — Disk Cleanup Scan / Add buttons: Dark / Neon / Futuristic / Data Poster drop leftover Apple `#0a84ff` washes for theme accent (Matrix green / neon green / poster·futuristic cyan), matching soft-delete and meta-card focus.
+- **v0.1.2788** — Disk Cleanup add-scope / scope-row input `:focus-visible` + `.disk-cleanup-scope-remove:focus-visible` Apple `#0a84ff` → theme accent (Matrix green / neon green / poster·futuristic cyan), matching primary/Add from **v0.1.2787**.
+- Earlier same window: **v0.1.2787** primary/Add; **v0.1.2786** AI Chat assistant bubbles; **v0.1.2785** Agent Ops editor focus; **v0.1.2784** AI Chat user bubbles; **v0.1.2783** Data Poster collapse/menu focus.
 
-## Also kept earlier this window
+## Capture status
 
-- **v0.1.2786** — AI Chat assistant bubbles onto theme accent (quieter than user bubbles).
-- **v0.1.2785** — Agent Ops editor focus rings onto theme accent (matching filter-input).
-- **v0.1.2784** — Dark / Neon AI Chat user bubbles onto theme accent.
+- CPU window not on-screen (Control Center chip only) or blank WebView layer on `screencapture -l` — grace: polish without shipping blank PNGs.
+- Still stale for marketing: `feature-processes.png` (~94d), `feature-cpu-metrics.png`, `feature-monitors.png` (grace on ai-chat / disk-cleanup / fresh agent-ops).
 
-## Tried / discarded
+## Next fuel
 
-- Parallel-race discards earlier in the evening (local editor-focus as 2783/2784 lost to origin); re-shipped as 2785.
+- Mac capture for `feature-processes` when TCC / layer capture works.
+- Neon / Futuristic layout-daily on a later calendar day.
+- Leftover: Send white-on-blue intentional; sibling/product fuel — not another keep-pNN clone.
 
-## Not a quiet night
-
-Digester empty; design-review due Agent Ops; layout-daily already marked for Data Poster/Dark today. Fuel came from standing P2 #14 leftover Apple blues on Disk Cleanup CRT shells.
-
+Generated: 2026-11-15T21:28:09
