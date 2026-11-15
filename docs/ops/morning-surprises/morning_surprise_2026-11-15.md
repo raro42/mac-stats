@@ -1,20 +1,21 @@
 # Morning surprise — 2026-11-15
 
-## Shipped overnight
+Overnight Track B (mac-stats autoresearch). Window 20:00–06:00 local.
 
-- **v0.1.2785** — Agent Ops editor focus: Dark / Neon / Futuristic / Data Poster `textarea.ops-agent-editor:focus` drops leftover Apple `#0a84ff` for theme accent rings (Matrix green / neon green / poster·futuristic cyan), matching `.ops-filter-input:focus`. Design-review polish-without-capture (feature-agent-ops ~61d stale; Mac TCC / Linux rack).
+## Shipped this tick (~21:05 CET)
 
-## Also tonight
+- **v0.1.2786** — Dark / Neon / Futuristic / Data Poster AI Chat `.chat-message.assistant` leaves muddy white lifts and uses quieter theme `--accent` field mixes (4–5%), so replies match CRT shells without looking like user bubbles (10%).
+- Design-review fuel: stale `feature-ai-chat.png` (~93d). Capture blocked (no on-screen CPU window / blank WebView layer) — polish shipped without replacing the tracked PNG.
+- Ratchet: keep @ `575f54697`. Install `/Applications/mac-stats.app` at 0.1.2786.
 
-- **v0.1.2784** (parallel tick) — Dark / Neon AI Chat `.chat-message.user` onto theme `--accent`.
-- Race: local editor-focus-as-2784 discarded after origin took user bubbles; re-shipped editor focus as 2785.
+## Earlier same overnight window
 
-## Tried / context
+- **v0.1.2785** — Agent Ops editor focus onto theme accent (Apple `#0a84ff` → Matrix/neon/cyan).
+- **v0.1.2784** — Dark / Neon AI Chat `.chat-message.user` onto theme `--accent`.
+- **v0.1.2783** — Data Poster collapse / monitors / ollama menu focus onto poster cyan.
 
-- Digester empty (0 turns / 7d). Layout-daily already marked Dark today. Sibling harnesses missing on rack. Debug.log quiet.
+## Tried / notes
 
-## Next fuel
-
-- Neon / Futuristic layout-daily on later calendar days
-- Mac window-only capture for `feature-agent-ops.png` when TCC allows
-- Leftover soft-states: Dark/Neon assistant bubble white wash · Disk Cleanup primary/add-btn Apple blue if muddy · Send white-on-blue intentional
+- Digester Slowest empty; open candidate was design-review AI Chat.
+- Layout-daily already marked for Data Poster/Dark today.
+- Next leftovers: Disk Cleanup primary/add-btn Apple `#0a84ff` if muddy; Send white-on-blue intentional; Neon/Futuristic layout-daily on a new calendar day; real `feature-ai-chat.png` when window-layer capture works.
