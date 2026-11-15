@@ -1,21 +1,20 @@
 # Morning surprise — 2026-11-15
 
-Overnight Track B kept shipping Top Processes / Disk Cleanup / theme accent soft-states (polish-without-capture while Mac Screen Recording TCC / blank WebView blocks fresh `feature-*.png`).
+Overnight Track B (Linux rack, polish-without-capture). Digester empty; design-review due Agent Ops / AI Chat / processes.
 
-## Shipped tonight (highlight)
+## Shipped tonight
 
-- **v0.1.2790** — Dark / Neon `.force-quit-btn:disabled` glass opacity → opaque red 63% (Futuristic / Data Poster / Apple parity). Design-review `feature-processes`.
-- **v0.1.2789** — Dark / Neon / Futuristic / Data Poster `.process-row.is-selected` Apple `#0a84ff` → theme accent (parallel tick).
-- Earlier: Disk Cleanup add-scope / primary / soft-delete focus, AI Chat assistant/user bubbles, Agent Ops chrome / editor focus, markdown soft-states (v0.1.2782–2788).
+- **v0.1.2791** — Dark / Neon / Futuristic / Data Poster: Ollama settings popover primary + textarea focus leave Apple `#007aff` for theme accent (Matrix green / neon green / futuristic·poster cyan). Save / API key chrome matches the rest of the CRT AI Chat shell.
+- **v0.1.2790** — Dark / Neon Force Quit disabled: drop glass opacity 0.7 for opaque red type (Futuristic / Data Poster parity).
+- Earlier same night: process-row selected (2789), Disk Cleanup add-scope / primary (2788 / 2787), AI Chat assistant bubbles (2786), Agent Ops editor focus (2785), …
 
 ## Tried / notes
 
-- Capture still blocked (Control Center chip only / no CPU window id). Prior `feature-processes.png` kept.
-- Digester open pointed design-review processes (~94d stale). Layout-daily due=false (Data Poster/Dark marked).
-- Race: two ticks claimed 2789; Force Quit disabled rebased to 2790.
+- Mac TCC still blocks fresh `feature-*.png` captures on this rack — polish without recapture.
+- Layout-daily already marked for Data Poster / Dark today.
+- Sibling OpenClaw / Hermes missing on rack.
+- Next leftovers: Neon `model-select:focus` Apple blue · Disk Cleanup collapsed-glance `.has-scopes-off` if muddy · Send stays white-on-blue on purpose.
 
-## Next fuel
+## Not a digester-only night
 
-- Mac capture for stale `feature-processes.png` when TCC allows
-- Leftover soft-states: ollama popover primary / textarea focus Apple `#007aff` · Neon `model-select:focus` · Send white-on-blue intentional
-- Neon / Futuristic layout-daily on a later calendar day
+Real keep in `results.tsv` (2791 + 2790 backfill). Empty digester was not the surprise.
