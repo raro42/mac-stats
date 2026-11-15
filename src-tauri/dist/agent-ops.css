@@ -38264,3 +38264,26 @@ body.theme-futuristic .process-detail-name:focus-visible,
 body.theme-futuristic .process-detail-pid:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic / Data Poster: pinned process pin glyph still uses
+ * shared Apple `#0a84ff` (`.process-pin.is-pinned`) while `.process-row.is-pinned`
+ * already sits on theme accent. A pinned row then shows an Apple-blue pin on
+ * Matrix / phosphor / poster shells. Catch up so the pin matches the row wash.
+ * Swiss / Apple / Light family keep shared blue. Design-review fuel
+ * (feature-processes) + standing P2 #14 after AI-off glyph v0.1.2767;
+ * polish-without-capture (Mac screencapture TCC).
+ */
+/* OVERNIGHT v0.1.2768: process-pin.is-pinned accent parity */
+body.theme-dark .process-pin.is-pinned {
+  color: color-mix(in srgb, var(--accent, #00cc66) 85%, #0a0a0a);
+}
+body.theme-neon .process-pin.is-pinned {
+  color: color-mix(in srgb, var(--accent, #6dff7b) 85%, #08120c);
+}
+body.theme-futuristic .process-pin.is-pinned {
+  color: color-mix(in srgb, var(--accent, #3bd6ff) 85%, #0b0b10);
+}
+body.theme-data-poster .process-pin.is-pinned {
+  color: color-mix(in srgb, var(--accent, #55c7ff) 85%, #0b0b10);
+}

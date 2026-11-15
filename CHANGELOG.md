@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2768] - 2026-11-15
+
+### Changed
+- Dark / Neon / Futuristic / Data Poster: pinned process pin glyph uses the theme accent (not Apple blue), matching the pinned process-row wash.
+
 ## [0.1.2767] - 2026-11-15
 
 ### Changed
