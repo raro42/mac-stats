@@ -946,7 +946,9 @@ body {
 }
 
 .force-quit-btn:disabled {
-  opacity: 0.7;
+  /* Opaque red type — glass opacity 0.7 lagged Apple/Futuristic/Data Poster (#14 / P2; design-review processes). */
+  color: color-mix(in srgb, #ff3b30 63%, #e7e2d9);
+  opacity: 1;
   cursor: wait;
   animation: none;
 }

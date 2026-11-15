@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2802] - 2026-11-16
+
+### Changed
+- Light / Material / Architect design-review (Top Processes Force Quit disabled): `.force-quit-btn:disabled` drops glass `opacity: 0.7` for opaque red 63% mixes on cream paper (`#f7f7fa` / `#e7e2d9` / `#f1f1f1`), matching Apple / Futuristic / Data Poster / Dark / Neon (polish-without-capture while Mac TCC blocks `feature-processes.png`).
+
 ## [0.1.2801] - 2026-11-16
 
 ### Changed
