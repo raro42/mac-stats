@@ -1,23 +1,20 @@
 # Morning surprise — 2026-11-15
 
-Overnight Track B (mac-stats autoresearch). Window 20:00–06:00 local.
+## Shipped overnight
 
-## Shipped this tick (~20:40 CET)
+- **v0.1.2785** — Agent Ops editor focus: Dark / Neon / Futuristic / Data Poster `textarea.ops-agent-editor:focus` drops leftover Apple `#0a84ff` for theme accent rings (Matrix green / neon green / poster·futuristic cyan), matching `.ops-filter-input:focus`. Design-review polish-without-capture (feature-agent-ops ~61d stale; Mac TCC / Linux rack).
 
-- **v0.1.2784** — Dark / Neon AI Chat `.chat-message.user` washes leave Apple `#007aff` and use theme `--accent` (Matrix green / neon green). Matches Futuristic / Data Poster user bubbles.
-- Design-review fuel: stale `feature-ai-chat.png` (~93d). Capture returned a blank WebView layer — polish shipped without replacing the tracked PNG.
-- Ratchet: keep @ `eab6add7`. Installed `/Applications/mac-stats.app` at 0.1.2784.
+## Also tonight
 
-## Earlier same overnight window (~20:15 CET)
+- **v0.1.2784** (parallel tick) — Dark / Neon AI Chat `.chat-message.user` onto theme `--accent`.
+- Race: local editor-focus-as-2784 discarded after origin took user bubbles; re-shipped editor focus as 2785.
 
-- **v0.1.2783** — Data Poster Agent Ops chrome: collapse / monitors-menu / ollama-menu `:focus-visible` rings use poster `--accent` cyan instead of bare Apple `#007aff` (icon-line parity). Keep @ `bd8f9026`.
+## Tried / context
 
-## Earlier same calendar day (pre-20:00 window)
+- Digester empty (0 turns / 7d). Layout-daily already marked Dark today. Sibling harnesses missing on rack. Debug.log quiet.
 
-- Through **v0.1.2782** — Disk Cleanup soft-delete focus accent + Dark hairline fallbacks (and the AI Chat / processes remaps that night).
+## Next fuel
 
-## Tried / notes
-
-- Digester Slowest empty; open candidate was design-review AI Chat.
-- Layout-daily already marked for Data Poster/Dark today.
-- Next leftovers: Send white-on-blue intentional; Dark/Neon assistant bubble white wash if muddy; Neon/Futuristic layout-daily on a new calendar day; real `feature-ai-chat.png` when window-layer capture works.
+- Neon / Futuristic layout-daily on later calendar days
+- Mac window-only capture for `feature-agent-ops.png` when TCC allows
+- Leftover soft-states: Dark/Neon assistant bubble white wash · Disk Cleanup primary/add-btn Apple blue if muddy · Send white-on-blue intentional
