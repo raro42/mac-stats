@@ -1,21 +1,13 @@
 # Morning surprise — 2026-11-15
 
-## Shipped overnight
+Overnight autoresearch kept shipping cream/CRT soft-state remaps (design-review polish-without-capture while Mac TCC blocks fresh feature screenshots). Digester stayed empty; layout-daily already marked Data Poster/Dark for the day.
 
-- **v0.1.2798** — Light / Material / Architect AI Chat Ollama settings: popover primary + textarea focus leave Apple `#007aff` for theme `--accent` (soft blue / taupe / slate). Matches CRT remaps from earlier tonight. Design-review polish while Mac Screen Recording still blocks a fresh `feature-processes.png`.
+## Shipped tonight (highlights)
+- **v0.1.2799** — Light / Material / Architect AI Chat `.chat-message.user` Apple `#007aff` → theme `--accent` (match Dark/Neon user bubbles + cream Ollama accents).
+- **v0.1.2798** — Light / Material / Architect Ollama settings popover primary + textarea focus onto theme `--accent`.
+- **v0.1.2797** — Light / Material / Architect Disk Cleanup collapsed-glance scopes-off onto amber (match meta-card).
+- Earlier evening keeps: CRT Disk Cleanup / processes / AI Chat / Agent Ops / Perplexity accent leftovers (2787–2796).
 
-## Also this night (already on main)
-
-- v0.1.2797 Light/Material/Architect Disk Cleanup scopes-off glance → amber
-- v0.1.2796 CRT logs-path + CPU card focus → theme accent
-- Earlier CRT focus / soft-state remaps (2790–2795)
-
-## Tried / blocked
-
-- Window-only screenshot for `feature-processes.png`: only Control Center chip / no CPU window id (TCC). Polish-without-capture grace; tracked PNG left alone.
-
-## Next fuel
-
-- Neon / Futuristic layout-daily on a later calendar day
-- Mac capture when TCC allows
-- Leftover Light/Material/Architect `.chat-message.user` / monitors add-form focus if still muddy Apple blue
+## Also
+- Nightly 23:00 git flush clean; CI trigger + GitHub release already cut today.
+- Next leftovers: cream Monitors input focus Apple blue if muddy; Neon/Futuristic layout-daily on later calendar days; Mac capture for stale feature-*.png when TCC allows.
