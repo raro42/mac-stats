@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2793] - 2026-11-15
+
+### Changed
+- Dark / Neon / Futuristic / Data Poster design-review (Disk Cleanup collapsed glance): `.disk-cleanup-collapsed-glance.has-scopes-off` remaps leftover Apple `#0a84ff` onto amber `#ff9f0a` matching `.disk-cleanup-meta-card.has-scopes-off` (Swiss / Apple / Light keep shared blue; polish-without-capture while Mac TCC blocks `feature-disk-cleanup.png`).
+
 ## [0.1.2792] - 2026-11-15
 
 ### Changed

@@ -18361,8 +18361,8 @@ body.theme-data-poster .disk-cleanup-collapsed-glance.is-clean {
   background: color-mix(in srgb, #34c759 7%, #0b0b10);
 }
 body.theme-data-poster .disk-cleanup-collapsed-glance.has-scopes-off {
-  border-color: color-mix(in srgb, #0a84ff 26%, #0b0b10);
-  background: color-mix(in srgb, #0a84ff 6%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 7%, #0b0b10);
 }
 body.theme-data-poster .details-collapsed-glance.is-hot {
   border-color: color-mix(in srgb, #ff9500 26%, #0b0b10);
@@ -19583,8 +19583,8 @@ body.theme-dark .disk-cleanup-collapsed-glance.is-clean {
   background: color-mix(in srgb, #34c759 7%, #0a0a0a);
 }
 body.theme-dark .disk-cleanup-collapsed-glance.has-scopes-off {
-  border-color: color-mix(in srgb, #0a84ff 26%, #0a0a0a);
-  background: color-mix(in srgb, #0a84ff 6%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0a0a0a);
+  background: color-mix(in srgb, #ff9f0a 7%, #0a0a0a);
 }
 body.theme-dark .details-collapsed-glance.is-hot {
   border-color: color-mix(in srgb, #ff9500 26%, #0a0a0a);
@@ -19620,8 +19620,8 @@ body.theme-neon .disk-cleanup-collapsed-glance.is-clean {
   background: color-mix(in srgb, #34c759 7%, #08120c);
 }
 body.theme-neon .disk-cleanup-collapsed-glance.has-scopes-off {
-  border-color: color-mix(in srgb, #0a84ff 26%, #08120c);
-  background: color-mix(in srgb, #0a84ff 6%, #08120c);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #08120c);
+  background: color-mix(in srgb, #ff9f0a 7%, #08120c);
 }
 body.theme-neon .details-collapsed-glance.is-hot {
   border-color: color-mix(in srgb, #ff9500 26%, #08120c);
@@ -19657,8 +19657,8 @@ body.theme-futuristic .disk-cleanup-collapsed-glance.is-clean {
   background: color-mix(in srgb, #34c759 7%, #0b0b10);
 }
 body.theme-futuristic .disk-cleanup-collapsed-glance.has-scopes-off {
-  border-color: color-mix(in srgb, #0a84ff 26%, #0b0b10);
-  background: color-mix(in srgb, #0a84ff 6%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 7%, #0b0b10);
 }
 body.theme-futuristic .details-collapsed-glance.is-hot {
   border-color: color-mix(in srgb, #ff9500 26%, #0b0b10);
