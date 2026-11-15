@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2769] - 2026-11-15
+
+### Changed
+- Neon / Futuristic design-review (Agent Ops AI-off chip glyphs): `.icon-line-item.is-ai-off` resting/hover type drops the extra 55% dim on `#08120c` / `#111123`, matching Dark AI-off and resting icon-line glyph strength (polish-without-capture while Mac TCC blocks `feature-agent-ops.png`).
+
 ## [0.1.2768] - 2026-11-15
 
 ### Changed

@@ -624,23 +624,27 @@ body.theme-dark .icon-line-item.is-ai-off:not(.status-good):not(.status-warning)
 body.theme-neon .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
   background: color-mix(in srgb, #06110a 55%, #08120c);
   border-color: color-mix(in srgb, #1a3a22 55%, #08120c);
-  color: color-mix(in srgb, color-mix(in srgb, #ebebf5 45%, #06110a) 55%, #08120c);
+  /* Opaque glyph — double-mix (45% then 55%) left muddy type on #08120c; match Dark AI-off / resting icon-line 45% (#14 / P2; design-review Agent Ops). */
+  color: color-mix(in srgb, #ebebf5 45%, #08120c);
 }
 body.theme-neon .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
   background: color-mix(in srgb, #0a1a10 55%, #08120c);
   border-color: color-mix(in srgb, #2a5a32 55%, #08120c);
-  color: color-mix(in srgb, color-mix(in srgb, #ebebf5 85%, #0a1a10) 55%, #08120c);
+  /* Opaque hover glyph — drop extra 55% dim; match Dark AI-off / resting icon-line hover 85% (#14 / P2). */
+  color: color-mix(in srgb, #ebebf5 85%, #08120c);
 }
 
 body.theme-futuristic .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
   background: color-mix(in srgb, #0a0a12 55%, #111123);
   border-color: color-mix(in srgb, #2a2a3a 55%, #111123);
-  color: color-mix(in srgb, color-mix(in srgb, #ebebf5 45%, #0a0a12) 55%, #111123);
+  /* Opaque glyph — double-mix (45% then 55%) left muddy type on #111123; match Dark AI-off / resting icon-line 45% (#14 / P2; design-review Agent Ops). */
+  color: color-mix(in srgb, #ebebf5 45%, #111123);
 }
 body.theme-futuristic .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
   background: color-mix(in srgb, #12121c 55%, #111123);
   border-color: color-mix(in srgb, #3a3a4a 55%, #111123);
-  color: color-mix(in srgb, color-mix(in srgb, #ebebf5 85%, #12121c) 55%, #111123);
+  /* Opaque hover glyph — drop extra 55% dim; match Dark AI-off / resting icon-line hover 85% (#14 / P2). */
+  color: color-mix(in srgb, #ebebf5 85%, #111123);
 }
 
 #icon-monitors.status-bad,
