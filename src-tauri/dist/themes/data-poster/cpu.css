@@ -2341,12 +2341,12 @@ body {
   margin: 4px 0;
 }
 
-/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-message .markdown blockquote {
   margin: 12px 0;
   padding: 8px 12px;
-  border-left: 3px solid color-mix(in srgb, #ffffff 20%, #0b0b10);
-  background: color-mix(in srgb, #ffffff 3%, #0b0b10);
+  /* Opaque poster accent — white 20%/3% lagged Dark/Neon/Futuristic blockquote accent 18%/4% (#14 / P2; design-review AI Chat). */
+  border-left: 3px solid color-mix(in srgb, #55c7ff 18%, #0b0b10);
+  background: color-mix(in srgb, #55c7ff 4%, #0b0b10);
   border-radius: 4px;
   font-style: italic;
 }
