@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2778] - 2026-11-15
+
+### Changed
+- Data Poster design-review (AI Chat): `.chat-message .markdown a` remaps leftover Apple `#007aff` onto poster `--accent` cyan (`#55c7ff`), matching Dark / Neon / Futuristic markdown links (polish-without-capture while Mac TCC blocks `feature-agent-ops.png` / `feature-ai-chat.png`).
+
 ## [0.1.2777] - 2026-11-15
 
 ### Changed
