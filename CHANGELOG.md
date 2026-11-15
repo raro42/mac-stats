@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2787] - 2026-11-15
+
+### Changed
+- Dark / Neon / Futuristic / Data Poster design-review (Disk Cleanup): `.disk-cleanup-primary` and `#disk-cleanup-add-btn` remap leftover Apple `#0a84ff` washes onto theme accent (Matrix green / neon green / poster·futuristic cyan), matching soft-delete / meta-card focus (polish-without-capture while Mac TCC blocks `feature-disk-cleanup.png` / `feature-agent-ops.png`).
+
 ## [0.1.2786] - 2026-11-15
 
 ### Changed

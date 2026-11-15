@@ -25073,38 +25073,43 @@ body.theme-futuristic .disk-cleanup-last.is-action.is-ok:not(.has-skip):focus-vi
   outline-color: color-mix(in srgb, #34c759 55%, #0b0b10);
 }
 
+/* OVERNIGHT v0.1.2787: disk-cleanup primary Apple #0a84ff → theme accent */
 body.theme-data-poster .disk-cleanup-toolbar .disk-cleanup-primary {
-  background: color-mix(in srgb, #0a84ff 14%, #0b0b10);
-  border-color: color-mix(in srgb, #0a84ff 30%, #0b0b10);
+  /* Opaque poster accent — Apple #0a84ff lagged soft-delete / meta-card cyan (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, #55c7ff 14%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 30%, #0b0b10);
 }
 body.theme-dark .disk-cleanup-toolbar .disk-cleanup-primary {
-  background: color-mix(in srgb, #0a84ff 14%, #0a0a0a);
-  border-color: color-mix(in srgb, #0a84ff 30%, #0a0a0a);
+  /* Opaque Matrix accent — Apple #0a84ff lagged soft-delete / meta-card green (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, #00cc66 14%, #0a0a0a);
+  border-color: color-mix(in srgb, #00cc66 30%, #0a0a0a);
 }
 body.theme-neon .disk-cleanup-toolbar .disk-cleanup-primary {
-  background: color-mix(in srgb, #0a84ff 14%, #08120c);
-  border-color: color-mix(in srgb, #0a84ff 30%, #08120c);
+  /* Opaque neon accent — Apple #0a84ff lagged soft-delete / meta-card green (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, #6dff7b 14%, #08120c);
+  border-color: color-mix(in srgb, #6dff7b 30%, #08120c);
 }
 body.theme-futuristic .disk-cleanup-toolbar .disk-cleanup-primary {
-  background: color-mix(in srgb, #0a84ff 14%, #0b0b10);
-  border-color: color-mix(in srgb, #0a84ff 30%, #0b0b10);
+  /* Opaque cyan accent — Apple #0a84ff lagged soft-delete / meta-card cyan (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, #55c7ff 14%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 30%, #0b0b10);
 }
 
 body.theme-data-poster .disk-cleanup-toolbar .disk-cleanup-primary:hover {
-  background: color-mix(in srgb, #0a84ff 22%, #0b0b10);
-  border-color: color-mix(in srgb, #0a84ff 42%, #0b0b10);
+  background: color-mix(in srgb, #55c7ff 22%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 42%, #0b0b10);
 }
 body.theme-dark .disk-cleanup-toolbar .disk-cleanup-primary:hover {
-  background: color-mix(in srgb, #0a84ff 22%, #0a0a0a);
-  border-color: color-mix(in srgb, #0a84ff 42%, #0a0a0a);
+  background: color-mix(in srgb, #00cc66 22%, #0a0a0a);
+  border-color: color-mix(in srgb, #00cc66 42%, #0a0a0a);
 }
 body.theme-neon .disk-cleanup-toolbar .disk-cleanup-primary:hover {
-  background: color-mix(in srgb, #0a84ff 22%, #08120c);
-  border-color: color-mix(in srgb, #0a84ff 42%, #08120c);
+  background: color-mix(in srgb, #6dff7b 22%, #08120c);
+  border-color: color-mix(in srgb, #6dff7b 42%, #08120c);
 }
 body.theme-futuristic .disk-cleanup-toolbar .disk-cleanup-primary:hover {
-  background: color-mix(in srgb, #0a84ff 22%, #0b0b10);
-  border-color: color-mix(in srgb, #0a84ff 42%, #0b0b10);
+  background: color-mix(in srgb, #55c7ff 22%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 42%, #0b0b10);
 }
 
 body.theme-data-poster .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
@@ -25220,64 +25225,69 @@ body.theme-futuristic .disk-cleanup-scope-remove:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #0b0b10);
 }
 
+/* OVERNIGHT v0.1.2787: disk-cleanup add-btn Apple #0a84ff → theme accent */
 body.theme-data-poster .disk-cleanup-add-scope #disk-cleanup-add-btn {
-  background: color-mix(in srgb, #0a84ff 16%, #0b0b10);
-  border-color: color-mix(in srgb, #0a84ff 32%, #0b0b10);
+  /* Opaque poster accent — Apple #0a84ff lagged soft-delete / primary cyan (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, #55c7ff 16%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 32%, #0b0b10);
 }
 body.theme-dark .disk-cleanup-add-scope #disk-cleanup-add-btn {
-  background: color-mix(in srgb, #0a84ff 16%, #0a0a0a);
-  border-color: color-mix(in srgb, #0a84ff 32%, #0a0a0a);
+  /* Opaque Matrix accent — Apple #0a84ff lagged soft-delete / primary green (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, #00cc66 16%, #0a0a0a);
+  border-color: color-mix(in srgb, #00cc66 32%, #0a0a0a);
 }
 body.theme-neon .disk-cleanup-add-scope #disk-cleanup-add-btn {
-  background: color-mix(in srgb, #0a84ff 16%, #08120c);
-  border-color: color-mix(in srgb, #0a84ff 32%, #08120c);
+  /* Opaque neon accent — Apple #0a84ff lagged soft-delete / primary green (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, #6dff7b 16%, #08120c);
+  border-color: color-mix(in srgb, #6dff7b 32%, #08120c);
 }
 body.theme-futuristic .disk-cleanup-add-scope #disk-cleanup-add-btn {
-  background: color-mix(in srgb, #0a84ff 16%, #0b0b10);
-  border-color: color-mix(in srgb, #0a84ff 32%, #0b0b10);
+  /* Opaque cyan accent — Apple #0a84ff lagged soft-delete / primary cyan (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, #55c7ff 16%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 32%, #0b0b10);
 }
 
 body.theme-data-poster .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
-  background: color-mix(in srgb, #0a84ff 24%, #0b0b10);
-  border-color: color-mix(in srgb, #0a84ff 46%, #0b0b10);
+  background: color-mix(in srgb, #55c7ff 24%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 46%, #0b0b10);
 }
 body.theme-dark .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
-  background: color-mix(in srgb, #0a84ff 24%, #0a0a0a);
-  border-color: color-mix(in srgb, #0a84ff 46%, #0a0a0a);
+  background: color-mix(in srgb, #00cc66 24%, #0a0a0a);
+  border-color: color-mix(in srgb, #00cc66 46%, #0a0a0a);
 }
 body.theme-neon .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
-  background: color-mix(in srgb, #0a84ff 24%, #08120c);
-  border-color: color-mix(in srgb, #0a84ff 46%, #08120c);
+  background: color-mix(in srgb, #6dff7b 24%, #08120c);
+  border-color: color-mix(in srgb, #6dff7b 46%, #08120c);
 }
 body.theme-futuristic .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
-  background: color-mix(in srgb, #0a84ff 24%, #0b0b10);
-  border-color: color-mix(in srgb, #0a84ff 46%, #0b0b10);
+  background: color-mix(in srgb, #55c7ff 24%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 46%, #0b0b10);
 }
 
 body.theme-data-poster .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
-  background: color-mix(in srgb, #0a84ff 28%, #0b0b10);
+  background: color-mix(in srgb, #55c7ff 28%, #0b0b10);
 }
 body.theme-dark .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
-  background: color-mix(in srgb, #0a84ff 28%, #0a0a0a);
+  background: color-mix(in srgb, #00cc66 28%, #0a0a0a);
 }
 body.theme-neon .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
-  background: color-mix(in srgb, #0a84ff 28%, #08120c);
+  background: color-mix(in srgb, #6dff7b 28%, #08120c);
 }
 body.theme-futuristic .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
-  background: color-mix(in srgb, #0a84ff 28%, #0b0b10);
+  background: color-mix(in srgb, #55c7ff 28%, #0b0b10);
 }
 
 body.theme-data-poster .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 22%, #0b0b10);
 }
 body.theme-dark .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #00cc66 22%, #0a0a0a);
 }
 body.theme-neon .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #08120c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #6dff7b 22%, #08120c);
 }
 body.theme-futuristic .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 22%, #0b0b10);
 }
 
 /*
