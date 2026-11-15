@@ -606,17 +606,19 @@ body.theme-data-poster .icon-line-item.is-ai-off:not(.status-good):not(.status-w
 }
 
 body.theme-dark .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
-  /* Chip matches the panel #0a0a0a, so the fill stays put. Glyph was 45% #ebebf5. */
+  /* Chip matches the panel #0a0a0a, so the fill stays put. */
   background: #0a0a0a;
   /* Opaque Matrix AI-off border — #004400@55% was near-invisible on #0a0a0a; match resting icon-line hairline (#14 / P2; design-review Agent Ops). */
   border-color: color-mix(in srgb, #00ff00 28%, #0a0a0a);
-  color: color-mix(in srgb, color-mix(in srgb, #ebebf5 45%, #0a0a0a) 55%, #0a0a0a);
+  /* Opaque glyph — double-mix (45% then 55%) left ~#424244 on #0a0a0a after border remap in 2760; match resting icon-line type (#14 / P2; design-review Agent Ops). */
+  color: color-mix(in srgb, #ebebf5 45%, #0a0a0a);
 }
 body.theme-dark .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
   background: color-mix(in srgb, #121212 55%, #0a0a0a);
   /* Opaque hover — #006600@55% still muddy; match icon-line hover hairline (#14 / P2). */
   border-color: color-mix(in srgb, #00ff00 40%, #0a0a0a);
-  color: color-mix(in srgb, color-mix(in srgb, #ebebf5 85%, #121212) 55%, #0a0a0a);
+  /* Opaque hover glyph — drop extra 55% dim; match resting icon-line hover type (#14 / P2). */
+  color: color-mix(in srgb, #ebebf5 85%, #0a0a0a);
 }
 
 body.theme-neon .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {

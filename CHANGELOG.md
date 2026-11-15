@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2767] - 2026-11-15
+
+### Changed
+- Dark design-review (Agent Ops AI-off chip glyphs): `.icon-line-item.is-ai-off` resting/hover type drops the extra 55% dim that left ~`#424244` on `#0a0a0a` after the border remap in 0.1.2760, matching resting icon-line glyph strength (polish-without-capture while Mac TCC blocks `feature-agent-ops.png`).
+
 ## [0.1.2766] - 2026-11-15
 
 ### Changed
