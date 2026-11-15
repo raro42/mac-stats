@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2766] - 2026-11-15
+
+### Changed
+- Dark / Neon / Futuristic: Top Processes name and detail keyboard focus outlines use the theme accent (not Apple blue), matching process-row focus.
+
 ## [0.1.2765] - 2026-11-15
 
 ### Changed

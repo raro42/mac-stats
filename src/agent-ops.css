@@ -38236,3 +38236,29 @@ body.theme-architect .popover-btn-secondary.is-just-saved {
   color: inherit;
   box-shadow: none;
 }
+
+/*
+ * Dark / Neon / Futuristic: Top Processes name / detail focus outlines still use
+ * Apple `#0a84ff` after the CRT field remap (v0.1.2522) while `.process-row:focus-visible`
+ * already uses theme accent (`#00cc66` / Neon green / Futuristic cyan). Keyboard focus
+ * on a process name then flashes Apple blue on Matrix / phosphor shells. Catch up so
+ * process name + detail focus match row focus. Disk Cleanup path focus stays Apple blue
+ * (separate surface). Design-review fuel (feature-processes) + standing P2 #14 after
+ * metric-hint / `--hint` v0.1.2765; polish-without-capture (Mac screencapture TCC).
+ */
+/* OVERNIGHT v0.1.2766: processes name/detail focus accent parity */
+body.theme-dark .process-name:focus-visible,
+body.theme-dark .process-detail-name:focus-visible,
+body.theme-dark .process-detail-pid:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
+}
+body.theme-neon .process-name:focus-visible,
+body.theme-neon .process-detail-name:focus-visible,
+body.theme-neon .process-detail-pid:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
+}
+body.theme-futuristic .process-name:focus-visible,
+body.theme-futuristic .process-detail-name:focus-visible,
+body.theme-futuristic .process-detail-pid:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
+}
