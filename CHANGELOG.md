@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2761] - 2026-11-15
+
+### Changed
+- Dark design-review (Top Processes Force Quit): `.force-quit-section` border remaps near-invisible `var(--border)` `#004400` on `#0a0a0a` to a visible Matrix green 28% hairline (Neon force-quit parity; polish-without-capture while Mac TCC blocks `feature-processes.png`).
+
 ## [0.1.2760] - 2026-11-15
 
 ### Changed

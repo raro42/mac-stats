@@ -768,7 +768,8 @@ body {
 .force-quit-section {
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 1px solid var(--border);
+  /* Opaque Matrix hairline — var(--border) #004400 was near-invisible on #0a0a0a; Neon force-quit already field-tinted (#14 / P2; design-review processes). */
+  border-top: 1px solid color-mix(in srgb, #00ff00 28%, #0a0a0a);
 }
 
 .force-quit-btn {
