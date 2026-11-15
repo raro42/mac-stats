@@ -2652,13 +2652,14 @@ body {
 
 .disk-cleanup-meta-card {
   height: 100%;
-  border-color: var(--hairline, #004400);
+  /* Opaque Matrix hairline — #004400 fallback was near-invisible on #0a0a0a; match --hairline 18% (#14 / P2; design-review disk-cleanup). */
+  border-color: var(--hairline, color-mix(in srgb, #00ff00 18%, #0a0a0a));
   /* Opaque wash — was color-mix(…, transparent) glass (#14). */
   background: color-mix(in srgb, var(--accent, #00cc66) 6%, #0a0a0a);
 }
 
 .disk-cleanup-meta-card:hover {
-  border-color: color-mix(in srgb, var(--accent, #00cc66) 45%, var(--hairline, #004400));
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 45%, var(--hairline, color-mix(in srgb, #00ff00 18%, #0a0a0a)));
   /* Opaque wash — was color-mix(…, transparent) glass (#14). */
   background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
   box-shadow: none;
@@ -2666,7 +2667,8 @@ body {
 }
 
 .disk-cleanup-soft-delete {
-  border-color: var(--hairline, #004400);
+  /* Opaque Matrix hairline — #004400 fallback was near-invisible on #0a0a0a; match --hairline 18% (#14 / P2; design-review disk-cleanup). */
+  border-color: var(--hairline, color-mix(in srgb, #00ff00 18%, #0a0a0a));
 }
 
 #gpu-usage-ring-progress {

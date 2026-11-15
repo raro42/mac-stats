@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2782] - 2026-11-15
+
+### Changed
+- Dark / Neon / Futuristic / Data Poster design-review (Disk Cleanup): `.disk-cleanup-soft-delete:focus-within` remaps leftover Apple `#0a84ff` rings onto theme accent (Matrix green / neon green / poster·futuristic cyan), matching meta-card focus; Dark theme `#004400` hairline fallbacks on meta-card / soft-delete → `--hairline` green 18% (polish-without-capture while Mac TCC blocks `feature-agent-ops.png` / `feature-disk-cleanup.png`).
+
 ## [0.1.2781] - 2026-11-15
 
 ### Changed
