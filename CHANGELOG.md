@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2785] - 2026-11-15
+
+### Changed
+- Dark / Neon / Futuristic / Data Poster design-review (Agent Ops): `textarea.ops-agent-editor:focus` remaps leftover Apple `#0a84ff` rings onto theme accent (Matrix green / neon green / poster·futuristic cyan), matching `.ops-filter-input:focus` (polish-without-capture while Mac TCC blocks `feature-agent-ops.png`).
+
+
 ## [0.1.2784] - 2026-11-15
 
 ### Changed

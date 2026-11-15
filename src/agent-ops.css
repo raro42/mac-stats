@@ -16411,8 +16411,9 @@ body.theme-futuristic .ops-filter-attention-glance.is-direct-filter {
  * + standing P2 #14 after copy/empty/preview in v0.1.2203.
  */
 body.theme-data-poster textarea.ops-agent-editor:focus {
-  border-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #0b0b10);
+  /* Opaque poster accent — Apple #0a84ff lagged ops-filter-input focus cyan (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
 }
 body.theme-data-poster textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #ff9f0a 50%, #0b0b10);
@@ -22043,8 +22044,9 @@ body.theme-futuristic .ops-health-card.is-active.ops-health-clickable:hover {
  */
 /* OVERNIGHT v0.1.2417: Agent Ops editor/meta opaque on Dark/Neon/Futuristic */
 body.theme-dark textarea.ops-agent-editor:focus {
-  border-color: color-mix(in srgb, #0a84ff 55%, #0a0a0a);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #0a0a0a);
+  /* Opaque Matrix accent — Apple #0a84ff lagged ops-filter-input focus green (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, #00cc66 55%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #00cc66 18%, #0a0a0a);
 }
 body.theme-dark textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #ff9f0a 50%, #0a0a0a);
@@ -22063,8 +22065,9 @@ body.theme-dark .ops-insights-kb-hint {
 }
 
 body.theme-neon textarea.ops-agent-editor:focus {
-  border-color: color-mix(in srgb, #0a84ff 55%, #08120c);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #08120c);
+  /* Opaque neon accent — Apple #0a84ff lagged ops-filter-input focus green (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, #6dff7b 55%, #08120c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #6dff7b 18%, #08120c);
 }
 body.theme-neon textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #ff9f0a 50%, #08120c);
@@ -22083,8 +22086,9 @@ body.theme-neon .ops-insights-kb-hint {
 }
 
 body.theme-futuristic textarea.ops-agent-editor:focus {
-  border-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #0b0b10);
+  /* Opaque cyan accent — Apple #0a84ff lagged ops-filter-input focus cyan (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
 }
 body.theme-futuristic textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #ff9f0a 50%, #0b0b10);
