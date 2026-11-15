@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2788] - 2026-11-15
+
+### Changed
+- Dark / Neon / Futuristic / Data Poster design-review (Disk Cleanup): add-scope / scope-row input `:focus-visible` and `.disk-cleanup-scope-remove:focus-visible` remap leftover Apple `#0a84ff` rings onto theme accent (Matrix green / neon green / poster·futuristic cyan), matching add-btn / primary (polish-without-capture while Mac TCC blocks `feature-disk-cleanup.png` / `feature-processes.png`).
+
 ## [0.1.2787] - 2026-11-15
 
 ### Changed
