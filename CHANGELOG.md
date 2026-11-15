@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2775] - 2026-11-15
+
+### Changed
+- Data Poster design-review (AI Chat): `.chat-message .markdown table` cell borders and `hr` remap muddy white 8% hairlines onto poster white 14%, matching markdown `pre` / model-select pane chrome (polish-without-capture while Mac TCC blocks `feature-ai-chat.png`).
+
 ## [0.1.2774] - 2026-11-15
 
 ### Changed
