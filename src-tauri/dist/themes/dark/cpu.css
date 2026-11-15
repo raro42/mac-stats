@@ -2268,8 +2268,8 @@ body {
 }
 
 .chat-message.user {
-  /* Opaque wash — was rgba(0,122,255,0.1) glass (#14). */
-  background: color-mix(in srgb, #007aff 10%, #0a0a0a);
+  /* Opaque Matrix accent — Apple #007aff lagged --accent / Futuristic-Neon user bubbles (#14 / P2; design-review AI Chat). */
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
   margin-left: 20px;
   color: var(--text, var(--ink, inherit));
 }

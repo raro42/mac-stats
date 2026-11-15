@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2784] - 2026-11-15
+
+### Changed
+- Dark / Neon design-review (AI Chat): `.chat-message.user` remaps leftover Apple `#007aff` washes onto theme `--accent` (Matrix green / neon green), matching Futuristic / Data Poster user bubbles (polish-without-capture — `screencapture -l` returned a blank WebView layer).
+
 ## [0.1.2783] - 2026-11-15
 
 ### Changed
