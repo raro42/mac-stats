@@ -2107,9 +2107,10 @@ body {
 
 .ollama-settings-popover .popover-body textarea:focus {
   outline: none;
-  border-color: color-mix(in srgb, #007aff 55%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff lagged --accent / focus-visible (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
   background: #f1f1f1;
-  box-shadow: 0 0 0 3px color-mix(in srgb, #007aff 18%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 18%, #f1f1f1);
 }
 
 .ollama-settings-popover .popover-actions {
@@ -2132,14 +2133,15 @@ body {
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ollama-settings-popover .popover-btn-primary {
-  background: color-mix(in srgb, #007aff 90%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff lagged --accent / secondary (#14 / P2; design-review AI Chat). */
+  background: color-mix(in srgb, var(--accent, #232d41) 90%, #f1f1f1);
   color: #ffffff;
-  border-color: color-mix(in srgb, #007aff 90%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 90%, #f1f1f1);
 }
 
 .ollama-settings-popover .popover-btn-primary:hover {
-  background: #007aff;
-  border-color: #007aff;
+  background: var(--accent, #232d41);
+  border-color: var(--accent, #232d41);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */

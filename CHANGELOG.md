@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2798] - 2026-11-15
+
+### Changed
+- Light / Material / Architect design-review (AI Chat Ollama settings): `.ollama-settings-popover` primary + textarea focus remap leftover Apple `#007aff` onto theme `--accent` (Light soft blue / Material taupe / Architect slate), matching CRT remaps in v0.1.2791 and focus-visible rings (polish-without-capture while Mac TCC blocks `feature-ai-chat.png` / `feature-processes.png`).
+
 ## [0.1.2797] - 2026-11-15
 
 ### Changed
