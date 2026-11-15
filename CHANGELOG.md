@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2801] - 2026-11-16
+
+### Changed
+- Light design-review (What's New / changelog): `.changelog-version` and `.changelog-item::before` remap leftover Apple `#007aff` onto theme `--accent` soft blue `#6aa6df`, matching Material / Futuristic / Data Poster / Swiss changelog accents (polish-without-capture while Mac TCC blocks `feature-processes.png`).
+
 ## [0.1.2800] - 2026-11-15
 
 ### Changed

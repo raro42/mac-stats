@@ -1232,8 +1232,8 @@ body {
 }
 
 .changelog-version {
-  /* Opaque accent — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
-  color: color-mix(in srgb, #007aff 90%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff lagged --accent / Material changelog (#14 / P2; design-review). */
+  color: color-mix(in srgb, var(--accent, #6aa6df) 90%, #f7f7fa);
   font-weight: 800;
 }
 
@@ -1289,8 +1289,8 @@ body {
   content: "•";
   position: absolute;
   left: 0;
-  /* Opaque accent — Apple #ffffff → Light paper #f7f7fa (#14 / P2). */
-  color: color-mix(in srgb, #007aff 60%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff lagged --accent / Material changelog (#14 / P2; design-review). */
+  color: color-mix(in srgb, var(--accent, #6aa6df) 60%, #f7f7fa);
   font-weight: bold;
 }
 
