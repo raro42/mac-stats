@@ -1,21 +1,18 @@
 # Morning surprise — 2026-11-16
 
-Overnight Track B kept product CSS — not an empty digester night.
+Overnight Track B (Linux rack; Mac TCC blocks window-only feature screenshots).
 
 ## Shipped
+- **v0.1.2802** — Light / Material / Architect `.force-quit-btn:disabled` glass `opacity: 0.7` → opaque red 63% paper mixes (Apple / Futuristic / Data Poster / Dark / Neon parity; Standing P2 #14).
+- **v0.1.2801** (parallel tick) — Light About changelog Apple `#007aff` → theme `--accent` soft blue.
+- **v0.1.2800** — Light / Material / Architect add-monitor focus onto theme `--accent`.
 
-- **v0.1.2801** — Light What's New / changelog: version title + list bullets left Apple `#007aff` on cream paper while Material / Futuristic / Data Poster / Swiss already used theme `--accent`. Remapped onto Light soft blue `#6aa6df` (opaque 90%/60% mixes).
-- Ratchet: `keep` @ `64df69a` after `verify`.
-- Design-review still due for `feature-processes.png` (~94d) — Mac TCC / no window layer blocked capture; polish-without-capture path.
-- Layout-daily still due today for **data-poster** (screen missing; remaps already clean) — next tick fuel.
+## Tried / discarded
+- Local Light changelog-as-2801 raced origin **v0.1.2801** — discard logged; re-picked Force Quit disabled → **keep v0.1.2802**.
 
-## Also this window (prior keeps)
+## Context
+- Digester empty. Design review still due (`feature-processes` / `feature-agent-ops`). Layout-daily due for Data Poster today (remaps none) — deferred after this keep.
+- Sibling harnesses missing. Debug.log quiet.
 
-- **v0.1.2800** Light / Material / Architect Monitors add-form focus onto theme accent.
-- Earlier CRT / cream soft-state remaps through the evening (see `results.tsv`).
-
-## Tried / notes
-
-- Digester Slowest empty after filters; open candidate was design-review processes.
-- Sibling OpenClaw/Hermes: no clear one-surface port this tick.
-- Debug.log: benign single-instance lock WARN only.
+## Not a quiet night
+Real CSS keep after a race-discard, not digester-empty alone.
