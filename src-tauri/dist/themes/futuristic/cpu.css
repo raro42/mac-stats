@@ -2331,7 +2331,8 @@ body {
 .chat-message .markdown pre {
   /* Opaque wash / hairline — was black glass rgba fallback (#14). */
   background: color-mix(in srgb, #ffffff 5%, #0b0b10);
-  border: 1px solid var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
+  /* Opaque cyan hairline — Apple white --hairline 12% lagged model-select / chat-messages cyan (#14 / P2; design-review AI Chat). */
+  border: 1px solid color-mix(in srgb, #3bd6ff 18%, #0b0b10);
   border-radius: 8px;
   padding: 12px;
   margin: 12px 0;

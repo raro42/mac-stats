@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2772] - 2026-11-15
+
+### Changed
+- Dark / Futuristic design-review (AI Chat): `.chat-message .markdown pre` borders remap leftover Apple white 12% hairlines onto Matrix green / cyan field mixes, matching each theme’s model-select / chat-messages pane (polish-without-capture while Mac TCC blocks `feature-ai-chat.png`).
+
 ## [0.1.2771] - 2026-11-15
 
 ### Changed
