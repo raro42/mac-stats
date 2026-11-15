@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2791] - 2026-11-15
+
+### Changed
+- Dark / Neon / Futuristic / Data Poster design-review (AI Chat Ollama settings): `.ollama-settings-popover` primary + textarea focus remaps leftover Apple `#007aff` onto theme accent (Matrix green / neon green / futuristic·poster cyan), matching popover focus-visible / secondary (polish-without-capture while Mac TCC blocks `feature-ai-chat.png` / `feature-agent-ops.png`).
+
 ## [0.1.2790] - 2026-11-15
 
 ### Changed

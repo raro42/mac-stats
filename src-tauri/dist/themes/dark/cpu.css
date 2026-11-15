@@ -2070,9 +2070,10 @@ body {
 
 .ollama-settings-popover .popover-body textarea:focus {
   outline: none;
-  border-color: color-mix(in srgb, #007aff 55%, #0a0a0a);
+  /* Opaque Matrix accent — Apple #007aff lagged --accent / popover focus-visible (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, #00cc66 55%, #0a0a0a);
   background: #0a0a0a;
-  box-shadow: 0 0 0 3px color-mix(in srgb, #007aff 18%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #00cc66 18%, #0a0a0a);
 }
 
 .ollama-settings-popover .popover-actions {
@@ -2095,14 +2096,15 @@ body {
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ollama-settings-popover .popover-btn-primary {
-  background: color-mix(in srgb, #007aff 90%, #0a0a0a);
+  /* Opaque Matrix accent — Apple #007aff lagged --accent / secondary green (#14 / P2; design-review AI Chat). */
+  background: color-mix(in srgb, #00cc66 90%, #0a0a0a);
   color: #ffffff;
-  border-color: color-mix(in srgb, #007aff 90%, #0a0a0a);
+  border-color: color-mix(in srgb, #00cc66 90%, #0a0a0a);
 }
 
 .ollama-settings-popover .popover-btn-primary:hover {
-  background: #007aff;
-  border-color: #007aff;
+  background: #00cc66;
+  border-color: #00cc66;
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
