@@ -2259,8 +2259,8 @@ body {
 }
 
 .chat-message.assistant {
-  /* Opaque wash — was white glass rgba(255,255,255,0.5) fallback (#14). */
-  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
+  /* Opaque cyan accent — white 8% lagged CRT tint / user --accent bubbles (#14 / P2; design-review AI Chat). Quieter than user 10%. */
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 5%, #0b0b10);
   margin-right: 20px;
   color: var(--text, var(--ink, inherit));
 }

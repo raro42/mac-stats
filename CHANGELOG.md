@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2786] - 2026-11-15
+
+### Changed
+- Dark / Neon / Futuristic / Data Poster design-review (AI Chat): `.chat-message.assistant` remaps leftover white washes onto theme `--accent` field mixes (Matrix green 4% / neon·cyan 5%), quieter than user bubbles at 10% (polish-without-capture while Mac TCC / blank WebView layer blocks `feature-ai-chat.png`).
+
 ## [0.1.2785] - 2026-11-15
 
 ### Changed
