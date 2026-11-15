@@ -33393,8 +33393,8 @@ body.theme-light .disk-cleanup-collapsed-glance.is-clean {
   background: color-mix(in srgb, #34c759 7%, #f7f7fa);
 }
 body.theme-light .disk-cleanup-collapsed-glance.has-scopes-off {
-  border-color: color-mix(in srgb, #0a84ff 26%, #f7f7fa);
-  background: color-mix(in srgb, #0a84ff 6%, #f7f7fa);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #f7f7fa);
+  background: color-mix(in srgb, #ff9f0a 7%, #f7f7fa);
 }
 body.theme-light .details-collapsed-glance {
   border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
@@ -33469,8 +33469,8 @@ body.theme-material .disk-cleanup-collapsed-glance.is-clean {
   background: color-mix(in srgb, #34c759 7%, #ebe4d9);
 }
 body.theme-material .disk-cleanup-collapsed-glance.has-scopes-off {
-  border-color: color-mix(in srgb, #0a84ff 26%, #ebe4d9);
-  background: color-mix(in srgb, #0a84ff 6%, #ebe4d9);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #ebe4d9);
+  background: color-mix(in srgb, #ff9f0a 7%, #ebe4d9);
 }
 body.theme-material .details-collapsed-glance {
   border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
@@ -33545,8 +33545,8 @@ body.theme-architect .disk-cleanup-collapsed-glance.is-clean {
   background: color-mix(in srgb, #34c759 7%, #f1f1f1);
 }
 body.theme-architect .disk-cleanup-collapsed-glance.has-scopes-off {
-  border-color: color-mix(in srgb, #0a84ff 26%, #f1f1f1);
-  background: color-mix(in srgb, #0a84ff 6%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #f1f1f1);
+  background: color-mix(in srgb, #ff9f0a 7%, #f1f1f1);
 }
 body.theme-architect .details-collapsed-glance {
   border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2797] - 2026-11-15
+
+### Changed
+- Light / Material / Architect design-review (Disk Cleanup collapsed glance): `.disk-cleanup-collapsed-glance.has-scopes-off` remap leftover Apple `#0a84ff` onto amber `#ff9f0a`, matching `.disk-cleanup-meta-card.has-scopes-off` (CRT remaps were v0.1.2793; polish-without-capture while Mac TCC blocks `feature-disk-cleanup.png`).
+
 ## [0.1.2796] - 2026-11-15
 
 ### Changed
