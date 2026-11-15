@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2764] - 2026-11-15
+
+### Changed
+- Dark design-review (Top Processes rows): `.process-row` border remaps muddy Matrix green 10% hairline on `#0a0a0a` to a visible 18% field mix (`--hairline` parity; polish-without-capture while Mac TCC blocks `feature-processes.png`).
+
 ## [0.1.2763] - 2026-11-15
 
 ### Changed

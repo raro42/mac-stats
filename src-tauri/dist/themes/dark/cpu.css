@@ -393,8 +393,8 @@ body {
   gap: 10px;
   align-items: center;
   padding: 3px 0;
-  /* Opaque hairline — was rgba(0,255,0,0.10) glass (#14). */
-  border-bottom: 1px solid color-mix(in srgb, #00ff00 10%, #0a0a0a);
+  /* Opaque Matrix hairline — 10% green was still muddy on #0a0a0a; match --hairline 18% (Neon process-row ~12%; #14 / P2; design-review processes). */
+  border-bottom: 1px solid color-mix(in srgb, #00ff00 18%, #0a0a0a);
 }
 
 .process-name {
