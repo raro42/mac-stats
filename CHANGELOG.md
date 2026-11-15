@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2795] - 2026-11-15
+
+### Changed
+- Dark / Neon / Futuristic / Data Poster design-review (Perplexity results / weather): `.perplexity-result-item:hover` and `.perplexity-weather-card` remap leftover Apple `#0a84ff` onto theme `--accent` (Matrix green / neon green / poster·futuristic cyan), matching selected / is-top; Data Poster selected/is-top fallbacks `#007aff`/`#0a84ff` → `#55c7ff` (polish-without-capture while Mac TCC blocks `feature-ai-chat.png`).
+
 ## [0.1.2794] - 2026-11-15
 
 ### Changed
