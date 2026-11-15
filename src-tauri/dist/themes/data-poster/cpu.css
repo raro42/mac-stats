@@ -2245,19 +2245,22 @@ body {
 
 .model-select:focus {
   outline: none;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 30%, #0b0b10);
+  /* Opaque poster accent — Apple #007aff lagged --accent / Neon·Dark focus (#14 / P2; layout-daily AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
   background: color-mix(in srgb, #ffffff 8%, #0b0b10);
 }
 
 .model-select:focus-visible {
-  outline: 2px solid color-mix(in srgb, #55c7ff 55%, #0b0b10);
+  outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
   outline-offset: 2px;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #0b0b10);
+  /* Opaque poster accent — Apple #007aff lagged --accent cyan (#14 / P2; layout-daily AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
 }
 
 .model-select:hover {
   background: color-mix(in srgb, #ffffff 7%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #0b0b10);
+  /* Opaque poster accent — Apple #007aff lagged --accent cyan (#14 / P2; layout-daily AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
 }
 
 .ollama-chat {
@@ -2278,8 +2281,9 @@ body {
 }
 
 .chat-messages:focus-within {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #0b0b10);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 14%, #0b0b10);
+  /* Opaque poster accent — Apple #007aff lagged --accent cyan (#14 / P2; layout-daily AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
 }
 
 .chat-message {
@@ -2292,7 +2296,8 @@ body {
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-message.user {
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, #0b0b10);
+  /* Opaque poster accent — Apple #007aff lagged --accent / assistant cyan (#14 / P2; layout-daily AI Chat). */
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
   margin-left: 20px;
   color: var(--text, var(--ink, inherit));
 }
@@ -2509,9 +2514,10 @@ body {
 }
 
 .chat-input-container:focus-within {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #0b0b10);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 12%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #007aff) 5%, #0b0b10);
+  /* Opaque poster accent — Apple #007aff lagged --accent cyan (#14 / P2; layout-daily AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 5%, #0b0b10);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */

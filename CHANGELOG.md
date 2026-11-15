@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2804] - 2026-11-16
+
+### Changed
+- Data Poster layout-daily (AI Chat model picker + composer): `.model-select` focus/hover borders, `.chat-messages:focus-within`, `.chat-message.user`, and `.chat-input-container:focus-within` remap leftover Apple `#007aff` fallbacks onto poster `--accent` cyan `#55c7ff`, matching Neon / Dark model-select focus and assistant bubble accent (Linux rack; Mac window capture still blocked by TCC).
+
 ## [0.1.2803] - 2026-11-16
 
 ### Changed
