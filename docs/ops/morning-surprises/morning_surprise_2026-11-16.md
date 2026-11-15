@@ -1,18 +1,19 @@
 # Morning surprise — 2026-11-16
 
-Overnight Track B (Linux rack; Mac TCC blocks window-only feature screenshots).
+Overnight Track B (Mac; Screen Recording TCC / no CPU window layer — polish-without-capture grace).
 
 ## Shipped
-- **v0.1.2802** — Light / Material / Architect `.force-quit-btn:disabled` glass `opacity: 0.7` → opaque red 63% paper mixes (Apple / Futuristic / Data Poster / Dark / Neon parity; Standing P2 #14).
-- **v0.1.2801** (parallel tick) — Light About changelog Apple `#007aff` → theme `--accent` soft blue.
+- **v0.1.2803** — Swiss Minimalistic `.force-quit-btn:disabled` glass `opacity: 0.7` → opaque red 63% on `#ffffff` (Apple / cream parity after v0.1.2802; Standing P2 #14; design-review `feature-processes`).
+- **v0.1.2802** (parallel tick) — Light / Material / Architect Force Quit disabled onto opaque red.
+- **v0.1.2801** — Light About changelog Apple `#007aff` → theme `--accent` soft blue.
 - **v0.1.2800** — Light / Material / Architect add-monitor focus onto theme `--accent`.
 
 ## Tried / discarded
-- Local Light changelog-as-2801 raced origin **v0.1.2801** — discard logged; re-picked Force Quit disabled → **keep v0.1.2802**.
+- Local cream Force Quit-as-2802 raced origin **v0.1.2802** — discard logged; re-picked Swiss leftover → **keep v0.1.2803**.
 
 ## Context
-- Digester empty. Design review still due (`feature-processes` / `feature-agent-ops`). Layout-daily due for Data Poster today (remaps none) — deferred after this keep.
-- Sibling harnesses missing. Debug.log quiet.
+- Digester open pointed design-review `feature-processes` (~94d). Layout-daily still due for Data Poster today (remaps none) — deferred after this keep.
+- Sibling harnesses: OpenClaw/Hermes scan only (no port this tick). Debug.log: single-instance WARN noise.
 
 ## Not a quiet night
 Real CSS keep after a race-discard, not digester-empty alone.
