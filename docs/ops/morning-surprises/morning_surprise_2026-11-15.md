@@ -1,19 +1,21 @@
 # Morning surprise — 2026-11-15
 
-Overnight autoresearch kept shipping CRT/poster accent parity (polish-without-capture while Mac Screen Recording TCC blocks fresh `docs/screens/feature-*.png`).
+Overnight Track B kept shipping Top Processes / Disk Cleanup / theme accent soft-states (polish-without-capture while Mac Screen Recording TCC / blank WebView blocks fresh `feature-*.png`).
 
-## Shipped tonight (latest)
+## Shipped tonight (highlight)
 
-- **v0.1.2789** — Top Processes `.process-row.is-selected` on Dark / Neon / Futuristic / Data Poster: leftover Apple `#0a84ff` wash + inset ring → theme accent (Matrix green / neon green / poster·futuristic cyan), matching `.process-row.is-pinned` and `:focus-visible`.
+- **v0.1.2790** — Dark / Neon `.force-quit-btn:disabled` glass opacity → opaque red 63% (Futuristic / Data Poster / Apple parity). Design-review `feature-processes`.
+- **v0.1.2789** — Dark / Neon / Futuristic / Data Poster `.process-row.is-selected` Apple `#0a84ff` → theme accent (parallel tick).
+- Earlier: Disk Cleanup add-scope / primary / soft-delete focus, AI Chat assistant/user bubbles, Agent Ops chrome / editor focus, markdown soft-states (v0.1.2782–2788).
 
-## Earlier same night (highlights)
+## Tried / notes
 
-- **v0.1.2788** — Disk Cleanup add-scope / scope-remove focus rings onto theme accent.
-- **v0.1.2787** — Disk Cleanup primary + Add button onto theme accent.
-- **v0.1.2786** — AI Chat assistant bubbles onto quieter theme accent washes.
-- **v0.1.2785** — Agent Ops editor focus onto theme accent (after race-discards vs parallel origin bubbles/chrome).
+- Capture still blocked (Control Center chip only / no CPU window id). Prior `feature-processes.png` kept.
+- Digester open pointed design-review processes (~94d stale). Layout-daily due=false (Data Poster/Dark marked).
+- Race: two ticks claimed 2789; Force Quit disabled rebased to 2790.
 
-## Not a quiet night
+## Next fuel
 
-Digester stayed empty (0 Werner turns / 7d). Design review still due on Agent Ops / processes / disk-cleanup screenshots. Layout-daily already marked Data Poster + Dark for today. Next soft-state candidate: Disk Cleanup collapsed-glance `.has-scopes-off` still Apple blue on CRT shells (meta-card scopes-off already amber).
-
+- Mac capture for stale `feature-processes.png` when TCC allows
+- Leftover soft-states: ollama popover primary / textarea focus Apple `#007aff` · Neon `model-select:focus` · Send white-on-blue intentional
+- Neon / Futuristic layout-daily on a later calendar day
