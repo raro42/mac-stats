@@ -4,6 +4,7 @@ Overnight Track B kept shipping dark-theme contrast remaps (design-review due; M
 
 ## Shipped tonight (selected)
 
+- **v0.1.2795** — Perplexity result hover + weather card: Apple `#0a84ff` → theme `--accent` on Dark / Neon / Futuristic / Data Poster (selected / is-top already accent; Data Poster fallbacks `#55c7ff`).
 - **v0.1.2794** — Agent Ops Insights clickable lines: focus outline Apple `#0a84ff` → theme `--accent` on Dark / Neon / Futuristic / Data Poster (selected already accent; Data Poster selected fallback `#55c7ff`).
 - **v0.1.2793** — Disk Cleanup collapsed glance `.has-scopes-off` Apple `#0a84ff` → amber `#ff9f0a` (meta-card scopes-off parity).
 - **v0.1.2792** — Neon AI Chat `.model-select:focus` → theme `--accent` green.
@@ -11,10 +12,10 @@ Overnight Track B kept shipping dark-theme contrast remaps (design-review due; M
 
 ## Tried / blocked
 
-- Fresh window-only screenshots for `feature-processes.png` / `feature-disk-cleanup.png` / `feature-ai-chat.png`: CPU window not on-screen (menu-bar Control Center chip only) or blank WebView layer — did not ship blanks.
+- Fresh window-only screenshots for `feature-processes.png` / `feature-disk-cleanup.png` / `feature-ai-chat.png` / `feature-agent-ops.png`: CPU window not on-screen (menu-bar Control Center chip only) or blank WebView layer — did not ship blanks.
 
 ## Next fuel
 
 - Neon / Futuristic layout-daily on a later calendar day.
 - Mac capture when TCC / CPU window allows.
-- Leftover soft-states: Perplexity result/weather Apple blues if muddy; Send white-on-blue intentional.
+- Leftover soft-states: Light/Material/Architect collapsed-glance `.has-scopes-off` Apple blues if muddy; logs-path-hint CRT Apple focus if muddy; Send white-on-blue intentional.
