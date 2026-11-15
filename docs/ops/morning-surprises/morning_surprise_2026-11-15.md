@@ -4,14 +4,15 @@ Overnight autoresearch kept shipping opaque CRT remaps and design-review polish 
 
 ## Latest keep
 
-**v0.1.2779** — Data Poster AI Chat markdown blockquote accent.
+**v0.1.2780** — Data Poster AI Chat markdown code + table header accent.
 
-- `.chat-message .markdown blockquote` still used muddy white 20%/3% on `#0b0b10` while Dark / Neon / Futuristic quotes already sat on accent 18%/4%.
-- Borders/washes now use poster `--accent` cyan (`#55c7ff`) 18%/4%.
-- Design-review fuel: stale `feature-agent-ops.png` (~60.4d) / AI Chat adjacent. Recapture still blocked (`screencapture -l` → TCC / Linux rack).
+- `.chat-message .markdown code` still used white 8% and table `th` white 5% on `#0b0b10` while Neon / Dark / Futuristic already sat on accent 8%/5%.
+- Washes now use poster `--accent` cyan (`#55c7ff`) 8%/5%.
+- Design-review fuel: digester pointed at stale `feature-agent-ops.png` (~60.4d) / AI Chat adjacent. Recapture still blocked (single-instance menu-bar only / Screen Recording TCC) — polish-without-capture.
 
 ## Earlier tonight (selected)
 
+- **v0.1.2779** — Data Poster AI Chat markdown blockquote accent.
 - **v0.1.2778** — Data Poster AI Chat markdown link accent (drop Apple `#007aff`).
 - **v0.1.2777** — Dark / Futuristic AI Chat markdown blockquote + Dark link accent.
 - **v0.1.2776** — Dark / Futuristic AI Chat markdown code + Futuristic th washes.
@@ -26,15 +27,16 @@ Overnight autoresearch kept shipping opaque CRT remaps and design-review polish 
 - **v0.1.2767** — Dark Agent Ops AI-off glyph readability.
 - **v0.1.2766** — Dark / Neon / Futuristic process name/detail focus → theme accent.
 - **v0.1.2765** — Dark `--hint` Matrix muted readability.
-- **v0.1.2763–2764** — Dark ring-track + process-row hairlines.
+- **v0.1.2764** — Dark `.process-row` hairline 10%→18%.
+- **v0.1.2763** — Dark ring-track / `--ring-inactive` field mix.
 - **v0.1.2761–2762** — Dark Force Quit + chrome token hairlines.
 
 ## Tried / blocked
 
-- Window-only recapture of stale feature screens (Agent Ops / AI Chat / processes) — Screen Recording TCC still refuses `screencapture -l` (polish-without-capture path).
+- Window-only recapture of `docs/screens/feature-agent-ops.png` / `feature-ai-chat.png` (and earlier processes) — Screen Recording TCC / missing CPU window id still blocks `screencapture -l` (polish-without-capture path). Single-instance lock kept menu-bar only.
 
 ## Next fuel
 
 - Neon / Futuristic layout-daily on a later calendar day.
 - Mac capture of stale feature screens when TCC allows.
-- Leftover soft-states (Data Poster markdown `code` white 8% / `th` white 5% if muddy · Disk Cleanup `#004400` fallbacks if muddy · Send white-on-blue intentional).
+- Leftover soft-states (Disk Cleanup `#004400` hairline fallbacks if muddy · Data Poster markdown `pre` fill white 5% if muddy · Send white-on-blue intentional).
