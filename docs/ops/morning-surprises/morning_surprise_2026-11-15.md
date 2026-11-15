@@ -6,6 +6,7 @@ Overnight Track B kept shipping. Digester opened **design-review** for stale `fe
 
 | Version | What |
 |---|---|
+| **v0.1.2764** | Dark design-review Top Processes: `.process-row` border muddy green 10% → Matrix green 18% (`--hairline` parity; TCC polish-without-capture). |
 | **v0.1.2763** | Dark design-review CPU metric rings: `--ring-inactive` / `.ring-track` `#003300` → Matrix green 18% field mix (Neon ring-track parity; TCC polish-without-capture). |
 | **v0.1.2762** | Dark Agent Ops chrome tokens: `:root` `--hairline` / `--panel-border` / `--border` `#004400` → Matrix green field mixes 18%/22%/22%. |
 | **v0.1.2761** | Dark Top Processes Force Quit: `.force-quit-section` border → Matrix green 28% hairline. |
@@ -24,7 +25,7 @@ Overnight Track B kept shipping. Digester opened **design-review** for stale `fe
 
 ## Why it matters
 
-Dark Matrix chrome and gauge wells stop vanishing into `#0a0a0a`. Token remaps fix the glass shell; the ring-track remap makes CPU · GPU · FREQ · TEMP wells readable again instead of a near-blank circle.
+Dark Matrix chrome, gauge wells, and Top Processes row dividers stop vanishing into `#0a0a0a`. Token remaps fix the glass shell; ring-track and process-row remaps make gauges and the process list readable again.
 
 ## Next fuel
 
@@ -34,4 +35,4 @@ Dark Matrix chrome and gauge wells stop vanishing into `#0a0a0a`. Token remaps f
 
 ## Nightly minimum
 
-Satisfied: multiple `keep` rows in `~/.mac-stats/improvements/autoresearch/results.tsv` for the 20:00–06:00 window (including **v0.1.2763**).
+Satisfied: multiple `keep` rows in `~/.mac-stats/improvements/autoresearch/results.tsv` for the 20:00–06:00 window (including **v0.1.2764**).
