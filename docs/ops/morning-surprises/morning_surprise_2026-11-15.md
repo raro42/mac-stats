@@ -1,21 +1,19 @@
 # Morning surprise — 2026-11-15
 
-Overnight Track B kept shipping Disk Cleanup / theme accent soft-states (polish-without-capture while Mac Screen Recording TCC / blank WebView blocks fresh `feature-*.png`).
+Overnight autoresearch kept shipping CRT/poster accent parity (polish-without-capture while Mac Screen Recording TCC blocks fresh `docs/screens/feature-*.png`).
 
-## Shipped tonight (highlight)
+## Shipped tonight (latest)
 
-- **v0.1.2788** — Disk Cleanup add-scope / scope-row input `:focus-visible` + `.disk-cleanup-scope-remove:focus-visible` Apple `#0a84ff` → theme accent (Matrix green / neon green / poster·futuristic cyan), matching primary/Add from **v0.1.2787**.
-- Earlier same window: **v0.1.2787** primary/Add; **v0.1.2786** AI Chat assistant bubbles; **v0.1.2785** Agent Ops editor focus; **v0.1.2784** AI Chat user bubbles; **v0.1.2783** Data Poster collapse/menu focus.
+- **v0.1.2789** — Top Processes `.process-row.is-selected` on Dark / Neon / Futuristic / Data Poster: leftover Apple `#0a84ff` wash + inset ring → theme accent (Matrix green / neon green / poster·futuristic cyan), matching `.process-row.is-pinned` and `:focus-visible`.
 
-## Capture status
+## Earlier same night (highlights)
 
-- CPU window not on-screen (Control Center chip only) or blank WebView layer on `screencapture -l` — grace: polish without shipping blank PNGs.
-- Still stale for marketing: `feature-processes.png` (~94d), `feature-cpu-metrics.png`, `feature-monitors.png` (grace on ai-chat / disk-cleanup / fresh agent-ops).
+- **v0.1.2788** — Disk Cleanup add-scope / scope-remove focus rings onto theme accent.
+- **v0.1.2787** — Disk Cleanup primary + Add button onto theme accent.
+- **v0.1.2786** — AI Chat assistant bubbles onto quieter theme accent washes.
+- **v0.1.2785** — Agent Ops editor focus onto theme accent (after race-discards vs parallel origin bubbles/chrome).
 
-## Next fuel
+## Not a quiet night
 
-- Mac capture for `feature-processes` when TCC / layer capture works.
-- Neon / Futuristic layout-daily on a later calendar day.
-- Leftover: Send white-on-blue intentional; sibling/product fuel — not another keep-pNN clone.
+Digester stayed empty (0 Werner turns / 7d). Design review still due on Agent Ops / processes / disk-cleanup screenshots. Layout-daily already marked Data Poster + Dark for today. Next soft-state candidate: Disk Cleanup collapsed-glance `.has-scopes-off` still Apple blue on CRT shells (meta-card scopes-off already amber).
 
-Generated: 2026-11-15T21:28:09
