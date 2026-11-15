@@ -1,13 +1,23 @@
 # Morning surprise — 2026-11-15
 
-Overnight autoresearch kept shipping cream/CRT soft-state remaps (design-review polish-without-capture while Mac TCC blocks fresh feature screenshots). Digester stayed empty; layout-daily already marked Data Poster/Dark for the day.
+Overnight Track B (design-review polish-without-capture; Mac TCC / Control Center chip only — no CPU window for `feature-processes.png`).
 
-## Shipped tonight (highlights)
-- **v0.1.2799** — Light / Material / Architect AI Chat `.chat-message.user` Apple `#007aff` → theme `--accent` (match Dark/Neon user bubbles + cream Ollama accents).
-- **v0.1.2798** — Light / Material / Architect Ollama settings popover primary + textarea focus onto theme `--accent`.
-- **v0.1.2797** — Light / Material / Architect Disk Cleanup collapsed-glance scopes-off onto amber (match meta-card).
-- Earlier evening keeps: CRT Disk Cleanup / processes / AI Chat / Agent Ops / Perplexity accent leftovers (2787–2796).
+## Shipped overnight
 
-## Also
-- Nightly 23:00 git flush clean; CI trigger + GitHub release already cut today.
-- Next leftovers: cream Monitors input focus Apple blue if muddy; Neon/Futuristic layout-daily on later calendar days; Mac capture for stale feature-*.png when TCC allows.
+- **v0.1.2800** — Light / Material / Architect `.add-monitor-form input:focus` Apple `#007aff` → theme `--accent` (CRT add-monitor parity).
+- **v0.1.2799** — Light / Material / Architect `.chat-message.user` Apple `#007aff` → theme `--accent`.
+- **v0.1.2798** — Light / Material / Architect Ollama popover primary + textarea focus → theme `--accent`.
+- **v0.1.2797** — Light / Material / Architect Disk Cleanup scopes-off glance → amber.
+- **v0.1.2796** — CRT logs-path + CPU card focus → theme accent.
+- Earlier CRT focus / soft-state remaps (2790–2795).
+
+## Tried / discarded
+
+- Local cream user-bubble attempt raced origin **v0.1.2799** — discard logged; re-picked add-monitor focus → **keep v0.1.2800**.
+- Window-only screenshot for `feature-processes.png`: only Control Center chip / no CPU window id (TCC). Polish-without-capture grace; tracked PNG left alone.
+
+## Next fuel
+
+- Neon / Futuristic layout-daily on a later calendar day
+- Mac capture when TCC allows
+- Send white-on-blue intentional; Swiss add-monitor shared Apple blue intentional
