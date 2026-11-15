@@ -1,21 +1,21 @@
 # Morning surprise — 2026-11-15
 
-Overnight autoresearch kept shipping theme contrast polish (design-review due; digester empty; Mac TCC blocks fresh feature screenshots).
+## Shipped overnight
 
-## Shipped
+- **v0.1.2798** — Light / Material / Architect AI Chat Ollama settings: popover primary + textarea focus leave Apple `#007aff` for theme `--accent` (soft blue / taupe / slate). Matches CRT remaps from earlier tonight. Design-review polish while Mac Screen Recording still blocks a fresh `feature-processes.png`.
 
-- **v0.1.2797** — Light / Material / Architect Disk Cleanup collapsed glance `.has-scopes-off`: leftover Apple `#0a84ff` → amber `#ff9f0a`, matching meta-card scopes-off (CRT remaps were v0.1.2793).
-- **v0.1.2796** — Dark / Neon / Futuristic / Data Poster Debug Log path + CPU card focus rings onto theme accent.
-- Earlier same night: Perplexity hover/weather, Agent Ops insight focus, Disk Cleanup scopes-off (CRT), Neon model-select, Ollama popover, Force Quit disabled, process-row selected, and more CRT accent remaps through the evening window.
+## Also this night (already on main)
 
-## Tried / notes
+- v0.1.2797 Light/Material/Architect Disk Cleanup scopes-off glance → amber
+- v0.1.2796 CRT logs-path + CPU card focus → theme accent
+- Earlier CRT focus / soft-state remaps (2790–2795)
 
-- Digester: empty (0 turns / 7d) — not a surprise by itself.
-- Design review still due (`feature-agent-ops` ~61d, also processes/disk-cleanup/AI Chat) — polish-without-capture on Linux rack.
-- Layout daily: Data Poster + Dark marked today; Neon/Futuristic later calendar days.
-- Sibling harnesses missing on rack.
-- 23:00 flush clean; CI/release already cut today (skipped).
+## Tried / blocked
+
+- Window-only screenshot for `feature-processes.png`: only Control Center chip / no CPU window id (TCC). Polish-without-capture grace; tracked PNG left alone.
 
 ## Next fuel
 
-Neon / Futuristic layout-daily on later days; Mac capture when TCC allows; leftover soft-states (Light/Material/Architect meta-card focus Apple blue is intentional shared chrome; Send white-on-blue intentional).
+- Neon / Futuristic layout-daily on a later calendar day
+- Mac capture when TCC allows
+- Leftover Light/Material/Architect `.chat-message.user` / monitors add-form focus if still muddy Apple blue
