@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2781] - 2026-11-15
+
+### Changed
+- Dark / Futuristic / Data Poster design-review (AI Chat): `.chat-message .markdown pre` remap leftover white 5% fills onto Matrix green / cyan / poster cyan field mixes (`#00ff00` / `#3bd6ff` / `#55c7ff` 5%), matching Neon markdown `pre` accent wash (polish-without-capture while Mac TCC blocks `feature-agent-ops.png` / `feature-ai-chat.png`).
+
 ## [0.1.2780] - 2026-11-15
 
 ### Changed

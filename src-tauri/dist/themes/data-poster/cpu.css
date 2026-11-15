@@ -2363,7 +2363,8 @@ body {
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-message .markdown pre {
-  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
+  /* Opaque poster accent — white 5% lagged Neon markdown pre accent 5% (#14 / P2; design-review AI Chat). */
+  background: color-mix(in srgb, #55c7ff 5%, #0b0b10);
   /* Opaque poster hairline — white 8% lagged model-select / chat-messages 14% (#14 / P2; design-review AI Chat). */
   border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
   border-radius: 8px;
