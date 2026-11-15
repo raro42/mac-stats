@@ -13022,9 +13022,11 @@ body.theme-data-poster #force-quit-process-btn.is-just-saved {
 body.theme-data-poster .process-list-header {
   border-bottom-color: color-mix(in srgb, currentColor 12%, #0b0b10);
 }
+/* OVERNIGHT v0.1.2789: process-row.is-selected Apple #0a84ff → poster accent */
 body.theme-data-poster .process-row.is-selected {
-  background: color-mix(in srgb, #0a84ff 12%, #0b0b10);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #0b0b10);
+  /* Opaque poster accent — Apple #0a84ff lagged is-pinned / focus cyan (#14 / P2; design-review processes). */
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
 }
 /*
  * Data Poster: Agent Ops health strip still mixed Apple #ffffff washes
@@ -30313,23 +30315,26 @@ body.theme-futuristic .logs-toolbar button:focus-visible {
 
 /*
  * Dark / Neon / Futuristic: Top Processes selected row still mixes Apple
- * `#ffffff` (`.process-row.is-selected` background · inset ring) → white slab
- * on opaque shells. Data Poster remapped earlier. Standing P2 #14 after Debug
- * Log toolbar CRT v0.1.2474; design-review `feature-processes` adjacent
+ * `#0a84ff` (`.process-row.is-selected` background · inset ring) on opaque
+ * shells while `.process-row.is-pinned` / `:focus-visible` already sit on
+ * theme accent. Standing P2 #14; design-review `feature-processes` adjacent
  * (polish-without-capture grace; Mac capture deferred — Screen Recording TCC /
- * menu-bar only).
+ * menu-bar only). OVERNIGHT v0.1.2789.
  */
 body.theme-dark .process-row.is-selected {
-  background: color-mix(in srgb, #0a84ff 12%, #0a0a0a);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #0a0a0a);
+  /* Opaque Matrix accent — Apple #0a84ff lagged is-pinned / focus green (#14 / P2; design-review processes). */
+  background: color-mix(in srgb, var(--accent, #00cc66) 12%, #0a0a0a);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
 }
 body.theme-neon .process-row.is-selected {
-  background: color-mix(in srgb, #0a84ff 12%, #08120c);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #08120c);
+  /* Opaque neon accent — Apple #0a84ff lagged is-pinned / focus green (#14 / P2; design-review processes). */
+  background: color-mix(in srgb, var(--accent, #6dff7b) 12%, #08120c);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #6dff7b) 28%, #08120c);
 }
 body.theme-futuristic .process-row.is-selected {
-  background: color-mix(in srgb, #0a84ff 12%, #0b0b10);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #0b0b10);
+  /* Opaque cyan accent — Apple #0a84ff lagged is-pinned / focus cyan (#14 / P2; design-review processes). */
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
 }
 
 /*

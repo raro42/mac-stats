@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2789] - 2026-11-15
+
+### Changed
+- Dark / Neon / Futuristic / Data Poster design-review (Top Processes): `.process-row.is-selected` remaps leftover Apple `#0a84ff` wash/inset ring onto theme accent (Matrix green / neon green / poster·futuristic cyan), matching `.process-row.is-pinned` / `:focus-visible` (polish-without-capture while Mac TCC blocks `feature-processes.png`).
+
 ## [0.1.2788] - 2026-11-15
 
 ### Changed
