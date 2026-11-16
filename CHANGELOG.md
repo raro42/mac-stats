@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2811] - 2026-11-16
+
+### Changed
+- Swiss Minimalistic design-review (AI Chat user bubbles): `.chat-message.user` remaps leftover Apple `#007aff` wash onto theme `--accent` Swiss ink `#121216`, matching Light / Material / Architect after v0.1.2799 (polish-without-capture while Mac TCC blocks `feature-cpu-metrics.png`).
+
 ## [0.1.2810] - 2026-11-16
 
 ### Changed
