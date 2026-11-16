@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2808] - 2026-11-16
+
+### Changed
+- Dark / Neon / Futuristic design-review (AI Chat composer): `.chat-input-container:focus-within` remap leftover Apple `#007aff` fallbacks onto theme `--accent` (Matrix green / neon green / futuristic cyan), matching Data Poster chat focus from v0.1.2804 (polish-without-capture while Mac TCC blocks `feature-ai-chat.png` / `feature-agent-ops.png`).
+
 ## [0.1.2807] - 2026-11-16
 
 ### Changed

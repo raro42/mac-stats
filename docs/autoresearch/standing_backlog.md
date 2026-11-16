@@ -1,8 +1,12 @@
-## Overnight merge — v0.1.2806
+## Overnight merge — v0.1.2808
+
+- Dark / Neon / Futuristic design-review AI Chat composer: `.chat-input-container:focus-within` still used Apple `#007aff` fallbacks on `#0a0a0a` / `#08120c` / `#111123` while Data Poster chat focus and CRT collapse/theme-version already sat on theme `--accent` (cream Top Processes remapped in v0.1.2807; Send white-on-blue intentional; Swiss add-monitor Apple blue intentional). Opaque Matrix green / neon green / futuristic cyan. Standing P2 #14 after cream section focus v0.1.2807; design-review due `feature-agent-ops` (~61d) — polish-without-capture (Mac TCC); digester empty; layout-daily due=false today — Data Poster marked; race-rebased after parallel 2807 cream focus. Next: Neon / Futuristic layout-daily later calendar days / Mac capture for feature-ai-chat when TCC allows, leftover soft-states (Send white-on-blue intentional · Swiss add-monitor Apple blue intentional · Light/Material/Architect `.chat-input-container:focus-within` Apple `#007aff` if muddy), or sibling/product fuel — not another keep-pNN clone.
 
 ## Overnight merge — v0.1.2807
 
 - Cream Top Processes section focus rings: Light/Material/Architect/Swiss collapsible/theme-version/collapse-btn Apple `#007aff` → theme `--accent` (CRT 2806 parity). Next: CRT `.chat-input-container:focus-within` fallbacks.
+
+## Overnight merge — v0.1.2806
 
 - Dark / Neon / Futuristic design-review Agent Ops chrome: `.collapse-btn:focus-visible` and `.theme-version:focus-visible` still used Apple `#007aff` fallbacks on `#0a0a0a` / `#08120c` / `#0b0b10` while `.icon-line-item:focus-visible` / `.icon-btn:focus-visible` and Data Poster collapse/theme-version already sat on theme `--accent` (Data Poster menus remapped in v0.1.2805; Send white-on-blue intentional; Swiss add-monitor Apple blue intentional). Opaque Matrix green / neon green / futuristic cyan. Standing P2 #14 after Data Poster chrome v0.1.2805; design-review due `feature-agent-ops` (~61d) — polish-without-capture (Mac TCC); digester empty; layout-daily due=false today — Data Poster marked. Next: Neon / Futuristic layout-daily later calendar days / Mac capture for feature-agent-ops when TCC allows, leftover soft-states (Send white-on-blue intentional · Swiss add-monitor Apple blue intentional · Dark/Neon/Futuristic `.chat-input-container:focus-within` Apple `#007aff` if muddy), or sibling/product fuel — not another keep-pNN clone.
 ## Overnight merge — v0.1.2805

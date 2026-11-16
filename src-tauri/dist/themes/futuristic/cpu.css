@@ -2471,9 +2471,10 @@ body {
 }
 
 .chat-input-container:focus-within {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #111123);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 12%, #111123);
-  background: color-mix(in srgb, var(--accent, #007aff) 5%, #111123);
+  /* Opaque cyan accent — Apple #007aff lagged --accent / Data Poster chat focus (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 28%, #111123);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #3bd6ff) 12%, #111123);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 5%, #111123);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
