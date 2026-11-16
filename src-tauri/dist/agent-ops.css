@@ -1315,13 +1315,19 @@ body.theme-futuristic .perplexity-filter-chip[data-perplexity-filter='snippet'].
   background: color-mix(in srgb, #34c759 20%, #0b0b10);
   border-color: color-mix(in srgb, #34c759 40%, #0b0b10);
 }
-body.theme-data-poster #chat-input:focus,
-body.theme-dark #chat-input:focus {
+body.theme-data-poster #chat-input:focus {
   border-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
   box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 22%, #0b0b10);
   background: color-mix(in srgb, currentColor 6%, #0b0b10);
   /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-dark #chat-input:focus {
+  /* Opaque Matrix accent — shared poster cyan #55c7ff lagged --accent / cpu.css + chat-input-container (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 6%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
 }
 
 /*
@@ -24348,8 +24354,9 @@ body.theme-futuristic .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
 }
 
 body.theme-dark #chat-input:focus {
-  border-color: color-mix(in srgb, #55c7ff 55%, #0a0a0a);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 22%, #0a0a0a);
+  /* Opaque Matrix accent — late CRT block still hard-coded poster cyan #55c7ff (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
   background: color-mix(in srgb, currentColor 6%, #0a0a0a);
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
 }

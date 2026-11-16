@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2814] - 2026-11-16
+
+### Fixed
+- Dark design-review (AI Chat composer): `body.theme-dark #chat-input:focus` in `agent-ops.css` no longer shares Data Poster cyan `#55c7ff` on `#0b0b10`. It remaps onto theme `--accent` Matrix green `#00cc66` mixed against Dark shell `#0a0a0a`, matching Dark `cpu.css` `#chat-input:focus` and `.chat-input-container:focus-within` from v0.1.2808 (polish-without-capture while Mac TCC blocks `feature-ai-chat.png` / `feature-agent-ops.png`).
+
 ## [0.1.2813] - 2026-11-16
 
 ### Fixed
