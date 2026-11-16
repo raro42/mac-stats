@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2818] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (Agent Ops expanded): overview cards, empty/Clear CTAs, filter input/match/clear, and file tabs remap leftover poster cyan `#55c7ff` fallbacks onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon Agent Ops accent parity and Futuristic AI Chat remaps from v0.1.2816/2817 (polish-without-capture while Mac TCC blocks `feature-agent-ops.png`).
+
 ## [0.1.2817] - 2026-11-16
 
 ### Fixed
