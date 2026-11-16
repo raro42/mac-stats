@@ -15193,15 +15193,16 @@ body.theme-neon .ops-runs-lane-chip[data-ops-runs-lane='fail'].is-active {
  * (Sessions All·Live·Files · Agents All·On·Off · Schedules All·Jobs·Deliveries ·
  *  Knowledge All·Discord·Core · Runs All·Instant·Lite·Direct·Slow·Fail + Clear)
  * → white slab on #0b0b10. Design-review fuel (feature-agent-ops) + standing P2 #14 after filter/tabs in v0.1.2353 (Data Poster parity).
- * Mac capture deferred (Screen Recording TCC / screencapture -l).
+ * Accent fallbacks remapped poster #55c7ff → theme --accent #3bd6ff (v0.1.2819;
+ * Neon kind-filter #6dff7b parity). Mac capture deferred (TCC).
  */
 body.theme-futuristic .ops-session-kind-filter-clear,
 body.theme-futuristic .ops-agents-enabled-filter-clear,
 body.theme-futuristic .ops-schedules-kind-filter-clear,
 body.theme-futuristic .ops-memory-kind-filter-clear,
 body.theme-futuristic .ops-runs-lane-filter-clear {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 10%, #0b0b10);
   color: color-mix(in srgb, #ffffff 81%, #0b0b10);
 }
 body.theme-futuristic .ops-session-kind-filter-clear:hover,
@@ -15210,15 +15211,15 @@ body.theme-futuristic .ops-schedules-kind-filter-clear:hover,
 body.theme-futuristic .ops-memory-kind-filter-clear:hover,
 body.theme-futuristic .ops-runs-lane-filter-clear:hover {
   color: color-mix(in srgb, #ffffff 88%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 44%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 44%, #0b0b10);
 }
 body.theme-futuristic .ops-session-kind-filter-clear:focus-visible,
 body.theme-futuristic .ops-agents-enabled-filter-clear:focus-visible,
 body.theme-futuristic .ops-schedules-kind-filter-clear:focus-visible,
 body.theme-futuristic .ops-memory-kind-filter-clear:focus-visible,
 body.theme-futuristic .ops-runs-lane-filter-clear:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 20%, #0b0b10);
 }
 body.theme-futuristic .ops-session-kind-filter-clear.is-just-saved,
 body.theme-futuristic .ops-agents-enabled-filter-clear.is-just-saved,
@@ -15251,7 +15252,7 @@ body.theme-futuristic .ops-agents-enabled-chip:focus-visible,
 body.theme-futuristic .ops-schedules-kind-chip:focus-visible,
 body.theme-futuristic .ops-memory-kind-chip:focus-visible,
 body.theme-futuristic .ops-runs-lane-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 20%, #0b0b10);
 }
 body.theme-futuristic .ops-session-kind-chip.is-active,
 body.theme-futuristic .ops-agents-enabled-chip.is-active,
@@ -15259,8 +15260,8 @@ body.theme-futuristic .ops-schedules-kind-chip.is-active,
 body.theme-futuristic .ops-memory-kind-chip.is-active,
 body.theme-futuristic .ops-runs-lane-chip.is-active {
   color: color-mix(in srgb, #ffffff 88%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 32%, #0b0b10);
 }
 body.theme-futuristic .ops-session-kind-count,
 body.theme-futuristic .ops-agents-enabled-count,
@@ -15286,12 +15287,12 @@ body.theme-futuristic .ops-session-kind-chip[data-ops-session-kind='live'].is-ac
   border-color: color-mix(in srgb, #30d158 36%, #0b0b10);
 }
 body.theme-futuristic .ops-session-kind-chip[data-ops-session-kind='files'].has-hits {
-  background: color-mix(in srgb, #55c7ff 12%, #0b0b10);
-  border-color: color-mix(in srgb, #55c7ff 28%, #0b0b10);
+  background: color-mix(in srgb, #3bd6ff 12%, #0b0b10);
+  border-color: color-mix(in srgb, #3bd6ff 28%, #0b0b10);
 }
 body.theme-futuristic .ops-session-kind-chip[data-ops-session-kind='files'].is-active {
-  background: color-mix(in srgb, #55c7ff 18%, #0b0b10);
-  border-color: color-mix(in srgb, #55c7ff 36%, #0b0b10);
+  background: color-mix(in srgb, #3bd6ff 18%, #0b0b10);
+  border-color: color-mix(in srgb, #3bd6ff 36%, #0b0b10);
 }
 /* Agents On / Off */
 body.theme-futuristic .ops-agents-enabled-chip[data-ops-agents-enabled='on'].has-hits {
@@ -15320,12 +15321,12 @@ body.theme-futuristic .ops-schedules-kind-chip[data-ops-schedules-kind='jobs'].i
   border-color: color-mix(in srgb, #30d158 36%, #0b0b10);
 }
 body.theme-futuristic .ops-schedules-kind-chip[data-ops-schedules-kind='deliveries'].has-hits {
-  background: color-mix(in srgb, #55c7ff 12%, #0b0b10);
-  border-color: color-mix(in srgb, #55c7ff 28%, #0b0b10);
+  background: color-mix(in srgb, #3bd6ff 12%, #0b0b10);
+  border-color: color-mix(in srgb, #3bd6ff 28%, #0b0b10);
 }
 body.theme-futuristic .ops-schedules-kind-chip[data-ops-schedules-kind='deliveries'].is-active {
-  background: color-mix(in srgb, #55c7ff 18%, #0b0b10);
-  border-color: color-mix(in srgb, #55c7ff 36%, #0b0b10);
+  background: color-mix(in srgb, #3bd6ff 18%, #0b0b10);
+  border-color: color-mix(in srgb, #3bd6ff 36%, #0b0b10);
 }
 /* Knowledge Discord / Core */
 body.theme-futuristic .ops-memory-kind-chip[data-ops-memory-kind='discord'].has-hits {
@@ -15337,12 +15338,12 @@ body.theme-futuristic .ops-memory-kind-chip[data-ops-memory-kind='discord'].is-a
   border-color: color-mix(in srgb, #30d158 36%, #0b0b10);
 }
 body.theme-futuristic .ops-memory-kind-chip[data-ops-memory-kind='core'].has-hits {
-  background: color-mix(in srgb, #55c7ff 12%, #0b0b10);
-  border-color: color-mix(in srgb, #55c7ff 28%, #0b0b10);
+  background: color-mix(in srgb, #3bd6ff 12%, #0b0b10);
+  border-color: color-mix(in srgb, #3bd6ff 28%, #0b0b10);
 }
 body.theme-futuristic .ops-memory-kind-chip[data-ops-memory-kind='core'].is-active {
-  background: color-mix(in srgb, #55c7ff 18%, #0b0b10);
-  border-color: color-mix(in srgb, #55c7ff 36%, #0b0b10);
+  background: color-mix(in srgb, #3bd6ff 18%, #0b0b10);
+  border-color: color-mix(in srgb, #3bd6ff 36%, #0b0b10);
 }
 /* Runs Instant · Lite · Direct · Slow · Fail */
 body.theme-futuristic .ops-runs-lane-chip[data-ops-runs-lane='instant'].has-hits {
@@ -15354,12 +15355,12 @@ body.theme-futuristic .ops-runs-lane-chip[data-ops-runs-lane='instant'].is-activ
   border-color: color-mix(in srgb, #30d158 36%, #0b0b10);
 }
 body.theme-futuristic .ops-runs-lane-chip[data-ops-runs-lane='lite'].has-hits {
-  background: color-mix(in srgb, #55c7ff 12%, #0b0b10);
-  border-color: color-mix(in srgb, #55c7ff 28%, #0b0b10);
+  background: color-mix(in srgb, #3bd6ff 12%, #0b0b10);
+  border-color: color-mix(in srgb, #3bd6ff 28%, #0b0b10);
 }
 body.theme-futuristic .ops-runs-lane-chip[data-ops-runs-lane='lite'].is-active {
-  background: color-mix(in srgb, #55c7ff 18%, #0b0b10);
-  border-color: color-mix(in srgb, #55c7ff 36%, #0b0b10);
+  background: color-mix(in srgb, #3bd6ff 18%, #0b0b10);
+  border-color: color-mix(in srgb, #3bd6ff 36%, #0b0b10);
 }
 body.theme-futuristic .ops-runs-lane-chip[data-ops-runs-lane='direct'].has-hits {
   background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
@@ -31398,8 +31399,9 @@ body.theme-futuristic .ops-close-btn:focus-visible {
   outline: none;
   color: color-mix(in srgb, #ffffff 88%, #0b0b10);
   background: color-mix(in srgb, currentColor 8%, #0b0b10);
-  border-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
+  /* Opaque futuristic cyan — bare poster #55c7ff lagged --accent after Agent Ops v0.1.2818 (#14 / P2). */
+  border-color: color-mix(in srgb, #3bd6ff 55%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #3bd6ff 18%, #0b0b10);
 }
 
 /*

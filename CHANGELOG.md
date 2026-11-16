@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2819] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (Agent Ops kind-filter + Close): leftover poster cyan `#55c7ff` on Sessions/Agents/Schedules/Knowledge/Runs kind-filter Clear/active chips (and Files/Deliveries/Core/Lite accents) plus `.ops-close-btn:focus-visible` remaps onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon kind-filter `#6dff7b` parity and Agent Ops overview remaps from v0.1.2818 (polish-without-capture while Mac TCC blocks `feature-agent-ops.png`).
+
 ## [0.1.2818] - 2026-11-16
 
 ### Fixed
