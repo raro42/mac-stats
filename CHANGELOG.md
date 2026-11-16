@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2828] - 2026-11-16
+
+### Fixed
+- Data Poster / Dark / Neon / Futuristic design-review (Monitors / Processes / Disk Cleanup / About / Settings focus): leftover Apple `#0a84ff` on monitor URL/detail, process + disk-cleanup path focus, Disk Cleanup toolbar secondary focus rings, changelog focus, and Settings/Ollama header focus remaps onto theme `--accent` (poster cyan `#55c7ff` / Matrix `#00cc66` / neon `#6dff7b` / futuristic `#3bd6ff`), matching other CRT focus remaps after filter-miss/clear/collapsed-glance v0.1.2827 (polish-without-capture while Mac TCC blocks capture).
+
 ## [0.1.2827] - 2026-11-16
 
 ### Fixed

@@ -30770,21 +30770,22 @@ body.theme-futuristic .monitor-remove-btn:focus-visible {
  * feature-monitors adjacent (polish-without-capture; Mac capture TCC-blocked).
  */
 /* OVERNIGHT v0.1.2521: monitors URL/detail focus CRT */
+/* OVERNIGHT v0.1.2828: Apple #0a84ff → theme --accent (poster/Matrix/neon/futuristic). */
 body.theme-data-poster .monitor-url:focus-visible,
 body.theme-data-poster button.monitor-detail-url:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
 }
 body.theme-dark .monitor-url:focus-visible,
 body.theme-dark button.monitor-detail-url:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #0a0a0a);
+  outline-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
 }
 body.theme-neon .monitor-url:focus-visible,
 body.theme-neon button.monitor-detail-url:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #08120c);
+  outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
 }
 body.theme-futuristic .monitor-url:focus-visible,
 body.theme-futuristic button.monitor-detail-url:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
 
 body.theme-data-poster .monitor-detail-remove:focus-visible {
@@ -30810,33 +30811,34 @@ body.theme-futuristic .monitor-detail-remove:focus-visible {
  * Mac capture TCC-blocked).
  */
 /* OVERNIGHT v0.1.2522: processes + disk-cleanup path focus CRT */
+/* OVERNIGHT v0.1.2828: Apple #0a84ff → theme --accent (poster/Matrix/neon/futuristic). */
 body.theme-data-poster .process-name:focus-visible,
 body.theme-data-poster .process-detail-name:focus-visible,
 body.theme-data-poster .process-detail-pid:focus-visible,
 body.theme-data-poster .disk-cleanup-item-path:focus-visible,
 body.theme-data-poster .disk-cleanup-scope-path:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
 }
 body.theme-dark .process-name:focus-visible,
 body.theme-dark .process-detail-name:focus-visible,
 body.theme-dark .process-detail-pid:focus-visible,
 body.theme-dark .disk-cleanup-item-path:focus-visible,
 body.theme-dark .disk-cleanup-scope-path:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #0a0a0a);
+  outline-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
 }
 body.theme-neon .process-name:focus-visible,
 body.theme-neon .process-detail-name:focus-visible,
 body.theme-neon .process-detail-pid:focus-visible,
 body.theme-neon .disk-cleanup-item-path:focus-visible,
 body.theme-neon .disk-cleanup-scope-path:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #08120c);
+  outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
 }
 body.theme-futuristic .process-name:focus-visible,
 body.theme-futuristic .process-detail-name:focus-visible,
 body.theme-futuristic .process-detail-pid:focus-visible,
 body.theme-futuristic .disk-cleanup-item-path:focus-visible,
 body.theme-futuristic .disk-cleanup-scope-path:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
 
 /*
@@ -30848,17 +30850,18 @@ body.theme-futuristic .disk-cleanup-scope-path:focus-visible {
  * capture TCC-blocked).
  */
 /* OVERNIGHT v0.1.2523: disk-cleanup toolbar secondary focus CRT */
+/* OVERNIGHT v0.1.2828: Apple #0a84ff → theme --accent (poster/Matrix/neon/futuristic). */
 body.theme-data-poster .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
 }
 body.theme-dark .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
 }
 body.theme-neon .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #08120c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 22%, #08120c);
 }
 body.theme-futuristic .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
 }
 
 /*
@@ -31135,25 +31138,26 @@ body.theme-futuristic #mac-stats-update-banner a {
  * adjacent (polish-without-capture; Mac capture TCC-blocked).
  */
 /* OVERNIGHT v0.1.2528: changelog focus CRT */
+/* OVERNIGHT v0.1.2828: Apple #0a84ff → theme --accent (poster/Matrix/neon/futuristic). */
 body.theme-data-poster .changelog-h2[tabindex]:focus,
 body.theme-data-poster .changelog-loading[tabindex]:focus,
 body.theme-data-poster .changelog-error[tabindex]:focus {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
 }
 body.theme-dark .changelog-h2[tabindex]:focus,
 body.theme-dark .changelog-loading[tabindex]:focus,
 body.theme-dark .changelog-error[tabindex]:focus {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #0a0a0a);
+  outline-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
 }
 body.theme-neon .changelog-h2[tabindex]:focus,
 body.theme-neon .changelog-loading[tabindex]:focus,
 body.theme-neon .changelog-error[tabindex]:focus {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #08120c);
+  outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
 }
 body.theme-futuristic .changelog-h2[tabindex]:focus,
 body.theme-futuristic .changelog-loading[tabindex]:focus,
 body.theme-futuristic .changelog-error[tabindex]:focus {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
 
 /*
@@ -31164,21 +31168,22 @@ body.theme-futuristic .changelog-error[tabindex]:focus {
  * (polish-without-capture; Mac capture TCC-blocked).
  */
 /* OVERNIGHT v0.1.2529: settings/ollama header focus CRT */
+/* OVERNIGHT v0.1.2828: Apple #0a84ff → theme --accent (poster/Matrix/neon/futuristic). */
 body.theme-data-poster .settings-header h2[tabindex]:focus,
 body.theme-data-poster .ollama-settings-popover .popover-header h3[tabindex]:focus {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
 }
 body.theme-dark .settings-header h2[tabindex]:focus,
 body.theme-dark .ollama-settings-popover .popover-header h3[tabindex]:focus {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #0a0a0a);
+  outline-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
 }
 body.theme-neon .settings-header h2[tabindex]:focus,
 body.theme-neon .ollama-settings-popover .popover-header h3[tabindex]:focus {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #08120c);
+  outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
 }
 body.theme-futuristic .settings-header h2[tabindex]:focus,
 body.theme-futuristic .ollama-settings-popover .popover-header h3[tabindex]:focus {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
 
 /*
