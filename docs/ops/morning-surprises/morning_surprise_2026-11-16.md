@@ -1,22 +1,20 @@
-# Morning surprise — 2026-11-16
+# Morning surprise  -  2026-11-16
 
-Overnight Track B (product) kept shipping Futuristic accent parity while digester stayed empty and Mac TCC blocked screenshots.
+Overnight autoresearch kept **v0.1.2822** (and earlier tonight through **v0.1.2821**).
 
-## Shipped tonight (highlights)
+## Shipped
+- **v0.1.2822**  -  Data Poster / Dark / Neon / Futuristic CPU metrics: metric-strip flash highlights + history sparkline focus Apple `#0a84ff` → theme `--accent`; Futuristic `#cpu-usage-card` / `.logs-path-hint` focus poster cyan `#55c7ff` → `#3bd6ff`. Design-review `feature-cpu-metrics` polish-without-capture (Mac TCC).
+- **v0.1.2821**  -  Futuristic empty chips + Perplexity filter + ops-health onto `#3bd6ff`.
+- **v0.1.2820**  -  Futuristic Top Processes onto `#3bd6ff`.
+- Earlier same night: Futuristic Agent Ops / soft-states / chat-input / Swiss remaps (see CHANGELOG 2810-2819).
 
-- **v0.1.2821** — Futuristic AI Chat empty chips + Perplexity filter + Agent Ops health: poster cyan `#55c7ff` → theme `--accent` `#3bd6ff` (Neon `#6dff7b` parity).
-- **v0.1.2820** — Futuristic Top Processes attention / filter / Clear / miss / pinned / selected onto `#3bd6ff`.
-- **v0.1.2819** — Futuristic Agent Ops kind-filter Clear/active + Close focus onto `#3bd6ff`.
-- Earlier same night: soft-states, chat-input, Swiss/cream remaps through **v0.1.2815–2818**.
+## Tried / context
+- Digester empty (0 turns / 7d). Sibling OpenClaw/Hermes missing on rack.
+- Layout-daily due=false (Data Poster marked today). Debug.log quiet.
+- Mac window-only screenshots still TCC-blocked; grace marked `feature-cpu-metrics`.
 
-## What we tried / process
-
-- Digester open: empty all night → standing P2 #14 design-review leftovers (not quiet-default).
-- Design-review: polish-without-capture (Mac TCC); grace marks on stale surfaces.
-- Layout-daily: Data Poster marked earlier; Dark waits for next calendar day.
-
-## Next
-
-- Dark layout-daily next calendar day.
-- Mac capture when TCC allows (`feature-processes` / `feature-ai-chat` / `feature-agent-ops`).
-- Leftover Futuristic `#55c7ff` fallbacks if muddy; sibling/product fuel — not keep-pNN clones.
+## Next fuel
+- Disk Cleanup STALE / Futuristic ops-row / runs Lite `#55c7ff` if muddy
+- Dark layout-daily next calendar day
+- Mac capture when TCC allows
+- Send white-on-blue intentional  -  not another keep-pNN clone
