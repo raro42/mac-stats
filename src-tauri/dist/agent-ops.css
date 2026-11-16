@@ -1605,8 +1605,9 @@ body.theme-futuristic .chat-offline-attention-glance.is-offline {
   background: color-mix(in srgb, #ff9500 12%, #0b0b10);
 }
 body.theme-futuristic .chat-turn-glance.is-active {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon turn active (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 14%, #0b0b10);
 }
 body.theme-futuristic .chat-empty {
   border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
@@ -30471,7 +30472,8 @@ body.theme-futuristic .chat-model-glance:focus-visible,
 body.theme-futuristic .chat-turn-glance:focus-visible,
 body.theme-futuristic .chat-answer-glance:focus-visible,
 body.theme-futuristic .chat-errors-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon glance focus (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 45%, #0b0b10);
 }
 body.theme-futuristic .chat-model-glance.is-online,
 body.theme-futuristic .chat-turn-glance.is-ok:not(.is-active),
@@ -30486,8 +30488,9 @@ body.theme-futuristic .chat-model-glance.is-offline.is-circuit {
   background: color-mix(in srgb, #ff9500 7%, #0b0b10);
 }
 body.theme-futuristic .chat-turn-glance.is-active {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 8%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon turn active (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 8%, #0b0b10);
 }
 body.theme-futuristic .chat-answer-glance.has-errors,
 body.theme-futuristic .chat-errors-glance.has-errors {
@@ -30556,7 +30559,8 @@ body.theme-futuristic .chat-offline-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
 }
 body.theme-futuristic .chat-offline-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon offline soft-states (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 45%, #0b0b10);
 }
 body.theme-futuristic .chat-offline-attention-glance.is-offline,
 body.theme-futuristic .chat-offline-attention-glance.is-circuit,
@@ -30575,16 +30579,16 @@ body.theme-futuristic .chat-offline-attention-glance.is-last-answer {
   background: color-mix(in srgb, #34c759 7%, #0b0b10);
 }
 body.theme-futuristic .chat-offline-attention-glance.is-continue {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 7%, #0b0b10);
 }
 body.theme-futuristic .chat-offline-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 24%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 5.5%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 24%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 5.5%, #0b0b10);
 }
 body.theme-futuristic .chat-offline-attention-glance.is-sending {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 38%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 38%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 10%, #0b0b10);
 }
 body.theme-futuristic .chat-offline-attention-glance.is-just-copied {
   border-color: color-mix(in srgb, #34c759 42%, #0b0b10);

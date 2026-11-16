@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2830] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (AI Chat glance soft-states): leftover poster cyan `#55c7ff` fallbacks on chat model/turn/answer/errors glance focus, turn active, and offline-attention (focus/continue/filter/sending) remap onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon `#6dff7b` / Dark Matrix soft-state parity after Dark/Neon soft-states v0.1.2829 (polish-without-capture while Mac TCC blocks capture).
+
 ## [0.1.2829] - 2026-11-16
 
 ### Fixed
