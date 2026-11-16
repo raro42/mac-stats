@@ -240,9 +240,10 @@ body {
 }
 
 .collapsible-header:focus-visible {
+  /* Opaque Material accent — Apple #007aff lagged --accent / CRT collapsible (#14 / P2; design-review processes). */
   outline: none;
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, #ebe4d9);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 8%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
 }
 
 .metric-label {
@@ -557,7 +558,8 @@ body {
 }
 
 .theme-version:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
+  /* Opaque Material accent — Apple #007aff lagged --accent / CRT theme-version (#14 / P2; design-review processes). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
   outline-offset: 2px;
 }
 
@@ -1487,7 +1489,8 @@ body {
 }
 
 .collapse-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
+  /* Opaque Material accent — Apple #007aff lagged --accent / CRT collapse-btn (#14 / P2; design-review processes). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
   outline-offset: 2px;
   color: var(--text);
 }

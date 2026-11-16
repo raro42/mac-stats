@@ -208,9 +208,10 @@ body {
 }
 
 .collapsible-header:focus-visible {
+  /* Opaque Swiss accent — Apple #007aff lagged --accent / CRT collapsible (#14 / P2; design-review processes). */
   outline: none;
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, #ffffff);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 8%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
 }
 
 .metric-label {
@@ -1060,7 +1061,8 @@ body {
 }
 
 .theme-version:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  /* Opaque Swiss accent — Apple #007aff lagged --accent / CRT theme-version (#14 / P2; design-review processes). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;
 }
 
@@ -1579,7 +1581,8 @@ body {
 }
 
 .collapse-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  /* Opaque Swiss accent — Apple #007aff lagged --accent / CRT collapse-btn (#14 / P2; design-review processes). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;
   color: var(--text);
 }

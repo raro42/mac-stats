@@ -275,9 +275,10 @@ body {
 }
 
 .collapsible-header:focus-visible {
+  /* Opaque Architect accent — Apple #007aff lagged --accent / CRT collapsible (#14 / P2; design-review processes). */
   outline: none;
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, #f1f1f1);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 8%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
 }
 
 .metric-box::before {
@@ -1462,7 +1463,8 @@ body {
 }
 
 .collapse-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff lagged --accent / CRT collapse-btn (#14 / P2; design-review processes). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
   outline-offset: 2px;
   color: var(--text);
 }

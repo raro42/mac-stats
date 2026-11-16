@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2807] - 2026-11-16
+
+### Changed
+- Light / Material / Architect / Swiss Minimalistic design-review (Top Processes section chrome): `.collapsible-header:focus-visible`, `.theme-version:focus-visible` (where present), and `.collapse-btn:focus-visible` remap leftover Apple `#007aff` outline fallbacks onto theme `--accent` (Light soft blue / Material taupe / Architect slate / Swiss ink), matching Dark / Neon / Futuristic after v0.1.2806 (polish-without-capture while Mac TCC blocks `feature-processes.png`).
+
 ## [0.1.2806] - 2026-11-16
 
 ### Fixed
