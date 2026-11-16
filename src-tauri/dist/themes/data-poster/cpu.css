@@ -253,8 +253,9 @@ body {
 
 .collapsible-header:focus-visible {
   outline: none;
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, #0b0b10);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, #0b0b10);
+  /* Opaque poster accent — Apple #007aff lagged --accent / Neon collapsible (#14 / P2; layout-daily). */
+  background: color-mix(in srgb, var(--accent, #55c7ff) 8%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
 }
 
 .metric-label {
@@ -515,7 +516,8 @@ body {
 }
 
 .theme-version:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #0b0b10);
+  /* Opaque poster accent — Apple #007aff lagged --accent / icon-btn cyan (#14 / P2; layout-daily). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
   outline-offset: 2px;
 }
 
@@ -1526,7 +1528,8 @@ body {
 }
 
 .monitors-menu-item:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #0b0b10);
+  /* Opaque poster accent — Apple #007aff lagged --accent / Neon monitors menu (#14 / P2; layout-daily). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
   outline-offset: -2px;
   background: color-mix(in srgb, #ffffff 8%, #0b0b10);
 }
@@ -1599,7 +1602,8 @@ body {
 }
 
 .monitors-settings-popover .popover-close:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #0b0b10);
+  /* Opaque poster accent — Apple #007aff lagged --accent / collapse-btn cyan (#14 / P2; layout-daily). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
   outline-offset: 2px;
   color: var(--text, var(--ink, inherit));
 }
@@ -1979,7 +1983,8 @@ body {
 }
 
 .ollama-menu-item:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #0b0b10);
+  /* Opaque poster accent — Apple #007aff lagged --accent / Neon ollama menu (#14 / P2; layout-daily). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
   outline-offset: -2px;
   background: color-mix(in srgb, #ffffff 8%, #0b0b10);
 }
@@ -2048,7 +2053,8 @@ body {
 }
 
 .ollama-settings-popover .popover-close:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #0b0b10);
+  /* Opaque poster accent — Apple #007aff lagged --accent / collapse-btn cyan (#14 / P2; layout-daily). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
   outline-offset: 2px;
   color: var(--text, var(--ink, inherit));
 }

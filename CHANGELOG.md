@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2805] - 2026-11-16
+
+### Changed
+- Data Poster layout-daily (Monitors / AI Chat menus + section chrome): `.collapsible-header:focus-visible`, `.theme-version:focus-visible`, `.monitors-menu-item:focus-visible`, Monitors/Ollama popover close focus, and `.ollama-menu-item:focus-visible` remap leftover Apple `#007aff` outline fallbacks onto poster `--accent` cyan `#55c7ff`, matching Neon menu focus and Data Poster collapse/icon-btn rings (Linux rack; Mac window capture still blocked by TCC).
+
 ## [0.1.2804] - 2026-11-16
 
 ### Changed
