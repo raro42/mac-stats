@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2832] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (Perplexity / Settings / logs glances): leftover poster cyan `#55c7ff` fallbacks on logs/perplexity/perplexity-key attention focus + is-filter, logs-error-glance focus, perplexity-last-glance focus/has-results/is-searching, and Settings credential attention focus remap onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon `#6dff7b` after Monitors/Ops/Disk attention v0.1.2831 (polish-without-capture while Mac TCC blocks capture).
+
 ## [0.1.2831] - 2026-11-16
 
 ### Fixed
