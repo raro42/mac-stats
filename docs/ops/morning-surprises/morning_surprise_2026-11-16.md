@@ -1,19 +1,20 @@
 # Morning surprise — 2026-11-16
 
-Overnight autoresearch (Track B) kept product CSS accents moving. Digester open stayed empty; design-review stayed in grace (Mac TCC); layout-daily already marked Data Poster for the day.
+Overnight autoresearch (Track B) kept product CSS polish through the evening window.
 
 ## Shipped
 
-- **v0.1.2829** — Dark / Neon AI Chat + Monitors soft-states: poster cyan `#55c7ff` → Matrix `#00cc66` / neon `#6dff7b` (collapsed glances + chat-offline + chat glances).
-- **v0.1.2830** — Futuristic AI Chat glance soft-states: poster cyan `#55c7ff` → theme `--accent` `#3bd6ff` (model/turn/answer/errors focus, turn active, offline continue/filter/sending).
-- **v0.1.2831** — Futuristic Monitors / Ops / Disk Cleanup attention + filter glances: poster cyan `#55c7ff` → `#3bd6ff` (Neon / Processes parity).
+- **v0.1.2832** — Futuristic Perplexity / Settings / Debug Log attention glances: poster cyan `#55c7ff` → theme `--accent` `#3bd6ff` (Neon `#6dff7b` parity).
+- **v0.1.2831** — Futuristic Monitors / Agent Ops / Disk Cleanup attention + filter glances → `#3bd6ff`.
+- **v0.1.2830** — Futuristic AI Chat glance soft-states → `#3bd6ff`.
+- **v0.1.2829** — Dark / Neon AI Chat + Monitors soft-states → Matrix / neon green.
 
-## Tried / discarded
+## Fuel notes
 
-- Race discards earlier in the night (local version collisions with origin) already logged in `results.tsv` for 2814/2822/2826 clones — re-picked as keeps.
+- Digester open stayed empty; design-review due=false (Mac TCC polish-without-capture); layout-daily Data Poster already marked for the calendar day.
+- Standing P2 #14 CRT accent remaps — not quiet-default.
 
-## Next fuel
+## Next
 
-- Dark layout-daily next calendar day.
-- Mac capture when TCC allows.
-- Leftover Futuristic `#55c7ff` (Perplexity / Settings help / logs glances) if still muddy — not keep-pNN clones.
+- Dark layout-daily on the next calendar day.
+- Leftover Futuristic `#55c7ff` soft-states (ops-row selected / ops-badge / ops-updated-ago) or sibling/product fuel.

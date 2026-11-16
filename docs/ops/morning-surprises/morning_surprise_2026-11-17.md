@@ -1,17 +1,14 @@
-# Morning surprise — 2026-11-17
+# Morning surprise — 2026-11-17 (draft overnight)
 
-Overnight autoresearch (Track B) kept Futuristic attention accents moving. Digester open stayed empty; design-review stayed in grace (Mac TCC); layout-daily already marked Data Poster for 2026-11-16.
+Overnight window still open after ~21:20 CET keep.
 
-## Shipped
+## Shipped so far (into this night)
 
-- **v0.1.2831** — Futuristic Monitors / Agent Ops / Disk Cleanup attention + filter glances: poster cyan `#55c7ff` → theme `--accent` `#3bd6ff` (Monitors attention + filter-attention, Ops signal + Discord filter attention, Disk Cleanup filter-attention). Neon `#6dff7b` / Processes `#3bd6ff` parity.
+- **v0.1.2832** — Futuristic Perplexity / Settings / logs glances `#55c7ff` → `#3bd6ff`.
+- Earlier same calendar day: **v0.1.2829–2831** Dark/Neon soft-states + Futuristic AI Chat / Monitors-Ops-Disk attention remaps.
 
-## Tried / discarded
+## Next ticks
 
-- None this window yet (first keep of the 20:00–06:00 night).
-
-## Next fuel
-
-- Dark layout-daily next calendar day.
-- Mac capture when TCC allows.
-- Leftover Futuristic `#55c7ff` (Perplexity / Settings help / logs glances) if still muddy — not keep-pNN clones.
+- Continue standing leftover CRT accents or sibling/product fuel.
+- Dark layout-daily waits for the next calendar day.
+- Refresh this note before ~05:50 with the full night keep/discard set.
