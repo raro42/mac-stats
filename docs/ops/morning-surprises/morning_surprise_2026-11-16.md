@@ -1,18 +1,28 @@
 # Morning surprise — 2026-11-16
 
-## Shipped overnight
+Overnight autoresearch (Track B) kept shipping Futuristic CRT accent remaps.
 
-- **v0.1.2835** — Futuristic chat Clear focus, Debug Log / rings filter chips (focus + active), and Settings AI·help attention glances: poster cyan `#55c7ff` → theme `--accent` `#3bd6ff` (Neon parity).
+## Shipped tonight (latest)
 
-## Also this window (earlier ticks)
+- **v0.1.2836** — Futuristic Perplexity  (hover / focus / selected / is-top) + : poster cyan  → theme   (Neon  parity). Standing P2 #14 after chat-clear / Settings v0.1.2835.
 
-- v0.1.2834 — Futuristic Agent Ops insight-line focus/selected
-- v0.1.2833 — Futuristic Agent Ops selected/badge/Updated ago
-- v0.1.2832 — Futuristic Perplexity/Settings/logs glances
-- v0.1.2831 — Futuristic Monitors/Ops/Disk attention
-- v0.1.2830 — Futuristic AI Chat glance soft-states
-- v0.1.2829 — Dark/Neon AI Chat+Monitors soft-states
+## Also tonight
 
-## Fuel note
+- **v0.1.2835** — chat Clear + logs·rings filter chips + Settings AI·help glances → 
+- **v0.1.2834** — Agent Ops insight-line focus/selected → 
+- **v0.1.2833** — ops-row selected / badge / Updated ago → 
+- **v0.1.2832** — Perplexity / Settings / logs glances → 
+- Earlier: 2831…2829 Monitors/Ops/Disk attention, AI Chat glances, Dark/Neon soft-states
 
-Digester open stayed empty. Design-review due=false (grace). Layout-daily already marked Data Poster today. Standing P2 #14 CRT accent remaps continue; next leftovers: Futuristic perplexity result items if muddy / Dark layout-daily next calendar day / Mac capture when TCC allows.
+## Context
+
+- Digester open empty most of the night; design-review due=false (Mac TCC — polish-without-capture).
+- Layout-daily already marked Data Poster today — Dark waits for next calendar day.
+- Quiet ticks avoided; each tick remapped one muddy soft-state cluster.
+
+## Next fuel
+
+- Dark layout-daily next calendar day
+- Mac capture when TCC allows
+- Leftover Futuristic  fallbacks if muddy (Send white-on-blue intentional)
+- Sibling / product fuel when digester opens
