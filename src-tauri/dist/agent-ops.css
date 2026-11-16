@@ -25723,21 +25723,25 @@ body.theme-futuristic .perplexity-result-item {
   border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
 }
 body.theme-futuristic .perplexity-result-item:hover {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 6%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon result items (#14 / P2; design-review Perplexity). */
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 6%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
 }
 body.theme-futuristic .perplexity-result-item[role='option']:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon result items (#14 / P2; design-review Perplexity). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #3bd6ff) 45%, #0b0b10);
 }
 body.theme-futuristic .perplexity-result-item:focus-within,
 body.theme-futuristic .perplexity-result-item.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 35%, #0b0b10);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon result items (#14 / P2; design-review Perplexity). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 35%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 14%, #0b0b10);
 }
 body.theme-futuristic .perplexity-result-item[role='option'].is-selected {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 5%, #0b0b10);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon result items (#14 / P2; design-review Perplexity). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 5%, #0b0b10);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #3bd6ff) 18%, #0b0b10);
 }
 body.theme-futuristic .perplexity-result-item[role='option'].is-just-copied {
   background: color-mix(in srgb, #34c759 12%, #0b0b10);
@@ -25746,16 +25750,19 @@ body.theme-futuristic .perplexity-result-item[role='option'].is-just-copied::aft
   background: color-mix(in srgb, #34c759 55%, #0b0b10);
 }
 body.theme-futuristic .perplexity-result-item.is-top {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 6%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon result items (#14 / P2; design-review Perplexity). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 6%, #0b0b10);
 }
 body.theme-futuristic .perplexity-result-item.is-top:hover {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon result items (#14 / P2; design-review Perplexity). */
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 10%, #0b0b10);
 }
 body.theme-futuristic .perplexity-weather-card {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
-  border-left-color: color-mix(in srgb, var(--accent, #55c7ff) 70%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 6%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon weather card (#14 / P2; design-review Perplexity). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
+  border-left-color: color-mix(in srgb, var(--accent, #3bd6ff) 70%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 6%, #0b0b10);
 }
 
 

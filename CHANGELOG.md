@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2836] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (Perplexity result items / weather card): leftover poster cyan `#55c7ff` fallbacks on `.perplexity-result-item` hover/focus/selected/is-top and `.perplexity-weather-card` remap onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon `#6dff7b` / chat-clear + Settings glances already on `#3bd6ff` after v0.1.2835 (polish-without-capture while Mac TCC blocks capture).
+
+
 ## [0.1.2835] - 2026-11-16
 
 ### Fixed
