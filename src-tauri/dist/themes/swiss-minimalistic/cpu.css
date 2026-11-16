@@ -2229,9 +2229,10 @@ body {
 
 .ollama-settings-popover .popover-body textarea:focus {
   outline: none;
-  border-color: color-mix(in srgb, #007aff 55%, #ffffff);
+  /* Opaque Swiss accent — Apple #007aff lagged --accent / focus-visible (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   background: #ffffff;
-  box-shadow: 0 0 0 3px color-mix(in srgb, #007aff 18%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
 }
 
 .ollama-settings-popover .popover-actions {
@@ -2254,14 +2255,15 @@ body {
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ollama-settings-popover .popover-btn-primary {
-  background: color-mix(in srgb, #007aff 90%, #ffffff);
+  /* Opaque Swiss accent — Apple #007aff lagged --accent / secondary (#14 / P2; design-review AI Chat). */
+  background: color-mix(in srgb, var(--accent, #121216) 90%, #ffffff);
   color: #ffffff;
-  border-color: color-mix(in srgb, #007aff 90%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 90%, #ffffff);
 }
 
 .ollama-settings-popover .popover-btn-primary:hover {
-  background: #007aff;
-  border-color: #007aff;
+  background: var(--accent, #121216);
+  border-color: var(--accent, #121216);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
@@ -2278,7 +2280,8 @@ body {
 
 .ollama-settings-popover .popover-btn-primary:focus-visible,
 .ollama-settings-popover .popover-btn-secondary:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  /* Opaque Swiss accent — Apple #007aff lagged --accent / collapsible (#14 / P2; design-review AI Chat). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;
 }
 

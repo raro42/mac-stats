@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2810] - 2026-11-16
+
+### Changed
+- Swiss Minimalistic design-review (AI Chat Ollama settings): `.ollama-settings-popover` `.popover-btn-primary` / `.popover-body textarea:focus` (and primary/secondary `:focus-visible`) remap leftover Apple `#007aff` onto theme `--accent` Swiss ink `#121216`, matching Light / Material / Architect after v0.1.2798 (polish-without-capture while Mac TCC blocks `feature-ai-chat.png`).
+
 ## [0.1.2809] - 2026-11-16
 
 ### Changed
