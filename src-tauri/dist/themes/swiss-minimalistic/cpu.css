@@ -1896,7 +1896,8 @@ body {
 
 .add-monitor-form input:focus {
   outline: none;
-  border-color: color-mix(in srgb, #007aff 30%, #ffffff);
+  /* Opaque Swiss accent — Apple #007aff lagged --accent / cream add-monitor (#14 / P2; design-review Monitors). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 30%, #ffffff);
   background: color-mix(in srgb, #ffffff 90%, #f6f6f6);
 }
 

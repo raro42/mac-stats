@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2815] - 2026-11-16
+
+### Changed
+- Swiss Minimalistic design-review (Monitors add form): `.add-monitor-form input:focus` remaps leftover Apple `#007aff` onto theme `--accent` Swiss ink `#121216`, matching Light / Material / Architect after v0.1.2800 (polish-without-capture while Mac TCC / no CPU window blocks `feature-monitors.png`).
+
 ## [0.1.2814] - 2026-11-16
 
 ### Fixed
