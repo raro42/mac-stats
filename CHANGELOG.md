@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2840] - 2026-11-17
+
+### Fixed
+- Light / Material / Architect design-review (Disk Cleanup item focus / Top Processes selected / Ops kind-chips): leftover bare Apple `#0a84ff` on `.disk-cleanup-item:focus-visible`, `.process-row.is-selected`, and Ops kind-chip Files / Deliveries / Core / Lite has-hits + is-active remap onto theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`), matching Neon Disk Cleanup focus / process-row selected / Ops kind-chip parity after cream Perplexity v0.1.2839 (polish-without-capture while Mac TCC blocks capture; Send white-on-blue intentional; Swiss / Apple keep shared blue).
+
+
 ## [0.1.2839] - 2026-11-17
 
 ### Fixed

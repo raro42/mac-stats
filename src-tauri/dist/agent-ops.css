@@ -27019,16 +27019,19 @@ body.theme-architect .disk-cleanup-item:hover {
 }
 
 body.theme-light .disk-cleanup-item:focus-visible {
-  border-color: color-mix(in srgb, #0a84ff 34%, #f7f7fa);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / Neon Disk Cleanup focus (#14 / P2; design-review). */
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 34%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
 }
 body.theme-material .disk-cleanup-item:focus-visible {
-  border-color: color-mix(in srgb, #0a84ff 34%, #ebe4d9);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / Neon Disk Cleanup focus (#14 / P2; design-review). */
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 34%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
 }
 body.theme-architect .disk-cleanup-item:focus-visible {
-  border-color: color-mix(in srgb, #0a84ff 34%, #f1f1f1);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon Disk Cleanup focus (#14 / P2; design-review). */
+  border-color: color-mix(in srgb, var(--accent, #232d41) 34%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
 }
 
 body.theme-light .disk-cleanup-item.is-selected {
@@ -27382,16 +27385,19 @@ body.theme-architect .logs-toolbar button:focus-visible {
  */
 /* OVERNIGHT v0.1.2635: light Top Processes selected-row remaps */
 body.theme-light .process-row.is-selected {
-  background: color-mix(in srgb, #0a84ff 12%, #f7f7fa);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / Neon process-row selected (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 12%, #f7f7fa);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
 }
 body.theme-material .process-row.is-selected {
-  background: color-mix(in srgb, #0a84ff 12%, #ebe4d9);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / Neon process-row selected (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 12%, #ebe4d9);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
 }
 body.theme-architect .process-row.is-selected {
-  background: color-mix(in srgb, #0a84ff 12%, #f1f1f1);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon process-row selected (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #232d41) 12%, #f1f1f1);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
 }
 
 /*
@@ -28589,12 +28595,14 @@ body.theme-light .ops-session-kind-chip[data-ops-session-kind='live'].is-active 
 }
 
 body.theme-light .ops-session-kind-chip[data-ops-session-kind='files'].has-hits {
-  background: color-mix(in srgb, #0a84ff 12%, #f7f7fa);
-  border-color: color-mix(in srgb, #0a84ff 28%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 12%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
 }
 body.theme-light .ops-session-kind-chip[data-ops-session-kind='files'].is-active {
-  background: color-mix(in srgb, #0a84ff 18%, #f7f7fa);
-  border-color: color-mix(in srgb, #0a84ff 36%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 18%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 36%, #f7f7fa);
 }
 
 body.theme-light .ops-agents-enabled-chip[data-ops-agents-enabled='on'].has-hits {
@@ -28625,12 +28633,14 @@ body.theme-light .ops-schedules-kind-chip[data-ops-schedules-kind='jobs'].is-act
 }
 
 body.theme-light .ops-schedules-kind-chip[data-ops-schedules-kind='deliveries'].has-hits {
-  background: color-mix(in srgb, #0a84ff 12%, #f7f7fa);
-  border-color: color-mix(in srgb, #0a84ff 28%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 12%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
 }
 body.theme-light .ops-schedules-kind-chip[data-ops-schedules-kind='deliveries'].is-active {
-  background: color-mix(in srgb, #0a84ff 18%, #f7f7fa);
-  border-color: color-mix(in srgb, #0a84ff 36%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 18%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 36%, #f7f7fa);
 }
 
 body.theme-light .ops-memory-kind-chip[data-ops-memory-kind='discord'].has-hits {
@@ -28643,12 +28653,14 @@ body.theme-light .ops-memory-kind-chip[data-ops-memory-kind='discord'].is-active
 }
 
 body.theme-light .ops-memory-kind-chip[data-ops-memory-kind='core'].has-hits {
-  background: color-mix(in srgb, #0a84ff 12%, #f7f7fa);
-  border-color: color-mix(in srgb, #0a84ff 28%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 12%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
 }
 body.theme-light .ops-memory-kind-chip[data-ops-memory-kind='core'].is-active {
-  background: color-mix(in srgb, #0a84ff 18%, #f7f7fa);
-  border-color: color-mix(in srgb, #0a84ff 36%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 18%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 36%, #f7f7fa);
 }
 
 body.theme-light .ops-runs-lane-chip[data-ops-runs-lane='instant'].has-hits {
@@ -28661,12 +28673,14 @@ body.theme-light .ops-runs-lane-chip[data-ops-runs-lane='instant'].is-active {
 }
 
 body.theme-light .ops-runs-lane-chip[data-ops-runs-lane='lite'].has-hits {
-  background: color-mix(in srgb, #0a84ff 12%, #f7f7fa);
-  border-color: color-mix(in srgb, #0a84ff 28%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 12%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
 }
 body.theme-light .ops-runs-lane-chip[data-ops-runs-lane='lite'].is-active {
-  background: color-mix(in srgb, #0a84ff 18%, #f7f7fa);
-  border-color: color-mix(in srgb, #0a84ff 36%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 18%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 36%, #f7f7fa);
 }
 
 body.theme-light .ops-runs-lane-chip[data-ops-runs-lane='direct'].has-hits {
@@ -28740,12 +28754,14 @@ body.theme-material .ops-session-kind-chip[data-ops-session-kind='live'].is-acti
 }
 
 body.theme-material .ops-session-kind-chip[data-ops-session-kind='files'].has-hits {
-  background: color-mix(in srgb, #0a84ff 12%, #ebe4d9);
-  border-color: color-mix(in srgb, #0a84ff 28%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 12%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
 }
 body.theme-material .ops-session-kind-chip[data-ops-session-kind='files'].is-active {
-  background: color-mix(in srgb, #0a84ff 18%, #ebe4d9);
-  border-color: color-mix(in srgb, #0a84ff 36%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 18%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 36%, #ebe4d9);
 }
 
 body.theme-material .ops-agents-enabled-chip[data-ops-agents-enabled='on'].has-hits {
@@ -28776,12 +28792,14 @@ body.theme-material .ops-schedules-kind-chip[data-ops-schedules-kind='jobs'].is-
 }
 
 body.theme-material .ops-schedules-kind-chip[data-ops-schedules-kind='deliveries'].has-hits {
-  background: color-mix(in srgb, #0a84ff 12%, #ebe4d9);
-  border-color: color-mix(in srgb, #0a84ff 28%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 12%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
 }
 body.theme-material .ops-schedules-kind-chip[data-ops-schedules-kind='deliveries'].is-active {
-  background: color-mix(in srgb, #0a84ff 18%, #ebe4d9);
-  border-color: color-mix(in srgb, #0a84ff 36%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 18%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 36%, #ebe4d9);
 }
 
 body.theme-material .ops-memory-kind-chip[data-ops-memory-kind='discord'].has-hits {
@@ -28794,12 +28812,14 @@ body.theme-material .ops-memory-kind-chip[data-ops-memory-kind='discord'].is-act
 }
 
 body.theme-material .ops-memory-kind-chip[data-ops-memory-kind='core'].has-hits {
-  background: color-mix(in srgb, #0a84ff 12%, #ebe4d9);
-  border-color: color-mix(in srgb, #0a84ff 28%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 12%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
 }
 body.theme-material .ops-memory-kind-chip[data-ops-memory-kind='core'].is-active {
-  background: color-mix(in srgb, #0a84ff 18%, #ebe4d9);
-  border-color: color-mix(in srgb, #0a84ff 36%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 18%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 36%, #ebe4d9);
 }
 
 body.theme-material .ops-runs-lane-chip[data-ops-runs-lane='instant'].has-hits {
@@ -28812,12 +28832,14 @@ body.theme-material .ops-runs-lane-chip[data-ops-runs-lane='instant'].is-active 
 }
 
 body.theme-material .ops-runs-lane-chip[data-ops-runs-lane='lite'].has-hits {
-  background: color-mix(in srgb, #0a84ff 12%, #ebe4d9);
-  border-color: color-mix(in srgb, #0a84ff 28%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 12%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
 }
 body.theme-material .ops-runs-lane-chip[data-ops-runs-lane='lite'].is-active {
-  background: color-mix(in srgb, #0a84ff 18%, #ebe4d9);
-  border-color: color-mix(in srgb, #0a84ff 36%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 18%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 36%, #ebe4d9);
 }
 
 body.theme-material .ops-runs-lane-chip[data-ops-runs-lane='direct'].has-hits {
@@ -28891,12 +28913,14 @@ body.theme-architect .ops-session-kind-chip[data-ops-session-kind='live'].is-act
 }
 
 body.theme-architect .ops-session-kind-chip[data-ops-session-kind='files'].has-hits {
-  background: color-mix(in srgb, #0a84ff 12%, #f1f1f1);
-  border-color: color-mix(in srgb, #0a84ff 28%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #232d41) 12%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
 }
 body.theme-architect .ops-session-kind-chip[data-ops-session-kind='files'].is-active {
-  background: color-mix(in srgb, #0a84ff 18%, #f1f1f1);
-  border-color: color-mix(in srgb, #0a84ff 36%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #232d41) 18%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 36%, #f1f1f1);
 }
 
 body.theme-architect .ops-agents-enabled-chip[data-ops-agents-enabled='on'].has-hits {
@@ -28927,12 +28951,14 @@ body.theme-architect .ops-schedules-kind-chip[data-ops-schedules-kind='jobs'].is
 }
 
 body.theme-architect .ops-schedules-kind-chip[data-ops-schedules-kind='deliveries'].has-hits {
-  background: color-mix(in srgb, #0a84ff 12%, #f1f1f1);
-  border-color: color-mix(in srgb, #0a84ff 28%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #232d41) 12%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
 }
 body.theme-architect .ops-schedules-kind-chip[data-ops-schedules-kind='deliveries'].is-active {
-  background: color-mix(in srgb, #0a84ff 18%, #f1f1f1);
-  border-color: color-mix(in srgb, #0a84ff 36%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #232d41) 18%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 36%, #f1f1f1);
 }
 
 body.theme-architect .ops-memory-kind-chip[data-ops-memory-kind='discord'].has-hits {
@@ -28945,12 +28971,14 @@ body.theme-architect .ops-memory-kind-chip[data-ops-memory-kind='discord'].is-ac
 }
 
 body.theme-architect .ops-memory-kind-chip[data-ops-memory-kind='core'].has-hits {
-  background: color-mix(in srgb, #0a84ff 12%, #f1f1f1);
-  border-color: color-mix(in srgb, #0a84ff 28%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #232d41) 12%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
 }
 body.theme-architect .ops-memory-kind-chip[data-ops-memory-kind='core'].is-active {
-  background: color-mix(in srgb, #0a84ff 18%, #f1f1f1);
-  border-color: color-mix(in srgb, #0a84ff 36%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #232d41) 18%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 36%, #f1f1f1);
 }
 
 body.theme-architect .ops-runs-lane-chip[data-ops-runs-lane='instant'].has-hits {
@@ -28963,12 +28991,14 @@ body.theme-architect .ops-runs-lane-chip[data-ops-runs-lane='instant'].is-active
 }
 
 body.theme-architect .ops-runs-lane-chip[data-ops-runs-lane='lite'].has-hits {
-  background: color-mix(in srgb, #0a84ff 12%, #f1f1f1);
-  border-color: color-mix(in srgb, #0a84ff 28%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #232d41) 12%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
 }
 body.theme-architect .ops-runs-lane-chip[data-ops-runs-lane='lite'].is-active {
-  background: color-mix(in srgb, #0a84ff 18%, #f1f1f1);
-  border-color: color-mix(in srgb, #0a84ff 36%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon Ops kind-chip (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #232d41) 18%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 36%, #f1f1f1);
 }
 
 body.theme-architect .ops-runs-lane-chip[data-ops-runs-lane='direct'].has-hits {
