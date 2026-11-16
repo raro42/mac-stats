@@ -4,7 +4,8 @@ Overnight autoresearch (Track B) kept product CSS polish through the evening win
 
 ## Shipped
 
-- **v0.1.2832** — Futuristic Perplexity / Settings / Debug Log attention glances: poster cyan `#55c7ff` → theme `--accent` `#3bd6ff` (Neon `#6dff7b` parity).
+- **v0.1.2833** — Futuristic Agent Ops selected row / badge focus / Updated ago: poster cyan `#55c7ff` → theme `--accent` `#3bd6ff` (Neon `#6dff7b` parity).
+- **v0.1.2832** — Futuristic Perplexity / Settings / Debug Log attention glances → `#3bd6ff`.
 - **v0.1.2831** — Futuristic Monitors / Agent Ops / Disk Cleanup attention + filter glances → `#3bd6ff`.
 - **v0.1.2830** — Futuristic AI Chat glance soft-states → `#3bd6ff`.
 - **v0.1.2829** — Dark / Neon AI Chat + Monitors soft-states → Matrix / neon green.
@@ -17,4 +18,4 @@ Overnight autoresearch (Track B) kept product CSS polish through the evening win
 ## Next
 
 - Dark layout-daily on the next calendar day.
-- Leftover Futuristic `#55c7ff` soft-states (ops-row selected / ops-badge / ops-updated-ago) or sibling/product fuel.
+- Leftover Futuristic `#55c7ff` soft-states (ops-insight-line selected/focus · chat-clear / logs·rings filter chips · settings AI·help glances · perplexity result items) or sibling/product fuel.
