@@ -15903,16 +15903,16 @@ body.theme-futuristic .processes-hot-attention-glance:hover {
 }
 body.theme-futuristic .processes-filter-attention-glance:focus-visible,
 body.theme-futuristic .processes-hot-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 45%, #0b0b10);
 }
 body.theme-futuristic .processes-filter-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
-  color: color-mix(in srgb, var(--accent, #55c7ff) 50%, var(--text, currentColor));
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 10%, #0b0b10);
+  color: color-mix(in srgb, var(--accent, #3bd6ff) 50%, var(--text, currentColor));
 }
 body.theme-futuristic .processes-filter-attention-glance.is-pinned {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 12%, #0b0b10);
 }
 body.theme-futuristic .processes-filter-attention-glance.is-hot-filter,
 body.theme-futuristic .processes-hot-attention-glance.has-hot {
@@ -15937,11 +15937,11 @@ body.theme-futuristic .processes-filter-chip:hover {
   background: color-mix(in srgb, currentColor 12%, #0b0b10);
 }
 body.theme-futuristic .processes-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
 }
 body.theme-futuristic .processes-filter-chip.is-active {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 36%, #0b0b10);
 }
 body.theme-futuristic .processes-filter-chip[data-processes-filter='pinned'].has-hits {
   background: color-mix(in srgb, #ffd60a 14%, #0b0b10);
@@ -15983,7 +15983,7 @@ body.theme-futuristic .processes-top-ram-glance:hover {
 body.theme-futuristic .processes-top-glance:focus-visible,
 body.theme-futuristic .processes-top-gpu-glance:focus-visible,
 body.theme-futuristic .processes-top-ram-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 45%, #0b0b10);
 }
 body.theme-futuristic .processes-top-glance.is-hot,
 body.theme-futuristic .processes-top-gpu-glance.is-hot,
@@ -16005,8 +16005,8 @@ body.theme-futuristic .processes-top-ram-glance.is-ok {
  * parity). Mac capture deferred (Screen Recording TCC / screencapture -l).
  */
 body.theme-futuristic .processes-filter-miss {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 10%, #0b0b10);
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-futuristic .processes-filter-miss.is-hot-empty {
@@ -16014,20 +16014,20 @@ body.theme-futuristic .processes-filter-miss.is-hot-empty {
   background: color-mix(in srgb, #34c759 10%, #0b0b10);
 }
 body.theme-futuristic .processes-filter-miss.is-pinned-empty {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 10%, #0b0b10);
 }
 body.theme-futuristic .processes-filter-miss-cta {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 14%, #0b0b10);
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-futuristic .processes-filter-miss-cta:hover {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 48%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 48%, #0b0b10);
 }
 body.theme-futuristic .processes-filter-miss-cta:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
 }
 /*
  * Futuristic: Top Processes list rows / pin / Copied still mixed Apple #ffffff washes
@@ -16038,7 +16038,7 @@ body.theme-futuristic .processes-filter-miss-cta:focus-visible {
  * (Screen Recording TCC / screencapture -l).
  */
 body.theme-futuristic .process-row.is-pinned {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 14%, #0b0b10);
 }
 body.theme-futuristic .process-row:hover {
   background: color-mix(in srgb, currentColor 10%, #0b0b10);
@@ -16047,7 +16047,7 @@ body.theme-futuristic .process-row:active {
   background: color-mix(in srgb, currentColor 14%, #0b0b10);
 }
 body.theme-futuristic .process-row:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
 body.theme-futuristic .process-pin:hover {
   background: color-mix(in srgb, currentColor 12%, #0b0b10);
@@ -16055,8 +16055,8 @@ body.theme-futuristic .process-pin:hover {
   color: color-mix(in srgb, #ffffff 84%, #0b0b10);
 }
 body.theme-futuristic .process-pin:focus-visible {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 40%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 14%, #0b0b10);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #3bd6ff) 40%, #0b0b10);
   color: color-mix(in srgb, #ffffff 84%, #0b0b10);
 }
 body.theme-futuristic .process-pin.is-just-saved {
@@ -16130,15 +16130,15 @@ body.theme-futuristic .ops-preview {
   border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
 }
 body.theme-futuristic .ops-session-copy-chip {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 8%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 8%, #0b0b10);
 }
 body.theme-futuristic .ops-session-copy-chip:hover {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 42%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 14%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 42%, #0b0b10);
 }
 body.theme-futuristic .ops-session-copy-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
 }
 body.theme-futuristic .ops-session-copy-chip.is-just-saved {
   border-color: color-mix(in srgb, #34c759 45%, #0b0b10);
@@ -21087,21 +21087,22 @@ body.theme-neon .logs-filter-clear.is-just-saved {
 body.theme-futuristic .monitors-filter-clear,
 body.theme-futuristic .processes-filter-clear,
 body.theme-futuristic .logs-filter-clear {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff lagged --accent / Neon Clear (#14 / P2; design-review processes). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 10%, #0b0b10);
   color: color-mix(in srgb, #ffffff 81%, #0b0b10);
 }
 body.theme-futuristic .monitors-filter-clear:hover,
 body.theme-futuristic .processes-filter-clear:hover,
 body.theme-futuristic .logs-filter-clear:hover {
   color: color-mix(in srgb, #ffffff 88%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 44%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 44%, #0b0b10);
 }
 body.theme-futuristic .monitors-filter-clear:focus-visible,
 body.theme-futuristic .processes-filter-clear:focus-visible,
 body.theme-futuristic .logs-filter-clear:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 20%, #0b0b10);
 }
 body.theme-futuristic .monitors-filter-clear.is-just-saved,
 body.theme-futuristic .processes-filter-clear.is-just-saved,
@@ -30348,9 +30349,9 @@ body.theme-neon .process-row.is-selected {
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #6dff7b) 28%, #08120c);
 }
 body.theme-futuristic .process-row.is-selected {
-  /* Opaque cyan accent — Apple #0a84ff lagged is-pinned / focus cyan (#14 / P2; design-review processes). */
-  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff lagged --accent / is-pinned (#14 / P2; design-review processes). */
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 12%, #0b0b10);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #3bd6ff) 28%, #0b0b10);
 }
 
 /*

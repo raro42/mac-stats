@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2820] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (Top Processes): leftover poster cyan `#55c7ff` on process attention glances, filter chips / Clear, top glances, filter-miss + CTA, pinned/focus rows, pin focus, selected row, and shared Monitors/Logs Clear remaps onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon Processes `#6dff7b` parity and Futuristic Agent Ops remaps from v0.1.2818/2819 (polish-without-capture while Mac TCC blocks `feature-processes.png`).
+
+
 ## [0.1.2819] - 2026-11-16
 
 ### Fixed
