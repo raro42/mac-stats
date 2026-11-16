@@ -1528,8 +1528,9 @@ body.theme-neon .chat-filter-chip.is-active {
   border-color: color-mix(in srgb, var(--accent, #6dff7b) 36%, #08120c);
 }
 body.theme-neon #chat-input:focus {
-  border-color: color-mix(in srgb, #6dff7b 55%, #08120c);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #6dff7b 22%, #08120c);
+  /* Opaque neon accent — bare #6dff7b matched theme but prefer var(--accent) like Dark/Futuristic (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 22%, #08120c);
   background: color-mix(in srgb, currentColor 6%, #08120c);
   color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
 }
@@ -1660,10 +1661,11 @@ body.theme-futuristic .chat-filter-chip.is-active {
   border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
 }
 body.theme-futuristic #chat-input:focus {
-  border-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 22%, #0b0b10);
-  background: color-mix(in srgb, currentColor 6%, #0b0b10);
-  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+  /* Opaque futuristic cyan — bare poster #55c7ff on #0b0b10 lagged --accent / cpu.css + chat-input-container (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #111123);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 22%, #111123);
+  background: color-mix(in srgb, currentColor 6%, #111123);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #111123));
 }
 body.theme-futuristic .chat-filter-miss {
   border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2816] - 2026-11-16
+
+### Fixed
+- Neon / Futuristic design-review (AI Chat composer): `body.theme-neon` / `body.theme-futuristic #chat-input:focus` in `agent-ops.css` remaps leftover bare poster cyan `#55c7ff` (Futuristic) onto theme `--accent` futuristic cyan `#3bd6ff` mixed against shell `#111123`, and Neon onto `var(--accent, #6dff7b)` on `#08120c`, matching theme `cpu.css` `#chat-input:focus` and `.chat-input-container:focus-within` from v0.1.2808 (polish-without-capture while Mac TCC blocks `feature-ai-chat.png` / `feature-agent-ops.png`).
+
 ## [0.1.2815] - 2026-11-16
 
 ### Changed
