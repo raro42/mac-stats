@@ -21841,7 +21841,8 @@ body.theme-futuristic #chat-clear-btn:hover:not(:disabled) {
   border-color: color-mix(in srgb, currentColor 28%, #0b0b10);
 }
 body.theme-futuristic #chat-clear-btn:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon clear focus (#14 / P2; design-review AI Chat). */
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
 body.theme-futuristic #chat-clear-btn:disabled {
   color: color-mix(in srgb, #ffffff 40%, #0b0b10);
@@ -22455,12 +22456,14 @@ body.theme-futuristic .logs-toolbar .logs-filter-chip:hover {
   border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
 }
 body.theme-futuristic .logs-toolbar .logs-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon logs chips (#14 / P2; design-review Debug Log). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
 }
 body.theme-futuristic .logs-toolbar .logs-filter-chip.is-active {
   color: var(--text, color-mix(in srgb, #ffffff 96%, #0b0b10));
-  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon logs chips (#14 / P2; design-review Debug Log). */
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 36%, #0b0b10);
 }
 body.theme-futuristic .logs-toolbar .logs-filter-chip[data-logs-filter='error'].has-hits {
   background: color-mix(in srgb, #ff3b30 14%, #0b0b10);
@@ -22620,12 +22623,14 @@ body.theme-futuristic .rings-filter-chip:hover {
   border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
 }
 body.theme-futuristic .rings-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon rings chips (#14 / P2; design-review CPU metrics). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
 }
 body.theme-futuristic .rings-filter-chip.is-active {
   color: var(--text, color-mix(in srgb, #ffffff 96%, #0b0b10));
-  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon rings chips (#14 / P2; design-review CPU metrics). */
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 36%, #0b0b10);
 }
 body.theme-futuristic .rings-filter-chip[data-rings-filter='hot'].has-hits {
   background: color-mix(in srgb, #ff9500 14%, #0b0b10);
@@ -23123,7 +23128,8 @@ body.theme-futuristic .settings-ori-attention-glance:focus-visible,
 body.theme-futuristic .settings-having-fun-attention-glance:focus-visible,
 body.theme-futuristic .settings-voice-stt-attention-glance:focus-visible,
 body.theme-futuristic .settings-help-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon settings glances (#14 / P2; design-review Settings). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 45%, #0b0b10);
   box-shadow: none;
 }
 body.theme-futuristic .settings-ai-attention-glance.is-off,
@@ -23138,9 +23144,10 @@ body.theme-futuristic .settings-compact-attention-glance.is-on {
   color: color-mix(in srgb, #ff9500 55%, var(--text, currentColor));
 }
 body.theme-futuristic .settings-help-attention-glance.is-closed {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
-  color: color-mix(in srgb, var(--accent, #55c7ff) 55%, var(--text, currentColor));
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon help closed (#14 / P2; design-review Settings). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 12%, #0b0b10);
+  color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, var(--text, currentColor));
 }
 body.theme-futuristic .settings-help-attention-glance.is-open {
   border-color: color-mix(in srgb, #34c759 32%, #0b0b10);

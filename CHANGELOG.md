@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2835] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (chat Clear / logs·rings filter chips / Settings AI·help glances): leftover poster cyan `#55c7ff` fallbacks on `#chat-clear-btn:focus-visible`, logs and rings filter-chip focus/active, Settings AI/help attention focus, and help `.is-closed` remap onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon `#6dff7b` / Agent Ops insight-line already on `#3bd6ff` after v0.1.2834 (polish-without-capture while Mac TCC blocks capture).
+
 ## [0.1.2834] - 2026-11-16
 
 ### Fixed
