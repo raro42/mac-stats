@@ -1,18 +1,17 @@
 # Morning surprise — 2026-11-17
 
-Overnight autoresearch (20:00–06:00 local) kept product CSS polish on cream AI Chat.
+Overnight autoresearch (Track B) shipped cream Perplexity accent parity.
 
 ## Shipped
 
-- **v0.1.2838** — Light / Material / Architect / Swiss AI Chat: `.model-select:focus` / `:focus-visible` and markdown links no longer fall back to Apple `#007aff`. They use each theme `--accent` (Light soft blue, Material taupe, Architect slate, Swiss ink), matching Neon / Dark.
-- Earlier same night (already on main before this tick): Futuristic soft-state cyan remaps through **v0.1.2837** (logs / Perplexity search / You filter / Monitors settings, and prior Agent Ops / glances clusters).
+- **v0.1.2839** — Light / Material / Architect Perplexity result hover, focus, selected, is-top, and weather card: bare Apple `#0a84ff` → theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`). Hover no longer flashes Apple blue while selected already used the cream accent.
+- Layout-daily: **data-poster** marked for 2026-11-17 (remaps clean; AI Chat + Monitors spot-check).
 
-## Tried / context
+## Context
 
-- Digester open empty; design-review grace; layout-daily already marked Data Poster for 2026-11-16.
-- Debug.log: no product ERROR/panic clusters (Soul content noise only).
-- Overnight git flush clean; GitHub release already cut today — skipped.
+- Digester open empty; design-review grace; standing soft-state fuel after cream model-select **v0.1.2838**.
+- Send white-on-blue intentional; Swiss / Apple keep shared Perplexity blue for now.
 
-## Next fuel
+## Next
 
-- Dark layout-daily next calendar day; Mac capture when TCC allows; cream outline `#007aff` leftovers if muddy; sibling/product — not keep-pNN clones.
+- Dark layout-daily next day; cream Disk Cleanup / Processes / Ops kind-chip Apple leftovers if muddy; sibling/product fuel — not keep-pNN clones.
