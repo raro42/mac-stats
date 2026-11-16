@@ -1,20 +1,22 @@
-# Morning surprise  -  2026-11-16
+# Morning surprise — 2026-11-16
 
-Overnight autoresearch kept **v0.1.2820** (and earlier tonight through **v0.1.2819**).
+Overnight Track B (product) kept shipping Futuristic accent parity while digester stayed empty and Mac TCC blocked screenshots.
 
-## Shipped
-- **v0.1.2820**  -  Futuristic Top Processes: attention glances, filter chips / Clear, top glances, filter-miss + CTA, pinned/focus rows, pin focus, selected row remap leftover poster cyan `#55c7ff` onto theme `--accent` `#3bd6ff` (Neon Processes parity). Design-review `feature-processes` polish-without-capture (Mac TCC).
-- **v0.1.2819**  -  Futuristic Agent Ops kind-filter + Close onto `#3bd6ff`.
-- **v0.1.2818**  -  Futuristic Agent Ops overview / filter / file tabs onto `#3bd6ff`.
-- Earlier same night: Futuristic soft-states, Neon/Futuristic chat-input, Dark Matrix chat-input split, Swiss remaps (see CHANGELOG 2810-2817).
+## Shipped tonight (highlights)
 
-## Tried / context
-- Digester empty (0 turns / 7d). Sibling OpenClaw/Hermes missing on rack.
-- Layout-daily due=false (Data Poster marked today). Debug.log quiet.
-- Mac window-only screenshots still TCC-blocked; grace marked `feature-processes`.
+- **v0.1.2821** — Futuristic AI Chat empty chips + Perplexity filter + Agent Ops health: poster cyan `#55c7ff` → theme `--accent` `#3bd6ff` (Neon `#6dff7b` parity).
+- **v0.1.2820** — Futuristic Top Processes attention / filter / Clear / miss / pinned / selected onto `#3bd6ff`.
+- **v0.1.2819** — Futuristic Agent Ops kind-filter Clear/active + Close focus onto `#3bd6ff`.
+- Earlier same night: soft-states, chat-input, Swiss/cream remaps through **v0.1.2815–2818**.
 
-## Next fuel
-- Futuristic shared `.chat-empty-chip` / Perplexity chip / ops-health focus `#55c7ff` fallbacks if muddy
-- Dark layout-daily next calendar day
-- Mac capture when TCC allows
-- Send white-on-blue intentional  -  not another keep-pNN clone
+## What we tried / process
+
+- Digester open: empty all night → standing P2 #14 design-review leftovers (not quiet-default).
+- Design-review: polish-without-capture (Mac TCC); grace marks on stale surfaces.
+- Layout-daily: Data Poster marked earlier; Dark waits for next calendar day.
+
+## Next
+
+- Dark layout-daily next calendar day.
+- Mac capture when TCC allows (`feature-processes` / `feature-ai-chat` / `feature-agent-ops`).
+- Leftover Futuristic `#55c7ff` fallbacks if muddy; sibling/product fuel — not keep-pNN clones.
