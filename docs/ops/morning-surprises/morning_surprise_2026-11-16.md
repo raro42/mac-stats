@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept product CSS accents moving. Digester open 
 
 - **v0.1.2829** — Dark / Neon AI Chat + Monitors soft-states: poster cyan `#55c7ff` → Matrix `#00cc66` / neon `#6dff7b` (collapsed glances + chat-offline + chat glances).
 - **v0.1.2830** — Futuristic AI Chat glance soft-states: poster cyan `#55c7ff` → theme `--accent` `#3bd6ff` (model/turn/answer/errors focus, turn active, offline continue/filter/sending).
+- **v0.1.2831** — Futuristic Monitors / Ops / Disk Cleanup attention + filter glances: poster cyan `#55c7ff` → `#3bd6ff` (Neon / Processes parity).
 
 ## Tried / discarded
 
@@ -15,4 +16,4 @@ Overnight autoresearch (Track B) kept product CSS accents moving. Digester open 
 
 - Dark layout-daily next calendar day.
 - Mac capture when TCC allows.
-- Leftover Futuristic `#55c7ff` soft-states (attention/filter chips) if still muddy — not keep-pNN clones.
+- Leftover Futuristic `#55c7ff` (Perplexity / Settings help / logs glances) if still muddy — not keep-pNN clones.
