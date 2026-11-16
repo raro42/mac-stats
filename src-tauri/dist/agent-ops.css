@@ -30864,7 +30864,7 @@ body.theme-futuristic {
  * after badge/jump-flash v0.1.2524; design-review feature-cpu-metrics /
  * feature-disk-cleanup adjacent (polish-without-capture; Mac capture TCC-blocked).
  */
-/* OVERNIGHT v0.1.2525: metric-strip flash highlight CRT */
+/* OVERNIGHT v0.1.2525 + v0.1.2822: metric-strip flash highlight CRT → theme accent */
 body.theme-data-poster .detail-label.is-ram-highlight,
 body.theme-data-poster .detail-value.is-ram-highlight,
 body.theme-data-poster #cpu-usage-card.is-cpu-highlight,
@@ -30874,12 +30874,13 @@ body.theme-data-poster .metric-card.is-temp-highlight,
 body.theme-data-poster .metric-card.is-freq-highlight,
 body.theme-data-poster .detail-label.is-uptime-highlight,
 body.theme-data-poster .detail-value.is-uptime-highlight {
-  background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #0b0b10);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #0b0b10);
+  /* Opaque poster cyan — Apple #0a84ff fallback lagged --accent (#14 / P2; design-review cpu-metrics). */
+  background-color: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
 }
 body.theme-data-poster .disk-cleanup-section.is-disk-highlight {
-  background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #0b0b10);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #0b0b10);
+  background-color: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
 }
 body.theme-dark .detail-label.is-ram-highlight,
 body.theme-dark .detail-value.is-ram-highlight,
@@ -30890,12 +30891,13 @@ body.theme-dark .metric-card.is-temp-highlight,
 body.theme-dark .metric-card.is-freq-highlight,
 body.theme-dark .detail-label.is-uptime-highlight,
 body.theme-dark .detail-value.is-uptime-highlight {
-  background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #0a0a0a);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #0a0a0a);
+  /* Opaque Matrix green — Apple #0a84ff fallback lagged --accent (#14 / P2; design-review cpu-metrics). */
+  background-color: color-mix(in srgb, var(--accent, #00cc66) 16%, #0a0a0a);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #00cc66) 16%, #0a0a0a);
 }
 body.theme-dark .disk-cleanup-section.is-disk-highlight {
-  background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #0a0a0a);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #0a0a0a);
+  background-color: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #00cc66) 14%, #0a0a0a);
 }
 body.theme-neon .detail-label.is-ram-highlight,
 body.theme-neon .detail-value.is-ram-highlight,
@@ -30906,12 +30908,13 @@ body.theme-neon .metric-card.is-temp-highlight,
 body.theme-neon .metric-card.is-freq-highlight,
 body.theme-neon .detail-label.is-uptime-highlight,
 body.theme-neon .detail-value.is-uptime-highlight {
-  background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #08120c);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #08120c);
+  /* Opaque neon green — Apple #0a84ff fallback lagged --accent (#14 / P2; design-review cpu-metrics). */
+  background-color: color-mix(in srgb, var(--accent, #6dff7b) 16%, #08120c);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #6dff7b) 16%, #08120c);
 }
 body.theme-neon .disk-cleanup-section.is-disk-highlight {
-  background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #08120c);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #08120c);
+  background-color: color-mix(in srgb, var(--accent, #6dff7b) 10%, #08120c);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #6dff7b) 14%, #08120c);
 }
 body.theme-futuristic .detail-label.is-ram-highlight,
 body.theme-futuristic .detail-value.is-ram-highlight,
@@ -30922,12 +30925,13 @@ body.theme-futuristic .metric-card.is-temp-highlight,
 body.theme-futuristic .metric-card.is-freq-highlight,
 body.theme-futuristic .detail-label.is-uptime-highlight,
 body.theme-futuristic .detail-value.is-uptime-highlight {
-  background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #0b0b10);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #0b0b10);
+  /* Opaque futuristic cyan — Apple #0a84ff fallback lagged --accent (#14 / P2; design-review cpu-metrics). */
+  background-color: color-mix(in srgb, var(--accent, #3bd6ff) 16%, #0b0b10);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #3bd6ff) 16%, #0b0b10);
 }
 body.theme-futuristic .disk-cleanup-section.is-disk-highlight {
-  background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #0b0b10);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #0b0b10);
+  background-color: color-mix(in srgb, var(--accent, #3bd6ff) 10%, #0b0b10);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #3bd6ff) 14%, #0b0b10);
 }
 
 /*
@@ -30937,18 +30941,22 @@ body.theme-futuristic .disk-cleanup-section.is-disk-highlight {
  * design-review feature-cpu-metrics adjacent (polish-without-capture; Mac
  * capture TCC-blocked).
  */
-/* OVERNIGHT v0.1.2526: history sparkline focus CRT */
+/* OVERNIGHT v0.1.2526 + v0.1.2822: history sparkline focus CRT → theme accent */
 body.theme-data-poster .history-chart-container[role="button"]:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #0b0b10);
+  /* Opaque poster cyan — Apple #0a84ff fallback lagged --accent (#14 / P2; design-review cpu-metrics). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
 }
 body.theme-dark .history-chart-container[role="button"]:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #0a0a0a);
+  /* Opaque Matrix green — Apple #0a84ff fallback lagged --accent (#14 / P2; design-review cpu-metrics). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
 }
 body.theme-neon .history-chart-container[role="button"]:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #08120c);
+  /* Opaque neon green — Apple #0a84ff fallback lagged --accent (#14 / P2; design-review cpu-metrics). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
 }
 body.theme-futuristic .history-chart-container[role="button"]:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #0b0b10);
+  /* Opaque futuristic cyan — Apple #0a84ff fallback lagged --accent (#14 / P2; design-review cpu-metrics). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
 
 /*
@@ -31345,12 +31353,13 @@ body.theme-neon #perplexity-search-btn:disabled {
 }
 
 body.theme-futuristic .logs-path-hint:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon·Dark cpu focus (#14 / P2; design-review cpu-metrics). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
   outline-offset: 2px;
 }
 body.theme-futuristic #cpu-usage-card:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
 }
 body.theme-futuristic #perplexity-search-btn:disabled {
   color: color-mix(in srgb, #ffffff 48%, #0b0b10);

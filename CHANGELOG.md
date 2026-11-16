@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2822] - 2026-11-16
+
+### Fixed
+- Dark / Neon / Futuristic / Data Poster design-review (CPU metrics): metric-strip flash highlights (RAM · CPU · GPU · Temp · Freq · Disk · Uptime), history sparkline focus rings, and Futuristic `#cpu-usage-card` / `.logs-path-hint` focus remaps leftover Apple `#0a84ff` / poster cyan `#55c7ff` fallbacks onto theme `--accent` (Matrix `#00cc66` / neon `#6dff7b` / futuristic `#3bd6ff` / poster `#55c7ff`), matching `#cpu-usage-card:focus-visible` remaps from v0.1.2796 (polish-without-capture while Mac TCC blocks `feature-cpu-metrics.png`).
+
 ## [0.1.2821] - 2026-11-16
 
 ### Fixed
