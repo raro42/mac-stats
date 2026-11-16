@@ -25439,7 +25439,8 @@ body.theme-neon .ops-insight-line.is-clickable:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
 }
 body.theme-futuristic .ops-insight-line.is-clickable:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon insight focus (#14 / P2; design-review Agent Ops). */
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
 
 body.theme-data-poster .ops-insight-line.is-clickable.is-selected {
@@ -25455,8 +25456,9 @@ body.theme-neon .ops-insight-line.is-clickable.is-selected {
   background: color-mix(in srgb, var(--accent, #6dff7b) 12%, #08120c);
 }
 body.theme-futuristic .ops-insight-line.is-clickable.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 42%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon insight selected (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 42%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 12%, #0b0b10);
 }
 
 /*

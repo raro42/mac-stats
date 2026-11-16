@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2834] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (Agent Ops Insights line focus / selected): leftover poster cyan `#55c7ff` fallbacks on `.ops-insight-line.is-clickable:focus-visible` and `.ops-insight-line.is-clickable.is-selected` remap onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon `#6dff7b` / ops-row selected already on `#3bd6ff` after Agent Ops selected/badge/updated-ago v0.1.2833 (polish-without-capture while Mac TCC blocks capture).
+
 ## [0.1.2833] - 2026-11-16
 
 ### Fixed
