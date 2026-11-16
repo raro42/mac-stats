@@ -1,20 +1,24 @@
-# Morning surprise  -  2026-11-16
+# Morning surprise — 2026-11-16
 
-Overnight autoresearch kept **v0.1.2822** (and earlier tonight through **v0.1.2821**).
+Generated: 2026-11-16T04:51:28+0100
+Window: overnight autoresearch (Track B)
 
-## Shipped
-- **v0.1.2822**  -  Data Poster / Dark / Neon / Futuristic CPU metrics: metric-strip flash highlights + history sparkline focus Apple `#0a84ff` → theme `--accent`; Futuristic `#cpu-usage-card` / `.logs-path-hint` focus poster cyan `#55c7ff` → `#3bd6ff`. Design-review `feature-cpu-metrics` polish-without-capture (Mac TCC).
-- **v0.1.2821**  -  Futuristic empty chips + Perplexity filter + ops-health onto `#3bd6ff`.
-- **v0.1.2820**  -  Futuristic Top Processes onto `#3bd6ff`.
-- Earlier same night: Futuristic Agent Ops / soft-states / chat-input / Swiss remaps (see CHANGELOG 2810-2819).
+## Shipped tonight (keep)
 
-## Tried / context
-- Digester empty (0 turns / 7d). Sibling OpenClaw/Hermes missing on rack.
-- Layout-daily due=false (Data Poster marked today). Debug.log quiet.
-- Mac window-only screenshots still TCC-blocked; grace marked `feature-cpu-metrics`.
+- **v0.1.2823** — Futuristic Agent Ops editor focus, filter just-cleared flash, row focus-visible, and lite-run rows: poster cyan `#55c7ff` → theme `--accent` `#3bd6ff` (Neon parity; race-renumber after origin CRT **v0.1.2822**).
+- **v0.1.2822** (sibling tick) — Dark / Neon / Futuristic / Data Poster CPU metrics flash + sparkline focus / Futuristic `#cpu-usage-card` + `.logs-path-hint` Apple/poster leftovers → theme accents.
+- Earlier same night (already on main before this tick): Futuristic empty-chip / Perplexity / ops-health (**v0.1.2821**), Top Processes (**v0.1.2820**), Agent Ops kind-filter (**v0.1.2819**), and prior soft-state remaps through **v0.1.2815+**.
 
-## Next fuel
-- Disk Cleanup STALE / Futuristic ops-row / runs Lite `#55c7ff` if muddy
-- Dark layout-daily next calendar day
-- Mac capture when TCC allows
-- Send white-on-blue intentional  -  not another keep-pNN clone
+## Tried / discarded
+
+- Local Futuristic Agent Ops editor/filter/runs as **v0.1.2822** raced origin CRT metrics — discard + re-pick as **v0.1.2823**.
+
+## Fuel notes
+
+- Digester open empty; design-review due=false (`feature-agent-ops` fresh); layout-daily Data Poster marked today (Dark next calendar day).
+- Debug.log: single-instance lock WARN only.
+- Next leftovers: Futuristic disk-cleanup meta/primary/add-scope `#55c7ff` if muddy; Send white-on-blue intentional; Dark layout-daily tomorrow.
+
+## Fitness (one line)
+
+Futuristic Agent Ops editor, Clear flash, and lite runs now share the same cyan accent as the rest of Futuristic chrome.
