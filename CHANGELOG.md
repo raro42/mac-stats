@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2831] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (attention / filter glances): leftover poster cyan `#55c7ff` fallbacks on Monitors attention + filter-attention focus/is-filter, Agent Ops signal focus + Discord filter attention, and Disk Cleanup filter-attention focus/is-filter remap onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon `#6dff7b` / Processes attention already on `#3bd6ff` after AI Chat glance soft-states v0.1.2830 (polish-without-capture while Mac TCC blocks capture).
+
 ## [0.1.2830] - 2026-11-16
 
 ### Fixed
