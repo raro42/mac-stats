@@ -4,14 +4,14 @@ Overnight autoresearch (Track B) kept shipping Futuristic CRT accent remaps.
 
 ## Shipped tonight (latest)
 
-- **v0.1.2836** — Futuristic Perplexity  (hover / focus / selected / is-top) + : poster cyan  → theme   (Neon  parity). Standing P2 #14 after chat-clear / Settings v0.1.2835.
+- **v0.1.2836** — Futuristic Perplexity `.perplexity-result-item` (hover / focus / selected / is-top) + `.perplexity-weather-card`: poster cyan `#55c7ff` → theme `--accent` `#3bd6ff` (Neon `#6dff7b` parity). Standing P2 #14 after chat-clear / Settings v0.1.2835.
 
 ## Also tonight
 
-- **v0.1.2835** — chat Clear + logs·rings filter chips + Settings AI·help glances → 
-- **v0.1.2834** — Agent Ops insight-line focus/selected → 
-- **v0.1.2833** — ops-row selected / badge / Updated ago → 
-- **v0.1.2832** — Perplexity / Settings / logs glances → 
+- **v0.1.2835** — chat Clear + logs·rings filter chips + Settings AI·help glances → `#3bd6ff`
+- **v0.1.2834** — Agent Ops insight-line focus/selected → `#3bd6ff`
+- **v0.1.2833** — ops-row selected / badge / Updated ago → `#3bd6ff`
+- **v0.1.2832** — Perplexity / Settings / logs glances → `#3bd6ff`
 - Earlier: 2831…2829 Monitors/Ops/Disk attention, AI Chat glances, Dark/Neon soft-states
 
 ## Context
@@ -24,5 +24,5 @@ Overnight autoresearch (Track B) kept shipping Futuristic CRT accent remaps.
 
 - Dark layout-daily next calendar day
 - Mac capture when TCC allows
-- Leftover Futuristic  fallbacks if muddy (Send white-on-blue intentional)
+- Leftover Futuristic `#55c7ff` fallbacks if muddy (Send white-on-blue intentional)
 - Sibling / product fuel when digester opens
