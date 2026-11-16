@@ -1,16 +1,18 @@
-# Morning surprise — 2026-11-17 (draft overnight)
+# Morning surprise — 2026-11-17
 
-Overnight window still open after ~23:15 CET keep.
+Overnight autoresearch (20:00–06:00 local) kept product CSS polish on cream AI Chat.
 
-## Shipped so far (into this night)
+## Shipped
 
-- **v0.1.2837** — Futuristic Debug Log lines / Perplexity search focus / chat You filter / Monitors settings `#55c7ff` → `#3bd6ff`.
-- **v0.1.2836** — Perplexity result items + weather card → `#3bd6ff`.
-- **v0.1.2835–2833** — chat-clear / logs·rings / Settings glances · insight-line · ops selected/badge/updated-ago.
-- Earlier same calendar day: **v0.1.2829–2832** Dark/Neon soft-states + Futuristic AI Chat / Monitors-Ops-Disk / Perplexity-Settings-logs remaps.
+- **v0.1.2838** — Light / Material / Architect / Swiss AI Chat: `.model-select:focus` / `:focus-visible` and markdown links no longer fall back to Apple `#007aff`. They use each theme `--accent` (Light soft blue, Material taupe, Architect slate, Swiss ink), matching Neon / Dark.
+- Earlier same night (already on main before this tick): Futuristic soft-state cyan remaps through **v0.1.2837** (logs / Perplexity search / You filter / Monitors settings, and prior Agent Ops / glances clusters).
 
-## Next ticks
+## Tried / context
 
-- Continue standing leftover CRT accents if muddy, or sibling/product fuel.
-- Dark layout-daily waits for the next calendar day.
-- Refresh this note before ~05:50 with the full night keep/discard set.
+- Digester open empty; design-review grace; layout-daily already marked Data Poster for 2026-11-16.
+- Debug.log: no product ERROR/panic clusters (Soul content noise only).
+- Overnight git flush clean; GitHub release already cut today — skipped.
+
+## Next fuel
+
+- Dark layout-daily next calendar day; Mac capture when TCC allows; cream outline `#007aff` leftovers if muddy; sibling/product — not keep-pNN clones.
