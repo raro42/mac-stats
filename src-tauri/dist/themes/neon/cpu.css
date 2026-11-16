@@ -586,7 +586,8 @@ body::before {
 }
 
 .theme-version:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #08120c);
+  /* Opaque neon accent — Apple #007aff lagged --accent / icon-btn (neon) (#14 / P2; design-review Agent Ops). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
   outline-offset: 2px;
 }
 
@@ -1527,7 +1528,8 @@ body::before {
 }
 
 .collapse-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #08120c);
+  /* Opaque neon accent — Apple #007aff lagged --accent / icon-line (neon) (#14 / P2; design-review Agent Ops). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
   outline-offset: 2px;
   color: var(--text);
 }

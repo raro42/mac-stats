@@ -900,7 +900,8 @@ body {
 }
 
 .theme-version:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #0a0a0a);
+  /* Opaque Matrix accent — Apple #007aff lagged --accent / icon-btn (dark) (#14 / P2; design-review Agent Ops). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
   outline-offset: 2px;
 }
 
@@ -1421,7 +1422,8 @@ body {
 }
 
 .collapse-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #0a0a0a);
+  /* Opaque Matrix accent — Apple #007aff lagged --accent / icon-line (dark) (#14 / P2; design-review Agent Ops). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
   outline-offset: 2px;
   color: var(--text);
 }

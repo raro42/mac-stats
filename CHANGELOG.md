@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2806] - 2026-11-16
+
+### Fixed
+- Dark / Neon / Futuristic: Agent Ops collapse + theme-version focus rings use theme `--accent` instead of Apple `#007aff` fallbacks (parity with icon-line / Data Poster).
+
 ## [0.1.2805] - 2026-11-16
 
 ### Changed
