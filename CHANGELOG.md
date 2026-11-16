@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2809] - 2026-11-16
+
+### Changed
+- Light / Material / Architect design-review (AI Chat composer): `.chat-input-container:focus-within` remaps leftover Apple `#007aff` outline/wash fallbacks onto theme `--accent` (Light soft blue / Material taupe / Architect slate), matching Dark / Neon / Futuristic after v0.1.2808 (polish-without-capture while Mac TCC blocks window-only feature screenshots).
+
 ## [0.1.2808] - 2026-11-16
 
 ### Changed
