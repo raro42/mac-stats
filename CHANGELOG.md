@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2829] - 2026-11-16
+
+### Fixed
+- Dark / Neon design-review (AI Chat + Monitors soft-states): Dark monitors/ollama/chat collapsed-glance focus, chat-offline attention (continue/filter/sending), and chat model/turn/answer/errors glance focus + turn active leftover poster cyan `#55c7ff` fallbacks remap onto Matrix `#00cc66` (matching disk-cleanup/details/agent-ops/monitors-summary); Neon ollama/chat collapsed focus remaps onto `#6dff7b` matching Neon monitors collapsed (polish-without-capture while Mac TCC blocks capture).
+
 ## [0.1.2828] - 2026-11-16
 
 ### Fixed
