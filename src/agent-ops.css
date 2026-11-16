@@ -15495,7 +15495,8 @@ body.theme-futuristic .ops-row:hover {
   background: color-mix(in srgb, currentColor 9%, #0b0b10);
 }
 body.theme-futuristic .ops-row:focus-visible {
-  outline-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
+  /* Opaque futuristic cyan — bare poster #55c7ff lagged --accent / Neon row focus (#14 / P2; design-review Agent Ops). */
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
 body.theme-futuristic .ops-row.is-selected {
   border-color: color-mix(in srgb, var(--accent, #55c7ff) 42%, #0b0b10);
@@ -15542,15 +15543,16 @@ body.theme-futuristic .ops-badge.off {
   color: color-mix(in srgb, #ffffff 55%, #0b0b10);
 }
 body.theme-futuristic #ops-runs-list .ops-row.is-lite:not(.is-selected) {
-  background: color-mix(in srgb, #55c7ff 8%, #0b0b10);
-  border-color: color-mix(in srgb, #55c7ff 22%, #0b0b10);
+  /* Opaque futuristic cyan — bare poster #55c7ff lagged --accent / Neon lite runs (#14 / P2; design-review Agent Ops). */
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 8%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
 }
 body.theme-futuristic #ops-runs-list .ops-row.is-lite:not(.is-selected):hover {
-  background: color-mix(in srgb, #55c7ff 12%, #0b0b10);
-  border-color: color-mix(in srgb, #55c7ff 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 12%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 28%, #0b0b10);
 }
 body.theme-futuristic #ops-runs-list .ops-row.is-lite .ops-row-meta {
-  color: color-mix(in srgb, #55c7ff 70%, #ffffff);
+  color: color-mix(in srgb, var(--accent, #3bd6ff) 70%, #ffffff);
 }
 body.theme-futuristic #ops-runs-list .ops-row.is-slow:not(.is-selected) {
   background: color-mix(in srgb, #ff9f0a 7%, #0b0b10);
@@ -22103,9 +22105,9 @@ body.theme-neon .ops-insights-kb-hint {
 }
 
 body.theme-futuristic textarea.ops-agent-editor:focus {
-  /* Opaque cyan accent — Apple #0a84ff lagged ops-filter-input focus cyan (#14 / P2; design-review Agent Ops). */
-  border-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
+  /* Opaque futuristic cyan — bare poster #55c7ff lagged --accent / ops-filter-input focus (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 18%, #0b0b10);
 }
 body.theme-futuristic textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #ff9f0a 50%, #0b0b10);
@@ -22169,9 +22171,10 @@ body.theme-neon .ops-filter-input.ops-filter-just-cleared {
   background: color-mix(in srgb, #6dff7b 8%, #08120c);
 }
 body.theme-futuristic .ops-filter-input.ops-filter-just-cleared {
-  border-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
-  background: color-mix(in srgb, #55c7ff 8%, #0b0b10);
+  /* Opaque futuristic cyan — bare poster #55c7ff lagged --accent / Neon just-cleared (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 18%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 8%, #0b0b10);
 }
 
 

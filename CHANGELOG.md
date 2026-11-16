@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2823] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (Agent Ops editor + filter flash + runs): leftover poster cyan `#55c7ff` on `textarea.ops-agent-editor:focus`, `.ops-filter-input.ops-filter-just-cleared`, `.ops-row:focus-visible`, and `#ops-runs-list .ops-row.is-lite` remaps onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon `#6dff7b` parity and Futuristic `ops-filter-input:focus` from v0.1.2818 (polish-without-capture while Mac TCC blocks capture).
+
 ## [0.1.2822] - 2026-11-16
 
 ### Fixed
