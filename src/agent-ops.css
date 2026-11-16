@@ -24917,8 +24917,9 @@ body.theme-futuristic .disk-cleanup-meta-card:hover {
   border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
 }
 body.theme-futuristic .disk-cleanup-meta-card:focus-within {
-  border-color: color-mix(in srgb, #55c7ff 36%, #0b0b10);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff lagged --accent / Neon meta-card (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, #3bd6ff 36%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #3bd6ff 18%, #0b0b10);
 }
 body.theme-futuristic .disk-cleanup-meta-card.has-reclaim {
   border-color: color-mix(in srgb, #ff9f0a 30%, #0b0b10);
@@ -24929,8 +24930,9 @@ body.theme-futuristic .disk-cleanup-meta-card.is-clean:not(.has-reclaim) {
   background: color-mix(in srgb, #34c759 7%, #0b0b10);
 }
 body.theme-futuristic .disk-cleanup-meta-card.is-action:focus-visible {
-  border-color: color-mix(in srgb, #55c7ff 36%, #0b0b10);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff lagged --accent / Neon meta-card (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, #3bd6ff 36%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #3bd6ff 18%, #0b0b10);
 }
 body.theme-futuristic .disk-cleanup-meta-card.is-action.has-reclaim:focus-visible {
   border-color: color-mix(in srgb, #ff9f0a 48%, #0b0b10);
@@ -25127,9 +25129,9 @@ body.theme-neon .disk-cleanup-toolbar .disk-cleanup-primary {
   border-color: color-mix(in srgb, #6dff7b 30%, #08120c);
 }
 body.theme-futuristic .disk-cleanup-toolbar .disk-cleanup-primary {
-  /* Opaque cyan accent — Apple #0a84ff lagged soft-delete / meta-card cyan (#14 / P2; design-review disk-cleanup). */
-  background: color-mix(in srgb, #55c7ff 14%, #0b0b10);
-  border-color: color-mix(in srgb, #55c7ff 30%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff lagged --accent / Neon primary (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, #3bd6ff 14%, #0b0b10);
+  border-color: color-mix(in srgb, #3bd6ff 30%, #0b0b10);
 }
 
 body.theme-data-poster .disk-cleanup-toolbar .disk-cleanup-primary:hover {
@@ -25145,8 +25147,8 @@ body.theme-neon .disk-cleanup-toolbar .disk-cleanup-primary:hover {
   border-color: color-mix(in srgb, #6dff7b 42%, #08120c);
 }
 body.theme-futuristic .disk-cleanup-toolbar .disk-cleanup-primary:hover {
-  background: color-mix(in srgb, #55c7ff 22%, #0b0b10);
-  border-color: color-mix(in srgb, #55c7ff 42%, #0b0b10);
+  background: color-mix(in srgb, #3bd6ff 22%, #0b0b10);
+  border-color: color-mix(in srgb, #3bd6ff 42%, #0b0b10);
 }
 
 body.theme-data-poster .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
@@ -25215,9 +25217,9 @@ body.theme-neon .disk-cleanup-add-scope input:focus-visible {
 }
 body.theme-futuristic .disk-cleanup-scope-row input[type="number"]:focus-visible,
 body.theme-futuristic .disk-cleanup-add-scope input:focus-visible {
-  /* Opaque cyan accent — Apple #0a84ff lagged add-btn / primary cyan (#14 / P2; design-review disk-cleanup). */
-  border-color: color-mix(in srgb, #55c7ff 40%, #0b0b10);
-  box-shadow: 0 0 0 2px color-mix(in srgb, #55c7ff 18%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff lagged --accent / Neon add-scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, #3bd6ff 40%, #0b0b10);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #3bd6ff 18%, #0b0b10);
 }
 
 body.theme-data-poster .disk-cleanup-scope-remove {
@@ -25268,8 +25270,8 @@ body.theme-neon .disk-cleanup-scope-remove:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, #6dff7b 20%, #08120c);
 }
 body.theme-futuristic .disk-cleanup-scope-remove:focus-visible {
-  /* Opaque cyan accent — Apple #0a84ff lagged add-btn / soft-delete cyan (#14 / P2; design-review disk-cleanup). */
-  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 20%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff lagged --accent / Neon scope-remove (#14 / P2; design-review disk-cleanup). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, #3bd6ff 20%, #0b0b10);
 }
 
 /* OVERNIGHT v0.1.2787: disk-cleanup add-btn Apple #0a84ff → theme accent */
@@ -25289,9 +25291,9 @@ body.theme-neon .disk-cleanup-add-scope #disk-cleanup-add-btn {
   border-color: color-mix(in srgb, #6dff7b 32%, #08120c);
 }
 body.theme-futuristic .disk-cleanup-add-scope #disk-cleanup-add-btn {
-  /* Opaque cyan accent — Apple #0a84ff lagged soft-delete / primary cyan (#14 / P2; design-review disk-cleanup). */
-  background: color-mix(in srgb, #55c7ff 16%, #0b0b10);
-  border-color: color-mix(in srgb, #55c7ff 32%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff lagged --accent / Neon add-btn (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, #3bd6ff 16%, #0b0b10);
+  border-color: color-mix(in srgb, #3bd6ff 32%, #0b0b10);
 }
 
 body.theme-data-poster .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
@@ -25307,8 +25309,8 @@ body.theme-neon .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
   border-color: color-mix(in srgb, #6dff7b 46%, #08120c);
 }
 body.theme-futuristic .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
-  background: color-mix(in srgb, #55c7ff 24%, #0b0b10);
-  border-color: color-mix(in srgb, #55c7ff 46%, #0b0b10);
+  background: color-mix(in srgb, #3bd6ff 24%, #0b0b10);
+  border-color: color-mix(in srgb, #3bd6ff 46%, #0b0b10);
 }
 
 body.theme-data-poster .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
@@ -25321,7 +25323,7 @@ body.theme-neon .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
   background: color-mix(in srgb, #6dff7b 28%, #08120c);
 }
 body.theme-futuristic .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
-  background: color-mix(in srgb, #55c7ff 28%, #0b0b10);
+  background: color-mix(in srgb, #3bd6ff 28%, #0b0b10);
 }
 
 body.theme-data-poster .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
@@ -25334,7 +25336,7 @@ body.theme-neon .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, #6dff7b 22%, #08120c);
 }
 body.theme-futuristic .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 22%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #3bd6ff 22%, #0b0b10);
 }
 
 /*

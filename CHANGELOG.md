@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2824] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (Disk Cleanup): leftover poster cyan `#55c7ff` on `.disk-cleanup-meta-card` focus, toolbar `.disk-cleanup-primary`, add-scope input focus, scope-remove focus, and `#disk-cleanup-add-btn` remaps onto theme accent futuristic cyan `#3bd6ff`, matching Neon `#6dff7b` parity and Disk Cleanup last-run focus from earlier CRT remaps (polish-without-capture while Mac TCC blocks `feature-disk-cleanup.png`).
+
+
 ## [0.1.2823] - 2026-11-16
 
 ### Fixed
