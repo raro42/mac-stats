@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2838] - 2026-11-16
+
+### Fixed
+- Light / Material / Architect / Swiss design-review (AI Chat model select + markdown links): leftover Apple `#007aff` on `.model-select:focus` / `:focus-visible` and `.chat-message .markdown a` remap onto theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41` · Swiss ink `#121216`), matching Neon / Dark model-select + markdown link parity after Futuristic soft-states v0.1.2837 (polish-without-capture while Mac TCC blocks capture; Send white-on-blue intentional).
+
+
 ## [0.1.2837] - 2026-11-16
 
 ### Fixed
