@@ -22024,8 +22024,9 @@ body.theme-futuristic .ops-health-card.ops-health-clickable:hover {
   background: color-mix(in srgb, currentColor 10%, #0b0b10);
 }
 body.theme-futuristic .ops-health-card.ops-health-clickable:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 35%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon ops-health (#14 / P2; design-review Agent Ops). */
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 35%, #0b0b10);
 }
 body.theme-futuristic .ops-health-card.ops-health-ok {
   border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
@@ -22040,14 +22041,14 @@ body.theme-futuristic .ops-health-card.ops-health-bad {
   background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
 }
 body.theme-futuristic .ops-health-card.is-active {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 42%, #0b0b10);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #3bd6ff) 42%, #0b0b10);
 }
 body.theme-futuristic .ops-health-card.is-active:not(.ops-health-ok):not(.ops-health-warn):not(.ops-health-bad) {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 7%, #0b0b10);
 }
 body.theme-futuristic .ops-health-card.is-active.ops-health-clickable:hover {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 52%, #0b0b10);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #3bd6ff) 52%, #0b0b10);
 }
 
 /*
@@ -23896,6 +23897,21 @@ body.theme-neon .chat-empty-chip:hover {
 body.theme-neon .chat-empty-chip:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
 }
+/* Opaque futuristic cyan — late Neon empty-chip remapped; Futuristic still shared early poster #55c7ff fallback (#14 / P2; design-review AI Chat). */
+body.theme-futuristic .chat-empty-chip {
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 13%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 87%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .chat-empty-chip:hover {
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 48%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .chat-empty-chip:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
+}
 
 /*
  * Dark: Top Processes list rows still mix on early shared `#0b0b10`
@@ -24191,20 +24207,21 @@ body.theme-futuristic .perplexity-filter-chip:hover {
   background: color-mix(in srgb, currentColor 7%, #0b0b10);
 }
 body.theme-futuristic .perplexity-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon Perplexity chips (#14 / P2; design-review AI Chat). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 20%, #0b0b10);
 }
 body.theme-futuristic .perplexity-filter-chip.is-active {
   color: color-mix(in srgb, #ffffff 88%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 32%, #0b0b10);
 }
 body.theme-futuristic .perplexity-filter-chip[data-perplexity-filter='top'].has-hits {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 12%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 28%, #0b0b10);
 }
 body.theme-futuristic .perplexity-filter-chip[data-perplexity-filter='top'].is-active {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 40%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 20%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 40%, #0b0b10);
 }
 body.theme-futuristic .perplexity-filter-chip[data-perplexity-filter='snippet'].has-hits {
   background: color-mix(in srgb, #34c759 14%, #0b0b10);
@@ -31361,10 +31378,11 @@ body.theme-neon .chat-filter-chip:focus-visible {
 }
 body.theme-futuristic .chat-filter-chip:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent (#14 / P2; design-review AI Chat). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 20%, #0b0b10);
 }
 body.theme-futuristic .chat-empty-chip:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
 
 /*

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2821] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (AI Chat empty chips + Perplexity filter + Agent Ops health): leftover poster cyan `#55c7ff` on `.chat-empty-chip` (late Neon-parity remap), `.perplexity-filter-chip` active/focus/top, `.ops-health-card` focus/active, and chat-filter/empty focus-visible remaps onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon `#6dff7b` parity and Futuristic remaps from v0.1.2817–2820 (polish-without-capture while Mac TCC blocks capture).
+
 ## [0.1.2820] - 2026-11-16
 
 ### Fixed
