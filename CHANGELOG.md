@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2812] - 2026-11-16
+
+### Fixed
+- Light / Material / Architect design-review (AI Chat composer): `body.theme-* #chat-input:focus` in `agent-ops.css` remaps leftover Apple `#0a84ff` / `#007aff` onto theme `--accent` (Light soft blue / Material taupe / Architect slate). `agent-ops.css` loads after theme `cpu.css`, so the old Apple rings overrode cream `#chat-input:focus` accents and fought `.chat-input-container:focus-within` from v0.1.2809 (polish-without-capture while Mac TCC blocks `feature-ai-chat.png`).
+
 ## [0.1.2811] - 2026-11-16
 
 ### Changed

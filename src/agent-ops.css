@@ -32301,8 +32301,9 @@ body.theme-light .chat-composer-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
 }
 body.theme-light #chat-input:focus {
-  border-color: color-mix(in srgb, #0a84ff 55%, #f7f7fa);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / cpu.css + chat-input-container (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 18%, #f7f7fa);
   background: #f7f7fa;
 }
 
@@ -32342,8 +32343,9 @@ body.theme-material .chat-composer-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
 }
 body.theme-material #chat-input:focus {
-  border-color: color-mix(in srgb, #0a84ff 55%, #ebe4d9);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / cpu.css + chat-input-container (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 18%, #ebe4d9);
   background: #ebe4d9;
 }
 
@@ -32383,8 +32385,9 @@ body.theme-architect .chat-composer-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
 }
 body.theme-architect #chat-input:focus {
-  border-color: color-mix(in srgb, #007aff 55%, #f1f1f1);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #007aff 18%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff lagged --accent / cpu.css + chat-input-container (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 18%, #f1f1f1);
   background: #f1f1f1;
 }
 
