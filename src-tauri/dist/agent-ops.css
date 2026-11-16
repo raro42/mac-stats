@@ -17114,16 +17114,17 @@ body.theme-neon .disk-cleanup-empty-cta:focus-visible {
 }
 
 body.theme-futuristic .disk-cleanup-empty-cta {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon empty-cta (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 14%, #0b0b10);
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-futuristic .disk-cleanup-empty-cta:hover {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 50%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 50%, #0b0b10);
 }
 body.theme-futuristic .disk-cleanup-empty-cta:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
 }
 
 /*
@@ -21736,9 +21737,9 @@ body.theme-futuristic .disk-cleanup-soft-delete:hover {
 }
 
 body.theme-futuristic .disk-cleanup-soft-delete:focus-within {
-  /* Opaque cyan accent — Apple #0a84ff lagged meta-card focus cyan (#14 / P2; design-review disk-cleanup). */
-  border-color: color-mix(in srgb, #55c7ff 34%, #0b0b10);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 16%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff lagged --accent / Neon soft-delete (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, #3bd6ff 34%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #3bd6ff 16%, #0b0b10);
 }
 
 body.theme-futuristic .disk-cleanup-soft-delete-label.is-just-saved {
@@ -22737,13 +22738,14 @@ body.theme-futuristic .disk-cleanup-scope-filter-chip:hover {
 }
 body.theme-futuristic .disk-cleanup-filter-chip:focus-visible,
 body.theme-futuristic .disk-cleanup-scope-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon filter-chip (#14 / P2; design-review disk-cleanup). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 20%, #0b0b10);
 }
 body.theme-futuristic .disk-cleanup-filter-chip.is-active,
 body.theme-futuristic .disk-cleanup-scope-filter-chip.is-active {
   color: color-mix(in srgb, #ffffff 88%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 32%, #0b0b10);
 }
 body.theme-futuristic .disk-cleanup-filter-chip[data-disk-cleanup-filter='reclaim'].has-hits {
   background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);

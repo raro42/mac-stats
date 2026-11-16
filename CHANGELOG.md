@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2825] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (Disk Cleanup soft-delete + empty CTA + filter chips): leftover poster cyan `#55c7ff` on `.disk-cleanup-soft-delete:focus-within`, `.disk-cleanup-empty-cta` (hover/focus), and `.disk-cleanup-filter-chip` / `.disk-cleanup-scope-filter-chip` focus/active remaps onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon `#6dff7b` parity and Futuristic meta/primary/add-scope from v0.1.2824 (polish-without-capture while Mac TCC blocks capture).
+
 ## [0.1.2824] - 2026-11-16
 
 ### Fixed
