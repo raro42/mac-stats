@@ -32391,6 +32391,14 @@ body.theme-architect #chat-input:focus {
   background: #f1f1f1;
 }
 
+/* --- swiss-minimalistic (#ffffff) --- */
+body.theme-swiss-minimalistic #chat-input:focus {
+  /* Opaque Swiss accent — Apple #0a84ff lagged --accent / cpu.css ink (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+  background: #ffffff;
+}
+
 /*
  * Light / Material / Architect: AI Chat message soft-states still mix Apple
  * `#ffffff` (`.chat-message[role]` hover · `:focus-visible` · `.is-selected` ·

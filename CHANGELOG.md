@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2813] - 2026-11-16
+
+### Fixed
+- Swiss Minimalistic design-review (AI Chat composer): `body.theme-swiss-minimalistic #chat-input:focus` in `agent-ops.css` remaps leftover Apple `#0a84ff` onto theme `--accent` Swiss ink `#121216`, and Swiss `.chat-input-container:focus-within` fallbacks match the same ink (cream parity after v0.1.2812). `agent-ops.css` loads after theme `cpu.css`, so the shared Apple ring had overridden Swiss `#chat-input:focus` ink from the theme sheet (polish-without-capture while Mac TCC blocks window-only feature screenshots).
+
 ## [0.1.2812] - 2026-11-16
 
 ### Fixed
