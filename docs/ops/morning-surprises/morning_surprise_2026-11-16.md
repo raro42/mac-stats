@@ -4,10 +4,11 @@ Overnight autoresearch (Track B) kept shipping Futuristic CRT accent remaps.
 
 ## Shipped tonight (latest)
 
-- **v0.1.2836** — Futuristic Perplexity `.perplexity-result-item` (hover / focus / selected / is-top) + `.perplexity-weather-card`: poster cyan `#55c7ff` → theme `--accent` `#3bd6ff` (Neon `#6dff7b` parity). Standing P2 #14 after chat-clear / Settings v0.1.2835.
+- **v0.1.2837** — Futuristic Debug Log `.logs-line` hover/selected, `#perplexity-search-btn:focus-visible`, chat You filter has-hits/active, `.monitor-settings-item:focus-within` + Monitors settings primary focus: poster cyan `#55c7ff` → theme `--accent` `#3bd6ff` (Neon `#6dff7b` parity). Standing P2 #14 after Perplexity result/weather v0.1.2836.
 
 ## Also tonight
 
+- **v0.1.2836** — Perplexity result items + weather card → `#3bd6ff`
 - **v0.1.2835** — chat Clear + logs·rings filter chips + Settings AI·help glances → `#3bd6ff`
 - **v0.1.2834** — Agent Ops insight-line focus/selected → `#3bd6ff`
 - **v0.1.2833** — ops-row selected / badge / Updated ago → `#3bd6ff`
