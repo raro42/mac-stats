@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2826] - 2026-11-16
+
+### Fixed
+- Futuristic / Neon design-review (Monitors): leftover poster cyan `#55c7ff` on Futuristic `.monitors-summary:focus-visible`, `.monitors-collapsed-glance:focus-visible`, and `.monitors-filter-chip` focus/active remaps onto theme `--accent` futuristic cyan `#3bd6ff`; Neon collapsed-glance focus fallback remaps onto `#6dff7b` matching Neon summary (polish-without-capture while Mac TCC blocks `feature-monitors.png`).
+
 ## [0.1.2825] - 2026-11-16
 
 ### Fixed

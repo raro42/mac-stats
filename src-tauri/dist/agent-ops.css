@@ -19454,7 +19454,8 @@ body.theme-neon .monitors-collapsed-glance:hover {
   border-color: color-mix(in srgb, currentColor 22%, #08120c);
 }
 body.theme-neon .monitors-collapsed-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #08120c);
+  /* Opaque neon green — poster #55c7ff lagged --accent / summary focus (#14 / P2; design-review Monitors). */
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
 }
 body.theme-neon .monitors-collapsed-glance.has-down {
   border-color: color-mix(in srgb, #ff3b30 35%, #08120c);
@@ -19514,7 +19515,8 @@ body.theme-futuristic .monitors-collapsed-glance:hover {
   border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
 }
 body.theme-futuristic .monitors-collapsed-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff lagged --accent / Neon collapsed (#14 / P2; design-review Monitors). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 45%, #0b0b10);
 }
 body.theme-futuristic .monitors-collapsed-glance.has-down {
   border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
@@ -20036,7 +20038,8 @@ body.theme-futuristic .monitors-summary:hover {
   border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
 }
 body.theme-futuristic .monitors-summary:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff lagged --accent / Neon summary (#14 / P2; design-review Monitors). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 45%, #0b0b10);
 }
 body.theme-futuristic .monitors-summary.has-down {
   border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
@@ -22892,12 +22895,13 @@ body.theme-futuristic .monitors-filter-chip:hover {
   background: color-mix(in srgb, currentColor 7%, #0b0b10);
 }
 body.theme-futuristic .monitors-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff lagged --accent / Neon chips (#14 / P2; design-review Monitors). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 20%, #0b0b10);
 }
 body.theme-futuristic .monitors-filter-chip.is-active {
   color: color-mix(in srgb, #ffffff 88%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 32%, #0b0b10);
 }
 body.theme-futuristic .monitors-filter-chip[data-monitors-filter='down'].has-hits {
   background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
