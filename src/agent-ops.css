@@ -15500,14 +15500,15 @@ body.theme-futuristic .ops-row:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
 body.theme-futuristic .ops-row.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 42%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon selected (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 42%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 12%, #0b0b10);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #3bd6ff) 16%, #0b0b10);
 }
 body.theme-futuristic .ops-row.is-selected:hover {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 52%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 15%, #0b0b10);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 52%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 15%, #0b0b10);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #3bd6ff) 20%, #0b0b10);
 }
 body.theme-futuristic .ops-row.is-copied,
 body.theme-futuristic .ops-row.is-selected.is-copied,
@@ -15533,7 +15534,8 @@ body.theme-futuristic button.ops-badge.off:hover {
   box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 14%, #0b0b10);
 }
 body.theme-futuristic button.ops-badge:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon badge focus (#14 / P2; design-review Agent Ops). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 28%, #0b0b10);
 }
 body.theme-futuristic button.ops-badge:disabled {
   color: color-mix(in srgb, #ffffff 51%, #0b0b10);
@@ -19303,7 +19305,8 @@ body.theme-futuristic .ops-updated-ago[role='button']:hover {
   background: color-mix(in srgb, currentColor 8%, #0b0b10);
 }
 body.theme-futuristic .ops-updated-ago[role='button']:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon updated-ago (#14 / P2; design-review Agent Ops). */
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
 body.theme-futuristic .ops-subhead,
 body.theme-futuristic .ops-insight-sub {

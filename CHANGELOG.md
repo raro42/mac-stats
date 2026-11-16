@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2833] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (Agent Ops selected row / badge / Updated ago): leftover poster cyan `#55c7ff` fallbacks on `.ops-row.is-selected` (+ hover), `button.ops-badge:focus-visible`, and `.ops-updated-ago[role='button']:focus-visible` remap onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon `#6dff7b` / row focus already on `#3bd6ff` after Perplexity/Settings/logs glances v0.1.2832 (polish-without-capture while Mac TCC blocks capture).
+
 ## [0.1.2832] - 2026-11-16
 
 ### Fixed
