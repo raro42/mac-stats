@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2839] - 2026-11-17
+
+### Fixed
+- Light / Material / Architect design-review (Perplexity result hover / weather / is-top): leftover bare Apple `#0a84ff` (and Apple `#007aff` / `#0a84ff` fallbacks) on `.perplexity-result-item` hover / focus / selected / is-top and `.perplexity-weather-card` remap onto theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`), matching Neon / Dark / Futuristic Perplexity parity after cream model-select v0.1.2838 (polish-without-capture while Mac TCC blocks capture; Send white-on-blue intentional; Swiss / Apple keep shared blue).
+
+
 ## [0.1.2838] - 2026-11-16
 
 ### Fixed

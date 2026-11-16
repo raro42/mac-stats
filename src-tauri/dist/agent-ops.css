@@ -26323,33 +26323,35 @@ body.theme-light .perplexity-result-item {
   border-color: color-mix(in srgb, currentColor 10%, #f7f7fa);
 }
 body.theme-light .perplexity-result-item:hover {
-  background: color-mix(in srgb, #0a84ff 6%, #f7f7fa);
-  border-color: color-mix(in srgb, #0a84ff 22%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / CRT·Neon hover (#14 / P2; design-review Perplexity). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 6%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 22%, #f7f7fa);
 }
 body.theme-light .perplexity-result-item[role='option']:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 45%, #f7f7fa);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6aa6df) 45%, #f7f7fa);
 }
 body.theme-light .perplexity-result-item:focus-within,
 body.theme-light .perplexity-result-item.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #f7f7fa);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 14%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 35%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 14%, #f7f7fa);
 }
 body.theme-light .perplexity-result-item[role='option'].is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 5%, #f7f7fa);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 18%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 22%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 5%, #f7f7fa);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #6aa6df) 18%, #f7f7fa);
 }
 body.theme-light .perplexity-result-item.is-top {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 6%, #f7f7fa);
 }
 body.theme-light .perplexity-result-item.is-top:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 10%, #f7f7fa);
 }
 body.theme-light .perplexity-weather-card {
-  border-color: color-mix(in srgb, #0a84ff 22%, #f7f7fa);
-  border-left-color: color-mix(in srgb, #0a84ff 70%, #f7f7fa);
-  background: color-mix(in srgb, #0a84ff 6%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / CRT·Neon weather (#14 / P2; design-review Perplexity). */
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 22%, #f7f7fa);
+  border-left-color: color-mix(in srgb, var(--accent, #6aa6df) 70%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 6%, #f7f7fa);
 }
 
 body.theme-material .perplexity-result-item {
@@ -26357,33 +26359,35 @@ body.theme-material .perplexity-result-item {
   border-color: color-mix(in srgb, currentColor 10%, #ebe4d9);
 }
 body.theme-material .perplexity-result-item:hover {
-  background: color-mix(in srgb, #0a84ff 6%, #ebe4d9);
-  border-color: color-mix(in srgb, #0a84ff 22%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / CRT·Neon hover (#14 / P2; design-review Perplexity). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 6%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 22%, #ebe4d9);
 }
 body.theme-material .perplexity-result-item[role='option']:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 45%, #ebe4d9);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #b8a68b) 45%, #ebe4d9);
 }
 body.theme-material .perplexity-result-item:focus-within,
 body.theme-material .perplexity-result-item.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #ebe4d9);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 14%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 35%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 14%, #ebe4d9);
 }
 body.theme-material .perplexity-result-item[role='option'].is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 5%, #ebe4d9);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 18%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 22%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 5%, #ebe4d9);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #b8a68b) 18%, #ebe4d9);
 }
 body.theme-material .perplexity-result-item.is-top {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 6%, #ebe4d9);
 }
 body.theme-material .perplexity-result-item.is-top:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 10%, #ebe4d9);
 }
 body.theme-material .perplexity-weather-card {
-  border-color: color-mix(in srgb, #0a84ff 22%, #ebe4d9);
-  border-left-color: color-mix(in srgb, #0a84ff 70%, #ebe4d9);
-  background: color-mix(in srgb, #0a84ff 6%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / CRT·Neon weather (#14 / P2; design-review Perplexity). */
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 22%, #ebe4d9);
+  border-left-color: color-mix(in srgb, var(--accent, #b8a68b) 70%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 6%, #ebe4d9);
 }
 
 body.theme-architect .perplexity-result-item {
@@ -26391,33 +26395,35 @@ body.theme-architect .perplexity-result-item {
   border-color: color-mix(in srgb, currentColor 10%, #f1f1f1);
 }
 body.theme-architect .perplexity-result-item:hover {
-  background: color-mix(in srgb, #0a84ff 6%, #f1f1f1);
-  border-color: color-mix(in srgb, #0a84ff 22%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / CRT·Neon hover (#14 / P2; design-review Perplexity). */
+  background: color-mix(in srgb, var(--accent, #232d41) 6%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 22%, #f1f1f1);
 }
 body.theme-architect .perplexity-result-item[role='option']:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 45%, #f1f1f1);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #232d41) 45%, #f1f1f1);
 }
 body.theme-architect .perplexity-result-item:focus-within,
 body.theme-architect .perplexity-result-item.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #f1f1f1);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 14%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 35%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 14%, #f1f1f1);
 }
 body.theme-architect .perplexity-result-item[role='option'].is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 5%, #f1f1f1);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 18%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 22%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 5%, #f1f1f1);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #232d41) 18%, #f1f1f1);
 }
 body.theme-architect .perplexity-result-item.is-top {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 6%, #f1f1f1);
 }
 body.theme-architect .perplexity-result-item.is-top:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 10%, #f1f1f1);
 }
 body.theme-architect .perplexity-weather-card {
-  border-color: color-mix(in srgb, #0a84ff 22%, #f1f1f1);
-  border-left-color: color-mix(in srgb, #0a84ff 70%, #f1f1f1);
-  background: color-mix(in srgb, #0a84ff 6%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / CRT·Neon weather (#14 / P2; design-review Perplexity). */
+  border-color: color-mix(in srgb, var(--accent, #232d41) 22%, #f1f1f1);
+  border-left-color: color-mix(in srgb, var(--accent, #232d41) 70%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 6%, #f1f1f1);
 }
 
 /*
