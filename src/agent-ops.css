@@ -24690,7 +24690,8 @@ body.theme-neon .logs-line[role='option']:hover {
   background: color-mix(in srgb, var(--accent, #6dff7b) 8%, #08120c);
 }
 body.theme-futuristic .logs-line[role='option']:hover {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 8%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon logs-line (#14 / P2; design-review Debug Log). */
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 8%, #0b0b10);
 }
 
 body.theme-data-poster .logs-line[role='option'].is-selected {
@@ -24706,8 +24707,9 @@ body.theme-neon .logs-line[role='option'].is-selected {
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #6dff7b) 28%, #08120c);
 }
 body.theme-futuristic .logs-line[role='option'].is-selected {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon logs-line (#14 / P2; design-review Debug Log). */
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 16%, #0b0b10);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #3bd6ff) 28%, #0b0b10);
 }
 
 body.theme-dark .logs-line[role='option'].is-just-copied {
@@ -25550,7 +25552,8 @@ body.theme-neon #perplexity-search-btn:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
 }
 body.theme-futuristic #perplexity-search-btn:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon search focus (#14 / P2; design-review Perplexity). */
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
 
 /*
@@ -30719,12 +30722,14 @@ body.theme-neon .chat-filter-chip[data-chat-filter='errors'].is-active {
 }
 
 body.theme-futuristic .chat-filter-chip[data-chat-filter='you'].has-hits {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 24%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon You chip (#14 / P2; design-review AI Chat). */
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 10%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 24%, #0b0b10);
 }
 body.theme-futuristic .chat-filter-chip[data-chat-filter='you'].is-active {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 38%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon You chip (#14 / P2; design-review AI Chat). */
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 38%, #0b0b10);
 }
 body.theme-futuristic .chat-filter-chip[data-chat-filter='assistant'].has-hits {
   background: color-mix(in srgb, #34c759 12%, #0b0b10);
@@ -30765,8 +30770,9 @@ body.theme-neon .monitor-settings-item:focus-within {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 16%, #08120c);
 }
 body.theme-futuristic .monitor-settings-item:focus-within {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon monitors settings (#14 / P2; design-review Monitors). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 36%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 16%, #0b0b10);
 }
 
 body.theme-data-poster .monitors-settings-popover .popover-btn-primary:focus-visible {
@@ -30779,7 +30785,8 @@ body.theme-neon .monitors-settings-popover .popover-btn-primary:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
 }
 body.theme-futuristic .monitors-settings-popover .popover-btn-primary:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon monitors settings (#14 / P2; design-review Monitors). */
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
 
 body.theme-data-poster .monitor-remove-btn:focus-visible {

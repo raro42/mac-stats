@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2837] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (Debug Log / Perplexity search / AI Chat You filter / Monitors settings): leftover poster cyan `#55c7ff` fallbacks on `.logs-line` hover/selected, `#perplexity-search-btn:focus-visible`, `.chat-filter-chip[data-chat-filter='you']` has-hits/active, `.monitor-settings-item:focus-within`, and Monitors settings primary focus remap onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon `#6dff7b` / Perplexity result items already on `#3bd6ff` after v0.1.2836 (polish-without-capture while Mac TCC blocks capture).
+
+
 ## [0.1.2836] - 2026-11-16
 
 ### Fixed
