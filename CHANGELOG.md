@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2827] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (filter-miss / filter-clear / collapsed-glance soft-states): leftover poster cyan `#55c7ff` fallbacks on rings/Disk Cleanup/Logs/Perplexity filter-miss shells + CTAs, Perplexity/Disk Cleanup/chat Clear controls, and Ollama/chat/Disk Cleanup/Details/Agent Ops collapsed-glance focus (plus Ollama glance active) remap onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon `#6dff7b` parity after Monitors summary/chips v0.1.2826 (polish-without-capture while Mac TCC blocks capture).
+
 ## [0.1.2826] - 2026-11-16
 
 ### Fixed
