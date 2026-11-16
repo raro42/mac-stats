@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2817] - 2026-11-16
+
+### Fixed
+- Futuristic design-review (AI Chat + Monitors soft-states): leftover poster cyan `#55c7ff` fallbacks on `.chat-filter-chip.is-active`, `.chat-filter-miss` (+ CTA), `.chat-answer-part.chat-answer-final`, `.monitors-empty-cta`, and `.monitors-filter-miss` remap onto theme `--accent` futuristic cyan `#3bd6ff`, matching Neon accent parity and Futuristic `#chat-input:focus` from v0.1.2816 (polish-without-capture while Mac TCC blocks `feature-ai-chat.png` / `feature-monitors.png`).
+
 ## [0.1.2816] - 2026-11-16
 
 ### Fixed

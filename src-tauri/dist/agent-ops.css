@@ -1657,8 +1657,9 @@ body.theme-futuristic .chat-filter-chip:hover {
   background: color-mix(in srgb, currentColor 12%, #0b0b10);
 }
 body.theme-futuristic .chat-filter-chip.is-active {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / chat-input (#14 / P2; design-review AI Chat). */
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 36%, #0b0b10);
 }
 body.theme-futuristic #chat-input:focus {
   /* Opaque futuristic cyan — bare poster #55c7ff on #0b0b10 lagged --accent / cpu.css + chat-input-container (#14 / P2; design-review AI Chat). */
@@ -1668,8 +1669,9 @@ body.theme-futuristic #chat-input:focus {
   color: var(--text, color-mix(in srgb, #ffffff 92%, #111123));
 }
 body.theme-futuristic .chat-filter-miss {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent after chat-input v0.1.2816 (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 10%, #0b0b10);
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-futuristic .chat-filter-miss.is-errors {
@@ -1678,20 +1680,20 @@ body.theme-futuristic .chat-filter-miss.is-errors {
 }
 body.theme-futuristic .chat-filter-miss.is-you,
 body.theme-futuristic .chat-filter-miss.is-assistant {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 10%, #0b0b10);
 }
 body.theme-futuristic .chat-filter-miss-cta {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 14%, #0b0b10);
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-futuristic .chat-filter-miss-cta:hover {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 48%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 48%, #0b0b10);
 }
 body.theme-futuristic .chat-filter-miss-cta:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
 }
 body.theme-futuristic .chat-exec-card {
   border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
@@ -1707,8 +1709,9 @@ body.theme-futuristic .chat-answer-part {
   background: color-mix(in srgb, currentColor 8%, #0b0b10);
 }
 body.theme-futuristic .chat-answer-part.chat-answer-final {
-  border-color: color-mix(in srgb, #55c7ff 28%, #0b0b10);
-  background: color-mix(in srgb, #55c7ff 10%, #0b0b10);
+  /* Opaque futuristic cyan — bare poster #55c7ff lagged --accent / Neon final parity (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 10%, #0b0b10);
 }
 
 /*
@@ -17062,16 +17065,17 @@ body.theme-neon .monitors-empty-cta:focus-visible {
 }
 
 body.theme-futuristic .monitors-empty-cta {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent (#14 / P2; design-review Monitors). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 14%, #0b0b10);
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-futuristic .monitors-empty-cta:hover {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 50%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 50%, #0b0b10);
 }
 body.theme-futuristic .monitors-empty-cta:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
 }
 
 /*
@@ -17222,8 +17226,9 @@ body.theme-neon .monitors-filter-miss.is-up-empty {
 }
 
 body.theme-futuristic .monitors-filter-miss {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  /* Opaque futuristic cyan — poster #55c7ff fallback lagged --accent / Neon monitors parity (#14 / P2; design-review Monitors). */
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 10%, #0b0b10);
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-futuristic .monitors-filter-miss.is-down-empty,
@@ -17232,8 +17237,8 @@ body.theme-futuristic .monitors-filter-miss.is-slow-empty {
   background: color-mix(in srgb, #34c759 10%, #0b0b10);
 }
 body.theme-futuristic .monitors-filter-miss.is-up-empty {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 10%, #0b0b10);
 }
 
 /*
