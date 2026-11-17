@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2841] - 2026-11-17
+
+### Fixed
+- Light / Material / Architect design-review (Disk Cleanup primary / meta / soft-delete / scope): leftover bare Apple `#0a84ff` on toolbar primary (+ hover), meta-card focus-within / is-action focus, soft-delete focus-within, scope-row focus, add-btn (+ hover/active/focus), scope-remove focus, add-scope / scope input focus, path focus outlines, and toolbar secondary focus remap onto theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`), matching Neon Disk Cleanup primary·meta·soft-delete·scope parity after cream item/process/ops-chip v0.1.2840 (polish-without-capture while Mac TCC blocks capture; Send white-on-blue intentional; Swiss / Apple keep shared blue).
+
 ## [0.1.2840] - 2026-11-17
 
 ### Fixed

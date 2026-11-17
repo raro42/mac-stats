@@ -27289,18 +27289,21 @@ body.theme-architect .disk-cleanup-scope-row:hover {
 
 body.theme-light .disk-cleanup-scope-row:focus-visible,
 body.theme-light .disk-cleanup-scope-row:focus-within {
-  border-color: color-mix(in srgb, #0a84ff 34%, #f7f7fa);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 34%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
 }
 body.theme-material .disk-cleanup-scope-row:focus-visible,
 body.theme-material .disk-cleanup-scope-row:focus-within {
-  border-color: color-mix(in srgb, #0a84ff 34%, #ebe4d9);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 34%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
 }
 body.theme-architect .disk-cleanup-scope-row:focus-visible,
 body.theme-architect .disk-cleanup-scope-row:focus-within {
-  border-color: color-mix(in srgb, #0a84ff 34%, #f1f1f1);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #232d41) 34%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
 }
 
 body.theme-light .disk-cleanup-scope-row.is-selected {
@@ -35664,7 +35667,8 @@ body.theme-light .process-detail-name:focus-visible,
 body.theme-light .process-detail-pid:focus-visible,
 body.theme-light .disk-cleanup-item-path:focus-visible,
 body.theme-light .disk-cleanup-scope-path:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  outline-color: color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
 }
 
 /* --- material (#ebe4d9) --- */
@@ -35674,7 +35678,8 @@ body.theme-material .process-detail-name:focus-visible,
 body.theme-material .process-detail-pid:focus-visible,
 body.theme-material .disk-cleanup-item-path:focus-visible,
 body.theme-material .disk-cleanup-scope-path:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  outline-color: color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
 }
 
 /* --- architect (#f1f1f1) --- */
@@ -35684,7 +35689,8 @@ body.theme-architect .process-detail-name:focus-visible,
 body.theme-architect .process-detail-pid:focus-visible,
 body.theme-architect .disk-cleanup-item-path:focus-visible,
 body.theme-architect .disk-cleanup-scope-path:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  outline-color: color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
 }
 
 /*
@@ -36631,7 +36637,8 @@ body.theme-light #chat-send-btn:focus-visible {
   outline-offset: 2px;
 }
 body.theme-light .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 22%, #f7f7fa);
 }
 body.theme-light #perplexity-search-btn:disabled {
   color: color-mix(in srgb, #0c0c10 48%, #f7f7fa);
@@ -36668,7 +36675,8 @@ body.theme-material #chat-send-btn:focus-visible {
   outline-offset: 2px;
 }
 body.theme-material .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 22%, #ebe4d9);
 }
 body.theme-material #perplexity-search-btn:disabled {
   color: color-mix(in srgb, #0c0c10 48%, #ebe4d9);
@@ -36703,7 +36711,8 @@ body.theme-architect #chat-send-btn:focus-visible {
   outline-offset: 2px;
 }
 body.theme-architect .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 22%, #f1f1f1);
 }
 body.theme-architect #perplexity-search-btn:disabled {
   color: color-mix(in srgb, #0c0c10 48%, #f1f1f1);
@@ -36755,10 +36764,12 @@ body.theme-light .process-pin.is-just-saved {
   background: color-mix(in srgb, #34c759 22%, #f7f7fa) !important;
 }
 body.theme-light .disk-cleanup-scope-remove:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 20%, #f7f7fa);
 }
 body.theme-light .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 22%, #f7f7fa);
 }
 body.theme-light .monitors-settings-popover .popover-btn-primary:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
@@ -36786,10 +36797,12 @@ body.theme-material .process-pin.is-just-saved {
   background: color-mix(in srgb, #34c759 22%, #ebe4d9) !important;
 }
 body.theme-material .disk-cleanup-scope-remove:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 20%, #ebe4d9);
 }
 body.theme-material .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 22%, #ebe4d9);
 }
 body.theme-material .monitors-settings-popover .popover-btn-primary:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
@@ -36817,10 +36830,12 @@ body.theme-architect .process-pin.is-just-saved {
   background: color-mix(in srgb, #34c759 22%, #f1f1f1) !important;
 }
 body.theme-architect .disk-cleanup-scope-remove:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 20%, #f1f1f1);
 }
 body.theme-architect .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 22%, #f1f1f1);
 }
 body.theme-architect .monitors-settings-popover .popover-btn-primary:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
@@ -36849,8 +36864,9 @@ body.theme-light .disk-cleanup-meta-card:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
 }
 body.theme-light .disk-cleanup-meta-card:focus-within {
-  border-color: color-mix(in srgb, #0a84ff 36%, #f7f7fa);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 36%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 18%, #f7f7fa);
 }
 body.theme-light .disk-cleanup-meta-card.has-reclaim {
   border-color: color-mix(in srgb, #ff9f0a 30%, #f7f7fa);
@@ -36861,8 +36877,9 @@ body.theme-light .disk-cleanup-meta-card.is-clean:not(.has-reclaim) {
   background: color-mix(in srgb, #34c759 7%, #f7f7fa);
 }
 body.theme-light .disk-cleanup-meta-card.is-action:focus-visible {
-  border-color: color-mix(in srgb, #0a84ff 36%, #f7f7fa);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 36%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 18%, #f7f7fa);
 }
 body.theme-light .disk-cleanup-meta-card.is-action.has-reclaim:focus-visible {
   border-color: color-mix(in srgb, #ff9f0a 48%, #f7f7fa);
@@ -36950,8 +36967,9 @@ body.theme-material .disk-cleanup-meta-card:hover {
   border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
 }
 body.theme-material .disk-cleanup-meta-card:focus-within {
-  border-color: color-mix(in srgb, #0a84ff 36%, #ebe4d9);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 36%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 18%, #ebe4d9);
 }
 body.theme-material .disk-cleanup-meta-card.has-reclaim {
   border-color: color-mix(in srgb, #ff9f0a 30%, #ebe4d9);
@@ -36962,8 +36980,9 @@ body.theme-material .disk-cleanup-meta-card.is-clean:not(.has-reclaim) {
   background: color-mix(in srgb, #34c759 7%, #ebe4d9);
 }
 body.theme-material .disk-cleanup-meta-card.is-action:focus-visible {
-  border-color: color-mix(in srgb, #0a84ff 36%, #ebe4d9);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 36%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 18%, #ebe4d9);
 }
 body.theme-material .disk-cleanup-meta-card.is-action.has-reclaim:focus-visible {
   border-color: color-mix(in srgb, #ff9f0a 48%, #ebe4d9);
@@ -37051,8 +37070,9 @@ body.theme-architect .disk-cleanup-meta-card:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
 }
 body.theme-architect .disk-cleanup-meta-card:focus-within {
-  border-color: color-mix(in srgb, #0a84ff 36%, #f1f1f1);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #232d41) 36%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 18%, #f1f1f1);
 }
 body.theme-architect .disk-cleanup-meta-card.has-reclaim {
   border-color: color-mix(in srgb, #ff9f0a 30%, #f1f1f1);
@@ -37063,8 +37083,9 @@ body.theme-architect .disk-cleanup-meta-card.is-clean:not(.has-reclaim) {
   background: color-mix(in srgb, #34c759 7%, #f1f1f1);
 }
 body.theme-architect .disk-cleanup-meta-card.is-action:focus-visible {
-  border-color: color-mix(in srgb, #0a84ff 36%, #f1f1f1);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #232d41) 36%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 18%, #f1f1f1);
 }
 body.theme-architect .disk-cleanup-meta-card.is-action.has-reclaim:focus-visible {
   border-color: color-mix(in srgb, #ff9f0a 48%, #f1f1f1);
@@ -37176,13 +37197,16 @@ body.theme-light #github-link[aria-disabled="true"] {
   color: color-mix(in srgb, #0c0c10 62%, #f7f7fa);
   opacity: 1;
 }
+/* OVERNIGHT v0.1.2841: cream Disk Cleanup primary/meta/soft-delete/scope Apple #0a84ff → theme accent (Light #6aa6df · Material #b8a68b · Architect #232d41; Neon parity) */
 body.theme-light .disk-cleanup-toolbar .disk-cleanup-primary {
-  background: color-mix(in srgb, #0a84ff 14%, #f7f7fa);
-  border-color: color-mix(in srgb, #0a84ff 30%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 14%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 30%, #f7f7fa);
 }
 body.theme-light .disk-cleanup-toolbar .disk-cleanup-primary:hover {
-  background: color-mix(in srgb, #0a84ff 22%, #f7f7fa);
-  border-color: color-mix(in srgb, #0a84ff 42%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 22%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 42%, #f7f7fa);
 }
 body.theme-light .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
   color: color-mix(in srgb, #0c0c10 48%, #f7f7fa);
@@ -37211,12 +37235,14 @@ body.theme-material #github-link[aria-disabled="true"] {
   opacity: 1;
 }
 body.theme-material .disk-cleanup-toolbar .disk-cleanup-primary {
-  background: color-mix(in srgb, #0a84ff 14%, #ebe4d9);
-  border-color: color-mix(in srgb, #0a84ff 30%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 14%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 30%, #ebe4d9);
 }
 body.theme-material .disk-cleanup-toolbar .disk-cleanup-primary:hover {
-  background: color-mix(in srgb, #0a84ff 22%, #ebe4d9);
-  border-color: color-mix(in srgb, #0a84ff 42%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 22%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 42%, #ebe4d9);
 }
 body.theme-material .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
   color: color-mix(in srgb, #0c0c10 48%, #ebe4d9);
@@ -37245,12 +37271,14 @@ body.theme-architect #github-link[aria-disabled="true"] {
   opacity: 1;
 }
 body.theme-architect .disk-cleanup-toolbar .disk-cleanup-primary {
-  background: color-mix(in srgb, #0a84ff 14%, #f1f1f1);
-  border-color: color-mix(in srgb, #0a84ff 30%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, var(--accent, #232d41) 14%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 30%, #f1f1f1);
 }
 body.theme-architect .disk-cleanup-toolbar .disk-cleanup-primary:hover {
-  background: color-mix(in srgb, #0a84ff 22%, #f1f1f1);
-  border-color: color-mix(in srgb, #0a84ff 42%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, var(--accent, #232d41) 22%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 42%, #f1f1f1);
 }
 body.theme-architect .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
   color: color-mix(in srgb, #0c0c10 48%, #f1f1f1);
@@ -37560,8 +37588,9 @@ body.theme-light .disk-cleanup-soft-delete:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
 }
 body.theme-light .disk-cleanup-soft-delete:focus-within {
-  border-color: color-mix(in srgb, #0a84ff 34%, #f7f7fa);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 34%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
 }
 
 /* --- material (#ebe4d9) --- */
@@ -37582,8 +37611,9 @@ body.theme-material .disk-cleanup-soft-delete:hover {
   border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
 }
 body.theme-material .disk-cleanup-soft-delete:focus-within {
-  border-color: color-mix(in srgb, #0a84ff 34%, #ebe4d9);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 34%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
 }
 
 /* --- architect (#f1f1f1) --- */
@@ -37604,8 +37634,9 @@ body.theme-architect .disk-cleanup-soft-delete:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
 }
 body.theme-architect .disk-cleanup-soft-delete:focus-within {
-  border-color: color-mix(in srgb, #0a84ff 34%, #f1f1f1);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #232d41) 34%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
 }
 /*
  * Light / Material / Architect: Debug Log line soft-states still mix Apple
@@ -37933,15 +37964,18 @@ body.theme-light .disk-cleanup-scope-remove:hover {
   border-color: color-mix(in srgb, #ff453a 32%, #f7f7fa);
 }
 body.theme-light .disk-cleanup-add-scope #disk-cleanup-add-btn {
-  background: color-mix(in srgb, #0a84ff 16%, #f7f7fa);
-  border-color: color-mix(in srgb, #0a84ff 32%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 32%, #f7f7fa);
 }
 body.theme-light .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
-  background: color-mix(in srgb, #0a84ff 24%, #f7f7fa);
-  border-color: color-mix(in srgb, #0a84ff 46%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 24%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 46%, #f7f7fa);
 }
 body.theme-light .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
-  background: color-mix(in srgb, #0a84ff 28%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
 }
 body.theme-light #force-quit-process-btn.is-just-saved {
   background: color-mix(in srgb, #34c759 95%, #f7f7fa) !important;
@@ -37961,15 +37995,18 @@ body.theme-material .disk-cleanup-scope-remove:hover {
   border-color: color-mix(in srgb, #ff453a 32%, #ebe4d9);
 }
 body.theme-material .disk-cleanup-add-scope #disk-cleanup-add-btn {
-  background: color-mix(in srgb, #0a84ff 16%, #ebe4d9);
-  border-color: color-mix(in srgb, #0a84ff 32%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 32%, #ebe4d9);
 }
 body.theme-material .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
-  background: color-mix(in srgb, #0a84ff 24%, #ebe4d9);
-  border-color: color-mix(in srgb, #0a84ff 46%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 24%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 46%, #ebe4d9);
 }
 body.theme-material .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
-  background: color-mix(in srgb, #0a84ff 28%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
 }
 body.theme-material #force-quit-process-btn.is-just-saved {
   background: color-mix(in srgb, #34c759 95%, #ebe4d9) !important;
@@ -37989,15 +38026,18 @@ body.theme-architect .disk-cleanup-scope-remove:hover {
   border-color: color-mix(in srgb, #ff453a 32%, #f1f1f1);
 }
 body.theme-architect .disk-cleanup-add-scope #disk-cleanup-add-btn {
-  background: color-mix(in srgb, #0a84ff 16%, #f1f1f1);
-  border-color: color-mix(in srgb, #0a84ff 32%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 32%, #f1f1f1);
 }
 body.theme-architect .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
-  background: color-mix(in srgb, #0a84ff 24%, #f1f1f1);
-  border-color: color-mix(in srgb, #0a84ff 46%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, var(--accent, #232d41) 24%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 46%, #f1f1f1);
 }
 body.theme-architect .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
-  background: color-mix(in srgb, #0a84ff 28%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  background: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
 }
 body.theme-architect #force-quit-process-btn.is-just-saved {
   background: color-mix(in srgb, #34c759 95%, #f1f1f1) !important;
@@ -38143,8 +38183,9 @@ body.theme-light .disk-cleanup-add-scope input[type="number"] {
 }
 body.theme-light .disk-cleanup-scope-row input[type="number"]:focus-visible,
 body.theme-light .disk-cleanup-add-scope input:focus-visible {
-  border-color: color-mix(in srgb, #0a84ff 40%, #f7f7fa);
-  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 18%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 40%, #f7f7fa);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6aa6df) 18%, #f7f7fa);
 }
 body.theme-light .monitor-detail-log {
   background: color-mix(in srgb, #000 6%, #f7f7fa);
@@ -38170,8 +38211,9 @@ body.theme-material .disk-cleanup-add-scope input[type="number"] {
 }
 body.theme-material .disk-cleanup-scope-row input[type="number"]:focus-visible,
 body.theme-material .disk-cleanup-add-scope input:focus-visible {
-  border-color: color-mix(in srgb, #0a84ff 40%, #ebe4d9);
-  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 18%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 40%, #ebe4d9);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #b8a68b) 18%, #ebe4d9);
 }
 body.theme-material .monitor-detail-log {
   background: color-mix(in srgb, #000 6%, #ebe4d9);
@@ -38197,8 +38239,9 @@ body.theme-architect .disk-cleanup-add-scope input[type="number"] {
 }
 body.theme-architect .disk-cleanup-scope-row input[type="number"]:focus-visible,
 body.theme-architect .disk-cleanup-add-scope input:focus-visible {
-  border-color: color-mix(in srgb, #0a84ff 40%, #f1f1f1);
-  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 18%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon Disk Cleanup primary·meta·soft-delete·scope (#14 / P2; design-review disk-cleanup). */
+  border-color: color-mix(in srgb, var(--accent, #232d41) 40%, #f1f1f1);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #232d41) 18%, #f1f1f1);
 }
 body.theme-architect .monitor-detail-log {
   background: color-mix(in srgb, #000 6%, #f1f1f1);
