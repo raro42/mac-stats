@@ -4,7 +4,8 @@ Overnight Track B kept shipping cream Agent Ops accent parity (Standing P2 #14).
 
 ## Shipped tonight (latest first)
 
-- **v0.1.2844** — Light / Material / Architect Agent Ops `.ops-file-tab.active` / `.agent-ops-tab.active` (+ hover), active `.ops-tab-digit` / `.ops-tab-count`, and `.ops-insight-line.is-clickable.is-selected` Apple `#007aff` → theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`; Neon parity).
+- **v0.1.2845** — Light / Material / Architect Agent Ops `.ops-filter-match.is-partial`, `.ops-filter-clear:hover` / `:focus-visible`, and `.ops-clear-filter` (+ hover / focus) Apple `#007aff` → theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`; Neon parity).
+- **v0.1.2844** — Light / Material / Architect Agent Ops `.ops-file-tab.active` / `.agent-ops-tab.active` (+ hover), active `.ops-tab-digit` / `.ops-tab-count`, and `.ops-insight-line.is-clickable.is-selected` Apple `#007aff` → theme `--accent`.
 - **v0.1.2843** — cream Ops file-tab/editor/Close/insight-line focus + chat-answer-final + process-pin bare Apple `#0a84ff` → theme accent.
 - **v0.1.2842** — cream Agent Ops filter/overview/row/lite + Debug Log filter-chip focus Apple → theme accent.
 - **v0.1.2841** — cream Disk Cleanup primary/meta/soft-delete/scope Apple → theme accent.
@@ -21,5 +22,5 @@ Overnight Track B kept shipping cream Agent Ops accent parity (Standing P2 #14).
 ## Next fuel
 
 - Dark layout-daily when the day quota opens.
-- Cream leftovers: `ops-filter-match.is-partial` / `ops-clear-filter` `#007aff` if muddy; Swiss Perplexity; other cream Apple leftovers.
+- Cream leftovers: `ops-empty:hover` / `empty-filter-miss.is-calm` / `empty-overview-cta.is-calm` `#007aff` if muddy; Swiss Perplexity; other cream Apple leftovers.
 - Mac capture when TCC allows; sibling/product fuel — not another keep-pNN clone.
