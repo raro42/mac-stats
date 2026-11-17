@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2845] - 2026-11-17
+
+### Fixed
+- Light / Material / Architect design-review (Agent Ops filter match partial + Clear / clear-filter): leftover Apple `#007aff` fallbacks on `.ops-filter-match.is-partial`, `.ops-filter-clear:hover` / `:focus-visible`, and `.ops-clear-filter` (+ hover / focus) remap onto theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`), matching Neon Ops filter match/clear parity after cream Ops file-tab.active / insight selected v0.1.2844 (polish-without-capture while Mac TCC blocks capture; Send white-on-blue intentional; Swiss / Apple keep shared blue).
+
 ## [0.1.2844] - 2026-11-17
 
 ### Fixed
