@@ -1,30 +1,34 @@
 # Morning surprise — 2026-11-17
 
-Overnight Track B kept shipping cream accent parity (Standing P2 #14). Digester open stayed empty; design-review grace; layout-daily already marked **data-poster** for the day.
+Overnight Track B kept shipping theme accent parity (Standing P2 #14). Digester stayed empty; design-review stayed in grace (Mac TCC); layout-daily already marked Data Poster for today.
 
-## Shipped tonight (latest first)
+## Shipped tonight (keeps)
 
-- **v0.1.2848** — Light / Material / Architect `.process-row.is-pinned`, `.monitor-url:focus-visible` / `button.monitor-detail-url:focus-visible`, `.logs-path-hint:focus-visible`, and Changelog / Settings header focus bare Apple `#0a84ff` → theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`; Neon / CRT pinned + monitor/logs/changelog focus parity).
-- **v0.1.2847** — Light / Material / Architect `#cpu-usage-card:focus-visible`, `#chat-send-btn:focus-visible`, and `#chat-clear-btn:focus-visible` bare Apple `#0a84ff` → theme `--accent` (Send fill stays white-on-blue).
-- **v0.1.2846** — Light / Material / Architect Agent Ops `.ops-empty:hover`, `.ops-empty-filter-miss.is-calm` / `.ops-empty-tab.ops-empty-filter-miss.is-calm`, and `.ops-overview-body > .ops-empty-overview-cta.is-calm` Apple `#007aff` → theme `--accent`.
-- **v0.1.2845** — Light / Material / Architect Agent Ops `.ops-filter-match.is-partial`, `.ops-filter-clear:hover` / `:focus-visible`, and `.ops-clear-filter` (+ hover / focus) Apple `#007aff` → theme `--accent`.
-- **v0.1.2844** — Light / Material / Architect Agent Ops `.ops-file-tab.active` / `.agent-ops-tab.active` (+ hover), active `.ops-tab-digit` / `.ops-tab-count`, and `.ops-insight-line.is-clickable.is-selected` Apple `#007aff` → theme `--accent`.
-- **v0.1.2843** — cream Ops file-tab/editor/Close/insight-line focus + chat-answer-final + process-pin bare Apple `#0a84ff` → theme accent.
-- **v0.1.2842** — cream Agent Ops filter/overview/row/lite + Debug Log filter-chip focus Apple → theme accent.
-- **v0.1.2841** — cream Disk Cleanup primary/meta/soft-delete/scope Apple → theme accent.
-- **v0.1.2840** — cream Disk Cleanup item focus + process-row selected + Ops kind-chip Apple → theme accent.
-- **v0.1.2839** — cream Perplexity result hover/focus/selected/is-top + weather Apple → theme accent.
+| Version | What |
+|---------|------|
+| **v0.1.2849** | Swiss Minimalistic Perplexity hover / focus / selected / is-top + weather-card: bare Apple `#0a84ff` → Swiss ink `#121216` (cream/CRT parity) |
+| **v0.1.2848** | Light / Material / Architect process pinned + monitor URL + logs path + Changelog/Settings header focus → theme accent |
+| **v0.1.2847** | Light / Material / Architect CPU card + AI Chat Send/Clear focus → theme accent |
+| **v0.1.2846** | Light / Material / Architect Ops empty hover / filter-miss calm / overview CTA → theme accent |
+| **v0.1.2845** | Light / Material / Architect Ops filter match partial + Clear / clear-filter → theme accent |
+| **v0.1.2844** | Light / Material / Architect Ops file-tab.active + insight selected → theme accent |
+| **v0.1.2843** | Light / Material / Architect Ops file-tab/editor/Close/insight-line + chat-answer-final + process-pin → theme accent |
+| **v0.1.2842** | Light / Material / Architect Ops filter/overview/row/lite + logs filter-chip → theme accent |
+| **v0.1.2841** | Light / Material / Architect Disk Cleanup primary/meta/soft-delete/scope → theme accent |
+| **v0.1.2840** | Light / Material / Architect Disk Cleanup item + process selected + Ops kind-chips → theme accent |
 
-## Tried / context
+## Skipped / notes
 
-- Digester: no open Slowest / Improve-task candidates after noise filters.
-- Design-review: due=false (grace windows); polish-without-capture while Mac Screen Recording TCC blocks `screencapture -l`.
-- Layout-daily: data-poster marked earlier tonight; Dark/Neon/Futuristic wait for the next calendar day quota.
-- Cream bare `#0a84ff` theme-override property lines are exhausted after 2848; remaining cream `#007aff` / `#0a84ff` are mostly `var(--accent, …)` fallback hygiene.
-- Debug.log scan: no product ERROR/WARN/panic clusters in the window.
+- Digester open candidates: none.
+- Design-review screenshot capture: blocked by Mac TCC — polish-without-capture path used.
+- Layout-daily Dark/Neon/Futuristic: due next calendar day (Data Poster already marked today).
+- Cream bare `#0a84ff` theme overrides treated as exhausted after v0.1.2848; Swiss Perplexity was the named muddy leftover.
 
 ## Next fuel
 
-- Dark layout-daily when the day quota opens.
-- Cream `ops-filter-just-cleared` `#007aff` fallback hygiene if muddy; Swiss Perplexity if muddy; Send white-on-blue intentional.
-- Mac capture when TCC allows; sibling/product fuel — not another keep-pNN clone.
+- Dark layout-daily when the day quota opens
+- Mac capture when TCC allows
+- cream `ops-filter-just-cleared` `#007aff` fallback hygiene only if muddy
+- sibling / product fuel — not keep-pNN clones
+
+Generated: 2026-11-17 ~04:20 CET
