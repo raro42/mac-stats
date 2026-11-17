@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2842] - 2026-11-17
+
+### Fixed
+- Light / Material / Architect design-review (Agent Ops filter / overview / rows / lite runs + Debug Log filter chips): leftover bare Apple `#0a84ff` on `.ops-filter-input:focus`, `.ops-overview-link:focus-visible`, `.ops-row:focus-visible`, `#ops-runs-list .ops-row.is-lite` (+ hover), and `.logs-toolbar .logs-filter-chip:focus-visible` remap onto theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`), matching Neon Agent Ops / logs filter-chip parity after cream Disk Cleanup primary·meta·soft-delete·scope v0.1.2841 (polish-without-capture while Mac TCC blocks capture; Send white-on-blue intentional; Swiss / Apple keep shared blue).
+
 ## [0.1.2841] - 2026-11-17
 
 ### Fixed
