@@ -1,17 +1,19 @@
 # Morning surprise — 2026-11-17
 
-Overnight autoresearch kept product UI polish (Standing P2 #14 cream Disk Cleanup accent parity). Digester open stayed empty; design-review grace; layout-daily Data Poster already marked for the day.
+Overnight Track B kept cream theme focus polish for Ralf.
 
 ## Shipped
 
-- **v0.1.2841** — Light / Material / Architect Disk Cleanup primary / meta / soft-delete / scope: bare Apple `#0a84ff` → theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`), matching Neon Disk Cleanup chrome after cream item/process/ops-chip **v0.1.2840**.
+- **v0.1.2842** — Light / Material / Architect: Agent Ops filter input, overview link, row focus, lite runs, and Debug Log filter-chip focus rings leave bare Apple `#0a84ff` and use theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`), matching Neon.
+- Earlier same night: **v0.1.2841** cream Disk Cleanup primary/meta/soft-delete/scope; **v0.1.2840** Disk Cleanup item / process selected / Ops kind-chips; **v0.1.2839** Perplexity hover/weather.
 
-## Earlier tonight
+## Context
 
-- **v0.1.2840** — cream Disk Cleanup item focus / Top Processes selected / Ops kind-chips Apple→accent.
-- **v0.1.2839** — cream Perplexity hover/weather Apple→accent.
-- **v0.1.2838** — cream/Swiss model-select + markdown links Apple→accent.
+- Digester open was empty; design-review grace (Mac TCC); layout-daily Data Poster already marked for the day.
+- Ratchet: keep rows in `~/.mac-stats/improvements/autoresearch/results.tsv`.
 
-## Not a surprise
+## Still open
 
-Empty digester alone would not count — this night moved the ratchet with keep rows in `results.tsv`.
+- Dark / Neon / Futuristic layout-daily on the next calendar day.
+- Cream leftovers: ops-file-tab / ops-agent-editor / ops-close / ops-insight-line / chat-answer-final / process-pin if muddy; Swiss Perplexity if muddy.
+- Mac screenshot capture when TCC allows.
