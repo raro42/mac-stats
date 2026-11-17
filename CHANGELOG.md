@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2849] - 2026-11-17
+
+### Fixed
+- Swiss Minimalistic design-review (Perplexity result hover / focus / selected / is-top + weather card): leftover bare Apple `#0a84ff` (and Apple `#007aff` / `#0a84ff` fallbacks) on `.perplexity-result-item` hover / focus / selected / is-top and `.perplexity-weather-card` remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`), matching Light / Material / Architect / Neon / Dark / Futuristic Perplexity accent parity after cream pinned/monitor/logs/changelog focus v0.1.2848 (polish-without-capture while Mac TCC blocks capture; Apple keeps shared blue).
+
 ## [0.1.2848] - 2026-11-17
 
 ### Fixed
