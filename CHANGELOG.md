@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2843] - 2026-11-17
+
+### Fixed
+- Light / Material / Architect design-review (Agent Ops file-tab / editor / Close / insight-line + AI Chat answer-final + process-pin): leftover bare Apple `#0a84ff` on `.ops-file-tab:focus-visible` / `.agent-ops-tab:focus-visible`, `textarea.ops-agent-editor:focus`, `.ops-close-btn:focus-visible`, `.ops-insight-line.is-clickable:focus-visible`, `.chat-answer-part.chat-answer-final`, and `.process-pin:focus-visible` remap onto theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`), matching Neon Ops / chat / process-pin parity after cream Agent Ops filter/overview/row/lite + logs filter-chip v0.1.2842 (polish-without-capture while Mac TCC blocks capture; Send white-on-blue intentional; Swiss / Apple keep shared blue).
+
 ## [0.1.2842] - 2026-11-17
 
 ### Fixed
