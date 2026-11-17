@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2853] - 2026-11-17
+
+### Fixed
+- Swiss Minimalistic design-review (Agent Ops file-tab / editor / Close / insight-line + AI Chat answer-final + process-pin): leftover bare Apple `#0a84ff` on `.ops-file-tab:focus-visible` / `.agent-ops-tab:focus-visible`, `textarea.ops-agent-editor:focus`, `.ops-close-btn:focus-visible`, `.ops-insight-line.is-clickable:focus-visible`, `.chat-answer-part.chat-answer-final`, and `.process-pin:focus-visible` remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`), matching Light / Material / Architect cream Ops/chat/process-pin focus parity after Swiss Ops filter/overview/row/lite + logs filter-chip v0.1.2852 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue).
+
 ## [0.1.2852] - 2026-11-17
 
 ### Fixed

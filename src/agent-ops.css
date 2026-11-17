@@ -38788,3 +38788,35 @@ body.theme-swiss-minimalistic #ops-runs-list .ops-row.is-lite:not(.is-selected):
   background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
   border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
 }
+
+/* OVERNIGHT v0.1.2853: Swiss Ops file-tab/editor/close/insight + chat-answer-final + process-pin (cream 2843 parity) */
+body.theme-swiss-minimalistic .agent-ops-tab:focus-visible,
+body.theme-swiss-minimalistic .ops-file-tab:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Ops file-tab (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+}
+body.theme-swiss-minimalistic textarea.ops-agent-editor:focus {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Ops editor (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-close-btn:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Ops close (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-insight-line.is-clickable:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Ops insight-line (#14 / P2; design-review agent-ops). */
+  outline-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-answer-part.chat-answer-final {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream chat-answer-final (#14 / P2; design-review ai-chat). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 6%, #ffffff);
+}
+body.theme-swiss-minimalistic .process-pin:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream process-pin (#14 / P2; design-review processes). */
+  background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #121216) 40%, #ffffff);
+}
