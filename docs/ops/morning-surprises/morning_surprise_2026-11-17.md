@@ -1,19 +1,17 @@
 # Morning surprise — 2026-11-17
 
-Overnight autoresearch kept product polish on cream themes (not digester-empty quiet).
+Overnight autoresearch kept product UI polish (Standing P2 #14 cream Disk Cleanup accent parity). Digester open stayed empty; design-review grace; layout-daily Data Poster already marked for the day.
 
 ## Shipped
 
-- **v0.1.2840** — Light / Material / Architect: Disk Cleanup item focus, Top Processes selected row, and Agent Ops kind-chips (Files / Deliveries / Core / Lite) drop bare Apple `#0a84ff` for theme accents (`#6aa6df` / `#b8a68b` / `#232d41`). Matches Neon parity.
-- Earlier tonight: **v0.1.2839** cream Perplexity hover/weather; **v0.1.2838** cream model-select + markdown links; Futuristic soft-state remaps through **v0.1.2837** and prior.
+- **v0.1.2841** — Light / Material / Architect Disk Cleanup primary / meta / soft-delete / scope: bare Apple `#0a84ff` → theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`), matching Neon Disk Cleanup chrome after cream item/process/ops-chip **v0.1.2840**.
 
-## Tried / context
+## Earlier tonight
 
-- Digester open empty all ticks; design-review grace (Mac TCC blocks capture); layout-daily data-poster marked for 2026-11-17.
-- Ratchet: keep rows in `~/.mac-stats/improvements/autoresearch/results.tsv`.
+- **v0.1.2840** — cream Disk Cleanup item focus / Top Processes selected / Ops kind-chips Apple→accent.
+- **v0.1.2839** — cream Perplexity hover/weather Apple→accent.
+- **v0.1.2838** — cream/Swiss model-select + markdown links Apple→accent.
 
-## Next fuel
+## Not a surprise
 
-- Dark layout-daily next calendar day.
-- Cream Disk Cleanup primary / meta / soft-delete / scope focus Apple leftovers if muddy.
-- Swiss Perplexity if muddy; sibling/product fuel when digester opens.
+Empty digester alone would not count — this night moved the ratchet with keep rows in `results.tsv`.
