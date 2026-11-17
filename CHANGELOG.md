@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2847] - 2026-11-17
+
+### Fixed
+- Light / Material / Architect design-review (CPU metrics card + AI Chat Send / Clear focus): leftover bare Apple `#0a84ff` on `#cpu-usage-card:focus-visible`, `#chat-send-btn:focus-visible`, and `#chat-clear-btn:focus-visible` remap onto theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`), matching Neon / CRT cpu-usage + chat focus parity after cream Ops empty soft-states v0.1.2846 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Swiss / Apple keep shared blue).
+
 ## [0.1.2846] - 2026-11-17
 
 ### Fixed
