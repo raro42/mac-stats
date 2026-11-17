@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2852] - 2026-11-17
+
+### Fixed
+- Swiss Minimalistic design-review (Agent Ops filter / overview / rows / lite runs + Debug Log filter chips): leftover bare Apple `#0a84ff` on `.ops-filter-input:focus`, `.ops-overview-link:focus-visible`, `.ops-row:focus-visible`, `#ops-runs-list .ops-row.is-lite` (+ hover), and `.logs-toolbar .logs-filter-chip:focus-visible` remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`), matching Light / Material / Architect cream Ops filter/overview/row/lite + logs filter-chip parity after Swiss pinned/monitor/logs/changelog focus v0.1.2851 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue).
+
 ## [0.1.2851] - 2026-11-17
 
 ### Fixed
