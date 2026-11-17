@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2846] - 2026-11-17
+
+### Fixed
+- Light / Material / Architect design-review (Agent Ops empty hover / filter-miss calm / overview CTA): leftover Apple `#007aff` fallbacks on `.ops-empty:hover`, `.ops-empty-filter-miss.is-calm` / `.ops-empty-tab.ops-empty-filter-miss.is-calm`, and `.ops-overview-body > .ops-empty-overview-cta.is-calm` remap onto theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`), matching Neon Ops empty soft-state parity after cream Ops filter match/clear v0.1.2845 (polish-without-capture while Mac TCC blocks capture; Send white-on-blue intentional; Swiss / Apple keep shared blue).
+
 ## [0.1.2845] - 2026-11-17
 
 ### Fixed

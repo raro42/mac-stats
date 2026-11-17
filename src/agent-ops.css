@@ -29269,14 +29269,16 @@ body.theme-light .ops-empty {
   background: color-mix(in srgb, currentColor 4%, #f7f7fa);
 }
 body.theme-light .ops-empty:hover {
+  /* Opaque Light accent — Apple #007aff fallback lagged --accent / Neon Ops empty (#14 / P2; design-review agent-ops). */
   color: color-mix(in srgb, #0c0c10 81%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 6%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 6%, #f7f7fa);
 }
 body.theme-light .ops-empty-filter-miss.is-calm,
 body.theme-light .ops-empty-tab.ops-empty-filter-miss.is-calm {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff fallback lagged --accent / Neon Ops empty-filter calm (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 34%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 7%, #f7f7fa);
 }
 body.theme-light .ops-empty-filter-miss.is-fail-empty {
   border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
@@ -29298,8 +29300,9 @@ body.theme-light .ops-clear-filter:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 22%, #f7f7fa);
 }
 body.theme-light .ops-overview-body > .ops-empty-overview-cta.is-calm {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff fallback lagged --accent / Neon Ops empty-overview CTA (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 34%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 7%, #f7f7fa);
 }
 body.theme-material .ops-filter-clear {
   border-color: color-mix(in srgb, currentColor 18%, #ebe4d9);
@@ -29322,14 +29325,16 @@ body.theme-material .ops-empty {
   background: color-mix(in srgb, currentColor 4%, #ebe4d9);
 }
 body.theme-material .ops-empty:hover {
+  /* Opaque Material accent — Apple #007aff fallback lagged --accent / Neon Ops empty (#14 / P2; design-review agent-ops). */
   color: color-mix(in srgb, #0c0c10 81%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 6%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 6%, #ebe4d9);
 }
 body.theme-material .ops-empty-filter-miss.is-calm,
 body.theme-material .ops-empty-tab.ops-empty-filter-miss.is-calm {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ebe4d9);
+  /* Opaque Material accent — Apple #007aff fallback lagged --accent / Neon Ops empty-filter calm (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 34%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 7%, #ebe4d9);
 }
 body.theme-material .ops-empty-filter-miss.is-fail-empty {
   border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
@@ -29351,8 +29356,9 @@ body.theme-material .ops-clear-filter:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 22%, #ebe4d9);
 }
 body.theme-material .ops-overview-body > .ops-empty-overview-cta.is-calm {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ebe4d9);
+  /* Opaque Material accent — Apple #007aff fallback lagged --accent / Neon Ops empty-overview CTA (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 34%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 7%, #ebe4d9);
 }
 body.theme-architect .ops-filter-clear {
   border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
@@ -29375,14 +29381,16 @@ body.theme-architect .ops-empty {
   background: color-mix(in srgb, currentColor 4%, #f1f1f1);
 }
 body.theme-architect .ops-empty:hover {
+  /* Opaque Architect accent — Apple #007aff fallback lagged --accent / Neon Ops empty (#14 / P2; design-review agent-ops). */
   color: color-mix(in srgb, #0c0c10 81%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 6%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 6%, #f1f1f1);
 }
 body.theme-architect .ops-empty-filter-miss.is-calm,
 body.theme-architect .ops-empty-tab.ops-empty-filter-miss.is-calm {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff fallback lagged --accent / Neon Ops empty-filter calm (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #232d41) 34%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 7%, #f1f1f1);
 }
 body.theme-architect .ops-empty-filter-miss.is-fail-empty {
   border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
@@ -29404,8 +29412,9 @@ body.theme-architect .ops-clear-filter:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 22%, #f1f1f1);
 }
 body.theme-architect .ops-overview-body > .ops-empty-overview-cta.is-calm {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff fallback lagged --accent / Neon Ops empty-overview CTA (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #232d41) 34%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 7%, #f1f1f1);
 }
 
 /*
