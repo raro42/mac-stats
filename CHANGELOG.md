@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2850] - 2026-11-17
+
+### Fixed
+- Swiss Minimalistic design-review (CPU metrics card + AI Chat Send / Clear focus): leftover bare Apple `#0a84ff` / `#007aff` on `#cpu-usage-card:focus-visible`, `#chat-send-btn:focus-visible`, and `#chat-clear-btn:focus-visible` remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`), matching Light / Material / Architect cream CPU/chat focus parity after Swiss Perplexity v0.1.2849 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue).
+
 ## [0.1.2849] - 2026-11-17
 
 ### Fixed

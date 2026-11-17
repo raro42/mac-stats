@@ -38693,3 +38693,30 @@ body.theme-swiss-minimalistic .perplexity-weather-card {
   border-left-color: color-mix(in srgb, var(--accent, #121216) 70%, #ffffff);
   background: color-mix(in srgb, var(--accent, #121216) 6%, #ffffff);
 }
+
+/*
+ * Swiss Minimalistic: CPU metrics card + AI Chat Send / Clear focus still use
+ * bare Apple `#0a84ff` / `#007aff` (`#cpu-usage-card:focus-visible` ·
+ * `#chat-send-btn:focus-visible` · `#chat-clear-btn:focus-visible`) while Light /
+ * Material / Architect already sit on theme `--accent` after cream CPU/chat
+ * focus v0.1.2847. Remap focus rings onto Swiss ink `#121216` (paper `#ffffff`).
+ * Send fill stays white-on-blue intentional. Apple keeps shared blue. Standing
+ * P2 #14 after Swiss Perplexity v0.1.2849; polish-without-capture (Mac TCC);
+ * digester empty; cream ops-filter-just-cleared already paper-remap (v0.1.2717).
+ */
+/* OVERNIGHT v0.1.2850: Swiss CPU + AI Chat Send/Clear focus Apple → Swiss ink */
+body.theme-swiss-minimalistic #cpu-usage-card:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream·Neon cpu-usage focus (#14 / P2; design-review cpu-metrics). */
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
+}
+body.theme-swiss-minimalistic #chat-clear-btn:focus-visible {
+  /* Opaque Swiss ink — Apple #007aff fallback lagged --accent / cream Clear focus (#14 / P2; design-review AI Chat). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+  outline-offset: 2px;
+}
+body.theme-swiss-minimalistic #chat-send-btn:focus-visible {
+  /* Opaque Swiss ink — bare Apple #007aff lagged --accent / cream Send focus (#14 / P2; design-review AI Chat; fill stays white-on-blue). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+  outline-offset: 2px;
+}
