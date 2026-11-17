@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2851] - 2026-11-17
+
+### Fixed
+- Swiss Minimalistic design-review (process pinned + Monitors URL + logs path + Changelog focus): leftover bare Apple `#0a84ff` on `.process-row.is-pinned`, `.monitor-url:focus-visible` / `button.monitor-detail-url:focus-visible`, `.logs-path-hint:focus-visible`, and Changelog / Settings header focus remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`), matching Light / Material / Architect cream pinned/monitor/logs/changelog focus parity after Swiss CPU/chat focus v0.1.2850 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue).
+
 ## [0.1.2850] - 2026-11-17
 
 ### Fixed

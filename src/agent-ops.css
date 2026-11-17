@@ -38720,3 +38720,40 @@ body.theme-swiss-minimalistic #chat-send-btn:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;
 }
+
+/*
+ * Swiss Minimalistic: process pinned + Monitors URL + logs path + Changelog /
+ * Settings header focus still use bare Apple `#0a84ff` (`.process-row.is-pinned` ·
+ * `.monitor-url:focus-visible` · `button.monitor-detail-url:focus-visible` ·
+ * `.logs-path-hint:focus-visible` · `.changelog-h2[tabindex]:focus` ·
+ * `.changelog-loading` · `.changelog-error` · `.settings-header h2[tabindex]:focus` ·
+ * `.ollama-settings-popover .popover-header h3[tabindex]:focus`) while Light /
+ * Material / Architect already sit on theme `--accent` after cream pinned /
+ * monitor / logs / changelog focus v0.1.2848. Remap onto Swiss ink `#121216`
+ * (paper `#ffffff`). Send fill stays white-on-blue intentional. Apple keeps
+ * shared blue. Standing P2 #14 after Swiss CPU/chat focus v0.1.2850;
+ * polish-without-capture (Mac TCC); digester empty; layout-daily data-poster
+ * marked today.
+ */
+/* OVERNIGHT v0.1.2851: Swiss pinned/monitor/logs/changelog focus Apple → Swiss ink */
+body.theme-swiss-minimalistic .process-row.is-pinned {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream process-row.is-pinned (#14 / P2; design-review processes). */
+  background: color-mix(in srgb, var(--accent, #121216) 6%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitor-url:focus-visible,
+body.theme-swiss-minimalistic button.monitor-detail-url:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream monitor-url focus (#14 / P2; design-review Monitors). */
+  outline-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+}
+body.theme-swiss-minimalistic .logs-path-hint:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream logs-path-hint focus (#14 / P2; design-review). */
+  outline-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+}
+body.theme-swiss-minimalistic .changelog-h2[tabindex]:focus,
+body.theme-swiss-minimalistic .changelog-loading[tabindex]:focus,
+body.theme-swiss-minimalistic .changelog-error[tabindex]:focus,
+body.theme-swiss-minimalistic .settings-header h2[tabindex]:focus,
+body.theme-swiss-minimalistic .ollama-settings-popover .popover-header h3[tabindex]:focus {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream changelog/Settings focus (#14 / P2; design-review). */
+  outline-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+}
