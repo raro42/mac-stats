@@ -1,19 +1,17 @@
 # Morning surprise — 2026-11-17
 
-Overnight Track B kept cream theme focus polish for Ralf.
+Overnight autoresearch kept product polish on cream Light / Material / Architect themes (Standing P2 #14 soft-state Apple-blue cleanup). Digester open stayed empty; design-review stayed in grace (Mac TCC); layout-daily already marked data-poster today.
 
-## Shipped
+## Shipped tonight
 
-- **v0.1.2842** — Light / Material / Architect: Agent Ops filter input, overview link, row focus, lite runs, and Debug Log filter-chip focus rings leave bare Apple `#0a84ff` and use theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`), matching Neon.
-- Earlier same night: **v0.1.2841** cream Disk Cleanup primary/meta/soft-delete/scope; **v0.1.2840** Disk Cleanup item / process selected / Ops kind-chips; **v0.1.2839** Perplexity hover/weather.
+- **v0.1.2843** — cream Agent Ops file-tab / editor / Close / insight-line + AI Chat answer-final + process-pin: bare Apple `#0a84ff` → theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`; Neon parity).
+- Earlier same window: **v0.1.2842** Agent Ops filter/overview/row/lite + logs filter-chip; **v0.1.2841** Disk Cleanup primary/meta/soft-delete/scope; **v0.1.2840** Disk Cleanup item / process selected / Ops kind-chips; **v0.1.2839** Perplexity hover/weather.
 
-## Context
+## Tried / notes
 
-- Digester open was empty; design-review grace (Mac TCC); layout-daily Data Poster already marked for the day.
-- Ratchet: keep rows in `~/.mac-stats/improvements/autoresearch/results.tsv`.
+- No discard this tick. Quiet avoided (standing leftover fuel).
+- Next fuel: Dark layout-daily next calendar day; cream `#007aff` fallback leftovers / Swiss Perplexity if muddy; Mac capture when TCC allows.
 
-## Still open
+## Fitness
 
-- Dark / Neon / Futuristic layout-daily on the next calendar day.
-- Cream leftovers: ops-file-tab / ops-agent-editor / ops-close / ops-insight-line / chat-answer-final / process-pin if muddy; Swiss Perplexity if muddy.
-- Mac screenshot capture when TCC allows.
+Keyboard focus and final-answer / pin chrome on cream paper now match each theme accent instead of Apple system blue.
