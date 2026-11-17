@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2844] - 2026-11-17
+
+### Fixed
+- Light / Material / Architect design-review (Agent Ops file-tab active + insight selected): leftover Apple `#007aff` fallbacks on `.ops-file-tab.active` / `.agent-ops-tab.active` (+ hover), active `.ops-tab-digit` / `.ops-tab-count`, and `.ops-insight-line.is-clickable.is-selected` remap onto theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`), matching Neon Ops file-tab / insight selected parity after cream Ops focus v0.1.2843 (polish-without-capture while Mac TCC blocks capture; Send white-on-blue intentional; Swiss / Apple keep shared blue).
+
 ## [0.1.2843] - 2026-11-17
 
 ### Fixed

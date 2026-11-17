@@ -29457,9 +29457,10 @@ body.theme-light .ops-file-tab:hover .ops-tab-count:not(.is-zero) {
 }
 body.theme-light .agent-ops-tab.active .ops-tab-count,
 body.theme-light .ops-file-tab.active .ops-tab-count {
-  color: var(--accent, #007aff);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff fallback lagged --accent / Neon Ops tab-count (#14 / P2; design-review agent-ops). */
+  color: var(--accent, #6aa6df);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 7%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
 }
 body.theme-material .ops-filter-input {
   border-color: color-mix(in srgb, currentColor 18%, #ebe4d9);
@@ -29509,9 +29510,10 @@ body.theme-material .ops-file-tab:hover .ops-tab-count:not(.is-zero) {
 }
 body.theme-material .agent-ops-tab.active .ops-tab-count,
 body.theme-material .ops-file-tab.active .ops-tab-count {
-  color: var(--accent, #007aff);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ebe4d9);
+  /* Opaque Material accent — Apple #007aff fallback lagged --accent / Neon Ops tab-count (#14 / P2; design-review agent-ops). */
+  color: var(--accent, #b8a68b);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 7%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
 }
 body.theme-architect .ops-filter-input {
   border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
@@ -29561,9 +29563,10 @@ body.theme-architect .ops-file-tab:hover .ops-tab-count:not(.is-zero) {
 }
 body.theme-architect .agent-ops-tab.active .ops-tab-count,
 body.theme-architect .ops-file-tab.active .ops-tab-count {
-  color: var(--accent, #007aff);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff fallback lagged --accent / Neon Ops tab-count (#14 / P2; design-review agent-ops). */
+  color: var(--accent, #232d41);
+  background: color-mix(in srgb, var(--accent, #232d41) 7%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
 }
 
 /*
@@ -36017,6 +36020,11 @@ body.theme-light .agent-ops-tab:hover .ops-tab-digit,
 body.theme-light .ops-file-tab:hover .ops-tab-digit {
   color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
 }
+body.theme-light .agent-ops-tab.active .ops-tab-digit,
+body.theme-light .ops-file-tab.active .ops-tab-digit {
+  /* Opaque Light accent — Apple #007aff fallback lagged --accent / Neon Ops tab-digit (#14 / P2; design-review agent-ops). */
+  color: var(--accent, #6aa6df);
+}
 body.theme-light .agent-ops-tab,
 body.theme-light .ops-file-tab {
   background: color-mix(in srgb, currentColor 6%, #f7f7fa);
@@ -36038,14 +36046,15 @@ body.theme-light .ops-file-tab:focus-visible {
 }
 body.theme-light .agent-ops-tab.active,
 body.theme-light .ops-file-tab.active {
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff fallback lagged --accent / Neon Ops file-tab.active (#14 / P2; design-review agent-ops). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 7%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
   color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
 }
 body.theme-light .agent-ops-tab.active:hover,
 body.theme-light .ops-file-tab.active:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 10%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 36%, #f7f7fa);
 }
 
 /* --- material (#ebe4d9) --- */
@@ -36055,6 +36064,11 @@ body.theme-material .ops-tab-digit {
 body.theme-material .agent-ops-tab:hover .ops-tab-digit,
 body.theme-material .ops-file-tab:hover .ops-tab-digit {
   color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
+}
+body.theme-material .agent-ops-tab.active .ops-tab-digit,
+body.theme-material .ops-file-tab.active .ops-tab-digit {
+  /* Opaque Material accent — Apple #007aff fallback lagged --accent / Neon Ops tab-digit (#14 / P2; design-review agent-ops). */
+  color: var(--accent, #b8a68b);
 }
 body.theme-material .agent-ops-tab,
 body.theme-material .ops-file-tab {
@@ -36077,14 +36091,15 @@ body.theme-material .ops-file-tab:focus-visible {
 }
 body.theme-material .agent-ops-tab.active,
 body.theme-material .ops-file-tab.active {
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ebe4d9);
+  /* Opaque Material accent — Apple #007aff fallback lagged --accent / Neon Ops file-tab.active (#14 / P2; design-review agent-ops). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 7%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
   color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
 }
 body.theme-material .agent-ops-tab.active:hover,
 body.theme-material .ops-file-tab.active:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 10%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 36%, #ebe4d9);
 }
 
 /* --- architect (#f1f1f1) --- */
@@ -36094,6 +36109,11 @@ body.theme-architect .ops-tab-digit {
 body.theme-architect .agent-ops-tab:hover .ops-tab-digit,
 body.theme-architect .ops-file-tab:hover .ops-tab-digit {
   color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
+}
+body.theme-architect .agent-ops-tab.active .ops-tab-digit,
+body.theme-architect .ops-file-tab.active .ops-tab-digit {
+  /* Opaque Architect accent — Apple #007aff fallback lagged --accent / Neon Ops tab-digit (#14 / P2; design-review agent-ops). */
+  color: var(--accent, #232d41);
 }
 body.theme-architect .agent-ops-tab,
 body.theme-architect .ops-file-tab {
@@ -36116,14 +36136,15 @@ body.theme-architect .ops-file-tab:focus-visible {
 }
 body.theme-architect .agent-ops-tab.active,
 body.theme-architect .ops-file-tab.active {
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff fallback lagged --accent / Neon Ops file-tab.active (#14 / P2; design-review agent-ops). */
+  background: color-mix(in srgb, var(--accent, #232d41) 7%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
   color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
 }
 body.theme-architect .agent-ops-tab.active:hover,
 body.theme-architect .ops-file-tab.active:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 10%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 36%, #f1f1f1);
 }
 
 /* OVERNIGHT v0.1.2694: light Monitors checking/pending + Ops file/edit/preview kb-hint remaps */
@@ -36548,8 +36569,9 @@ body.theme-light .ops-insight-line.is-clickable:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
 }
 body.theme-light .ops-insight-line.is-clickable.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff fallback lagged --accent / Neon Ops insight selected (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 42%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 12%, #f7f7fa);
   color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
   opacity: 1;
 }
@@ -36586,8 +36608,9 @@ body.theme-material .ops-insight-line.is-clickable:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
 }
 body.theme-material .ops-insight-line.is-clickable.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, #ebe4d9);
+  /* Opaque Material accent — Apple #007aff fallback lagged --accent / Neon Ops insight selected (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 42%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 12%, #ebe4d9);
   color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
   opacity: 1;
 }
@@ -36624,8 +36647,9 @@ body.theme-architect .ops-insight-line.is-clickable:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
 }
 body.theme-architect .ops-insight-line.is-clickable.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff fallback lagged --accent / Neon Ops insight selected (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #232d41) 42%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 12%, #f1f1f1);
   color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
   opacity: 1;
 }
