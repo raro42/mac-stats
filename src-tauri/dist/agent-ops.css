@@ -35673,7 +35673,8 @@ body.theme-light .changelog-loading[tabindex]:focus,
 body.theme-light .changelog-error[tabindex]:focus,
 body.theme-light .settings-header h2[tabindex]:focus,
 body.theme-light .ollama-settings-popover .popover-header h3[tabindex]:focus {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / Neon changelog focus (#14 / P2; design-review). */
+  outline-color: color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
 }
 
 /* --- material (#ebe4d9) --- */
@@ -35682,7 +35683,8 @@ body.theme-material .changelog-loading[tabindex]:focus,
 body.theme-material .changelog-error[tabindex]:focus,
 body.theme-material .settings-header h2[tabindex]:focus,
 body.theme-material .ollama-settings-popover .popover-header h3[tabindex]:focus {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / Neon changelog focus (#14 / P2; design-review). */
+  outline-color: color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
 }
 
 /* --- architect (#f1f1f1) --- */
@@ -35691,7 +35693,8 @@ body.theme-architect .changelog-loading[tabindex]:focus,
 body.theme-architect .changelog-error[tabindex]:focus,
 body.theme-architect .settings-header h2[tabindex]:focus,
 body.theme-architect .ollama-settings-popover .popover-header h3[tabindex]:focus {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon changelog focus (#14 / P2; design-review). */
+  outline-color: color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
 }
 
 /*
@@ -35875,37 +35878,43 @@ body.theme-architect .monitor-backoff-hint {
 /* --- light (#f7f7fa) --- */
 body.theme-light .monitor-url:focus-visible,
 body.theme-light button.monitor-detail-url:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / Neon monitor-url focus (#14 / P2; design-review). */
+  outline-color: color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
 }
 body.theme-light .monitor-detail-remove:focus-visible {
   outline-color: color-mix(in srgb, #ff3b30 55%, #f7f7fa);
 }
 body.theme-light .logs-path-hint:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / Neon logs-path-hint focus (#14 / P2; design-review). */
+  outline-color: color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
 }
 
 /* --- material (#ebe4d9) --- */
 body.theme-material .monitor-url:focus-visible,
 body.theme-material button.monitor-detail-url:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / Neon monitor-url focus (#14 / P2; design-review). */
+  outline-color: color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
 }
 body.theme-material .monitor-detail-remove:focus-visible {
   outline-color: color-mix(in srgb, #ff3b30 55%, #ebe4d9);
 }
 body.theme-material .logs-path-hint:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / Neon logs-path-hint focus (#14 / P2; design-review). */
+  outline-color: color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
 }
 
 /* --- architect (#f1f1f1) --- */
 body.theme-architect .monitor-url:focus-visible,
 body.theme-architect button.monitor-detail-url:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon monitor-url focus (#14 / P2; design-review). */
+  outline-color: color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
 }
 body.theme-architect .monitor-detail-remove:focus-visible {
   outline-color: color-mix(in srgb, #ff3b30 55%, #f1f1f1);
 }
 body.theme-architect .logs-path-hint:focus-visible {
-  outline-color: color-mix(in srgb, #0a84ff 55%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon logs-path-hint focus (#14 / P2; design-review). */
+  outline-color: color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
 }
 
 /*
@@ -37471,7 +37480,8 @@ body.theme-light .process-row:active {
   box-shadow: none;
 }
 body.theme-light .process-row.is-pinned {
-  background: color-mix(in srgb, #0a84ff 6%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / Neon process-row.is-pinned (#14 / P2; design-review processes). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 6%, #f7f7fa);
 }
 body.theme-light .process-row.is-just-copied {
   background: color-mix(in srgb, #34c759 12%, #f7f7fa);
@@ -37497,7 +37507,8 @@ body.theme-material .process-row:active {
   box-shadow: none;
 }
 body.theme-material .process-row.is-pinned {
-  background: color-mix(in srgb, #0a84ff 6%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / Neon process-row.is-pinned (#14 / P2; design-review processes). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 6%, #ebe4d9);
 }
 body.theme-material .process-row.is-just-copied {
   background: color-mix(in srgb, #34c759 12%, #ebe4d9);
@@ -37523,7 +37534,8 @@ body.theme-architect .process-row:active {
   box-shadow: none;
 }
 body.theme-architect .process-row.is-pinned {
-  background: color-mix(in srgb, #0a84ff 6%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon process-row.is-pinned (#14 / P2; design-review processes). */
+  background: color-mix(in srgb, var(--accent, #232d41) 6%, #f1f1f1);
 }
 body.theme-architect .process-row.is-just-copied {
   background: color-mix(in srgb, #34c759 12%, #f1f1f1);

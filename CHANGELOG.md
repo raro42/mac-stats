@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2848] - 2026-11-17
+
+### Fixed
+- Light / Material / Architect design-review (process pinned + Monitors URL + logs path + Changelog focus): leftover bare Apple `#0a84ff` on `.process-row.is-pinned`, `.monitor-url:focus-visible` / `button.monitor-detail-url:focus-visible`, `.logs-path-hint:focus-visible`, and Changelog / Settings header focus remap onto theme `--accent` (Light `#6aa6df` · Material `#b8a68b` · Architect `#232d41`), matching Neon / CRT pinned-row + monitor/logs/changelog focus parity after cream CPU/chat focus v0.1.2847 (polish-without-capture while Mac TCC blocks capture; Send white-on-blue intentional; Swiss / Apple keep shared blue).
+
 ## [0.1.2847] - 2026-11-17
 
 ### Fixed
