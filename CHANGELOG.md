@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2864] - 2026-11-19
+
+### Fixed
+- Swiss Minimalistic design-review (filter Clear + Monitors filter-miss): leftover shared Apple `#007aff` fallbacks on `.monitors-filter-clear` / `.processes-filter-clear` / `.logs-filter-clear` / `.perplexity-filter-clear` / `.disk-cleanup-filter-clear` / `.disk-cleanup-scope-filter-clear` / `.chat-filter-clear` (resting/hover/focus/`is-just-saved`) and `.monitors-filter-miss` (+ Down/Slow/Up empty · hint · empty CTA) remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; Down/Slow empty keep soft green), matching Light / Material / Architect cream Clear (v0.1.2642) / Monitors filter-miss (v0.1.2667) parity after Swiss processes chip/miss v0.1.2863 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2863] - 2026-11-18
 
 ### Fixed

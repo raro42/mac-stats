@@ -39490,3 +39490,91 @@ body.theme-swiss-minimalistic .processes-filter-miss-cta:hover {
 body.theme-swiss-minimalistic .processes-filter-miss-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
 }
+
+/*
+ * Swiss Minimalistic: filter Clear chips + Monitors filter-miss still mix shared
+ * Apple `#007aff` fallbacks on Swiss paper while cream Light / Material /
+ * Architect remapped Clear in v0.1.2642 and Monitors filter-miss in v0.1.2667,
+ * and Swiss already remapped processes-filter-chip / processes-filter-miss in
+ * v0.1.2863. Opaque Swiss ink `#121216` mixes (Down/Slow empty keep soft green).
+ * Standing P2 #14 leftover soft-states after processes chip/miss v0.1.2863
+ * (not a keep-pNN Disk Cleanup clone). Design-review polish-without-capture
+ * (Mac TCC).
+ */
+/* OVERNIGHT v0.1.2864: Swiss filter-clear + monitors-filter-miss remaps */
+
+body.theme-swiss-minimalistic .monitors-filter-clear,
+body.theme-swiss-minimalistic .processes-filter-clear,
+body.theme-swiss-minimalistic .logs-filter-clear,
+body.theme-swiss-minimalistic .perplexity-filter-clear,
+body.theme-swiss-minimalistic .disk-cleanup-filter-clear,
+body.theme-swiss-minimalistic .disk-cleanup-scope-filter-clear,
+body.theme-swiss-minimalistic .chat-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #121216) 32%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 10%, #ffffff);
+  color: color-mix(in srgb, #0c0c10 81%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitors-filter-clear:hover,
+body.theme-swiss-minimalistic .processes-filter-clear:hover,
+body.theme-swiss-minimalistic .logs-filter-clear:hover,
+body.theme-swiss-minimalistic .perplexity-filter-clear:hover,
+body.theme-swiss-minimalistic .disk-cleanup-filter-clear:hover,
+body.theme-swiss-minimalistic .disk-cleanup-scope-filter-clear:hover,
+body.theme-swiss-minimalistic .chat-filter-clear:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 44%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitors-filter-clear:focus-visible,
+body.theme-swiss-minimalistic .processes-filter-clear:focus-visible,
+body.theme-swiss-minimalistic .logs-filter-clear:focus-visible,
+body.theme-swiss-minimalistic .perplexity-filter-clear:focus-visible,
+body.theme-swiss-minimalistic .disk-cleanup-filter-clear:focus-visible,
+body.theme-swiss-minimalistic .disk-cleanup-scope-filter-clear:focus-visible,
+body.theme-swiss-minimalistic .chat-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitors-filter-clear.is-just-saved,
+body.theme-swiss-minimalistic .processes-filter-clear.is-just-saved,
+body.theme-swiss-minimalistic .logs-filter-clear.is-just-saved,
+body.theme-swiss-minimalistic .perplexity-filter-clear.is-just-saved,
+body.theme-swiss-minimalistic .disk-cleanup-filter-clear.is-just-saved,
+body.theme-swiss-minimalistic .disk-cleanup-scope-filter-clear.is-just-saved,
+body.theme-swiss-minimalistic .chat-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #ffffff);
+  border-color: color-mix(in srgb, #34c759 38%, #ffffff);
+  color: color-mix(in srgb, #34c759 55%, var(--text, currentColor));
+  box-shadow: none;
+}
+
+body.theme-swiss-minimalistic .monitors-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #121216) 34%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .monitors-filter-miss.is-down-empty,
+body.theme-swiss-minimalistic .monitors-filter-miss.is-slow-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitors-filter-miss.is-up-empty {
+  border-color: color-mix(in srgb, var(--accent, #121216) 34%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitors-filter-miss-hint,
+body.theme-swiss-minimalistic .monitors-empty-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #ffffff);
+  opacity: 1;
+}
+body.theme-swiss-minimalistic .monitors-empty-cta {
+  border-color: color-mix(in srgb, var(--accent, #121216) 35%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 88%, #ffffff));
+}
+body.theme-swiss-minimalistic .monitors-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 50%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitors-empty-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
+}
