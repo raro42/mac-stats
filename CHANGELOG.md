@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2865] - 2026-11-19
+
+### Fixed
+- Swiss Minimalistic design-review (Monitors filter chips + Debug Log filter-miss): leftover shared Apple `#0a84ff` / `#007aff` washes on `.monitors-filter-chip` (resting/hover/focus/active · Down · Up · Slow) and `.logs-viewer-empty.logs-filter-miss` (+ Error/Warn empty · hint · CTA) remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; Down/Up/Slow keep status colors; Error/Warn empty keep soft green), matching Light / Material / Architect cream monitors chips (v0.1.2644) / logs filter-miss (v0.1.2667) parity after Swiss filter Clear + monitors-miss v0.1.2864 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2864] - 2026-11-19
 
 ### Fixed
