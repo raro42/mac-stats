@@ -39148,3 +39148,170 @@ body.theme-swiss-minimalistic #github-link[aria-disabled="true"] {
   color: color-mix(in srgb, #0c0c10 62%, #ffffff);
   opacity: 1;
 }
+
+/*
+ * Swiss Minimalistic: collapsed-glance soft-states still inherit shared Apple
+ * `#007aff` / `#0a84ff` focus + is-active / has-scopes-off washes while cream
+ * Light / Material / Architect already remapped ollama/chat (v0.1.2666),
+ * monitors/disk/details (v0.1.2669), and Agent Ops collapsed (v0.1.2671) onto
+ * theme paper. Opaque Swiss ink `#121216` fallbacks on paper `#ffffff` so
+ * keep-header glances match Swiss soft-states after metric-strip v0.1.2860.
+ * Disk `has-scopes-off` follows cream amber `#ff9f0a` (not bare Apple blue).
+ * Apple keeps shared blue. Standing P2 #14 leftover soft-states — not a
+ * keep-pNN Disk Cleanup clone; polish-without-capture (Mac TCC); digester empty.
+ */
+/* OVERNIGHT v0.1.2861: Swiss collapsed-glance soft-states (cream 2666/2669/2671) */
+
+/* --- swiss AI Chat / Ollama collapsed (cream 2666 parity) --- */
+body.theme-swiss-minimalistic .ollama-collapsed-glance,
+body.theme-swiss-minimalistic .chat-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .ollama-collapsed-glance:hover,
+body.theme-swiss-minimalistic .chat-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+  box-shadow: none;
+}
+body.theme-swiss-minimalistic .ollama-collapsed-glance:focus-visible,
+body.theme-swiss-minimalistic .chat-collapsed-glance:focus-visible {
+  outline: none;
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream collapsed focus (#14 / P2; design-review soft-states). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+  box-shadow: none;
+}
+body.theme-swiss-minimalistic .ollama-collapsed-glance.is-online {
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .ollama-collapsed-glance.is-offline {
+  border-color: color-mix(in srgb, #ff9500 28%, #ffffff);
+  background: color-mix(in srgb, #ff9500 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .ollama-collapsed-glance.is-active {
+  /* Opaque Swiss ink — Apple #0a84ff lagged --accent / cream ollama is-active (#14 / P2; design-review soft-states). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 34%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 8%, #ffffff);
+}
+body.theme-swiss-minimalistic .ollama-collapsed-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-swiss-minimalistic .ollama-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #0c0c10 75%, #ffffff);
+  opacity: 1;
+}
+
+/* --- swiss Monitors / Disk / Details collapsed (cream 2669 parity) --- */
+body.theme-swiss-minimalistic .monitors-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .monitors-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitors-collapsed-glance:focus-visible {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream monitors collapsed focus (#14 / P2; design-review soft-states). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitors-collapsed-glance.has-down {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-swiss-minimalistic .monitors-collapsed-glance.is-all-up {
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitors-collapsed-glance.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 26%, #ffffff);
+  background: color-mix(in srgb, #ff9500 6%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitors-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #0c0c10 75%, #ffffff);
+  opacity: 1;
+}
+body.theme-swiss-minimalistic .disk-cleanup-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .disk-cleanup-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-collapsed-glance:focus-visible {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream disk collapsed focus (#14 / P2; design-review soft-states). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-collapsed-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9500 28%, #ffffff);
+  background: color-mix(in srgb, #ff9500 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-collapsed-glance.is-due,
+body.theme-swiss-minimalistic .disk-cleanup-collapsed-glance.is-clean {
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-collapsed-glance.has-scopes-off {
+  /* Cream amber — bare Apple #0a84ff lagged cream has-scopes-off (#14 / P2; design-review soft-states). */
+  border-color: color-mix(in srgb, #ff9f0a 28%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .details-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .details-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+}
+body.theme-swiss-minimalistic .details-collapsed-glance:focus-visible {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream details collapsed focus (#14 / P2; design-review soft-states). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+}
+body.theme-swiss-minimalistic .details-collapsed-glance.is-hot {
+  border-color: color-mix(in srgb, #ff9500 26%, #ffffff);
+  background: color-mix(in srgb, #ff9500 6%, #ffffff);
+}
+body.theme-swiss-minimalistic .details-collapsed-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
+}
+
+/* --- swiss Agent Ops collapsed (cream 2671 parity) --- */
+body.theme-swiss-minimalistic .agent-ops-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .agent-ops-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+}
+body.theme-swiss-minimalistic .agent-ops-collapsed-glance:focus-visible {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops collapsed focus (#14 / P2; design-review soft-states). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+}
+body.theme-swiss-minimalistic .agent-ops-collapsed-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .agent-ops-collapsed-glance.is-warn {
+  border-color: color-mix(in srgb, #ff9500 28%, #ffffff);
+  background: color-mix(in srgb, #ff9500 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .agent-ops-collapsed-glance.is-offline {
+  border-color: color-mix(in srgb, #ff3b30 28%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .agent-ops-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #0c0c10 75%, #ffffff);
+  opacity: 1;
+}

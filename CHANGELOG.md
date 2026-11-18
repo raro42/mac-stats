@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2861] - 2026-11-18
+
+### Fixed
+- Swiss Minimalistic design-review (collapsed-glance soft-states): leftover Apple `#007aff` / `#0a84ff` focus + is-active / has-scopes-off washes on `.ollama-collapsed-glance` / `.chat-collapsed-glance`, `.monitors-collapsed-glance`, `.disk-cleanup-collapsed-glance`, `.details-collapsed-glance`, and `.agent-ops-collapsed-glance` remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; disk `has-scopes-off` follows cream amber `#ff9f0a`), matching Light / Material / Architect cream collapsed-glance parity after metric-strip v0.1.2860 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2860] - 2026-11-18
 
 ### Fixed
