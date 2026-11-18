@@ -1,19 +1,14 @@
 # Morning surprise — 2026-11-19
 
-Overnight Track B (mac-stats product ratchet). Digester open stayed empty; design-review grace; layout-daily already marked data-poster for 2026-11-18.
+Overnight Track B kept Swiss Minimalistic Disk Cleanup accent parity on cream 2841 chrome.
 
 ## Shipped
+- **v0.1.2858** — Swiss Disk Cleanup primary / meta / soft-delete / scope focus: bare Apple `#0a84ff` → Swiss ink `#121216` (paper `#ffffff`).
+- Earlier same night: **v0.1.2854–2857** Swiss Ops / Disk Cleanup item / process / kind-chip remaps.
 
-- **v0.1.2857** — Swiss Minimalistic Disk Cleanup item focus + Top Processes selected + Ops kind-chips Files / Deliveries / Core / Lite: bare Apple `#0a84ff` → Swiss ink `#121216` on paper white (cream v0.1.2840 parity after Swiss Ops empty soft-states v0.1.2856).
-
-## Also this window (earlier ticks)
-
-- **v0.1.2856** — Swiss Ops empty soft-states → ink accent.
-- **v0.1.2855** — Swiss Ops filter-match partial + Clear / clear-filter → ink accent.
-- **v0.1.2854** — Swiss Ops file-tab.active + insight selected → ink accent.
+## Fuel
+- Digester open empty; design-review grace; layout-daily data-poster already marked (Dark waits next calendar day).
+- Standing P2 #14 Swiss leftovers after cream Light/Material/Architect remaps.
 
 ## Tried / notes
-
-- Polish-without-capture (Mac TCC). Send fill stays white-on-blue intentional.
-- Dark layout-daily waits for the next calendar day quota.
-- Next Swiss leftover: cream Disk Cleanup primary/meta/soft-delete/scope (2841) if muddy.
+- Polish-without-capture (Mac TCC). Send fill white-on-blue intentional. Apple keeps shared blue.
