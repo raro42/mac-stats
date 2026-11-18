@@ -38900,3 +38900,55 @@ body.theme-swiss-minimalistic .ops-overview-body > .ops-empty-overview-cta.is-ca
   border-color: color-mix(in srgb, var(--accent, #121216) 34%, #ffffff);
   background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
 }
+
+/* OVERNIGHT v0.1.2857: Swiss Disk Cleanup item focus + process selected + Ops kind-chips (cream 2840 parity) */
+body.theme-swiss-minimalistic .disk-cleanup-item:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup item focus (#14 / P2; design-review). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 34%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+}
+body.theme-swiss-minimalistic .process-row.is-selected {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream process-row selected (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-session-kind-chip[data-ops-session-kind='files'].has-hits {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Ops kind-chip Files (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-session-kind-chip[data-ops-session-kind='files'].is-active {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Ops kind-chip Files (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 36%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-schedules-kind-chip[data-ops-schedules-kind='deliveries'].has-hits {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Ops kind-chip Deliveries (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-schedules-kind-chip[data-ops-schedules-kind='deliveries'].is-active {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Ops kind-chip Deliveries (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 36%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-memory-kind-chip[data-ops-memory-kind='core'].has-hits {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Ops kind-chip Core (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-memory-kind-chip[data-ops-memory-kind='core'].is-active {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Ops kind-chip Core (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 36%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-runs-lane-chip[data-ops-runs-lane='lite'].has-hits {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Ops kind-chip Lite (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-runs-lane-chip[data-ops-runs-lane='lite'].is-active {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Ops kind-chip Lite (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 36%, #ffffff);
+}

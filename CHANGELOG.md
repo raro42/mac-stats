@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2857] - 2026-11-18
+
+### Fixed
+- Swiss Minimalistic design-review (Disk Cleanup item focus / Top Processes selected / Ops kind-chips): leftover bare Apple `#0a84ff` on `.disk-cleanup-item:focus-visible`, `.process-row.is-selected`, and Ops kind-chip Files / Deliveries / Core / Lite has-hits + is-active remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`), matching Light / Material / Architect cream Disk Cleanup focus / process-row selected / Ops kind-chip parity after Swiss Ops empty soft-states v0.1.2856 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue).
+
 ## [0.1.2856] - 2026-11-18
 
 ### Fixed
