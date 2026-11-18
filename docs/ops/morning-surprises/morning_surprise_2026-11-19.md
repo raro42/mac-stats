@@ -1,21 +1,17 @@
 # Morning surprise — 2026-11-19
 
-Overnight Track B (mac-stats product ratchet). Digester open empty; design-review grace; layout-daily Data Poster already marked.
+Overnight Track B (mac-stats product ratchet). Digester open stayed empty; design-review grace; layout-daily already marked data-poster for 2026-11-18.
 
 ## Shipped
 
-- **v0.1.2855** — Swiss Minimalistic Agent Ops filter match partial + Clear / clear-filter: Apple `#007aff` → Swiss ink `#121216` on paper white (cream 2845 parity; Standing P2 #14).
+- **v0.1.2856** — Swiss Minimalistic Agent Ops empty soft-states: `.ops-empty:hover`, filter-miss `.is-calm`, and overview empty CTA remap Apple `#007aff` fallbacks → Swiss ink `#121216` on paper white (cream Ops empty v0.1.2846 parity after Swiss filter-match/clear v0.1.2855).
 
-## Earlier same calendar night (before this tick)
+## Also this window (earlier ticks)
 
-- **v0.1.2854** — Swiss Ops file-tab.active (+ digit/count) + insight selected Apple → ink (cream 2844 parity).
+- **v0.1.2855** — Swiss Ops filter-match partial + Clear / clear-filter → ink accent.
+- **v0.1.2854** — Swiss Ops file-tab.active + insight selected → ink accent.
 
-## Tried / skipped
+## Tried / notes
 
-- Digester Slowest: none (filtered noise only).
-- Layout-daily Dark/Neon/Futuristic: due next calendar day (quota used by data-poster).
-- Mac screenshot capture: still blocked by TCC — polish-without-capture.
-
-## Next fuel
-
-Swiss cream 2846 leftovers (ops-empty:hover / empty-filter-miss.is-calm / empty-overview-cta) if muddy, Dark layout-daily when the day opens, or sibling/product — not keep-pNN.
+- Polish-without-capture (Mac TCC). Send fill stays white-on-blue intentional.
+- Dark layout-daily waits for the next calendar day quota.
