@@ -4,10 +4,11 @@ Overnight Track B (mac-stats product ratchet). Digester open stayed empty; desig
 
 ## Shipped
 
-- **v0.1.2856** — Swiss Minimalistic Agent Ops empty soft-states: `.ops-empty:hover`, filter-miss `.is-calm`, and overview empty CTA remap Apple `#007aff` fallbacks → Swiss ink `#121216` on paper white (cream Ops empty v0.1.2846 parity after Swiss filter-match/clear v0.1.2855).
+- **v0.1.2857** — Swiss Minimalistic Disk Cleanup item focus + Top Processes selected + Ops kind-chips Files / Deliveries / Core / Lite: bare Apple `#0a84ff` → Swiss ink `#121216` on paper white (cream v0.1.2840 parity after Swiss Ops empty soft-states v0.1.2856).
 
 ## Also this window (earlier ticks)
 
+- **v0.1.2856** — Swiss Ops empty soft-states → ink accent.
 - **v0.1.2855** — Swiss Ops filter-match partial + Clear / clear-filter → ink accent.
 - **v0.1.2854** — Swiss Ops file-tab.active + insight selected → ink accent.
 
@@ -15,3 +16,4 @@ Overnight Track B (mac-stats product ratchet). Digester open stayed empty; desig
 
 - Polish-without-capture (Mac TCC). Send fill stays white-on-blue intentional.
 - Dark layout-daily waits for the next calendar day quota.
+- Next Swiss leftover: cream Disk Cleanup primary/meta/soft-delete/scope (2841) if muddy.
