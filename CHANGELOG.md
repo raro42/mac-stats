@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2854] - 2026-11-18
+
+### Fixed
+- Swiss Minimalistic design-review (Agent Ops file-tab active + insight selected): leftover Apple `#007aff` fallbacks on `.ops-file-tab.active` / `.agent-ops-tab.active` (+ hover), active `.ops-tab-digit` / `.ops-tab-count`, and `.ops-insight-line.is-clickable.is-selected` remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`), matching Light / Material / Architect cream Ops file-tab.active / insight selected parity after Swiss Ops file-tab/editor/close/insight + chat-answer-final + process-pin v0.1.2853 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue).
+
 ## [0.1.2853] - 2026-11-17
 
 ### Fixed

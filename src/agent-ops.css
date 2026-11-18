@@ -38820,3 +38820,36 @@ body.theme-swiss-minimalistic .process-pin:focus-visible {
   background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #121216) 40%, #ffffff);
 }
+
+/* OVERNIGHT v0.1.2854: Swiss Ops file-tab.active (+digit/count) + insight selected (cream 2844 parity) */
+body.theme-swiss-minimalistic .agent-ops-tab.active .ops-tab-digit,
+body.theme-swiss-minimalistic .ops-file-tab.active .ops-tab-digit {
+  /* Opaque Swiss ink — Apple #007aff fallback lagged --accent / cream Ops tab-digit (#14 / P2; design-review agent-ops). */
+  color: var(--accent, #121216);
+}
+body.theme-swiss-minimalistic .agent-ops-tab.active .ops-tab-count,
+body.theme-swiss-minimalistic .ops-file-tab.active .ops-tab-count {
+  /* Opaque Swiss ink — Apple #007aff fallback lagged --accent / cream Ops tab-count (#14 / P2; design-review agent-ops). */
+  color: var(--accent, #121216);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .agent-ops-tab.active,
+body.theme-swiss-minimalistic .ops-file-tab.active {
+  /* Opaque Swiss ink — Apple #007aff fallback lagged --accent / cream Ops file-tab.active (#14 / P2; design-review agent-ops). */
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
+}
+body.theme-swiss-minimalistic .agent-ops-tab.active:hover,
+body.theme-swiss-minimalistic .ops-file-tab.active:hover {
+  background: color-mix(in srgb, var(--accent, #121216) 10%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 36%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-insight-line.is-clickable.is-selected {
+  /* Opaque Swiss ink — Apple #007aff fallback lagged --accent / cream Ops insight selected (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 42%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
+  opacity: 1;
+}
