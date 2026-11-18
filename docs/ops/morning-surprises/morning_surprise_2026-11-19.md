@@ -1,27 +1,19 @@
 # Morning surprise — 2026-11-19
 
-Overnight Track B (mac-stats autoresearch) shipped user-visible theme soft-state fixes.
+Overnight Track B kept shipping Swiss Minimalistic soft-state parity on cream paper.
 
 ## Shipped
 
-| Version | What |
-|---------|------|
-| **v0.1.2861** | Swiss: collapsed-glance soft-states (ollama/chat + monitors/disk/details + Agent Ops) Apple blue → Swiss ink; disk has-scopes-off → cream amber (cream 2666/2669/2671 parity). |
-| **v0.1.2860** | Swiss: metric-strip flash highlights + history sparkline focus + first-launch tip / update banner + GitHub link hover/focus/busy → Swiss ink (cream 2686/2687 parity). |
-| **v0.1.2859** | Cream + Swiss: `.process-pin.is-pinned` Apple blue → theme accent (matches pinned row wash; CRT parity). Swiss process row/name/detail focus → Swiss ink. |
-| **v0.1.2858** | Swiss Disk Cleanup primary/meta/soft-delete/scope Apple blue → Swiss ink. |
-| **v0.1.2857** | Swiss Disk Cleanup item focus + process selected + Ops kind-chips → Swiss ink. |
-| **v0.1.2856** | Swiss Ops empty soft-states → Swiss ink. |
-| **v0.1.2855** | Swiss Ops filter-match / Clear → Swiss ink. |
-| **v0.1.2854** | Swiss Ops file-tab.active + insight selected → Swiss ink. |
+- **v0.1.2862** — Swiss Top Processes / Monitors attention glances (`.monitors-attention-glance` / `.monitors-filter-attention-glance` + `.processes-filter-attention-glance` / `.processes-hot-attention-glance`) remap shared Apple soft washes onto Swiss ink `#121216` (paper `#ffffff`). Cream 2671 parity after collapsed-glance **v0.1.2861**.
+- Earlier same night / prior ticks still on the board: Swiss collapsed glances **2861**, metric-strip flash **2860**, process-pin **2859**, Disk Cleanup scope **2858**, …
 
 ## Context
 
-- Digester open empty; design-review grace (Mac TCC); layout-daily data-poster marked 2026-11-18 (Dark next calendar day).
-- Fuel: standing P2 #14 leftover soft-states — not quiet-default; not keep-pNN Disk Cleanup clones.
+- Digester open: empty. Design-review grace (TCC blocks capture). Layout-daily Data Poster already marked for 2026-11-18 — Dark is next calendar day.
+- Send fill stays white-on-blue on purpose.
 
-## Next
+## Next fuel
 
-- Dark layout-daily when the day quota opens.
-- Mac capture when TCC allows.
-- Swiss Top Processes glance / Monitors attention if muddy; sibling / product fuel preferred over Disk Cleanup remap clones.
+- Dark layout-daily when the day quota opens
+- Mac window-only capture when Screen Recording TCC allows
+- Swiss leftover soft-states (processes-filter-chip / filter-miss if muddy) or sibling/product — not another keep-pNN Disk Cleanup clone
