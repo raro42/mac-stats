@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2863] - 2026-11-18
+
+### Fixed
+- Swiss Minimalistic design-review (Top Processes filter chips / filter-miss): leftover shared Apple soft washes on `.processes-filter-chip` (resting/hover/focus/active · pinned · Hot) and `.processes-filter-miss` (+ Hot/Pinned empty · hint · CTA) remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; Hot/Pinned keep status amber/yellow; Hot-empty keeps soft green), matching Light / Material / Architect cream chip/filter-miss parity after attention glances v0.1.2862 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2862] - 2026-11-18
 
 ### Fixed
