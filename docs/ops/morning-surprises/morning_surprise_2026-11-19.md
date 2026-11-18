@@ -1,20 +1,22 @@
 # Morning surprise — 2026-11-19
 
-Overnight Track B kept shipping Swiss Minimalistic soft-state parity on cream paper.
+Overnight autoresearch (Track B) kept product polish for Ralf.
 
 ## Shipped
 
-- **v0.1.2863** — Swiss Top Processes filter chips / filter-miss (`.processes-filter-chip` resting/hover/focus/active · pinned · Hot + `.processes-filter-miss` / Hot-empty / Pinned-empty / hint / CTA) remap shared Apple soft washes onto Swiss ink `#121216` (paper `#ffffff`). Cream chip/filter-miss parity after attention glances **v0.1.2862**.
-- Earlier same night: Swiss attention glances **2862**, collapsed glances **2861**, metric-strip flash **2860**, process-pin **2859**, Disk Cleanup scope **2858**, …
+- **v0.1.2864** — Swiss Minimalistic filter Clear chips (Monitors / Top Processes / Logs / Perplexity / Disk Cleanup / AI Chat) and Monitors filter-miss empty chrome remap Apple `#007aff` soft-states onto Swiss ink `#121216` (cream Clear v0.1.2642 / Monitors filter-miss v0.1.2667 parity after Swiss processes chip/miss v0.1.2863).
 
-## Context
+## Also this night (already on main)
 
-- Digester open: empty. Design-review grace (TCC blocks capture). Layout-daily Data Poster already marked for 2026-11-18 — Dark is next calendar day.
-- Send fill stays white-on-blue on purpose.
-- ~23:00 backstop: git flush clean; CI already triggered today; release already cut today.
+- **v0.1.2863** — Swiss Top Processes filter chips / filter-miss
+- **v0.1.2862** — Swiss Top Processes / Monitors attention glances
+- **v0.1.2861** — Swiss collapsed-glance soft-states
 
-## Next fuel
+## Tried / context
 
-- Dark layout-daily when the day quota opens
-- Mac window-only capture when Screen Recording TCC allows
-- Swiss leftover soft-states (processes-filter-clear / Monitors filter-miss if muddy) or sibling/product — not another keep-pNN Disk Cleanup clone
+- Digester open empty; design-review grace (TCC blocks capture); layout-daily **data-poster** marked (remaps already present).
+- Fuel: standing P2 #14 leftover soft-states — not quiet-default.
+
+## Next
+
+- Dark layout-daily next day · Swiss monitors-filter-chip / logs-filter-miss if muddy · sibling/product fuel when soft-states quiet.
