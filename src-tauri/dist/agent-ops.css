@@ -39315,3 +39315,103 @@ body.theme-swiss-minimalistic .agent-ops-collapsed-glance.is-empty {
   color: color-mix(in srgb, #0c0c10 75%, #ffffff);
   opacity: 1;
 }
+
+/* --- swiss Monitors / Top Processes attention (cream 2671 parity) --- */
+/* Opaque Swiss ink — Apple #0a84ff lagged --accent / cream attention glances (#14 / P2; design-review soft-states). */
+body.theme-swiss-minimalistic .monitors-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .monitors-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitors-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitors-attention-glance.has-down {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-swiss-minimalistic .monitors-attention-glance.has-slow {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 7%, #ffffff);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
+}
+body.theme-swiss-minimalistic .monitors-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .monitors-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitors-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitors-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #121216) 24%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 5.5%, #ffffff);
+  color: color-mix(in srgb, var(--accent, #121216) 42%, currentColor);
+}
+body.theme-swiss-minimalistic .monitors-filter-attention-glance.is-up-filter {
+  border-color: color-mix(in srgb, #30d158 28%, #ffffff);
+  background: color-mix(in srgb, #30d158 7%, #ffffff);
+  color: color-mix(in srgb, #30d158 45%, currentColor);
+}
+body.theme-swiss-minimalistic .monitors-filter-attention-glance.is-down-filter {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
+}
+body.theme-swiss-minimalistic .monitors-filter-attention-glance.is-slow-filter {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 7%, #ffffff);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
+}
+body.theme-swiss-minimalistic .processes-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .processes-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+}
+body.theme-swiss-minimalistic .processes-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+}
+body.theme-swiss-minimalistic .processes-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #121216) 24%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 5.5%, #ffffff);
+  color: color-mix(in srgb, var(--accent, #121216) 42%, currentColor);
+}
+body.theme-swiss-minimalistic .processes-filter-attention-glance.is-pinned {
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .processes-filter-attention-glance.is-hot-filter {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 7%, #ffffff);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
+}
+body.theme-swiss-minimalistic .processes-hot-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .processes-hot-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+}
+body.theme-swiss-minimalistic .processes-hot-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+}
+body.theme-swiss-minimalistic .processes-hot-attention-glance.has-hot {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 7%, #ffffff);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
+}

@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2862] - 2026-11-18
+
+### Fixed
+- Swiss Minimalistic design-review (Top Processes / Monitors attention glances): leftover shared Apple soft washes on `.monitors-attention-glance` / `.monitors-filter-attention-glance` and `.processes-filter-attention-glance` / `.processes-hot-attention-glance` remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; Down/Slow/Hot keep status amber/red/green), matching Light / Material / Architect cream attention-glance parity after collapsed-glance v0.1.2861 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
+
 ## [0.1.2861] - 2026-11-18
 
 ### Fixed
