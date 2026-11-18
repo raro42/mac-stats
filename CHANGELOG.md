@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2855] - 2026-11-18
+
+### Fixed
+- Swiss Minimalistic design-review (Agent Ops filter match partial + Clear / clear-filter): leftover Apple `#007aff` fallbacks on `.ops-filter-match.is-partial`, `.ops-filter-clear:hover` / `:focus-visible`, and `.ops-clear-filter` (+ hover / focus) remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`), matching Light / Material / Architect cream Ops filter match/clear parity after Swiss Ops file-tab.active / insight selected v0.1.2854 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue).
+
 ## [0.1.2854] - 2026-11-18
 
 ### Fixed
