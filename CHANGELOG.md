@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2860] - 2026-11-18
+
+### Fixed
+- Swiss Minimalistic design-review (metric-strip flash + tip/banner + GitHub link): leftover Apple `#ffffff` / soft-blue washes on metric-strip highlights (`#cpu-usage-card.is-cpu-highlight` · GPU/Temp/Freq/RAM/Uptime · `.disk-cleanup-section.is-disk-highlight`), history sparkline focus, `#mac-stats-update-banner` / first-launch tip chrome, and `#github-link` hover/focus/busy remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`), matching cream metric-strip / tip-banner parity after process-pin v0.1.2859 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2859] - 2026-11-18
 
 ### Fixed

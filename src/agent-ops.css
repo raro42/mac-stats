@@ -39063,3 +39063,88 @@ body.theme-swiss-minimalistic .process-detail-pid:focus-visible {
   /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream process focus (#14 / P2; design-review processes). */
   outline-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
 }
+
+/*
+ * Swiss Minimalistic: metric-strip flash highlights + history sparkline focus +
+ * first-launch tip / update banner + footer GitHub link still mix shared Apple
+ * `#ffffff` / soft-blue washes while cream already remapped them in v0.1.2686 /
+ * v0.1.2687 (and cream GitHub hover/busy paper washes). Opaque Swiss ink
+ * `#121216` on paper `#ffffff` so jump-to flashes, tip chrome, and footer link
+ * match Swiss soft-states after process-pin v0.1.2859. Apple keeps shared blue.
+ * Standing P2 #14 leftover soft-states — not a keep-pNN Disk Cleanup clone;
+ * polish-without-capture (Mac TCC); digester empty.
+ */
+/* OVERNIGHT v0.1.2860: Swiss metric-highlight + tip/banner + github-link remaps */
+
+/* --- swiss metric-strip flash highlights (cream 2686 parity) --- */
+body.theme-swiss-minimalistic .detail-label.is-ram-highlight,
+body.theme-swiss-minimalistic .detail-value.is-ram-highlight,
+body.theme-swiss-minimalistic #cpu-usage-card.is-cpu-highlight,
+body.theme-swiss-minimalistic .metric-card.is-gpu-highlight,
+body.theme-swiss-minimalistic #gpu-power.is-gpu-highlight,
+body.theme-swiss-minimalistic .metric-card.is-temp-highlight,
+body.theme-swiss-minimalistic .metric-card.is-freq-highlight,
+body.theme-swiss-minimalistic .detail-label.is-uptime-highlight,
+body.theme-swiss-minimalistic .detail-value.is-uptime-highlight {
+  /* Opaque Swiss ink — Apple #ffffff flash lagged cream metric-strip (#14 / P2; design-review metrics). */
+  background-color: color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-section.is-disk-highlight {
+  /* Opaque Swiss ink — Apple #ffffff flash lagged cream disk-highlight (#14 / P2; design-review disk-cleanup). */
+  background-color: color-mix(in srgb, var(--accent, #121216) 10%, #ffffff);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #121216) 14%, #ffffff);
+}
+
+/* --- swiss history focus + tip / update banner (cream 2687 parity) --- */
+body.theme-swiss-minimalistic .history-chart-container[role="button"]:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream history focus (#14 / P2; design-review history). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+}
+body.theme-swiss-minimalistic #mac-stats-update-banner {
+  /* Opaque Swiss ink — soft Apple blue wash lagged cream banner (#14 / P2; design-review tip). */
+  background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
+}
+body.theme-swiss-minimalistic #mac-stats-first-launch-tip .tip-glyph,
+body.theme-swiss-minimalistic #mac-stats-update-banner .tip-glyph {
+  /* Opaque chrome — Apple #ffffff → Swiss paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #e8e8ee 45%, #ffffff);
+  border-color: color-mix(in srgb, #e0e0e6 55%, #ffffff);
+  color: color-mix(in srgb, #0c0c10 50%, #ffffff);
+}
+body.theme-swiss-minimalistic #mac-stats-first-launch-tip code,
+body.theme-swiss-minimalistic #mac-stats-update-banner code {
+  background: color-mix(in srgb, #0c0c10 6%, #ffffff);
+  border-color: color-mix(in srgb, #0c0c10 4%, #ffffff);
+}
+body.theme-swiss-minimalistic #mac-stats-first-launch-tip .tip-dismiss,
+body.theme-swiss-minimalistic #mac-stats-update-banner .tip-dismiss {
+  border-color: color-mix(in srgb, #0c0c10 8%, #ffffff);
+  /* Opaque chrome — Apple #ffffff → Swiss paper pigments (#14 / P2). */
+  background: color-mix(in srgb, #e8e8ee 35%, #ffffff);
+  color: color-mix(in srgb, #0c0c10 45%, #ffffff);
+}
+body.theme-swiss-minimalistic #mac-stats-first-launch-tip .tip-dismiss:hover,
+body.theme-swiss-minimalistic #mac-stats-update-banner .tip-dismiss:hover {
+  border-color: color-mix(in srgb, #0c0c10 12%, #ffffff);
+  background: color-mix(in srgb, #e0e0e6 55%, #ffffff);
+  color: color-mix(in srgb, #0c0c10 80%, #ffffff);
+}
+body.theme-swiss-minimalistic #mac-stats-update-banner a {
+  text-decoration-color: color-mix(in srgb, currentColor 35%, #ffffff);
+}
+
+/* --- swiss footer GitHub link (cream hover/busy paper wash parity) --- */
+body.theme-swiss-minimalistic #github-link:hover {
+  background: color-mix(in srgb, currentColor 10%, #ffffff);
+}
+body.theme-swiss-minimalistic #github-link:focus-visible {
+  /* Opaque Swiss ink — bare Apple outline lagged cream/neon github focus (#14 / P2; design-review footer). */
+  outline-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+}
+body.theme-swiss-minimalistic #github-link[aria-busy="true"],
+body.theme-swiss-minimalistic #github-link[aria-disabled="true"] {
+  color: color-mix(in srgb, #0c0c10 62%, #ffffff);
+  opacity: 1;
+}
