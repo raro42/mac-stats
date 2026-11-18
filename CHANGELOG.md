@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2856] - 2026-11-18
+
+### Fixed
+- Swiss Minimalistic design-review (Agent Ops empty hover / filter-miss calm / overview CTA): leftover Apple `#007aff` fallbacks on `.ops-empty:hover`, `.ops-empty-filter-miss.is-calm` / `.ops-empty-tab.ops-empty-filter-miss.is-calm`, and `.ops-overview-body > .ops-empty-overview-cta.is-calm` remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`), matching Light / Material / Architect cream Ops empty soft-states parity after Swiss Ops filter match/clear v0.1.2855 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue).
+
 ## [0.1.2855] - 2026-11-18
 
 ### Fixed
