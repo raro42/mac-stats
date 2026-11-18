@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2859] - 2026-11-18
+
+### Fixed
+- Cream + Swiss Minimalistic design-review (Top Processes pin glyph + Swiss process focus): leftover bare Apple `#0a84ff` on `.process-pin.is-pinned` (Light / Material / Architect / Swiss) remap onto theme `--accent` so the pin matches `.process-row.is-pinned` after cream v0.1.2848 / Swiss v0.1.2851 (CRT parity v0.1.2768); Swiss also remaps `.process-row:focus-visible` / `.process-name:focus-visible` / process-detail name·pid focus onto Swiss ink `#121216` (paper `#ffffff`) to match cream process focus v0.1.2689 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue).
+
 ## [0.1.2858] - 2026-11-18
 
 ### Fixed

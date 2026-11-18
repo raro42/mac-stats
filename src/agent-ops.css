@@ -39026,3 +39026,40 @@ body.theme-swiss-minimalistic .disk-cleanup-toolbar .popover-btn-secondary:focus
   /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup toolbar secondary (#14 / P2; design-review). */
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
 }
+
+/*
+ * Light / Material / Architect / Swiss: pinned process pin glyph still uses
+ * shared Apple `#0a84ff` (`.process-pin.is-pinned`) while `.process-row.is-pinned`
+ * already sits on theme accent after cream v0.1.2848 / Swiss v0.1.2851. A pinned
+ * row then shows an Apple-blue pin on cream / Swiss paper. Catch up so the pin
+ * matches the row wash (CRT parity v0.1.2768). Swiss also lacked process
+ * row/name/detail focus outlines that cream remapped in v0.1.2689 — remap those
+ * onto Swiss ink so keyboard focus matches Swiss process-pin:focus-visible
+ * (v0.1.2853). Apple keeps shared blue. Standing P2 #14 leftover soft-states
+ * after Swiss Disk Cleanup primary/meta/soft-delete/scope v0.1.2858 (not a
+ * keep-pNN Disk Cleanup clone); polish-without-capture (Mac TCC); digester empty.
+ */
+/* OVERNIGHT v0.1.2859: process-pin.is-pinned cream+Swiss + Swiss process focus */
+body.theme-light .process-pin.is-pinned {
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / CRT process-pin.is-pinned (#14 / P2; design-review processes). */
+  color: color-mix(in srgb, var(--accent, #6aa6df) 85%, #0c0c10);
+}
+body.theme-material .process-pin.is-pinned {
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / CRT process-pin.is-pinned (#14 / P2; design-review processes). */
+  color: color-mix(in srgb, var(--accent, #b8a68b) 85%, #0c0c10);
+}
+body.theme-architect .process-pin.is-pinned {
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / CRT process-pin.is-pinned (#14 / P2; design-review processes). */
+  color: color-mix(in srgb, var(--accent, #232d41) 85%, #0c0c10);
+}
+body.theme-swiss-minimalistic .process-pin.is-pinned {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / CRT·cream process-pin.is-pinned (#14 / P2; design-review processes). */
+  color: color-mix(in srgb, var(--accent, #121216) 85%, #0c0c10);
+}
+body.theme-swiss-minimalistic .process-row:focus-visible,
+body.theme-swiss-minimalistic .process-name:focus-visible,
+body.theme-swiss-minimalistic .process-detail-name:focus-visible,
+body.theme-swiss-minimalistic .process-detail-pid:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream process focus (#14 / P2; design-review processes). */
+  outline-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+}
