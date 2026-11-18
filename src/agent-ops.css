@@ -38952,3 +38952,77 @@ body.theme-swiss-minimalistic .ops-runs-lane-chip[data-ops-runs-lane='lite'].is-
   background: color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
   border-color: color-mix(in srgb, var(--accent, #121216) 36%, #ffffff);
 }
+
+/* OVERNIGHT v0.1.2858: Swiss Disk Cleanup primary/meta/soft-delete/scope (cream 2841 parity) */
+body.theme-swiss-minimalistic .disk-cleanup-toolbar .disk-cleanup-primary {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup primary (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 14%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 30%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-toolbar .disk-cleanup-primary:hover {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup primary (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 42%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
+  color: color-mix(in srgb, #0c0c10 48%, #ffffff);
+  opacity: 1;
+}
+body.theme-swiss-minimalistic .disk-cleanup-meta-card:focus-within {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup meta (#14 / P2; design-review). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 36%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-meta-card.is-action:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup meta (#14 / P2; design-review). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 36%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-soft-delete:focus-within {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup soft-delete (#14 / P2; design-review). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 34%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-scope-row:focus-visible,
+body.theme-swiss-minimalistic .disk-cleanup-scope-row:focus-within {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup scope-row (#14 / P2; design-review). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 34%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-add-scope #disk-cleanup-add-btn {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup add-btn (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 32%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-add-scope #disk-cleanup-add-btn:hover {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup add-btn (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 24%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 46%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-add-scope #disk-cleanup-add-btn:active {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup add-btn (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-add-scope #disk-cleanup-add-btn:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup add-btn (#14 / P2; design-review). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-scope-remove:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup scope-remove (#14 / P2; design-review). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-scope-row input[type="number"]:focus-visible,
+body.theme-swiss-minimalistic .disk-cleanup-add-scope input:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup scope/add input (#14 / P2; design-review). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 40%, #ffffff);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-item-path:focus-visible,
+body.theme-swiss-minimalistic .disk-cleanup-scope-path:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup path focus (#14 / P2; design-review). */
+  outline-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup toolbar secondary (#14 / P2; design-review). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
+}

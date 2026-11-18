@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2858] - 2026-11-18
+
+### Fixed
+- Swiss Minimalistic design-review (Disk Cleanup primary / meta / soft-delete / scope): leftover bare Apple `#0a84ff` on toolbar primary (+ hover), meta-card focus-within / is-action focus, soft-delete focus-within, scope-row focus, add-btn (+ hover/active/focus), scope-remove focus, add-scope / scope input focus, path focus outlines, and toolbar secondary focus remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`), matching Light / Material / Architect cream Disk Cleanup primary/meta/soft-delete/scope parity after Swiss item/process/Ops chips v0.1.2857 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue).
+
 ## [0.1.2857] - 2026-11-18
 
 ### Fixed
