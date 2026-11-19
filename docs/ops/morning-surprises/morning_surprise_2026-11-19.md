@@ -4,10 +4,11 @@ Overnight Track B (Swiss soft-state parity) kept shipping after digester open st
 
 ## Shipped (latest)
 
-- **v0.1.2873** — Swiss Minimalistic Perplexity last-glance: Apple `#007aff` focus/has-results/is-searching fallbacks → Swiss ink `#121216` on paper `#ffffff` (cream 2676 parity after chat glances v0.1.2872). Has-error stays red; needs-key amber; is-ready green.
+- **v0.1.2874** — Swiss Minimalistic Perplexity attention + key-attention: Apple `#007aff` focus/is-filter fallbacks → Swiss ink `#121216` on paper `#ffffff` (cream 2674 parity after last-glance v0.1.2873). Has-error / is-not-set stay red; has-top amber.
 
 ## Earlier tonight (same window)
 
+- v0.1.2873 Perplexity last-glance
 - v0.1.2872 AI Chat model/turn/answer/errors glances
 - v0.1.2871 Disk Cleanup attention + chat-offline-attention
 - v0.1.2870 logs-filter-chip
@@ -19,4 +20,4 @@ Overnight Track B (Swiss soft-state parity) kept shipping after digester open st
 - Digester: empty open candidates (filtered noise).
 - Design-review: due=false (grace; Mac TCC blocks window capture) — polish-without-capture.
 - Layout-daily: data-poster already marked today; Dark next calendar day.
-- Next fuel: Swiss `.perplexity-attention-glance` / `.perplexity-key-attention-glance` (cream 2674) · Settings kb-hints · sibling/product fuel.
+- Next fuel: Settings kb-hints · sibling/product fuel · Dark layout-daily next calendar day.
