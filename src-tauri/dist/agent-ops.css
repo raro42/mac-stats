@@ -27053,16 +27053,19 @@ body.theme-architect .disk-cleanup-item:focus-visible {
 }
 
 body.theme-light .disk-cleanup-item.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / cream Disk Cleanup focus (#14 / P2; design-review). */
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 6%, #f7f7fa);
 }
 body.theme-material .disk-cleanup-item.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / cream Disk Cleanup focus (#14 / P2; design-review). */
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 6%, #ebe4d9);
 }
 body.theme-architect .disk-cleanup-item.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / cream Disk Cleanup focus (#14 / P2; design-review). */
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 6%, #f1f1f1);
 }
 
 body.theme-light .disk-cleanup-item.has-reclaim {
@@ -38944,6 +38947,12 @@ body.theme-swiss-minimalistic .disk-cleanup-item:focus-visible {
   /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup item focus (#14 / P2; design-review). */
   border-color: color-mix(in srgb, var(--accent, #121216) 34%, #ffffff);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+}
+/* OVERNIGHT v0.1.2887: Swiss Disk Cleanup item is-selected (cream focus parity after v0.1.2886) */
+body.theme-swiss-minimalistic .disk-cleanup-item.is-selected {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup is-selected (#14 / P2; design-review). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 6%, #ffffff);
 }
 body.theme-swiss-minimalistic .process-row.is-selected {
   /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream process-row selected (#14 / P2; design-review). */

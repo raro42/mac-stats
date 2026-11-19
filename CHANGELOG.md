@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2887] - 2026-11-19
+
+### Fixed
+- Light / Material / Architect / Swiss design-review (Disk Cleanup selected item): cream `.disk-cleanup-item.is-selected` still used Apple `#0a84ff` accent fallbacks after paper remaps while matching `:focus-visible` already sat on theme accents; Swiss lacked an is-selected remap and inherited shared Apple `#0a84ff` on paper `#ffffff`. Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` / Swiss ink `#121216` mixed onto each theme paper (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2886] - 2026-11-19
 
 ### Fixed
