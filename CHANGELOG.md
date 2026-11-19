@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2866] - 2026-11-19
+
+### Fixed
+- Swiss Minimalistic design-review (AI Chat + Rings filter chips): leftover shared Apple `#0a84ff` accent fallbacks on `.chat-filter-chip` (resting/hover/focus/active · You · Assistant · Errors) and `.rings-filter-chip` (resting/hover/focus/active · Hot) remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; You uses accent; Assistant green; Errors red; Hot amber), matching Light / Material / Architect cream chat/rings chips (v0.1.2644) parity after Swiss monitors chips + logs filter-miss v0.1.2865 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2865] - 2026-11-19
 
 ### Fixed

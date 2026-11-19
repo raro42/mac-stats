@@ -39660,3 +39660,84 @@ body.theme-swiss-minimalistic .logs-filter-miss-cta:hover {
 body.theme-swiss-minimalistic .logs-filter-miss-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
 }
+
+/*
+ * Swiss Minimalistic: AI Chat / Rings filter chips still inherit shared Apple
+ * `#0a84ff` accent fallbacks on paper `#ffffff` (`.chat-filter-chip`
+ * resting/hover/focus/active · You · Assistant · Errors; `.rings-filter-chip`
+ * resting/hover/focus/active · Hot) while cream Light / Material / Architect
+ * remapped them in v0.1.2644, and Swiss already remapped monitors chips +
+ * logs filter-miss in v0.1.2865. Opaque Swiss ink `#121216` mixes (You uses
+ * accent; Assistant green; Errors red; Hot amber). Standing P2 #14 leftover
+ * soft-states after monitors-filter-chip + logs-filter-miss v0.1.2865 (not a
+ * keep-pNN Disk Cleanup clone). Design-review polish-without-capture (Mac TCC).
+ */
+/* OVERNIGHT v0.1.2866: Swiss chat-filter-chip + rings-filter-chip remaps */
+
+body.theme-swiss-minimalistic .chat-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  color: color-mix(in srgb, #0c0c10 77%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
+  background: color-mix(in srgb, currentColor 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 32%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-filter-chip[data-chat-filter='you'].has-hits {
+  background: color-mix(in srgb, var(--accent, #121216) 10%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 24%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-filter-chip[data-chat-filter='you'].is-active {
+  background: color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 38%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-filter-chip[data-chat-filter='assistant'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #ffffff);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-filter-chip[data-chat-filter='assistant'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #ffffff);
+  border-color: color-mix(in srgb, #34c759 38%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-filter-chip[data-chat-filter='errors'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #ffffff);
+  border-color: color-mix(in srgb, #ff3b30 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-filter-chip[data-chat-filter='errors'].is-active {
+  background: color-mix(in srgb, #ff3b30 20%, #ffffff);
+  border-color: color-mix(in srgb, #ff3b30 40%, #ffffff);
+}
+
+body.theme-swiss-minimalistic .rings-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  color: color-mix(in srgb, #0c0c10 77%, #ffffff);
+}
+body.theme-swiss-minimalistic .rings-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
+  background: color-mix(in srgb, currentColor 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .rings-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
+}
+body.theme-swiss-minimalistic .rings-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 32%, #ffffff);
+}
+body.theme-swiss-minimalistic .rings-filter-chip[data-rings-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, #ffffff);
+  border-color: color-mix(in srgb, #ff9500 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .rings-filter-chip[data-rings-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, #ffffff);
+  border-color: color-mix(in srgb, #ff9500 40%, #ffffff);
+}
