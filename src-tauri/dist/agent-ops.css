@@ -40034,3 +40034,117 @@ body.theme-swiss-minimalistic .logs-toolbar .logs-filter-chip[data-logs-filter='
   background: color-mix(in srgb, #ff9f0a 20%, #ffffff);
   border-color: color-mix(in srgb, #ff9f0a 40%, #ffffff);
 }
+
+/*
+ * Swiss Minimalistic: Disk Cleanup attention + filter-attention glances and AI
+ * Chat offline-attention still mix shared Apple `#007aff` / `#0a84ff` accent
+ * fallbacks on Swiss paper while cream Light / Material / Architect remapped
+ * Disk Cleanup attention in v0.1.2675 and chat-offline soft-states in
+ * v0.1.2661. Opaque Swiss ink `#121216` mixes (reclaim/big/offline/circuit/
+ * no-model keep status amber; clean/ready/last-answer keep green; not-set/
+ * errors keep red). Standing P2 #14 leftover soft-states after logs-filter-chip
+ * v0.1.2870 (not a keep-pNN Disk Cleanup clone). Design-review
+ * polish-without-capture (Mac TCC).
+ */
+/* OVERNIGHT v0.1.2871: Swiss disk-cleanup attention + chat-offline-attention remaps */
+
+/* --- swiss Disk Cleanup attention / filter-attention (cream 2675 parity) --- */
+/* Opaque Swiss ink — Apple #007aff lagged --accent / cream Disk Cleanup attention (#14 / P2; design-review soft-states). */
+body.theme-swiss-minimalistic .disk-cleanup-attention-glance,
+body.theme-swiss-minimalistic .disk-cleanup-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .disk-cleanup-attention-glance:hover,
+body.theme-swiss-minimalistic .disk-cleanup-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .disk-cleanup-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #121216) 24%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 5.5%, #ffffff);
+  color: color-mix(in srgb, var(--accent, #121216) 42%, currentColor);
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-attention-glance.is-reclaim-filter,
+body.theme-swiss-minimalistic .disk-cleanup-attention-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 6%, #ffffff);
+  color: color-mix(in srgb, #ff9f0a 45%, currentColor);
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-attention-glance.is-big-filter,
+body.theme-swiss-minimalistic .disk-cleanup-attention-glance.has-big {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 7%, #ffffff);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-attention-glance.is-clean-filter {
+  border-color: color-mix(in srgb, #30d158 28%, #ffffff);
+  background: color-mix(in srgb, #30d158 7%, #ffffff);
+  color: color-mix(in srgb, #30d158 45%, currentColor);
+}
+body.theme-swiss-minimalistic .disk-cleanup-attention-glance.is-due {
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
+  color: color-mix(in srgb, #34c759 50%, currentColor);
+}
+
+/* --- swiss AI Chat offline-attention (cream 2661 offline soft-state parity) --- */
+/* Opaque Swiss ink — Apple #007aff lagged --accent / cream chat-offline-attention (#14 / P2; design-review soft-states). */
+body.theme-swiss-minimalistic .chat-offline-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .chat-offline-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+  box-shadow: none;
+}
+body.theme-swiss-minimalistic .chat-offline-attention-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+  box-shadow: none;
+}
+body.theme-swiss-minimalistic .chat-offline-attention-glance.is-ready,
+body.theme-swiss-minimalistic .chat-offline-attention-glance.is-last-answer {
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-offline-attention-glance.is-offline,
+body.theme-swiss-minimalistic .chat-offline-attention-glance.is-circuit,
+body.theme-swiss-minimalistic .chat-offline-attention-glance.is-no-model {
+  border-color: color-mix(in srgb, #ff9500 30%, #ffffff);
+  background: color-mix(in srgb, #ff9500 7%, #ffffff);
+  color: color-mix(in srgb, #ff9500 48%, currentColor);
+}
+body.theme-swiss-minimalistic .chat-offline-attention-glance.is-continue {
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+  color: color-mix(in srgb, var(--accent, #121216) 48%, currentColor);
+}
+body.theme-swiss-minimalistic .chat-offline-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #121216) 24%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 5.5%, #ffffff);
+  color: color-mix(in srgb, var(--accent, #121216) 42%, currentColor);
+}
+body.theme-swiss-minimalistic .chat-offline-attention-glance.is-sending {
+  border-color: color-mix(in srgb, var(--accent, #121216) 38%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 10%, #ffffff);
+  color: color-mix(in srgb, var(--accent, #121216) 55%, currentColor);
+}
+body.theme-swiss-minimalistic .chat-offline-attention-glance.is-not-set,
+body.theme-swiss-minimalistic .chat-offline-attention-glance.is-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+body.theme-swiss-minimalistic .chat-offline-attention-glance.is-just-copied {
+  border-color: color-mix(in srgb, #34c759 42%, #ffffff);
+  background: color-mix(in srgb, #34c759 14%, #ffffff);
+  color: color-mix(in srgb, #34c759 62%, currentColor);
+}

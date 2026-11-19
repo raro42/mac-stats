@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2871] - 2026-11-19
+
+### Fixed
+- Swiss Minimalistic design-review (Disk Cleanup attention + AI Chat offline-attention): leftover shared Apple `#007aff` / `#0a84ff` accent fallbacks on `.disk-cleanup-attention-glance` / `.disk-cleanup-filter-attention-glance` (resting/hover/focus · filter · reclaim · big · clean · due) and `.chat-offline-attention-glance` (resting/hover/focus · ready/last-answer · offline/circuit/no-model · continue/filter/sending · not-set/errors · just-copied) remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; reclaim/big/offline keep amber; clean/ready keep green; not-set/errors keep red), matching Light / Material / Architect cream Disk Cleanup attention (v0.1.2675) / chat-offline soft-states (v0.1.2661) parity after Swiss logs-filter-chip v0.1.2870 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2870] - 2026-11-19
 
 ### Fixed
