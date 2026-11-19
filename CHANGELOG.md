@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2889] - 2026-11-20
+
+### Fixed
+- Cream / Swiss / CRT layout-daily + design-review (Monitors settings primary): `.monitors-settings-popover .popover-btn-primary` / `.popover-btn-secondary` resting · hover · `:focus-visible` stayed off the themed Ollama primary styles (selectors were Ollama-only), so Add Monitor / Cancel lacked theme accent fills while cream / Data Poster focus remaps still fell back to Apple `#007aff`. Selector share with Ollama primary/secondary across theme `cpu.css` shells, plus Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` / Swiss ink `#121216` / Data Poster `#55c7ff` focus fallback hygiene (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2888] - 2026-11-19
 
 ### Fixed

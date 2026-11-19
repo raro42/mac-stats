@@ -2126,7 +2126,9 @@ body {
 }
 
 .ollama-settings-popover .popover-btn-primary,
-.ollama-settings-popover .popover-btn-secondary {
+.monitors-settings-popover .popover-btn-primary,
+.ollama-settings-popover .popover-btn-secondary,
+.monitors-settings-popover .popover-btn-secondary {
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 13px;
@@ -2137,32 +2139,38 @@ body {
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
-.ollama-settings-popover .popover-btn-primary {
+.ollama-settings-popover .popover-btn-primary,
+.monitors-settings-popover .popover-btn-primary {
   /* Opaque Architect accent — Apple #007aff lagged --accent / secondary (#14 / P2; design-review AI Chat). */
   background: color-mix(in srgb, var(--accent, #232d41) 90%, #f1f1f1);
   color: #ffffff;
   border-color: color-mix(in srgb, var(--accent, #232d41) 90%, #f1f1f1);
 }
 
-.ollama-settings-popover .popover-btn-primary:hover {
+.ollama-settings-popover .popover-btn-primary:hover,
+.monitors-settings-popover .popover-btn-primary:hover {
   background: var(--accent, #232d41);
   border-color: var(--accent, #232d41);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
-.ollama-settings-popover .popover-btn-secondary {
+.ollama-settings-popover .popover-btn-secondary,
+.monitors-settings-popover .popover-btn-secondary {
   background: color-mix(in srgb, #232d41 6%, #f1f1f1);
   color: color-mix(in srgb, #232d41 86%, #f1f1f1);
   border-color: color-mix(in srgb, #232d41 10%, #f1f1f1);
 }
 
-.ollama-settings-popover .popover-btn-secondary:hover {
+.ollama-settings-popover .popover-btn-secondary:hover,
+.monitors-settings-popover .popover-btn-secondary:hover {
   background: color-mix(in srgb, #232d41 10%, #f1f1f1);
   border-color: color-mix(in srgb, #232d41 14%, #f1f1f1);
 }
 
 .ollama-settings-popover .popover-btn-primary:focus-visible,
-.ollama-settings-popover .popover-btn-secondary:focus-visible {
+.monitors-settings-popover .popover-btn-primary:focus-visible,
+.ollama-settings-popover .popover-btn-secondary:focus-visible,
+.monitors-settings-popover .popover-btn-secondary:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
   outline-offset: 2px;
 }

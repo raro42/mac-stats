@@ -2102,7 +2102,9 @@ body {
 }
 
 .ollama-settings-popover .popover-btn-primary,
-.ollama-settings-popover .popover-btn-secondary {
+.monitors-settings-popover .popover-btn-primary,
+.ollama-settings-popover .popover-btn-secondary,
+.monitors-settings-popover .popover-btn-secondary {
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 13px;
@@ -2113,32 +2115,38 @@ body {
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
-.ollama-settings-popover .popover-btn-primary {
+.ollama-settings-popover .popover-btn-primary,
+.monitors-settings-popover .popover-btn-primary {
   /* Opaque poster accent — Apple #007aff lagged --accent / textarea cyan (#14 / P2; design-review AI Chat). */
   background: color-mix(in srgb, #55c7ff 90%, #0b0b10);
   color: #0b0b10;
   border-color: color-mix(in srgb, #55c7ff 90%, #0b0b10);
 }
 
-.ollama-settings-popover .popover-btn-primary:hover {
+.ollama-settings-popover .popover-btn-primary:hover,
+.monitors-settings-popover .popover-btn-primary:hover {
   background: #55c7ff;
   border-color: #55c7ff;
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
-.ollama-settings-popover .popover-btn-secondary {
+.ollama-settings-popover .popover-btn-secondary,
+.monitors-settings-popover .popover-btn-secondary {
   background: color-mix(in srgb, #ffffff 6%, #0b0b10);
   color: color-mix(in srgb, #ffffff 92%, #0b0b10);
   border-color: color-mix(in srgb, #ffffff 14%, #0b0b10);
 }
 
-.ollama-settings-popover .popover-btn-secondary:hover {
+.ollama-settings-popover .popover-btn-secondary:hover,
+.monitors-settings-popover .popover-btn-secondary:hover {
   background: color-mix(in srgb, #ffffff 10%, #0b0b10);
   border-color: color-mix(in srgb, #ffffff 20%, #0b0b10);
 }
 
 .ollama-settings-popover .popover-btn-primary:focus-visible,
-.ollama-settings-popover .popover-btn-secondary:focus-visible {
+.monitors-settings-popover .popover-btn-primary:focus-visible,
+.ollama-settings-popover .popover-btn-secondary:focus-visible,
+.monitors-settings-popover .popover-btn-secondary:focus-visible {
   /* Opaque poster accent — Apple #007aff lagged --accent / textarea cyan (#14 / P2; design-review AI Chat). */
   outline: 2px solid color-mix(in srgb, #55c7ff 55%, #0b0b10);
   outline-offset: 2px;

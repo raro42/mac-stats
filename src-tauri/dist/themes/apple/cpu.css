@@ -3956,7 +3956,9 @@ border-radius: 24px;
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ollama-settings-popover .popover-btn-primary,
-.ollama-settings-popover .popover-btn-secondary {
+.monitors-settings-popover .popover-btn-primary,
+.ollama-settings-popover .popover-btn-secondary,
+.monitors-settings-popover .popover-btn-secondary {
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 13px;
@@ -3967,31 +3969,37 @@ border-radius: 24px;
   box-shadow: none;
 }
 
-.ollama-settings-popover .popover-btn-primary {
+.ollama-settings-popover .popover-btn-primary,
+.monitors-settings-popover .popover-btn-primary {
   background: color-mix(in srgb, var(--accent, #007aff) 90%, #ffffff);
   color: white;
   border-color: color-mix(in srgb, var(--accent, #007aff) 90%, #ffffff);
 }
 
-.ollama-settings-popover .popover-btn-primary:hover {
+.ollama-settings-popover .popover-btn-primary:hover,
+.monitors-settings-popover .popover-btn-primary:hover {
   background: var(--accent, #007aff);
   border-color: var(--accent, #007aff);
   box-shadow: none;
 }
 
 .ollama-settings-popover .popover-btn-primary:focus-visible,
-.ollama-settings-popover .popover-btn-secondary:focus-visible {
+.monitors-settings-popover .popover-btn-primary:focus-visible,
+.ollama-settings-popover .popover-btn-secondary:focus-visible,
+.monitors-settings-popover .popover-btn-secondary:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
 }
 
-.ollama-settings-popover .popover-btn-secondary {
+.ollama-settings-popover .popover-btn-secondary,
+.monitors-settings-popover .popover-btn-secondary {
   background: color-mix(in srgb, var(--text, #0c0c10) 6%, #ffffff);
   color: var(--text);
   border-color: color-mix(in srgb, #0c0c10 10%, #ffffff);
 }
 
-.ollama-settings-popover .popover-btn-secondary:hover {
+.ollama-settings-popover .popover-btn-secondary:hover,
+.monitors-settings-popover .popover-btn-secondary:hover {
   background: color-mix(in srgb, var(--text, #0c0c10) 10%, #ffffff);
   border-color: color-mix(in srgb, #0c0c10 14%, #ffffff);
 }

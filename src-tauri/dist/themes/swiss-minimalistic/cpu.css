@@ -2244,7 +2244,9 @@ body {
 }
 
 .ollama-settings-popover .popover-btn-primary,
-.ollama-settings-popover .popover-btn-secondary {
+.monitors-settings-popover .popover-btn-primary,
+.ollama-settings-popover .popover-btn-secondary,
+.monitors-settings-popover .popover-btn-secondary {
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 13px;
@@ -2255,32 +2257,38 @@ body {
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
-.ollama-settings-popover .popover-btn-primary {
+.ollama-settings-popover .popover-btn-primary,
+.monitors-settings-popover .popover-btn-primary {
   /* Opaque Swiss accent — Apple #007aff lagged --accent / secondary (#14 / P2; design-review AI Chat). */
   background: color-mix(in srgb, var(--accent, #121216) 90%, #ffffff);
   color: #ffffff;
   border-color: color-mix(in srgb, var(--accent, #121216) 90%, #ffffff);
 }
 
-.ollama-settings-popover .popover-btn-primary:hover {
+.ollama-settings-popover .popover-btn-primary:hover,
+.monitors-settings-popover .popover-btn-primary:hover {
   background: var(--accent, #121216);
   border-color: var(--accent, #121216);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
-.ollama-settings-popover .popover-btn-secondary {
+.ollama-settings-popover .popover-btn-secondary,
+.monitors-settings-popover .popover-btn-secondary {
   background: color-mix(in srgb, #121216 6%, #ffffff);
   color: color-mix(in srgb, #121216 86%, #ffffff);
   border-color: color-mix(in srgb, #121216 10%, #ffffff);
 }
 
-.ollama-settings-popover .popover-btn-secondary:hover {
+.ollama-settings-popover .popover-btn-secondary:hover,
+.monitors-settings-popover .popover-btn-secondary:hover {
   background: color-mix(in srgb, #121216 10%, #ffffff);
   border-color: color-mix(in srgb, #121216 14%, #ffffff);
 }
 
 .ollama-settings-popover .popover-btn-primary:focus-visible,
-.ollama-settings-popover .popover-btn-secondary:focus-visible {
+.monitors-settings-popover .popover-btn-primary:focus-visible,
+.ollama-settings-popover .popover-btn-secondary:focus-visible,
+.monitors-settings-popover .popover-btn-secondary:focus-visible {
   /* Opaque Swiss accent — Apple #007aff lagged --accent / collapsible (#14 / P2; design-review AI Chat). */
   outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;

@@ -30892,7 +30892,8 @@ body.theme-futuristic .monitor-settings-item:focus-within {
 }
 
 body.theme-data-poster .monitors-settings-popover .popover-btn-primary:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #0b0b10);
+  /* Opaque poster accent — Apple #007aff lagged --accent / cream monitors primary (#14 / P2; layout-daily Monitors). */
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
 }
 body.theme-dark .monitors-settings-popover .popover-btn-primary:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
@@ -36923,7 +36924,8 @@ body.theme-light .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 22%, #f7f7fa);
 }
 body.theme-light .monitors-settings-popover .popover-btn-primary:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff lagged --accent / CRT monitors primary (#14 / P2; design-review Monitors). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
   outline-offset: 2px;
 }
 
@@ -36958,7 +36960,8 @@ body.theme-material .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 22%, #ebe4d9);
 }
 body.theme-material .monitors-settings-popover .popover-btn-primary:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
+  /* Opaque Material accent — Apple #007aff lagged --accent / CRT monitors primary (#14 / P2; design-review Monitors). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
   outline-offset: 2px;
 }
 
@@ -36993,7 +36996,8 @@ body.theme-architect .disk-cleanup-toolbar .popover-btn-secondary:focus-visible 
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 22%, #f1f1f1);
 }
 body.theme-architect .monitors-settings-popover .popover-btn-primary:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff lagged --accent / CRT monitors primary (#14 / P2; design-review Monitors). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
   outline-offset: 2px;
 }
 
@@ -38993,6 +38997,12 @@ body.theme-swiss-minimalistic .details-grid > .detail-value[role='option'].is-se
   /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Details option (#14 / P2; design-review). */
   background: color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #121216) 35%, #ffffff);
+}
+/* OVERNIGHT v0.1.2889: Swiss monitors-settings primary focus (cream 2702 paper + 2889 accent parity; resting fill via theme cpu.css selector share with Ollama) */
+body.theme-swiss-minimalistic .monitors-settings-popover .popover-btn-primary:focus-visible {
+  /* Opaque Swiss ink — bare Apple #007aff lagged --accent / cream monitors primary (#14 / P2; design-review Monitors). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+  outline-offset: 2px;
 }
 body.theme-swiss-minimalistic .process-row.is-selected {
   /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream process-row selected (#14 / P2; design-review). */
