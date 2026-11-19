@@ -39804,3 +39804,77 @@ body.theme-swiss-minimalistic .rings-filter-miss-cta:hover {
 body.theme-swiss-minimalistic .rings-filter-miss-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
 }
+
+/*
+ * Swiss Minimalistic: Disk Cleanup + Perplexity filter-miss still mix shared
+ * Apple `#007aff` accent fallbacks on paper `#ffffff` while cream Light /
+ * Material / Architect remapped them in v0.1.2668 (Swiss chat/rings filter-miss
+ * already in v0.1.2867). Opaque Swiss ink `#121216` mixes (reclaim/big/off empty
+ * keep soft green). Standing P2 #14 leftover soft-states after chat/rings
+ * filter-miss v0.1.2867 (not a keep-pNN Disk Cleanup clone). Design-review
+ * polish-without-capture (Mac TCC).
+ */
+/* OVERNIGHT v0.1.2868: Swiss Disk Cleanup + Perplexity filter-miss remaps */
+
+body.theme-swiss-minimalistic .disk-cleanup-filter-miss,
+body.theme-swiss-minimalistic .disk-cleanup-scope-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #121216) 34%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-miss.is-reclaim-empty,
+body.theme-swiss-minimalistic .disk-cleanup-filter-miss.is-big-empty,
+body.theme-swiss-minimalistic .disk-cleanup-scope-filter-miss.is-off-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-miss.is-clean-empty,
+body.theme-swiss-minimalistic .disk-cleanup-scope-filter-miss.is-on-empty {
+  border-color: color-mix(in srgb, var(--accent, #121216) 34%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-miss-hint,
+body.theme-swiss-minimalistic .disk-cleanup-empty-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #ffffff);
+  opacity: 1;
+}
+body.theme-swiss-minimalistic .disk-cleanup-empty-cta {
+  border-color: color-mix(in srgb, var(--accent, #121216) 35%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 88%, #ffffff));
+}
+body.theme-swiss-minimalistic .disk-cleanup-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 50%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-empty-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
+}
+
+body.theme-swiss-minimalistic .perplexity-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #121216) 34%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .perplexity-filter-miss.is-top-empty,
+body.theme-swiss-minimalistic .perplexity-filter-miss.is-snippet-empty {
+  border-color: color-mix(in srgb, var(--accent, #121216) 34%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .perplexity-filter-miss-hint,
+body.theme-swiss-minimalistic .perplexity-empty-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #ffffff);
+  opacity: 1;
+}
+body.theme-swiss-minimalistic .perplexity-empty-cta {
+  border-color: color-mix(in srgb, var(--accent, #121216) 35%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 88%, #ffffff));
+}
+body.theme-swiss-minimalistic .perplexity-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 50%, #ffffff);
+}
+body.theme-swiss-minimalistic .perplexity-empty-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
+}

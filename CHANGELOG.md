@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2868] - 2026-11-19
+
+### Fixed
+- Swiss Minimalistic design-review (Disk Cleanup + Perplexity filter-miss): leftover shared Apple `#007aff` accent fallbacks on `.disk-cleanup-filter-miss` / `.disk-cleanup-scope-filter-miss` (+ reclaim/big/off empty · clean/on empty · hint · empty CTA) and `.perplexity-filter-miss` (+ Top/Snippet empty · hint · empty CTA) remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; reclaim/big/off empty keep soft green), matching Light / Material / Architect cream Disk Cleanup / Perplexity filter-miss (v0.1.2668) parity after Swiss chat/rings filter-miss v0.1.2867 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2867] - 2026-11-19
 
 ### Fixed
