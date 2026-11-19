@@ -40205,3 +40205,44 @@ body.theme-swiss-minimalistic .chat-answer-glance.is-just-copied {
   background: color-mix(in srgb, #34c759 10%, #ffffff);
   color: color-mix(in srgb, #34c759 55%, currentColor);
 }
+
+/* OVERNIGHT v0.1.2873: Swiss Perplexity last-glance remaps */
+/* Opaque Swiss ink — Apple #007aff lagged --accent / cream last-glance (#14 / P2; design-review soft-states). */
+/* --- swiss Perplexity last-glance (cream 2676 parity) --- */
+body.theme-swiss-minimalistic .perplexity-last-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .perplexity-last-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+  box-shadow: none;
+}
+body.theme-swiss-minimalistic .perplexity-last-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+  box-shadow: none;
+}
+body.theme-swiss-minimalistic .perplexity-last-glance.has-results {
+  border-color: color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 5%, #ffffff);
+}
+body.theme-swiss-minimalistic .perplexity-last-glance.is-searching {
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .perplexity-last-glance.has-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-swiss-minimalistic .perplexity-last-glance.needs-key {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 7%, #ffffff);
+  color: color-mix(in srgb, #ff9f0a 42%, var(--text, currentColor));
+}
+body.theme-swiss-minimalistic .perplexity-last-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
+}

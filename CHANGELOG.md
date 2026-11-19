@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2873] - 2026-11-19
+
+### Fixed
+- Swiss Minimalistic design-review (Perplexity last-glance): leftover shared Apple `#007aff` accent fallbacks on `.perplexity-last-glance` (resting/hover/focus · has-results · is-searching · has-error · needs-key · is-ready) remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; has-error keep red; needs-key keep amber; is-ready keep green), matching Light / Material / Architect cream Perplexity last-glance (v0.1.2676) after Swiss chat-model/turn/answer/errors glances v0.1.2872 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2872] - 2026-11-19
 
 ### Fixed
