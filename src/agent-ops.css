@@ -25547,7 +25547,8 @@ body.theme-futuristic #perplexity-search-btn:hover:not(:disabled) {
 }
 
 body.theme-data-poster #perplexity-search-btn:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #0b0b10);
+  /* Opaque Data Poster accent — Apple #007aff fallback lagged --accent / Dark·Neon·Futuristic search focus (#14 / P2; design-review Perplexity). */
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
 }
 body.theme-dark #perplexity-search-btn:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
@@ -25586,19 +25587,28 @@ body.theme-futuristic .perplexity-search-box input:focus-visible {
   background: #0b0b10;
 }
 body.theme-light .perplexity-search-box input:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff fallback lagged --accent / CRT search-box (#14 / P2; design-review Perplexity). */
+  outline-color: color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 35%, #f7f7fa);
   background: #f7f7fa;
 }
 body.theme-material .perplexity-search-box input:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #ebe4d9);
+  /* Opaque Material accent — Apple #007aff fallback lagged --accent / CRT search-box (#14 / P2; design-review Perplexity). */
+  outline-color: color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 35%, #ebe4d9);
   background: #ebe4d9;
 }
 body.theme-architect .perplexity-search-box input:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff fallback lagged --accent / CRT search-box (#14 / P2; design-review Perplexity). */
+  outline-color: color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 35%, #f1f1f1);
   background: #f1f1f1;
+}
+body.theme-swiss-minimalistic .perplexity-search-box input:focus-visible {
+  /* Opaque Swiss ink — Apple #007aff fallback lagged --accent / cream search-box (#14 / P2; design-review Perplexity). */
+  outline-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 35%, #ffffff);
+  background: #ffffff;
 }
 
 
@@ -36855,7 +36865,8 @@ body.theme-architect .icon-line-item.is-ai-off:not(.status-good):not(.status-war
 
 /* --- light (#f7f7fa) --- */
 body.theme-light #perplexity-search-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff fallback lagged --accent / Data Poster·Neon search focus (#14 / P2; design-review Perplexity). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
   outline-offset: 2px;
 }
 body.theme-light .process-pin {
@@ -36889,7 +36900,8 @@ body.theme-light .monitors-settings-popover .popover-btn-primary:focus-visible {
 
 /* --- material (#ebe4d9) --- */
 body.theme-material #perplexity-search-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
+  /* Opaque Material accent — Apple #007aff fallback lagged --accent / Data Poster·Neon search focus (#14 / P2; design-review Perplexity). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
   outline-offset: 2px;
 }
 body.theme-material .process-pin {
@@ -36923,7 +36935,8 @@ body.theme-material .monitors-settings-popover .popover-btn-primary:focus-visibl
 
 /* --- architect (#f1f1f1) --- */
 body.theme-architect #perplexity-search-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff fallback lagged --accent / Data Poster·Neon search focus (#14 / P2; design-review Perplexity). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
   outline-offset: 2px;
 }
 body.theme-architect .process-pin {
@@ -38712,6 +38725,11 @@ body.theme-swiss-minimalistic .perplexity-weather-card {
   border-color: color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
   border-left-color: color-mix(in srgb, var(--accent, #121216) 70%, #ffffff);
   background: color-mix(in srgb, var(--accent, #121216) 6%, #ffffff);
+}
+body.theme-swiss-minimalistic #perplexity-search-btn:focus-visible {
+  /* Opaque Swiss ink — Apple #007aff fallback lagged --accent / cream·Data Poster search focus (#14 / P2; design-review Perplexity). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+  outline-offset: 2px;
 }
 
 /*

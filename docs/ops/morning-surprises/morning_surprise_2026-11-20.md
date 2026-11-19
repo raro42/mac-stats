@@ -1,26 +1,20 @@
 # Morning surprise — 2026-11-20
 
-Overnight Track B kept shipping Standing P2 #14 accent hygiene on cream / Swiss / CRT shells (digester open empty; design-review due=false / Mac TCC polish-without-capture; layout-daily data-poster marked 2026-11-19).
+Overnight autoresearch (20:00–06:00 CET window) kept product CSS soft-state hygiene on theme paper.
 
-## Shipped tonight (selected)
+## Shipped
 
-- **v0.1.2885** — CRT Neon / Dark / Data Poster / Futuristic AI Chat `#chat-send-btn:focus-visible` mid-file `agent-ops.css` remaps Apple `#007aff` → theme accents (cascade fix so theme `cpu.css` v0.1.2883 actually wins; Send fill white-on-blue intentional).
-- **v0.1.2884** — cream / Swiss / CRT `.perplexity-weather-card` Apple `#0a84ff` → theme accents on theme paper.
-- **v0.1.2883** — Neon / Dark / Data Poster / Futuristic AI Chat Send focus in theme `cpu.css` (later overridden until 2885).
-- **v0.1.2882** — cream Light / Material / Architect AI Chat Send focus ring → theme accents.
-- **v0.1.2881** — cream + Swiss Settings attention focus + help is-closed.
-- **v0.1.2880** — cream + Swiss Debug Log toolbar hover/focus.
-- Earlier same night: Swiss soft-state parity cascade + cream chrome / Ops just-cleared / section-header / logs-viewer (v0.1.2868–2879).
+- **v0.1.2886** — Perplexity Search focus: cream / Swiss / Data Poster `#perplexity-search-btn:focus-visible` + cream/Swiss `.perplexity-search-box input:focus-visible` Apple `#007aff` fallbacks → Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` / Swiss ink `#121216` / Data Poster `#55c7ff` (Dark/Neon/Futuristic already correct; Swiss Search + query field were missing).
+- **v0.1.2885** — CRT AI Chat Send focus cascade: mid-file `agent-ops.css` remaps no longer force Apple `#007aff` after theme `cpu.css` (Neon/Dark/Data Poster/Futuristic).
+- **v0.1.2884** — Cream / Swiss / CRT Perplexity weather-card Apple `#0a84ff` → theme accents.
+- **v0.1.2883–2882** — CRT then cream AI Chat Send focus rings onto theme accents (fill stays white-on-blue).
+- Earlier same night: Settings attention / logs toolbar / section-header / chrome outlines / Swiss soft-state parity (see CHANGELOG / results.tsv).
 
-## Tried / context
+## Fuel notes
 
-- Digester Slowest empty after noise filters.
-- Design-review screenshots stale but due=false (grace); Mac TCC blocks capture → polish-without-capture.
-- Layout-daily: data-poster marked today; Dark/Neon/Futuristic wait next calendar day.
-- Soft-state accent remaps in agent-ops are largely complete except intentional Send fill; 2885 fixed a cascade regression on CRT Send focus.
+- Digester open stayed empty; design-review grace (Mac TCC polish-without-capture); layout-daily data-poster already marked for 2026-11-19 — Dark/Neon/Futuristic due next calendar day.
+- Next leftovers: cream `disk-cleanup-item.is-selected` `#0a84ff` fallback · CRT Details hover/focus `#0a84ff` fallback · monitors-settings primary `#007aff` fallback · sibling/product fuel.
 
-## Next fuel
+## Not a surprise
 
-- Dark layout-daily when day quota opens.
-- Leftover soft-states if muddy (Send fill white-on-blue intentional · sibling/product).
-- Not another keep-pNN Disk Cleanup clone.
+Empty digester alone would not count — this night moved the ratchet with keeps in `results.tsv`.

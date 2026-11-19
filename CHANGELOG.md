@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2886] - 2026-11-19
+
+### Fixed
+- Cream / Swiss / Data Poster design-review (Perplexity search focus): `#perplexity-search-btn:focus-visible` and cream `.perplexity-search-box input:focus-visible` still used Apple `#007aff` accent fallbacks after paper remaps while Dark / Neon / Futuristic search focus (and Data Poster search-box) already sat on theme accents. Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` / Swiss ink `#121216` / Data Poster `#55c7ff` mixed onto each theme paper; Swiss also gains missing Search button + query-field focus remaps (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2885] - 2026-11-19
 
 ### Fixed
