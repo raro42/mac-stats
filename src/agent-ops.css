@@ -17677,7 +17677,8 @@ body.theme-data-poster .process-row.is-just-copied::after {
  * fuel (feature-ai-chat) + standing P2 #14.
  */
 body.theme-data-poster #chat-send-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, #007aff 55%, #0b0b10);
+  /* Opaque Data Poster accent — mid-file CRT remap still forced Apple #007aff after theme cpu.css v0.1.2883 (agent-ops loads last; fill stays white-on-blue). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
   outline-offset: 2px;
 }
 body.theme-data-poster #chat-send-btn:active {
@@ -18630,7 +18631,8 @@ body.theme-data-poster .perplexity-filter-clear.is-just-saved {
  * (feature-ai-chat) + standing P2 #14.
  */
 body.theme-neon #chat-send-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, #007aff 55%, #08120c);
+  /* Opaque neon accent — mid-file CRT remap still forced Apple #007aff after theme cpu.css v0.1.2883 (agent-ops loads last; fill stays white-on-blue). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
   outline-offset: 2px;
 }
 body.theme-neon #chat-send-btn:active {
@@ -18645,7 +18647,8 @@ body.theme-neon #chat-send-btn:disabled {
   box-shadow: none;
 }
 body.theme-futuristic #chat-send-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, #007aff 55%, #0b0b10);
+  /* Opaque Futuristic accent — mid-file CRT remap still forced Apple #007aff after theme cpu.css v0.1.2883 (agent-ops loads last; fill stays white-on-blue). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
   outline-offset: 2px;
 }
 body.theme-futuristic #chat-send-btn:active {
@@ -18668,7 +18671,8 @@ body.theme-futuristic #chat-send-btn:disabled {
  * (feature-ai-chat) + standing P2 #14.
  */
 body.theme-dark #chat-send-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, #007aff 55%, #0a0a0a);
+  /* Opaque Matrix accent — mid-file CRT remap still forced Apple #007aff after theme cpu.css v0.1.2883 (agent-ops loads last; fill stays white-on-blue). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
   outline-offset: 2px;
 }
 body.theme-dark #chat-send-btn:active {

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2885] - 2026-11-19
+
+### Fixed
+- Neon / Dark / Data Poster / Futuristic design-review (AI Chat Send focus cascade): mid-file `agent-ops.css` `body.theme-* #chat-send-btn:focus-visible` remaps still forced Apple `#007aff` after theme `cpu.css` remaps in v0.1.2883, and `agent-ops.css` loads after theme CSS so the keyboard ring stayed Apple blue on CRT shells. Fallback hygiene remaps onto Neon `#6dff7b` / Dark `#00cc66` / Data Poster `#55c7ff` / Futuristic `#3bd6ff` mixed onto each CRT paper (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2884] - 2026-11-19
 
 ### Fixed
