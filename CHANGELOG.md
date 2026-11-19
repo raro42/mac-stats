@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2890] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect / Swiss design-review (Disk Cleanup scope selected): cream `.disk-cleanup-scope-row.is-selected` still used Apple `#0a84ff` accent fallbacks after paper remaps while matching `:focus-visible` / `:focus-within` already sat on theme accents (and CRT scope is-selected already used theme accents); Swiss lacked an is-selected remap and inherited shared Apple `#0a84ff` on paper `#ffffff`. Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` / Swiss ink `#121216` mixed onto each theme paper (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; scope-row after item.is-selected v0.1.2887 — not a keep-pNN Disk Cleanup primary/meta clone).
+
+
 ## [0.1.2889] - 2026-11-20
 
 ### Fixed
