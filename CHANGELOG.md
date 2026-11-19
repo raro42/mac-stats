@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2877] - 2026-11-19
+
+### Fixed
+- Light / Material / Architect / Swiss design-review (Agent Ops filter just-cleared): cream `.ops-filter-input.ops-filter-just-cleared` still used Apple `#007aff` accent fallbacks after paper remaps (v0.1.2717) while other cream soft-states already sat on theme `--accent` (`#6aa6df` / `#b8a68b` / `#232d41`); Swiss lacked a just-cleared remap and inherited shared Apple `#007aff` fallback on paper `#ffffff`. Fallback hygiene remaps onto theme accents / Swiss ink `#121216` (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2876] - 2026-11-19
 
 ### Fixed

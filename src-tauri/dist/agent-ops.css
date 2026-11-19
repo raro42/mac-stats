@@ -38169,9 +38169,10 @@ body.theme-light .perplexity-inline-key {
   background: color-mix(in srgb, currentColor 4%, #f7f7fa);
 }
 body.theme-light .ops-filter-input.ops-filter-just-cleared {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff lagged --accent / cream Ops just-cleared fallback hygiene (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 18%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 8%, #f7f7fa);
 }
 
 /* --- material (#ebe4d9) --- */
@@ -38184,9 +38185,10 @@ body.theme-material .perplexity-inline-key {
   background: color-mix(in srgb, currentColor 4%, #ebe4d9);
 }
 body.theme-material .ops-filter-input.ops-filter-just-cleared {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, #ebe4d9);
+  /* Opaque Material accent — Apple #007aff lagged --accent / cream Ops just-cleared fallback hygiene (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 18%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 8%, #ebe4d9);
 }
 
 /* --- architect (#f1f1f1) --- */
@@ -38199,9 +38201,10 @@ body.theme-architect .perplexity-inline-key {
   background: color-mix(in srgb, currentColor 4%, #f1f1f1);
 }
 body.theme-architect .ops-filter-input.ops-filter-just-cleared {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff lagged --accent / cream Ops just-cleared fallback hygiene (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 18%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 8%, #f1f1f1);
 }
 
 /*
@@ -40392,4 +40395,13 @@ body.theme-swiss-minimalistic .ops-schedules-kind-count.is-zero,
 body.theme-swiss-minimalistic .ops-memory-kind-count.is-zero,
 body.theme-swiss-minimalistic .ops-runs-lane-count.is-zero {
   color: color-mix(in srgb, #121216 37%, #ffffff);
+}
+
+/* OVERNIGHT v0.1.2877: cream Ops filter just-cleared Apple #007aff→theme accent fallbacks + Swiss just-cleared parity */
+/* --- swiss ops-filter-just-cleared (cream 2717 paper already #ffffff; accent fallback hygiene) --- */
+body.theme-swiss-minimalistic .ops-filter-input.ops-filter-just-cleared {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops just-cleared (#14 / P2; design-review agent-ops). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 8%, #ffffff);
 }
