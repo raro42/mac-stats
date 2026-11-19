@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2881] - 2026-11-19
+
+### Fixed
+- Light / Material / Architect / Swiss design-review (Settings attention focus + help is-closed): cream Settings product/credential `.settings-*-attention-glance:focus-visible` and `.settings-help-attention-glance.is-closed` still used Apple `#007aff` accent fallbacks after paper remaps (v0.1.2621) while Neon already sat on `#6dff7b`; Swiss lacked focus/is-closed remaps and inherited shared Apple `#007aff` on paper `#ffffff`. Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` / Swiss ink `#121216` (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2880] - 2026-11-19
 
 ### Fixed

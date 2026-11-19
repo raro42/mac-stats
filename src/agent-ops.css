@@ -26000,6 +26000,7 @@ body.theme-architect .section-header-collapsible:focus-visible {
  * shared `#ffffff`). Standing P2 #14 after section-header light focus v0.1.2620.
  */
 /* OVERNIGHT v0.1.2621: settings attention-glance light-paper remaps */
+/* OVERNIGHT v0.1.2881: cream Settings attention focus + help is-closed Apple #007aff→theme accent fallbacks (#6aa6df/#b8a68b/#232d41; Swiss parity at EOF) */
 body.theme-light .settings-ai-attention-glance,
 body.theme-light .settings-compact-attention-glance,
 body.theme-light .settings-judge-attention-glance,
@@ -26064,7 +26065,7 @@ body.theme-light .settings-slack-attention-glance:focus-visible,
 body.theme-light .settings-signal-attention-glance:focus-visible,
 body.theme-light .settings-perplexity-key-attention-glance:focus-visible,
 body.theme-light .settings-discord-token-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 45%, #f7f7fa);
   box-shadow: none;
 }
 body.theme-light .settings-ai-attention-glance.is-off,
@@ -26078,8 +26079,8 @@ body.theme-light .settings-compact-attention-glance.is-on {
   background: color-mix(in srgb, #ff9500 7%, #f7f7fa);
 }
 body.theme-light .settings-help-attention-glance.is-closed {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 32%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 32%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 12%, #f7f7fa);
 }
 body.theme-light .settings-help-attention-glance.is-open {
   border-color: color-mix(in srgb, #34c759 32%, #f7f7fa);
@@ -26168,7 +26169,7 @@ body.theme-material .settings-slack-attention-glance:focus-visible,
 body.theme-material .settings-signal-attention-glance:focus-visible,
 body.theme-material .settings-perplexity-key-attention-glance:focus-visible,
 body.theme-material .settings-discord-token-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 45%, #ebe4d9);
   box-shadow: none;
 }
 body.theme-material .settings-ai-attention-glance.is-off,
@@ -26182,8 +26183,8 @@ body.theme-material .settings-compact-attention-glance.is-on {
   background: color-mix(in srgb, #ff9500 7%, #ebe4d9);
 }
 body.theme-material .settings-help-attention-glance.is-closed {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 32%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 32%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 12%, #ebe4d9);
 }
 body.theme-material .settings-help-attention-glance.is-open {
   border-color: color-mix(in srgb, #34c759 32%, #ebe4d9);
@@ -26272,7 +26273,7 @@ body.theme-architect .settings-slack-attention-glance:focus-visible,
 body.theme-architect .settings-signal-attention-glance:focus-visible,
 body.theme-architect .settings-perplexity-key-attention-glance:focus-visible,
 body.theme-architect .settings-discord-token-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 45%, #f1f1f1);
   box-shadow: none;
 }
 body.theme-architect .settings-ai-attention-glance.is-off,
@@ -26286,8 +26287,8 @@ body.theme-architect .settings-compact-attention-glance.is-on {
   background: color-mix(in srgb, #ff9500 7%, #f1f1f1);
 }
 body.theme-architect .settings-help-attention-glance.is-closed {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 32%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 32%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 12%, #f1f1f1);
 }
 body.theme-architect .settings-help-attention-glance.is-open {
   border-color: color-mix(in srgb, #34c759 32%, #f1f1f1);
@@ -40464,4 +40465,35 @@ body.theme-swiss-minimalistic .logs-toolbar button:focus-visible {
   /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream logs-toolbar focus (#14 / P2; design-review soft-states). */
   outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;
+}
+
+/* OVERNIGHT v0.1.2881: cream Settings attention focus + help is-closed Apple #007aff→theme accent fallbacks + Swiss focus/is-closed parity (Neon #6dff7b parity) */
+/* --- swiss Settings attention focus + help is-closed (cream 2621 paper already; accent fallback hygiene) --- */
+body.theme-swiss-minimalistic .settings-ai-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-compact-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-judge-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-downloads-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-ori-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-having-fun-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-voice-stt-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-help-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-brave-key-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-redmine-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-mastodon-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-mcp-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-browser-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-cursor-agent-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-telegram-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-slack-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-signal-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-perplexity-key-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .settings-discord-token-attention-glance:focus-visible {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Settings attention focus (#14 / P2; design-review Settings). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+  box-shadow: none;
+}
+body.theme-swiss-minimalistic .settings-help-attention-glance.is-closed {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Settings help is-closed (#14 / P2; design-review Settings). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 32%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
 }
