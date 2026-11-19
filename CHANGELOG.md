@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2884] - 2026-11-19
+
+### Fixed
+- Cream / Swiss / CRT design-review (Perplexity weather card): `.perplexity-weather-card` still inherited bare Apple `#0a84ff` border/wash from the shared Apple shell after Send focus remaps (v0.1.2882–2883; fill stays white-on-blue intentional). Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` / Swiss ink `#121216` / Neon `#6dff7b` / Dark `#00cc66` / Data Poster `#55c7ff` / Futuristic `#3bd6ff` mixed onto each theme paper (polish-without-capture while Mac TCC blocks capture; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2883] - 2026-11-19
 
 ### Fixed

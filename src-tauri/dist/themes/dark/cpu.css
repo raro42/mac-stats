@@ -2560,6 +2560,14 @@ body {
   box-shadow: none;
 }
 
+/* Opaque Matrix accent — bare Apple #0a84ff lagged --accent / cream weather-card (#14 / P2; design-review Perplexity; Send fill white-on-blue intentional). */
+.perplexity-weather-card {
+  border: 1px solid color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+  border-left: 3px solid color-mix(in srgb, var(--accent, #00cc66) 70%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 6%, #0a0a0a);
+}
+
+
 /* History controls - time range dropdown */
 .history-controls {
   display: flex;

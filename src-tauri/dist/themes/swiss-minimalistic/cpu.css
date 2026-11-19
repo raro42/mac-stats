@@ -2729,6 +2729,14 @@ body {
   box-shadow: none;
 }
 
+/* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream weather-card (#14 / P2; design-review Perplexity; Send fill white-on-blue intentional). */
+.perplexity-weather-card {
+  border: 1px solid color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
+  border-left: 3px solid color-mix(in srgb, var(--accent, #121216) 70%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 6%, #ffffff);
+}
+
+
 /* Debug Log viewer */
 
 .logs-path-hint{font-size:11px;color:var(--muted);font-family:ui-monospace,Menlo,monospace;margin-left:8px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

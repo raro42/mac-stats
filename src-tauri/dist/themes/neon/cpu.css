@@ -2653,6 +2653,14 @@ body::before {
   box-shadow: none;
 }
 
+/* Opaque neon accent — bare Apple #0a84ff lagged --accent / cream weather-card (#14 / P2; design-review Perplexity; Send fill white-on-blue intentional). */
+.perplexity-weather-card {
+  border: 1px solid color-mix(in srgb, var(--accent, #6dff7b) 22%, #08120c);
+  border-left: 3px solid color-mix(in srgb, var(--accent, #6dff7b) 70%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 6%, #08120c);
+}
+
+
 /* History section and charts */
 .history-section {
   display: grid;
