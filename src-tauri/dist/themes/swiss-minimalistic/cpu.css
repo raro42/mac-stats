@@ -153,7 +153,7 @@ body {
 
 /* Opaque focus ring — was missing (Apple / Data Poster / CRT already had it) (#14). */
 .icon-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 1px;
   z-index: 1;
 }
@@ -606,7 +606,7 @@ body {
 }
 
 .theme-item:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;
 }
 
@@ -1406,7 +1406,7 @@ body {
 }
 
 .icon-line-item:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;
 }
 
@@ -1648,7 +1648,7 @@ body {
 }
 
 .monitors-menu-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;
   color: var(--text, var(--ink, inherit));
 }
@@ -1684,7 +1684,7 @@ body {
 }
 
 .monitors-menu-item:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: -2px;
   background: color-mix(in srgb, var(--text, #0c0c10) 6%, #ffffff);
 }
@@ -1757,7 +1757,7 @@ body {
 }
 
 .monitors-settings-popover .popover-close:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;
   color: var(--text, var(--ink, inherit));
 }
@@ -1923,7 +1923,7 @@ body {
 }
 
 .add-btn-small:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;
   color: var(--text, var(--ink, inherit));
 }
@@ -2090,7 +2090,7 @@ body {
 }
 
 .ollama-menu-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;
   color: var(--text, var(--ink, inherit));
 }
@@ -2126,7 +2126,7 @@ body {
 }
 
 .ollama-menu-item:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: -2px;
   background: color-mix(in srgb, var(--text, #0c0c10) 6%, #ffffff);
 }
@@ -2195,7 +2195,7 @@ body {
 }
 
 .ollama-settings-popover .popover-close:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;
   color: var(--text, var(--ink, inherit));
 }
@@ -2307,7 +2307,7 @@ body {
 }
 
 .connection-indicator:focus-visible:not(.connected) {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 3px;
 }
 
@@ -2333,7 +2333,7 @@ body {
 }
 
 .model-text:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;
   color: var(--text, var(--ink, inherit));
 }
@@ -2736,7 +2736,7 @@ body {
 /* Opaque Debug Log chrome — was gray/black glass rgba (#14); Material-parity on Swiss paper. */
 .logs-toolbar button{font-size:12px;padding:6px 10px;border-radius:6px;border:1px solid var(--hairline,color-mix(in srgb,#808080 30%,#ffffff));background:color-mix(in srgb,#808080 12%,#ffffff);color:var(--text,inherit);cursor:pointer}
 .logs-toolbar button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;
 }
 .logs-autorefresh{font-size:12px;color:var(--muted,color-mix(in srgb,#808080 80%,#ffffff));display:inline-flex;align-items:center;gap:6px;margin-left:auto}

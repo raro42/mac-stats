@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2878] - 2026-11-19
+
+### Fixed
+- Light / Material / Architect / Swiss design-review (chrome focus outlines): leftover Apple `#007aff` accent fallbacks on `.icon-btn` / `.theme-item` / `.icon-line-item` / Monitors + Ollama menu·item·popover chrome / `.add-btn-small` / `.connection-indicator` / `.model-text` / Debug Log toolbar button focus rings (Architect also `.arch-version`) still used shared Apple blue while Neon already sat on `#6dff7b` and other cream soft-states already sat on theme `--accent`. Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` / Swiss ink `#121216` (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2877] - 2026-11-19
 
 ### Fixed
