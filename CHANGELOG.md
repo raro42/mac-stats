@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2870] - 2026-11-19
+
+### Fixed
+- Swiss Minimalistic design-review (Debug Log filter chips): leftover shared Apple `#0a84ff` accent fallbacks on `.logs-toolbar .logs-filter-chip` (resting/hover/focus/active · error · warn) remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; error/warn keep status red/amber), matching Light / Material / Architect cream logs chips (v0.1.2643) parity after Swiss Disk Cleanup / Perplexity filter chips v0.1.2869 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2869] - 2026-11-19
 
 ### Fixed

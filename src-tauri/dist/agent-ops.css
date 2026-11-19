@@ -39986,3 +39986,51 @@ body.theme-swiss-minimalistic .perplexity-filter-chip[data-perplexity-filter='sn
   background: color-mix(in srgb, #34c759 18%, #ffffff);
   border-color: color-mix(in srgb, #34c759 38%, #ffffff);
 }
+
+/*
+ * Swiss Minimalistic: Debug Log filter chips still mix shared Apple `#0a84ff`
+ * accent fallbacks on `.logs-toolbar .logs-filter-chip` resting/hover/active
+ * (focus-visible already remapped earlier) while cream Light / Material /
+ * Architect remapped them in v0.1.2643 (Swiss logs-filter-miss already in
+ * v0.1.2865). Opaque Swiss ink `#121216` mixes (error/warn keep status red/
+ * amber). Standing P2 #14 leftover soft-states after Disk Cleanup / Perplexity
+ * filter chips v0.1.2869 (not a keep-pNN Disk Cleanup clone). Design-review
+ * polish-without-capture (Mac TCC).
+ */
+/* OVERNIGHT v0.1.2870: Swiss logs-filter-chip resting/hover/active remaps */
+
+body.theme-swiss-minimalistic .logs-toolbar .logs-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  color: color-mix(in srgb, #0c0c10 77%, #ffffff);
+}
+body.theme-swiss-minimalistic .logs-toolbar .logs-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
+  background: color-mix(in srgb, currentColor 7%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 20%, #ffffff);
+}
+body.theme-swiss-minimalistic .logs-toolbar .logs-filter-chip:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream logs filter-chip (#14 / P2; design-review). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
+}
+body.theme-swiss-minimalistic .logs-toolbar .logs-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 32%, #ffffff);
+}
+body.theme-swiss-minimalistic .logs-toolbar .logs-filter-chip[data-logs-filter='error'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #ffffff);
+  border-color: color-mix(in srgb, #ff3b30 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .logs-toolbar .logs-filter-chip[data-logs-filter='error'].is-active {
+  background: color-mix(in srgb, #ff3b30 18%, #ffffff);
+  border-color: color-mix(in srgb, #ff3b30 38%, #ffffff);
+}
+body.theme-swiss-minimalistic .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 14%, #ffffff);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ffffff);
+}
+body.theme-swiss-minimalistic .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].is-active {
+  background: color-mix(in srgb, #ff9f0a 20%, #ffffff);
+  border-color: color-mix(in srgb, #ff9f0a 40%, #ffffff);
+}
