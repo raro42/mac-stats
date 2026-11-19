@@ -18784,46 +18784,60 @@ body.theme-futuristic .disk-cleanup-item.has-reclaim.is-just-copied {
  * · :focus-visible · .is-selected) → white slab on opaque shells. Copied flash
  * opaque in v0.1.2238 / v0.1.2369. Design-review fuel (feature-cpu-metrics /
  * Details) + standing P2 #14; layout-daily Data Poster adjacent.
+ * OVERNIGHT v0.1.2888: accent fallbacks Apple #0a84ff → theme accents
+ * (paper remaps already landed; cream Details accent parity).
  */
 body.theme-data-poster .details-grid > .detail-value[role='option']:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #0b0b10);
+  /* Opaque Data Poster accent — bare Apple #0a84ff lagged --accent / CRT Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
 }
 body.theme-data-poster .details-grid > .detail-value[role='option']:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #0b0b10);
+  /* Opaque Data Poster accent — bare Apple #0a84ff lagged --accent / CRT Details option (#14 / P2; design-review). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
 }
 body.theme-data-poster .details-grid > .detail-value[role='option'].is-selected {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #0b0b10);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #0b0b10);
+  /* Opaque Data Poster accent — bare Apple #0a84ff lagged --accent / CRT Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #55c7ff) 35%, #0b0b10);
 }
 body.theme-dark .details-grid > .detail-value[role='option']:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #0a0a0a);
+  /* Opaque Dark accent — bare Apple #0a84ff lagged --accent / CRT Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #00cc66) 12%, #0a0a0a);
 }
 body.theme-dark .details-grid > .detail-value[role='option']:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #0a0a0a);
+  /* Opaque Dark accent — bare Apple #0a84ff lagged --accent / CRT Details option (#14 / P2; design-review). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
 }
 body.theme-dark .details-grid > .detail-value[role='option'].is-selected {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #0a0a0a);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #0a0a0a);
+  /* Opaque Dark accent — bare Apple #0a84ff lagged --accent / CRT Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #00cc66) 16%, #0a0a0a);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #00cc66) 35%, #0a0a0a);
 }
 body.theme-neon .details-grid > .detail-value[role='option']:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #08120c);
+  /* Opaque Neon accent — bare Apple #0a84ff lagged --accent / CRT Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #6dff7b) 12%, #08120c);
 }
 body.theme-neon .details-grid > .detail-value[role='option']:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #08120c);
+  /* Opaque Neon accent — bare Apple #0a84ff lagged --accent / CRT Details option (#14 / P2; design-review). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
 }
 body.theme-neon .details-grid > .detail-value[role='option'].is-selected {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #08120c);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #08120c);
+  /* Opaque Neon accent — bare Apple #0a84ff lagged --accent / CRT Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #6dff7b) 16%, #08120c);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #6dff7b) 35%, #08120c);
 }
 body.theme-futuristic .details-grid > .detail-value[role='option']:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #0b0b10);
+  /* Opaque Futuristic accent — bare Apple #0a84ff lagged --accent / CRT Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 12%, #0b0b10);
 }
 body.theme-futuristic .details-grid > .detail-value[role='option']:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #0b0b10);
+  /* Opaque Futuristic accent — bare Apple #0a84ff lagged --accent / CRT Details option (#14 / P2; design-review). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
 }
 body.theme-futuristic .details-grid > .detail-value[role='option'].is-selected {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #0b0b10);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #0b0b10);
+  /* Opaque Futuristic accent — bare Apple #0a84ff lagged --accent / CRT Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 16%, #0b0b10);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #3bd6ff) 35%, #0b0b10);
 }
 /*
  * Dark / Neon / Futuristic: Force Quit Saved flash still mixed Apple
@@ -36474,19 +36488,25 @@ body.theme-architect .ops-close-btn:focus-visible {
  * on cream paper so Details keyboard/copy chrome matches light shells
  * (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light Ops
  * Close remaps v0.1.2697.
+ * OVERNIGHT v0.1.2888: accent fallbacks Apple #0a84ff → theme accents
+ * (paper remaps already landed in v0.1.2698; Disk Cleanup is-selected parity
+ * v0.1.2887).
  */
 /* OVERNIGHT v0.1.2698: light Details option soft-state remaps */
 
 /* --- light (#f7f7fa) --- */
 body.theme-light .details-grid > .detail-value[role='option']:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / cream Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 12%, #f7f7fa);
 }
 body.theme-light .details-grid > .detail-value[role='option']:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / cream Details option (#14 / P2; design-review). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
 }
 body.theme-light .details-grid > .detail-value[role='option'].is-selected {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #f7f7fa);
+  /* Opaque Light accent — bare Apple #0a84ff lagged --accent / cream Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #6aa6df) 35%, #f7f7fa);
 }
 body.theme-light .details-grid > .detail-value[role='option'].is-just-copied {
   background: color-mix(in srgb, #34c759 12%, #f7f7fa);
@@ -36498,14 +36518,17 @@ body.theme-light .details-grid > .detail-value[role='option'].is-just-copied::af
 
 /* --- material (#ebe4d9) --- */
 body.theme-material .details-grid > .detail-value[role='option']:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / cream Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 12%, #ebe4d9);
 }
 body.theme-material .details-grid > .detail-value[role='option']:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / cream Details option (#14 / P2; design-review). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
 }
 body.theme-material .details-grid > .detail-value[role='option'].is-selected {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #0a84ff lagged --accent / cream Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #b8a68b) 35%, #ebe4d9);
 }
 body.theme-material .details-grid > .detail-value[role='option'].is-just-copied {
   background: color-mix(in srgb, #34c759 12%, #ebe4d9);
@@ -36517,14 +36540,17 @@ body.theme-material .details-grid > .detail-value[role='option'].is-just-copied:
 
 /* --- architect (#f1f1f1) --- */
 body.theme-architect .details-grid > .detail-value[role='option']:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / cream Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #232d41) 12%, #f1f1f1);
 }
 body.theme-architect .details-grid > .detail-value[role='option']:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / cream Details option (#14 / P2; design-review). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
 }
 body.theme-architect .details-grid > .detail-value[role='option'].is-selected {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #f1f1f1);
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / cream Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #232d41) 35%, #f1f1f1);
 }
 body.theme-architect .details-grid > .detail-value[role='option'].is-just-copied {
   background: color-mix(in srgb, #34c759 12%, #f1f1f1);
@@ -38953,6 +38979,20 @@ body.theme-swiss-minimalistic .disk-cleanup-item.is-selected {
   /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Disk Cleanup is-selected (#14 / P2; design-review). */
   border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
   background: color-mix(in srgb, var(--accent, #121216) 6%, #ffffff);
+}
+/* OVERNIGHT v0.1.2888: Swiss Details option hover/focus/is-selected (cream 2698 paper + 2888 accent parity) */
+body.theme-swiss-minimalistic .details-grid > .detail-value[role='option']:hover {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
+}
+body.theme-swiss-minimalistic .details-grid > .detail-value[role='option']:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Details option (#14 / P2; design-review). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+}
+body.theme-swiss-minimalistic .details-grid > .detail-value[role='option'].is-selected {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Details option (#14 / P2; design-review). */
+  background: color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #121216) 35%, #ffffff);
 }
 body.theme-swiss-minimalistic .process-row.is-selected {
   /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream process-row selected (#14 / P2; design-review). */

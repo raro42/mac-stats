@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2888] - 2026-11-19
+
+### Fixed
+- Light / Material / Architect / Swiss / CRT design-review (Details option soft-states): cream `.details-grid > .detail-value[role='option']` hover / `:focus-visible` / `.is-selected` still used Apple `#0a84ff` accent fallbacks after paper remaps (v0.1.2698) while Disk Cleanup is-selected already sat on theme accents (v0.1.2887); Swiss lacked Details option remaps and inherited shared Apple `#0a84ff` on paper `#ffffff`; CRT paper remaps still fell back to Apple blue. Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` / Swiss ink `#121216` / Neon `#6dff7b` / Dark `#00cc66` / Data Poster `#55c7ff` / Futuristic `#3bd6ff` mixed onto each theme paper (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Copied flash stays green; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2887] - 2026-11-19
 
 ### Fixed
