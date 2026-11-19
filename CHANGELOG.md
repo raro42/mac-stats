@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2880] - 2026-11-19
+
+### Fixed
+- Light / Material / Architect / Swiss design-review (Debug Log toolbar hover/focus): cream `.logs-toolbar button:hover` / `:focus-visible` still used Apple `#0a84ff` accent fallbacks after paper remaps (v0.1.2634) while Neon already sat on `#6dff7b`; Swiss lacked resting/hover/focus remaps and inherited shared bare Apple `#0a84ff` on paper `#ffffff`. Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` / Swiss ink `#121216` (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2879] - 2026-11-19
 
 ### Fixed

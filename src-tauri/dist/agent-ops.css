@@ -27360,28 +27360,34 @@ body.theme-architect .logs-toolbar button {
 }
 
 body.theme-light .logs-toolbar button:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 8%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon logs-toolbar hover (#14 / P2; design-review soft-states). */
+  background: color-mix(in srgb, var(--accent, #6aa6df) 8%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 24%, #f7f7fa);
 }
 body.theme-material .logs-toolbar button:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 8%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon logs-toolbar hover (#14 / P2; design-review soft-states). */
+  background: color-mix(in srgb, var(--accent, #b8a68b) 8%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 24%, #ebe4d9);
 }
 body.theme-architect .logs-toolbar button:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 8%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon logs-toolbar hover (#14 / P2; design-review soft-states). */
+  background: color-mix(in srgb, var(--accent, #232d41) 8%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 24%, #f1f1f1);
 }
 
 body.theme-light .logs-toolbar button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon logs-toolbar focus (#14 / P2; design-review soft-states). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
   outline-offset: 2px;
 }
 body.theme-material .logs-toolbar button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon logs-toolbar focus (#14 / P2; design-review soft-states). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
   outline-offset: 2px;
 }
 body.theme-architect .logs-toolbar button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon logs-toolbar focus (#14 / P2; design-review soft-states). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
   outline-offset: 2px;
 }
 
@@ -40440,4 +40446,22 @@ body.theme-swiss-minimalistic .logs-viewer:focus-visible {
 body.theme-swiss-minimalistic #ops-runs-list .ops-row.is-lite .ops-row-meta {
   /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Ops lite meta (#14 / P2; design-review agent-ops). */
   color: color-mix(in srgb, var(--accent, #121216) 70%, var(--text-secondary, #86868b));
+}
+
+/* OVERNIGHT v0.1.2880: cream Debug Log toolbar hover/focus Apple #0a84ff→theme accent fallbacks + Swiss toolbar parity (Neon parity) */
+/* --- swiss logs-toolbar button resting/hover/focus (cream 2634 paper already; accent fallback hygiene) --- */
+body.theme-swiss-minimalistic .logs-toolbar button {
+  /* Opaque Swiss ink — shared Apple washes lagged paper / cream logs-toolbar resting (#14 / P2; design-review soft-states). */
+  border-color: color-mix(in srgb, currentColor 14%, #ffffff);
+  background: color-mix(in srgb, currentColor 5%, #ffffff);
+}
+body.theme-swiss-minimalistic .logs-toolbar button:hover {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream logs-toolbar hover (#14 / P2; design-review soft-states). */
+  background: color-mix(in srgb, var(--accent, #121216) 8%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 24%, #ffffff);
+}
+body.theme-swiss-minimalistic .logs-toolbar button:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream logs-toolbar focus (#14 / P2; design-review soft-states). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+  outline-offset: 2px;
 }
