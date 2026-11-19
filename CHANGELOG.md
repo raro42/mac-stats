@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2876] - 2026-11-19
+
+### Fixed
+- Swiss Minimalistic design-review (Agent Ops kind Clear / count): leftover shared Apple `#007aff` accent fallbacks on `.ops-session-kind-filter-clear` / `.ops-agents-enabled-filter-clear` / `.ops-schedules-kind-filter-clear` / `.ops-memory-kind-filter-clear` / `.ops-runs-lane-filter-clear` (resting/hover/focus · is-just-saved) and matching `.ops-*-count` / `.is-zero` remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; is-just-saved keeps green), matching Light / Material / Architect cream Ops kind Clear/count (v0.1.2647; copy-chip already in v0.1.2875) after Swiss session-copy + chat empty chips v0.1.2875 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2875] - 2026-11-19
 
 ### Fixed

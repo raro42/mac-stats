@@ -40339,3 +40339,57 @@ body.theme-swiss-minimalistic .chat-kb-hint {
   color: color-mix(in srgb, #121216 63%, #ffffff);
   opacity: 1;
 }
+
+/* OVERNIGHT v0.1.2876: Swiss Ops kind Clear / count remaps (cream 2647 Clear/count parity; copy-chip already v0.1.2875) */
+/* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops kind Clear (#14 / P2; design-review soft-states). */
+/* --- swiss ops kind-filter Clear (sessions/agents/schedules/memory/runs) --- */
+body.theme-swiss-minimalistic .ops-session-kind-filter-clear,
+body.theme-swiss-minimalistic .ops-agents-enabled-filter-clear,
+body.theme-swiss-minimalistic .ops-schedules-kind-filter-clear,
+body.theme-swiss-minimalistic .ops-memory-kind-filter-clear,
+body.theme-swiss-minimalistic .ops-runs-lane-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #121216) 32%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 10%, #ffffff);
+  color: color-mix(in srgb, #121216 81%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-session-kind-filter-clear:hover,
+body.theme-swiss-minimalistic .ops-agents-enabled-filter-clear:hover,
+body.theme-swiss-minimalistic .ops-schedules-kind-filter-clear:hover,
+body.theme-swiss-minimalistic .ops-memory-kind-filter-clear:hover,
+body.theme-swiss-minimalistic .ops-runs-lane-filter-clear:hover {
+  color: color-mix(in srgb, #121216 88%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 44%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-session-kind-filter-clear:focus-visible,
+body.theme-swiss-minimalistic .ops-agents-enabled-filter-clear:focus-visible,
+body.theme-swiss-minimalistic .ops-schedules-kind-filter-clear:focus-visible,
+body.theme-swiss-minimalistic .ops-memory-kind-filter-clear:focus-visible,
+body.theme-swiss-minimalistic .ops-runs-lane-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-session-kind-filter-clear.is-just-saved,
+body.theme-swiss-minimalistic .ops-agents-enabled-filter-clear.is-just-saved,
+body.theme-swiss-minimalistic .ops-schedules-kind-filter-clear.is-just-saved,
+body.theme-swiss-minimalistic .ops-memory-kind-filter-clear.is-just-saved,
+body.theme-swiss-minimalistic .ops-runs-lane-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #ffffff);
+  border-color: color-mix(in srgb, #34c759 38%, #ffffff);
+  color: color-mix(in srgb, #34c759 55%, var(--text, currentColor));
+  box-shadow: none;
+}
+/* --- swiss ops kind counts --- */
+body.theme-swiss-minimalistic .ops-session-kind-count,
+body.theme-swiss-minimalistic .ops-agents-enabled-count,
+body.theme-swiss-minimalistic .ops-schedules-kind-count,
+body.theme-swiss-minimalistic .ops-memory-kind-count,
+body.theme-swiss-minimalistic .ops-runs-lane-count {
+  color: color-mix(in srgb, #121216 79%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-session-kind-count.is-zero,
+body.theme-swiss-minimalistic .ops-agents-enabled-count.is-zero,
+body.theme-swiss-minimalistic .ops-schedules-kind-count.is-zero,
+body.theme-swiss-minimalistic .ops-memory-kind-count.is-zero,
+body.theme-swiss-minimalistic .ops-runs-lane-count.is-zero {
+  color: color-mix(in srgb, #121216 37%, #ffffff);
+}
