@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2874] - 2026-11-19
+
+### Fixed
+- Swiss Minimalistic design-review (Perplexity attention + key-attention): leftover shared Apple `#007aff` accent fallbacks on `.perplexity-attention-glance` (resting/hover/focus · has-error · has-top · is-filter) and `.perplexity-key-attention-glance` (resting/hover/focus · is-not-set) remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; has-error/is-not-set keep red; has-top keep amber), matching Light / Material / Architect cream Perplexity attention (v0.1.2674) after Swiss Perplexity last-glance v0.1.2873 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2873] - 2026-11-19
 
 ### Fixed

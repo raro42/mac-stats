@@ -40246,3 +40246,57 @@ body.theme-swiss-minimalistic .perplexity-last-glance.is-ready {
   border-color: color-mix(in srgb, #34c759 28%, #ffffff);
   background: color-mix(in srgb, #34c759 7%, #ffffff);
 }
+
+/* OVERNIGHT v0.1.2874: Swiss Perplexity attention + key-attention remaps */
+/* Opaque Swiss ink — Apple #007aff lagged --accent / cream attention (#14 / P2; design-review soft-states). */
+/* --- swiss Perplexity attention/key-attention (cream 2674 parity) --- */
+body.theme-swiss-minimalistic .perplexity-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .perplexity-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+  box-shadow: none;
+}
+body.theme-swiss-minimalistic .perplexity-attention-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+  box-shadow: none;
+}
+body.theme-swiss-minimalistic .perplexity-attention-glance.has-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+body.theme-swiss-minimalistic .perplexity-attention-glance.has-top {
+  border-color: color-mix(in srgb, #ff9500 26%, #ffffff);
+  background: color-mix(in srgb, #ff9500 7%, #ffffff);
+  color: color-mix(in srgb, #ff9500 42%, currentColor);
+}
+body.theme-swiss-minimalistic .perplexity-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #121216) 24%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 5.5%, #ffffff);
+  color: color-mix(in srgb, var(--accent, #121216) 42%, currentColor);
+}
+body.theme-swiss-minimalistic .perplexity-key-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .perplexity-key-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+  box-shadow: none;
+}
+body.theme-swiss-minimalistic .perplexity-key-attention-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+  box-shadow: none;
+}
+body.theme-swiss-minimalistic .perplexity-key-attention-glance.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
