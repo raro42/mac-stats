@@ -3,6 +3,7 @@
 Overnight Track B kept shipping Swiss Minimalistic soft-state parity (Apple `#007aff` → Swiss ink `#121216` on paper `#ffffff`).
 
 ## Shipped this night (highlights)
+- **v0.1.2876** — Agent Ops kind Clear / count (sessions · agents · schedules · memory · runs) remaps; cream 2647 Clear/count parity (copy-chip already in 2875).
 - **v0.1.2875** — Agent Ops `.ops-session-copy-chip` + AI Chat `.chat-empty-chip` / `.chat-kb-hint` (cream 2647/2664 parity).
 - **v0.1.2874** — Perplexity attention + key-attention glances.
 - **v0.1.2873** — Perplexity last-glance.
@@ -14,4 +15,4 @@ Overnight Track B kept shipping Swiss Minimalistic soft-state parity (Apple `#00
 - Send fill white-on-blue left intentional. Settings kb-hints skipped on Swiss (paper already white).
 
 ## Next fuel
-- Dark layout-daily next calendar day · Mac capture when TCC allows · Swiss ops kind-filter Clear/count if muddy · sibling/product fuel — not keep-pNN clones.
+- Dark layout-daily next calendar day · Mac capture when TCC allows · leftover soft-states / sibling/product fuel — not keep-pNN clones.
