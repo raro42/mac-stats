@@ -2520,7 +2520,8 @@ body {
 
 /* Opaque focus / active / disabled — was Apple #ffffff focus ring / active wash (#14). */
 #chat-send-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, #007aff 55%, #0b0b10);
+  /* Opaque Futuristic accent — bare Apple #007aff lagged --accent / cream Send focus (#14 / P2; design-review AI Chat; fill stays white-on-blue). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #3bd6ff) 55%, #111123);
   outline-offset: 2px;
 }
 

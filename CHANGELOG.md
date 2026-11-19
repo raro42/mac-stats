@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2883] - 2026-11-19
+
+### Fixed
+- Neon / Dark / Data Poster / Futuristic design-review (AI Chat Send focus): CRT `#chat-send-btn:focus-visible` still used bare Apple `#007aff` on dark shells while cream/Swiss already remapped the keyboard ring onto theme accents (v0.1.2882; fill stays white-on-blue intentional). Fallback hygiene remaps onto Neon `#6dff7b` / Dark `#00cc66` / Data Poster `#55c7ff` / Futuristic `#3bd6ff` (polish-without-capture while Mac TCC blocks capture; Apple keeps shared blue fill+ring; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2882] - 2026-11-19
 
 ### Fixed
