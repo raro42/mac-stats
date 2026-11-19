@@ -2611,7 +2611,8 @@ body {
 
 /* Opaque focus / active / disabled — keyboard ring was missing (Apple/Swiss/Dark parity). */
 #chat-send-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, #007aff 55%, #ebe4d9);
+  /* Opaque Material accent — bare Apple #007aff lagged --accent / Swiss Send focus (#14 / P2; design-review AI Chat; fill stays white-on-blue). */
+  outline: 2px solid color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
   outline-offset: 2px;
 }
 

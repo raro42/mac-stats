@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2882] - 2026-11-19
+
+### Fixed
+- Light / Material / Architect design-review (AI Chat Send focus): cream `#chat-send-btn:focus-visible` still used bare Apple `#007aff` on paper while Swiss already remapped the keyboard ring onto ink `#121216` (fill stays white-on-blue intentional). Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` (polish-without-capture while Mac TCC blocks capture; Apple/Neon keep shared blue fill+ring; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2881] - 2026-11-19
 
 ### Fixed
