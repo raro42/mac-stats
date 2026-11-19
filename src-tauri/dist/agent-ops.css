@@ -39741,3 +39741,66 @@ body.theme-swiss-minimalistic .rings-filter-chip[data-rings-filter='hot'].is-act
   background: color-mix(in srgb, #ff9500 20%, #ffffff);
   border-color: color-mix(in srgb, #ff9500 40%, #ffffff);
 }
+
+/*
+ * Swiss Minimalistic: AI Chat + Rings filter-miss still mix shared Apple
+ * `#007aff` / `#0a84ff` accent fallbacks on paper `#ffffff` while cream Light /
+ * Material / Architect remapped chat-filter-miss in v0.1.2666 and
+ * rings-filter-miss in v0.1.2668 (Swiss chat/rings chips already in v0.1.2866).
+ * Opaque Swiss ink `#121216` mixes (Errors keep soft green). Standing P2 #14
+ * leftover soft-states after chat/rings filter-chip v0.1.2866 (not a keep-pNN
+ * Disk Cleanup clone). Design-review polish-without-capture (Mac TCC).
+ */
+/* OVERNIGHT v0.1.2867: Swiss chat-filter-miss + rings-filter-miss remaps */
+
+body.theme-swiss-minimalistic .chat-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 8%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .chat-filter-miss.is-errors {
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-filter-miss.is-you,
+body.theme-swiss-minimalistic .chat-filter-miss.is-assistant {
+  border-color: color-mix(in srgb, var(--accent, #121216) 34%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-filter-miss-msg {
+  color: color-mix(in srgb, #0c0c10 77%, #ffffff);
+  opacity: 1;
+}
+body.theme-swiss-minimalistic .chat-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #121216) 35%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 88%, #ffffff));
+}
+body.theme-swiss-minimalistic .chat-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 48%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
+}
+
+body.theme-swiss-minimalistic .rings-filter-miss {
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+}
+body.theme-swiss-minimalistic .rings-filter-miss-hint {
+  color: color-mix(in srgb, #0c0c10 69%, #ffffff);
+  opacity: 1;
+}
+body.theme-swiss-minimalistic .rings-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #121216) 32%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 14%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 88%, #ffffff));
+}
+body.theme-swiss-minimalistic .rings-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 48%, #ffffff);
+}
+body.theme-swiss-minimalistic .rings-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
+}

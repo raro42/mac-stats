@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2867] - 2026-11-19
+
+### Fixed
+- Swiss Minimalistic design-review (AI Chat + Rings filter-miss): leftover shared Apple `#007aff` / `#0a84ff` accent fallbacks on `.chat-filter-miss` (+ Errors/You/Assistant · msg · CTA) and `.rings-filter-miss` (+ hint · CTA) remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; Errors keep soft green), matching Light / Material / Architect cream chat filter-miss (v0.1.2666) / rings filter-miss (v0.1.2668) parity after Swiss chat/rings chips v0.1.2866 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2866] - 2026-11-19
 
 ### Fixed
