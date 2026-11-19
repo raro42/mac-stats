@@ -1,20 +1,23 @@
 # Morning surprise — 2026-11-20
 
-Overnight autoresearch kept product UI soft-state hygiene on cream + Swiss themes.
+Overnight Track B kept shipping Standing P2 #14 accent hygiene on cream / Swiss / CRT shells (digester open empty; design-review due=false / Mac TCC polish-without-capture; layout-daily data-poster marked 2026-11-19).
 
-## Shipped
-- **v0.1.2882** — Light / Material / Architect AI Chat Send `#chat-send-btn:focus-visible` bare Apple `#007aff` → theme accents (`#6aa6df` / `#b8a68b` / `#232d41`); Swiss focus parity; fill stays white-on-blue intentional (Standing P2 #14 leftover soft-states).
+## Shipped tonight (selected)
 
-- **v0.1.2881** — Settings attention focus + help is-closed: Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` remaps on `.settings-*-attention-glance:focus-visible` and `.settings-help-attention-glance.is-closed`; Swiss ink `#121216` focus/is-closed parity (after logs-toolbar hover/focus **v0.1.2880**).
-- Earlier same night: **v0.1.2880** Debug Log toolbar hover/focus; **v0.1.2879** section-header/logs-viewer focus + Ops lite meta (and prior Swiss leftover soft-state keeps).
+- **v0.1.2883** — Neon / Dark / Data Poster / Futuristic AI Chat `#chat-send-btn:focus-visible` Apple `#007aff` → theme accents (`#6dff7b` / `#00cc66` / `#55c7ff` / `#3bd6ff`); fill stays white-on-blue intentional (cream/Swiss 2882 parity).
+- **v0.1.2882** — cream Light / Material / Architect AI Chat Send focus ring → theme accents.
+- **v0.1.2881** — cream + Swiss Settings attention focus + help is-closed.
+- **v0.1.2880** — cream + Swiss Debug Log toolbar hover/focus.
+- Earlier same night: Swiss soft-state parity cascade + cream chrome / Ops just-cleared / section-header / logs-viewer (v0.1.2868–2879).
 
-## Fuel / gate
+## Tried / context
 
-- Digester open empty; design-review due=false (grace / Mac TCC polish-without-capture); layout-daily data-poster already marked (Dark/Neon/Futuristic next calendar day).
-- Ratchet: keep rows in `~/.mac-stats/improvements/autoresearch/results.tsv`.
+- Digester Slowest empty after noise filters.
+- Design-review screenshots stale but due=false (grace); Mac TCC blocks capture → polish-without-capture.
+- Layout-daily: data-poster marked today; Dark/Neon/Futuristic wait next calendar day.
 
-## Next
+## Next fuel
 
-- Dark layout-daily when the day quota opens.
-- Mac capture when TCC allows.
-- Leftover cream `#007aff`/`#0a84ff` fallback hygiene if muddy; Send fill white-on-blue stays intentional (focus ring closed in v0.1.2882); sibling/product fuel — not keep-pNN Disk Cleanup clones.
+- Dark layout-daily when day quota opens.
+- Leftover soft-states if muddy (Send fill white-on-blue intentional · other `#007aff`/`#0a84ff` fallback hygiene · sibling/product).
+- Not another keep-pNN Disk Cleanup clone.
