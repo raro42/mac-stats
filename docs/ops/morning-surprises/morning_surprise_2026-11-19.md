@@ -1,9 +1,10 @@
 # Morning surprise — 2026-11-19
 
-Generated: 2026-11-19T00:40:51+01:00
+Generated: 2026-11-19T01:05:30+01:00
 
 ## Shipped overnight
 
+- **v0.1.2866** — Swiss Minimalistic AI Chat + Rings filter chips: Apple `#0a84ff` → Swiss ink `#121216` on paper (cream 2644 parity; Standing P2 #14).
 - **v0.1.2865** — Swiss Minimalistic Monitors filter chips + Debug Log filter-miss: Apple soft washes → Swiss ink `#121216` on paper (cream 2644/2667 parity; Standing P2 #14).
 - **v0.1.2864** — Swiss filter Clear + Monitors filter-miss → Swiss ink (cream 2642/2667 parity).
 - **v0.1.2863** — Swiss Top Processes filter chips / filter-miss → Swiss ink (cream 2643 parity).
@@ -22,4 +23,4 @@ Generated: 2026-11-19T00:40:51+01:00
 
 - Dark layout-daily next calendar day.
 - Mac capture when TCC allows.
-- Leftover soft-states: Swiss chat/rings filter-chip if muddy; sibling/product fuel — not keep-pNN Disk Cleanup clones.
+- Leftover soft-states: Swiss chat/rings filter-miss if muddy; Send white-on-blue intentional; sibling/product fuel — not keep-pNN Disk Cleanup clones.
