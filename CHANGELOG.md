@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2879] - 2026-11-19
+
+### Fixed
+- Light / Material / Architect / Swiss design-review (section-header + Debug Log viewer focus + Ops lite meta): cream `.section-header-collapsible:focus-visible` still used Apple `#007aff` fallbacks and `.logs-viewer:focus-visible` still used Apple `#0a84ff` fallbacks after paper remaps while Neon already sat on `#6dff7b`; Swiss lacked both remaps and inherited shared Apple blue on paper `#ffffff`. Also `#ops-runs-list .ops-row.is-lite .ops-row-meta` still used bare Apple `#0a84ff` on cream/Swiss while lite row washes already sat on theme `--accent`. Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` / Swiss ink `#121216` (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2878] - 2026-11-19
 
 ### Fixed
