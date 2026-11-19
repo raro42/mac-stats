@@ -40148,3 +40148,60 @@ body.theme-swiss-minimalistic .chat-offline-attention-glance.is-just-copied {
   background: color-mix(in srgb, #34c759 14%, #ffffff);
   color: color-mix(in srgb, #34c759 62%, currentColor);
 }
+
+/* OVERNIGHT v0.1.2872: Swiss AI Chat model/turn/answer/errors glance remaps */
+/* Opaque Swiss ink — Apple #007aff lagged --accent / cream chat glances (#14 / P2; design-review soft-states). */
+/* --- swiss AI Chat model/turn/answer/errors (cream 2661 glance parity; offline already v0.1.2871) --- */
+body.theme-swiss-minimalistic .chat-model-glance,
+body.theme-swiss-minimalistic .chat-turn-glance,
+body.theme-swiss-minimalistic .chat-answer-glance,
+body.theme-swiss-minimalistic .chat-errors-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .chat-model-glance:hover,
+body.theme-swiss-minimalistic .chat-turn-glance:hover,
+body.theme-swiss-minimalistic .chat-answer-glance:hover,
+body.theme-swiss-minimalistic .chat-errors-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+  box-shadow: none;
+}
+body.theme-swiss-minimalistic .chat-model-glance:focus-visible,
+body.theme-swiss-minimalistic .chat-turn-glance:focus-visible,
+body.theme-swiss-minimalistic .chat-answer-glance:focus-visible,
+body.theme-swiss-minimalistic .chat-errors-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+  box-shadow: none;
+}
+body.theme-swiss-minimalistic .chat-model-glance.is-online,
+body.theme-swiss-minimalistic .chat-turn-glance.is-ok:not(.is-active),
+body.theme-swiss-minimalistic .chat-answer-glance.has-answer:not(.has-errors) {
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-model-glance.is-offline,
+body.theme-swiss-minimalistic .chat-model-glance.is-online.is-no-model,
+body.theme-swiss-minimalistic .chat-model-glance.is-offline.is-circuit {
+  border-color: color-mix(in srgb, #ff9500 30%, #ffffff);
+  background: color-mix(in srgb, #ff9500 7%, #ffffff);
+  color: color-mix(in srgb, #ff9500 48%, currentColor);
+}
+body.theme-swiss-minimalistic .chat-turn-glance.is-active {
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+  color: color-mix(in srgb, var(--accent, #121216) 48%, currentColor);
+}
+body.theme-swiss-minimalistic .chat-answer-glance.has-errors,
+body.theme-swiss-minimalistic .chat-errors-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+body.theme-swiss-minimalistic .chat-answer-glance.is-just-copied {
+  border-color: color-mix(in srgb, #34c759 40%, #ffffff);
+  background: color-mix(in srgb, #34c759 10%, #ffffff);
+  color: color-mix(in srgb, #34c759 55%, currentColor);
+}

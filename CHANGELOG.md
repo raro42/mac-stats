@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2872] - 2026-11-19
+
+### Fixed
+- Swiss Minimalistic design-review (AI Chat model/turn/answer/errors glances): leftover shared Apple `#007aff` accent fallbacks on `.chat-model-glance` / `.chat-turn-glance` / `.chat-answer-glance` / `.chat-errors-glance` (resting/hover/focus · online/ok · offline/no-model/circuit · turn active · has-answer · has-errors · just-copied) remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; online/ok/has-answer/copied keep green; offline keep amber; has-errors keep red), matching Light / Material / Architect cream AI Chat glances (v0.1.2661) after Swiss chat-offline-attention v0.1.2871 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2871] - 2026-11-19
 
 ### Fixed
