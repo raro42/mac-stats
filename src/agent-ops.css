@@ -40300,3 +40300,42 @@ body.theme-swiss-minimalistic .perplexity-key-attention-glance.is-not-set {
   background: color-mix(in srgb, #ff3b30 7%, #ffffff);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
+
+/* OVERNIGHT v0.1.2875: Swiss Ops session-copy + AI Chat empty-chip remaps */
+/* Opaque Swiss ink — Apple #007aff lagged --accent / cream copy+empty chips (#14 / P2; design-review soft-states). */
+/* --- swiss ops-session-copy-chip (cream 2647 parity) --- */
+body.theme-swiss-minimalistic .ops-session-copy-chip {
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 8%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-session-copy-chip:hover {
+  background: color-mix(in srgb, var(--accent, #121216) 14%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 42%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-session-copy-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-session-copy-chip.is-just-saved {
+  border-color: color-mix(in srgb, #34c759 45%, #ffffff);
+  background: color-mix(in srgb, #34c759 14%, #ffffff);
+}
+
+/* --- swiss chat-empty-chip + chat-kb-hint (cream 2664 parity) --- */
+body.theme-swiss-minimalistic .chat-empty-chip {
+  border-color: color-mix(in srgb, var(--accent, #121216) 27%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 10%, #ffffff);
+  color: color-mix(in srgb, #121216 84%, #ffffff);
+  opacity: 1;
+}
+body.theme-swiss-minimalistic .chat-empty-chip:hover {
+  background: color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 42%, #ffffff);
+  color: inherit;
+}
+body.theme-swiss-minimalistic .chat-empty-chip:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-kb-hint {
+  color: color-mix(in srgb, #121216 63%, #ffffff);
+  opacity: 1;
+}

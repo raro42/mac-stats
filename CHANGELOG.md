@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2875] - 2026-11-19
+
+### Fixed
+- Swiss Minimalistic design-review (Agent Ops session-copy + AI Chat empty chips): leftover shared Apple `#007aff` accent fallbacks on `.ops-session-copy-chip` (resting/hover/focus · is-just-saved) and `.chat-empty-chip` (resting/hover/focus) plus `.chat-kb-hint` remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; is-just-saved keeps green), matching Light / Material / Architect cream Ops copy (v0.1.2647) / empty-chip (v0.1.2664) after Swiss Perplexity attention v0.1.2874 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Settings kb-hints already on Swiss white paper — skipped; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2874] - 2026-11-19
 
 ### Fixed
