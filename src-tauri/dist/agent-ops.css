@@ -39878,3 +39878,111 @@ body.theme-swiss-minimalistic .perplexity-empty-cta:hover {
 body.theme-swiss-minimalistic .perplexity-empty-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
 }
+
+
+/*
+ * Swiss Minimalistic: Disk Cleanup + Perplexity filter chips still mix shared
+ * Apple `#0a84ff` accent fallbacks on paper `#ffffff` while cream Light /
+ * Material / Architect remapped them in v0.1.2645 (Swiss Disk Cleanup /
+ * Perplexity filter-miss already in v0.1.2868). Opaque Swiss ink `#121216`
+ * mixes (reclaim/big/off keep amber/red/green status). Standing P2 #14 leftover
+ * soft-states after Disk Cleanup / Perplexity filter-miss v0.1.2868 (not a
+ * keep-pNN Disk Cleanup clone). Design-review polish-without-capture (Mac TCC).
+ */
+/* OVERNIGHT v0.1.2869: Swiss Disk Cleanup + Perplexity filter-chip remaps */
+
+body.theme-swiss-minimalistic .disk-cleanup-filter-chip,
+body.theme-swiss-minimalistic .disk-cleanup-scope-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  color: color-mix(in srgb, #0c0c10 77%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-chip:hover,
+body.theme-swiss-minimalistic .disk-cleanup-scope-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
+  background: color-mix(in srgb, currentColor 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-chip:focus-visible,
+body.theme-swiss-minimalistic .disk-cleanup-scope-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-chip.is-active,
+body.theme-swiss-minimalistic .disk-cleanup-scope-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 32%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-chip[data-disk-cleanup-filter='reclaim'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 12%, #ffffff);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-chip[data-disk-cleanup-filter='reclaim'].is-active {
+  background: color-mix(in srgb, #ff9f0a 18%, #ffffff);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-chip[data-disk-cleanup-filter='big'].has-hits {
+  background: color-mix(in srgb, #ff453a 12%, #ffffff);
+  border-color: color-mix(in srgb, #ff453a 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-chip[data-disk-cleanup-filter='big'].is-active {
+  background: color-mix(in srgb, #ff453a 18%, #ffffff);
+  border-color: color-mix(in srgb, #ff453a 38%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-chip[data-disk-cleanup-filter='clean'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #ffffff);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-filter-chip[data-disk-cleanup-filter='clean'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #ffffff);
+  border-color: color-mix(in srgb, #34c759 38%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='on'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #ffffff);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='on'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #ffffff);
+  border-color: color-mix(in srgb, #34c759 38%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='off'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 12%, #ffffff);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='off'].is-active {
+  background: color-mix(in srgb, #ff9f0a 18%, #ffffff);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #ffffff);
+}
+
+body.theme-swiss-minimalistic .perplexity-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  color: color-mix(in srgb, #0c0c10 77%, #ffffff);
+}
+body.theme-swiss-minimalistic .perplexity-filter-chip:hover {
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
+  background: color-mix(in srgb, currentColor 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .perplexity-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
+}
+body.theme-swiss-minimalistic .perplexity-filter-chip.is-active {
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 32%, #ffffff);
+}
+body.theme-swiss-minimalistic .perplexity-filter-chip[data-perplexity-filter='top'].has-hits {
+  background: color-mix(in srgb, var(--accent, #121216) 10%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 24%, #ffffff);
+}
+body.theme-swiss-minimalistic .perplexity-filter-chip[data-perplexity-filter='top'].is-active {
+  background: color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 38%, #ffffff);
+}
+body.theme-swiss-minimalistic .perplexity-filter-chip[data-perplexity-filter='snippet'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #ffffff);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .perplexity-filter-chip[data-perplexity-filter='snippet'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #ffffff);
+  border-color: color-mix(in srgb, #34c759 38%, #ffffff);
+}

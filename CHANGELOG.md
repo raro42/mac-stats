@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2869] - 2026-11-19
+
+### Fixed
+- Swiss Minimalistic design-review (Disk Cleanup + Perplexity filter chips): leftover shared Apple `#0a84ff` accent fallbacks on `.disk-cleanup-filter-chip` / `.disk-cleanup-scope-filter-chip` (resting/hover/focus/active · reclaim · big · clean · On · Off) and `.perplexity-filter-chip` (resting/hover/focus/active · Top · Snippet) remap onto Swiss ink `--accent` `#121216` (paper `#ffffff`; reclaim/big/off keep amber/red/green status; Top uses accent; Snippet green), matching Light / Material / Architect cream Disk Cleanup / Perplexity chips (v0.1.2645) parity after Swiss Disk Cleanup / Perplexity filter-miss v0.1.2868 (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a Disk Cleanup keep-pNN clone).
+
 ## [0.1.2868] - 2026-11-19
 
 ### Fixed
