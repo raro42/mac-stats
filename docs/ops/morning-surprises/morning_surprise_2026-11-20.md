@@ -1,21 +1,17 @@
 # Morning surprise — 2026-11-20
 
-Overnight Track B kept cream accent fallback hygiene on AI Chat soft-states (Standing P2 #14). Digester open stayed empty; design-review stayed in screenshot grace (Mac TCC); layout-daily already marked data-poster for the day.
+## Shipped overnight (Track B)
 
-## Shipped tonight (keep)
+- **v0.1.2910** — Light / Material / Architect Perplexity attention + key-attention: focus / filter accents on cream paper (no more Apple blue fallbacks). Swiss already sat on ink.
+- Earlier same window / day: **v0.1.2904–2909** Ops badge / AI Chat glances / chat-message / monitors·processes·logs attention soft-state accent hygiene (cream + Swiss parity).
 
-- **v0.1.2906** — Light / Material / Architect AI Chat message hover · focus · selected: Apple `#0a84ff`/`#007aff` → theme accents (`#6aa6df` / `#b8a68b` / `#232d41`).
-- Earlier same night / window: **v0.1.2905** cream chat model/turn/answer/errors/offline glances; **v0.1.2904** Swiss Ops badge/Updated-ago/health; **v0.1.2903–2900** cream Ops + filter-miss cascade.
+## Tried / context
 
-## Tried / skipped
+- Digester open empty; design-review in grace (Mac TCC — polish-without-capture); layout-daily data-poster already marked for the day.
+- Fuel: Standing P2 #14 leftover soft-states (not quiet-default).
 
-- Digester: no open Slowest / Improve candidates.
-- Design-review capture: TCC polish-without-capture (grace).
-- Layout-daily Dark/Neon/Futuristic: deferred to next calendar day (one layout tick/day).
+## Next
 
-## Next fuel
-
-- Cream/Swiss processes · monitors attention `#0a84ff` leftovers if muddy.
-- Swiss chat-message hover/selected parity if muddy.
-- Dark layout-daily next calendar day.
-- Sibling/product fuel when digester has open work.
+- cream disk-cleanup filter-attention / perplexity-last-glance / processes-top-ram-glance `#0a84ff` if muddy
+- Dark layout-daily when the day quota opens
+- sibling / product fuel when digester has open candidates
