@@ -2,8 +2,8 @@
 
 ## Shipped overnight (Track B)
 
-- **v0.1.2910** — Light / Material / Architect Perplexity attention + key-attention: focus / filter accents on cream paper (no more Apple blue fallbacks). Swiss already sat on ink.
-- Earlier same window / day: **v0.1.2904–2909** Ops badge / AI Chat glances / chat-message / monitors·processes·logs attention soft-state accent hygiene (cream + Swiss parity).
+- **v0.1.2911** — Light / Material / Architect Disk Cleanup attention / Perplexity last-search / Top Processes glances: focus and filter accents on cream paper (no more Apple blue fallbacks). Swiss already sat on ink.
+- Earlier same window / day: **v0.1.2904–2910** Ops badge / AI Chat glances / chat-message / monitors·processes·logs·Perplexity attention soft-state accent hygiene (cream + Swiss parity).
 
 ## Tried / context
 
@@ -12,6 +12,6 @@
 
 ## Next
 
-- cream disk-cleanup filter-attention / perplexity-last-glance / processes-top-ram-glance `#0a84ff` if muddy
+- cream metric-strip / history-chart / monitors-summary / monitor-item / disk-cleanup-last / logs-line option `#0a84ff`/`#007aff` if muddy
 - Dark layout-daily when the day quota opens
 - sibling / product fuel when digester has open candidates
