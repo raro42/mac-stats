@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2905] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect AI Chat: model, turn, answer, errors, and offline glances (focus, active, continue, filter, sending) now use theme accents instead of Apple blue fallbacks on cream paper.
+
 ## [0.1.2904] - 2026-11-20
 
 ### Fixed

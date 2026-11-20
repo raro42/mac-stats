@@ -32346,6 +32346,7 @@ body.theme-architect .chat-answer-part.chat-answer-final {
  */
 /* OVERNIGHT v0.1.2661: light AI Chat glance remaps */
 
+/* OVERNIGHT v0.1.2905: cream AI Chat model/turn/answer/errors/offline glance focus · is-active/continue/filter/sending Apple #0a84ff/#007aff → theme accents (Swiss 2872 parity) */
 /* --- light (#f7f7fa) --- */
 body.theme-light .chat-model-glance,
 body.theme-light .chat-turn-glance,
@@ -32371,7 +32372,7 @@ body.theme-light .chat-answer-glance:focus-visible,
 body.theme-light .chat-errors-glance:focus-visible,
 body.theme-light .chat-offline-attention-glance:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 45%, #f7f7fa);
   box-shadow: none;
 }
 body.theme-light .chat-model-glance.is-online,
@@ -32393,16 +32394,16 @@ body.theme-light .chat-offline-attention-glance.is-no-model {
 }
 body.theme-light .chat-turn-glance.is-active,
 body.theme-light .chat-offline-attention-glance.is-continue {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 7%, #f7f7fa);
 }
 body.theme-light .chat-offline-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 24%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 5.5%, #f7f7fa);
 }
 body.theme-light .chat-offline-attention-glance.is-sending {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 38%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 38%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 10%, #f7f7fa);
 }
 body.theme-light .chat-answer-glance.has-errors,
 body.theme-light .chat-errors-glance.has-errors,
@@ -32442,7 +32443,7 @@ body.theme-material .chat-answer-glance:focus-visible,
 body.theme-material .chat-errors-glance:focus-visible,
 body.theme-material .chat-offline-attention-glance:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 45%, #ebe4d9);
   box-shadow: none;
 }
 body.theme-material .chat-model-glance.is-online,
@@ -32464,16 +32465,16 @@ body.theme-material .chat-offline-attention-glance.is-no-model {
 }
 body.theme-material .chat-turn-glance.is-active,
 body.theme-material .chat-offline-attention-glance.is-continue {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 7%, #ebe4d9);
 }
 body.theme-material .chat-offline-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 24%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 5.5%, #ebe4d9);
 }
 body.theme-material .chat-offline-attention-glance.is-sending {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 38%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 38%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 10%, #ebe4d9);
 }
 body.theme-material .chat-answer-glance.has-errors,
 body.theme-material .chat-errors-glance.has-errors,
@@ -32513,7 +32514,7 @@ body.theme-architect .chat-answer-glance:focus-visible,
 body.theme-architect .chat-errors-glance:focus-visible,
 body.theme-architect .chat-offline-attention-glance:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 45%, #f1f1f1);
   box-shadow: none;
 }
 body.theme-architect .chat-model-glance.is-online,
@@ -32535,16 +32536,16 @@ body.theme-architect .chat-offline-attention-glance.is-no-model {
 }
 body.theme-architect .chat-turn-glance.is-active,
 body.theme-architect .chat-offline-attention-glance.is-continue {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 7%, #f1f1f1);
 }
 body.theme-architect .chat-offline-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 24%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 5.5%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 24%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 5.5%, #f1f1f1);
 }
 body.theme-architect .chat-offline-attention-glance.is-sending {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 38%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 38%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 10%, #f1f1f1);
 }
 body.theme-architect .chat-answer-glance.has-errors,
 body.theme-architect .chat-errors-glance.has-errors,
