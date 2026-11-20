@@ -1,17 +1,25 @@
 # Morning surprise — 2026-11-20
 
-Overnight autoresearch (Track B) kept product CSS accent hygiene on cream shells.
+Overnight Track B (product code) kept shipping cream/Swiss soft-state accent hygiene.
 
-## Shipped
+## Shipped tonight (keeps)
 
-- **v0.1.2889–v0.1.2893** (window into early morning): Monitors settings primary share, Disk Cleanup scope selected, Data Poster/cream focus-within + Ops jump-flash, cream Monitors settings focus-within, then cream **section filter Clear** accent fallbacks.
-- **v0.1.2893** (this tick): Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` on monitors/processes/logs/perplexity/disk/scope/chat `.*-filter-clear` resting · hover · `:focus-visible` (Swiss Clear already themed; Send fill white-on-blue intentional).
+Latest: **v0.1.2894** — Light / Material / Architect section filter chips (processes / logs / monitors / chat / rings) focus · active · You: Apple  → theme accents ( /  / ) on cream paper. Filter Clear was already themed in **v0.1.2893**; Swiss chips already sat on ink.
+
+Earlier same window (selection): cream filter Clear, Monitors settings focus-within, Data Poster focus + jump-flash, Disk Cleanup scope selected, Monitors settings primary, Details option soft-states, and more P2 #14 leftover soft-states — see .
 
 ## Tried / context
 
-- Digester open empty all night; design-review grace (TCC polish-without-capture); layout-daily data-poster marked for the day.
-- Standing P2 #14 leftover soft-states chain — not keep-pNN Disk Cleanup clones.
+- Digester open: empty (instant/direct noise filtered).
+- Design-review: due=false (grace; polish-without-capture — Mac TCC).
+- Layout-daily: data-poster marked today; Dark queued next calendar day.
+- Debug.log: no product ERROR/panic clusters in the scan window.
 
-## Next
+## Next fuel
 
-- Cream filter-chip `#0a84ff` leftovers · Dark layout-daily next calendar day · sibling/product fuel when digester has open candidates.
+- Cream Disk Cleanup / Perplexity filter-chip  leftovers (v0.1.2645 block).
+- Send fill white-on-blue intentional (leave).
+- Dark layout-daily when day quota opens / Mac capture when TCC allows.
+- Sibling/product fuel when soft-state queue drains.
+
+Not a quiet night — ratchet moved.
