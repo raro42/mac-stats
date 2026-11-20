@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2896] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect design-review (AI Chat empty chips): cream `.chat-empty-chip` resting · hover · `:focus-visible` still used Apple `#0a84ff` / `#007aff` accent fallbacks after paper remaps (v0.1.2664) while Swiss empty chips already sat on ink (v0.1.2875) and cream filter chips already sat on theme accents (v0.1.2894–2895). Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` mixed onto each theme paper (polish-without-capture while Mac TCC blocks capture; `.chat-kb-hint` type stays ink-on-paper; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a keep-pNN Disk Cleanup clone).
+
 ## [0.1.2895] - 2026-11-20
 
 ### Fixed

@@ -32776,29 +32776,33 @@ body.theme-architect .chat-message.assistant.is-error {
 }
 
 /*
- * Light / Material / Architect: AI Chat empty suggestion chips + message-list
- * kb-hint still mix Apple `#ffffff` (`.chat-empty-chip` resting · hover ·
- * `:focus-visible` · `.chat-kb-hint`) while Data Poster / Dark / Neon /
- * Futuristic remaps already exist. Opaque washes on cream paper so suggestion
- * chips / list hint match light shells (Swiss / Apple keep shared `#ffffff`).
- * Standing P2 #14 after light AI Chat message soft-state remaps v0.1.2663.
+ * Light / Material / Architect: AI Chat empty suggestion chips still used
+ * Apple `#0a84ff` / `#007aff` accent fallbacks after cream paper remaps
+ * (v0.1.2664) while Swiss empty chips already sat on ink `#121216`
+ * (v0.1.2875) and cream filter chips already sat on theme accents
+ * (v0.1.2894–2895). Opaque Light `#6aa6df` / Material `#b8a68b` /
+ * Architect `#232d41` mixes. Standing P2 #14 leftover soft-states after
+ * cream Disk/Perplexity filter-chip v0.1.2895 (not a keep-pNN Disk Cleanup
+ * clone; `.chat-kb-hint` type stays ink-on-paper; Send fill white-on-blue
+ * intentional).
  */
 /* OVERNIGHT v0.1.2664: light AI Chat empty-chip / kb-hint remaps */
+/* OVERNIGHT v0.1.2896: cream chat-empty-chip accent fallback #0a84ff/#007aff→theme accents */
 
 /* --- light (#f7f7fa) --- */
 body.theme-light .chat-empty-chip {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 27%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 27%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 10%, #f7f7fa);
   color: color-mix(in srgb, #0c0c10 84%, #f7f7fa);
   opacity: 1;
 }
 body.theme-light .chat-empty-chip:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 18%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 42%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 18%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 42%, #f7f7fa);
   color: inherit;
 }
 body.theme-light .chat-empty-chip:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #0a84ff) 55%, #f7f7fa);
+  outline-color: color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
 }
 body.theme-light .chat-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
@@ -32807,18 +32811,18 @@ body.theme-light .chat-kb-hint {
 
 /* --- material (#ebe4d9) --- */
 body.theme-material .chat-empty-chip {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 27%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 27%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 10%, #ebe4d9);
   color: color-mix(in srgb, #0c0c10 84%, #ebe4d9);
   opacity: 1;
 }
 body.theme-material .chat-empty-chip:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 18%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 42%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 18%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 42%, #ebe4d9);
   color: inherit;
 }
 body.theme-material .chat-empty-chip:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #0a84ff) 55%, #ebe4d9);
+  outline-color: color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
 }
 body.theme-material .chat-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
@@ -32827,18 +32831,18 @@ body.theme-material .chat-kb-hint {
 
 /* --- architect (#f1f1f1) --- */
 body.theme-architect .chat-empty-chip {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 27%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 27%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 10%, #f1f1f1);
   color: color-mix(in srgb, #0c0c10 84%, #f1f1f1);
   opacity: 1;
 }
 body.theme-architect .chat-empty-chip:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 18%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 18%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 42%, #f1f1f1);
   color: inherit;
 }
 body.theme-architect .chat-empty-chip:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+  outline-color: color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
 }
 body.theme-architect .chat-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
