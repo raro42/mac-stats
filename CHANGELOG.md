@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2906] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect AI Chat: message hover, focus, and selected washes now use theme accents instead of Apple blue fallbacks on cream paper.
+
 ## [0.1.2905] - 2026-11-20
 
 ### Fixed

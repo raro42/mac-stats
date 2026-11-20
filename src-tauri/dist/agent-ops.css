@@ -32715,20 +32715,21 @@ body.theme-swiss-minimalistic #chat-input:focus {
  * composer remaps v0.1.2662.
  */
 /* OVERNIGHT v0.1.2663: light AI Chat message soft-state remaps */
+/* OVERNIGHT v0.1.2906: cream chat-message hover/focus/is-selected Apple #0a84ff/#007aff → theme accents */
 
 /* --- light (#f7f7fa) --- */
 body.theme-light .chat-message[role='option']:hover,
 body.theme-light .chat-message[role='button']:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 6%, #f7f7fa);
 }
 body.theme-light .chat-message[role='option']:focus-visible,
 body.theme-light .chat-message[role='button']:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+  outline-color: color-mix(in srgb, var(--accent, #6aa6df) 45%, #f7f7fa);
 }
 body.theme-light .chat-message[role='option'].is-selected,
 body.theme-light .chat-message[role='button'].is-selected {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 22%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 22%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 5%, #f7f7fa);
 }
 body.theme-light .chat-message[role='option'].is-just-copied,
 body.theme-light .chat-message[role='button'].is-just-copied {
@@ -32746,16 +32747,16 @@ body.theme-light .chat-message.assistant.is-error {
 /* --- material (#ebe4d9) --- */
 body.theme-material .chat-message[role='option']:hover,
 body.theme-material .chat-message[role='button']:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 6%, #ebe4d9);
 }
 body.theme-material .chat-message[role='option']:focus-visible,
 body.theme-material .chat-message[role='button']:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+  outline-color: color-mix(in srgb, var(--accent, #b8a68b) 45%, #ebe4d9);
 }
 body.theme-material .chat-message[role='option'].is-selected,
 body.theme-material .chat-message[role='button'].is-selected {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 22%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 22%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 5%, #ebe4d9);
 }
 body.theme-material .chat-message[role='option'].is-just-copied,
 body.theme-material .chat-message[role='button'].is-just-copied {
@@ -32773,16 +32774,16 @@ body.theme-material .chat-message.assistant.is-error {
 /* --- architect (#f1f1f1) --- */
 body.theme-architect .chat-message[role='option']:hover,
 body.theme-architect .chat-message[role='button']:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 6%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 6%, #f1f1f1);
 }
 body.theme-architect .chat-message[role='option']:focus-visible,
 body.theme-architect .chat-message[role='button']:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #007aff) 45%, #f1f1f1);
+  outline-color: color-mix(in srgb, var(--accent, #232d41) 45%, #f1f1f1);
 }
 body.theme-architect .chat-message[role='option'].is-selected,
 body.theme-architect .chat-message[role='button'].is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 5%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 22%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 5%, #f1f1f1);
 }
 body.theme-architect .chat-message[role='option'].is-just-copied,
 body.theme-architect .chat-message[role='button'].is-just-copied {
