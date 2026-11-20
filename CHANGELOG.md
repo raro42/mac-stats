@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2893] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect design-review (section filter Clear): cream `.monitors-filter-clear` / `.processes-filter-clear` / `.logs-filter-clear` / `.perplexity-filter-clear` / `.disk-cleanup-filter-clear` / `.disk-cleanup-scope-filter-clear` / `.chat-filter-clear` resting · hover · `:focus-visible` still used Apple `#007aff` accent fallbacks after paper remaps (v0.1.2642) while Ops filter-clear and Swiss section Clear already sat on theme accents. Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` mixed onto each theme paper (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; is-just-saved stays green; Apple keeps shared blue; not a keep-pNN Disk Cleanup clone).
+
 ## [0.1.2892] - 2026-11-20
 
 ### Fixed
