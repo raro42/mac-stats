@@ -1,25 +1,20 @@
 # Morning surprise — 2026-11-20
 
-Overnight Track B (product code) kept shipping cream/Swiss soft-state accent hygiene.
+Overnight autoresearch kept cream theme accent fallback hygiene (Standing P2 #14). Digester open stayed empty; design-review stayed in grace (Mac TCC — polish-without-capture); layout-daily already marked data-poster for today.
 
-## Shipped tonight (keeps)
+## Shipped
 
-Latest: **v0.1.2894** — Light / Material / Architect section filter chips (processes / logs / monitors / chat / rings) focus · active · You: Apple  → theme accents ( /  / ) on cream paper. Filter Clear was already themed in **v0.1.2893**; Swiss chips already sat on ink.
-
-Earlier same window (selection): cream filter Clear, Monitors settings focus-within, Data Poster focus + jump-flash, Disk Cleanup scope selected, Monitors settings primary, Details option soft-states, and more P2 #14 leftover soft-states — see .
+- **v0.1.2895** — Light / Material / Architect Disk Cleanup + Perplexity filter chips (`disk-cleanup-filter-chip` / `disk-cleanup-scope-filter-chip` / `perplexity-filter-chip` focus · active · Top) Apple `#0a84ff` → theme accents (`#6aa6df` / `#b8a68b` / `#232d41`).
+- Earlier tonight: **v0.1.2890–2894** (scope selected, Monitors focus-within / jump-flash, cream focus-within, section filter Clear, section filter chips).
 
 ## Tried / context
 
-- Digester open: empty (instant/direct noise filtered).
-- Design-review: due=false (grace; polish-without-capture — Mac TCC).
-- Layout-daily: data-poster marked today; Dark queued next calendar day.
-- Debug.log: no product ERROR/panic clusters in the scan window.
+- No digester Slowest fuel.
+- Dark / Neon / Futuristic layout-daily due next calendar day (day quota used).
+- Send fill white-on-blue stays intentional.
 
 ## Next fuel
 
-- Cream Disk Cleanup / Perplexity filter-chip  leftovers (v0.1.2645 block).
-- Send fill white-on-blue intentional (leave).
-- Dark layout-daily when day quota opens / Mac capture when TCC allows.
-- Sibling/product fuel when soft-state queue drains.
-
-Not a quiet night — ratchet moved.
+- Other cream `#0a84ff` / `#007aff` soft-state leftovers if muddy
+- Dark layout-daily next day
+- Sibling / product fuel when digester has open candidates
