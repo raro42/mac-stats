@@ -30876,9 +30876,10 @@ body.theme-futuristic .chat-filter-chip[data-chat-filter='errors'].is-active {
  * feature-monitors adjacent (polish-without-capture; Mac capture TCC-blocked).
  */
 /* OVERNIGHT v0.1.2520: monitors settings focus CRT */
+/* OVERNIGHT v0.1.2891: Data Poster focus-within accent fallback #007aff→#55c7ff (Neon/Dark/Futuristic already themed) */
 body.theme-data-poster .monitor-settings-item:focus-within {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #0b0b10);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
 }
 body.theme-dark .monitor-settings-item:focus-within {
   border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
@@ -31046,17 +31047,18 @@ body.theme-neon #icon-disk-cleanup .disk-cleanup-badge {
 body.theme-futuristic #icon-disk-cleanup .disk-cleanup-badge {
   box-shadow: 0 0 0 2px color-mix(in srgb, #000 12%, #0b0b10);
 }
+/* OVERNIGHT v0.1.2891: CRT jump-flash accent fallbacks #007aff→theme accents */
 body.theme-data-poster {
-  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #0b0b10);
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
 }
 body.theme-dark {
-  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #0a0a0a);
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #00cc66) 32%, #0a0a0a);
 }
 body.theme-neon {
-  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #08120c);
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #6dff7b) 32%, #08120c);
 }
 body.theme-futuristic {
-  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #0b0b10);
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #3bd6ff) 32%, #0b0b10);
 }
 
 /*
@@ -31655,8 +31657,9 @@ body.theme-light .ops-hint {
 body.theme-light .ops-tab-bar-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
 }
+/* OVERNIGHT v0.1.2891: cream jump-flash accent fallbacks #007aff→theme accents + Swiss parity */
 body.theme-light {
-  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #f7f7fa);
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #6aa6df) 32%, #f7f7fa);
 }
 body.theme-material .ops-loading {
   color: color-mix(in srgb, #0c0c10 55%, #ebe4d9);
@@ -31670,7 +31673,7 @@ body.theme-material .ops-tab-bar-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
 }
 body.theme-material {
-  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #ebe4d9);
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #b8a68b) 32%, #ebe4d9);
 }
 body.theme-architect .ops-loading {
   color: color-mix(in srgb, #0c0c10 55%, #f1f1f1);
@@ -31684,7 +31687,10 @@ body.theme-architect .ops-tab-bar-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
 }
 body.theme-architect {
-  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #007aff) 32%, #f1f1f1);
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #232d41) 32%, #f1f1f1);
+}
+body.theme-swiss-minimalistic {
+  --ops-jump-flash-ring: color-mix(in srgb, var(--accent, #121216) 32%, #ffffff);
 }
 
 /*

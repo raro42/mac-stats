@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2891] - 2026-11-20
+
+### Fixed
+- Data Poster / cream / CRT / Swiss design-review (Monitors settings focus + Agent Ops jump-flash): Data Poster `.monitor-settings-item:focus-within` still used Apple `#007aff` accent fallbacks after CRT paper remaps while Dark / Neon / Futuristic already sat on theme accents, and cream/CRT `--ops-jump-flash-ring` still fell back to Apple `#007aff` on themed paper; Swiss lacked a jump-flash remap on paper `#ffffff`. Fallback hygiene remaps onto Data Poster `#55c7ff` focus-within plus Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` / Swiss ink `#121216` / Neon `#6dff7b` / Dark `#00cc66` / Data Poster `#55c7ff` / Futuristic `#3bd6ff` jump-flash mixes (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a keep-pNN Disk Cleanup clone).
+
 ## [0.1.2890] - 2026-11-20
 
 ### Fixed
