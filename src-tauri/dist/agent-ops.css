@@ -27761,8 +27761,11 @@ body.theme-architect .chat-filter-clear.is-just-saved {
  * landed in v0.1.2642). Opaque washes on cream paper so filter chips match
  * light shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after
  * light filter Clear remaps v0.1.2642.
+ * OVERNIGHT v0.1.2894: accent fallback hygiene `#0a84ff`→theme accents
+ * (logs focus already themed; Send fill white-on-blue intentional).
  */
 /* OVERNIGHT v0.1.2643: light Processes/Logs filter-chip remaps */
+/* OVERNIGHT v0.1.2894: cream filter-chip accent fallback #0a84ff→theme accents */
 
 body.theme-light .processes-filter-chip {
   border-color: color-mix(in srgb, currentColor 14%, #f7f7fa);
@@ -27774,12 +27777,12 @@ body.theme-light .processes-filter-chip:hover {
   background: color-mix(in srgb, currentColor 7%, #f7f7fa);
 }
 body.theme-light .processes-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 20%, #f7f7fa);
 }
 body.theme-light .processes-filter-chip.is-active {
   color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 32%, #f7f7fa);
 }
 body.theme-light .processes-filter-chip[data-processes-filter='pinned'].has-hits {
   background: color-mix(in srgb, #ffd60a 14%, #f7f7fa);
@@ -27813,8 +27816,8 @@ body.theme-light .logs-toolbar .logs-filter-chip:focus-visible {
 }
 body.theme-light .logs-toolbar .logs-filter-chip.is-active {
   color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 32%, #f7f7fa);
 }
 body.theme-light .logs-toolbar .logs-filter-chip[data-logs-filter='error'].has-hits {
   background: color-mix(in srgb, #ff3b30 12%, #f7f7fa);
@@ -27843,12 +27846,12 @@ body.theme-material .processes-filter-chip:hover {
   background: color-mix(in srgb, currentColor 7%, #ebe4d9);
 }
 body.theme-material .processes-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 20%, #ebe4d9);
 }
 body.theme-material .processes-filter-chip.is-active {
   color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 32%, #ebe4d9);
 }
 body.theme-material .processes-filter-chip[data-processes-filter='pinned'].has-hits {
   background: color-mix(in srgb, #ffd60a 14%, #ebe4d9);
@@ -27882,8 +27885,8 @@ body.theme-material .logs-toolbar .logs-filter-chip:focus-visible {
 }
 body.theme-material .logs-toolbar .logs-filter-chip.is-active {
   color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 32%, #ebe4d9);
 }
 body.theme-material .logs-toolbar .logs-filter-chip[data-logs-filter='error'].has-hits {
   background: color-mix(in srgb, #ff3b30 12%, #ebe4d9);
@@ -27912,12 +27915,12 @@ body.theme-architect .processes-filter-chip:hover {
   background: color-mix(in srgb, currentColor 7%, #f1f1f1);
 }
 body.theme-architect .processes-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 20%, #f1f1f1);
 }
 body.theme-architect .processes-filter-chip.is-active {
   color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 32%, #f1f1f1);
 }
 body.theme-architect .processes-filter-chip[data-processes-filter='pinned'].has-hits {
   background: color-mix(in srgb, #ffd60a 14%, #f1f1f1);
@@ -27951,8 +27954,8 @@ body.theme-architect .logs-toolbar .logs-filter-chip:focus-visible {
 }
 body.theme-architect .logs-toolbar .logs-filter-chip.is-active {
   color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 32%, #f1f1f1);
 }
 body.theme-architect .logs-toolbar .logs-filter-chip[data-logs-filter='error'].has-hits {
   background: color-mix(in srgb, #ff3b30 12%, #f1f1f1);
@@ -27980,8 +27983,11 @@ body.theme-architect .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].is
  * v0.1.2643). Opaque washes on cream paper so filter chips match light shells
  * (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
  * Processes/Logs filter-chip remaps v0.1.2643.
+ * OVERNIGHT v0.1.2894: accent fallback hygiene `#0a84ff`→theme accents
+ * (paired with Processes/Logs chip fallbacks; Send fill white-on-blue intentional).
  */
 /* OVERNIGHT v0.1.2644: light Monitors/Chat/Rings filter-chip remaps */
+/* OVERNIGHT v0.1.2894: cream filter-chip accent fallback #0a84ff→theme accents */
 
 body.theme-light .monitors-filter-chip {
   border-color: color-mix(in srgb, currentColor 14%, #f7f7fa);
@@ -27993,12 +27999,12 @@ body.theme-light .monitors-filter-chip:hover {
   background: color-mix(in srgb, currentColor 7%, #f7f7fa);
 }
 body.theme-light .monitors-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 20%, #f7f7fa);
 }
 body.theme-light .monitors-filter-chip.is-active {
   color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 32%, #f7f7fa);
 }
 body.theme-light .monitors-filter-chip[data-monitors-filter='down'].has-hits {
   background: color-mix(in srgb, #ff3b30 12%, #f7f7fa);
@@ -28034,20 +28040,20 @@ body.theme-light .chat-filter-chip:hover {
   background: color-mix(in srgb, currentColor 7%, #f7f7fa);
 }
 body.theme-light .chat-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 20%, #f7f7fa);
 }
 body.theme-light .chat-filter-chip.is-active {
   color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 32%, #f7f7fa);
 }
 body.theme-light .chat-filter-chip[data-chat-filter='you'].has-hits {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 10%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 24%, #f7f7fa);
 }
 body.theme-light .chat-filter-chip[data-chat-filter='you'].is-active {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 18%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 38%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 18%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 38%, #f7f7fa);
 }
 body.theme-light .chat-filter-chip[data-chat-filter='assistant'].has-hits {
   background: color-mix(in srgb, #34c759 12%, #f7f7fa);
@@ -28075,12 +28081,12 @@ body.theme-light .rings-filter-chip:hover {
   background: color-mix(in srgb, currentColor 7%, #f7f7fa);
 }
 body.theme-light .rings-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 20%, #f7f7fa);
 }
 body.theme-light .rings-filter-chip.is-active {
   color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 32%, #f7f7fa);
 }
 body.theme-light .rings-filter-chip[data-rings-filter='hot'].has-hits {
   background: color-mix(in srgb, #ff9500 12%, #f7f7fa);
@@ -28101,12 +28107,12 @@ body.theme-material .monitors-filter-chip:hover {
   background: color-mix(in srgb, currentColor 7%, #ebe4d9);
 }
 body.theme-material .monitors-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 20%, #ebe4d9);
 }
 body.theme-material .monitors-filter-chip.is-active {
   color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 32%, #ebe4d9);
 }
 body.theme-material .monitors-filter-chip[data-monitors-filter='down'].has-hits {
   background: color-mix(in srgb, #ff3b30 12%, #ebe4d9);
@@ -28142,20 +28148,20 @@ body.theme-material .chat-filter-chip:hover {
   background: color-mix(in srgb, currentColor 7%, #ebe4d9);
 }
 body.theme-material .chat-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 20%, #ebe4d9);
 }
 body.theme-material .chat-filter-chip.is-active {
   color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 32%, #ebe4d9);
 }
 body.theme-material .chat-filter-chip[data-chat-filter='you'].has-hits {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 10%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 24%, #ebe4d9);
 }
 body.theme-material .chat-filter-chip[data-chat-filter='you'].is-active {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 18%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 38%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 18%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 38%, #ebe4d9);
 }
 body.theme-material .chat-filter-chip[data-chat-filter='assistant'].has-hits {
   background: color-mix(in srgb, #34c759 12%, #ebe4d9);
@@ -28183,12 +28189,12 @@ body.theme-material .rings-filter-chip:hover {
   background: color-mix(in srgb, currentColor 7%, #ebe4d9);
 }
 body.theme-material .rings-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 20%, #ebe4d9);
 }
 body.theme-material .rings-filter-chip.is-active {
   color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 32%, #ebe4d9);
 }
 body.theme-material .rings-filter-chip[data-rings-filter='hot'].has-hits {
   background: color-mix(in srgb, #ff9500 12%, #ebe4d9);
@@ -28209,12 +28215,12 @@ body.theme-architect .monitors-filter-chip:hover {
   background: color-mix(in srgb, currentColor 7%, #f1f1f1);
 }
 body.theme-architect .monitors-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 20%, #f1f1f1);
 }
 body.theme-architect .monitors-filter-chip.is-active {
   color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 32%, #f1f1f1);
 }
 body.theme-architect .monitors-filter-chip[data-monitors-filter='down'].has-hits {
   background: color-mix(in srgb, #ff3b30 12%, #f1f1f1);
@@ -28250,20 +28256,20 @@ body.theme-architect .chat-filter-chip:hover {
   background: color-mix(in srgb, currentColor 7%, #f1f1f1);
 }
 body.theme-architect .chat-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 20%, #f1f1f1);
 }
 body.theme-architect .chat-filter-chip.is-active {
   color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 32%, #f1f1f1);
 }
 body.theme-architect .chat-filter-chip[data-chat-filter='you'].has-hits {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 10%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 24%, #f1f1f1);
 }
 body.theme-architect .chat-filter-chip[data-chat-filter='you'].is-active {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 18%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 38%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 18%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 38%, #f1f1f1);
 }
 body.theme-architect .chat-filter-chip[data-chat-filter='assistant'].has-hits {
   background: color-mix(in srgb, #34c759 12%, #f1f1f1);
@@ -28291,12 +28297,12 @@ body.theme-architect .rings-filter-chip:hover {
   background: color-mix(in srgb, currentColor 7%, #f1f1f1);
 }
 body.theme-architect .rings-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 20%, #f1f1f1);
 }
 body.theme-architect .rings-filter-chip.is-active {
   color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 32%, #f1f1f1);
 }
 body.theme-architect .rings-filter-chip[data-rings-filter='hot'].has-hits {
   background: color-mix(in srgb, #ff9500 12%, #f1f1f1);

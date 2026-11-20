@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2894] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect design-review (section filter chips): cream `.processes-filter-chip` / `.logs-toolbar .logs-filter-chip` / `.monitors-filter-chip` / `.chat-filter-chip` / `.rings-filter-chip` focus · active · You still used Apple `#0a84ff` accent fallbacks after paper remaps (v0.1.2643–2644) while matching filter Clear already sat on theme accents (v0.1.2893) and Swiss chips already sat on ink. Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` mixed onto each theme paper (polish-without-capture while Mac TCC blocks capture; Hot/Pinned/Down/Up/Slow/Errors/Warn status colors stay; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a keep-pNN Disk Cleanup clone).
+
 ## [0.1.2893] - 2026-11-20
 
 ### Fixed
