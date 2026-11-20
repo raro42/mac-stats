@@ -1,19 +1,21 @@
 # Morning surprise — 2026-11-20
 
-Overnight Track B kept shipping Agent Ops accent hygiene on cream and Swiss paper.
+Overnight Track B kept cream accent fallback hygiene on AI Chat soft-states (Standing P2 #14). Digester open stayed empty; design-review stayed in screenshot grace (Mac TCC); layout-daily already marked data-poster for the day.
 
-## Shipped
+## Shipped tonight (keep)
 
-- **v0.1.2904** — Swiss Minimalistic Agent Ops: badge focus, Updated-ago focus, and health-card focus/active use Swiss ink `#121216` instead of Apple `#0a84ff` / `#007aff` (cream v0.1.2903 parity).
-- Earlier same night: **v0.1.2903** cream Ops badge / Updated-ago / health-card accent fallbacks (Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41`).
+- **v0.1.2906** — Light / Material / Architect AI Chat message hover · focus · selected: Apple `#0a84ff`/`#007aff` → theme accents (`#6aa6df` / `#b8a68b` / `#232d41`).
+- Earlier same night / window: **v0.1.2905** cream chat model/turn/answer/errors/offline glances; **v0.1.2904** Swiss Ops badge/Updated-ago/health; **v0.1.2903–2900** cream Ops + filter-miss cascade.
 
-## Context
+## Tried / skipped
 
-- Digester open stayed empty; design-review grace (TCC polish-without-capture); layout-daily data-poster already marked for the day.
-- Standing P2 #14 leftover soft-states — not a keep-pNN Disk Cleanup clone; Send fill stays white-on-blue intentional.
+- Digester: no open Slowest / Improve candidates.
+- Design-review capture: TCC polish-without-capture (grace).
+- Layout-daily Dark/Neon/Futuristic: deferred to next calendar day (one layout tick/day).
 
-## Next
+## Next fuel
 
-- Other cream/Swiss `#007aff` / `#0a84ff` soft-states if muddy
-- Dark layout-daily next calendar day
-- Sibling / product fuel when digester has open candidates
+- Cream/Swiss processes · monitors attention `#0a84ff` leftovers if muddy.
+- Swiss chat-message hover/selected parity if muddy.
+- Dark layout-daily next calendar day.
+- Sibling/product fuel when digester has open work.
