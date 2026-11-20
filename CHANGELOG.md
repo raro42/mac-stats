@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2911] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect Disk Cleanup, Perplexity last-search, and Top Processes glances: focus and filter accent washes now use theme accents instead of Apple blue fallbacks on cream paper.
+
 ## [0.1.2910] - 2026-11-20
 
 ### Fixed

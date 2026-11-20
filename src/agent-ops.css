@@ -34012,7 +34012,7 @@ body.theme-architect .details-collapsed-glance.is-ok {
  * Apple keep shared `#ffffff`). Standing P2 #14 after light Monitors/Disk/
  * Details collapsed-glance remaps v0.1.2669.
  */
-/* OVERNIGHT v0.1.2670: light Top Processes CPU/GPU/RAM glance remaps */
+/* OVERNIGHT v0.1.2670 + v0.1.2911: light Top Processes CPU/GPU/RAM glance remaps (accent fallback hygiene) */
 
 /* --- light (#f7f7fa) --- */
 body.theme-light .processes-top-glance,
@@ -34031,7 +34031,7 @@ body.theme-light .processes-top-ram-glance:hover {
 body.theme-light .processes-top-glance:focus-visible,
 body.theme-light .processes-top-gpu-glance:focus-visible,
 body.theme-light .processes-top-ram-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 45%, #f7f7fa);
 }
 body.theme-light .processes-top-glance.is-hot,
 body.theme-light .processes-top-gpu-glance.is-hot,
@@ -34063,7 +34063,7 @@ body.theme-material .processes-top-ram-glance:hover {
 body.theme-material .processes-top-glance:focus-visible,
 body.theme-material .processes-top-gpu-glance:focus-visible,
 body.theme-material .processes-top-ram-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 45%, #ebe4d9);
 }
 body.theme-material .processes-top-glance.is-hot,
 body.theme-material .processes-top-gpu-glance.is-hot,
@@ -34095,7 +34095,7 @@ body.theme-architect .processes-top-ram-glance:hover {
 body.theme-architect .processes-top-glance:focus-visible,
 body.theme-architect .processes-top-gpu-glance:focus-visible,
 body.theme-architect .processes-top-ram-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 45%, #f1f1f1);
 }
 body.theme-architect .processes-top-glance.is-hot,
 body.theme-architect .processes-top-gpu-glance.is-hot,
@@ -34837,7 +34837,7 @@ body.theme-architect .perplexity-key-attention-glance.is-not-set {
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
-/* OVERNIGHT v0.1.2675: light Disk Cleanup attention + filter-attention remaps */
+/* OVERNIGHT v0.1.2675 + v0.1.2911: light Disk Cleanup attention + filter-attention remaps (accent fallback hygiene) */
 
 /* --- light (#f7f7fa) --- */
 body.theme-light .disk-cleanup-attention-glance,
@@ -34853,12 +34853,12 @@ body.theme-light .disk-cleanup-filter-attention-glance:hover {
 }
 body.theme-light .disk-cleanup-attention-glance:focus-visible,
 body.theme-light .disk-cleanup-filter-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 45%, #f7f7fa);
 }
 body.theme-light .disk-cleanup-filter-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #f7f7fa);
-  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 24%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 5.5%, #f7f7fa);
+  color: color-mix(in srgb, var(--accent, #6aa6df) 42%, currentColor);
 }
 body.theme-light .disk-cleanup-filter-attention-glance.is-reclaim-filter,
 body.theme-light .disk-cleanup-attention-glance.has-reclaim {
@@ -34897,12 +34897,12 @@ body.theme-material .disk-cleanup-filter-attention-glance:hover {
 }
 body.theme-material .disk-cleanup-attention-glance:focus-visible,
 body.theme-material .disk-cleanup-filter-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 45%, #ebe4d9);
 }
 body.theme-material .disk-cleanup-filter-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #ebe4d9);
-  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 24%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 5.5%, #ebe4d9);
+  color: color-mix(in srgb, var(--accent, #b8a68b) 42%, currentColor);
 }
 body.theme-material .disk-cleanup-filter-attention-glance.is-reclaim-filter,
 body.theme-material .disk-cleanup-attention-glance.has-reclaim {
@@ -34941,12 +34941,12 @@ body.theme-architect .disk-cleanup-filter-attention-glance:hover {
 }
 body.theme-architect .disk-cleanup-attention-glance:focus-visible,
 body.theme-architect .disk-cleanup-filter-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 45%, #f1f1f1);
 }
 body.theme-architect .disk-cleanup-filter-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #f1f1f1);
-  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 24%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 5.5%, #f1f1f1);
+  color: color-mix(in srgb, var(--accent, #232d41) 42%, currentColor);
 }
 body.theme-architect .disk-cleanup-filter-attention-glance.is-reclaim-filter,
 body.theme-architect .disk-cleanup-attention-glance.has-reclaim {
@@ -34979,7 +34979,7 @@ body.theme-architect .disk-cleanup-attention-glance.is-due {
  * paper so the glance matches light shells (Swiss / Apple keep shared `#ffffff`).
  * Standing P2 #14 after light Disk Cleanup attention remaps v0.1.2675.
  */
-/* OVERNIGHT v0.1.2676: light Perplexity last-glance remaps */
+/* OVERNIGHT v0.1.2676 + v0.1.2911: light Perplexity last-glance remaps (accent fallback hygiene) */
 
 /* --- light (#f7f7fa) --- */
 body.theme-light .perplexity-last-glance {
@@ -34992,15 +34992,15 @@ body.theme-light .perplexity-last-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
 }
 body.theme-light .perplexity-last-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 45%, #f7f7fa);
 }
 body.theme-light .perplexity-last-glance.has-results {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 22%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 22%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 5%, #f7f7fa);
 }
 body.theme-light .perplexity-last-glance.is-searching {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 7%, #f7f7fa);
 }
 body.theme-light .perplexity-last-glance.has-error {
   border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
@@ -35028,15 +35028,15 @@ body.theme-material .perplexity-last-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
 }
 body.theme-material .perplexity-last-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 45%, #ebe4d9);
 }
 body.theme-material .perplexity-last-glance.has-results {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 22%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 22%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 5%, #ebe4d9);
 }
 body.theme-material .perplexity-last-glance.is-searching {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 7%, #ebe4d9);
 }
 body.theme-material .perplexity-last-glance.has-error {
   border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
@@ -35064,15 +35064,15 @@ body.theme-architect .perplexity-last-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
 }
 body.theme-architect .perplexity-last-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 45%, #f1f1f1);
 }
 body.theme-architect .perplexity-last-glance.has-results {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 22%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 22%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 5%, #f1f1f1);
 }
 body.theme-architect .perplexity-last-glance.is-searching {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 7%, #f1f1f1);
 }
 body.theme-architect .perplexity-last-glance.has-error {
   border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
