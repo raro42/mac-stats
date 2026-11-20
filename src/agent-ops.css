@@ -40762,3 +40762,26 @@ body.theme-swiss-minimalistic .settings-help-attention-glance.is-closed {
   border-color: color-mix(in srgb, var(--accent, #121216) 32%, #ffffff);
   background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
 }
+
+/* OVERNIGHT v0.1.2904: Swiss Ops badge / Updated-ago / health-card Apple #0a84ff/#007aff → ink (cream 2903 parity) */
+/* Opaque Swiss ink — Apple accent fallbacks lagged --accent on paper #ffffff (#14 / P2; design-review Agent Ops). */
+body.theme-swiss-minimalistic button.ops-badge:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-updated-ago[role='button']:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-health-card.ops-health-clickable:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 35%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-health-card.is-active {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #121216) 42%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-health-card.is-active:not(.ops-health-ok):not(.ops-health-warn):not(.ops-health-bad) {
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-health-card.is-active.ops-health-clickable:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #121216) 52%, #ffffff);
+}

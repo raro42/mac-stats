@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2904] - 2026-11-20
+
+### Fixed
+- Swiss Minimalistic Agent Ops: badge focus, Updated-ago focus, and health-card focus/active now use Swiss ink instead of Apple blue fallbacks on paper.
+
 ## [0.1.2903] - 2026-11-20
 
 ### Fixed
