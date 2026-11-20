@@ -34162,7 +34162,7 @@ body.theme-light .monitors-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
 }
 body.theme-light .monitors-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 45%, #f7f7fa);
 }
 body.theme-light .monitors-attention-glance.has-down {
   border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
@@ -34215,7 +34215,7 @@ body.theme-material .monitors-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
 }
 body.theme-material .monitors-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 45%, #ebe4d9);
 }
 body.theme-material .monitors-attention-glance.has-down {
   border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
@@ -34268,7 +34268,7 @@ body.theme-architect .monitors-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
 }
 body.theme-architect .monitors-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 45%, #f1f1f1);
 }
 body.theme-architect .monitors-attention-glance.has-down {
   border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
@@ -34292,6 +34292,7 @@ body.theme-architect .monitors-attention-glance.has-slow {
  * shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
  * Agent Ops collapsed + Monitors attention remaps v0.1.2671.
  */
+/* OVERNIGHT v0.1.2907: cream monitors/processes attention Apple #0a84ff → theme accents */
 /* OVERNIGHT v0.1.2672: light Monitors filter-attention + Logs attention remaps */
 
 /* --- light (#f7f7fa) --- */
@@ -34305,12 +34306,12 @@ body.theme-light .monitors-filter-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
 }
 body.theme-light .monitors-filter-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 45%, #f7f7fa);
 }
 body.theme-light .monitors-filter-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #f7f7fa);
-  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 24%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 5.5%, #f7f7fa);
+  color: color-mix(in srgb, var(--accent, #6aa6df) 42%, currentColor);
 }
 body.theme-light .monitors-filter-attention-glance.is-up-filter {
   border-color: color-mix(in srgb, #30d158 28%, #f7f7fa);
@@ -34361,12 +34362,12 @@ body.theme-material .monitors-filter-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
 }
 body.theme-material .monitors-filter-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 45%, #ebe4d9);
 }
 body.theme-material .monitors-filter-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #ebe4d9);
-  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 24%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 5.5%, #ebe4d9);
+  color: color-mix(in srgb, var(--accent, #b8a68b) 42%, currentColor);
 }
 body.theme-material .monitors-filter-attention-glance.is-up-filter {
   border-color: color-mix(in srgb, #30d158 28%, #ebe4d9);
@@ -34417,12 +34418,12 @@ body.theme-architect .monitors-filter-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
 }
 body.theme-architect .monitors-filter-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 45%, #f1f1f1);
 }
 body.theme-architect .monitors-filter-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #f1f1f1);
-  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 24%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 5.5%, #f1f1f1);
+  color: color-mix(in srgb, var(--accent, #232d41) 42%, currentColor);
 }
 body.theme-architect .monitors-filter-attention-glance.is-up-filter {
   border-color: color-mix(in srgb, #30d158 28%, #f1f1f1);
@@ -34512,16 +34513,16 @@ body.theme-light .processes-filter-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
 }
 body.theme-light .processes-filter-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 45%, #f7f7fa);
 }
 body.theme-light .processes-filter-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #f7f7fa);
-  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 24%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 5.5%, #f7f7fa);
+  color: color-mix(in srgb, var(--accent, #6aa6df) 42%, currentColor);
 }
 body.theme-light .processes-filter-attention-glance.is-pinned {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 7%, #f7f7fa);
 }
 body.theme-light .processes-filter-attention-glance.is-hot-filter {
   border-color: color-mix(in srgb, #ff9f0a 30%, #f7f7fa);
@@ -34538,7 +34539,7 @@ body.theme-light .processes-hot-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
 }
 body.theme-light .processes-hot-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 45%, #f7f7fa);
 }
 body.theme-light .processes-hot-attention-glance.has-hot {
   border-color: color-mix(in srgb, #ff9f0a 30%, #f7f7fa);
@@ -34582,16 +34583,16 @@ body.theme-material .processes-filter-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
 }
 body.theme-material .processes-filter-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 45%, #ebe4d9);
 }
 body.theme-material .processes-filter-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #ebe4d9);
-  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 24%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 5.5%, #ebe4d9);
+  color: color-mix(in srgb, var(--accent, #b8a68b) 42%, currentColor);
 }
 body.theme-material .processes-filter-attention-glance.is-pinned {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 7%, #ebe4d9);
 }
 body.theme-material .processes-filter-attention-glance.is-hot-filter {
   border-color: color-mix(in srgb, #ff9f0a 30%, #ebe4d9);
@@ -34608,7 +34609,7 @@ body.theme-material .processes-hot-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
 }
 body.theme-material .processes-hot-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 45%, #ebe4d9);
 }
 body.theme-material .processes-hot-attention-glance.has-hot {
   border-color: color-mix(in srgb, #ff9f0a 30%, #ebe4d9);
@@ -34652,16 +34653,16 @@ body.theme-architect .processes-filter-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
 }
 body.theme-architect .processes-filter-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 45%, #f1f1f1);
 }
 body.theme-architect .processes-filter-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 5.5%, #f1f1f1);
-  color: color-mix(in srgb, var(--accent, #0a84ff) 42%, currentColor);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 24%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 5.5%, #f1f1f1);
+  color: color-mix(in srgb, var(--accent, #232d41) 42%, currentColor);
 }
 body.theme-architect .processes-filter-attention-glance.is-pinned {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 7%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 7%, #f1f1f1);
 }
 body.theme-architect .processes-filter-attention-glance.is-hot-filter {
   border-color: color-mix(in srgb, #ff9f0a 30%, #f1f1f1);
@@ -34678,7 +34679,7 @@ body.theme-architect .processes-hot-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
 }
 body.theme-architect .processes-hot-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 45%, #f1f1f1);
 }
 body.theme-architect .processes-hot-attention-glance.has-hot {
   border-color: color-mix(in srgb, #ff9f0a 30%, #f1f1f1);

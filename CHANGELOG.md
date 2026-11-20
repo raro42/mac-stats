@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2907] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect Monitors and Processes: attention glances (focus, filter, pinned) now use theme accents instead of Apple blue fallbacks on cream paper.
+
 ## [0.1.2906] - 2026-11-20
 
 ### Fixed
