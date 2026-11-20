@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2909] - 2026-11-20
+
+### Fixed
+- Swiss Minimalistic AI Chat and Debug Log: message hover/focus/selected and logs attention/error keyboard focus now use Swiss ink instead of Apple blue fallbacks on paper.
+
 ## [0.1.2908] - 2026-11-20
 
 ### Fixed

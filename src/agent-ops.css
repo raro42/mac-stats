@@ -40789,3 +40789,39 @@ body.theme-swiss-minimalistic .ops-health-card.is-active:not(.ops-health-ok):not
 body.theme-swiss-minimalistic .ops-health-card.is-active.ops-health-clickable:hover {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #121216) 52%, #ffffff);
 }
+
+/*
+ * Swiss Minimalistic: AI Chat message hover/focus/selected + Debug Log
+ * attention/error focus still used shared Apple `#007aff` / `#0a84ff` accent
+ * fallbacks on paper `#ffffff` while cream Light/Material/Architect already
+ * sat on theme accents (v0.1.2906 / v0.1.2908) and Swiss monitors/processes
+ * attention already sat on ink (v0.1.2862). Opaque Swiss ink `#121216` mixes.
+ * Standing P2 #14 leftover soft-states after cream logs attention/error
+ * v0.1.2908 (not a keep-pNN Disk Cleanup clone; Send fill white-on-blue
+ * intentional; polish-without-capture Mac TCC).
+ */
+/* OVERNIGHT v0.1.2909: Swiss chat-message + logs-attention/error focus Apple → ink (cream 2906/2908 parity) */
+body.theme-swiss-minimalistic .chat-message[role='option']:hover,
+body.theme-swiss-minimalistic .chat-message[role='button']:hover {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream chat-message hover (#14 / P2; design-review AI Chat). */
+  background: color-mix(in srgb, var(--accent, #121216) 6%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-message[role='option']:focus-visible,
+body.theme-swiss-minimalistic .chat-message[role='button']:focus-visible {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream chat-message focus (#14 / P2; design-review AI Chat). */
+  outline-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+}
+body.theme-swiss-minimalistic .chat-message[role='option'].is-selected,
+body.theme-swiss-minimalistic .chat-message[role='button'].is-selected {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream chat-message is-selected (#14 / P2; design-review AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 5%, #ffffff);
+}
+body.theme-swiss-minimalistic .logs-attention-glance:focus-visible {
+  /* Opaque Swiss ink — Apple #007aff/#0a84ff lagged --accent / cream logs-attention focus (#14 / P2; design-review Debug Log). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+}
+body.theme-swiss-minimalistic .logs-error-glance:focus-visible {
+  /* Opaque Swiss ink — Apple #007aff/#0a84ff lagged --accent / cream logs-error focus (#14 / P2; design-review Debug Log). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+}
