@@ -3,26 +3,27 @@
 Overnight Track B (product) ratchet for Ralf.
 
 ## Shipped
+- **v0.1.2882–v0.1.2902** — Standing P2 #14 cream / CRT soft-state accent hygiene (Apple `#007aff` / `#0a84ff` → theme accents on paper). Digester open stayed empty; design-review stayed in grace (Mac TCC polish-without-capture); layout-daily already marked Data Poster for today.
 
-- **v0.1.2901** — Light / Material / Architect Agent Ops kind chips · Clear · copy: remapped Apple `#0a84ff` / `#007aff` accent fallbacks onto theme accents (`#6aa6df` / `#b8a68b` / `#232d41`) for kind-chip focus · is-active, kind Clear, and session copy-chip (after Rings/Disk/Perplexity filter-miss **v0.1.2900**). Swiss already sat on ink. Specialty status chips and `.is-just-saved` greens stay. Send fill stays white-on-blue intentional.
+### Latest keep
+- **v0.1.2902** — Light / Material / Architect Agent Ops overview cards, selected rows, and attention glances: `#007aff` fallbacks → `#6aa6df` / `#b8a68b` / `#232d41`.
 
-## Also tonight (earlier keeps)
-
-- v0.1.2900 Rings/Disk/Perplexity filter-miss
-- v0.1.2899 monitors/processes/logs filter-miss
+### Earlier tonight (highlights)
+- v0.1.2901 Ops kind-chip focus / Clear / copy
+- v0.1.2900 Rings / Disk / Perplexity filter-miss
+- v0.1.2899 Monitors / Processes / Logs filter-miss
 - v0.1.2898 AI Chat filter-miss
 - v0.1.2897 collapsed-glance soft-states
-- …and the cream soft-state hygiene chain back through filter chips / Clear / focus remaps
+- v0.1.2889 Monitors settings primary (+ layout-daily data-poster)
+- v0.1.2882–2885 AI Chat Send focus (cream → CRT cascade)
 
-## Context
-
-- Digester open: empty most of the night.
-- Design-review: due=false (grace; Mac TCC → polish-without-capture).
-- Layout-daily: data-poster marked for 2026-11-20; Dark next calendar day.
-- Standing fuel: P2 #14 leftover soft-states (not keep-pNN clones).
+## Tried / notes
+- Digester Slowest empty all night — fuel from standing backlog soft-states.
+- Design-review recommended Agent Ops screenshot still stale; capture blocked by Mac TCC → polish-without-capture path.
+- Send fill white-on-blue left intentional.
+- Dark / Neon / Futuristic layout-daily due next calendar day.
 
 ## Next
-
-- Cream Ops overview/row/attention `#007aff` hygiene if muddy.
-- Dark layout-daily when due next calendar day.
-- Sibling/product fuel when digester opens.
+- Leftover cream `#007aff` / `#0a84ff` soft-states if muddy
+- Dark layout-daily when the calendar rolls
+- Sibling / product fuel when digester opens
