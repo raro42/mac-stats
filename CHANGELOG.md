@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2902] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect design-review (Agent Ops overview / row / attention): cream `.ops-overview-card` focus-within · focus-visible · is-active · head-count, `.ops-row.is-selected` · hover, and Ops `*-attention-glance` focus-visible · has-ok / is-ok-filter still used Apple `#007aff` accent fallbacks after paper remaps (v0.1.2650–2653) while focus-visible outlines / lite runs already sat on theme accents (v0.1.2901 kind chips). Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` mixed onto each theme paper (polish-without-capture while Mac TCC blocks capture; health ok/warn/bad and fail/slow/copied status colors stay; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a keep-pNN Disk Cleanup clone).
+
 ## [0.1.2901] - 2026-11-20
 
 ### Fixed

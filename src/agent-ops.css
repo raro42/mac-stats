@@ -29675,6 +29675,7 @@ body.theme-architect .ops-file-tab.active .ops-tab-count {
  * Ops filter-input + match + tab-count remaps v0.1.2649.
  */
 /* OVERNIGHT v0.1.2650: light Ops attention-glance remaps */
+/* OVERNIGHT v0.1.2902: cream Ops attention Apple #007aff → theme accents */
 body.theme-light .ops-runs-attention-glance,
 body.theme-light .ops-filter-attention-glance,
 body.theme-light .ops-digest-attention-glance,
@@ -29728,7 +29729,7 @@ body.theme-light .ops-mastodon-attention-glance:focus-visible,
 body.theme-light .ops-telegram-attention-glance:focus-visible,
 body.theme-light .ops-slack-attention-glance:focus-visible,
 body.theme-light .ops-signal-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 45%, #f7f7fa);
   box-shadow: none;
 }
 body.theme-light .ops-runs-attention-glance.has-fail,
@@ -29789,9 +29790,9 @@ body.theme-light .ops-filter-attention-glance.is-off-filter,
 body.theme-light .ops-filter-attention-glance.is-files-filter,
 body.theme-light .ops-filter-attention-glance.is-deliveries-filter,
 body.theme-light .ops-filter-attention-glance.is-discord-filter {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f7f7fa);
-  color: color-mix(in srgb, var(--accent, #007aff) 45%, var(--text, currentColor));
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 7%, #f7f7fa);
+  color: color-mix(in srgb, var(--accent, #6aa6df) 45%, var(--text, currentColor));
 }
 body.theme-light .ops-filter-attention-glance.is-on-filter,
 body.theme-light .ops-filter-attention-glance.is-live-filter,
@@ -29857,7 +29858,7 @@ body.theme-material .ops-mastodon-attention-glance:focus-visible,
 body.theme-material .ops-telegram-attention-glance:focus-visible,
 body.theme-material .ops-slack-attention-glance:focus-visible,
 body.theme-material .ops-signal-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 45%, #ebe4d9);
   box-shadow: none;
 }
 body.theme-material .ops-runs-attention-glance.has-fail,
@@ -29918,9 +29919,9 @@ body.theme-material .ops-filter-attention-glance.is-off-filter,
 body.theme-material .ops-filter-attention-glance.is-files-filter,
 body.theme-material .ops-filter-attention-glance.is-deliveries-filter,
 body.theme-material .ops-filter-attention-glance.is-discord-filter {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ebe4d9);
-  color: color-mix(in srgb, var(--accent, #007aff) 45%, var(--text, currentColor));
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 7%, #ebe4d9);
+  color: color-mix(in srgb, var(--accent, #b8a68b) 45%, var(--text, currentColor));
 }
 body.theme-material .ops-filter-attention-glance.is-on-filter,
 body.theme-material .ops-filter-attention-glance.is-live-filter,
@@ -29986,7 +29987,7 @@ body.theme-architect .ops-mastodon-attention-glance:focus-visible,
 body.theme-architect .ops-telegram-attention-glance:focus-visible,
 body.theme-architect .ops-slack-attention-glance:focus-visible,
 body.theme-architect .ops-signal-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 45%, #f1f1f1);
   box-shadow: none;
 }
 body.theme-architect .ops-runs-attention-glance.has-fail,
@@ -30047,9 +30048,9 @@ body.theme-architect .ops-filter-attention-glance.is-off-filter,
 body.theme-architect .ops-filter-attention-glance.is-files-filter,
 body.theme-architect .ops-filter-attention-glance.is-deliveries-filter,
 body.theme-architect .ops-filter-attention-glance.is-discord-filter {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f1f1f1);
-  color: color-mix(in srgb, var(--accent, #007aff) 45%, var(--text, currentColor));
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 7%, #f1f1f1);
+  color: color-mix(in srgb, var(--accent, #232d41) 45%, var(--text, currentColor));
 }
 body.theme-architect .ops-filter-attention-glance.is-on-filter,
 body.theme-architect .ops-filter-attention-glance.is-live-filter,
@@ -30074,6 +30075,7 @@ body.theme-architect .ops-filter-attention-glance.is-direct-filter {
  * Ops attention-glance remaps v0.1.2650.
  */
 /* OVERNIGHT v0.1.2651: light Ops overview/card remaps */
+/* OVERNIGHT v0.1.2902: cream Ops overview Apple #007aff → theme accents */
 body.theme-light .ops-overview-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
 }
@@ -30086,16 +30088,16 @@ body.theme-light .ops-overview-card:hover {
   border-color: color-mix(in srgb, currentColor 18%, #f7f7fa);
 }
 body.theme-light .ops-overview-card:focus-within {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f7f7fa);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 22%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6aa6df) 22%, #f7f7fa);
 }
 body.theme-light .ops-overview-card.ops-overview-clickable:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #f7f7fa);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 28%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 42%, #f7f7fa);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
 }
 body.theme-light .ops-overview-card.is-active {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 7%, #f7f7fa);
 }
 body.theme-light .ops-overview-card.ops-health-ok {
   border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
@@ -30112,21 +30114,21 @@ body.theme-light .ops-overview-card.ops-health-bad {
 body.theme-light .ops-overview-card.is-active.ops-health-ok,
 body.theme-light .ops-overview-card.is-active.ops-health-warn,
 body.theme-light .ops-overview-card.is-active.ops-health-bad {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 42%, #f7f7fa);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6aa6df) 42%, #f7f7fa);
 }
 body.theme-light .ops-overview-card.is-active:hover {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 36%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 10%, #f7f7fa);
 }
 body.theme-light .ops-overview-card.is-active.ops-health-ok:hover,
 body.theme-light .ops-overview-card.is-active.ops-health-warn:hover,
 body.theme-light .ops-overview-card.is-active.ops-health-bad:hover {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 52%, #f7f7fa);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6aa6df) 52%, #f7f7fa);
 }
 body.theme-light .ops-overview-card.is-active .ops-overview-link {
   color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 7%, #f7f7fa);
 }
 body.theme-light .ops-overview-head-count {
   color: color-mix(in srgb, #0c0c10 69%, #f7f7fa);
@@ -30140,11 +30142,11 @@ body.theme-light .ops-overview-card:hover .ops-overview-head-count:not(.is-zero)
   color: color-mix(in srgb, #0c0c10 81%, #f7f7fa);
 }
 body.theme-light .ops-overview-card.is-active .ops-overview-head-count {
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 7%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
 }
 body.theme-light .ops-overview-card.is-active .ops-overview-head-count.is-zero {
-  color: color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
+  color: color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
 }
 body.theme-light .ops-overview-link {
   background: color-mix(in srgb, currentColor 4%, #f7f7fa);
@@ -30176,16 +30178,16 @@ body.theme-material .ops-overview-card:hover {
   border-color: color-mix(in srgb, currentColor 18%, #ebe4d9);
 }
 body.theme-material .ops-overview-card:focus-within {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ebe4d9);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 22%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #b8a68b) 22%, #ebe4d9);
 }
 body.theme-material .ops-overview-card.ops-overview-clickable:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #ebe4d9);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 28%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 42%, #ebe4d9);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
 }
 body.theme-material .ops-overview-card.is-active {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 7%, #ebe4d9);
 }
 body.theme-material .ops-overview-card.ops-health-ok {
   border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
@@ -30202,21 +30204,21 @@ body.theme-material .ops-overview-card.ops-health-bad {
 body.theme-material .ops-overview-card.is-active.ops-health-ok,
 body.theme-material .ops-overview-card.is-active.ops-health-warn,
 body.theme-material .ops-overview-card.is-active.ops-health-bad {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 42%, #ebe4d9);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #b8a68b) 42%, #ebe4d9);
 }
 body.theme-material .ops-overview-card.is-active:hover {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 36%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 10%, #ebe4d9);
 }
 body.theme-material .ops-overview-card.is-active.ops-health-ok:hover,
 body.theme-material .ops-overview-card.is-active.ops-health-warn:hover,
 body.theme-material .ops-overview-card.is-active.ops-health-bad:hover {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 52%, #ebe4d9);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #b8a68b) 52%, #ebe4d9);
 }
 body.theme-material .ops-overview-card.is-active .ops-overview-link {
   color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 7%, #ebe4d9);
 }
 body.theme-material .ops-overview-head-count {
   color: color-mix(in srgb, #0c0c10 69%, #ebe4d9);
@@ -30230,11 +30232,11 @@ body.theme-material .ops-overview-card:hover .ops-overview-head-count:not(.is-ze
   color: color-mix(in srgb, #0c0c10 81%, #ebe4d9);
 }
 body.theme-material .ops-overview-card.is-active .ops-overview-head-count {
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 7%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
 }
 body.theme-material .ops-overview-card.is-active .ops-overview-head-count.is-zero {
-  color: color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
+  color: color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
 }
 body.theme-material .ops-overview-link {
   background: color-mix(in srgb, currentColor 4%, #ebe4d9);
@@ -30266,16 +30268,16 @@ body.theme-architect .ops-overview-card:hover {
   border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
 }
 body.theme-architect .ops-overview-card:focus-within {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 22%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #232d41) 22%, #f1f1f1);
 }
 body.theme-architect .ops-overview-card.ops-overview-clickable:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #f1f1f1);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 42%, #f1f1f1);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
 }
 body.theme-architect .ops-overview-card.is-active {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 7%, #f1f1f1);
 }
 body.theme-architect .ops-overview-card.ops-health-ok {
   border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
@@ -30292,21 +30294,21 @@ body.theme-architect .ops-overview-card.ops-health-bad {
 body.theme-architect .ops-overview-card.is-active.ops-health-ok,
 body.theme-architect .ops-overview-card.is-active.ops-health-warn,
 body.theme-architect .ops-overview-card.is-active.ops-health-bad {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 42%, #f1f1f1);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #232d41) 42%, #f1f1f1);
 }
 body.theme-architect .ops-overview-card.is-active:hover {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 36%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 10%, #f1f1f1);
 }
 body.theme-architect .ops-overview-card.is-active.ops-health-ok:hover,
 body.theme-architect .ops-overview-card.is-active.ops-health-warn:hover,
 body.theme-architect .ops-overview-card.is-active.ops-health-bad:hover {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 52%, #f1f1f1);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #232d41) 52%, #f1f1f1);
 }
 body.theme-architect .ops-overview-card.is-active .ops-overview-link {
   color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 7%, #f1f1f1);
 }
 body.theme-architect .ops-overview-head-count {
   color: color-mix(in srgb, #0c0c10 69%, #f1f1f1);
@@ -30320,11 +30322,11 @@ body.theme-architect .ops-overview-card:hover .ops-overview-head-count:not(.is-z
   color: color-mix(in srgb, #0c0c10 81%, #f1f1f1);
 }
 body.theme-architect .ops-overview-card.is-active .ops-overview-head-count {
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 7%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
 }
 body.theme-architect .ops-overview-card.is-active .ops-overview-head-count.is-zero {
-  color: color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+  color: color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
 }
 body.theme-architect .ops-overview-link {
   background: color-mix(in srgb, currentColor 4%, #f1f1f1);
@@ -31729,6 +31731,7 @@ body.theme-swiss-minimalistic {
  * loading/hint remaps v0.1.2652.
  */
 /* OVERNIGHT v0.1.2653: light Ops row/list remaps */
+/* OVERNIGHT v0.1.2902: cream Ops row is-selected Apple #007aff → theme accents */
 body.theme-light .ops-row {
   background: color-mix(in srgb, currentColor 4%, #f7f7fa);
 }
@@ -31741,14 +31744,14 @@ body.theme-light .ops-row:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
 }
 body.theme-light .ops-row.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, #f7f7fa);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 42%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 12%, #f7f7fa);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
 }
 body.theme-light .ops-row.is-selected:hover {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 52%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 15%, #f7f7fa);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 20%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 52%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 15%, #f7f7fa);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #6aa6df) 20%, #f7f7fa);
 }
 body.theme-light .ops-row.is-copied,
 body.theme-light .ops-row.is-selected.is-copied,
@@ -31802,14 +31805,14 @@ body.theme-material .ops-row:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
 }
 body.theme-material .ops-row.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, #ebe4d9);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 42%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 12%, #ebe4d9);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
 }
 body.theme-material .ops-row.is-selected:hover {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 52%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 15%, #ebe4d9);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 20%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 52%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 15%, #ebe4d9);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #b8a68b) 20%, #ebe4d9);
 }
 body.theme-material .ops-row.is-copied,
 body.theme-material .ops-row.is-selected.is-copied,
@@ -31863,14 +31866,14 @@ body.theme-architect .ops-row:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
 }
 body.theme-architect .ops-row.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, #f1f1f1);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 42%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 12%, #f1f1f1);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
 }
 body.theme-architect .ops-row.is-selected:hover {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 52%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 15%, #f1f1f1);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 20%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 52%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 15%, #f1f1f1);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #232d41) 20%, #f1f1f1);
 }
 body.theme-architect .ops-row.is-copied,
 body.theme-architect .ops-row.is-selected.is-copied,
