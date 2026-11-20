@@ -4,6 +4,7 @@ Overnight autoresearch kept shipping accent hygiene on cream / Swiss / CRT shell
 
 ## Shipped this window
 
+- **v0.1.2891** — Data Poster Monitors settings focus-within leaves Apple `#007aff` for `#55c7ff`; cream / CRT / Swiss Agent Ops jump-flash rings leave Apple `#007aff` for theme accents.
 - **v0.1.2890** — Disk Cleanup scope-row selected wash leaves Apple `#0a84ff` for Light / Material / Architect / Swiss theme accents (focus already themed; CRT already correct).
 - **v0.1.2889** — Monitors settings primary/secondary now share Ollama theme accent fills (Add Monitor / Cancel). Cream / Swiss / Data Poster focus rings leave Apple `#007aff` for theme accents. Layout-daily Data Poster marked for 2026-11-20.
 - **v0.1.2888** — Details option hover/focus/is-selected accent fallbacks.
@@ -14,8 +15,8 @@ Overnight autoresearch kept shipping accent hygiene on cream / Swiss / CRT shell
 ## Tried / context
 
 - Digester open stayed empty (noise filtered). Design-review screenshots stay in grace (Mac TCC). Send fill white-on-blue stays intentional.
-- Next fuel: Data Poster `monitor-settings-item:focus-within` · `--ops-jump-flash-ring` · Dark layout-daily · sibling/product (not keep-pNN clones).
+- Next fuel: cream Light/Material/Architect `.monitor-settings-item:focus-within` · Swiss focus-within parity · Dark layout-daily · sibling/product (not keep-pNN clones).
 
 ## Fitness
 
-Selected Disk Cleanup scopes finally match each cream/Swiss theme accent instead of flashing Apple blue after paper remaps.
+Data Poster keyboard focus on Monitors settings rows and Agent Ops jump-flash rings finally match each theme accent instead of flashing Apple blue after paper remaps.
