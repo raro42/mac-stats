@@ -34292,6 +34292,7 @@ body.theme-architect .monitors-attention-glance.has-slow {
  * shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
  * Agent Ops collapsed + Monitors attention remaps v0.1.2671.
  */
+/* OVERNIGHT v0.1.2908: cream logs-attention/error-glance focus Apple #0a84ff → theme accents */
 /* OVERNIGHT v0.1.2907: cream monitors/processes attention Apple #0a84ff → theme accents */
 /* OVERNIGHT v0.1.2672: light Monitors filter-attention + Logs attention remaps */
 
@@ -34338,7 +34339,7 @@ body.theme-light .logs-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
 }
 body.theme-light .logs-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 45%, #f7f7fa);
 }
 body.theme-light .logs-attention-glance.has-errors {
   border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
@@ -34394,7 +34395,7 @@ body.theme-material .logs-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
 }
 body.theme-material .logs-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 45%, #ebe4d9);
 }
 body.theme-material .logs-attention-glance.has-errors {
   border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
@@ -34450,7 +34451,7 @@ body.theme-architect .logs-attention-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
 }
 body.theme-architect .logs-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 45%, #f1f1f1);
 }
 body.theme-architect .logs-attention-glance.has-errors {
   border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
@@ -34488,7 +34489,7 @@ body.theme-light .logs-error-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f7f7fa);
 }
 body.theme-light .logs-error-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 45%, #f7f7fa);
 }
 body.theme-light .logs-error-glance.has-errors {
   border-color: color-mix(in srgb, #ff3b30 30%, #f7f7fa);
@@ -34558,7 +34559,7 @@ body.theme-material .logs-error-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #ebe4d9);
 }
 body.theme-material .logs-error-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 45%, #ebe4d9);
 }
 body.theme-material .logs-error-glance.has-errors {
   border-color: color-mix(in srgb, #ff3b30 30%, #ebe4d9);
@@ -34628,7 +34629,7 @@ body.theme-architect .logs-error-glance:hover {
   border-color: color-mix(in srgb, currentColor 16%, #f1f1f1);
 }
 body.theme-architect .logs-error-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 45%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 45%, #f1f1f1);
 }
 body.theme-architect .logs-error-glance.has-errors {
   border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);

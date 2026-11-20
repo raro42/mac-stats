@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2908] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect Debug Log: attention and error glances (keyboard focus) now use theme accents instead of Apple blue fallbacks on cream paper.
+
 ## [0.1.2907] - 2026-11-20
 
 ### Fixed
