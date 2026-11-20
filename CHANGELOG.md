@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2899] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect design-review (Monitors / Processes / Logs filter-miss): cream `.monitors-filter-miss` · Up empty · empty CTA, `.processes-filter-miss` · Pinned empty · CTA, and `.logs-viewer-empty.logs-filter-miss` · CTA resting · hover · `:focus-visible` still used Apple `#0a84ff` accent fallbacks after paper remaps (v0.1.2667) while Swiss already sat on ink (v0.1.2863–2865) and cream chat-filter-miss already sat on theme accents (v0.1.2898). Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` mixed onto each theme paper (polish-without-capture while Mac TCC blocks capture; Down/Slow/Hot/Error/Warn empty stay soft green; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a keep-pNN Disk Cleanup clone).
+
 ## [0.1.2898] - 2026-11-20
 
 ### Fixed
