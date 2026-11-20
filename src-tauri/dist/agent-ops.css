@@ -31934,7 +31934,9 @@ body.theme-light button.ops-badge.off:hover {
   box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 14%, #f7f7fa);
 }
 body.theme-light button.ops-badge:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 28%, #f7f7fa);
+  /* OVERNIGHT v0.1.2903: cream Ops badge / Updated-ago / health-card Apple #007aff/#0a84ff → theme accents */
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Neon Ops badge focus (#14 / P2; design-review Agent Ops). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
 }
 body.theme-light button.ops-badge:disabled {
   color: color-mix(in srgb, #0c0c10 48%, #f7f7fa);
@@ -31956,7 +31958,8 @@ body.theme-material button.ops-badge.off:hover {
   box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 14%, #ebe4d9);
 }
 body.theme-material button.ops-badge:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 28%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Neon Ops badge focus (#14 / P2; design-review Agent Ops). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
 }
 body.theme-material button.ops-badge:disabled {
   color: color-mix(in srgb, #0c0c10 48%, #ebe4d9);
@@ -31978,7 +31981,8 @@ body.theme-architect button.ops-badge.off:hover {
   box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 14%, #f1f1f1);
 }
 body.theme-architect button.ops-badge:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 28%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Neon Ops badge focus (#14 / P2; design-review Agent Ops). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
 }
 body.theme-architect button.ops-badge:disabled {
   color: color-mix(in srgb, #0c0c10 48%, #f1f1f1);
@@ -32012,7 +32016,8 @@ body.theme-light .ops-updated-ago[role='button']:hover {
   background: color-mix(in srgb, currentColor 8%, #f7f7fa);
 }
 body.theme-light .ops-updated-ago[role='button']:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff lagged --accent / Neon Ops updated-ago focus (#14 / P2; design-review Agent Ops). */
+  outline-color: color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
 }
 body.theme-light .ops-keyboard-hint {
   color: color-mix(in srgb, #0c0c10 62%, #f7f7fa);
@@ -32033,7 +32038,8 @@ body.theme-material .ops-updated-ago[role='button']:hover {
   background: color-mix(in srgb, currentColor 8%, #ebe4d9);
 }
 body.theme-material .ops-updated-ago[role='button']:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
+  /* Opaque Material accent — Apple #007aff lagged --accent / Neon Ops updated-ago focus (#14 / P2; design-review Agent Ops). */
+  outline-color: color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
 }
 body.theme-material .ops-keyboard-hint {
   color: color-mix(in srgb, #0c0c10 62%, #ebe4d9);
@@ -32054,7 +32060,8 @@ body.theme-architect .ops-updated-ago[role='button']:hover {
   background: color-mix(in srgb, currentColor 8%, #f1f1f1);
 }
 body.theme-architect .ops-updated-ago[role='button']:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff lagged --accent / Neon Ops updated-ago focus (#14 / P2; design-review Agent Ops). */
+  outline-color: color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
 }
 body.theme-architect .ops-keyboard-hint {
   color: color-mix(in srgb, #0c0c10 62%, #f1f1f1);
@@ -32130,8 +32137,9 @@ body.theme-light .ops-health-card.ops-health-clickable:hover {
   background: color-mix(in srgb, currentColor 10%, #f7f7fa);
 }
 body.theme-light .ops-health-card.ops-health-clickable:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff lagged --accent / Neon Ops health focus (#14 / P2; design-review Agent Ops). */
+  outline-color: color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 35%, #f7f7fa);
 }
 body.theme-light .ops-health-card.ops-health-ok {
   border-color: color-mix(in srgb, #34c759 28%, #f7f7fa);
@@ -32146,14 +32154,14 @@ body.theme-light .ops-health-card.ops-health-bad {
   background: color-mix(in srgb, #ff3b30 7%, #f7f7fa);
 }
 body.theme-light .ops-health-card.is-active {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 42%, #f7f7fa);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6aa6df) 42%, #f7f7fa);
 }
 body.theme-light .ops-health-card.is-active:not(.ops-health-ok):not(.ops-health-warn):not(.ops-health-bad) {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 7%, #f7f7fa);
 }
 body.theme-light .ops-health-card.is-active.ops-health-clickable:hover {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 52%, #f7f7fa);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6aa6df) 52%, #f7f7fa);
 }
 body.theme-material .ops-health-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #ebe4d9);
@@ -32172,8 +32180,9 @@ body.theme-material .ops-health-card.ops-health-clickable:hover {
   background: color-mix(in srgb, currentColor 10%, #ebe4d9);
 }
 body.theme-material .ops-health-card.ops-health-clickable:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #ebe4d9);
+  /* Opaque Material accent — Apple #007aff lagged --accent / Neon Ops health focus (#14 / P2; design-review Agent Ops). */
+  outline-color: color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 35%, #ebe4d9);
 }
 body.theme-material .ops-health-card.ops-health-ok {
   border-color: color-mix(in srgb, #34c759 28%, #ebe4d9);
@@ -32188,14 +32197,14 @@ body.theme-material .ops-health-card.ops-health-bad {
   background: color-mix(in srgb, #ff3b30 7%, #ebe4d9);
 }
 body.theme-material .ops-health-card.is-active {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 42%, #ebe4d9);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #b8a68b) 42%, #ebe4d9);
 }
 body.theme-material .ops-health-card.is-active:not(.ops-health-ok):not(.ops-health-warn):not(.ops-health-bad) {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 7%, #ebe4d9);
 }
 body.theme-material .ops-health-card.is-active.ops-health-clickable:hover {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 52%, #ebe4d9);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #b8a68b) 52%, #ebe4d9);
 }
 body.theme-architect .ops-health-kb-hint {
   color: color-mix(in srgb, #0c0c10 63%, #f1f1f1);
@@ -32214,8 +32223,9 @@ body.theme-architect .ops-health-card.ops-health-clickable:hover {
   background: color-mix(in srgb, currentColor 10%, #f1f1f1);
 }
 body.theme-architect .ops-health-card.ops-health-clickable:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #007aff) 55%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff lagged --accent / Neon Ops health focus (#14 / P2; design-review Agent Ops). */
+  outline-color: color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 35%, #f1f1f1);
 }
 body.theme-architect .ops-health-card.ops-health-ok {
   border-color: color-mix(in srgb, #34c759 28%, #f1f1f1);
@@ -32230,14 +32240,14 @@ body.theme-architect .ops-health-card.ops-health-bad {
   background: color-mix(in srgb, #ff3b30 7%, #f1f1f1);
 }
 body.theme-architect .ops-health-card.is-active {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 42%, #f1f1f1);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #232d41) 42%, #f1f1f1);
 }
 body.theme-architect .ops-health-card.is-active:not(.ops-health-ok):not(.ops-health-warn):not(.ops-health-bad) {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 7%, #f1f1f1);
 }
 body.theme-architect .ops-health-card.is-active.ops-health-clickable:hover {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 52%, #f1f1f1);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #232d41) 52%, #f1f1f1);
 }
 
 /*

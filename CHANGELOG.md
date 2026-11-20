@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2903] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect Agent Ops: badge focus, Updated-ago focus, and health-card focus/active now use theme accents instead of Apple blue fallbacks on cream paper.
+
+
 ## [0.1.2902] - 2026-11-20
 
 ### Fixed
