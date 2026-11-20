@@ -1,29 +1,23 @@
 # Morning surprise — 2026-11-20
 
-Overnight Track B (product) ratchet for Ralf.
+Overnight autoresearch (Track B) kept cream Agent Ops accent hygiene through **v0.1.2903**.
 
-## Shipped
-- **v0.1.2882–v0.1.2902** — Standing P2 #14 cream / CRT soft-state accent hygiene (Apple `#007aff` / `#0a84ff` → theme accents on paper). Digester open stayed empty; design-review stayed in grace (Mac TCC polish-without-capture); layout-daily already marked Data Poster for today.
+## Shipped tonight (keep)
 
-### Latest keep
-- **v0.1.2902** — Light / Material / Architect Agent Ops overview cards, selected rows, and attention glances: `#007aff` fallbacks → `#6aa6df` / `#b8a68b` / `#232d41`.
+- **v0.1.2903** — Light / Material / Architect Agent Ops: `ops-badge` focus, Updated-ago focus, and health-card focus/active use theme accents (`#6aa6df` / `#b8a68b` / `#232d41`) instead of Apple blue fallbacks on cream paper.
+- Earlier same night (already archived): v0.1.2883–2902 soft-state accent remaps (Send focus, weather, Perplexity, Disk Cleanup, Details, Monitors settings, filter Clear/chips/miss, collapsed glances, Ops kind/Clear/copy/overview/row/attention, and more).
 
-### Earlier tonight (highlights)
-- v0.1.2901 Ops kind-chip focus / Clear / copy
-- v0.1.2900 Rings / Disk / Perplexity filter-miss
-- v0.1.2899 Monitors / Processes / Logs filter-miss
-- v0.1.2898 AI Chat filter-miss
-- v0.1.2897 collapsed-glance soft-states
-- v0.1.2889 Monitors settings primary (+ layout-daily data-poster)
-- v0.1.2882–2885 AI Chat Send focus (cream → CRT cascade)
+## Tried / context
 
-## Tried / notes
-- Digester Slowest empty all night — fuel from standing backlog soft-states.
-- Design-review recommended Agent Ops screenshot still stale; capture blocked by Mac TCC → polish-without-capture path.
-- Send fill white-on-blue left intentional.
-- Dark / Neon / Futuristic layout-daily due next calendar day.
+- Digester open: empty (no Slowest / improve candidates).
+- Design-review: due=false (grace; Mac TCC → polish-without-capture).
+- Layout-daily: data-poster marked for 2026-11-20; Dark/Neon/Futuristic wait for next calendar day.
+- Debug.log: no product ERROR/panic clusters (content noise only).
 
-## Next
-- Leftover cream `#007aff` / `#0a84ff` soft-states if muddy
-- Dark layout-daily when the calendar rolls
-- Sibling / product fuel when digester opens
+## Next fuel
+
+- Swiss Ops badge / Updated-ago / health-card parity if muddy on paper.
+- Other cream `#007aff`/`#0a84ff` soft-state leftovers if muddy.
+- Send fill white-on-blue intentional (leave).
+- Dark layout-daily next calendar day; sibling/product fuel when digester opens.
+
