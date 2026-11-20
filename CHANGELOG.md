@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2901] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect design-review (Agent Ops kind chips / Clear / copy): cream `.ops-session-kind-chip` / agents/schedules/memory/runs kind-chip `:focus-visible` · `.is-active`, matching `.ops-*-filter-clear` resting · hover · `:focus-visible`, and `.ops-session-copy-chip` resting · hover · `:focus-visible` still used Apple `#0a84ff` / `#007aff` accent fallbacks after paper remaps (v0.1.2646–2647) while Swiss already sat on ink (v0.1.2875–2876) and specialty kind chips (Files/Deliveries/Core/Lite) already sat on theme accents. Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` mixed onto each theme paper (polish-without-capture while Mac TCC blocks capture; Live/On/Jobs/Discord/Instant greens, Off/Direct/Slow ambers, Fail reds, and `.is-just-saved` greens stay; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a keep-pNN Disk Cleanup clone).
+
 ## [0.1.2900] - 2026-11-20
 
 ### Fixed

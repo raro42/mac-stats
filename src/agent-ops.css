@@ -28622,6 +28622,7 @@ body.theme-architect .perplexity-filter-chip[data-perplexity-filter='snippet'].i
  * P2 #14 after light Disk Cleanup/Perplexity filter-chip remaps v0.1.2645.
  */
 /* OVERNIGHT v0.1.2646: light Ops kind-filter chip remaps */
+/* OVERNIGHT v0.1.2901: cream Ops kind-chip focus/is-active Apple #0a84ff → theme accents */
 
 body.theme-light .ops-session-kind-chip,
 body.theme-light .ops-agents-enabled-chip,
@@ -28645,16 +28646,18 @@ body.theme-light .ops-agents-enabled-chip:focus-visible,
 body.theme-light .ops-schedules-kind-chip:focus-visible,
 body.theme-light .ops-memory-kind-chip:focus-visible,
 body.theme-light .ops-runs-lane-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / cream Ops kind-chip focus (#6aa6df) (#14 / P2; design-review soft-states). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 20%, #f7f7fa);
 }
 body.theme-light .ops-session-kind-chip.is-active,
 body.theme-light .ops-agents-enabled-chip.is-active,
 body.theme-light .ops-schedules-kind-chip.is-active,
 body.theme-light .ops-memory-kind-chip.is-active,
 body.theme-light .ops-runs-lane-chip.is-active {
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / cream Ops kind-chip is-active (#6aa6df) (#14 / P2; design-review soft-states). */
   color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 32%, #f7f7fa);
 }
 
 body.theme-light .ops-session-kind-chip[data-ops-session-kind='live'].has-hits {
@@ -28804,16 +28807,18 @@ body.theme-material .ops-agents-enabled-chip:focus-visible,
 body.theme-material .ops-schedules-kind-chip:focus-visible,
 body.theme-material .ops-memory-kind-chip:focus-visible,
 body.theme-material .ops-runs-lane-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / cream Ops kind-chip focus (#b8a68b) (#14 / P2; design-review soft-states). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 20%, #ebe4d9);
 }
 body.theme-material .ops-session-kind-chip.is-active,
 body.theme-material .ops-agents-enabled-chip.is-active,
 body.theme-material .ops-schedules-kind-chip.is-active,
 body.theme-material .ops-memory-kind-chip.is-active,
 body.theme-material .ops-runs-lane-chip.is-active {
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / cream Ops kind-chip is-active (#b8a68b) (#14 / P2; design-review soft-states). */
   color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 32%, #ebe4d9);
 }
 
 body.theme-material .ops-session-kind-chip[data-ops-session-kind='live'].has-hits {
@@ -28963,16 +28968,18 @@ body.theme-architect .ops-agents-enabled-chip:focus-visible,
 body.theme-architect .ops-schedules-kind-chip:focus-visible,
 body.theme-architect .ops-memory-kind-chip:focus-visible,
 body.theme-architect .ops-runs-lane-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / cream Ops kind-chip focus (#232d41) (#14 / P2; design-review soft-states). */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 20%, #f1f1f1);
 }
 body.theme-architect .ops-session-kind-chip.is-active,
 body.theme-architect .ops-agents-enabled-chip.is-active,
 body.theme-architect .ops-schedules-kind-chip.is-active,
 body.theme-architect .ops-memory-kind-chip.is-active,
 body.theme-architect .ops-runs-lane-chip.is-active {
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / cream Ops kind-chip is-active (#232d41) (#14 / P2; design-review soft-states). */
   color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 32%, #f1f1f1);
 }
 
 body.theme-architect .ops-session-kind-chip[data-ops-session-kind='live'].has-hits {
@@ -29111,13 +29118,14 @@ body.theme-architect .ops-runs-lane-chip[data-ops-runs-lane='fail'].is-active {
  * light Ops kind-filter chip remaps v0.1.2646.
  */
 /* OVERNIGHT v0.1.2647: light Ops kind Clear/count/copy remaps */
+/* OVERNIGHT v0.1.2901: cream Ops kind Clear/copy Apple #007aff → theme accents */
 body.theme-light .ops-session-kind-filter-clear,
 body.theme-light .ops-agents-enabled-filter-clear,
 body.theme-light .ops-schedules-kind-filter-clear,
 body.theme-light .ops-memory-kind-filter-clear,
 body.theme-light .ops-runs-lane-filter-clear {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 32%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 32%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 10%, #f7f7fa);
   color: color-mix(in srgb, #0c0c10 81%, #f7f7fa);
 }
 body.theme-light .ops-session-kind-filter-clear:hover,
@@ -29126,15 +29134,15 @@ body.theme-light .ops-schedules-kind-filter-clear:hover,
 body.theme-light .ops-memory-kind-filter-clear:hover,
 body.theme-light .ops-runs-lane-filter-clear:hover {
   color: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 16%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 44%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 44%, #f7f7fa);
 }
 body.theme-light .ops-session-kind-filter-clear:focus-visible,
 body.theme-light .ops-agents-enabled-filter-clear:focus-visible,
 body.theme-light .ops-schedules-kind-filter-clear:focus-visible,
 body.theme-light .ops-memory-kind-filter-clear:focus-visible,
 body.theme-light .ops-runs-lane-filter-clear:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 20%, #f7f7fa);
 }
 body.theme-light .ops-session-kind-filter-clear.is-just-saved,
 body.theme-light .ops-agents-enabled-filter-clear.is-just-saved,
@@ -29161,15 +29169,15 @@ body.theme-light .ops-runs-lane-count.is-zero {
   color: color-mix(in srgb, #0c0c10 37%, #f7f7fa);
 }
 body.theme-light .ops-session-copy-chip {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f7f7fa);
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 28%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 8%, #f7f7fa);
 }
 body.theme-light .ops-session-copy-chip:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 14%, #f7f7fa);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #f7f7fa);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 14%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 42%, #f7f7fa);
 }
 body.theme-light .ops-session-copy-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 22%, #f7f7fa);
 }
 body.theme-light .ops-session-copy-chip.is-just-saved {
   border-color: color-mix(in srgb, #34c759 45%, #f7f7fa);
@@ -29180,8 +29188,8 @@ body.theme-material .ops-agents-enabled-filter-clear,
 body.theme-material .ops-schedules-kind-filter-clear,
 body.theme-material .ops-memory-kind-filter-clear,
 body.theme-material .ops-runs-lane-filter-clear {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 32%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 32%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 10%, #ebe4d9);
   color: color-mix(in srgb, #0c0c10 81%, #ebe4d9);
 }
 body.theme-material .ops-session-kind-filter-clear:hover,
@@ -29190,15 +29198,15 @@ body.theme-material .ops-schedules-kind-filter-clear:hover,
 body.theme-material .ops-memory-kind-filter-clear:hover,
 body.theme-material .ops-runs-lane-filter-clear:hover {
   color: color-mix(in srgb, #0c0c10 88%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 16%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 44%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 44%, #ebe4d9);
 }
 body.theme-material .ops-session-kind-filter-clear:focus-visible,
 body.theme-material .ops-agents-enabled-filter-clear:focus-visible,
 body.theme-material .ops-schedules-kind-filter-clear:focus-visible,
 body.theme-material .ops-memory-kind-filter-clear:focus-visible,
 body.theme-material .ops-runs-lane-filter-clear:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 20%, #ebe4d9);
 }
 body.theme-material .ops-session-kind-filter-clear.is-just-saved,
 body.theme-material .ops-agents-enabled-filter-clear.is-just-saved,
@@ -29225,15 +29233,15 @@ body.theme-material .ops-runs-lane-count.is-zero {
   color: color-mix(in srgb, #0c0c10 37%, #ebe4d9);
 }
 body.theme-material .ops-session-copy-chip {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ebe4d9);
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 28%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 8%, #ebe4d9);
 }
 body.theme-material .ops-session-copy-chip:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 14%, #ebe4d9);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #ebe4d9);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 14%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 42%, #ebe4d9);
 }
 body.theme-material .ops-session-copy-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 22%, #ebe4d9);
 }
 body.theme-material .ops-session-copy-chip.is-just-saved {
   border-color: color-mix(in srgb, #34c759 45%, #ebe4d9);
@@ -29244,8 +29252,8 @@ body.theme-architect .ops-agents-enabled-filter-clear,
 body.theme-architect .ops-schedules-kind-filter-clear,
 body.theme-architect .ops-memory-kind-filter-clear,
 body.theme-architect .ops-runs-lane-filter-clear {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 32%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 32%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 10%, #f1f1f1);
   color: color-mix(in srgb, #0c0c10 81%, #f1f1f1);
 }
 body.theme-architect .ops-session-kind-filter-clear:hover,
@@ -29254,15 +29262,15 @@ body.theme-architect .ops-schedules-kind-filter-clear:hover,
 body.theme-architect .ops-memory-kind-filter-clear:hover,
 body.theme-architect .ops-runs-lane-filter-clear:hover {
   color: color-mix(in srgb, #0c0c10 88%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 16%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 44%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 44%, #f1f1f1);
 }
 body.theme-architect .ops-session-kind-filter-clear:focus-visible,
 body.theme-architect .ops-agents-enabled-filter-clear:focus-visible,
 body.theme-architect .ops-schedules-kind-filter-clear:focus-visible,
 body.theme-architect .ops-memory-kind-filter-clear:focus-visible,
 body.theme-architect .ops-runs-lane-filter-clear:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 20%, #f1f1f1);
 }
 body.theme-architect .ops-session-kind-filter-clear.is-just-saved,
 body.theme-architect .ops-agents-enabled-filter-clear.is-just-saved,
@@ -29289,15 +29297,15 @@ body.theme-architect .ops-runs-lane-count.is-zero {
   color: color-mix(in srgb, #0c0c10 37%, #f1f1f1);
 }
 body.theme-architect .ops-session-copy-chip {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #f1f1f1);
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 28%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 8%, #f1f1f1);
 }
 body.theme-architect .ops-session-copy-chip:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 14%, #f1f1f1);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #f1f1f1);
+  background: color-mix(in srgb, var(--accent, #232d41) 14%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 42%, #f1f1f1);
 }
 body.theme-architect .ops-session-copy-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 22%, #f1f1f1);
 }
 body.theme-architect .ops-session-copy-chip.is-just-saved {
   border-color: color-mix(in srgb, #34c759 45%, #f1f1f1);
