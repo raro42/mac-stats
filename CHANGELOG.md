@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2895] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect design-review (Disk Cleanup / Perplexity filter chips): cream `.disk-cleanup-filter-chip` / `.disk-cleanup-scope-filter-chip` / `.perplexity-filter-chip` focus · active · Top still used Apple `#0a84ff` accent fallbacks after paper remaps (v0.1.2645) while section filter chips already sat on theme accents (v0.1.2894) and Swiss Disk/Perplexity chips already sat on ink. Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` mixed onto each theme paper (polish-without-capture while Mac TCC blocks capture; reclaim/big/clean/off/snippet status colors stay; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a keep-pNN Disk Cleanup clone).
+
 ## [0.1.2894] - 2026-11-20
 
 ### Fixed
