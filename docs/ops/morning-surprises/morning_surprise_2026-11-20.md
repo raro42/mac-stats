@@ -1,25 +1,23 @@
 # Morning surprise — 2026-11-20
 
-Overnight autoresearch (Track B) kept shipping cream soft-state accent hygiene while digester open stayed empty and Mac TCC blocked design-review screenshots.
+Overnight autoresearch kept shipping cream soft-state accent hygiene (Standing P2 #14). Digester stayed empty; design-review stayed in grace (Mac TCC — polish-without-capture); layout-daily already marked data-poster for the day.
 
-## Shipped tonight (keeps)
+## Shipped (keep)
 
-- **v0.1.2897** — Light / Material / Architect collapsed-glance focus · `is-active` (ollama/chat + Monitors / Disk Cleanup / Details / Agent Ops): Apple `#0a84ff` → `#6aa6df` / `#b8a68b` / `#232d41`.
-- **v0.1.2896** — cream AI Chat empty chips resting · hover · focus.
-- **v0.1.2895** — cream Disk Cleanup / Perplexity filter chips.
-- **v0.1.2894** — cream section filter chips (processes/logs/monitors/chat/rings).
-- **v0.1.2893** — cream section filter Clear.
-- Earlier same night: Monitors settings focus-within / jump-flash / scope selected / settings primary (through v0.1.2890–2892).
+- **v0.1.2898** — Light / Material / Architect AI Chat `.chat-filter-miss` shell · You/Assistant · CTA: Apple `#0a84ff` → theme accents (`#6aa6df` / `#b8a68b` / `#232d41`). Commit `e5b76e0c4`.
+- **v0.1.2897** — cream collapsed-glance focus / `is-active` (ollama/chat/monitors/disk/details/agent-ops) Apple → theme accents. Commit `85fe9d799`.
+- Earlier same night: **v0.1.2881–2896** cream/CRT soft-state accent cascade (Settings attention, Send focus, weather-card, Perplexity search, Disk Cleanup selected, Details option, Monitors settings primary, scope selected, focus-within, filter Clear/chips, chat-empty-chip, …).
 
-## Tried / skipped
+## Tried / context
 
-- Digester open: empty (no Slowest / Improve-task fuel).
-- Design-review capture: due=false grace — polish-without-capture (TCC).
-- Layout-daily: Data Poster already marked for 2026-11-20; Dark recommended next calendar day (at most one layout tick/day).
+- Digester open: empty (no Slowest / latency fuel).
+- Sibling harness: OpenClaw/Hermes ports noted; no port this tick (cream filter-miss was clearer user-facing win).
+- Quiet ticks: none required — nightly keep minimum satisfied many times over.
 
-## Next fuel
+## Next
 
-- Cream filter-miss `#0a84ff` leftovers if muddy.
-- Send fill white-on-blue intentional (leave).
-- Dark layout-daily next calendar day / Mac capture when TCC allows.
-- Sibling/product fuel when soft-state hygiene thins out.
+- Cream Monitors / Processes / Logs / Rings / Disk / Perplexity filter-miss `#0a84ff` leftovers if muddy.
+- Dark layout-daily when the calendar-day quota opens.
+- Mac capture when TCC allows (Agent Ops screenshot still stale).
+- Send fill white-on-blue stays intentional.
+
