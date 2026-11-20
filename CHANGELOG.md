@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2900] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect design-review (Rings / Disk Cleanup / Perplexity filter-miss): cream `.rings-filter-miss-cta`, `.disk-cleanup-filter-miss` / `.disk-cleanup-scope-filter-miss` · Clean/On empty · empty CTA, and `.perplexity-filter-miss` · Top/Snippet empty · empty CTA resting · hover · `:focus-visible` still used Apple `#0a84ff` accent fallbacks after paper remaps (v0.1.2668) while Swiss already sat on ink (v0.1.2867–2868) and cream Monitors/Processes/Logs filter-miss already sat on theme accents (v0.1.2899). Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` mixed onto each theme paper (polish-without-capture while Mac TCC blocks capture; reclaim/big/off empty stay soft green; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a keep-pNN Disk Cleanup clone).
+
 ## [0.1.2899] - 2026-11-20
 
 ### Fixed
