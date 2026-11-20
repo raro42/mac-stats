@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2892] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect / Swiss design-review (Monitors settings focus-within): cream `.monitor-settings-item:focus-within` still used Apple `#007aff` accent fallbacks after paper remaps while Data Poster / Dark / Neon / Futuristic already sat on theme accents (v0.1.2891); Swiss lacked a focus-within remap and inherited shared Apple `#007aff` on paper `#ffffff`. Fallback hygiene remaps onto Light `#6aa6df` / Material `#b8a68b` / Architect `#232d41` / Swiss ink `#121216` mixed onto each theme paper (polish-without-capture while Mac TCC blocks capture; Send fill stays white-on-blue intentional; Apple keeps shared blue; not a keep-pNN Disk Cleanup clone).
+
 ## [0.1.2891] - 2026-11-20
 
 ### Fixed

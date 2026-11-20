@@ -38554,11 +38554,13 @@ body.theme-architect .setting-toggle .toggle-label.is-judge-off {
  * Saved + soft-delete Saved + Ops hairline + Judge-off remaps v0.1.2721.
  */
 /* OVERNIGHT v0.1.2722: light Monitors settings focus-within + Disk Cleanup badge + Perplexity search-box button remaps */
+/* OVERNIGHT v0.1.2892: cream focus-within accent fallback #007aff→theme accents + Swiss focus-within parity */
 
 /* --- light (#f7f7fa) --- */
 body.theme-light .monitor-settings-item:focus-within {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f7f7fa);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, #f7f7fa);
+  /* Opaque Light accent — Apple #007aff lagged --accent / Data Poster monitors focus-within (#14 / P2; design-review Monitors; v0.1.2892). */
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 36%, #f7f7fa);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
 }
 body.theme-light #icon-disk-cleanup .disk-cleanup-badge {
   box-shadow: 0 0 0 2px color-mix(in srgb, #000 12%, #f7f7fa);
@@ -38570,8 +38572,9 @@ body.theme-light .perplexity-search-box button {
 
 /* --- material (#ebe4d9) --- */
 body.theme-material .monitor-settings-item:focus-within {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #ebe4d9);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, #ebe4d9);
+  /* Opaque Material accent — Apple #007aff lagged --accent / cream monitors focus-within (#14 / P2; design-review Monitors; v0.1.2892). */
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 36%, #ebe4d9);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
 }
 body.theme-material #icon-disk-cleanup .disk-cleanup-badge {
   box-shadow: 0 0 0 2px color-mix(in srgb, #000 12%, #ebe4d9);
@@ -38583,8 +38586,9 @@ body.theme-material .perplexity-search-box button {
 
 /* --- architect (#f1f1f1) --- */
 body.theme-architect .monitor-settings-item:focus-within {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #f1f1f1);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, #f1f1f1);
+  /* Opaque Architect accent — Apple #007aff lagged --accent / cream monitors focus-within (#14 / P2; design-review Monitors; v0.1.2892). */
+  border-color: color-mix(in srgb, var(--accent, #232d41) 36%, #f1f1f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
 }
 body.theme-architect #icon-disk-cleanup .disk-cleanup-badge {
   box-shadow: 0 0 0 2px color-mix(in srgb, #000 12%, #f1f1f1);
@@ -38592,6 +38596,13 @@ body.theme-architect #icon-disk-cleanup .disk-cleanup-badge {
 body.theme-architect .perplexity-search-box button {
   border-color: color-mix(in srgb, currentColor 18%, #f1f1f1);
   background: color-mix(in srgb, currentColor 8%, #f1f1f1);
+}
+
+/* --- swiss (#ffffff) — missing focus-within remap inherited shared Apple #007aff --- */
+body.theme-swiss-minimalistic .monitor-settings-item:focus-within {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream monitors focus-within (#14 / P2; design-review Monitors; v0.1.2892). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 36%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
 }
 
 /*
