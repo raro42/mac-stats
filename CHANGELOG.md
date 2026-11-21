@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2920] - 2026-11-21
+
+### Fixed
+- Ring Hot / Ok / Fair washes now cover Dark/Neon `metric-tile`, Data Poster `poster-tile`, and Swiss `tile` (not only `.metric-card`). Those themes were missing the amber/green ring wash while the CPU window still toggled the classes.
+
 ## [0.1.2919] - 2026-11-21
 
 ### Fixed

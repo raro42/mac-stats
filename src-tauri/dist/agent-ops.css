@@ -3848,34 +3848,71 @@ body.theme-futuristic .lpm-info.is-on.is-busy .lpm-value {
 
 /* Hot ring — static wash only (KISS). Infinite filter/box-shadow pulses kept WKWebView hot. */
 /* Opaque washes — glass alpha + ring shadows stay in Graphics and Media (#14). */
-.metric-card.is-hot {
+/* OVERNIGHT v0.1.2920: Hot/Ok/Fair shell parity for metric-box/tile/dial/tile/poster-tile
+ * (Dark/Neon metric-tile, Data Poster poster-tile, Swiss tile — cpu.js closestRingMetricCard). */
+.metric-card.is-hot,
+.metric-box.is-hot,
+.metric-tile.is-hot,
+.dial.is-hot,
+.tile.is-hot,
+.poster-tile.is-hot {
   background-color: color-mix(in srgb, #ff9500 7%, #ffffff);
   box-shadow: none;
   border-radius: 12px;
 }
 
 /* CPU · GPU · FREQ · Temp rings — calm below hot (Temp Nominal / Details is-ok parity). */
-.metric-card.is-ok:not(.is-hot):not(.is-fair) {
+.metric-card.is-ok:not(.is-hot):not(.is-fair),
+.metric-box.is-ok:not(.is-hot):not(.is-fair),
+.metric-tile.is-ok:not(.is-hot):not(.is-fair),
+.dial.is-ok:not(.is-hot):not(.is-fair),
+.tile.is-ok:not(.is-hot):not(.is-fair),
+.poster-tile.is-ok:not(.is-hot):not(.is-fair) {
   background-color: color-mix(in srgb, #34c759 7%, #ffffff);
   box-shadow: none;
   border-radius: 12px;
 }
 
 .metric-card.is-ok:not(.is-hot):not(.is-fair) .metric-subtext,
-.metric-card.is-ok:not(.is-hot):not(.is-fair) [id$="-subtext"] {
+.metric-box.is-ok:not(.is-hot):not(.is-fair) .metric-subtext,
+.metric-tile.is-ok:not(.is-hot):not(.is-fair) .metric-subtext,
+.dial.is-ok:not(.is-hot):not(.is-fair) .metric-subtext,
+.tile.is-ok:not(.is-hot):not(.is-fair) .metric-subtext,
+.poster-tile.is-ok:not(.is-hot):not(.is-fair) .metric-subtext,
+.metric-card.is-ok:not(.is-hot):not(.is-fair) [id$="-subtext"],
+.metric-box.is-ok:not(.is-hot):not(.is-fair) [id$="-subtext"],
+.metric-tile.is-ok:not(.is-hot):not(.is-fair) [id$="-subtext"],
+.dial.is-ok:not(.is-hot):not(.is-fair) [id$="-subtext"],
+.tile.is-ok:not(.is-hot):not(.is-fair) [id$="-subtext"],
+.poster-tile.is-ok:not(.is-hot):not(.is-fair) [id$="-subtext"] {
   color: color-mix(in srgb, #34c759 68%, var(--text, currentColor));
   font-weight: 650;
 }
 
 /* Temp ring — Fair thermal (power-strip Heat parity); soft static wash, no pulse. */
-.metric-card.is-fair:not(.is-hot) {
+.metric-card.is-fair:not(.is-hot),
+.metric-box.is-fair:not(.is-hot),
+.metric-tile.is-fair:not(.is-hot),
+.dial.is-fair:not(.is-hot),
+.tile.is-fair:not(.is-hot),
+.poster-tile.is-fair:not(.is-hot) {
   background-color: color-mix(in srgb, #ff9500 7%, #ffffff);
   box-shadow: none;
   border-radius: 12px;
 }
 
 .metric-card.is-fair:not(.is-hot) .metric-subtext,
-.metric-card.is-fair:not(.is-hot) [id$="-subtext"] {
+.metric-box.is-fair:not(.is-hot) .metric-subtext,
+.metric-tile.is-fair:not(.is-hot) .metric-subtext,
+.dial.is-fair:not(.is-hot) .metric-subtext,
+.tile.is-fair:not(.is-hot) .metric-subtext,
+.poster-tile.is-fair:not(.is-hot) .metric-subtext,
+.metric-card.is-fair:not(.is-hot) [id$="-subtext"],
+.metric-box.is-fair:not(.is-hot) [id$="-subtext"],
+.metric-tile.is-fair:not(.is-hot) [id$="-subtext"],
+.dial.is-fair:not(.is-hot) [id$="-subtext"],
+.tile.is-fair:not(.is-hot) [id$="-subtext"],
+.poster-tile.is-fair:not(.is-hot) [id$="-subtext"] {
   color: color-mix(in srgb, #ff9500 72%, var(--text, currentColor));
   font-weight: 650;
 }
@@ -16855,15 +16892,30 @@ body.theme-data-poster .history-chart-container.is-fair:not(.is-hot) {
  * #0b0b10. History-chart status opaque in v0.1.2219. Design-review fuel
  * (feature-cpu-metrics) + standing P2 #14 + layout-daily Data Poster.
  */
-body.theme-data-poster .metric-card.is-hot {
+body.theme-data-poster .metric-card.is-hot,
+body.theme-data-poster .metric-box.is-hot,
+body.theme-data-poster .metric-tile.is-hot,
+body.theme-data-poster .dial.is-hot,
+body.theme-data-poster .tile.is-hot,
+body.theme-data-poster .poster-tile.is-hot {
   background-color: color-mix(in srgb, #ff9500 7%, #0b0b10);
   box-shadow: none;
 }
-body.theme-data-poster .metric-card.is-ok:not(.is-hot):not(.is-fair) {
+body.theme-data-poster .metric-card.is-ok:not(.is-hot):not(.is-fair),
+body.theme-data-poster .metric-box.is-ok:not(.is-hot):not(.is-fair),
+body.theme-data-poster .metric-tile.is-ok:not(.is-hot):not(.is-fair),
+body.theme-data-poster .dial.is-ok:not(.is-hot):not(.is-fair),
+body.theme-data-poster .tile.is-ok:not(.is-hot):not(.is-fair),
+body.theme-data-poster .poster-tile.is-ok:not(.is-hot):not(.is-fair) {
   background-color: color-mix(in srgb, #34c759 7%, #0b0b10);
   box-shadow: none;
 }
-body.theme-data-poster .metric-card.is-fair:not(.is-hot) {
+body.theme-data-poster .metric-card.is-fair:not(.is-hot),
+body.theme-data-poster .metric-box.is-fair:not(.is-hot),
+body.theme-data-poster .metric-tile.is-fair:not(.is-hot),
+body.theme-data-poster .dial.is-fair:not(.is-hot),
+body.theme-data-poster .tile.is-fair:not(.is-hot),
+body.theme-data-poster .poster-tile.is-fair:not(.is-hot) {
   background-color: color-mix(in srgb, #ff9500 7%, #0b0b10);
   box-shadow: none;
 }
@@ -24561,42 +24613,87 @@ body.theme-neon .ops-runs-lane-filter-clear.is-just-saved {
  * feature-cpu-metrics / feature-agent-ops adjacent (polish-without-capture
  * grace; feature-agent-ops capture still TCC-blocked).
  */
-/* OVERNIGHT v0.1.2461: metric-card + history Hot/Ok/Fair CRT */
-body.theme-dark .metric-card.is-hot {
+/* OVERNIGHT v0.1.2461 + v0.1.2920: metric-card/tile/poster-tile + history Hot/Ok/Fair CRT */
+body.theme-dark .metric-card.is-hot,
+body.theme-dark .metric-box.is-hot,
+body.theme-dark .metric-tile.is-hot,
+body.theme-dark .dial.is-hot,
+body.theme-dark .tile.is-hot,
+body.theme-dark .poster-tile.is-hot {
   background-color: color-mix(in srgb, #ff9500 7%, #0a0a0a);
   box-shadow: none;
 }
-body.theme-neon .metric-card.is-hot {
+body.theme-neon .metric-card.is-hot,
+body.theme-neon .metric-box.is-hot,
+body.theme-neon .metric-tile.is-hot,
+body.theme-neon .dial.is-hot,
+body.theme-neon .tile.is-hot,
+body.theme-neon .poster-tile.is-hot {
   background-color: color-mix(in srgb, #ff9500 7%, #08120c);
   box-shadow: none;
 }
-body.theme-futuristic .metric-card.is-hot {
+body.theme-futuristic .metric-card.is-hot,
+body.theme-futuristic .metric-box.is-hot,
+body.theme-futuristic .metric-tile.is-hot,
+body.theme-futuristic .dial.is-hot,
+body.theme-futuristic .tile.is-hot,
+body.theme-futuristic .poster-tile.is-hot {
   background-color: color-mix(in srgb, #ff9500 7%, #0b0b10);
   box-shadow: none;
 }
 
-body.theme-dark .metric-card.is-ok:not(.is-hot):not(.is-fair) {
+body.theme-dark .metric-card.is-ok:not(.is-hot):not(.is-fair),
+body.theme-dark .metric-box.is-ok:not(.is-hot):not(.is-fair),
+body.theme-dark .metric-tile.is-ok:not(.is-hot):not(.is-fair),
+body.theme-dark .dial.is-ok:not(.is-hot):not(.is-fair),
+body.theme-dark .tile.is-ok:not(.is-hot):not(.is-fair),
+body.theme-dark .poster-tile.is-ok:not(.is-hot):not(.is-fair) {
   background-color: color-mix(in srgb, #34c759 7%, #0a0a0a);
   box-shadow: none;
 }
-body.theme-neon .metric-card.is-ok:not(.is-hot):not(.is-fair) {
+body.theme-neon .metric-card.is-ok:not(.is-hot):not(.is-fair),
+body.theme-neon .metric-box.is-ok:not(.is-hot):not(.is-fair),
+body.theme-neon .metric-tile.is-ok:not(.is-hot):not(.is-fair),
+body.theme-neon .dial.is-ok:not(.is-hot):not(.is-fair),
+body.theme-neon .tile.is-ok:not(.is-hot):not(.is-fair),
+body.theme-neon .poster-tile.is-ok:not(.is-hot):not(.is-fair) {
   background-color: color-mix(in srgb, #34c759 7%, #08120c);
   box-shadow: none;
 }
-body.theme-futuristic .metric-card.is-ok:not(.is-hot):not(.is-fair) {
+body.theme-futuristic .metric-card.is-ok:not(.is-hot):not(.is-fair),
+body.theme-futuristic .metric-box.is-ok:not(.is-hot):not(.is-fair),
+body.theme-futuristic .metric-tile.is-ok:not(.is-hot):not(.is-fair),
+body.theme-futuristic .dial.is-ok:not(.is-hot):not(.is-fair),
+body.theme-futuristic .tile.is-ok:not(.is-hot):not(.is-fair),
+body.theme-futuristic .poster-tile.is-ok:not(.is-hot):not(.is-fair) {
   background-color: color-mix(in srgb, #34c759 7%, #0b0b10);
   box-shadow: none;
 }
 
-body.theme-dark .metric-card.is-fair:not(.is-hot) {
+body.theme-dark .metric-card.is-fair:not(.is-hot),
+body.theme-dark .metric-box.is-fair:not(.is-hot),
+body.theme-dark .metric-tile.is-fair:not(.is-hot),
+body.theme-dark .dial.is-fair:not(.is-hot),
+body.theme-dark .tile.is-fair:not(.is-hot),
+body.theme-dark .poster-tile.is-fair:not(.is-hot) {
   background-color: color-mix(in srgb, #ff9500 7%, #0a0a0a);
   box-shadow: none;
 }
-body.theme-neon .metric-card.is-fair:not(.is-hot) {
+body.theme-neon .metric-card.is-fair:not(.is-hot),
+body.theme-neon .metric-box.is-fair:not(.is-hot),
+body.theme-neon .metric-tile.is-fair:not(.is-hot),
+body.theme-neon .dial.is-fair:not(.is-hot),
+body.theme-neon .tile.is-fair:not(.is-hot),
+body.theme-neon .poster-tile.is-fair:not(.is-hot) {
   background-color: color-mix(in srgb, #ff9500 7%, #08120c);
   box-shadow: none;
 }
-body.theme-futuristic .metric-card.is-fair:not(.is-hot) {
+body.theme-futuristic .metric-card.is-fair:not(.is-hot),
+body.theme-futuristic .metric-box.is-fair:not(.is-hot),
+body.theme-futuristic .metric-tile.is-fair:not(.is-hot),
+body.theme-futuristic .dial.is-fair:not(.is-hot),
+body.theme-futuristic .tile.is-fair:not(.is-hot),
+body.theme-futuristic .poster-tile.is-fair:not(.is-hot) {
   background-color: color-mix(in srgb, #ff9500 7%, #0b0b10);
   box-shadow: none;
 }
@@ -35724,18 +35821,33 @@ body.theme-architect .lpm-info.is-on.is-busy .lpm-value {
  * match light shells (Swiss / Apple keep shared `#ffffff`). Standing P2 #14
  * after light metrics kb-hint + LPM busy remaps v0.1.2684.
  */
-/* OVERNIGHT v0.1.2685: light metric-card + history Hot/Ok/Fair remaps */
+/* OVERNIGHT v0.1.2685 + v0.1.2920: light metric-card/tile shells + history Hot/Ok/Fair remaps */
 
 /* --- light (#f7f7fa) --- */
-body.theme-light .metric-card.is-hot {
+body.theme-light .metric-card.is-hot,
+body.theme-light .metric-box.is-hot,
+body.theme-light .metric-tile.is-hot,
+body.theme-light .dial.is-hot,
+body.theme-light .tile.is-hot,
+body.theme-light .poster-tile.is-hot {
   background-color: color-mix(in srgb, #ff9500 7%, #f7f7fa);
   box-shadow: none;
 }
-body.theme-light .metric-card.is-ok:not(.is-hot):not(.is-fair) {
+body.theme-light .metric-card.is-ok:not(.is-hot):not(.is-fair),
+body.theme-light .metric-box.is-ok:not(.is-hot):not(.is-fair),
+body.theme-light .metric-tile.is-ok:not(.is-hot):not(.is-fair),
+body.theme-light .dial.is-ok:not(.is-hot):not(.is-fair),
+body.theme-light .tile.is-ok:not(.is-hot):not(.is-fair),
+body.theme-light .poster-tile.is-ok:not(.is-hot):not(.is-fair) {
   background-color: color-mix(in srgb, #34c759 7%, #f7f7fa);
   box-shadow: none;
 }
-body.theme-light .metric-card.is-fair:not(.is-hot) {
+body.theme-light .metric-card.is-fair:not(.is-hot),
+body.theme-light .metric-box.is-fair:not(.is-hot),
+body.theme-light .metric-tile.is-fair:not(.is-hot),
+body.theme-light .dial.is-fair:not(.is-hot),
+body.theme-light .tile.is-fair:not(.is-hot),
+body.theme-light .poster-tile.is-fair:not(.is-hot) {
   background-color: color-mix(in srgb, #ff9500 7%, #f7f7fa);
   box-shadow: none;
 }
@@ -35753,15 +35865,30 @@ body.theme-light .history-chart-container.is-fair:not(.is-hot) {
 }
 
 /* --- material (#ebe4d9) --- */
-body.theme-material .metric-card.is-hot {
+body.theme-material .metric-card.is-hot,
+body.theme-material .metric-box.is-hot,
+body.theme-material .metric-tile.is-hot,
+body.theme-material .dial.is-hot,
+body.theme-material .tile.is-hot,
+body.theme-material .poster-tile.is-hot {
   background-color: color-mix(in srgb, #ff9500 7%, #ebe4d9);
   box-shadow: none;
 }
-body.theme-material .metric-card.is-ok:not(.is-hot):not(.is-fair) {
+body.theme-material .metric-card.is-ok:not(.is-hot):not(.is-fair),
+body.theme-material .metric-box.is-ok:not(.is-hot):not(.is-fair),
+body.theme-material .metric-tile.is-ok:not(.is-hot):not(.is-fair),
+body.theme-material .dial.is-ok:not(.is-hot):not(.is-fair),
+body.theme-material .tile.is-ok:not(.is-hot):not(.is-fair),
+body.theme-material .poster-tile.is-ok:not(.is-hot):not(.is-fair) {
   background-color: color-mix(in srgb, #34c759 7%, #ebe4d9);
   box-shadow: none;
 }
-body.theme-material .metric-card.is-fair:not(.is-hot) {
+body.theme-material .metric-card.is-fair:not(.is-hot),
+body.theme-material .metric-box.is-fair:not(.is-hot),
+body.theme-material .metric-tile.is-fair:not(.is-hot),
+body.theme-material .dial.is-fair:not(.is-hot),
+body.theme-material .tile.is-fair:not(.is-hot),
+body.theme-material .poster-tile.is-fair:not(.is-hot) {
   background-color: color-mix(in srgb, #ff9500 7%, #ebe4d9);
   box-shadow: none;
 }
@@ -35779,15 +35906,30 @@ body.theme-material .history-chart-container.is-fair:not(.is-hot) {
 }
 
 /* --- architect (#f1f1f1) --- */
-body.theme-architect .metric-card.is-hot {
+body.theme-architect .metric-card.is-hot,
+body.theme-architect .metric-box.is-hot,
+body.theme-architect .metric-tile.is-hot,
+body.theme-architect .dial.is-hot,
+body.theme-architect .tile.is-hot,
+body.theme-architect .poster-tile.is-hot {
   background-color: color-mix(in srgb, #ff9500 7%, #f1f1f1);
   box-shadow: none;
 }
-body.theme-architect .metric-card.is-ok:not(.is-hot):not(.is-fair) {
+body.theme-architect .metric-card.is-ok:not(.is-hot):not(.is-fair),
+body.theme-architect .metric-box.is-ok:not(.is-hot):not(.is-fair),
+body.theme-architect .metric-tile.is-ok:not(.is-hot):not(.is-fair),
+body.theme-architect .dial.is-ok:not(.is-hot):not(.is-fair),
+body.theme-architect .tile.is-ok:not(.is-hot):not(.is-fair),
+body.theme-architect .poster-tile.is-ok:not(.is-hot):not(.is-fair) {
   background-color: color-mix(in srgb, #34c759 7%, #f1f1f1);
   box-shadow: none;
 }
-body.theme-architect .metric-card.is-fair:not(.is-hot) {
+body.theme-architect .metric-card.is-fair:not(.is-hot),
+body.theme-architect .metric-box.is-fair:not(.is-hot),
+body.theme-architect .metric-tile.is-fair:not(.is-hot),
+body.theme-architect .dial.is-fair:not(.is-hot),
+body.theme-architect .tile.is-fair:not(.is-hot),
+body.theme-architect .poster-tile.is-fair:not(.is-hot) {
   background-color: color-mix(in srgb, #ff9500 7%, #f1f1f1);
   box-shadow: none;
 }
