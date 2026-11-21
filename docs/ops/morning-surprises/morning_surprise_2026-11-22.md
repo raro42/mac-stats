@@ -3,27 +3,16 @@
 Overnight window 2026-11-21 20:00 → 2026-11-22 06:00 (local).
 
 ## Shipped
-
-- **v0.1.2926** — Instant P-core / E-core chips accept `/p-core` · `/e-core` and view/see/open/list NL (`view p core`, `open e core`, …). Bare `/freq` / `view freq` still open the combined Freq ring.
-- **v0.1.2925** — Instant Power watts chip accepts `/watts` · `/power-draw` and view/see/show me/open/list NL (`view watts`, `open power draw`, …). Bare `/power` / `view power` still open the full power strip.
-- **v0.1.2924** — Instant Load 5m / 15m chips accept `/load-5m` · `/load-15m` and view/see/show me/open/list NL (`view load 5`, `open load 15m`, …). Bare `view load` / `/load` still open full Details.
-- **v0.1.2923** — Instant `load 1` / `1-minute load` / `/load-1m` → focused Load 1m chip (same shape as `load 5` / `load 15`); bare `/load` stays Details.
-- **v0.1.2922** — Having-fun idle Discord send / non-timeout failure WARNs share the 5-minute gate with Ollama/send timeouts (extra → DEBUG).
-- **v0.1.2921** — Instant RAM ring (`ram ring` / `/ram-ring` / memory gauge); strip `/ram` stays power-strip.
-- **v0.1.2920** — Ring Hot / Ok / Fair washes cover Dark/Neon `metric-tile`, Data Poster `poster-tile`, Swiss `tile`.
-- **v0.1.2918–2919** — CRT Send fill theme accents; GPU·Temp·Freq ring jump-flash tile parity.
+- **v0.1.2927** — Load 1m `view load 1` · `open load 1m` · `/load1` · `/load1m` (parity with Load 5m/15m view/open); bare `view load` stays Details.
+- **v0.1.2926** — P-core / E-core `/p-core` · `/e-core` + view/open NL; bare `/freq` stays combined Freq ring.
+- **v0.1.2925** — Power watts `/watts` · `/power-draw` + view/open NL; bare `/power` stays full strip.
+- **v0.1.2924** — Load 5m/15m slash + view/open NL.
+- **v0.1.2923** — `load 1` / `1-minute load` → focused Load 1m chip.
+- Earlier in-window: RAM ring instant, ring Hot/Ok/Fair tile washes, idle Discord WARN gate, soft-state accent remaps.
 
 ## Tried / context
+- Digester empty all ticks; design-review grace (Mac TCC); layout-daily data-poster marked (Dark next calendar day).
+- Cream/Swiss Send fill white-on-blue left intentional.
 
-- Digester open empty all evening.
-- Design-review due=false (grace; Mac TCC polish-without-capture).
-- Layout-daily data-poster marked; Dark due next calendar day.
-- Soft-state Apple-blue remaps largely exhausted; cream/Swiss Send fill stays white-on-blue on purpose.
-
-## Next fuel
-
-- Cream/Swiss Send fill white-on-blue intentional (leave unless product asks).
-- Dark layout-daily when the day quota opens.
-- Sibling / product fuel (other strip/ring slash gaps if muddy).
-
-Generated: 2026-11-21T22:25:00+01:00
+## Fitness
+Operator instant chips keep gaining slash + view/open parity without stealing full panels.
