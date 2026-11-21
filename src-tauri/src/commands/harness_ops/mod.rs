@@ -160,4 +160,51 @@ mod tests {
         let full = try_operator_instant_reply("view load").unwrap();
         assert!(full.contains("**Details**"), "got: {full}");
     }
+
+    #[test]
+    fn power_watts_slash_and_view_open_do_not_steal_full_strip() {
+        // Slash + view/open NL → focused Power watts chip (Bat `/battery` shape).
+        assert_eq!(parse_strip_chip_ask("/watts"), Some(StripChipAsk::Power));
+        assert_eq!(
+            parse_strip_chip_ask("/power-draw"),
+            Some(StripChipAsk::Power)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("view watts"),
+            Some(StripChipAsk::Power)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("open power draw"),
+            Some(StripChipAsk::Power)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("show me the watts"),
+            Some(StripChipAsk::Power)
+        );
+        // Bare /power · view power · power stay the full strip.
+        assert!(parse_strip_chip_ask("/power").is_none());
+        assert!(parse_strip_chip_ask("view power").is_none());
+        assert!(parse_strip_chip_ask("power").is_none());
+        assert!(looks_like_strip_request("/power"));
+        assert!(looks_like_strip_request("view power"));
+        assert!(!looks_like_strip_request("/watts"));
+        assert!(!looks_like_strip_request("view watts"));
+        let watts = try_operator_instant_reply("/watts").unwrap();
+        assert!(watts.contains("**Power**"), "got: {watts}");
+        assert!(
+            !watts.contains("**Power strip**"),
+            "/watts must not expand full strip: {watts}"
+        );
+        let open = try_operator_instant_reply("open power draw").unwrap();
+        assert!(open.contains("**Power**"), "got: {open}");
+        assert!(
+            !open.contains("**Power strip**"),
+            "open power draw must not expand full strip: {open}"
+        );
+        let full = try_operator_instant_reply("/power").unwrap();
+        assert!(
+            full.contains("**Power strip**"),
+            "got: {full}"
+        );
+    }
 }

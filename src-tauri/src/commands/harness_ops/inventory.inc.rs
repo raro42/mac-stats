@@ -3938,7 +3938,7 @@ pub fn format_strip_gateway(filter: StripListFilter) -> String {
 }
 
 
-/// Focused power-strip chip asks (`/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime`) — not full `/strip`.
+/// Focused power-strip chip asks (`/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `/watts`) — not full `/strip`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StripChipAsk {
     Battery,
@@ -3947,15 +3947,15 @@ pub enum StripChipAsk {
     Ram,
     Ssd,
     Uptime,
-    /// Combined CPU+GPU watts. Not `/power` (full strip) and not Low Power Mode.
+    /// Combined CPU+GPU watts (`/watts` · `/power-draw`). Not `/power` (full strip) and not Low Power Mode.
     Power,
 }
 
 
-/// Parse `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` (and short NL). None when not a chip ask.
+/// Parse `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `/watts` (and short NL). None when not a chip ask.
 /// View/see/show me/open/list-the NL (v0.1.1042). Exact `open battery` / `open the battery` only
-/// (same for heat / lpm / ram / ssd / uptime). After normalize strips `show me` / `show`, prefer
-/// `the battery` etc. so `show me the battery` still matches. Does not steal `/strip`, `/disk`
+/// (same for heat / lpm / ram / ssd / uptime / watts / power draw). After normalize strips `show me` / `show`, prefer
+/// `the battery` etc. so `show me the battery` still matches. Does not steal `/strip`, `/power`, `/disk`
 /// Disk Cleanup (`open disk`), `/details`, or path/size/age.
 pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
     let n = normalize_operator_command(content);
@@ -4344,10 +4344,14 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
     ) {
         return Some(StripChipAsk::Uptime);
     }
-    // Power watts — not `/power` (full strip) and not Low Power Mode.
+    // Power watts — not `/power` / bare `power` / `view power` (full strip) and not Low Power Mode.
+    // Slash + view/open NL (`/watts` · `/power-draw`) match Bat `/battery` shape; bare `/power` stays strip.
     if matches!(
         n.as_str(),
-        "how much power"
+        "/watts"
+            | "/power-draw"
+            | "/powerdraw"
+            | "how much power"
             | "how much power is used"
             | "how much power used"
             | "power draw"
@@ -4368,6 +4372,30 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
             | "the watts"
             | "cpu power"
             | "gpu power"
+            | "show watts"
+            | "show the watts"
+            | "show me watts"
+            | "show me the watts"
+            | "show power draw"
+            | "show the power draw"
+            | "show me power draw"
+            | "show me the power draw"
+            | "list watts"
+            | "list the watts"
+            | "list power draw"
+            | "list the power draw"
+            | "view watts"
+            | "view the watts"
+            | "view power draw"
+            | "view the power draw"
+            | "see watts"
+            | "see the watts"
+            | "see power draw"
+            | "see the power draw"
+            | "open watts"
+            | "open the watts"
+            | "open power draw"
+            | "open the power draw"
     ) {
         return Some(StripChipAsk::Power);
     }
@@ -4375,7 +4403,7 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
 }
 
 
-/// True for focused Bat · Heat · LPM · RAM · SSD · Up chip asks (power-strip parity; not full `/strip`).
+/// True for focused Bat · Heat · LPM · RAM · SSD · Up · Power-watts chip asks (power-strip parity; not full `/strip`).
 pub fn looks_like_strip_chip_request(content: &str) -> bool {
     parse_strip_chip_ask(content).is_some()
 }

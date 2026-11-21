@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2925] - 2026-11-21
+
+### Added
+- Instant Power watts chip accepts `/watts` · `/power-draw` and view/see/show me/open/list NL (`view watts`, `open power draw`, …). Bare `/power` / `view power` still open the full power strip.
+
 ## [0.1.2924] - 2026-11-21
 
 ### Added
