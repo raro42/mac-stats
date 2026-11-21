@@ -276,6 +276,42 @@ mod tests {
     }
 
     #[test]
+    fn ssd_storage_slash_and_view_open_do_not_steal_disk_cleanup() {
+        // `/storage` · view/open storage → focused SSD chip (watts `/watts` parity).
+        // Bare open disk / view disk stay Disk Cleanup.
+        assert_eq!(parse_strip_chip_ask("/storage"), Some(StripChipAsk::Ssd));
+        assert_eq!(parse_strip_chip_ask("storage"), Some(StripChipAsk::Ssd));
+        assert_eq!(
+            parse_strip_chip_ask("view storage"),
+            Some(StripChipAsk::Ssd)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("open the storage"),
+            Some(StripChipAsk::Ssd)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("show me the storage"),
+            Some(StripChipAsk::Ssd)
+        );
+        assert_eq!(parse_strip_chip_ask("/ssd"), Some(StripChipAsk::Ssd));
+        assert!(parse_strip_chip_ask("view disk").is_none());
+        assert!(parse_strip_chip_ask("open disk").is_none());
+        assert!(looks_like_disk_cleanup_request("view disk"));
+        assert!(looks_like_disk_cleanup_request("open disk"));
+        assert!(!looks_like_disk_cleanup_request("/storage"));
+        assert!(!looks_like_disk_cleanup_request("view storage"));
+        let storage = try_operator_instant_reply("/storage").unwrap();
+        assert!(storage.contains("**SSD**"), "got: {storage}");
+        let viewed = try_operator_instant_reply("view storage").unwrap();
+        assert!(viewed.contains("**SSD**"), "got: {viewed}");
+        let cleanup = try_operator_instant_reply("view disk").unwrap();
+        assert!(
+            cleanup.to_lowercase().contains("disk") || cleanup.contains("Cleanup") || cleanup.contains("cleanup") || cleanup.contains("**Disk"),
+            "view disk should stay Disk Cleanup: {cleanup}"
+        );
+    }
+
+    #[test]
     fn p_e_core_slash_and_view_open_do_not_steal_freq_ring() {
         // Slash + view/open NL → focused P/E-core chips (Load `/load-5m` parity).
         assert_eq!(

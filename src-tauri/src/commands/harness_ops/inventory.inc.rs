@@ -4190,7 +4190,7 @@ pub fn format_strip_gateway(filter: StripListFilter) -> String {
 }
 
 
-/// Focused power-strip chip asks (`/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `/watts`) — not full `/strip`.
+/// Focused power-strip chip asks (`/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/storage` · `/uptime` · `/watts`) — not full `/strip`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StripChipAsk {
     Battery,
@@ -4204,7 +4204,7 @@ pub enum StripChipAsk {
 }
 
 
-/// Parse `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `/watts` (and short NL). None when not a chip ask.
+/// Parse `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/storage` · `/uptime` · `/watts` (and short NL). None when not a chip ask.
 /// View/see/show me/open/list-the NL (v0.1.1042). Exact `open battery` / `open the battery` only
 /// (same for heat / lpm / ram / ssd / uptime / watts / power draw). After normalize strips `show me` / `show`, prefer
 /// `the battery` etc. so `show me the battery` still matches. Does not steal `/strip`, `/power`, `/disk`
@@ -4500,11 +4500,16 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
         return Some(StripChipAsk::Ram);
     }
     // SSD chip — not `/disk` Disk Cleanup (cleanup/reclaim / open disk rejected above).
+    // Slash + view/open NL (`/storage` · `view storage`) match Bat `/battery` · watts `/watts` shape;
+    // bare `open disk` / `view disk` stay Disk Cleanup (rejected above).
     if matches!(
         n.as_str(),
         "/ssd"
+            | "/storage"
             | "ssd"
             | "the ssd"
+            | "storage"
+            | "the storage"
             | "disk percent"
             | "disk percentage"
             | "disk %"
@@ -4512,19 +4517,33 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
             | "ssd %"
             | "disk usage"
             | "ssd usage"
+            | "storage usage"
             | "show ssd"
             | "show the ssd"
             | "show me ssd"
             | "show me the ssd"
+            | "show storage"
+            | "show the storage"
+            | "show me storage"
+            | "show me the storage"
             | "list ssd"
             | "list the ssd"
+            | "list storage"
+            | "list the storage"
             | "view ssd"
             | "view the ssd"
+            | "view storage"
+            | "view the storage"
             | "see ssd"
             | "see the ssd"
+            | "see storage"
+            | "see the storage"
             | "open ssd"
             | "open the ssd"
+            | "open storage"
+            | "open the storage"
             | "ssd status"
+            | "storage status"
             | "what's the ssd"
             | "whats the ssd"
             | "what is the ssd"

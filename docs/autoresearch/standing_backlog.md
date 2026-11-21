@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2929
+
+- Product fuel after CPU/GPU/Freq/Temp /*-ring NL v0.1.2928: SSD chip already answered `how much storage` / `/ssd` but lacked `/storage` and view/see/show me/open/list storage phrases while Bat `/battery` and Power `/watts` already had slash+NL. Bare `view disk` / `open disk` stay Disk Cleanup. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — SSD `/storage` NL closed; not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2928
 
 - CPU · GPU · Freq · Temp instant `/*-ring` + singular `* ring` NL: RAM already answered `/ram-ring` / `ram ring` but CPU/GPU/Freq/Temp hit the generic `ring` veto so `cpu ring` / `/cpu-ring` fell through to Ollama. Plural `cpu rings` / `view cpu rings` stay full `/rings` (router first). Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — CPU/GPU/Freq/Temp ring slash NL closed; not another keep-pNN clone.

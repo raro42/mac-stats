@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2929] - 2026-11-21
+
+### Added
+- Instant SSD chip accepts `/storage` and view/see/show me/open/list storage NL (`view storage`, `open the storage`, …), matching `/ssd` and “how much storage”. Bare `view disk` / `open disk` still open Disk Cleanup.
+
 ## [0.1.2928] - 2026-11-21
 
 ### Added
