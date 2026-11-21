@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2914] - 2026-11-21
+
+### Fixed
+- Swiss Minimalistic Monitors summary/item focus and selected, Disk Cleanup last-run focus, and Debug Log line hover/selected now use Swiss ink instead of Apple blue fallbacks on paper.
+
 ## [0.1.2913] - 2026-11-21
 
 ### Fixed

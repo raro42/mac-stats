@@ -40854,3 +40854,41 @@ body.theme-swiss-minimalistic .logs-error-glance:focus-visible {
   /* Opaque Swiss ink — Apple #007aff/#0a84ff lagged --accent / cream logs-error focus (#14 / P2; design-review Debug Log). */
   border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
 }
+
+/*
+ * Swiss Minimalistic: Monitors summary/item + Disk Cleanup last + Debug Log
+ * line still used shared Apple `#007aff` / `#0a84ff` accent fallbacks on paper
+ * `#ffffff` while cream Light/Material/Architect already sat on theme accents
+ * (v0.1.2913). Opaque Swiss ink `#121216` mixes. Standing P2 #14 leftover
+ * soft-states after cream monitors/disk-last/logs-line v0.1.2913 (not a
+ * keep-pNN Disk Cleanup clone; Send fill white-on-blue intentional;
+ * polish-without-capture Mac TCC).
+ */
+/* OVERNIGHT v0.1.2914: Swiss monitors-summary / monitor-item / disk-cleanup-last / logs-line Apple → ink (cream 2913 parity) */
+body.theme-swiss-minimalistic .monitors-summary:focus-visible {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream monitors-summary focus (#14 / P2; design-review Monitors). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitor-item.is-selected {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream monitor-item is-selected (#14 / P2; design-review Monitors). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 5%, #ffffff);
+}
+body.theme-swiss-minimalistic .monitor-item:focus-visible {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream monitor-item focus (#14 / P2; design-review Monitors). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 36%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+}
+body.theme-swiss-minimalistic .disk-cleanup-last.is-action:focus-visible {
+  /* Opaque Swiss ink — Apple #0a84ff lagged --accent / cream disk-cleanup-last focus (#14 / P2; design-review Disk Cleanup). */
+  outline-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+}
+body.theme-swiss-minimalistic .logs-line[role='option']:hover {
+  /* Opaque Swiss ink — Apple #0a84ff lagged --accent / cream logs-line hover (#14 / P2; design-review Debug Log). */
+  background: color-mix(in srgb, var(--accent, #121216) 8%, #ffffff);
+}
+body.theme-swiss-minimalistic .logs-line[role='option'].is-selected {
+  /* Opaque Swiss ink — Apple #0a84ff lagged --accent / cream logs-line is-selected (#14 / P2; design-review Debug Log). */
+  background: color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+}
