@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2925
+
+- Product fuel after Load 5m/15m slash+NL v0.1.2924: Power watts chip already answered `how many watts` / `power draw` but lacked `/watts` · `/power-draw` and view/see/show me/open/list phrases while Bat `/battery` already had slash+NL. Bare `/power` / `view power` / `power` stay the full power strip. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — Power watts slash+NL closed; not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2924
 
 - Load 5m / 15m instant slash + view/open NL: focused chips already answered `load 5` / `load 15` but lacked `/load-5m` · `/load-15m` and view/see/show me/open/list phrases after Load 1m got `/load-1m` (v0.1.2923). Bare `view load` / `/load` stay the full Details panel. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — Load 5m/15m NL closed; not another keep-pNN clone.
