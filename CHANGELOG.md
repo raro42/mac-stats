@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2913] - 2026-11-21
+
+### Fixed
+- Light / Material / Architect Monitors summary/item focus and selected, Disk Cleanup last-run focus, and Debug Log line hover/selected now use theme accents instead of Apple blue fallbacks on cream paper.
+
 ## [0.1.2912] - 2026-11-20
 
 ### Fixed
