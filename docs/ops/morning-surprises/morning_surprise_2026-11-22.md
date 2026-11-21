@@ -3,9 +3,10 @@
 Overnight window 2026-11-21 20:00 → 2026-11-22 06:00 (local).
 
 ## Shipped
-- **v0.1.2929** — SSD `/storage` · `view storage` · `open the storage` (parity with `/ssd` and “how much storage”); bare `view disk` stays Disk Cleanup.
-- **v0.1.2928** — CPU · GPU · Freq · Temp `/*-ring` + singular `cpu ring` NL (RAM `/ram-ring` parity); plural `cpu rings` stay full rings.
-- **v0.1.2927** — Load 1m `view load 1` · `open load 1m` · `/load1` · `/load1m`.
+- **v0.1.2930** — SSD free-bytes `/free` · `/ssd-free` · `/disk-free` · `/free-space` + view/open NL (`view free space`); bare `free space` / `disk free` stay SSD %; `view disk` stays Disk Cleanup.
+- **v0.1.2929** — SSD `/storage` + view/open storage NL; bare `view disk` stays Disk Cleanup.
+- **v0.1.2928** — CPU · GPU · Freq · Temp `/*-ring` + singular `* ring` NL; plural stays `/rings`.
+- **v0.1.2927** — Load 1m view/open NL; bare `view load` stays Details.
 - **v0.1.2926** — P-core / E-core `/p-core` · `/e-core` + view/open NL.
 - **v0.1.2925** — Power watts `/watts` · `/power-draw` + view/open NL.
 - **v0.1.2924** — Load 5m/15m slash + view/open NL.
@@ -15,6 +16,7 @@ Overnight window 2026-11-21 20:00 → 2026-11-22 06:00 (local).
 ## Tried / context
 - Digester empty all ticks; design-review grace (Mac TCC); layout-daily data-poster marked (Dark next calendar day).
 - Cream/Swiss Send fill white-on-blue left intentional.
+- ~23:00 flush clean; CI already triggered today; release skip (cargo ahead of Latest by 19 patches after this ship — gate ~20).
 
 ## Fitness
-Operator instant chips keep gaining slash + view/open parity without stealing full panels (Disk Cleanup / Details / rings / power strip).
+Operator instant chips keep gaining slash + view/open parity without stealing full panels or SSD %.
