@@ -1489,8 +1489,8 @@ async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
         .await;
 }
 
-/// Idle-thought Discord send / Ollama timeouts are best-effort noise.
-/// Emit at most one WARN per interval; further timeouts stay DEBUG (single-instance busy parity).
+/// Idle-thought Discord send / Ollama failures are best-effort noise.
+/// Emit at most one WARN per interval; further failures stay DEBUG (single-instance busy parity).
 const IDLE_THOUGHT_TIMEOUT_WARN_INTERVAL_SECS: u64 = 5 * 60;
 static LAST_IDLE_THOUGHT_TIMEOUT_WARN_SECS: AtomicU64 = AtomicU64::new(0);
 
@@ -1586,6 +1586,52 @@ fn log_idle_thought_send_timeout(part_index: usize, total: usize) {
             target: "outbound_pipeline",
             "outbound discord_idle_thought: per-send timeout (part {}/{}); aborting remaining blocks (rate-limited)",
             part_index, total
+        );
+    }
+}
+
+/// Discord API send failure after the safe retry — same 5m WARN gate as Ollama / send timeouts.
+fn log_idle_thought_discord_send_failed(part_index: usize, total: usize, detail: &str) {
+    let now = std::time::SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    if claim_idle_thought_timeout_warn(
+        &LAST_IDLE_THOUGHT_TIMEOUT_WARN_SECS,
+        now,
+        IDLE_THOUGHT_TIMEOUT_WARN_INTERVAL_SECS,
+    ) {
+        warn!(
+            "Having fun: idle thought Discord send failed (part {}/{}): {}",
+            part_index, total, detail
+        );
+    } else {
+        debug!(
+            "Having fun: idle thought Discord send failed (part {}/{}; rate-limited): {}",
+            part_index, total, detail
+        );
+    }
+}
+
+/// Non-timeout Ollama / pipeline failure for idle thought — same 5m WARN gate.
+fn log_idle_thought_failed(channel_id: u64, detail: &str) {
+    let now = std::time::SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    if claim_idle_thought_timeout_warn(
+        &LAST_IDLE_THOUGHT_TIMEOUT_WARN_SECS,
+        now,
+        IDLE_THOUGHT_TIMEOUT_WARN_INTERVAL_SECS,
+    ) {
+        warn!(
+            "Having fun: idle thought failed for channel {}: {}",
+            channel_id, detail
+        );
+    } else {
+        debug!(
+            "Having fun: idle thought failed for channel {} (rate-limited): {}",
+            channel_id, detail
         );
     }
 }
@@ -1740,10 +1786,7 @@ async fn having_fun_idle_thought_locked(channel_id: u64, ctx: Context) {
                                 tokio::time::sleep(delay).await;
                                 continue;
                             }
-                            warn!(
-                                "Having fun: idle thought Discord send failed (part {}/{}): {}",
-                                part, total, err_str
-                            );
+                            log_idle_thought_discord_send_failed(part, total, &err_str);
                             aborted = true;
                             break;
                         }
@@ -1795,10 +1838,7 @@ async fn having_fun_idle_thought_locked(channel_id: u64, ctx: Context) {
                 apply_idle_thought_timeout_backoff(channel_id);
                 log_idle_thought_ollama_timeout(channel_id, &err_str);
             } else {
-                warn!(
-                    "Having fun: idle thought failed for channel {}: {}",
-                    channel_id, err_str
-                );
+                log_idle_thought_failed(channel_id, &err_str);
             }
         }
     }

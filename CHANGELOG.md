@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2922] - 2026-11-21
+
+### Fixed
+- Having-fun idle thought Discord send failures and other non-timeout idle failures now share the same 5-minute WARN gate as Ollama / send timeouts. Extra failures stay DEBUG so `debug.log` does not fill with best-effort noise.
+
 ## [0.1.2921] - 2026-11-21
 
 ### Added
