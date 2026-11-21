@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2922
+
+- Having-fun idle thought Discord send / non-timeout failure WARN rate-limit: Discord API send failures after the safe retry and other non-timeout idle failures still logged WARN every attempt while Ollama timeout + per-send timeout already shared a 5m gate (`claim_idle_thought_timeout_warn`). Now all three share that gate (extra → DEBUG). Standing P2 #5 debug.log noise after RAM ring instant v0.1.2921 / ring Hot/Ok/Fair v0.1.2920 (not a keep-pNN Disk Cleanup clone); digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — idle Discord send WARN gate closed; not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2921
 
 - Product fuel after soft-state P2 #14 Swiss/#ffffff largely exhausted through ring Hot/Ok/Fair tile washes (v0.1.2920): RAM ring gauge (v0.1.2915) had no focused `RingChipAsk` while CPU · GPU · Freq · Temp did. Added `RingChipAsk::Ram` with `ram ring` / `/ram-ring` / memory gauge phrases (before the generic `ring` veto) so strip `/ram` / “how much ram” stay `StripChipAsk::Ram`. Digester empty; design-review due=false; layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — RAM ring instant lane closed; not another keep-pNN clone.
