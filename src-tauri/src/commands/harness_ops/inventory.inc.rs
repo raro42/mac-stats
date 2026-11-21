@@ -4851,6 +4851,8 @@ pub fn parse_details_list_filter(content: &str) -> DetailsListFilter {
 
 /// Focused Load 1m asks — not full `/details` / `/load` (those stay the three-row panel).
 /// Parity with `load 5` / `load 15` chips: `load 1` / `1-minute load` / `/load-1m` stay here.
+/// Slash + view/see/show me/open/list-the NL (v0.1.2927) — parity with Load 5m `/load-5m` · `view load 5`.
+/// Exact `open load 1` / `open the 1 minute load` only (not bare `open load` → Details).
 /// "Why is the load high" stays with the agent.
 pub fn looks_like_load_chip_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -4888,6 +4890,8 @@ pub fn looks_like_load_chip_request(content: &str) -> bool {
             // Explicit 1m window — same shape as load 5 / load 15 (not full `/load`).
             | "/load-1m"
             | "/load-1"
+            | "/load1"
+            | "/load1m"
             | "load 1"
             | "load 1m"
             | "1m load"
@@ -4902,6 +4906,34 @@ pub fn looks_like_load_chip_request(content: &str) -> bool {
             | "hows the 1 minute load"
             | "is the 1 minute load high"
             | "is 1 minute load high"
+            | "view load 1"
+            | "view load 1m"
+            | "view the 1 minute load"
+            | "view 1 minute load"
+            | "view 1m load"
+            | "see load 1"
+            | "see load 1m"
+            | "see the 1 minute load"
+            | "see 1 minute load"
+            | "see 1m load"
+            | "show load 1"
+            | "show load 1m"
+            | "show the 1 minute load"
+            | "show 1 minute load"
+            | "show me load 1"
+            | "show me load 1m"
+            | "show me the 1 minute load"
+            | "show me 1 minute load"
+            | "open load 1"
+            | "open load 1m"
+            | "open the 1 minute load"
+            | "open 1 minute load"
+            | "open 1m load"
+            | "list load 1"
+            | "list load 1m"
+            | "list the 1 minute load"
+            | "list 1 minute load"
+            | "list the 1m load"
     )
 }
 

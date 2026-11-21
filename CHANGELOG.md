@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2927] - 2026-11-21
+
+### Added
+- Instant Load 1m chip accepts view/see/show me/open/list NL (`view load 1`, `open load 1m`, …) plus `/load1` · `/load1m` aliases, matching Load 5m/15m. Bare `view load` / `/load` still open the full Details panel.
+
 ## [0.1.2926] - 2026-11-21
 
 ### Added

@@ -88,19 +88,28 @@ mod tests {
 
     #[test]
     fn load_1m_chip_does_not_steal_full_load_panel() {
-        // Explicit 1m window → focused Load chip (parity with load 5 / load 15).
+        // Explicit 1m window + view/open NL → focused Load chip (parity with load 5 / load 15).
         assert!(looks_like_load_chip_request("load 1"));
         assert!(looks_like_load_chip_request("load 1m"));
         assert!(looks_like_load_chip_request("1-minute load"));
         assert!(looks_like_load_chip_request("/load-1m"));
+        assert!(looks_like_load_chip_request("/load1m"));
         assert!(looks_like_load_chip_request("1m load"));
-        // Full Details panel still owns bare /load · what's the load.
+        assert!(looks_like_load_chip_request("view load 1"));
+        assert!(looks_like_load_chip_request("open load 1m"));
+        assert!(looks_like_load_chip_request("show me the 1 minute load"));
+        // Full Details panel still owns bare /load · view load · what's the load.
         assert!(!looks_like_load_chip_request("/load"));
+        assert!(!looks_like_load_chip_request("view load"));
+        assert!(!looks_like_load_chip_request("open load"));
         assert!(!looks_like_load_chip_request("what's the load"));
         assert!(looks_like_details_request("/load"));
+        assert!(looks_like_details_request("view load"));
         assert!(looks_like_details_request("what's the load"));
         assert!(!looks_like_details_request("load 1"));
         assert!(!looks_like_details_request("1-minute load"));
+        assert!(!looks_like_details_request("view load 1"));
+        assert!(!looks_like_details_request("open load 1m"));
         let reply = try_operator_instant_reply("load 1");
         assert!(reply.is_some());
         let text = reply.unwrap();
@@ -108,6 +117,18 @@ mod tests {
         assert!(
             !text.contains("**Details**"),
             "load 1 must not expand full Details: {text}"
+        );
+        let viewed = try_operator_instant_reply("view load 1").unwrap();
+        assert!(viewed.contains("**Load**"), "got: {viewed}");
+        assert!(
+            !viewed.contains("**Details**"),
+            "view load 1 must not expand full Details: {viewed}"
+        );
+        let opened = try_operator_instant_reply("open load 1m").unwrap();
+        assert!(opened.contains("**Load**"), "got: {opened}");
+        assert!(
+            !opened.contains("**Details**"),
+            "open load 1m must not expand full Details: {opened}"
         );
         let full = try_operator_instant_reply("/load").unwrap();
         assert!(full.contains("**Details**"), "got: {full}");
