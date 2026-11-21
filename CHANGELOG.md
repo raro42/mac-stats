@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2912] - 2026-11-20
+
+### Fixed
+- Light / Material / Architect metric-strip jump flashes and history sparkline keyboard focus now use theme accents instead of Apple blue fallbacks on cream paper.
+
 ## [0.1.2911] - 2026-11-20
 
 ### Fixed

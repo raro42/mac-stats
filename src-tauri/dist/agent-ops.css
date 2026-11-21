@@ -35708,12 +35708,14 @@ body.theme-light .metric-card.is-temp-highlight,
 body.theme-light .metric-card.is-freq-highlight,
 body.theme-light .detail-label.is-uptime-highlight,
 body.theme-light .detail-value.is-uptime-highlight {
-  background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Swiss metric-strip (#14 / P2; design-review metrics). */
+  background-color: color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #6aa6df) 16%, #f7f7fa);
 }
 body.theme-light .disk-cleanup-section.is-disk-highlight {
-  background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #f7f7fa);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Swiss disk-highlight (#14 / P2; design-review disk-cleanup). */
+  background-color: color-mix(in srgb, var(--accent, #6aa6df) 10%, #f7f7fa);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #6aa6df) 14%, #f7f7fa);
 }
 
 /* --- material (#ebe4d9) --- */
@@ -35726,12 +35728,14 @@ body.theme-material .metric-card.is-temp-highlight,
 body.theme-material .metric-card.is-freq-highlight,
 body.theme-material .detail-label.is-uptime-highlight,
 body.theme-material .detail-value.is-uptime-highlight {
-  background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Swiss metric-strip (#14 / P2; design-review metrics). */
+  background-color: color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #b8a68b) 16%, #ebe4d9);
 }
 body.theme-material .disk-cleanup-section.is-disk-highlight {
-  background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #ebe4d9);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Swiss disk-highlight (#14 / P2; design-review disk-cleanup). */
+  background-color: color-mix(in srgb, var(--accent, #b8a68b) 10%, #ebe4d9);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #b8a68b) 14%, #ebe4d9);
 }
 
 /* --- architect (#f1f1f1) --- */
@@ -35744,12 +35748,14 @@ body.theme-architect .metric-card.is-temp-highlight,
 body.theme-architect .metric-card.is-freq-highlight,
 body.theme-architect .detail-label.is-uptime-highlight,
 body.theme-architect .detail-value.is-uptime-highlight {
-  background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Swiss metric-strip (#14 / P2; design-review metrics). */
+  background-color: color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #232d41) 16%, #f1f1f1);
 }
 body.theme-architect .disk-cleanup-section.is-disk-highlight {
-  background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, #f1f1f1);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Swiss disk-highlight (#14 / P2; design-review disk-cleanup). */
+  background-color: color-mix(in srgb, var(--accent, #232d41) 10%, #f1f1f1);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #232d41) 14%, #f1f1f1);
 }
 
 /*
@@ -35765,7 +35771,8 @@ body.theme-architect .disk-cleanup-section.is-disk-highlight {
 
 /* --- light (#f7f7fa) --- */
 body.theme-light .history-chart-container[role="button"]:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #f7f7fa);
+  /* Opaque Light accent — Apple #0a84ff lagged --accent / Swiss history focus (#14 / P2; design-review history). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6aa6df) 55%, #f7f7fa);
 }
 body.theme-light #mac-stats-update-banner {
   background: color-mix(in srgb, var(--accent, #8bb4e8) 22%, #f7f7fa);
@@ -35802,7 +35809,8 @@ body.theme-light #mac-stats-update-banner a {
 
 /* --- material (#ebe4d9) --- */
 body.theme-material .history-chart-container[role="button"]:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #ebe4d9);
+  /* Opaque Material accent — Apple #0a84ff lagged --accent / Swiss history focus (#14 / P2; design-review history). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #b8a68b) 55%, #ebe4d9);
 }
 body.theme-material #mac-stats-update-banner {
   background: color-mix(in srgb, var(--accent, #8bb4e8) 22%, #ebe4d9);
@@ -35839,7 +35847,8 @@ body.theme-material #mac-stats-update-banner a {
 
 /* --- architect (#f1f1f1) --- */
 body.theme-architect .history-chart-container[role="button"]:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #f1f1f1);
+  /* Opaque Architect accent — Apple #0a84ff lagged --accent / Swiss history focus (#14 / P2; design-review history). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
 }
 body.theme-architect #mac-stats-update-banner {
   background: color-mix(in srgb, var(--accent, #8bb4e8) 22%, #f1f1f1);
