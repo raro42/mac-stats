@@ -31096,10 +31096,19 @@ body.theme-futuristic {
  * glass in the injected cpu.js sheet. Remap onto CRT shells. Standing P2 #14
  * after badge/jump-flash v0.1.2524; design-review feature-cpu-metrics /
  * feature-disk-cleanup adjacent (polish-without-capture; Mac capture TCC-blocked).
+ * OVERNIGHT v0.1.2917 layout-daily: RAM ring card flash (`.metric-card` /
+ * `.metric-tile` / `.poster-tile` · `.is-ram-highlight`) after v0.1.2915 —
+ * detail-label remaps alone left ring jump flashes on Apple `#ffffff`.
  */
-/* OVERNIGHT v0.1.2525 + v0.1.2822: metric-strip flash highlight CRT → theme accent */
+/* OVERNIGHT v0.1.2525 + v0.1.2822 + v0.1.2917: metric-strip flash highlight CRT → theme accent */
 body.theme-data-poster .detail-label.is-ram-highlight,
 body.theme-data-poster .detail-value.is-ram-highlight,
+body.theme-data-poster .metric-card.is-ram-highlight,
+body.theme-data-poster .metric-box.is-ram-highlight,
+body.theme-data-poster .metric-tile.is-ram-highlight,
+body.theme-data-poster .dial.is-ram-highlight,
+body.theme-data-poster .tile.is-ram-highlight,
+body.theme-data-poster .poster-tile.is-ram-highlight,
 body.theme-data-poster #cpu-usage-card.is-cpu-highlight,
 body.theme-data-poster .metric-card.is-gpu-highlight,
 body.theme-data-poster #gpu-power.is-gpu-highlight,
@@ -31117,6 +31126,12 @@ body.theme-data-poster .disk-cleanup-section.is-disk-highlight {
 }
 body.theme-dark .detail-label.is-ram-highlight,
 body.theme-dark .detail-value.is-ram-highlight,
+body.theme-dark .metric-card.is-ram-highlight,
+body.theme-dark .metric-box.is-ram-highlight,
+body.theme-dark .metric-tile.is-ram-highlight,
+body.theme-dark .dial.is-ram-highlight,
+body.theme-dark .tile.is-ram-highlight,
+body.theme-dark .poster-tile.is-ram-highlight,
 body.theme-dark #cpu-usage-card.is-cpu-highlight,
 body.theme-dark .metric-card.is-gpu-highlight,
 body.theme-dark #gpu-power.is-gpu-highlight,
@@ -31134,6 +31149,12 @@ body.theme-dark .disk-cleanup-section.is-disk-highlight {
 }
 body.theme-neon .detail-label.is-ram-highlight,
 body.theme-neon .detail-value.is-ram-highlight,
+body.theme-neon .metric-card.is-ram-highlight,
+body.theme-neon .metric-box.is-ram-highlight,
+body.theme-neon .metric-tile.is-ram-highlight,
+body.theme-neon .dial.is-ram-highlight,
+body.theme-neon .tile.is-ram-highlight,
+body.theme-neon .poster-tile.is-ram-highlight,
 body.theme-neon #cpu-usage-card.is-cpu-highlight,
 body.theme-neon .metric-card.is-gpu-highlight,
 body.theme-neon #gpu-power.is-gpu-highlight,
@@ -31151,6 +31172,12 @@ body.theme-neon .disk-cleanup-section.is-disk-highlight {
 }
 body.theme-futuristic .detail-label.is-ram-highlight,
 body.theme-futuristic .detail-value.is-ram-highlight,
+body.theme-futuristic .metric-card.is-ram-highlight,
+body.theme-futuristic .metric-box.is-ram-highlight,
+body.theme-futuristic .metric-tile.is-ram-highlight,
+body.theme-futuristic .dial.is-ram-highlight,
+body.theme-futuristic .tile.is-ram-highlight,
+body.theme-futuristic .poster-tile.is-ram-highlight,
 body.theme-futuristic #cpu-usage-card.is-cpu-highlight,
 body.theme-futuristic .metric-card.is-gpu-highlight,
 body.theme-futuristic #gpu-power.is-gpu-highlight,
@@ -35701,6 +35728,12 @@ body.theme-architect .history-chart-container.is-fair:not(.is-hot) {
 /* --- light (#f7f7fa) --- */
 body.theme-light .detail-label.is-ram-highlight,
 body.theme-light .detail-value.is-ram-highlight,
+body.theme-light .metric-card.is-ram-highlight,
+body.theme-light .metric-box.is-ram-highlight,
+body.theme-light .metric-tile.is-ram-highlight,
+body.theme-light .dial.is-ram-highlight,
+body.theme-light .tile.is-ram-highlight,
+body.theme-light .poster-tile.is-ram-highlight,
 body.theme-light #cpu-usage-card.is-cpu-highlight,
 body.theme-light .metric-card.is-gpu-highlight,
 body.theme-light #gpu-power.is-gpu-highlight,
@@ -35721,6 +35754,12 @@ body.theme-light .disk-cleanup-section.is-disk-highlight {
 /* --- material (#ebe4d9) --- */
 body.theme-material .detail-label.is-ram-highlight,
 body.theme-material .detail-value.is-ram-highlight,
+body.theme-material .metric-card.is-ram-highlight,
+body.theme-material .metric-box.is-ram-highlight,
+body.theme-material .metric-tile.is-ram-highlight,
+body.theme-material .dial.is-ram-highlight,
+body.theme-material .tile.is-ram-highlight,
+body.theme-material .poster-tile.is-ram-highlight,
 body.theme-material #cpu-usage-card.is-cpu-highlight,
 body.theme-material .metric-card.is-gpu-highlight,
 body.theme-material #gpu-power.is-gpu-highlight,
@@ -35741,6 +35780,12 @@ body.theme-material .disk-cleanup-section.is-disk-highlight {
 /* --- architect (#f1f1f1) --- */
 body.theme-architect .detail-label.is-ram-highlight,
 body.theme-architect .detail-value.is-ram-highlight,
+body.theme-architect .metric-card.is-ram-highlight,
+body.theme-architect .metric-box.is-ram-highlight,
+body.theme-architect .metric-tile.is-ram-highlight,
+body.theme-architect .dial.is-ram-highlight,
+body.theme-architect .tile.is-ram-highlight,
+body.theme-architect .poster-tile.is-ram-highlight,
 body.theme-architect #cpu-usage-card.is-cpu-highlight,
 body.theme-architect .metric-card.is-gpu-highlight,
 body.theme-architect #gpu-power.is-gpu-highlight,
@@ -39393,6 +39438,12 @@ body.theme-swiss-minimalistic .process-detail-pid:focus-visible {
 /* --- swiss metric-strip flash highlights (cream 2686 parity) --- */
 body.theme-swiss-minimalistic .detail-label.is-ram-highlight,
 body.theme-swiss-minimalistic .detail-value.is-ram-highlight,
+body.theme-swiss-minimalistic .metric-card.is-ram-highlight,
+body.theme-swiss-minimalistic .metric-box.is-ram-highlight,
+body.theme-swiss-minimalistic .metric-tile.is-ram-highlight,
+body.theme-swiss-minimalistic .dial.is-ram-highlight,
+body.theme-swiss-minimalistic .tile.is-ram-highlight,
+body.theme-swiss-minimalistic .poster-tile.is-ram-highlight,
 body.theme-swiss-minimalistic #cpu-usage-card.is-cpu-highlight,
 body.theme-swiss-minimalistic .metric-card.is-gpu-highlight,
 body.theme-swiss-minimalistic #gpu-power.is-gpu-highlight,

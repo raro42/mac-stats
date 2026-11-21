@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2917] - 2026-11-21
+
+### Fixed
+- RAM ring jump-flash on Data Poster / Dark / Neon / Futuristic / cream / Swiss: ring card `.is-ram-highlight` now mixes onto theme paper instead of Apple white (detail-label remaps alone left ring flashes muddy after the new RAM gauge).
+
 ## [0.1.2916] - 2026-11-21
 
 ### Fixed
