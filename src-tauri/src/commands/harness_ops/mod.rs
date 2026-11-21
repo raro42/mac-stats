@@ -312,6 +312,48 @@ mod tests {
     }
 
     #[test]
+    fn ram_capacity_slash_and_view_open_do_not_steal_ram_percent() {
+        // Slash + view/open NL → installed RAM (SSD `/free` · watts `/watts` parity).
+        // Bare /ram · how much ram · view ram stay the % chip.
+        // Also: `ram size` / `how big is ram` must beat execution_prompt size nouns.
+        assert!(looks_like_ram_capacity_request("/ram-size"));
+        assert!(looks_like_ram_capacity_request("/ram-capacity"));
+        assert!(looks_like_ram_capacity_request("/memory-size"));
+        assert!(looks_like_ram_capacity_request("/total-ram"));
+        assert!(looks_like_ram_capacity_request("view ram size"));
+        assert!(looks_like_ram_capacity_request("open ram capacity"));
+        assert!(looks_like_ram_capacity_request("list memory capacity"));
+        assert!(looks_like_ram_capacity_request("how big is ram"));
+        assert!(!looks_like_ram_capacity_request("/ram"));
+        assert!(!looks_like_ram_capacity_request("how much ram"));
+        assert!(!looks_like_ram_capacity_request("view ram"));
+        assert!(!looks_like_ram_capacity_request("how much ram is used"));
+        assert_eq!(parse_strip_chip_ask("/ram"), Some(StripChipAsk::Ram));
+        assert_eq!(parse_strip_chip_ask("view ram"), Some(StripChipAsk::Ram));
+        let cap = try_operator_instant_reply("/ram-size").unwrap();
+        assert!(
+            cap.contains("**RAM**") && !cap.to_lowercase().contains("execution"),
+            "got: {cap}"
+        );
+        let classic = try_operator_instant_reply("ram size").unwrap();
+        assert!(
+            classic.contains("**RAM**") && !classic.to_lowercase().contains("execution"),
+            "ram size must not hit execution_prompt: {classic}"
+        );
+        let viewed = try_operator_instant_reply("view ram size").unwrap();
+        assert!(
+            viewed.contains("**RAM**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let pct = try_operator_instant_reply("/ram").unwrap();
+        assert!(pct.contains("**RAM**"), "got: {pct}");
+        assert!(
+            !pct.to_lowercase().contains("installed"),
+            "bare /ram must stay % chip, not capacity: {pct}"
+        );
+    }
+
+    #[test]
     fn disk_free_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → free bytes (SSD `/storage` · watts `/watts` parity).
         // Bare free space / disk free stay SSD %; view disk stays Disk Cleanup.

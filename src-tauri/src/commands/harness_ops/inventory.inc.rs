@@ -4764,6 +4764,8 @@ pub fn format_strip_chip_gateway(ask: StripChipAsk) -> String {
 
 /// Installed RAM size — not the used-% chip, not notes / memory.md disk size.
 /// "Why" stays with the agent. "How much RAM is used" stays the RAM percent chip.
+/// Slash + view/open NL (`/ram-size` · `/ram-capacity` · `view ram size`) match Bat `/battery` ·
+/// watts `/watts` · SSD `/free` shape; bare `/ram` / `how much ram` / `view ram` stay the % chip.
 pub fn looks_like_ram_capacity_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 56 {
@@ -4793,7 +4795,19 @@ pub fn looks_like_ram_capacity_request(content: &str) -> bool {
     }
     matches!(
         n.as_str(),
-        "memory size"
+        "/ram-size"
+            | "/ramsize"
+            | "/ram-capacity"
+            | "/ramcapacity"
+            | "/memory-size"
+            | "/memorysize"
+            | "/memory-capacity"
+            | "/memorycapacity"
+            | "/total-ram"
+            | "/totalram"
+            | "/installed-ram"
+            | "/installedram"
+            | "memory size"
             | "the memory size"
             | "how big is memory"
             | "how big is the memory"
@@ -4828,6 +4842,43 @@ pub fn looks_like_ram_capacity_request(content: &str) -> bool {
             | "installed memory"
             | "how much ram installed"
             | "how much memory installed"
+            // View/see/show me/open/list (show me → ram size stays capacity; bare view ram stays %).
+            | "view ram size"
+            | "view the ram size"
+            | "view ram capacity"
+            | "view the ram capacity"
+            | "view memory size"
+            | "view the memory size"
+            | "view memory capacity"
+            | "view the memory capacity"
+            | "view total ram"
+            | "view the total ram"
+            | "view installed ram"
+            | "view the installed ram"
+            | "see ram size"
+            | "see the ram size"
+            | "see ram capacity"
+            | "see memory size"
+            | "see memory capacity"
+            | "see total ram"
+            | "see installed ram"
+            | "open ram size"
+            | "open the ram size"
+            | "open ram capacity"
+            | "open the ram capacity"
+            | "open memory size"
+            | "open the memory size"
+            | "open memory capacity"
+            | "open the memory capacity"
+            | "open total ram"
+            | "open installed ram"
+            | "list ram size"
+            | "list the ram size"
+            | "list ram capacity"
+            | "list memory size"
+            | "list memory capacity"
+            | "list total ram"
+            | "list installed ram"
     )
 }
 

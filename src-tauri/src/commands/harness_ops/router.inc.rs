@@ -43,6 +43,11 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_compact_ready_request(content) {
         return Some(format_compact_ready_chip());
     }
+    // Installed RAM before resource-stat size lanes (execution_prompt / planning / soul / …
+    // nouns include bare "size"/"big" and would steal `ram size` / `/ram-size` / `how big is ram`).
+    if looks_like_ram_capacity_request(content) {
+        return Some(format_ram_capacity_gateway());
+    }
     // downloads-organizer-rules.md size before age/path (stat only; no dump).
     if looks_like_downloads_organizer_rules_size_request(content) {
         return Some(format_downloads_organizer_rules_size_gateway());
@@ -959,11 +964,8 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchd_stdout_path_request(content) {
         return Some(format_launchd_stdout_path_gateway());
     }
-    // Installed RAM before notes-folder size (bare "memory size" is RAM, not notes).
-    if looks_like_ram_capacity_request(content) {
-        return Some(format_ram_capacity_gateway());
-    }
     // Chip name before ring chips ("what's the cpu" stays usage).
+    // (Installed RAM is routed early — before resource-stat size nouns steal `ram size`.)
     if looks_like_chip_identity_request(content) {
         return Some(format_chip_identity_gateway());
     }

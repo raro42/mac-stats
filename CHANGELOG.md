@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+## [0.1.2931] - 2026-11-21
+
+### Added
+- Instant RAM capacity accepts `/ram-size` · `/ram-capacity` · `/memory-size` · `/total-ram` and view/see/open/list NL (`view ram size`, `open ram capacity`, …), matching “how big is ram” / “ram capacity”. Bare `/ram` / `how much ram` / `view ram` still use the RAM % chip.
+
+### Fixed
+- Instant `ram size` / `how big is ram` no longer lose to execution_prompt size nouns (bare `size` / `big` in that lane). Router checks installed RAM before resource-stat size lanes.
+
 ## [0.1.2930] - 2026-11-21
 
 ### Added
