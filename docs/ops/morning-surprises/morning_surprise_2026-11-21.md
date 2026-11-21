@@ -1,20 +1,27 @@
 # Morning surprise — 2026-11-21
 
-Overnight autoresearch (20:00–06:00 window) kept cream theme accent hygiene.
+Overnight Track B (mac-stats product code). Local window 20:00–06:00.
 
 ## Shipped
 
-- **v0.1.2913** — Light / Material / Architect Monitors summary focus + monitor-item selected/focus + Disk Cleanup last-run focus + Debug Log line hover/selected: theme accents (`#6aa6df` / `#b8a68b` / `#232d41`) instead of Apple `#007aff` / `#0a84ff` on cream paper.
-- Same night earlier: **v0.1.2912** metric-strip + history sparkline focus; **v0.1.2907–2911** Monitors/Processes/Logs attention, Swiss chat/logs, Perplexity, Disk/Top-Processes glances.
+- **v0.1.2914** — Swiss Minimalistic Monitors summary/item focus·selected, Disk Cleanup last-run focus, and Debug Log line hover·selected: Apple `#007aff`/`#0a84ff` accent fallbacks → Swiss ink `#121216` on paper (cream v0.1.2913 parity). Standing P2 #14 leftover soft-states.
+- **v0.1.2913** — Light / Material / Architect same surfaces: theme accents `#6aa6df` / `#b8a68b` / `#232d41` instead of Apple blue on cream paper.
+- **v0.1.2912** — Light / Material / Architect metric-strip jump flashes + history sparkline keyboard focus → theme accents.
 
-## Context
+## Fuel this night
 
-- Digester open empty; design-review polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-21 (remaps none; Dark next).
-- Standing P2 #14 soft-state cascade — not quiet-default.
+- Digester open: empty (latency filtered).
+- Design-review: due=false (grace; Agent Ops screenshot stale — polish-without-capture Mac TCC).
+- Layout-daily: data-poster marked (remaps none); Dark due next calendar day.
+- Debug.log: no ERROR/WARN/panic clusters in scan window.
 
-## Next fuel
+## Ratchet
 
-- Swiss monitors-summary / monitor-item / disk-cleanup-last / logs-line Apple accent parity if muddy
-- Send fill white-on-blue intentional (leave)
-- Dark layout-daily next
-- sibling/product fuel when digester has open candidates
+Keeps landed in `~/.mac-stats/improvements/autoresearch/results.tsv` (2912–2914). Nightly minimum satisfied.
+
+## Next
+
+- Send fill white-on-blue intentional
+- Other cream/Swiss `#007aff`/`#0a84ff` fallback hygiene if muddy
+- Dark layout-daily when day quota opens
+- Sibling/product fuel when digester opens
