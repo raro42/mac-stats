@@ -1,23 +1,24 @@
 # Morning surprise — 2026-11-21
 
-Overnight autoresearch kept product UI polish (Standing P2 #14 soft-state accent hygiene) plus a shipped RAM ring from the issue loop.
+Overnight autoresearch kept shipping theme soft-state polish (digester empty; Mac screenshot TCC blocked → polish-without-capture).
 
 ## Shipped
 
-- **v0.1.2918** — Dark / Neon / Data Poster / Futuristic AI Chat **Send** (resting, hover, active, disabled) uses each theme accent instead of Apple blue. Cream and Swiss stay white-on-blue on purpose.
-- **v0.1.2917** — RAM ring jump-flash theme remaps on CRT / cream / Swiss paper (detail-label remaps alone left ring card flashes muddy).
-- **v0.1.2916** — Swiss Minimalistic Agent Ops overview cards, selected rows, and attention glances: focus / active / filter washes use Swiss ink `#121216` instead of Apple blue on paper (cream v0.1.2902 parity).
-- **v0.1.2915** — RAM ring gauge + sparkline beside CPU · GPU · Freq · Temp (issue #27; history seed + amber wash at ≥85%).
-- **v0.1.2914** — Swiss Monitors summary/item, Disk Cleanup last-run, Debug Log line: ink instead of Apple blue.
-- **v0.1.2913** — Cream Light/Material/Architect Monitors/Disk/Logs accent fallbacks → theme accents.
+- **v0.1.2919** — GPU · Temp · Freq ring jump-flash: tile variants (`.metric-box` / `.metric-tile` / `.dial` / `.tile` / `.poster-tile`) now mix onto theme paper like RAM (v0.1.2917), not only `.metric-card`.
+- **v0.1.2918** — CRT AI Chat Send fill uses theme accents (cream/Swiss stay white-on-blue on purpose).
+- **v0.1.2917** — RAM ring jump-flash theme remaps (layout-daily data-poster marked).
+- **v0.1.2916** — Swiss Agent Ops overview / row / attention ink accents (remote race; local RAM work rebased as 2917).
 
 ## Tried / context
 
-- Digester open empty most of the night; design-review due=false (Mac TCC polish-without-capture); layout-daily data-poster marked (Dark next calendar quota).
-- Soft-state cascade: CRT Send fill closed in v0.1.2918; cream/Swiss Send fill stays white-on-blue intentional.
+- Digester: 0 turns / 7d (no open candidates).
+- Design review: grace (not due).
+- Layout daily: data-poster marked; Dark due next calendar day.
+- Sibling harnesses missing on this rack.
+- Debug.log: quiet in the 180m window.
 
 ## Next fuel
 
-- Dark layout-daily when day quota opens
-- CRT/cream GPU · Temp · Freq ring card highlight remaps if muddy
-- Sibling / product fuel when digester has open candidates
+- Dark layout-daily next calendar day
+- Leftover soft-states (cream/Swiss Send fill intentional)
+- Sibling / product fuel when available
