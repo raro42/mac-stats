@@ -62,4 +62,27 @@ mod tests {
         assert!(try_operator_instant_reply("/keep-p4").is_some());
         assert!(try_operator_instant_reply("results.tsv path").is_some());
     }
+
+    #[test]
+    fn ram_ring_chip_ask_does_not_steal_strip_ram() {
+        assert_eq!(parse_ring_chip_ask("/ram-ring"), Some(RingChipAsk::Ram));
+        assert_eq!(parse_ring_chip_ask("ram ring"), Some(RingChipAsk::Ram));
+        assert_eq!(
+            parse_ring_chip_ask("show me the ram ring"),
+            Some(RingChipAsk::Ram)
+        );
+        assert_eq!(parse_ring_chip_ask("memory gauge"), Some(RingChipAsk::Ram));
+        // Strip owns bare /ram · how much ram (power-strip chip).
+        assert!(parse_ring_chip_ask("/ram").is_none());
+        assert!(parse_ring_chip_ask("how much ram").is_none());
+        assert!(parse_ring_chip_ask("ram").is_none());
+        assert_eq!(parse_strip_chip_ask("/ram"), Some(StripChipAsk::Ram));
+        assert_eq!(
+            parse_strip_chip_ask("how much ram"),
+            Some(StripChipAsk::Ram)
+        );
+        let reply = try_operator_instant_reply("ram ring");
+        assert!(reply.is_some());
+        assert!(reply.unwrap().contains("**RAM**"));
+    }
 }

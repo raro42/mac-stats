@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2921] - 2026-11-21
+
+### Added
+- Instant lane for the RAM ring (`ram ring` / `/ram-ring` / memory gauge). Strip `/ram` and “how much ram” stay the power-strip chip.
+
 ## [0.1.2920] - 2026-11-21
 
 ### Fixed

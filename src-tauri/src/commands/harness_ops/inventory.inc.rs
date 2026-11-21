@@ -3112,24 +3112,65 @@ pub fn format_rings_gateway(filter: RingsListFilter) -> String {
 }
 
 
-/// Focused CPU ring asks (`/cpu` · `/gpu` · `/freq` · `/temp`) — not full `/rings`.
+/// Focused CPU ring asks (`/cpu` · `/gpu` · `/ram-ring` · `/freq` · `/temp`) — not full `/rings`.
+/// RAM ring (v0.1.2915) uses `ram ring` / `/ram-ring` so strip `/ram` stays the power-strip chip.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RingChipAsk {
     Cpu,
     Gpu,
+    Ram,
     Freq,
     Temp,
 }
 
 
-/// Parse `/cpu` · `/gpu` · `/freq` · `/temp` (and short NL). None when not a chip ask.
+/// Parse `/cpu` · `/gpu` · `/ram-ring` · `/freq` · `/temp` (and short NL). None when not a chip ask.
 /// View/see/show me/open/list-the NL (v0.1.1041). Exact `open cpu` / `open the cpu` only
 /// (same for gpu / freq / temp). After normalize strips `show me` / `show`, prefer `the cpu`
 /// etc. so `show me the cpu` still matches. Does not steal `/rings`, `/details`, or `cpu window`.
+/// RAM ring phrases must include `ring` / `gauge` so strip `/ram` / "how much ram" stay strip.
 pub fn parse_ring_chip_ask(content: &str) -> Option<RingChipAsk> {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
         return None;
+    }
+    // RAM ring before the generic `ring` veto (strip `/ram` stays StripChipAsk::Ram).
+    if matches!(
+        n.as_str(),
+        "/ram-ring"
+            | "/ramring"
+            | "ram ring"
+            | "the ram ring"
+            | "ram gauge"
+            | "the ram gauge"
+            | "memory ring"
+            | "the memory ring"
+            | "memory gauge"
+            | "the memory gauge"
+            | "show ram ring"
+            | "show the ram ring"
+            | "show me ram ring"
+            | "show me the ram ring"
+            | "list ram ring"
+            | "list the ram ring"
+            | "view ram ring"
+            | "view the ram ring"
+            | "see ram ring"
+            | "see the ram ring"
+            | "open ram ring"
+            | "open the ram ring"
+            | "ram ring status"
+            | "how's the ram ring"
+            | "hows the ram ring"
+            | "what's the ram ring"
+            | "whats the ram ring"
+            | "what is the ram ring"
+            | "is the ram ring hot"
+            | "is ram ring hot"
+            | "is the ram ring high"
+            | "is ram ring high"
+    ) {
+        return Some(RingChipAsk::Ram);
     }
     if n.contains("why")
         || n.contains("process")
@@ -3376,13 +3417,13 @@ pub fn parse_ring_chip_ask(content: &str) -> Option<RingChipAsk> {
 }
 
 
-/// True for focused CPU · GPU · Freq · Temp ring asks (not full `/rings`).
+/// True for focused CPU · GPU · RAM · Freq · Temp ring asks (not full `/rings`).
 pub fn looks_like_ring_chip_request(content: &str) -> bool {
     parse_ring_chip_ask(content).is_some()
 }
 
 
-/// Zero-LLM one-ring reply (CPU · GPU · Freq · Temp; live get_cpu_details; menu-bar amber cues).
+/// Zero-LLM one-ring reply (CPU · GPU · RAM · Freq · Temp; live get_cpu_details; menu-bar amber cues).
 pub fn format_ring_chip_gateway(ask: RingChipAsk) -> String {
     let d = crate::metrics::get_cpu_details();
     match ask {
@@ -3401,6 +3442,14 @@ pub fn format_ring_chip_gateway(ask: RingChipAsk) -> String {
                 ""
             };
             format!("**GPU** · {:.0}%{hot_mark}", d.gpu_usage)
+        }
+        RingChipAsk::Ram => {
+            let hot_mark = if ring_ram_is_hot(d.ram_percent) {
+                " · hot"
+            } else {
+                ""
+            };
+            format!("**RAM** · {:.0}%{hot_mark}", d.ram_percent)
         }
         RingChipAsk::Freq => {
             if d.frequency <= 0.0 {
