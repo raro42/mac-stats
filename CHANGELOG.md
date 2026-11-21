@@ -2,17 +2,13 @@
 
 ## [0.1.2936] - 2026-11-22
 
-<<<<<<< HEAD
 ### Added
 - Instant hostname accepts `/hostname` · `/computer-name` · `/machine-name` · `/local-hostname` and view/see/open/list NL (`view hostname`, `open computer name`, `list machine name`, …), matching “hostname” / “what's my hostname” / “computer name”. Bare `host` / `view host` stay with the agent (monitors/URLs).
-=======
+- Instant Ori vault size / path / age accept `/ori-vault-size` · `/mnemos-vault-size` · `/vault-size` · `/ori-vault-path` · `/vault-path` · `/ori-vault-age` · `/vault-age` and view/open NL (`view ori vault size`, …). Bare `/ori` / `view ori` stay the Ready chip.
+
 ### Fixed
 - Instant resource size/path/age matching no longer treats bare `size` / `path` / `age` nouns as enough to claim a lane. Early lanes (execution prompt and friends) were stealing `/ori-vault-size`, `config size`, and bare `/ori` Ready.
 - Ori vault size/age phrases no longer list bare `/ori` · `/mnemos` (Ready stays Ready).
-
-### Added
-- Instant Ori vault size / path / age accept `/ori-vault-size` · `/mnemos-vault-size` · `/vault-size` · `/ori-vault-path` · `/vault-path` · `/ori-vault-age` · `/vault-age` and view/open NL (`view ori vault size`, …). Bare `/ori` / `view ori` stay the Ready chip.
->>>>>>> d38e59379 (fix(ops): Ori vault size no longer steals /ori Ready (v0.1.2936))
 
 ## [0.1.2935] - 2026-11-22
 

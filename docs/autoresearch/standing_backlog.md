@@ -1,6 +1,7 @@
 ## Overnight merge — v0.1.2936
 
 - Product fuel after macOS version `/macos` NL v0.1.2935: ComputerName · LocalHostName already answered via agent/`hostname`/`scutil` but lacked `/hostname` · `/computer-name` · `/machine-name` · `/local-hostname` and view/see/open/list phrases while chip `/chip`, RAM `/ram-size`, SSD `/ssd-size`, and macOS `/macos` already had slash+NL. Bare `host` / `view host` stay with the agent (monitors/URLs). Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — hostname slash NL closed; not another keep-pNN clone.
+- Same version train (overnight flush): Ori vault Ready fix — substantive-noun gate so early `size`/`path` lanes stop stealing `/ori-vault-size` / `config size`; vault-specific `/ori-vault-size` · path/age slash + NL; bare `/ori` stays Ready.
 
 ## Overnight merge — v0.1.2935
 
