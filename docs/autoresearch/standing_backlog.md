@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2926
+
+- P-core / E-core instant slash + view/open NL: focused chips already answered `p core frequency` / `how fast are the p cores` but lacked `/p-core` · `/e-core` and view/see/open/list phrases after Load `/load-5m` (v0.1.2924) and Power `/watts` (v0.1.2925). Bare `/freq` / `view freq` stay the combined Freq ring. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — P-core/E-core slash NL closed; not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2925
 
 - Product fuel after Load 5m/15m slash+NL v0.1.2924: Power watts chip already answered `how many watts` / `power draw` but lacked `/watts` · `/power-draw` and view/see/show me/open/list phrases while Bat `/battery` already had slash+NL. Bare `/power` / `view power` / `power` stay the full power strip. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — Power watts slash+NL closed; not another keep-pNN clone.

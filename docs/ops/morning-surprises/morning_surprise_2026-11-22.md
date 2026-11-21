@@ -4,6 +4,7 @@ Overnight window 2026-11-21 20:00 → 2026-11-22 06:00 (local).
 
 ## Shipped
 
+- **v0.1.2926** — Instant P-core / E-core chips accept `/p-core` · `/e-core` and view/see/open/list NL (`view p core`, `open e core`, …). Bare `/freq` / `view freq` still open the combined Freq ring.
 - **v0.1.2925** — Instant Power watts chip accepts `/watts` · `/power-draw` and view/see/show me/open/list NL (`view watts`, `open power draw`, …). Bare `/power` / `view power` still open the full power strip.
 - **v0.1.2924** — Instant Load 5m / 15m chips accept `/load-5m` · `/load-15m` and view/see/show me/open/list NL (`view load 5`, `open load 15m`, …). Bare `view load` / `/load` still open full Details.
 - **v0.1.2923** — Instant `load 1` / `1-minute load` / `/load-1m` → focused Load 1m chip (same shape as `load 5` / `load 15`); bare `/load` stays Details.
@@ -18,12 +19,11 @@ Overnight window 2026-11-21 20:00 → 2026-11-22 06:00 (local).
 - Design-review due=false (grace; Mac TCC polish-without-capture).
 - Layout-daily data-poster marked; Dark due next calendar day.
 - Soft-state Apple-blue remaps largely exhausted; cream/Swiss Send fill stays white-on-blue on purpose.
-- Sibling OpenClaw/Hermes missing on this rack.
 
 ## Next fuel
 
 - Cream/Swiss Send fill white-on-blue intentional (leave unless product asks).
 - Dark layout-daily when the day quota opens.
-- Sibling / product fuel (other strip-chip slash gaps if any).
+- Sibling / product fuel (other strip/ring slash gaps if muddy).
 
-Generated: 2026-11-21T22:10:00+01:00
+Generated: 2026-11-21T22:25:00+01:00
