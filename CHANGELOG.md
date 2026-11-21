@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2935] - 2026-11-22
+
+### Added
+- Instant macOS version accepts `/macos` · `/os` · `/os-version` · `/macos-version` · `/system-version` · `/sw-vers` · `/build` · `/build-version` and view/see/open/list NL (`view macos`, `open os version`, `list system version`, …), matching “macos version” / “what os is this”. Bare `/version` / `view version` / `what version` still use app status.
+
 ## [0.1.2934] - 2026-11-22
 
 ### Added

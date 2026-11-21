@@ -5104,6 +5104,184 @@ pub fn format_chip_identity_gateway() -> String {
 }
 
 
+/// macOS ProductName · ProductVersion · BuildVersion — not app `/version` / status health.
+/// Slash + view/open NL (`/macos` · `/os-version` · `view macos` · `macos version`) match chip
+/// `/chip` · RAM `/ram-size` shape; bare `/version` · `view version` · `what version` stay app.
+pub fn looks_like_macos_version_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || n.contains("changelog")
+        || n.contains("release")
+        || n.contains("bump")
+        || n.contains("ship")
+        || n.contains("app version")
+        || n.contains("mac-stats version")
+        || n.contains("bot version")
+        // App `/version` · bare version stays status health (routed earlier; keep explicit veto).
+        || n == "/version"
+        || n == "version"
+        || n == "the version"
+        || n == "what version"
+        || n == "which version"
+        || n == "view version"
+        || n == "view the version"
+        || n == "see version"
+        || n == "see the version"
+        || n == "open version"
+        || n == "open the version"
+        || n == "list version"
+        || n == "list the version"
+        || n == "show version"
+        || n == "show the version"
+        || n == "show me version"
+        || n == "show me the version"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/macos"
+            | "/mac-os"
+            | "/os"
+            | "/os-version"
+            | "/osversion"
+            | "/macos-version"
+            | "/macosversion"
+            | "/mac-os-version"
+            | "/system-version"
+            | "/systemversion"
+            | "/sw-vers"
+            | "/swvers"
+            | "/build"
+            | "/build-version"
+            | "/buildversion"
+            | "macos"
+            | "the macos"
+            | "mac os"
+            | "the mac os"
+            | "os version"
+            | "the os version"
+            | "macos version"
+            | "the macos version"
+            | "mac os version"
+            | "the mac os version"
+            | "system version"
+            | "the system version"
+            | "what macos"
+            | "what macos is this"
+            | "what macos do i have"
+            | "what os"
+            | "what os is this"
+            | "what os do i have"
+            | "which macos"
+            | "which macos is this"
+            | "which os"
+            | "which os is this"
+            | "what's the macos"
+            | "whats the macos"
+            | "what is the macos"
+            | "what's the os"
+            | "whats the os"
+            | "what is the os"
+            | "what's the os version"
+            | "whats the os version"
+            | "what is the os version"
+            | "what's the macos version"
+            | "whats the macos version"
+            | "what is the macos version"
+            | "what's the system version"
+            | "whats the system version"
+            | "what is the system version"
+            | "build version"
+            | "the build version"
+            | "sw vers"
+            | "sw_vers"
+            // View/see/show me/open/list (bare view version stays app `/version`).
+            | "view macos"
+            | "view the macos"
+            | "view macos version"
+            | "view the macos version"
+            | "view os"
+            | "view the os"
+            | "view os version"
+            | "view the os version"
+            | "view system version"
+            | "view the system version"
+            | "view mac os"
+            | "view the mac os"
+            | "view mac os version"
+            | "view the mac os version"
+            | "view build"
+            | "view the build"
+            | "view build version"
+            | "view the build version"
+            | "see macos"
+            | "see the macos"
+            | "see macos version"
+            | "see the macos version"
+            | "see os"
+            | "see the os"
+            | "see os version"
+            | "see the os version"
+            | "see system version"
+            | "see the system version"
+            | "open macos"
+            | "open the macos"
+            | "open macos version"
+            | "open the macos version"
+            | "open os"
+            | "open the os"
+            | "open os version"
+            | "open the os version"
+            | "open system version"
+            | "open the system version"
+            | "list macos"
+            | "list the macos"
+            | "list macos version"
+            | "list the macos version"
+            | "list os"
+            | "list the os"
+            | "list os version"
+            | "list the os version"
+            | "list system version"
+            | "list the system version"
+            | "show macos"
+            | "show the macos"
+            | "show me macos"
+            | "show me the macos"
+            | "show macos version"
+            | "show the macos version"
+            | "show me macos version"
+            | "show me the macos version"
+            | "show os version"
+            | "show the os version"
+            | "show me os version"
+            | "show me the os version"
+            | "show system version"
+            | "show the system version"
+            | "show me system version"
+            | "show me the system version"
+    )
+}
+
+
+/// Zero-LLM macOS version from cached `sw_vers` (e.g. `macOS 15.1 (24B83)`).
+pub fn format_macos_version_gateway() -> String {
+    let v = crate::metrics::get_macos_version();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**macOS** — _no OS version right now._".to_string();
+    }
+    format!("**macOS** · {v}")
+}
+
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

@@ -130,6 +130,51 @@ pub struct CpuDetails {
     pub low_power_mode: bool,
 }
 
+/// Cached macOS ProductName · ProductVersion · BuildVersion (`sw_vers`).
+/// Used by the Discord/operator instant `/macos` · `/os-version` lane.
+pub fn get_macos_version() -> String {
+    MACOS_VERSION_CACHE
+        .get_or_init(|| {
+            let run = |flag: &str| -> Option<String> {
+                let output = Command::new("/usr/bin/sw_vers")
+                    .arg(flag)
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                let s = String::from_utf8_lossy(&output.stdout);
+                let t = s.trim();
+                if t.is_empty() {
+                    None
+                } else {
+                    Some(t.to_string())
+                }
+            };
+            let name = run("-productName").unwrap_or_else(|| "macOS".to_string());
+            let ver = run("-productVersion").unwrap_or_default();
+            let build = run("-buildVersion").unwrap_or_default();
+            if ver.is_empty() && build.is_empty() {
+                debug3!("macOS version: sw_vers empty");
+                return String::new();
+            }
+            let mut info = name;
+            if !ver.is_empty() {
+                info.push(' ');
+                info.push_str(&ver);
+            }
+            if !build.is_empty() {
+                info.push_str(" (");
+                info.push_str(&build);
+                info.push(')');
+            }
+            debug3!("macOS version cached: '{}'", info);
+            info
+        })
+        .clone()
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

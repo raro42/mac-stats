@@ -428,6 +428,45 @@ mod tests {
     }
 
     #[test]
+    fn macos_version_slash_and_view_open_do_not_steal_app_version() {
+        // Slash + view/open NL → macOS sw_vers (chip `/chip` · RAM `/ram-size` parity).
+        // Bare /version · view version · what version stay app status health.
+        assert!(looks_like_macos_version_request("/macos"));
+        assert!(looks_like_macos_version_request("/os"));
+        assert!(looks_like_macos_version_request("/os-version"));
+        assert!(looks_like_macos_version_request("/macos-version"));
+        assert!(looks_like_macos_version_request("/system-version"));
+        assert!(looks_like_macos_version_request("/sw-vers"));
+        assert!(looks_like_macos_version_request("/build"));
+        assert!(looks_like_macos_version_request("view macos"));
+        assert!(looks_like_macos_version_request("open os version"));
+        assert!(looks_like_macos_version_request("list system version"));
+        assert!(looks_like_macos_version_request("macos version"));
+        assert!(looks_like_macos_version_request("what os is this"));
+        assert!(!looks_like_macos_version_request("/version"));
+        assert!(!looks_like_macos_version_request("view version"));
+        assert!(!looks_like_macos_version_request("what version"));
+        assert!(!looks_like_macos_version_request("app version"));
+        assert!(looks_like_status_request("/version"));
+        assert!(looks_like_status_request("view version"));
+        let os = try_operator_instant_reply("/macos").unwrap();
+        assert!(
+            os.contains("**macOS**") && !os.to_lowercase().contains("execution"),
+            "got: {os}"
+        );
+        let viewed = try_operator_instant_reply("view macos").unwrap();
+        assert!(
+            viewed.contains("**macOS**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let app = try_operator_instant_reply("/version").unwrap();
+        assert!(
+            !app.contains("**macOS**"),
+            "bare /version must stay app status, not macOS: {app}"
+        );
+    }
+
+    #[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.
