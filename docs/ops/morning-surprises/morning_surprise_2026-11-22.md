@@ -3,6 +3,7 @@
 Overnight window 2026-11-21 20:00 → 2026-11-22 06:00 (local).
 
 ## Shipped
+- **v0.1.2928** — CPU · GPU · Freq · Temp `/cpu-ring` · `/gpu-ring` · `/freq-ring` · `/temp-ring` + singular `cpu ring` / `view cpu ring` NL (RAM `/ram-ring` parity); plural `cpu rings` stays full `/rings`.
 - **v0.1.2927** — Load 1m `view load 1` · `open load 1m` · `/load1` · `/load1m` (parity with Load 5m/15m view/open); bare `view load` stays Details.
 - **v0.1.2926** — P-core / E-core `/p-core` · `/e-core` + view/open NL; bare `/freq` stays combined Freq ring.
 - **v0.1.2925** — Power watts `/watts` · `/power-draw` + view/open NL; bare `/power` stays full strip.
