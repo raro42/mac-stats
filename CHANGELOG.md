@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2916] - 2026-11-21
+
+### Fixed
+- Swiss Minimalistic Agent Ops overview cards, selected rows, and attention glances (focus and filter) now use Swiss ink instead of Apple blue fallbacks on paper.
+
 ## [0.1.2915] - 2026-11-21
 
 ### Added

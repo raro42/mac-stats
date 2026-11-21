@@ -40892,3 +40892,111 @@ body.theme-swiss-minimalistic .logs-line[role='option'].is-selected {
   background: color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
 }
+
+/*
+ * Swiss Minimalistic: Agent Ops overview / row / attention still used shared
+ * Apple `#007aff` / `#0a84ff` accent fallbacks on paper `#ffffff` while cream
+ * Light/Material/Architect already sat on theme accents (v0.1.2902) and Swiss
+ * badge/Updated-ago/health already sat on ink (v0.1.2904). Opaque Swiss ink
+ * `#121216` mixes. Standing P2 #14 leftover soft-states after Swiss
+ * monitors/disk/logs v0.1.2914 (not a keep-pNN Disk Cleanup clone; Send fill
+ * white-on-blue intentional; polish-without-capture Mac TCC).
+ */
+/* OVERNIGHT v0.1.2916: Swiss Ops overview / row / attention Apple → ink (cream 2902 parity) */
+body.theme-swiss-minimalistic .ops-overview-card:focus-within {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops overview focus-within (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-overview-card.ops-overview-clickable:focus-visible {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops overview focus-visible (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 42%, #ffffff);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-overview-card.is-active {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops overview is-active (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-overview-card.is-active.ops-health-ok,
+body.theme-swiss-minimalistic .ops-overview-card.is-active.ops-health-warn,
+body.theme-swiss-minimalistic .ops-overview-card.is-active.ops-health-bad {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops overview active health ring (#14 / P2; design-review Agent Ops). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #121216) 42%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-overview-card.is-active:hover {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops overview is-active hover (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 36%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 10%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-overview-card.is-active.ops-health-ok:hover,
+body.theme-swiss-minimalistic .ops-overview-card.is-active.ops-health-warn:hover,
+body.theme-swiss-minimalistic .ops-overview-card.is-active.ops-health-bad:hover {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops overview active health hover (#14 / P2; design-review Agent Ops). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #121216) 52%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-overview-card.is-active .ops-overview-link {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops overview active link (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-overview-card.is-active .ops-overview-head-count {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops overview head-count (#14 / P2; design-review Agent Ops). */
+  color: var(--accent, #121216);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-overview-card.is-active .ops-overview-head-count.is-zero {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops overview head-count zero (#14 / P2; design-review Agent Ops). */
+  color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-overview-link:focus-visible {
+  /* Opaque Swiss ink — Apple #0a84ff lagged --accent / cream Ops overview-link focus (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #121216) 18%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-row:focus-visible {
+  /* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream Ops row focus (#14 / P2; design-review Agent Ops). */
+  outline-color: color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-row.is-selected {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops row is-selected (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 42%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 12%, #ffffff);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #121216) 16%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-row.is-selected:hover {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops row is-selected hover (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 52%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 15%, #ffffff);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #121216) 20%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-runs-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .ops-filter-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .ops-digest-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .ops-discord-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .ops-redmine-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .ops-ollama-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .ops-brave-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .ops-browser-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .ops-mcp-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .ops-cursor-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .ops-perplexity-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .ops-mastodon-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .ops-telegram-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .ops-slack-attention-glance:focus-visible,
+body.theme-swiss-minimalistic .ops-signal-attention-glance:focus-visible {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops attention focus (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+}
+body.theme-swiss-minimalistic .ops-filter-attention-glance.is-filter,
+body.theme-swiss-minimalistic .ops-filter-attention-glance.is-off-filter,
+body.theme-swiss-minimalistic .ops-filter-attention-glance.is-files-filter,
+body.theme-swiss-minimalistic .ops-filter-attention-glance.is-deliveries-filter,
+body.theme-swiss-minimalistic .ops-filter-attention-glance.is-discord-filter,
+body.theme-swiss-minimalistic .ops-filter-attention-glance.is-on-filter {
+  /* Opaque Swiss ink — Apple #007aff lagged --accent / cream Ops filter-attention is-filter (#14 / P2; design-review Agent Ops). */
+  border-color: color-mix(in srgb, var(--accent, #121216) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #121216) 7%, #ffffff);
+  color: color-mix(in srgb, var(--accent, #121216) 45%, var(--text, currentColor));
+}
