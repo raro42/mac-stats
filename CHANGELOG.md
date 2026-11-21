@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2928] - 2026-11-21
+
+### Added
+- Instant CPU · GPU · Freq · Temp ring chips accept `/cpu-ring` · `/gpu-ring` · `/freq-ring` · `/temp-ring` and singular `cpu ring` / `view cpu ring` NL (RAM `/ram-ring` parity). Plural `cpu rings` / `view cpu rings` still open the full rings panel.
+
 ## [0.1.2927] - 2026-11-21
 
 ### Added

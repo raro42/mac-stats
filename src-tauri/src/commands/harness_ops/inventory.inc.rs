@@ -3114,6 +3114,8 @@ pub fn format_rings_gateway(filter: RingsListFilter) -> String {
 
 /// Focused CPU ring asks (`/cpu` · `/gpu` · `/ram-ring` · `/freq` · `/temp`) — not full `/rings`.
 /// RAM ring (v0.1.2915) uses `ram ring` / `/ram-ring` so strip `/ram` stays the power-strip chip.
+/// CPU · GPU · Freq · Temp `* ring` / `/*-ring` (v0.1.2928) — parity with `/ram-ring`; plural
+/// `cpu rings` / `view cpu rings` stay the full `/rings` panel (router checks rings first).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RingChipAsk {
     Cpu,
@@ -3129,6 +3131,7 @@ pub enum RingChipAsk {
 /// (same for gpu / freq / temp). After normalize strips `show me` / `show`, prefer `the cpu`
 /// etc. so `show me the cpu` still matches. Does not steal `/rings`, `/details`, or `cpu window`.
 /// RAM ring phrases must include `ring` / `gauge` so strip `/ram` / "how much ram" stay strip.
+/// CPU · GPU · Freq · Temp ring/gauge aliases run before the generic `ring` veto (v0.1.2928).
 pub fn parse_ring_chip_ask(content: &str) -> Option<RingChipAsk> {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -3171,6 +3174,174 @@ pub fn parse_ring_chip_ask(content: &str) -> Option<RingChipAsk> {
             | "is ram ring high"
     ) {
         return Some(RingChipAsk::Ram);
+    }
+    // CPU · GPU · Freq · Temp ring/gauge before the generic `ring` veto (RAM parity).
+    // Plural `cpu rings` stays `looks_like_rings_request` (router runs that first).
+    if matches!(
+        n.as_str(),
+        "/cpu-ring"
+            | "/cpuring"
+            | "cpu ring"
+            | "the cpu ring"
+            | "cpu gauge"
+            | "the cpu gauge"
+            | "show cpu ring"
+            | "show the cpu ring"
+            | "show me cpu ring"
+            | "show me the cpu ring"
+            | "list cpu ring"
+            | "list the cpu ring"
+            | "view cpu ring"
+            | "view the cpu ring"
+            | "see cpu ring"
+            | "see the cpu ring"
+            | "open cpu ring"
+            | "open the cpu ring"
+            | "cpu ring status"
+            | "how's the cpu ring"
+            | "hows the cpu ring"
+            | "what's the cpu ring"
+            | "whats the cpu ring"
+            | "what is the cpu ring"
+            | "is the cpu ring hot"
+            | "is cpu ring hot"
+            | "is the cpu ring high"
+            | "is cpu ring high"
+    ) {
+        return Some(RingChipAsk::Cpu);
+    }
+    if matches!(
+        n.as_str(),
+        "/gpu-ring"
+            | "/gpuring"
+            | "gpu ring"
+            | "the gpu ring"
+            | "gpu gauge"
+            | "the gpu gauge"
+            | "show gpu ring"
+            | "show the gpu ring"
+            | "show me gpu ring"
+            | "show me the gpu ring"
+            | "list gpu ring"
+            | "list the gpu ring"
+            | "view gpu ring"
+            | "view the gpu ring"
+            | "see gpu ring"
+            | "see the gpu ring"
+            | "open gpu ring"
+            | "open the gpu ring"
+            | "gpu ring status"
+            | "how's the gpu ring"
+            | "hows the gpu ring"
+            | "what's the gpu ring"
+            | "whats the gpu ring"
+            | "what is the gpu ring"
+            | "is the gpu ring hot"
+            | "is gpu ring hot"
+            | "is the gpu ring high"
+            | "is gpu ring high"
+    ) {
+        return Some(RingChipAsk::Gpu);
+    }
+    if matches!(
+        n.as_str(),
+        "/freq-ring"
+            | "/frequency-ring"
+            | "/freqring"
+            | "freq ring"
+            | "the freq ring"
+            | "frequency ring"
+            | "the frequency ring"
+            | "freq gauge"
+            | "the freq gauge"
+            | "frequency gauge"
+            | "the frequency gauge"
+            | "show freq ring"
+            | "show the freq ring"
+            | "show me freq ring"
+            | "show me the freq ring"
+            | "show frequency ring"
+            | "show the frequency ring"
+            | "show me frequency ring"
+            | "show me the frequency ring"
+            | "list freq ring"
+            | "list the freq ring"
+            | "list frequency ring"
+            | "list the frequency ring"
+            | "view freq ring"
+            | "view the freq ring"
+            | "view frequency ring"
+            | "view the frequency ring"
+            | "see freq ring"
+            | "see the freq ring"
+            | "see frequency ring"
+            | "see the frequency ring"
+            | "open freq ring"
+            | "open the freq ring"
+            | "open frequency ring"
+            | "open the frequency ring"
+            | "freq ring status"
+            | "how's the freq ring"
+            | "hows the freq ring"
+            | "what's the freq ring"
+            | "whats the freq ring"
+            | "what is the freq ring"
+            | "is the freq ring hot"
+            | "is freq ring hot"
+            | "is the freq ring high"
+            | "is freq ring high"
+    ) {
+        return Some(RingChipAsk::Freq);
+    }
+    if matches!(
+        n.as_str(),
+        "/temp-ring"
+            | "/temperature-ring"
+            | "/tempring"
+            | "temp ring"
+            | "the temp ring"
+            | "temperature ring"
+            | "the temperature ring"
+            | "temp gauge"
+            | "the temp gauge"
+            | "temperature gauge"
+            | "the temperature gauge"
+            | "show temp ring"
+            | "show the temp ring"
+            | "show me temp ring"
+            | "show me the temp ring"
+            | "show temperature ring"
+            | "show the temperature ring"
+            | "show me temperature ring"
+            | "show me the temperature ring"
+            | "list temp ring"
+            | "list the temp ring"
+            | "list temperature ring"
+            | "list the temperature ring"
+            | "view temp ring"
+            | "view the temp ring"
+            | "view temperature ring"
+            | "view the temperature ring"
+            | "see temp ring"
+            | "see the temp ring"
+            | "see temperature ring"
+            | "see the temperature ring"
+            | "open temp ring"
+            | "open the temp ring"
+            | "open temperature ring"
+            | "open the temperature ring"
+            | "temp ring status"
+            | "how's the temp ring"
+            | "hows the temp ring"
+            | "what's the temp ring"
+            | "whats the temp ring"
+            | "what is the temp ring"
+            | "is the temp ring hot"
+            | "is temp ring hot"
+            | "is the temp ring high"
+            | "is temp ring high"
+    ) {
+        return Some(RingChipAsk::Temp);
     }
     if n.contains("why")
         || n.contains("process")

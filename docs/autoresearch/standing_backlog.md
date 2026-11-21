@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2928
+
+- CPU · GPU · Freq · Temp instant `/*-ring` + singular `* ring` NL: RAM already answered `/ram-ring` / `ram ring` but CPU/GPU/Freq/Temp hit the generic `ring` veto so `cpu ring` / `/cpu-ring` fell through to Ollama. Plural `cpu rings` / `view cpu rings` stay full `/rings` (router first). Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — CPU/GPU/Freq/Temp ring slash NL closed; not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2927
 
 - Load 1m instant view/open NL: focused chip already answered `load 1` / `/load-1m` but lacked view/see/show me/open/list phrases after Load 5m/15m got them (v0.1.2924) and P-core/E-core slash+NL (v0.1.2926). Bare `view load` / `/load` stay the full Details panel. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — Load 1m view/open NL closed; not another keep-pNN clone.

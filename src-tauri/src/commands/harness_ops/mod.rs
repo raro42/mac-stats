@@ -87,6 +87,52 @@ mod tests {
     }
 
     #[test]
+    fn cpu_gpu_freq_temp_ring_slash_does_not_steal_full_rings() {
+        // Singular * ring / /*-ring → focused chip (RAM `/ram-ring` parity).
+        assert_eq!(parse_ring_chip_ask("/cpu-ring"), Some(RingChipAsk::Cpu));
+        assert_eq!(parse_ring_chip_ask("cpu ring"), Some(RingChipAsk::Cpu));
+        assert_eq!(
+            parse_ring_chip_ask("view cpu ring"),
+            Some(RingChipAsk::Cpu)
+        );
+        assert_eq!(parse_ring_chip_ask("/gpu-ring"), Some(RingChipAsk::Gpu));
+        assert_eq!(
+            parse_ring_chip_ask("open gpu ring"),
+            Some(RingChipAsk::Gpu)
+        );
+        assert_eq!(parse_ring_chip_ask("/freq-ring"), Some(RingChipAsk::Freq));
+        assert_eq!(
+            parse_ring_chip_ask("view frequency ring"),
+            Some(RingChipAsk::Freq)
+        );
+        assert_eq!(parse_ring_chip_ask("/temp-ring"), Some(RingChipAsk::Temp));
+        assert_eq!(
+            parse_ring_chip_ask("open temp ring"),
+            Some(RingChipAsk::Temp)
+        );
+        // Plural cpu rings / view cpu rings stay the full `/rings` panel.
+        assert!(parse_ring_chip_ask("cpu rings").is_none());
+        assert!(parse_ring_chip_ask("view cpu rings").is_none());
+        assert!(looks_like_rings_request("cpu rings"));
+        assert!(looks_like_rings_request("view cpu rings"));
+        assert!(!looks_like_rings_request("cpu ring"));
+        assert!(!looks_like_rings_request("/cpu-ring"));
+        let cpu = try_operator_instant_reply("/cpu-ring").unwrap();
+        assert!(cpu.contains("**CPU**"), "got: {cpu}");
+        assert!(
+            !cpu.contains("**CPU rings**"),
+            "/cpu-ring must not expand full rings: {cpu}"
+        );
+        let gpu = try_operator_instant_reply("open gpu ring").unwrap();
+        assert!(gpu.contains("**GPU**"), "got: {gpu}");
+        let full = try_operator_instant_reply("view cpu rings").unwrap();
+        assert!(
+            full.contains("**CPU rings**"),
+            "got: {full}"
+        );
+    }
+
+    #[test]
     fn load_1m_chip_does_not_steal_full_load_panel() {
         // Explicit 1m window + view/open NL → focused Load chip (parity with load 5 / load 15).
         assert!(looks_like_load_chip_request("load 1"));
