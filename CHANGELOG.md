@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2933] - 2026-11-22
+
+### Added
+- Instant mac-stats process uptime accepts `/app-uptime` · `/process-uptime` · `/bot-uptime` · `/mac-stats-uptime` and view/see/open/list NL (`view app uptime`, `open process uptime`, `list bot uptime`, …), matching “app uptime” / “how long have you been running”. Bare `/uptime` / `view uptime` / `what's the uptime` still use the Mac Up chip.
+
 ## [0.1.2932] - 2026-11-21
 
 ### Added

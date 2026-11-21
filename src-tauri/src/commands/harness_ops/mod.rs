@@ -354,6 +354,43 @@ mod tests {
     }
 
     #[test]
+    fn app_uptime_slash_and_view_open_do_not_steal_mac_up_chip() {
+        // Slash + view/open NL → process clock (chip `/chip` · RAM `/ram-size` parity).
+        // Bare /uptime · view uptime · what's the uptime stay the Mac Up chip.
+        assert!(looks_like_app_uptime_request("/app-uptime"));
+        assert!(looks_like_app_uptime_request("/process-uptime"));
+        assert!(looks_like_app_uptime_request("/bot-uptime"));
+        assert!(looks_like_app_uptime_request("/mac-stats-uptime"));
+        assert!(looks_like_app_uptime_request("view app uptime"));
+        assert!(looks_like_app_uptime_request("open process uptime"));
+        assert!(looks_like_app_uptime_request("list bot uptime"));
+        assert!(looks_like_app_uptime_request("app uptime"));
+        assert!(looks_like_app_uptime_request("how long have you been running"));
+        assert!(!looks_like_app_uptime_request("/uptime"));
+        assert!(!looks_like_app_uptime_request("uptime"));
+        assert!(!looks_like_app_uptime_request("view uptime"));
+        assert!(!looks_like_app_uptime_request("what's the uptime"));
+        assert!(!looks_like_app_uptime_request("how long has the mac been up"));
+        assert_eq!(parse_strip_chip_ask("/uptime"), Some(StripChipAsk::Uptime));
+        assert_eq!(parse_strip_chip_ask("view uptime"), Some(StripChipAsk::Uptime));
+        let app = try_operator_instant_reply("/app-uptime").unwrap();
+        assert!(
+            app.contains("**App up**") && !app.to_lowercase().contains("execution"),
+            "got: {app}"
+        );
+        let viewed = try_operator_instant_reply("view app uptime").unwrap();
+        assert!(
+            viewed.contains("**App up**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let mac = try_operator_instant_reply("/uptime").unwrap();
+        assert!(
+            !mac.contains("**App up**"),
+            "bare /uptime must stay Mac Up chip, not process clock: {mac}"
+        );
+    }
+
+    #[test]
     fn chip_identity_slash_and_view_open_do_not_steal_cpu_ring_or_ollama_model() {
         // Slash + view/open NL → Apple chip name (RAM `/ram-size` · SSD `/free` parity).
         // Bare /cpu · view cpu · what's the cpu stay the CPU usage ring; /model stays Ollama.

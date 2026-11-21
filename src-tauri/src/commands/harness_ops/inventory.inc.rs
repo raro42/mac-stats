@@ -3885,7 +3885,9 @@ pub(super) fn format_system_uptime(secs: u64) -> String {
 
 
 /// mac-stats process clock — not the Mac Up chip.
-/// "Why" stays with the agent. "What's the uptime" stays system uptime.
+/// "Why" stays with the agent. "What's the uptime" / bare `/uptime` stay system uptime.
+/// Slash + view/open NL (`/app-uptime` · `/process-uptime` · `view app uptime`) match Bat
+/// `/battery` · watts `/watts` · chip `/chip` · RAM `/ram-size` shape.
 pub fn looks_like_app_uptime_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 56 {
@@ -3901,12 +3903,42 @@ pub fn looks_like_app_uptime_request(content: &str) -> bool {
         || n.contains("kill")
         || n.contains("how to")
         || n.contains("explain")
+        // Mac Up chip owns bare `/uptime` · `uptime` · `view uptime` · `what's the uptime`.
+        || n == "/uptime"
+        || n == "uptime"
+        || n == "up time"
+        || n == "the uptime"
+        || n == "view uptime"
+        || n == "view the uptime"
+        || n == "see uptime"
+        || n == "see the uptime"
+        || n == "open uptime"
+        || n == "open the uptime"
+        || n == "list uptime"
+        || n == "list the uptime"
+        || n == "what's the uptime"
+        || n == "whats the uptime"
+        || n == "what is the uptime"
+        || n == "how's the uptime"
+        || n == "hows the uptime"
+        || n == "uptime status"
     {
         return false;
     }
     matches!(
         n.as_str(),
-        "how long have you been up"
+        "/app-uptime"
+            | "/appuptime"
+            | "/process-uptime"
+            | "/processuptime"
+            | "/bot-uptime"
+            | "/botuptime"
+            | "/mac-stats-uptime"
+            | "/macstats-uptime"
+            | "/macstatsuptime"
+            | "/your-uptime"
+            | "/youruptime"
+            | "how long have you been up"
             | "how long are you up"
             | "how long running"
             | "how long have you been running"
@@ -3919,6 +3951,34 @@ pub fn looks_like_app_uptime_request(content: &str) -> bool {
             | "mac-stats uptime"
             | "bot uptime"
             | "your uptime"
+            // View/see/show me/open/list (bare view uptime stays Mac Up chip).
+            | "view app uptime"
+            | "view the app uptime"
+            | "view process uptime"
+            | "view the process uptime"
+            | "view bot uptime"
+            | "view the bot uptime"
+            | "view mac-stats uptime"
+            | "view the mac-stats uptime"
+            | "view your uptime"
+            | "see app uptime"
+            | "see the app uptime"
+            | "see process uptime"
+            | "see the process uptime"
+            | "see bot uptime"
+            | "see mac-stats uptime"
+            | "open app uptime"
+            | "open the app uptime"
+            | "open process uptime"
+            | "open the process uptime"
+            | "open bot uptime"
+            | "open mac-stats uptime"
+            | "list app uptime"
+            | "list the app uptime"
+            | "list process uptime"
+            | "list the process uptime"
+            | "list bot uptime"
+            | "list mac-stats uptime"
     )
 }
 
