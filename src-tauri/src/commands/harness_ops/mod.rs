@@ -312,6 +312,46 @@ mod tests {
     }
 
     #[test]
+    fn disk_free_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
+        // Slash + view/open NL → free bytes (SSD `/storage` · watts `/watts` parity).
+        // Bare free space / disk free stay SSD %; view disk stays Disk Cleanup.
+        assert!(looks_like_disk_free_request("/free"));
+        assert!(looks_like_disk_free_request("/ssd-free"));
+        assert!(looks_like_disk_free_request("/disk-free"));
+        assert!(looks_like_disk_free_request("/free-space"));
+        assert!(looks_like_disk_free_request("view free space"));
+        assert!(looks_like_disk_free_request("open free space"));
+        assert!(looks_like_disk_free_request("list ssd free"));
+        assert!(looks_like_disk_free_request("how much free space"));
+        assert!(!looks_like_disk_free_request("free space"));
+        assert!(!looks_like_disk_free_request("disk free"));
+        assert!(!looks_like_disk_free_request("view disk"));
+        assert!(!looks_like_disk_free_request("/ssd"));
+        assert!(!looks_like_disk_free_request("/storage"));
+        assert!(!looks_like_disk_free_request("how much disk is used"));
+        assert_eq!(parse_strip_chip_ask("free space"), Some(StripChipAsk::Ssd));
+        assert_eq!(parse_strip_chip_ask("disk free"), Some(StripChipAsk::Ssd));
+        assert!(looks_like_disk_cleanup_request("view disk"));
+        let free = try_operator_instant_reply("/free").unwrap();
+        assert!(
+            free.contains("**SSD**") && free.to_lowercase().contains("free"),
+            "got: {free}"
+        );
+        let viewed = try_operator_instant_reply("view free space").unwrap();
+        assert!(
+            viewed.contains("**SSD**") && viewed.to_lowercase().contains("free"),
+            "got: {viewed}"
+        );
+        let pct = try_operator_instant_reply("free space").unwrap();
+        assert!(pct.contains("**SSD**"), "got: {pct}");
+        // Percent chip is short; free-bytes line mentions "total".
+        assert!(
+            !pct.to_lowercase().contains(" total"),
+            "bare free space must stay % chip, not free bytes: {pct}"
+        );
+    }
+
+    #[test]
     fn p_e_core_slash_and_view_open_do_not_steal_freq_ring() {
         // Slash + view/open NL → focused P/E-core chips (Load `/load-5m` parity).
         assert_eq!(

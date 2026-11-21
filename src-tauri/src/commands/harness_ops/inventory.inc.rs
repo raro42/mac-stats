@@ -4926,6 +4926,8 @@ pub fn format_chip_identity_gateway() -> String {
 /// Free disk bytes — not the used-% chip, not Disk Cleanup, not a config file size.
 /// "Why" stays with the agent. "How much disk is used" stays the SSD percent chip.
 /// Bare "free space" / "disk free" stay the percent chip.
+/// Slash + view/open NL (`/free` · `/ssd-free` · `view free space`) match Bat `/battery` ·
+/// watts `/watts` · SSD `/storage` shape; bare `view disk` / `open disk` stay Disk Cleanup.
 pub fn looks_like_disk_free_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 56 {
@@ -4956,7 +4958,16 @@ pub fn looks_like_disk_free_request(content: &str) -> bool {
     }
     matches!(
         n.as_str(),
-        "how much free space"
+        "/free"
+            | "/ssd-free"
+            | "/ssdfree"
+            | "/disk-free"
+            | "/diskfree"
+            | "/free-space"
+            | "/freespace"
+            | "/space-left"
+            | "/spaceleft"
+            | "how much free space"
             | "how much space is left"
             | "how much space left"
             | "how much disk is free"
@@ -4976,6 +4987,42 @@ pub fn looks_like_disk_free_request(content: &str) -> bool {
             | "how much ssd free"
             | "space left on disk"
             | "space left on the disk"
+            // View/see/show me/open/list (show me → free space stays SSD %; keep view/open prefixes).
+            | "view free space"
+            | "view the free space"
+            | "view free disk space"
+            | "view disk free"
+            | "view the disk free"
+            | "view ssd free"
+            | "view the ssd free"
+            | "view storage free"
+            | "view the storage free"
+            | "view space left"
+            | "view the space left"
+            | "see free space"
+            | "see the free space"
+            | "see free disk space"
+            | "see disk free"
+            | "see ssd free"
+            | "see storage free"
+            | "see space left"
+            | "open free space"
+            | "open the free space"
+            | "open free disk space"
+            | "open disk free"
+            | "open ssd free"
+            | "open storage free"
+            | "open space left"
+            | "list free space"
+            | "list the free space"
+            | "list free disk space"
+            | "list disk free"
+            | "list ssd free"
+            | "list storage free"
+            | "list space left"
+            | "list the space left"
+            // After normalize strips `show` / `show me`: `show me how much free space` →
+            // `how much free space` (above). Bare `show free space` → `free space` stays SSD %.
     )
 }
 

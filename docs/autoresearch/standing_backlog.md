@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2930
+
+- Product fuel after SSD `/storage` NL v0.1.2929: SSD free-bytes already answered `how much free space` / `how much ssd free` but lacked `/free` · `/ssd-free` · `/disk-free` · `/free-space` and view/see/open/list phrases while Bat `/battery`, watts `/watts`, and SSD `/storage` already had slash+NL. Bare `free space` / `disk free` stay the SSD % chip; `view disk` stays Disk Cleanup. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — SSD free slash NL closed; not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2929
 
 - Product fuel after CPU/GPU/Freq/Temp /*-ring NL v0.1.2928: SSD chip already answered `how much storage` / `/ssd` but lacked `/storage` and view/see/show me/open/list storage phrases while Bat `/battery` and Power `/watts` already had slash+NL. Bare `view disk` / `open disk` stay Disk Cleanup. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — SSD `/storage` NL closed; not another keep-pNN clone.

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2930] - 2026-11-21
+
+### Added
+- Instant SSD free-bytes accepts `/free` · `/ssd-free` · `/disk-free` · `/free-space` and view/see/open/list NL (`view free space`, `open free space`, …), matching “how much free space”. Bare `free space` / `disk free` still use the SSD % chip; `view disk` still opens Disk Cleanup.
+
 ## [0.1.2929] - 2026-11-21
 
 ### Added
