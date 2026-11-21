@@ -4896,7 +4896,9 @@ pub fn format_ram_capacity_gateway() -> String {
 
 
 /// Apple chip name — not the CPU ring, not the Ollama model.
-/// "Why" stays with the agent. "What's the CPU" stays the usage ring.
+/// "Why" stays with the agent. "What's the CPU" / bare `/cpu` / `view cpu` stay the usage ring.
+/// Slash + view/open NL (`/chip` · `/processor` · `/cpu-name` · `view chip`) match Bat `/battery` ·
+/// watts `/watts` · SSD `/free` · RAM `/ram-size` shape; `/model` stays Ollama.
 pub fn looks_like_chip_identity_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 56 {
@@ -4920,12 +4922,35 @@ pub fn looks_like_chip_identity_request(content: &str) -> bool {
         || n.contains("how to")
         || n.contains("explain")
         || n.contains("gpu")
+        // CPU usage ring owns bare `/cpu` · `view cpu` · `what's the cpu` (not chip name).
+        || n == "/cpu"
+        || n == "cpu"
+        || n == "the cpu"
+        || n == "view cpu"
+        || n == "view the cpu"
+        || n == "see cpu"
+        || n == "see the cpu"
+        || n == "open cpu"
+        || n == "open the cpu"
+        || n == "list cpu"
+        || n == "list the cpu"
+        || n == "what's the cpu"
+        || n == "whats the cpu"
+        || n == "what is the cpu"
     {
         return false;
     }
     matches!(
         n.as_str(),
-        "what chip"
+        "/chip"
+            | "/chip-name"
+            | "/chipname"
+            | "/processor"
+            | "/cpu-name"
+            | "/cpuname"
+            | "/apple-chip"
+            | "/applechip"
+            | "what chip"
             | "what chip is this"
             | "what chip do i have"
             | "what chip does this mac have"
@@ -4959,6 +4984,51 @@ pub fn looks_like_chip_identity_request(content: &str) -> bool {
             | "which cpu do i have"
             | "apple chip"
             | "the apple chip"
+            // View/see/show me/open/list (bare view cpu stays CPU ring).
+            | "view chip"
+            | "view the chip"
+            | "view chip name"
+            | "view the chip name"
+            | "view processor"
+            | "view the processor"
+            | "view processor name"
+            | "view the processor name"
+            | "view cpu name"
+            | "view the cpu name"
+            | "view apple chip"
+            | "view the apple chip"
+            | "view mac chip"
+            | "view the mac chip"
+            | "see chip"
+            | "see the chip"
+            | "see chip name"
+            | "see the chip name"
+            | "see processor"
+            | "see the processor"
+            | "see cpu name"
+            | "see the cpu name"
+            | "see apple chip"
+            | "see the apple chip"
+            | "open chip"
+            | "open the chip"
+            | "open chip name"
+            | "open the chip name"
+            | "open processor"
+            | "open the processor"
+            | "open cpu name"
+            | "open the cpu name"
+            | "open apple chip"
+            | "open the apple chip"
+            | "list chip"
+            | "list the chip"
+            | "list chip name"
+            | "list the chip name"
+            | "list processor"
+            | "list the processor"
+            | "list cpu name"
+            | "list the cpu name"
+            | "list apple chip"
+            | "list the apple chip"
     )
 }
 

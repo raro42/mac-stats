@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2932] - 2026-11-21
+
+### Added
+- Instant Apple chip identity accepts `/chip` · `/chip-name` · `/processor` · `/cpu-name` · `/apple-chip` and view/see/open/list NL (`view chip`, `open processor`, `list cpu name`, …), matching “what chip is this” / “cpu name”. Bare `/cpu` / `view cpu` / `what's the cpu` still use the CPU usage ring; `/model` stays Ollama.
+
 ## [0.1.2931] - 2026-11-21
 
 ### Added

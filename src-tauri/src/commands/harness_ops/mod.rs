@@ -354,6 +354,43 @@ mod tests {
     }
 
     #[test]
+    fn chip_identity_slash_and_view_open_do_not_steal_cpu_ring_or_ollama_model() {
+        // Slash + view/open NL → Apple chip name (RAM `/ram-size` · SSD `/free` parity).
+        // Bare /cpu · view cpu · what's the cpu stay the CPU usage ring; /model stays Ollama.
+        assert!(looks_like_chip_identity_request("/chip"));
+        assert!(looks_like_chip_identity_request("/chip-name"));
+        assert!(looks_like_chip_identity_request("/processor"));
+        assert!(looks_like_chip_identity_request("/cpu-name"));
+        assert!(looks_like_chip_identity_request("/apple-chip"));
+        assert!(looks_like_chip_identity_request("view chip"));
+        assert!(looks_like_chip_identity_request("open processor"));
+        assert!(looks_like_chip_identity_request("list cpu name"));
+        assert!(looks_like_chip_identity_request("what chip is this"));
+        assert!(!looks_like_chip_identity_request("/cpu"));
+        assert!(!looks_like_chip_identity_request("view cpu"));
+        assert!(!looks_like_chip_identity_request("what's the cpu"));
+        assert!(!looks_like_chip_identity_request("/model"));
+        assert!(!looks_like_chip_identity_request("which model"));
+        assert_eq!(parse_ring_chip_ask("/cpu"), Some(RingChipAsk::Cpu));
+        assert_eq!(parse_ring_chip_ask("view cpu"), Some(RingChipAsk::Cpu));
+        let chip = try_operator_instant_reply("/chip").unwrap();
+        assert!(
+            chip.contains("**Chip**") && !chip.to_lowercase().contains("execution"),
+            "got: {chip}"
+        );
+        let viewed = try_operator_instant_reply("view chip").unwrap();
+        assert!(
+            viewed.contains("**Chip**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let cpu = try_operator_instant_reply("/cpu").unwrap();
+        assert!(
+            !cpu.contains("**Chip**"),
+            "bare /cpu must stay CPU ring, not chip name: {cpu}"
+        );
+    }
+
+    #[test]
     fn disk_free_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → free bytes (SSD `/storage` · watts `/watts` parity).
         // Bare free space / disk free stay SSD %; view disk stays Disk Cleanup.
