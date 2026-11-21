@@ -112,4 +112,52 @@ mod tests {
         let full = try_operator_instant_reply("/load").unwrap();
         assert!(full.contains("**Details**"), "got: {full}");
     }
+
+    #[test]
+    fn load_5m_15m_slash_and_view_open_do_not_steal_full_load() {
+        // Slash + view/open NL → focused 5m / 15m chips (Load 1m `/load-1m` parity).
+        assert_eq!(
+            parse_load_window_chip("/load-5m"),
+            Some(LoadWindowChip::Five)
+        );
+        assert_eq!(
+            parse_load_window_chip("/load-15m"),
+            Some(LoadWindowChip::Fifteen)
+        );
+        assert_eq!(
+            parse_load_window_chip("view load 5"),
+            Some(LoadWindowChip::Five)
+        );
+        assert_eq!(
+            parse_load_window_chip("open load 15m"),
+            Some(LoadWindowChip::Fifteen)
+        );
+        assert_eq!(
+            parse_load_window_chip("show me the 5 minute load"),
+            Some(LoadWindowChip::Five)
+        );
+        // Bare view/open load still Details; why stays with the agent.
+        assert!(parse_load_window_chip("view load").is_none());
+        assert!(parse_load_window_chip("open load").is_none());
+        assert!(parse_load_window_chip("/load").is_none());
+        assert!(parse_load_window_chip("why is the 5 minute load high").is_none());
+        assert!(looks_like_details_request("view load"));
+        assert!(looks_like_details_request("/load"));
+        assert!(!looks_like_details_request("view load 5"));
+        assert!(!looks_like_details_request("/load-5m"));
+        let five = try_operator_instant_reply("/load-5m").unwrap();
+        assert!(five.contains("**Load 5m**"), "got: {five}");
+        assert!(
+            !five.contains("**Details**"),
+            "/load-5m must not expand full Details: {five}"
+        );
+        let fifteen = try_operator_instant_reply("open load 15m").unwrap();
+        assert!(fifteen.contains("**Load 15m**"), "got: {fifteen}");
+        assert!(
+            !fifteen.contains("**Details**"),
+            "open load 15m must not expand full Details: {fifteen}"
+        );
+        let full = try_operator_instant_reply("view load").unwrap();
+        assert!(full.contains("**Details**"), "got: {full}");
+    }
 }

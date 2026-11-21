@@ -4818,6 +4818,8 @@ pub enum LoadWindowChip {
 
 
 /// Focused 5m / 15m load asks. "Why" stays with the agent. `/load` stays the full panel.
+/// Slash + view/see/show me/open/list-the NL (v0.1.2924) — parity with Load 1m `/load-1m`.
+/// Exact `open load 5` / `open the 5 minute load` only (not bare `open load` → Details).
 pub fn parse_load_window_chip(content: &str) -> Option<LoadWindowChip> {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -4838,7 +4840,11 @@ pub fn parse_load_window_chip(content: &str) -> Option<LoadWindowChip> {
     }
     if matches!(
         n.as_str(),
-        "5 minute load"
+        "/load-5m"
+            | "/load-5"
+            | "/load5"
+            | "/load5m"
+            | "5 minute load"
             | "5-minute load"
             | "five minute load"
             | "load 5"
@@ -4852,12 +4858,44 @@ pub fn parse_load_window_chip(content: &str) -> Option<LoadWindowChip> {
             | "hows the 5 minute load"
             | "is the 5 minute load high"
             | "is 5 minute load high"
+            | "view load 5"
+            | "view load 5m"
+            | "view the 5 minute load"
+            | "view 5 minute load"
+            | "view 5m load"
+            | "see load 5"
+            | "see load 5m"
+            | "see the 5 minute load"
+            | "see 5 minute load"
+            | "see 5m load"
+            | "show load 5"
+            | "show load 5m"
+            | "show the 5 minute load"
+            | "show 5 minute load"
+            | "show me load 5"
+            | "show me load 5m"
+            | "show me the 5 minute load"
+            | "show me 5 minute load"
+            | "open load 5"
+            | "open load 5m"
+            | "open the 5 minute load"
+            | "open 5 minute load"
+            | "open 5m load"
+            | "list load 5"
+            | "list load 5m"
+            | "list the 5 minute load"
+            | "list 5 minute load"
+            | "list the 5m load"
     ) {
         return Some(LoadWindowChip::Five);
     }
     if matches!(
         n.as_str(),
-        "15 minute load"
+        "/load-15m"
+            | "/load-15"
+            | "/load15"
+            | "/load15m"
+            | "15 minute load"
             | "15-minute load"
             | "fifteen minute load"
             | "load 15"
@@ -4871,6 +4909,34 @@ pub fn parse_load_window_chip(content: &str) -> Option<LoadWindowChip> {
             | "hows the 15 minute load"
             | "is the 15 minute load high"
             | "is 15 minute load high"
+            | "view load 15"
+            | "view load 15m"
+            | "view the 15 minute load"
+            | "view 15 minute load"
+            | "view 15m load"
+            | "see load 15"
+            | "see load 15m"
+            | "see the 15 minute load"
+            | "see 15 minute load"
+            | "see 15m load"
+            | "show load 15"
+            | "show load 15m"
+            | "show the 15 minute load"
+            | "show 15 minute load"
+            | "show me load 15"
+            | "show me load 15m"
+            | "show me the 15 minute load"
+            | "show me 15 minute load"
+            | "open load 15"
+            | "open load 15m"
+            | "open the 15 minute load"
+            | "open 15 minute load"
+            | "open 15m load"
+            | "list load 15"
+            | "list load 15m"
+            | "list the 15 minute load"
+            | "list 15 minute load"
+            | "list the 15m load"
     ) {
         return Some(LoadWindowChip::Fifteen);
     }

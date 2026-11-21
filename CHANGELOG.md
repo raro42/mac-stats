@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2924] - 2026-11-21
+
+### Added
+- Instant Load 5m / 15m chips accept `/load-5m` · `/load-15m` and view/see/show me/open/list NL (`view load 5`, `open load 15m`, …). Bare `view load` / `/load` still open the full Details panel.
+
 ## [0.1.2923] - 2026-11-21
 
 ### Fixed
