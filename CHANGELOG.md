@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2919] - 2026-11-21
+
+### Fixed
+- GPU · Temp · Freq ring jump-flash on Data Poster / Dark / Neon / Futuristic / cream / Swiss: ring card tile variants (`.metric-box` / `.metric-tile` / `.dial` / `.tile` / `.poster-tile`) now mix onto theme paper like RAM, not only `.metric-card`.
+
 ## [0.1.2918] - 2026-11-21
 
 ### Fixed

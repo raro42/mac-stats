@@ -31128,8 +31128,11 @@ body.theme-futuristic {
  * OVERNIGHT v0.1.2917 layout-daily: RAM ring card flash (`.metric-card` /
  * `.metric-tile` / `.poster-tile` · `.is-ram-highlight`) after v0.1.2915 —
  * detail-label remaps alone left ring jump flashes on Apple `#ffffff`.
+ * OVERNIGHT v0.1.2919: GPU · Temp · Freq ring card flash parity with RAM
+ * (`.metric-box` / `.metric-tile` / `.dial` / `.tile` / `.poster-tile`) —
+ * remaps previously only hit `.metric-card` while cpu.js flashes tile variants.
  */
-/* OVERNIGHT v0.1.2525 + v0.1.2822 + v0.1.2917: metric-strip flash highlight CRT → theme accent */
+/* OVERNIGHT v0.1.2525 + v0.1.2822 + v0.1.2917 + v0.1.2919: metric-strip flash highlight CRT → theme accent */
 body.theme-data-poster .detail-label.is-ram-highlight,
 body.theme-data-poster .detail-value.is-ram-highlight,
 body.theme-data-poster .metric-card.is-ram-highlight,
@@ -31140,9 +31143,24 @@ body.theme-data-poster .tile.is-ram-highlight,
 body.theme-data-poster .poster-tile.is-ram-highlight,
 body.theme-data-poster #cpu-usage-card.is-cpu-highlight,
 body.theme-data-poster .metric-card.is-gpu-highlight,
+body.theme-data-poster .metric-box.is-gpu-highlight,
+body.theme-data-poster .metric-tile.is-gpu-highlight,
+body.theme-data-poster .dial.is-gpu-highlight,
+body.theme-data-poster .tile.is-gpu-highlight,
+body.theme-data-poster .poster-tile.is-gpu-highlight,
 body.theme-data-poster #gpu-power.is-gpu-highlight,
 body.theme-data-poster .metric-card.is-temp-highlight,
+body.theme-data-poster .metric-box.is-temp-highlight,
+body.theme-data-poster .metric-tile.is-temp-highlight,
+body.theme-data-poster .dial.is-temp-highlight,
+body.theme-data-poster .tile.is-temp-highlight,
+body.theme-data-poster .poster-tile.is-temp-highlight,
 body.theme-data-poster .metric-card.is-freq-highlight,
+body.theme-data-poster .metric-box.is-freq-highlight,
+body.theme-data-poster .metric-tile.is-freq-highlight,
+body.theme-data-poster .dial.is-freq-highlight,
+body.theme-data-poster .tile.is-freq-highlight,
+body.theme-data-poster .poster-tile.is-freq-highlight,
 body.theme-data-poster .detail-label.is-uptime-highlight,
 body.theme-data-poster .detail-value.is-uptime-highlight {
   /* Opaque poster cyan — Apple #0a84ff fallback lagged --accent (#14 / P2; design-review cpu-metrics). */
@@ -31163,9 +31181,24 @@ body.theme-dark .tile.is-ram-highlight,
 body.theme-dark .poster-tile.is-ram-highlight,
 body.theme-dark #cpu-usage-card.is-cpu-highlight,
 body.theme-dark .metric-card.is-gpu-highlight,
+body.theme-dark .metric-box.is-gpu-highlight,
+body.theme-dark .metric-tile.is-gpu-highlight,
+body.theme-dark .dial.is-gpu-highlight,
+body.theme-dark .tile.is-gpu-highlight,
+body.theme-dark .poster-tile.is-gpu-highlight,
 body.theme-dark #gpu-power.is-gpu-highlight,
 body.theme-dark .metric-card.is-temp-highlight,
+body.theme-dark .metric-box.is-temp-highlight,
+body.theme-dark .metric-tile.is-temp-highlight,
+body.theme-dark .dial.is-temp-highlight,
+body.theme-dark .tile.is-temp-highlight,
+body.theme-dark .poster-tile.is-temp-highlight,
 body.theme-dark .metric-card.is-freq-highlight,
+body.theme-dark .metric-box.is-freq-highlight,
+body.theme-dark .metric-tile.is-freq-highlight,
+body.theme-dark .dial.is-freq-highlight,
+body.theme-dark .tile.is-freq-highlight,
+body.theme-dark .poster-tile.is-freq-highlight,
 body.theme-dark .detail-label.is-uptime-highlight,
 body.theme-dark .detail-value.is-uptime-highlight {
   /* Opaque Matrix green — Apple #0a84ff fallback lagged --accent (#14 / P2; design-review cpu-metrics). */
@@ -31186,9 +31219,24 @@ body.theme-neon .tile.is-ram-highlight,
 body.theme-neon .poster-tile.is-ram-highlight,
 body.theme-neon #cpu-usage-card.is-cpu-highlight,
 body.theme-neon .metric-card.is-gpu-highlight,
+body.theme-neon .metric-box.is-gpu-highlight,
+body.theme-neon .metric-tile.is-gpu-highlight,
+body.theme-neon .dial.is-gpu-highlight,
+body.theme-neon .tile.is-gpu-highlight,
+body.theme-neon .poster-tile.is-gpu-highlight,
 body.theme-neon #gpu-power.is-gpu-highlight,
 body.theme-neon .metric-card.is-temp-highlight,
+body.theme-neon .metric-box.is-temp-highlight,
+body.theme-neon .metric-tile.is-temp-highlight,
+body.theme-neon .dial.is-temp-highlight,
+body.theme-neon .tile.is-temp-highlight,
+body.theme-neon .poster-tile.is-temp-highlight,
 body.theme-neon .metric-card.is-freq-highlight,
+body.theme-neon .metric-box.is-freq-highlight,
+body.theme-neon .metric-tile.is-freq-highlight,
+body.theme-neon .dial.is-freq-highlight,
+body.theme-neon .tile.is-freq-highlight,
+body.theme-neon .poster-tile.is-freq-highlight,
 body.theme-neon .detail-label.is-uptime-highlight,
 body.theme-neon .detail-value.is-uptime-highlight {
   /* Opaque neon green — Apple #0a84ff fallback lagged --accent (#14 / P2; design-review cpu-metrics). */
@@ -31209,9 +31257,24 @@ body.theme-futuristic .tile.is-ram-highlight,
 body.theme-futuristic .poster-tile.is-ram-highlight,
 body.theme-futuristic #cpu-usage-card.is-cpu-highlight,
 body.theme-futuristic .metric-card.is-gpu-highlight,
+body.theme-futuristic .metric-box.is-gpu-highlight,
+body.theme-futuristic .metric-tile.is-gpu-highlight,
+body.theme-futuristic .dial.is-gpu-highlight,
+body.theme-futuristic .tile.is-gpu-highlight,
+body.theme-futuristic .poster-tile.is-gpu-highlight,
 body.theme-futuristic #gpu-power.is-gpu-highlight,
 body.theme-futuristic .metric-card.is-temp-highlight,
+body.theme-futuristic .metric-box.is-temp-highlight,
+body.theme-futuristic .metric-tile.is-temp-highlight,
+body.theme-futuristic .dial.is-temp-highlight,
+body.theme-futuristic .tile.is-temp-highlight,
+body.theme-futuristic .poster-tile.is-temp-highlight,
 body.theme-futuristic .metric-card.is-freq-highlight,
+body.theme-futuristic .metric-box.is-freq-highlight,
+body.theme-futuristic .metric-tile.is-freq-highlight,
+body.theme-futuristic .dial.is-freq-highlight,
+body.theme-futuristic .tile.is-freq-highlight,
+body.theme-futuristic .poster-tile.is-freq-highlight,
 body.theme-futuristic .detail-label.is-uptime-highlight,
 body.theme-futuristic .detail-value.is-uptime-highlight {
   /* Opaque futuristic cyan — Apple #0a84ff fallback lagged --accent (#14 / P2; design-review cpu-metrics). */
@@ -35744,15 +35807,16 @@ body.theme-architect .history-chart-container.is-fair:not(.is-hot) {
 /*
  * Light / Material / Architect: metric-strip flash highlights still mix
  * Apple `#ffffff` (`.detail-label/.detail-value.is-ram-highlight` ·
- * `#cpu-usage-card.is-cpu-highlight` · `.metric-card.is-gpu-highlight` ·
- * `#gpu-power.is-gpu-highlight` · `.metric-card.is-temp-highlight` ·
- * `.metric-card.is-freq-highlight` · `.detail-label/.detail-value.is-uptime-highlight` ·
+ * `#cpu-usage-card.is-cpu-highlight` · `.metric-card/.metric-tile/.poster-tile.is-gpu-highlight` ·
+ * `#gpu-power.is-gpu-highlight` · `.metric-card/.metric-tile/.poster-tile.is-temp-highlight` ·
+ * `.metric-card/.metric-tile/.poster-tile.is-freq-highlight` · `.detail-label/.detail-value.is-uptime-highlight` ·
  * `.disk-cleanup-section.is-disk-highlight`) while Hot/Ok/Fair remaps already
  * mix on cream paper. Opaque washes so jump-to flashes match light shells
  * (Swiss / Apple keep shared `#ffffff`). Standing P2 #14 after light
  * metric-card + history Hot/Ok/Fair remaps v0.1.2685.
+ * OVERNIGHT v0.1.2919: GPU · Temp · Freq ring card tile-variant parity with RAM.
  */
-/* OVERNIGHT v0.1.2686: light metric-strip flash highlight remaps */
+/* OVERNIGHT v0.1.2686 + v0.1.2919: light metric-strip flash highlight remaps */
 
 /* --- light (#f7f7fa) --- */
 body.theme-light .detail-label.is-ram-highlight,
@@ -35765,9 +35829,24 @@ body.theme-light .tile.is-ram-highlight,
 body.theme-light .poster-tile.is-ram-highlight,
 body.theme-light #cpu-usage-card.is-cpu-highlight,
 body.theme-light .metric-card.is-gpu-highlight,
+body.theme-light .metric-box.is-gpu-highlight,
+body.theme-light .metric-tile.is-gpu-highlight,
+body.theme-light .dial.is-gpu-highlight,
+body.theme-light .tile.is-gpu-highlight,
+body.theme-light .poster-tile.is-gpu-highlight,
 body.theme-light #gpu-power.is-gpu-highlight,
 body.theme-light .metric-card.is-temp-highlight,
+body.theme-light .metric-box.is-temp-highlight,
+body.theme-light .metric-tile.is-temp-highlight,
+body.theme-light .dial.is-temp-highlight,
+body.theme-light .tile.is-temp-highlight,
+body.theme-light .poster-tile.is-temp-highlight,
 body.theme-light .metric-card.is-freq-highlight,
+body.theme-light .metric-box.is-freq-highlight,
+body.theme-light .metric-tile.is-freq-highlight,
+body.theme-light .dial.is-freq-highlight,
+body.theme-light .tile.is-freq-highlight,
+body.theme-light .poster-tile.is-freq-highlight,
 body.theme-light .detail-label.is-uptime-highlight,
 body.theme-light .detail-value.is-uptime-highlight {
   /* Opaque Light accent — Apple #0a84ff lagged --accent / Swiss metric-strip (#14 / P2; design-review metrics). */
@@ -35791,9 +35870,24 @@ body.theme-material .tile.is-ram-highlight,
 body.theme-material .poster-tile.is-ram-highlight,
 body.theme-material #cpu-usage-card.is-cpu-highlight,
 body.theme-material .metric-card.is-gpu-highlight,
+body.theme-material .metric-box.is-gpu-highlight,
+body.theme-material .metric-tile.is-gpu-highlight,
+body.theme-material .dial.is-gpu-highlight,
+body.theme-material .tile.is-gpu-highlight,
+body.theme-material .poster-tile.is-gpu-highlight,
 body.theme-material #gpu-power.is-gpu-highlight,
 body.theme-material .metric-card.is-temp-highlight,
+body.theme-material .metric-box.is-temp-highlight,
+body.theme-material .metric-tile.is-temp-highlight,
+body.theme-material .dial.is-temp-highlight,
+body.theme-material .tile.is-temp-highlight,
+body.theme-material .poster-tile.is-temp-highlight,
 body.theme-material .metric-card.is-freq-highlight,
+body.theme-material .metric-box.is-freq-highlight,
+body.theme-material .metric-tile.is-freq-highlight,
+body.theme-material .dial.is-freq-highlight,
+body.theme-material .tile.is-freq-highlight,
+body.theme-material .poster-tile.is-freq-highlight,
 body.theme-material .detail-label.is-uptime-highlight,
 body.theme-material .detail-value.is-uptime-highlight {
   /* Opaque Material accent — Apple #0a84ff lagged --accent / Swiss metric-strip (#14 / P2; design-review metrics). */
@@ -35817,9 +35911,24 @@ body.theme-architect .tile.is-ram-highlight,
 body.theme-architect .poster-tile.is-ram-highlight,
 body.theme-architect #cpu-usage-card.is-cpu-highlight,
 body.theme-architect .metric-card.is-gpu-highlight,
+body.theme-architect .metric-box.is-gpu-highlight,
+body.theme-architect .metric-tile.is-gpu-highlight,
+body.theme-architect .dial.is-gpu-highlight,
+body.theme-architect .tile.is-gpu-highlight,
+body.theme-architect .poster-tile.is-gpu-highlight,
 body.theme-architect #gpu-power.is-gpu-highlight,
 body.theme-architect .metric-card.is-temp-highlight,
+body.theme-architect .metric-box.is-temp-highlight,
+body.theme-architect .metric-tile.is-temp-highlight,
+body.theme-architect .dial.is-temp-highlight,
+body.theme-architect .tile.is-temp-highlight,
+body.theme-architect .poster-tile.is-temp-highlight,
 body.theme-architect .metric-card.is-freq-highlight,
+body.theme-architect .metric-box.is-freq-highlight,
+body.theme-architect .metric-tile.is-freq-highlight,
+body.theme-architect .dial.is-freq-highlight,
+body.theme-architect .tile.is-freq-highlight,
+body.theme-architect .poster-tile.is-freq-highlight,
 body.theme-architect .detail-label.is-uptime-highlight,
 body.theme-architect .detail-value.is-uptime-highlight {
   /* Opaque Architect accent — Apple #0a84ff lagged --accent / Swiss metric-strip (#14 / P2; design-review metrics). */
@@ -39462,9 +39571,9 @@ body.theme-swiss-minimalistic .process-detail-pid:focus-visible {
  * Standing P2 #14 leftover soft-states — not a keep-pNN Disk Cleanup clone;
  * polish-without-capture (Mac TCC); digester empty.
  */
-/* OVERNIGHT v0.1.2860: Swiss metric-highlight + tip/banner + github-link remaps */
+/* OVERNIGHT v0.1.2860 + v0.1.2919: Swiss metric-highlight + tip/banner + github-link remaps */
 
-/* --- swiss metric-strip flash highlights (cream 2686 parity) --- */
+/* --- swiss metric-strip flash highlights (cream 2686 + GPU/Temp/Freq tile parity) --- */
 body.theme-swiss-minimalistic .detail-label.is-ram-highlight,
 body.theme-swiss-minimalistic .detail-value.is-ram-highlight,
 body.theme-swiss-minimalistic .metric-card.is-ram-highlight,
@@ -39475,9 +39584,24 @@ body.theme-swiss-minimalistic .tile.is-ram-highlight,
 body.theme-swiss-minimalistic .poster-tile.is-ram-highlight,
 body.theme-swiss-minimalistic #cpu-usage-card.is-cpu-highlight,
 body.theme-swiss-minimalistic .metric-card.is-gpu-highlight,
+body.theme-swiss-minimalistic .metric-box.is-gpu-highlight,
+body.theme-swiss-minimalistic .metric-tile.is-gpu-highlight,
+body.theme-swiss-minimalistic .dial.is-gpu-highlight,
+body.theme-swiss-minimalistic .tile.is-gpu-highlight,
+body.theme-swiss-minimalistic .poster-tile.is-gpu-highlight,
 body.theme-swiss-minimalistic #gpu-power.is-gpu-highlight,
 body.theme-swiss-minimalistic .metric-card.is-temp-highlight,
+body.theme-swiss-minimalistic .metric-box.is-temp-highlight,
+body.theme-swiss-minimalistic .metric-tile.is-temp-highlight,
+body.theme-swiss-minimalistic .dial.is-temp-highlight,
+body.theme-swiss-minimalistic .tile.is-temp-highlight,
+body.theme-swiss-minimalistic .poster-tile.is-temp-highlight,
 body.theme-swiss-minimalistic .metric-card.is-freq-highlight,
+body.theme-swiss-minimalistic .metric-box.is-freq-highlight,
+body.theme-swiss-minimalistic .metric-tile.is-freq-highlight,
+body.theme-swiss-minimalistic .dial.is-freq-highlight,
+body.theme-swiss-minimalistic .tile.is-freq-highlight,
+body.theme-swiss-minimalistic .poster-tile.is-freq-highlight,
 body.theme-swiss-minimalistic .detail-label.is-uptime-highlight,
 body.theme-swiss-minimalistic .detail-value.is-uptime-highlight {
   /* Opaque Swiss ink — Apple #ffffff flash lagged cream metric-strip (#14 / P2; design-review metrics). */
