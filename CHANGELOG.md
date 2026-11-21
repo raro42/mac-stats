@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2934] - 2026-11-22
+
+### Added
+- Instant SSD capacity accepts `/ssd-size` · `/disk-size` · `/storage-size` · `/ssd-capacity` · `/disk-capacity` · `/storage-capacity` · `/total-ssd` · `/total-disk` · `/total-storage` and view/see/open/list NL (`view ssd size`, `open disk capacity`, …), matching “how big is the ssd” / “disk size”. Bare `/ssd` / `/storage` / `how much storage` / `view ssd` still use the SSD % chip; `/free` still uses free-bytes; `view disk` still opens Disk Cleanup.
+
 ## [0.1.2933] - 2026-11-22
 
 ### Added

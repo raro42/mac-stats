@@ -48,6 +48,11 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_ram_capacity_request(content) {
         return Some(format_ram_capacity_gateway());
     }
+    // SSD capacity before resource-stat size lanes (disk cleanup / notes / … would steal
+    // `disk size` / `/ssd-size` / `how big is the ssd`). Bare `/ssd` / `view disk` stay later.
+    if looks_like_disk_capacity_request(content) {
+        return Some(format_disk_capacity_gateway());
+    }
     // downloads-organizer-rules.md size before age/path (stat only; no dump).
     if looks_like_downloads_organizer_rules_size_request(content) {
         return Some(format_downloads_organizer_rules_size_gateway());

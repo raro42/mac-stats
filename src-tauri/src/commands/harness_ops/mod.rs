@@ -428,6 +428,54 @@ mod tests {
     }
 
     #[test]
+    fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
+        // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
+        // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.
+        assert!(looks_like_disk_capacity_request("/ssd-size"));
+        assert!(looks_like_disk_capacity_request("/disk-size"));
+        assert!(looks_like_disk_capacity_request("/storage-size"));
+        assert!(looks_like_disk_capacity_request("/ssd-capacity"));
+        assert!(looks_like_disk_capacity_request("/total-ssd"));
+        assert!(looks_like_disk_capacity_request("view ssd size"));
+        assert!(looks_like_disk_capacity_request("open disk capacity"));
+        assert!(looks_like_disk_capacity_request("list storage size"));
+        assert!(looks_like_disk_capacity_request("how big is the ssd"));
+        assert!(looks_like_disk_capacity_request("ssd size"));
+        assert!(!looks_like_disk_capacity_request("/ssd"));
+        assert!(!looks_like_disk_capacity_request("/storage"));
+        assert!(!looks_like_disk_capacity_request("view ssd"));
+        assert!(!looks_like_disk_capacity_request("how much storage"));
+        assert!(!looks_like_disk_capacity_request("view disk"));
+        assert!(!looks_like_disk_capacity_request("/free"));
+        assert!(!looks_like_disk_capacity_request("how much free space"));
+        assert!(!looks_like_disk_capacity_request("disk cleanup size"));
+        assert_eq!(parse_strip_chip_ask("/ssd"), Some(StripChipAsk::Ssd));
+        assert_eq!(parse_strip_chip_ask("view storage"), Some(StripChipAsk::Ssd));
+        let cap = try_operator_instant_reply("/ssd-size").unwrap();
+        assert!(
+            cap.contains("**SSD**")
+                && cap.to_lowercase().contains("capacity")
+                && !cap.to_lowercase().contains("execution"),
+            "got: {cap}"
+        );
+        let viewed = try_operator_instant_reply("view ssd size").unwrap();
+        assert!(
+            viewed.contains("**SSD**") && viewed.to_lowercase().contains("capacity"),
+            "got: {viewed}"
+        );
+        let pct = try_operator_instant_reply("/ssd").unwrap();
+        assert!(
+            pct.contains("**SSD**") && !pct.to_lowercase().contains("capacity"),
+            "bare /ssd must stay % chip, not capacity: {pct}"
+        );
+        let free = try_operator_instant_reply("/free").unwrap();
+        assert!(
+            free.contains("**SSD**") && free.to_lowercase().contains("free"),
+            "got: {free}"
+        );
+    }
+
+    #[test]
     fn disk_free_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → free bytes (SSD `/storage` · watts `/watts` parity).
         // Bare free space / disk free stay SSD %; view disk stays Disk Cleanup.

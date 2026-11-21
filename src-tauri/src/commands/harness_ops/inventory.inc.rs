@@ -5104,6 +5104,219 @@ pub fn format_chip_identity_gateway() -> String {
 }
 
 
+/// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
+/// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
+/// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·
+/// Bat `/battery` shape; bare `view disk` / `open disk` stay Disk Cleanup; `/free` stays free-bytes.
+pub fn looks_like_disk_capacity_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("path")
+        || n.contains(" age")
+        || n.ends_with(" age")
+        || n.contains("cleanup")
+        || n.contains("quarantine")
+        || n.contains("reclaim")
+        || n.contains("free")
+        || n.contains("left")
+        || n.contains("used")
+        || n.contains("usage")
+        || n.contains("percent")
+        || n.contains('%')
+        || n.contains("full")
+        || n.contains("hot")
+        || n.contains("json")
+        || n.contains("notes")
+        || n.contains("memory")
+        || n.contains("process")
+        || n.contains("folder")
+        || n.contains("file")
+        || n.contains("how to")
+        || n.contains("explain")
+        // SSD % chip owns bare `/ssd` · `/storage` · `view ssd` · `how much storage`.
+        || n == "/ssd"
+        || n == "/storage"
+        || n == "ssd"
+        || n == "storage"
+        || n == "the ssd"
+        || n == "the storage"
+        || n == "disk"
+        || n == "the disk"
+        || n == "view ssd"
+        || n == "view the ssd"
+        || n == "view storage"
+        || n == "view the storage"
+        || n == "see ssd"
+        || n == "see the ssd"
+        || n == "see storage"
+        || n == "see the storage"
+        || n == "open ssd"
+        || n == "open the ssd"
+        || n == "open storage"
+        || n == "open the storage"
+        || n == "list ssd"
+        || n == "list the ssd"
+        || n == "list storage"
+        || n == "list the storage"
+        || n == "how much ssd"
+        || n == "how much storage"
+        || n == "how much disk"
+        // Disk Cleanup owns bare `view disk` / `open disk`.
+        || n == "view disk"
+        || n == "view the disk"
+        || n == "see disk"
+        || n == "see the disk"
+        || n == "open disk"
+        || n == "open the disk"
+        || n == "list disk"
+        || n == "list the disk"
+        || n == "/disk"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/ssd-size"
+            | "/ssdsize"
+            | "/disk-size"
+            | "/disksize"
+            | "/storage-size"
+            | "/storagesize"
+            | "/ssd-capacity"
+            | "/ssdcapacity"
+            | "/disk-capacity"
+            | "/diskcapacity"
+            | "/storage-capacity"
+            | "/storagecapacity"
+            | "/total-ssd"
+            | "/totalssd"
+            | "/total-disk"
+            | "/totaldisk"
+            | "/total-storage"
+            | "/totalstorage"
+            | "ssd size"
+            | "the ssd size"
+            | "disk size"
+            | "the disk size"
+            | "storage size"
+            | "the storage size"
+            | "ssd capacity"
+            | "the ssd capacity"
+            | "disk capacity"
+            | "the disk capacity"
+            | "storage capacity"
+            | "the storage capacity"
+            | "total ssd"
+            | "the total ssd"
+            | "total disk"
+            | "the total disk"
+            | "total storage"
+            | "the total storage"
+            | "how big is ssd"
+            | "how big is the ssd"
+            | "how big is disk"
+            | "how big is the disk"
+            | "how big is storage"
+            | "how big is the storage"
+            | "how large is ssd"
+            | "how large is the ssd"
+            | "how large is disk"
+            | "how large is the disk"
+            | "how large is storage"
+            | "how large is the storage"
+            | "how many gb of ssd"
+            | "how many gb of disk"
+            | "how many gb of storage"
+            | "how many gigabytes of ssd"
+            | "how many gigabytes of disk"
+            | "how many gigabytes of storage"
+            | "how much ssd does this mac have"
+            | "how much disk does this mac have"
+            | "how much storage does this mac have"
+            | "what's the ssd size"
+            | "whats the ssd size"
+            | "what is the ssd size"
+            | "what's the disk size"
+            | "whats the disk size"
+            | "what is the disk size"
+            | "what's the storage size"
+            | "whats the storage size"
+            | "what is the storage size"
+            // View/see/show me/open/list (bare view ssd / view disk stay % / Cleanup).
+            | "view ssd size"
+            | "view the ssd size"
+            | "view ssd capacity"
+            | "view the ssd capacity"
+            | "view disk size"
+            | "view the disk size"
+            | "view disk capacity"
+            | "view the disk capacity"
+            | "view storage size"
+            | "view the storage size"
+            | "view storage capacity"
+            | "view the storage capacity"
+            | "view total ssd"
+            | "view the total ssd"
+            | "view total disk"
+            | "view the total disk"
+            | "view total storage"
+            | "view the total storage"
+            | "see ssd size"
+            | "see the ssd size"
+            | "see ssd capacity"
+            | "see disk size"
+            | "see disk capacity"
+            | "see storage size"
+            | "see storage capacity"
+            | "see total ssd"
+            | "see total disk"
+            | "see total storage"
+            | "open ssd size"
+            | "open the ssd size"
+            | "open ssd capacity"
+            | "open the ssd capacity"
+            | "open disk size"
+            | "open the disk size"
+            | "open disk capacity"
+            | "open the disk capacity"
+            | "open storage size"
+            | "open the storage size"
+            | "open storage capacity"
+            | "open the storage capacity"
+            | "open total ssd"
+            | "open total disk"
+            | "open total storage"
+            | "list ssd size"
+            | "list the ssd size"
+            | "list ssd capacity"
+            | "list disk size"
+            | "list disk capacity"
+            | "list storage size"
+            | "list storage capacity"
+            | "list total ssd"
+            | "list total disk"
+            | "list total storage"
+    )
+}
+
+
+/// Zero-LLM SSD capacity (total bytes + used). Percent chip still owns "how much ssd".
+pub fn format_disk_capacity_gateway() -> String {
+    match crate::metrics::get_system_disk_bytes() {
+        Some((total, available)) if total > 0 => {
+            let used_bytes = total.saturating_sub(available);
+            let tot = crate::commands::disk_cleanup::format_bytes(total);
+            let used = crate::commands::disk_cleanup::format_bytes(used_bytes);
+            format!("**SSD** · {tot} capacity · {used} used")
+        }
+        _ => "**SSD** — _no disk size reading right now._".to_string(),
+    }
+}
+
+
 /// Free disk bytes — not the used-% chip, not Disk Cleanup, not a config file size.
 /// "Why" stays with the agent. "How much disk is used" stays the SSD percent chip.
 /// Bare "free space" / "disk free" stay the percent chip.
