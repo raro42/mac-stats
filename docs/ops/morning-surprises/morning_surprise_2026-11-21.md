@@ -1,26 +1,17 @@
 # Morning surprise — 2026-11-21
 
-Overnight Track B (mac-stats product ratchet). Local night window 20:00–06:00.
+Overnight autoresearch (Track B) while you slept. Digester was empty; design-review grace; layout-daily data-poster already marked. Product fuel kept moving.
 
 ## Shipped
 
+- **v0.1.2923** — `load 1` / `1-minute load` / `/load-1m` now answer the focused Load 1m chip (same shape as `load 5` / `load 15`). Bare `/load` still shows Load · RAM · Up.
 - **v0.1.2922** — Having-fun idle thought Discord send failures and other non-timeout idle failures share the 5-minute WARN gate with Ollama / send timeouts (extra → DEBUG). Quieter `debug.log` when Discord flaps.
-- **v0.1.2921** — Instant lane for the RAM ring (`ram ring` / `/ram-ring` / memory gauge). Strip `/ram` and “how much ram” stay the power-strip chip.
-- **v0.1.2920** — Ring Hot / Ok / Fair washes cover Dark/Neon `metric-tile`, Data Poster `poster-tile`, and Swiss `tile` (not only `.metric-card`).
-- **v0.1.2919** — GPU · Temp · Freq ring jump-flash tile shell remaps.
-- **v0.1.2918** — CRT AI Chat Send fill uses theme accents (cream/Swiss stay white-on-blue).
-- **v0.1.2917** — RAM ring jump-flash theme remaps.
+- **v0.1.2921** — Instant RAM ring chip (`ram ring` / `/ram-ring` / memory gauge). Strip `/ram` stays the power-strip chip.
+- **v0.1.2920** — Ring Hot / Ok / Fair washes on Dark/Neon `metric-tile`, Data Poster `poster-tile`, and Swiss `tile` (not only `.metric-card`).
 
-## Tried / notes
+## Tried / context
 
-- Digester open empty; design-review grace (TCC); layout-daily data-poster marked (Dark next calendar day).
-- Cream/Swiss Send fill left intentional white-on-blue.
-- Soft-state CSS mostly exhausted; parallel tick shipped RAM ring instant as v0.1.2921 — this tick took P2 #5 log noise.
+- Soft-state Apple `#ffffff` / `#007aff` remaps on cream/Swiss largely exhausted through 2920; cream/Swiss Send fill stays white-on-blue on purpose.
+- Sibling OpenClaw/Hermes missing on this rack; no digester Slowest fuel.
+- Dark layout-daily waits for the next calendar day quota.
 
-## Next fuel
-
-- Cream/Swiss Send fill white-on-blue intentional
-- Dark layout-daily next calendar day
-- Sibling / product fuel when digester stays empty
-
-Generated: 2026-11-21T21:27:06
