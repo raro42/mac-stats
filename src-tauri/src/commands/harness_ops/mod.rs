@@ -85,4 +85,31 @@ mod tests {
         assert!(reply.is_some());
         assert!(reply.unwrap().contains("**RAM**"));
     }
+
+    #[test]
+    fn load_1m_chip_does_not_steal_full_load_panel() {
+        // Explicit 1m window → focused Load chip (parity with load 5 / load 15).
+        assert!(looks_like_load_chip_request("load 1"));
+        assert!(looks_like_load_chip_request("load 1m"));
+        assert!(looks_like_load_chip_request("1-minute load"));
+        assert!(looks_like_load_chip_request("/load-1m"));
+        assert!(looks_like_load_chip_request("1m load"));
+        // Full Details panel still owns bare /load · what's the load.
+        assert!(!looks_like_load_chip_request("/load"));
+        assert!(!looks_like_load_chip_request("what's the load"));
+        assert!(looks_like_details_request("/load"));
+        assert!(looks_like_details_request("what's the load"));
+        assert!(!looks_like_details_request("load 1"));
+        assert!(!looks_like_details_request("1-minute load"));
+        let reply = try_operator_instant_reply("load 1");
+        assert!(reply.is_some());
+        let text = reply.unwrap();
+        assert!(text.contains("**Load**"), "got: {text}");
+        assert!(
+            !text.contains("**Details**"),
+            "load 1 must not expand full Details: {text}"
+        );
+        let full = try_operator_instant_reply("/load").unwrap();
+        assert!(full.contains("**Details**"), "got: {full}");
+    }
 }

@@ -4741,6 +4741,7 @@ pub fn parse_details_list_filter(content: &str) -> DetailsListFilter {
 
 
 /// Focused Load 1m asks — not full `/details` / `/load` (those stay the three-row panel).
+/// Parity with `load 5` / `load 15` chips: `load 1` / `1-minute load` / `/load-1m` stay here.
 /// "Why is the load high" stays with the agent.
 pub fn looks_like_load_chip_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -4775,6 +4776,23 @@ pub fn looks_like_load_chip_request(content: &str) -> bool {
             | "is the system loaded"
             | "is the mac loaded"
             | "load high"
+            // Explicit 1m window — same shape as load 5 / load 15 (not full `/load`).
+            | "/load-1m"
+            | "/load-1"
+            | "load 1"
+            | "load 1m"
+            | "1m load"
+            | "1 minute load"
+            | "1-minute load"
+            | "one minute load"
+            | "the 1 minute load"
+            | "what's the 1 minute load"
+            | "whats the 1 minute load"
+            | "what is the 1 minute load"
+            | "how's the 1 minute load"
+            | "hows the 1 minute load"
+            | "is the 1 minute load high"
+            | "is 1 minute load high"
     )
 }
 
@@ -4974,8 +4992,7 @@ pub fn looks_like_details_request(content: &str) -> bool {
             | "what's the load"
             | "whats the load"
             | "what is the load"
-            | "load 1"
-            | "1-minute load"
+            // `load 1` / `1-minute load` / `/load-1m` → Load 1m chip (not full Details).
     )
 }
 

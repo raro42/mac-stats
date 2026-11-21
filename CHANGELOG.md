@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2923] - 2026-11-21
+
+### Fixed
+- Instant `load 1` / `1-minute load` / `/load-1m` now answers the focused Load 1m chip (same shape as `load 5` / `load 15`) instead of expanding the full Details panel. Bare `/load` and “what's the load” still show Load · RAM · Up.
+
 ## [0.1.2922] - 2026-11-21
 
 ### Fixed
