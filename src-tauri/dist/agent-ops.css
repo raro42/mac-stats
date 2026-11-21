@@ -17670,24 +17670,32 @@ body.theme-data-poster .process-row.is-just-copied::after {
   background: color-mix(in srgb, #34c759 55%, #0b0b10);
 }
 /*
- * Data Poster: AI Chat Send focus / active / disabled still mixed Apple
- * `#ffffff` focus ring and active wash (`#chat-send-btn:focus-visible` ·
- * `:active` · `:disabled`) → white slab / wrong ring on the opaque shell
- * `#0b0b10`. Resting / hover already opaque in theme cpu.css. Design-review
- * fuel (feature-ai-chat) + standing P2 #14.
+ * Data Poster: AI Chat Send fill / active / disabled were bare Apple `#007aff`
+ * / `#0064dc` while focus already sat on `#55c7ff`. Theme resting fill in
+ * cpu.css; agent-ops loads last so active/disabled must match. Cream/Swiss
+ * Send fill stays white-on-blue intentional. Standing P2 #14.
  */
+body.theme-data-poster #chat-send-btn {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 90%, #0b0b10);
+  color: #0b0b10;
+}
+body.theme-data-poster #chat-send-btn:hover {
+  background: var(--accent, #55c7ff);
+  color: #0b0b10;
+}
 body.theme-data-poster #chat-send-btn:focus-visible {
-  /* Opaque Data Poster accent — mid-file CRT remap still forced Apple #007aff after theme cpu.css v0.1.2883 (agent-ops loads last; fill stays white-on-blue). */
+  /* Opaque Data Poster accent — mid-file CRT remap after theme cpu.css (agent-ops loads last). */
   outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
   outline-offset: 2px;
 }
 body.theme-data-poster #chat-send-btn:active {
   box-shadow: none;
-  background: color-mix(in srgb, #0064dc 95%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 95%, #0b0b10);
+  color: #0b0b10;
 }
 body.theme-data-poster #chat-send-btn:disabled {
-  color: color-mix(in srgb, #ffffff 55%, #007aff);
-  background: color-mix(in srgb, #007aff 50%, #0b0b10);
+  color: color-mix(in srgb, #0b0b10 55%, var(--accent, #55c7ff));
+  background: color-mix(in srgb, var(--accent, #55c7ff) 50%, #0b0b10);
   opacity: 1;
   cursor: not-allowed;
   box-shadow: none;
@@ -18623,65 +18631,86 @@ body.theme-data-poster .perplexity-filter-clear.is-just-saved {
   color: color-mix(in srgb, #34c759 70%, #ffffff);
 }
 /*
- * Neon / Futuristic: AI Chat Send focus / active / disabled still mixed Apple
- * `#ffffff` focus ring and active wash (`#chat-send-btn:focus-visible` ·
- * `:active` · `:disabled`) → white slab / wrong ring on opaque shells
- * `#08120c` / `#0b0b10`. Resting / hover already opaque in theme cpu.css.
- * Data Poster parity (v0.1.2233 / agent-ops remaps). Design-review fuel
- * (feature-ai-chat) + standing P2 #14.
+ * Neon / Futuristic: AI Chat Send fill / active / disabled were bare Apple
+ * `#007aff` / `#0064dc` while focus already sat on theme accents. Cream/Swiss
+ * Send fill stays white-on-blue intentional. Standing P2 #14.
  */
+body.theme-neon #chat-send-btn {
+  background: color-mix(in srgb, var(--accent, #6dff7b) 90%, #08120c);
+  color: #08120c;
+}
+body.theme-neon #chat-send-btn:hover {
+  background: var(--accent, #6dff7b);
+  color: #08120c;
+}
 body.theme-neon #chat-send-btn:focus-visible {
-  /* Opaque neon accent — mid-file CRT remap still forced Apple #007aff after theme cpu.css v0.1.2883 (agent-ops loads last; fill stays white-on-blue). */
+  /* Opaque neon accent — mid-file CRT remap after theme cpu.css (agent-ops loads last). */
   outline: 2px solid color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
   outline-offset: 2px;
 }
 body.theme-neon #chat-send-btn:active {
   box-shadow: none;
-  background: color-mix(in srgb, #0064dc 95%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 95%, #08120c);
+  color: #08120c;
 }
 body.theme-neon #chat-send-btn:disabled {
-  color: color-mix(in srgb, #ffffff 55%, #007aff);
-  background: color-mix(in srgb, #007aff 50%, #08120c);
+  color: color-mix(in srgb, #08120c 55%, var(--accent, #6dff7b));
+  background: color-mix(in srgb, var(--accent, #6dff7b) 50%, #08120c);
   opacity: 1;
   cursor: not-allowed;
   box-shadow: none;
 }
+body.theme-futuristic #chat-send-btn {
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 90%, #111123);
+  color: #0b0b10;
+}
+body.theme-futuristic #chat-send-btn:hover {
+  background: var(--accent, #3bd6ff);
+  color: #0b0b10;
+}
 body.theme-futuristic #chat-send-btn:focus-visible {
-  /* Opaque Futuristic accent — mid-file CRT remap still forced Apple #007aff after theme cpu.css v0.1.2883 (agent-ops loads last; fill stays white-on-blue). */
+  /* Opaque Futuristic accent — mid-file CRT remap after theme cpu.css (agent-ops loads last). */
   outline: 2px solid color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
   outline-offset: 2px;
 }
 body.theme-futuristic #chat-send-btn:active {
   box-shadow: none;
-  background: color-mix(in srgb, #0064dc 95%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 95%, #0b0b10);
+  color: #0b0b10;
 }
 body.theme-futuristic #chat-send-btn:disabled {
-  color: color-mix(in srgb, #ffffff 55%, #007aff);
-  background: color-mix(in srgb, #007aff 50%, #0b0b10);
+  color: color-mix(in srgb, #0b0b10 55%, var(--accent, #3bd6ff));
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 50%, #0b0b10);
   opacity: 1;
   cursor: not-allowed;
   box-shadow: none;
 }
 /*
- * Dark (TUI): AI Chat Send focus / active / disabled still mixed Apple
- * `#ffffff` focus ring and active wash (`#chat-send-btn:focus-visible` ·
- * `:active` · `:disabled`) → white slab / wrong ring on opaque CRT shell
- * `#0a0a0a`. Resting / hover already opaque in theme cpu.css.
- * Neon / Futuristic / Data Poster parity (v0.1.2367). Design-review fuel
- * (feature-ai-chat) + standing P2 #14.
+ * Dark (TUI): AI Chat Send fill / active / disabled were bare Apple `#007aff`
+ * / `#0064dc` while focus already sat on Matrix `#00cc66`. Cream/Swiss Send
+ * fill stays white-on-blue intentional. Standing P2 #14.
  */
+body.theme-dark #chat-send-btn {
+  background: color-mix(in srgb, var(--accent, #00cc66) 90%, #0a0a0a);
+  color: #ffffff;
+}
+body.theme-dark #chat-send-btn:hover {
+  background: var(--accent, #00cc66);
+  color: #ffffff;
+}
 body.theme-dark #chat-send-btn:focus-visible {
-  /* Opaque Matrix accent — mid-file CRT remap still forced Apple #007aff after theme cpu.css v0.1.2883 (agent-ops loads last; fill stays white-on-blue). */
+  /* Opaque Matrix accent — mid-file CRT remap after theme cpu.css (agent-ops loads last). */
   outline: 2px solid color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
   outline-offset: 2px;
 }
 body.theme-dark #chat-send-btn:active {
   box-shadow: none;
-  background: color-mix(in srgb, #0064dc 95%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 95%, #0a0a0a);
+  color: #ffffff;
 }
 body.theme-dark #chat-send-btn:disabled {
-  color: color-mix(in srgb, #ffffff 55%, #007aff);
-  background: color-mix(in srgb, #007aff 50%, #0a0a0a);
+  color: color-mix(in srgb, #ffffff 55%, var(--accent, #00cc66));
+  background: color-mix(in srgb, var(--accent, #00cc66) 50%, #0a0a0a);
   opacity: 1;
   cursor: not-allowed;
   box-shadow: none;

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2918] - 2026-11-21
+
+### Fixed
+- Dark / Neon / Data Poster / Futuristic AI Chat Send button (resting, hover, active, disabled) now uses each theme accent instead of Apple blue. Cream and Swiss stay white-on-blue on purpose.
+
 ## [0.1.2917] - 2026-11-21
 
 ### Fixed

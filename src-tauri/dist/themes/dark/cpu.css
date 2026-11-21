@@ -2531,7 +2531,8 @@ body {
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #chat-send-btn {
-  background: color-mix(in srgb, #007aff 90%, #0a0a0a);
+  /* Opaque Matrix accent — resting fill was bare Apple #007aff (#14 / P2; cream/Swiss stay white-on-blue intentional). */
+  background: color-mix(in srgb, var(--accent, #00cc66) 90%, #0a0a0a);
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
@@ -2544,25 +2545,25 @@ body {
 }
 
 #chat-send-btn:hover {
-  background: #007aff;
+  background: var(--accent, #00cc66);
 }
 
 /* Opaque focus / active / disabled — was Apple #ffffff focus ring / active wash (#14). */
 #chat-send-btn:focus-visible {
-  /* Opaque Matrix accent — bare Apple #007aff lagged --accent / cream Send focus (#14 / P2; design-review AI Chat; fill stays white-on-blue). */
+  /* Opaque Matrix accent — bare Apple #007aff lagged --accent / cream Send focus (#14 / P2; design-review AI Chat). */
   outline: 2px solid color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
   outline-offset: 2px;
 }
 
 #chat-send-btn:active {
   box-shadow: none;
-  background: color-mix(in srgb, #0064dc 95%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 95%, #0a0a0a);
 }
 
 #chat-send-btn:disabled {
   /* Was opacity 0.55 on white type + accent wash → muted opaque mix on #0a0a0a. */
-  color: color-mix(in srgb, #ffffff 55%, #007aff);
-  background: color-mix(in srgb, #007aff 50%, #0a0a0a);
+  color: color-mix(in srgb, #ffffff 55%, var(--accent, #00cc66));
+  background: color-mix(in srgb, var(--accent, #00cc66) 50%, #0a0a0a);
   opacity: 1;
   cursor: not-allowed;
   box-shadow: none;
