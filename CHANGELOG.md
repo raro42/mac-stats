@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2915] - 2026-11-21
+
+### Added
+- RAM ring gauge and sparkline beside CPU · GPU · Freq · Temp (history seed + amber wash at ≥85%).
+
 ## [0.1.2914] - 2026-11-21
 
 ### Fixed

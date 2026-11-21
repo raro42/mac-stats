@@ -1,5 +1,5 @@
 /**
- * Shared CPU window line charts (CPU / GPU / frequency / temperature).
+ * Shared CPU window line charts (CPU / GPU / RAM / frequency / temperature).
  * Themes load this via ../../chart-line.js. Exposes window.themeHistory plus
  * legacy per-theme aliases (appleHistory, darkHistory, …) for cpu.js callers.
  */
@@ -16,6 +16,7 @@
     const keys = {
       usage: ["--accent-usage", "--accent"],
       gpu: ["--accent-gpu", "--accent"],
+      ram: ["--accent-ram", "--accent-usage", "--accent"],
       frequency: ["--accent-freq", "--accent"],
       temperature: ["--accent", "--accent-freq"],
     }[metric] || ["--accent"];
@@ -48,7 +49,7 @@
     }
 
     const out = {};
-    for (const metric of ["usage", "gpu", "frequency", "temperature"]) {
+    for (const metric of ["usage", "gpu", "ram", "frequency", "temperature"]) {
       const line = metricColor(metric, computedStyle);
       out[metric] = { line, fill: hexToRgba(line, 0.12) };
     }
@@ -59,6 +60,7 @@
     temperature: { line: new Array(LINE_CHART_POINTS).fill(EMPTY_POINT) },
     usage: { line: new Array(LINE_CHART_POINTS).fill(EMPTY_POINT) },
     gpu: { line: new Array(LINE_CHART_POINTS).fill(EMPTY_POINT) },
+    ram: { line: new Array(LINE_CHART_POINTS).fill(EMPTY_POINT) },
     frequency: { line: new Array(LINE_CHART_POINTS).fill(EMPTY_POINT) },
   };
 
@@ -74,6 +76,7 @@
     temperature: NaN,
     usage: NaN,
     gpu: NaN,
+    ram: NaN,
     frequency: NaN,
   };
 
@@ -123,6 +126,7 @@
       temperature: document.getElementById("temperature-history-chart"),
       usage: document.getElementById("usage-history-chart"),
       gpu: document.getElementById("gpu-history-chart"),
+      ram: document.getElementById("ram-history-chart"),
       frequency: document.getElementById("frequency-history-chart"),
     };
   }
@@ -132,7 +136,13 @@
     setHistoryGpuUnparkedClass(false);
     // Drop pending focus/visibility unpark so blur does not still alloc GPU (#14).
     cancelDeferredUnparkCanvases();
-    if (!canvases.usage && !canvases.gpu && !canvases.frequency && !canvases.temperature) {
+    if (
+      !canvases.usage &&
+      !canvases.gpu &&
+      !canvases.ram &&
+      !canvases.frequency &&
+      !canvases.temperature
+    ) {
       bindCanvasElements();
     }
     Object.keys(canvases).forEach((metric) => {
@@ -161,7 +171,13 @@
     canvasesParked = false;
     setHistoryGpuUnparkedClass(true);
     wireListeners();
-    if (!canvases.usage && !canvases.gpu && !canvases.frequency && !canvases.temperature) {
+    if (
+      !canvases.usage &&
+      !canvases.gpu &&
+      !canvases.ram &&
+      !canvases.frequency &&
+      !canvases.temperature
+    ) {
       bindCanvasElements();
     }
     Object.keys(canvases).forEach((metric) => {
@@ -261,7 +277,7 @@
       maxValue += pad;
       minValue -= pad;
     }
-    if (metric === "usage" || metric === "gpu") {
+    if (metric === "usage" || metric === "gpu" || metric === "ram") {
       minValue = Math.max(0, minValue);
       maxValue = Math.min(100, Math.max(maxValue, 1));
     } else if (metric === "temperature") {
@@ -412,6 +428,7 @@
     const getters = {
       usage: (p) => p && p.cpu,
       gpu: (p) => p && p.gpu,
+      ram: (p) => p && p.ram,
       frequency: (p) => p && p.frequency,
       temperature: (p) => p && p.temperature,
     };
@@ -441,6 +458,7 @@
     updateTemperature: (value) => updateCharts("temperature", value),
     updateUsage: (value) => updateCharts("usage", value),
     updateGpu: (value) => updateCharts("gpu", value),
+    updateRam: (value) => updateCharts("ram", value),
     updateFrequency: (value) => updateCharts("frequency", value),
     seedFromPoints,
     park: parkCanvases,

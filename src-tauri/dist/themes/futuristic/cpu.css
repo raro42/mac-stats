@@ -173,7 +173,7 @@ body {
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
   margin-bottom: 22px;
   flex-shrink: 0; /* Don't shrink metrics section */
@@ -378,7 +378,7 @@ body {
 
 .history-section {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 16px;
   margin-top: 4px;
   padding: 0;
@@ -2558,7 +2558,7 @@ body {
 /* History section and charts */
 .history-section {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 14px;
   padding: 8px 0;
   flex-shrink: 0; /* Don't shrink history section */

@@ -1,19 +1,18 @@
-# FEAT-26: External monitors empty flash on fresh open
+# UNTESTED-27: RAM usage as ring widget (#27)
 
 ## Plan
-- [x] Read issue #26 + WIP task + lessons
-- [x] Persist last monitor rows to localStorage on successful `loadMonitors`
-- [x] Seed list from local cache synchronously when Monitors is expanded (before IPC)
-- [x] Call seed on early open path (`applyIconPaneVisibilityFromLocalEarly` / hydrate)
-- [x] Bump version + CHANGELOG, sync `src-tauri/dist/cpu.js`, `cargo check`
-- [x] Rename `WIP-26-…` → `UNTESTED-26-…`
-- [x] Commit and push `origin/main` (do not close GitHub issue)
+- [x] Add RAM metric-card + history sparkline to all theme `cpu.html` (after GPU)
+- [x] CSS grids: metrics + history `repeat(4)` → `repeat(5)` in theme `cpu.css`
+- [x] `chart-line.js` + data-poster `poster-charts.js`: ram buffer / seed / updateRam
+- [x] `cpu.js`: live ring, hot wash (85%), seed gauges, feed charts, kb/history maps
+- [x] Harness `/rings`: include RAM + hot threshold
+- [x] Bump v0.1.2915 + CHANGELOG; sync dist; `cargo check`
+- [x] Rename `WIP-27-…` → `UNTESTED-27-…`; commit + push `origin/main` (issue left open)
 
 ## Notes
-GitHub: https://github.com/raro42/mac-stats/issues/26
-Cause: theme HTML ships "Nothing watching yet"; #24 starts hydrate when expanded, but list still waits on history + `list_monitor_statuses` IPC, so configured sites flash empty for a few seconds.
-Fix: last-known rows in localStorage (icon-wash parity); paint list IPC before history ticks.
+GitHub: https://github.com/raro42/mac-stats/issues/27
+RAM already in history.json / Details; gauge chips were pruned from the power strip — ring was missing.
 
 ## Review
-- v0.1.2641: local seed + list-before-history (#26).
+- v0.1.2915: RAM ring + sparkline across themes; `/rings` lists 5.
 - Handoff: tester / 004 (issue left open).

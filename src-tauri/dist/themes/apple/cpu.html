@@ -57,6 +57,18 @@
         </div>
 
 <div class="metric-card">
+          <div class="metric-label">RAM</div>
+          <div class="metric-value" id="ram-usage-value">None yet</div>
+          <div class="metric-subtext" id="ram-usage-subtext">None yet</div>
+
+          <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+            <path class="ring-track" d="M 13.6 71 A 42 42 0 1 1 86.4 71" />
+            <path class="ring-progress" id="ram-usage-ring-progress" d="M 13.6 71 A 42 42 0 1 1 86.4 71" pathLength="264" style="stroke-dashoffset: 264;" />
+          </svg>
+
+        </div>
+
+<div class="metric-card">
           <div class="metric-label" title="Frequency">Freq</div>
           <div class="metric-value" id="frequency-value">None yet</div>
           <div class="metric-subtext" id="frequency-subtext">None yet</div>
@@ -106,6 +118,12 @@
           <canvas class="history-chart" id="gpu-history-chart" width="1" height="1"></canvas>
         </div>
 
+
+<div class="history-chart-container" aria-label="RAM usage history">
+          <span class="history-chart-caption">RAM</span>
+          <canvas class="history-chart" id="ram-history-chart" width="1" height="1"></canvas>
+        </div>
+
 <div class="history-chart-container" aria-label="Frequency history">
           <span class="history-chart-caption">Freq</span>
           <canvas class="history-chart" id="frequency-history-chart" width="1" height="1"></canvas>
@@ -115,7 +133,7 @@
           <span class="history-chart-caption">Temp</span>
           <canvas class="history-chart" id="temperature-history-chart" width="1" height="1"></canvas>
         </div>
-        <div id="history-sparkline-kb-hint" class="history-sparkline-kb-hint" aria-hidden="true">Tab or click a chart · ← → / h l · Home/End move · at start crosses to temperature ring · at end ↓ crosses to Top Processes filters · → crosses to battery strip · Enter / Space jumps to ring</div>
+        <div id="history-sparkline-kb-hint" class="history-sparkline-kb-hint" aria-hidden="true">Tab or click a chart · ← → / h l · Home/End move · at start crosses to RAM ring · at end ↓ crosses to Top Processes filters · → crosses to battery strip · Enter / Space jumps to ring</div>
       </section>
 
 <!-- Battery & Power Status Strip -->

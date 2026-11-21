@@ -2880,6 +2880,8 @@ pub const OPS_RING_HOT_CPU_PCT: f32 = 50.0;
 
 pub const OPS_RING_HOT_GPU_PCT: f32 = 15.0;
 
+pub const OPS_RING_HOT_RAM_PCT: f32 = 85.0;
+
 pub const OPS_RING_HOT_FREQ_GHZ: f32 = 3.5;
 
 pub const OPS_RING_HOT_TEMP_C: f32 = 70.0;
@@ -2892,6 +2894,11 @@ pub(super) fn ring_cpu_is_hot(usage: f32) -> bool {
 
 pub(super) fn ring_gpu_is_hot(gpu: f32) -> bool {
     gpu >= OPS_RING_HOT_GPU_PCT
+}
+
+
+pub(super) fn ring_ram_is_hot(ram: f32) -> bool {
+    ram >= OPS_RING_HOT_RAM_PCT
 }
 
 
@@ -3013,10 +3020,11 @@ pub fn format_rings_gateway(filter: RingsListFilter) -> String {
     let d = crate::metrics::get_cpu_details();
     let cpu = d.usage;
     let gpu = d.gpu_usage;
+    let ram = d.ram_percent;
     let freq = d.frequency;
     let temp = d.temperature;
 
-    let rows: [( &str, String, bool); 4] = [
+    let rows: [(&str, String, bool); 5] = [
         (
             "CPU",
             format!("{cpu:.0}%"),
@@ -3026,6 +3034,11 @@ pub fn format_rings_gateway(filter: RingsListFilter) -> String {
             "GPU",
             format!("{gpu:.0}%"),
             ring_gpu_is_hot(gpu),
+        ),
+        (
+            "RAM",
+            format!("{ram:.0}%"),
+            ring_ram_is_hot(ram),
         ),
         (
             "Freq",
@@ -3050,13 +3063,14 @@ pub fn format_rings_gateway(filter: RingsListFilter) -> String {
     let hot_n = rows.iter().filter(|(_, _, hot)| *hot).count();
     let title = match filter {
         RingsListFilter::All => {
-            format!("**CPU rings** — 4 · {hot_n} hot")
+            format!("**CPU rings** — 5 · {hot_n} hot")
         }
         RingsListFilter::Hot => {
             format!(
-                "**CPU rings · Hot** — {hot_n} (CPU≥{:.0}% · GPU≥{:.0}% · Freq≥{} GHz · Temp≥{:.0}°C)",
+                "**CPU rings · Hot** — {hot_n} (CPU≥{:.0}% · GPU≥{:.0}% · RAM≥{:.0}% · Freq≥{} GHz · Temp≥{:.0}°C)",
                 OPS_RING_HOT_CPU_PCT,
                 OPS_RING_HOT_GPU_PCT,
+                OPS_RING_HOT_RAM_PCT,
                 OPS_RING_HOT_FREQ_GHZ,
                 OPS_RING_HOT_TEMP_C
             )
@@ -3075,9 +3089,10 @@ pub fn format_rings_gateway(filter: RingsListFilter) -> String {
                 "_Nothing here yet — open the CPU window so rings can fill in._".to_string()
             }
             RingsListFilter::Hot => format!(
-                "_No ring is hot right now (CPU ≥{:.0}%, GPU ≥{:.0}%, Freq ≥{} GHz, or Temp ≥{:.0}°C)._",
+                "_No ring is hot right now (CPU ≥{:.0}%, GPU ≥{:.0}%, RAM ≥{:.0}%, Freq ≥{} GHz, or Temp ≥{:.0}°C)._",
                 OPS_RING_HOT_CPU_PCT,
                 OPS_RING_HOT_GPU_PCT,
+                OPS_RING_HOT_RAM_PCT,
                 OPS_RING_HOT_FREQ_GHZ,
                 OPS_RING_HOT_TEMP_C
             ),

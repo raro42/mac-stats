@@ -314,7 +314,7 @@ border-radius: 24px;
 
 .apple-metrics {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 20px;
   flex-shrink: 0; /* Don't shrink metrics section */
 }
@@ -1017,7 +1017,7 @@ border-radius: 24px;
 /* History section and charts */
 .history-section {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 14px;
   padding: 8px 0;
   flex-shrink: 0; /* Don't shrink history section */

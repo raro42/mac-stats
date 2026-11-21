@@ -30,6 +30,11 @@
       bar: 'rgba(196, 168, 216, 0.9)',
       line: 'rgba(196, 168, 216, 0.8)',
       fill: 'rgba(196, 168, 216, 0.15)'
+    },
+    ram: {
+      bar: 'rgba(120, 200, 255, 0.9)',
+      line: 'rgba(120, 200, 255, 0.8)',
+      fill: 'rgba(120, 200, 255, 0.15)'
     }
   };
 
@@ -58,6 +63,12 @@
       line: new Array(LINE_CHART_POINTS).fill(0),
       max: 100,
       min: 0
+    },
+    ram: {
+      bars: new Array(BAR_CHART_COUNT).fill(0),
+      line: new Array(LINE_CHART_POINTS).fill(0),
+      max: 100,
+      min: 0
     }
   };
 
@@ -78,6 +89,10 @@
     gpu: {
       bar: document.getElementById('gpu-usage-bar-chart'),
       line: document.getElementById('gpu-usage-line-chart')
+    },
+    ram: {
+      bar: document.getElementById('ram-usage-bar-chart'),
+      line: document.getElementById('ram-usage-line-chart')
     }
   };
 
@@ -280,11 +295,13 @@
     updateUsage: (value) => updateCharts('usage', value),
     updateFrequency: (value) => updateCharts('frequency', value),
     updateGpuUsage: (value) => updateCharts('gpu', value),
+    updateRam: (value) => updateCharts('ram', value),
     seedFromPoints: (points) => {
       if (!Array.isArray(points) || !points.length) return false;
       const getters = {
         usage: (p) => p && p.cpu,
         gpu: (p) => p && p.gpu,
+        ram: (p) => p && p.ram,
         frequency: (p) => p && p.frequency,
         temperature: (p) => p && p.temperature,
       };

@@ -275,6 +275,7 @@ let previousValues = {
   temperature: 0,
   usage: 0,
   gpuUsage: 0,
+  ramUsage: 0,
   frequency: 0,
   cpuPower: 0,
   gpuPower: 0,
@@ -2015,6 +2016,68 @@ async function refresh() {
       }
     }
 
+    // Update RAM usage (top gauge — menu-bar / Details parity)
+    const ramUsageEl = document.getElementById("ram-usage-value");
+    const ramUsageSubtext = document.getElementById("ram-usage-subtext");
+    if (ramUsageEl) {
+      const ramPctLive =
+        typeof data.ram_percent === "number" && Number.isFinite(data.ram_percent)
+          ? data.ram_percent
+          : null;
+      const newRamUsage =
+        ramPctLive != null ? Math.max(0, Math.round(ramPctLive)) : null;
+      if (newRamUsage != null) {
+        const ramNumberText = `${newRamUsage}`;
+        const ramCurrentText = ramUsageEl.textContent.match(/^\d+/)
+          ? ramUsageEl.textContent.match(/^\d+/)[0]
+          : "";
+        if (ramCurrentText !== ramNumberText) {
+          scheduleDOMUpdate(() => {
+            if (ramUsageEl.firstChild && ramUsageEl.firstChild.nodeType === 3) {
+              ramUsageEl.firstChild.textContent = ramNumberText;
+            } else {
+              ramUsageEl.innerHTML = `${ramNumberText}<span class="metric-unit">%</span>`;
+            }
+          });
+          previousValues.ramUsage = newRamUsage;
+        }
+        const usedBytes = Number(data.ram_used_bytes) || 0;
+        const totalBytes = Number(data.ram_total_bytes) || 0;
+        let ramSub = "Live";
+        if (usedBytes > 0 && totalBytes > 0) {
+          ramSub = `${formatBytes(usedBytes)} of ${formatBytes(totalBytes)}`;
+        }
+        if (ramUsageSubtext && ramUsageSubtext.textContent !== ramSub) {
+          scheduleDOMUpdate(() => {
+            ramUsageSubtext.textContent = ramSub;
+          });
+        }
+        updateRingGauge("ram-usage-ring-progress", ramPctLive, "ram");
+      }
+      ensureRamStrip();
+      const ramStripEl = document.getElementById("ram-strip-value");
+      const ramStripCell = document.getElementById("ram-strip");
+      if (ramStripEl || ramStripCell) {
+        const pctText =
+          newRamUsage != null ? `${newRamUsage}%` : "None yet";
+        if (ramStripEl && ramStripEl.textContent !== pctText) {
+          scheduleDOMUpdate(() => {
+            ramStripEl.textContent = pctText;
+          });
+        }
+        if (ramStripCell) {
+          const hot = newRamUsage != null && newRamUsage >= 85;
+          ramStripCell.classList.toggle("is-hot", hot);
+          const title = "Show RAM ring";
+          ramStripCell.title = title;
+          ramStripCell.setAttribute(
+            "aria-label",
+            `RAM ${pctText}. ${title}`
+          );
+        }
+      }
+    }
+
     // Update CPU usage
     const cpuUsageEl = document.getElementById("cpu-usage-value");
     const cpuUsageSubtext = document.getElementById("cpu-usage-subtext");
@@ -2260,7 +2323,7 @@ async function refresh() {
           usedText !== "None yet" && totalText !== "None yet"
             ? ` (${usedText} of ${totalText})`
             : "";
-        const title = `Show RAM in Details${extra}`;
+        const title = `Show RAM ring${extra}`;
         ramStripCell.title = title;
         ramStripCell.setAttribute("aria-label", `RAM ${pctText}. ${title}`);
       }
@@ -2962,6 +3025,7 @@ function wireCpuWindowChromeOnce() {
   ensureRingGaugeKeyboard();
   ensureHistorySparklineKeyboard();
   ensureGpuHistoryChart();
+  ensureRamHistoryChart();
   ensurePowerStripKeyboard();
 }
 
@@ -3302,23 +3366,74 @@ function ensureGpuHistoryChart() {
   gpuContainer.appendChild(caption);
   gpuContainer.appendChild(canvas);
   freqContainer.parentNode.insertBefore(gpuContainer, freqContainer);
-  if (!document.getElementById('mac-stats-history-four-col')) {
-    const style = document.createElement('style');
-    style.id = 'mac-stats-history-four-col';
-    style.textContent = `
-      .history-section:has(#gpu-history-chart) {
-        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-      }
-    `;
-    document.head.appendChild(style);
-  }
+  ensureHistoryFiveColStyle();
   // Do not call themeHistory.init() here — that unparks sparkline GPU
   // buffers on open. Chart-line stays parked until focus / late idle (#14).
+}
+
+/** Inject RAM sparkline when a theme shell still ships only CPU · GPU · Freq · Temp (#27). */
+function ensureRamHistoryChart() {
+  if (document.getElementById('ram-history-chart')) return;
+  const gpuContainer = document.getElementById('gpu-history-chart')?.closest(
+    '.history-chart-container'
+  );
+  const freqContainer = document.getElementById('frequency-history-chart')?.closest(
+    '.history-chart-container'
+  );
+  const anchor = gpuContainer || freqContainer;
+  if (!anchor || !anchor.parentNode) return;
+  const ramContainer = document.createElement('div');
+  ramContainer.className = 'history-chart-container';
+  ramContainer.setAttribute('aria-label', 'RAM usage history');
+  const caption = document.createElement('span');
+  caption.className = 'history-chart-caption';
+  caption.textContent = 'RAM';
+  const canvas = document.createElement('canvas');
+  canvas.className = 'history-chart';
+  canvas.id = 'ram-history-chart';
+  canvas.width = 1;
+  canvas.height = 1;
+  ramContainer.appendChild(caption);
+  ramContainer.appendChild(canvas);
+  if (gpuContainer && gpuContainer.nextSibling) {
+    gpuContainer.parentNode.insertBefore(ramContainer, gpuContainer.nextSibling);
+  } else if (freqContainer) {
+    freqContainer.parentNode.insertBefore(ramContainer, freqContainer);
+  } else {
+    anchor.parentNode.appendChild(ramContainer);
+  }
+  ensureHistoryFiveColStyle();
+}
+
+function ensureHistoryFiveColStyle() {
+  let style = document.getElementById('mac-stats-history-five-col');
+  if (!style) {
+    style = document.createElement('style');
+    style.id = 'mac-stats-history-five-col';
+    document.head.appendChild(style);
+  }
+  style.textContent = `
+    .history-section:has(#ram-history-chart),
+    .history-section:has(#gpu-history-chart) {
+      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    }
+    .apple-metrics:has(#ram-usage-value),
+    .cpu-metrics:has(#ram-usage-value),
+    .metrics-grid:has(#ram-usage-value),
+    .arch-metrics:has(#ram-usage-value),
+    .swiss-metrics:has(#ram-usage-value),
+    .mat-metrics:has(#ram-usage-value),
+    .poster-metrics:has(#ram-usage-value) {
+      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    }
+  `;
+  document.getElementById('mac-stats-history-four-col')?.remove();
 }
 
 function feedThemeHistoryCharts(data, _includeTemperature) {
   if (!sparklineHistoryReady) return;
   ensureGpuHistoryChart();
+  ensureRamHistoryChart();
   const usage =
     typeof data?.usage === 'number' && Number.isFinite(data.usage)
       ? data.usage
@@ -3326,6 +3441,10 @@ function feedThemeHistoryCharts(data, _includeTemperature) {
   const gpu =
     typeof data?.gpu_usage === 'number' && Number.isFinite(data.gpu_usage)
       ? Math.max(0, data.gpu_usage)
+      : null;
+  const ram =
+    typeof data?.ram_percent === 'number' && Number.isFinite(data.ram_percent)
+      ? Math.max(0, data.ram_percent)
       : null;
   const freq =
     typeof data?.frequency === 'number' &&
@@ -3355,6 +3474,10 @@ function feedThemeHistoryCharts(data, _includeTemperature) {
     if (gpu !== null) {
       if (typeof h.updateGpu === 'function') h.updateGpu(gpu);
       else if (typeof h.updateGpuUsage === 'function') h.updateGpuUsage(gpu);
+    }
+    if (ram !== null) {
+      if (typeof h.updateRam === 'function') h.updateRam(ram);
+      else if (typeof h.updateRamUsage === 'function') h.updateRamUsage(ram);
     }
     if (freq !== null && typeof h.updateFrequency === 'function') {
       h.updateFrequency(freq);
@@ -3502,6 +3625,7 @@ function wireMetricValueCopy() {
   ensureMetricValueCopyStyles();
   const ids = [
     'gpu-usage-value',
+    'ram-usage-value',
     'frequency-value',
     'temperature-value',
     'battery-level',
@@ -3746,13 +3870,38 @@ function ensureRamStripStyles() {
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
     }
     .metric-card.is-gpu-highlight,
+    .metric-box.is-gpu-highlight,
+    .metric-tile.is-gpu-highlight,
+    .dial.is-gpu-highlight,
+    .tile.is-gpu-highlight,
+    .poster-tile.is-gpu-highlight,
     #gpu-power.is-gpu-highlight {
       background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
       border-radius: 10px;
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
     }
+    .metric-card.is-ram-highlight,
+    .metric-box.is-ram-highlight,
+    .metric-tile.is-ram-highlight,
+    .dial.is-ram-highlight,
+    .tile.is-ram-highlight,
+    .poster-tile.is-ram-highlight {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
+      border-radius: 10px;
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
+    }
     .metric-card.is-temp-highlight,
-    .metric-card.is-freq-highlight {
+    .metric-card.is-freq-highlight,
+    .metric-box.is-temp-highlight,
+    .metric-box.is-freq-highlight,
+    .metric-tile.is-temp-highlight,
+    .metric-tile.is-freq-highlight,
+    .dial.is-temp-highlight,
+    .dial.is-freq-highlight,
+    .tile.is-temp-highlight,
+    .tile.is-freq-highlight,
+    .poster-tile.is-temp-highlight,
+    .poster-tile.is-freq-highlight {
       background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
       border-radius: 10px;
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
@@ -3894,7 +4043,7 @@ function openCpuRingFromStrip() {
 
 function flashMetricRingHighlight(valueId, highlightClass) {
   const el = document.getElementById(valueId);
-  const card = el?.closest?.(".metric-card") || el;
+  const card = closestRingMetricCard(el) || el;
   if (!card) return;
   card.classList.add(highlightClass);
   window.setTimeout(() => card.classList.remove(highlightClass), 1600);
@@ -3922,6 +4071,14 @@ function openTempRingFromStrip() {
     el.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }
   flashMetricRingHighlight("temperature-value", "is-temp-highlight");
+}
+
+function openRamRingFromStrip() {
+  const el = document.getElementById("ram-usage-value");
+  if (el && typeof el.scrollIntoView === "function") {
+    el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+  flashMetricRingHighlight("ram-usage-value", "is-ram-highlight");
 }
 
 function ensureCpuStrip() { return _metricStripStub(); }
@@ -4209,7 +4366,7 @@ function ensurePowerStripKeyboard() {
   strip.dataset.powerStripKbWired = '1';
 }
 
-/** Metrics section that holds the four ring cards (theme class varies). */
+/** Metrics section that holds the ring cards (theme class varies). */
 function getRingGaugeSection() {
   const cpuCard = document.getElementById('cpu-usage-card');
   if (!cpuCard) return null;
@@ -4220,9 +4377,19 @@ function getRingGaugeSection() {
   );
 }
 
+/** Closest ring card shell across themes (metric-card / tile / dial / poster-tile). */
+function closestRingMetricCard(el) {
+  return (
+    el?.closest?.(
+      '.metric-card, .metric-box, .metric-tile, .dial, .tile, .poster-tile'
+    ) || el
+  );
+}
+
 /** Ring gauges amber wash thresholds (menu-bar parity). No All/Hot chip row. */
 const RING_HOT_CPU_PCT = 50;
 const RING_HOT_GPU_PCT = 15;
+const RING_HOT_RAM_PCT = 85;
 const RING_HOT_FREQ_GHZ = 3.5;
 const RING_HOT_TEMP_C = 70;
 
@@ -4326,6 +4493,7 @@ function getRingMetricCardEntries() {
   const specs = [
     { key: 'cpu', valueId: 'cpu-usage-card', cardId: 'cpu-usage-card' },
     { key: 'gpu', valueId: 'gpu-usage-value' },
+    { key: 'ram', valueId: 'ram-usage-value' },
     { key: 'freq', valueId: 'frequency-value' },
     { key: 'temp', valueId: 'temperature-value' },
   ];
@@ -4335,7 +4503,7 @@ function getRingMetricCardEntries() {
     if (!valueEl || !section.contains(valueEl)) continue;
     const card =
       (spec.cardId && document.getElementById(spec.cardId)) ||
-      valueEl.closest('.metric-card') ||
+      closestRingMetricCard(valueEl) ||
       valueEl;
     if (!card || !section.contains(card)) continue;
     out.push({ key: spec.key, card, valueEl });
@@ -4347,6 +4515,7 @@ function historyChartContainerForRingKey(key) {
   const idByKey = {
     cpu: 'usage-history-chart',
     gpu: 'gpu-history-chart',
+    ram: 'ram-history-chart',
     freq: 'frequency-history-chart',
     temp: 'temperature-history-chart',
   };
@@ -4365,10 +4534,11 @@ function removeRingsFilterChips() {
 }
 
 /** History Hot attention labels kept for `/rings hot` / digester parity (no UI chrome). */
-const HISTORY_HOT_ORDER = ['cpu', 'gpu', 'freq', 'temp'];
+const HISTORY_HOT_ORDER = ['cpu', 'gpu', 'ram', 'freq', 'temp'];
 const HISTORY_HOT_LABELS = {
   cpu: 'CPU',
   gpu: 'GPU',
+  ram: 'RAM',
   freq: 'Freq',
   temp: 'Temp',
 };
@@ -4420,6 +4590,10 @@ function updateRingHotStates(data) {
     typeof data?.gpu_usage === 'number' && Number.isFinite(data.gpu_usage)
       ? data.gpu_usage
       : null;
+  const ram =
+    typeof data?.ram_percent === 'number' && Number.isFinite(data.ram_percent)
+      ? data.ram_percent
+      : null;
   const freq =
     data?.can_read_frequency &&
     typeof data?.frequency === 'number' &&
@@ -4445,13 +4619,15 @@ function updateRingHotStates(data) {
   const hotByKey = {
     cpu: usage != null && usage >= RING_HOT_CPU_PCT,
     gpu: gpu != null && gpu >= RING_HOT_GPU_PCT,
+    ram: ram != null && ram >= RING_HOT_RAM_PCT,
     freq: freq != null && freq >= RING_HOT_FREQ_GHZ,
     temp: tempHotByC || tempHotByThermal,
   };
-  // CPU · GPU · FREQ calm when below hot (Temp Nominal parity).
+  // CPU · GPU · RAM · FREQ calm when below hot (Temp Nominal parity).
   const okByKey = {
     cpu: usage != null && !hotByKey.cpu,
     gpu: gpu != null && !hotByKey.gpu,
+    ram: ram != null && !hotByKey.ram,
     freq: freq != null && !hotByKey.freq,
     temp: tempOk,
   };
@@ -4459,11 +4635,13 @@ function updateRingHotStates(data) {
   const hotSig = [
     hotByKey.cpu ? 1 : 0,
     hotByKey.gpu ? 1 : 0,
+    hotByKey.ram ? 1 : 0,
     hotByKey.freq ? 1 : 0,
     hotByKey.temp ? 1 : 0,
     tempFair ? 1 : 0,
     okByKey.cpu ? 1 : 0,
     okByKey.gpu ? 1 : 0,
+    okByKey.ram ? 1 : 0,
     okByKey.freq ? 1 : 0,
     okByKey.temp ? 1 : 0,
   ].join('');
@@ -4515,7 +4693,7 @@ function updateRingHotStates(data) {
 
 /**
  * Focusable ring-gauge targets in DOM order: CPU card (toggles Details /
- * Processes) then GPU · Frequency · Temperature values (click-to-copy).
+ * Processes) then GPU · RAM · Frequency · Temperature values (click-to-copy).
  */
 function getRingGaugeChips() {
   const section = getRingGaugeSection();
@@ -4523,6 +4701,7 @@ function getRingGaugeChips() {
   const ids = [
     'cpu-usage-card',
     'gpu-usage-value',
+    'ram-usage-value',
     'frequency-value',
     'temperature-value',
   ];
@@ -4531,7 +4710,7 @@ function getRingGaugeChips() {
     .filter((el) => {
       if (!el || !section.contains(el)) return false;
       if (el.hidden) return false;
-      const card = el.closest('.metric-card') || el;
+      const card = closestRingMetricCard(el) || el;
       if (card.hidden || card.style.display === 'none') return false;
       return (
         el.getClientRects().length > 0 ||
@@ -4756,7 +4935,7 @@ function ensureHistorySparklineKbHint() {
     section.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click a chart · ← → / h l · Home/End move · at start crosses to temperature ring · at end ↓ crosses to Top Processes filters · → crosses to battery strip · Enter / Space jumps to ring';
+    'Tab or click a chart · ← → / h l · Home/End move · at start crosses to RAM ring · at end ↓ crosses to Top Processes filters · → crosses to battery strip · Enter / Space jumps to ring';
 }
 
 /**
@@ -4773,6 +4952,10 @@ function activateHistorySparkline(container) {
   }
   if (id === 'gpu-history-chart') {
     openGpuRingFromStrip();
+    return;
+  }
+  if (id === 'ram-history-chart') {
+    openRamRingFromStrip();
     return;
   }
   if (id === 'frequency-history-chart') {
@@ -4801,6 +4984,7 @@ function ensureHistorySparklineKeyboard() {
     let title = 'Show related ring';
     if (id === 'usage-history-chart') title = 'Show CPU ring';
     else if (id === 'gpu-history-chart') title = 'Show GPU ring';
+    else if (id === 'ram-history-chart') title = 'Show RAM ring';
     else if (id === 'frequency-history-chart') title = 'Show frequency ring';
     else if (id === 'temperature-history-chart') title = 'Show temperature ring';
     if (!el.title) el.title = title;
@@ -25854,11 +26038,16 @@ function applyHistoryPointToGauges(point) {
     typeof point.gpu === 'number' && Number.isFinite(point.gpu)
       ? Math.max(0, point.gpu)
       : 0;
+  const ram =
+    typeof point.ram === 'number' && Number.isFinite(point.ram)
+      ? Math.max(0, point.ram)
+      : 0;
 
   if (temp > 0) previousValues.temperature = temp;
   if (freq > 0) previousValues.frequency = freq;
   if (cpu > 0) previousValues.usage = cpu;
   if (gpu > 0) previousValues.gpuUsage = gpu;
+  if (ram > 0) previousValues.ramUsage = ram;
 
   scheduleDOMUpdate(() => {
     const tempEl = document.getElementById('temperature-value');
@@ -25907,12 +26096,25 @@ function applyHistoryPointToGauges(point) {
         updateRingGauge('gpu-usage-ring-progress', Math.min(100, gpu), 'gpu');
       }
     }
+    const ramEl = document.getElementById('ram-usage-value');
+    const ramSub = document.getElementById('ram-usage-subtext');
+    if (ram > 0 && ramEl) {
+      const n = `${Math.round(ram)}`;
+      ramEl.innerHTML = `${n}<span class="metric-unit">%</span>`;
+      if (ramSub && (!ramSub.textContent || ramSub.textContent === 'None yet')) {
+        ramSub.textContent = `${n}%`;
+      }
+      if (typeof updateRingGauge === 'function') {
+        updateRingGauge('ram-usage-ring-progress', Math.min(100, ram), 'ram');
+      }
+    }
   });
 }
 
 /** Paint sparklines from backend history (menu-bar samples) so charts are not empty on open. */
 async function seedThemeHistoryFromBackend() {
   ensureGpuHistoryChart();
+  ensureRamHistoryChart();
   const inv = getInvoke() || (typeof invoke !== 'undefined' ? invoke : null);
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   for (let attempt = 0; attempt < 8; attempt++) {
