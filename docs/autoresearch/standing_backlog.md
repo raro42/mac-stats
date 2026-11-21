@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2924
+
+- Load 5m / 15m instant slash + view/open NL: focused chips already answered `load 5` / `load 15` but lacked `/load-5m` · `/load-15m` and view/see/show me/open/list phrases after Load 1m got `/load-1m` (v0.1.2923). Bare `view load` / `/load` stay the full Details panel. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — Load 5m/15m NL closed; not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2923
 
 - Product fuel after idle Discord WARN gate v0.1.2922 / soft-state P2 #14 largely exhausted: `load 1` / `1-minute load` still expanded full Details (Load · RAM · Up) while `load 5` / `load 15` already used focused Load chips. Moved explicit 1m window phrases (+ `/load-1m` / `load 1m` / `1m load` / …) onto `looks_like_load_chip_request`; bare `/load` / “what's the load” stay Details. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — Load 1m chip parity closed; not another keep-pNN clone.
