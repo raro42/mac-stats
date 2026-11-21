@@ -207,4 +207,46 @@ mod tests {
             "got: {full}"
         );
     }
+
+    #[test]
+    fn p_e_core_slash_and_view_open_do_not_steal_freq_ring() {
+        // Slash + view/open NL → focused P/E-core chips (Load `/load-5m` parity).
+        assert_eq!(
+            parse_core_cluster_freq("/p-core"),
+            Some(CoreClusterChip::Performance)
+        );
+        assert_eq!(
+            parse_core_cluster_freq("/e-core"),
+            Some(CoreClusterChip::Efficiency)
+        );
+        assert_eq!(
+            parse_core_cluster_freq("view p core"),
+            Some(CoreClusterChip::Performance)
+        );
+        assert_eq!(
+            parse_core_cluster_freq("open e core"),
+            Some(CoreClusterChip::Efficiency)
+        );
+        assert_eq!(
+            parse_core_cluster_freq("list the p cores"),
+            Some(CoreClusterChip::Performance)
+        );
+        assert_eq!(
+            parse_core_cluster_freq("see e-core frequency"),
+            Some(CoreClusterChip::Efficiency)
+        );
+        // Combined Freq ring still owns bare /freq · view freq · how fast is the cpu.
+        assert!(parse_core_cluster_freq("/freq").is_none());
+        assert!(parse_core_cluster_freq("view freq").is_none());
+        assert!(parse_core_cluster_freq("how fast is the cpu").is_none());
+        assert!(parse_core_cluster_freq("why is the p core high").is_none());
+        assert_eq!(parse_ring_chip_ask("/freq"), Some(RingChipAsk::Freq));
+        assert_eq!(parse_ring_chip_ask("view freq"), Some(RingChipAsk::Freq));
+        let p = try_operator_instant_reply("/p-core").unwrap();
+        assert!(p.contains("**P-core**"), "got: {p}");
+        let e = try_operator_instant_reply("open e core").unwrap();
+        assert!(e.contains("**E-core**"), "got: {e}");
+        let freq = try_operator_instant_reply("view freq").unwrap();
+        assert!(freq.contains("**Freq**") || freq.contains("**Frequency**") || freq.contains("GHz"), "got: {freq}");
+    }
 }

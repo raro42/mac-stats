@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2926] - 2026-11-21
+
+### Added
+- Instant P-core / E-core chips accept `/p-core` · `/e-core` and view/see/open/list NL (`view p core`, `open e core`, …). Bare `/freq` / `view freq` still open the combined Freq ring.
+
 ## [0.1.2925] - 2026-11-21
 
 ### Added
