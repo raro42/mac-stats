@@ -6,20 +6,19 @@ Overnight autoresearch (Track B) kept shipping operator instant lanes. Digester 
 
 | Version | What |
 |---------|------|
-| **v0.1.2954** | Primary IPv4 broadcast `/broadcast` · `/bcast` + view/open NL |
-| v0.1.2953 | Primary iface `/iface` · `/ifname` + view/open NL |
+| **v0.1.2955** | Primary link status · media / speed `/link-status` · `/media` · `/link-speed` + view/open NL |
+| v0.1.2954 | Primary IPv4 broadcast `/broadcast` · `/bcast` + view/open NL |
+| v0.1.2953 | Primary / default-route iface `/iface` · `/ifname` · `/interface` + view/open NL |
 | v0.1.2952 | Primary IPv4 netmask `/netmask` · `/subnet` · `/cidr` + view/open NL |
 | v0.1.2951 | Primary interface MTU `/mtu` · `/if-mtu` · `/interface-mtu` + view/open NL |
 | v0.1.2950 | Primary MAC `/mac-address` · `/ether` · `/en0-mac` + view/open NL |
-| v0.1.2949 | Wi-Fi SSID `/wifi` · `/ssid` + view/open NL |
-| v0.1.2948 | DNS nameservers `/dns` · `/nameserver` + view/open NL |
-| earlier | gateway · local IP · boot · cores · kernel · locale · arch · tz · serial · … |
+| earlier | wifi · dns · gateway · ip · boot · cores · kernel · locale · arch · tz · serial · … |
 
-## This tick (~05:10 CET)
+## This tick (~05:25 CET)
 
-- Fuel: standing product after iface `/ifname` — broadcast completes the LAN twin set with `/ip` · `/netmask` · `/gateway` · `/iface`.
-- Verify OK → keep @ `6e339579e` → install/kickstart → push `main`.
-- Bare `broadcast` / `bcast` stay with the agent on purpose.
+- Fuel: standing product after broadcast — `ifconfig` `status:` + `media:` on the default-route iface had no dedicated slash+NL while `/mtu` · `/mac-address` · `/iface` · `/broadcast` already did.
+- Verify OK → keep @ `47aa870` → push `main` (also backfilled missing 2954 keep row).
+- Bare `status` stays app health; bare `media` / `speed` / `link` stay with the agent; `/link-mtu` stays MTU; `/link-address` stays MAC.
 
 ## Still open
 
