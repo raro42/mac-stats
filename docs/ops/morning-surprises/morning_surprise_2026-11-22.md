@@ -1,27 +1,19 @@
 # Morning surprise — 2026-11-22
 
-Refreshed: 2026-11-22 21:41 CET
+Overnight autoresearch kept shipping product fuel while digester stayed empty.
 
-## Shipped tonight (keep)
+## Shipped (selected)
 
-| Version | What |
-|---------|------|
-| **v0.1.2965** | Dark layout-daily: AI Chat `.chat-messages:focus-within` → Matrix `--accent` |
-| **v0.1.2964** | FileVault status `/filevault` · `/fv` · `/fde` · `/disk-encryption` + view/open NL |
-| **v0.1.2963** | Boot volume / startup disk `/boot-volume` · `/startup-disk` + view/open NL |
-| **v0.1.2962** | Hardware UUID `/uuid` · `/hw-uuid` + view/open NL |
-| **v0.1.2961** | VPN status `/vpn` · `/vpn-status` + view/open NL |
-| **v0.1.2960** | GPU chipset · cores · Metal `/gpu-name` · `/metal` + view/open NL |
+- **v0.1.2966** — Instant SIP status: `/sip` · `/csrutil` · `/system-integrity` (+ view/open NL). Bare `sip` / Gatekeeper stay with the agent; `/filevault` stays FileVault.
+- **v0.1.2965** — Dark layout-daily: AI Chat `.chat-messages:focus-within` Matrix accent (not Apple blue).
+- **v0.1.2964** — Instant FileVault status: `/filevault` · `/fv` · `/fde` (+ view/open NL).
+- Earlier same night: boot volume, UUID, VPN, GPU identity, displays, battery time/charger/cycles, link status, broadcast, netmask/MTU/MAC, Wi-Fi, DNS, gateway, LAN IP, and more slash+NL chips.
 
-## This tick (~21:40 CET)
+## Notes
 
-- Digester open empty; design-review due=false; layout-daily **Dark marked** (Neon/Futuristic next calendar quota).
-- Kept **v0.1.2965** Dark AI Chat messages pane focus wash (Data Poster parity; composer focus already Matrix).
-- Also backfilled missing keep row for **v0.1.2964** FileVault.
-- Cream/Swiss Send fill white-on-blue left intentional.
+- Digester open empty all night; standing backlog + layout-daily carried the ratchet.
+- Design-review stayed in Mac TCC grace (polish-without-capture).
+- Cream/Swiss Send fill white-on-blue remains intentional.
+- Next fuel cues: Neon layout-daily · Gatekeeper slash NL · sibling ports.
 
-## Still open
-
-- Neon layout-daily (next calendar quota)
-- cream/Swiss Send fill white-on-blue intentional
-- sibling/product fuel (not another keep-pNN clone)
+Generated: 2026-11-22T21:48:49+01:00
