@@ -1426,6 +1426,67 @@ mod tests {
     }
 
 #[test]
+    fn broadcast_slash_and_view_open_do_not_steal_lan_ip_or_netmask() {
+        // Slash + view/open NL → primary IPv4 broadcast (`/netmask` · `/ip` parity).
+        // Bare `broadcast` / `bcast` stay with the agent; `/ip` stays LAN; `/netmask` stays mask.
+        assert!(looks_like_broadcast_request("/broadcast"));
+        assert!(looks_like_broadcast_request("/bcast"));
+        assert!(looks_like_broadcast_request("/ip-broadcast"));
+        assert!(looks_like_broadcast_request("/lan-broadcast"));
+        assert!(looks_like_broadcast_request("/broadcast-addr"));
+        assert!(looks_like_broadcast_request("/broadcast-address"));
+        assert!(looks_like_broadcast_request("/ipv4-broadcast"));
+        assert!(looks_like_broadcast_request("view broadcast"));
+        assert!(looks_like_broadcast_request("open broadcast address"));
+        assert!(looks_like_broadcast_request("list broadcast"));
+        assert!(looks_like_broadcast_request("broadcast address"));
+        assert!(looks_like_broadcast_request("ip broadcast"));
+        assert!(looks_like_broadcast_request("what's my broadcast"));
+        assert!(looks_like_broadcast_request("what's my broadcast address"));
+        assert!(looks_like_broadcast_request("which broadcast"));
+        assert!(!looks_like_broadcast_request("broadcast"));
+        assert!(!looks_like_broadcast_request("bcast"));
+        assert!(!looks_like_broadcast_request("/ip"));
+        assert!(!looks_like_broadcast_request("/netmask"));
+        assert!(!looks_like_broadcast_request("/subnet"));
+        assert!(!looks_like_broadcast_request("/iface"));
+        assert!(!looks_like_broadcast_request("/gateway"));
+        assert!(!looks_like_broadcast_request("/mac-address"));
+        assert!(!looks_like_broadcast_request("/mtu"));
+        let bcast = try_operator_instant_reply("/broadcast").unwrap();
+        assert!(
+            bcast.contains("**Broadcast**") && !bcast.to_lowercase().contains("execution"),
+            "got: {bcast}"
+        );
+        let viewed = try_operator_instant_reply("view broadcast").unwrap();
+        assert!(
+            viewed.contains("**Broadcast**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let short = try_operator_instant_reply("/bcast").unwrap();
+        assert!(
+            short.contains("**Broadcast**") && !short.to_lowercase().contains("execution"),
+            "got: {short}"
+        );
+        assert!(try_operator_instant_reply("broadcast").is_none());
+        assert!(try_operator_instant_reply("bcast").is_none());
+        let ip = try_operator_instant_reply("/ip");
+        if let Some(reply) = ip {
+            assert!(
+                !reply.contains("**Broadcast**"),
+                "/ip must stay LAN IP, not broadcast: {reply}"
+            );
+        }
+        let mask = try_operator_instant_reply("/netmask");
+        if let Some(reply) = mask {
+            assert!(
+                !reply.contains("**Broadcast**"),
+                "/netmask must stay subnet mask, not broadcast: {reply}"
+            );
+        }
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.

@@ -7687,6 +7687,8 @@ pub fn looks_like_netmask_request(content: &str) -> bool {
         || n.contains("ssid")
         || n.contains("wlan")
         || n.contains("airport")
+        || n.contains("broadcast")
+        || n.contains("bcast")
         || n.contains("public")
         || n.contains("external")
         || n.contains("wan")
@@ -7843,6 +7845,8 @@ pub fn looks_like_primary_iface_request(content: &str) -> bool {
         || n.contains("netmask")
         || n.contains("subnet")
         || n.contains("cidr")
+        || n.contains("broadcast")
+        || n.contains("bcast")
         || n.contains("mac")
         || n.contains("ether")
         || n.contains("address")
@@ -8000,6 +8004,141 @@ pub fn format_primary_iface_report() -> String {
         return "**Iface** — _no default interface right now._".to_string();
     }
     format!("**Iface** · `{v}`")
+}
+
+/// Primary IPv4 broadcast address — not LAN IP, not netmask, not gateway, not iface name.
+/// Slash + view/open NL (`/broadcast` · `/bcast` · `view broadcast`) match `/netmask` · `/ip` shape;
+/// bare `broadcast` / `bcast` stay with the agent; `/ip` stays LAN; `/netmask` stays subnet mask;
+/// `/iface` stays interface name; `/gateway` stays default route.
+pub fn looks_like_broadcast_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("gateway")
+        || n.contains("router")
+        || n.contains("dns")
+        || n.contains("nameserver")
+        || n.contains("mac address")
+        || n.contains("ethernet")
+        || n.contains("ether")
+        || n.contains("wifi")
+        || n.contains("mtu")
+        || n.contains("ssid")
+        || n.contains("wlan")
+        || n.contains("airport")
+        || n.contains("netmask")
+        || n.contains("subnet")
+        || n.contains("cidr")
+        || n.contains("iface")
+        || n.contains("ifname")
+        || n.contains("public")
+        || n.contains("external")
+        || n.contains("wan")
+        || n.contains("vpn")
+        || n.contains("typing")
+        || n.contains("discord")
+        || n.contains("channel")
+        || n.contains("message")
+        || n.contains("send")
+        || n.contains("storm")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("spoof")
+        // Bare short / ambiguous asks stay with the agent.
+        || n == "broadcast"
+        || n == "the broadcast"
+        || n == "bcast"
+        || n == "the bcast"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/broadcast"
+            | "/bcast"
+            | "/ip-broadcast"
+            | "/ipbroadcast"
+            | "/lan-broadcast"
+            | "/lanbroadcast"
+            | "/broadcast-addr"
+            | "/broadcastaddr"
+            | "/broadcast-address"
+            | "/broadcastaddress"
+            | "/ipv4-broadcast"
+            | "/ipv4broadcast"
+            | "broadcast address"
+            | "the broadcast address"
+            | "ip broadcast"
+            | "the ip broadcast"
+            | "lan broadcast"
+            | "the lan broadcast"
+            | "ipv4 broadcast"
+            | "the ipv4 broadcast"
+            | "my broadcast"
+            | "my broadcast address"
+            | "my ip broadcast"
+            | "what's my broadcast"
+            | "whats my broadcast"
+            | "what is my broadcast"
+            | "what's the broadcast"
+            | "whats the broadcast"
+            | "what is the broadcast"
+            | "what's my broadcast address"
+            | "whats my broadcast address"
+            | "what is my broadcast address"
+            | "what's the broadcast address"
+            | "whats the broadcast address"
+            | "what is the broadcast address"
+            | "which broadcast"
+            | "which broadcast address"
+            // View/see/show me/open/list.
+            | "view broadcast"
+            | "view the broadcast"
+            | "view broadcast address"
+            | "view the broadcast address"
+            | "view ip broadcast"
+            | "view the ip broadcast"
+            | "view lan broadcast"
+            | "view the lan broadcast"
+            | "see broadcast"
+            | "see the broadcast"
+            | "see broadcast address"
+            | "see the broadcast address"
+            | "open broadcast"
+            | "open the broadcast"
+            | "open broadcast address"
+            | "open the broadcast address"
+            | "list broadcast"
+            | "list the broadcast"
+            | "list broadcast address"
+            | "list the broadcast address"
+            | "show broadcast"
+            | "show the broadcast"
+            | "show me broadcast"
+            | "show me the broadcast"
+            | "show broadcast address"
+            | "show the broadcast address"
+            | "show me broadcast address"
+            | "show me the broadcast address"
+    )
+}
+
+/// Zero-LLM primary interface IPv4 broadcast from `route` default iface + `ifconfig`.
+pub fn format_broadcast_report() -> String {
+    let v = crate::metrics::get_primary_broadcast();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Broadcast** — _no broadcast address right now._".to_string();
+    }
+    format!("**Broadcast** · `{v}`")
 }
 
 

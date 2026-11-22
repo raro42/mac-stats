@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2954] - 2026-11-22
+
+### Added
+- Instant primary IPv4 broadcast accepts `/broadcast` · `/bcast` · `/ip-broadcast` · `/lan-broadcast` · `/broadcast-addr` · `/broadcast-address` · `/ipv4-broadcast` and view/see/open/list NL (`view broadcast`, `open broadcast address`, `list broadcast`, …), matching “broadcast address” / “ip broadcast” / “what's my broadcast” / “what's my broadcast address” / “which broadcast”. Bare `broadcast` / `bcast` stay with the agent; `/ip` stays LAN address; `/netmask` stays subnet mask; `/iface` stays interface name; `/gateway` stays default route.
+
 ## [0.1.2953] - 2026-11-22
 
 ### Added

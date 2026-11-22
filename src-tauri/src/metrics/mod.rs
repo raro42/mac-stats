@@ -1227,6 +1227,82 @@ pub fn get_primary_iface() -> String {
     info
 }
 
+/// Primary interface IPv4 broadcast address (default-route iface via `route` + `ifconfig`).
+/// Live (not OnceLock): Wi-Fi / USB / VPN iface can change while the process stays up.
+/// Used by the Discord/operator instant `/broadcast` · `/bcast` lane.
+/// Distinct from LAN IP (`/ip`), netmask (`/netmask`), gateway (`/gateway`), iface (`/iface`).
+pub fn get_primary_broadcast() -> String {
+    let default_iface = || -> Option<String> {
+        let output = Command::new("/sbin/route")
+            .args(["-n", "get", "default"])
+            .stderr(std::process::Stdio::null())
+            .output()
+            .ok()?;
+        if !output.status.success() {
+            return None;
+        }
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        for line in stdout.lines() {
+            let t = line.trim();
+            if let Some(rest) = t.strip_prefix("interface:") {
+                let iface = rest.trim();
+                if !iface.is_empty() {
+                    return Some(iface.to_string());
+                }
+            }
+        }
+        None
+    };
+    let broadcast_of = |iface: &str| -> Option<String> {
+        let output = Command::new("/sbin/ifconfig")
+            .arg(iface)
+            .stderr(std::process::Stdio::null())
+            .output()
+            .ok()?;
+        if !output.status.success() {
+            return None;
+        }
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        for line in stdout.lines() {
+            let t = line.trim();
+            if !t.starts_with("inet ") {
+                continue;
+            }
+            let parts: Vec<&str> = t.split_whitespace().collect();
+            let mut i = 0;
+            while i + 1 < parts.len() {
+                if parts[i] == "broadcast" {
+                    let bcast = parts[i + 1];
+                    if bcast.contains('.') && bcast.chars().all(|c| c.is_ascii_digit() || c == '.') {
+                        return Some(format!("{bcast} ({iface})"));
+                    }
+                }
+                i += 1;
+            }
+        }
+        None
+    };
+    let from_default = || -> Option<String> {
+        let iface = default_iface()?;
+        broadcast_of(&iface)
+    };
+    let from_fallback = || -> Option<String> {
+        for iface in ["en0", "en1", "en2"] {
+            if let Some(bcast) = broadcast_of(iface) {
+                return Some(bcast);
+            }
+        }
+        None
+    };
+    let info = from_default().or_else(from_fallback).unwrap_or_default();
+    if info.is_empty() {
+        debug3!("primary broadcast: ifconfig empty");
+    } else {
+        debug3!("primary broadcast: '{}'", info);
+    }
+    info
+}
+
 
 
 
