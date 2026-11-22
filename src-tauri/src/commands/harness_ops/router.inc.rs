@@ -978,6 +978,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_macos_version_request(content) {
         return Some(format_macos_version_gateway());
     }
+    // ComputerName · LocalHostName (bare "host" / monitor host stay out).
+    if looks_like_hostname_request(content) {
+        return Some(format_hostname_gateway());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());

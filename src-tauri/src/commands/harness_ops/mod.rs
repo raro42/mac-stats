@@ -467,6 +467,40 @@ mod tests {
     }
 
     #[test]
+    fn hostname_slash_and_view_open_do_not_steal_bare_host() {
+        // Slash + view/open NL → ComputerName · LocalHostName (chip `/chip` · macOS `/macos` parity).
+        // Bare host / view host stay with the agent (too ambiguous for monitors/URLs).
+        assert!(looks_like_hostname_request("/hostname"));
+        assert!(looks_like_hostname_request("/computer-name"));
+        assert!(looks_like_hostname_request("/machine-name"));
+        assert!(looks_like_hostname_request("/local-hostname"));
+        assert!(looks_like_hostname_request("view hostname"));
+        assert!(looks_like_hostname_request("open computer name"));
+        assert!(looks_like_hostname_request("list machine name"));
+        assert!(looks_like_hostname_request("hostname"));
+        assert!(looks_like_hostname_request("computer name"));
+        assert!(looks_like_hostname_request("what's my hostname"));
+        assert!(looks_like_hostname_request("what computer name"));
+        assert!(!looks_like_hostname_request("/host"));
+        assert!(!looks_like_hostname_request("host"));
+        assert!(!looks_like_hostname_request("view host"));
+        assert!(!looks_like_hostname_request("localhost"));
+        assert!(!looks_like_hostname_request("monitor hostname"));
+        let host = try_operator_instant_reply("/hostname").unwrap();
+        assert!(
+            host.contains("**Host**") && !host.to_lowercase().contains("execution"),
+            "got: {host}"
+        );
+        let viewed = try_operator_instant_reply("view hostname").unwrap();
+        assert!(
+            viewed.contains("**Host**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("view host").is_none());
+        assert!(try_operator_instant_reply("/host").is_none());
+    }
+
+    #[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.

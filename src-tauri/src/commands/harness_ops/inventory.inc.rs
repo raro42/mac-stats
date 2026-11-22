@@ -5282,6 +5282,149 @@ pub fn format_macos_version_gateway() -> String {
 }
 
 
+/// ComputerName · LocalHostName — not monitor/website host, not bare "host".
+/// Slash + view/open NL (`/hostname` · `/computer-name` · `view hostname`) match chip
+/// `/chip` · macOS `/macos` shape.
+pub fn looks_like_hostname_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("monitor")
+        || n.contains("website")
+        || n.contains("url")
+        || n.contains("http")
+        || n.contains("dns")
+        || n.contains("ssrf")
+        || n.contains("allowlist")
+        || n.contains("localhost")
+        || n.contains("remote")
+        || n.contains("ssh")
+        // Bare "host" is too ambiguous (monitors / URLs / agent host talk).
+        || n == "/host"
+        || n == "host"
+        || n == "the host"
+        || n == "view host"
+        || n == "view the host"
+        || n == "see host"
+        || n == "see the host"
+        || n == "open host"
+        || n == "open the host"
+        || n == "list host"
+        || n == "list the host"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/hostname"
+            | "/host-name"
+            | "/computer-name"
+            | "/computername"
+            | "/machine-name"
+            | "/machinename"
+            | "/local-hostname"
+            | "/localhostname"
+            | "hostname"
+            | "the hostname"
+            | "host name"
+            | "the host name"
+            | "computer name"
+            | "the computer name"
+            | "machine name"
+            | "the machine name"
+            | "local hostname"
+            | "the local hostname"
+            | "local host name"
+            | "the local host name"
+            | "what hostname"
+            | "what hostname is this"
+            | "what hostname do i have"
+            | "what's the hostname"
+            | "whats the hostname"
+            | "what is the hostname"
+            | "what's my hostname"
+            | "whats my hostname"
+            | "what is my hostname"
+            | "which hostname"
+            | "which hostname is this"
+            | "what computer name"
+            | "what computer name is this"
+            | "what's the computer name"
+            | "whats the computer name"
+            | "what is the computer name"
+            | "what's my computer name"
+            | "whats my computer name"
+            | "what is my computer name"
+            | "what machine name"
+            | "what's the machine name"
+            | "whats the machine name"
+            | "what is the machine name"
+            | "my hostname"
+            | "my computer name"
+            | "my machine name"
+            // View/see/show me/open/list (bare view host stays vetoed).
+            | "view hostname"
+            | "view the hostname"
+            | "view host name"
+            | "view the host name"
+            | "view computer name"
+            | "view the computer name"
+            | "view machine name"
+            | "view the machine name"
+            | "view local hostname"
+            | "view the local hostname"
+            | "see hostname"
+            | "see the hostname"
+            | "see computer name"
+            | "see the computer name"
+            | "see machine name"
+            | "see the machine name"
+            | "open hostname"
+            | "open the hostname"
+            | "open computer name"
+            | "open the computer name"
+            | "open machine name"
+            | "open the machine name"
+            | "list hostname"
+            | "list the hostname"
+            | "list computer name"
+            | "list the computer name"
+            | "list machine name"
+            | "list the machine name"
+            | "show hostname"
+            | "show the hostname"
+            | "show me hostname"
+            | "show me the hostname"
+            | "show computer name"
+            | "show the computer name"
+            | "show me computer name"
+            | "show me the computer name"
+            | "show machine name"
+            | "show the machine name"
+            | "show me machine name"
+            | "show me the machine name"
+    )
+}
+
+
+/// Zero-LLM hostname from cached ComputerName · LocalHostName (e.g. `Ralf’s MacBook (ralfs-macbook)`).
+pub fn format_hostname_gateway() -> String {
+    let v = crate::metrics::get_hostname();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Host** — _no hostname right now._".to_string();
+    }
+    format!("**Host** · {v}")
+}
+
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

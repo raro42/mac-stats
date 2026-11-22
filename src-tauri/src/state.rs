@@ -110,6 +110,8 @@ pub(crate) fn format_process_uptime() -> String {
 pub(crate) static CHIP_INFO_CACHE: OnceLock<String> = OnceLock::new();
 /// Cached `sw_vers` ProductName · ProductVersion · BuildVersion (instant `/macos` lane).
 pub(crate) static MACOS_VERSION_CACHE: OnceLock<String> = OnceLock::new();
+/// Cached ComputerName · LocalHostName (instant `/hostname` · `/computer-name` lane).
+pub(crate) static HOSTNAME_CACHE: OnceLock<String> = OnceLock::new();
 
 pub(crate) static CAN_READ_FREQUENCY: OnceLock<bool> = OnceLock::new();
 pub(crate) static CAN_READ_CPU_POWER: OnceLock<bool> = OnceLock::new();

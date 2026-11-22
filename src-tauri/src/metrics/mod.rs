@@ -175,6 +175,66 @@ pub fn get_macos_version() -> String {
         .clone()
 }
 
+/// Cached ComputerName · LocalHostName (`scutil` / `hostname`).
+/// Used by the Discord/operator instant `/hostname` · `/computer-name` lane.
+pub fn get_hostname() -> String {
+    HOSTNAME_CACHE
+        .get_or_init(|| {
+            let scutil = |key: &str| -> Option<String> {
+                let output = Command::new("/usr/sbin/scutil")
+                    .args(["--get", key])
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                let s = String::from_utf8_lossy(&output.stdout);
+                let t = s.trim();
+                if t.is_empty() {
+                    None
+                } else {
+                    Some(t.to_string())
+                }
+            };
+            let computer = scutil("ComputerName");
+            let local = scutil("LocalHostName");
+            let info = match (computer, local) {
+                (Some(c), Some(l)) if !c.eq_ignore_ascii_case(&l) => format!("{c} ({l})"),
+                (Some(c), _) => c,
+                (_, Some(l)) => l,
+                (None, None) => {
+                    let output = Command::new("/bin/hostname")
+                        .arg("-s")
+                        .stderr(std::process::Stdio::null())
+                        .output()
+                        .ok();
+                    output
+                        .and_then(|o| {
+                            if !o.status.success() {
+                                return None;
+                            }
+                            let s = String::from_utf8_lossy(&o.stdout);
+                            let t = s.trim();
+                            if t.is_empty() {
+                                None
+                            } else {
+                                Some(t.to_string())
+                            }
+                        })
+                        .unwrap_or_default()
+                }
+            };
+            if info.is_empty() {
+                debug3!("hostname: scutil/hostname empty");
+            } else {
+                debug3!("hostname cached: '{}'", info);
+            }
+            info
+        })
+        .clone()
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

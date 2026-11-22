@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2936] - 2026-11-22
+
+### Added
+- Instant hostname accepts `/hostname` · `/computer-name` · `/machine-name` · `/local-hostname` and view/see/open/list NL (`view hostname`, `open computer name`, `list machine name`, …), matching “hostname” / “what's my hostname” / “computer name”. Bare `host` / `view host` stay with the agent (monitors/URLs).
+
 ## [0.1.2935] - 2026-11-22
 
 ### Added
