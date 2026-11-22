@@ -1074,6 +1074,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_display_resolution_request(content) {
         return Some(format_display_resolution_report());
     }
+    // GPU chipset · cores · Metal (bare `gpu` / `view gpu` / `what's the gpu` stay usage ring; `/chip` stays CPU chip; `/display` stays displays).
+    if looks_like_gpu_identity_request(content) {
+        return Some(format_gpu_identity_report());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());

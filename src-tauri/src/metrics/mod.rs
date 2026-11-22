@@ -1708,6 +1708,83 @@ pub fn get_display_resolution() -> String {
     info
 }
 
+/// GPU chipset model · core count · Metal family from `system_profiler SPDisplaysDataType`.
+/// Cached (OnceLock): discrete/built-in GPU identity does not change while the process stays up.
+/// Distinct from GPU usage ring (`/gpu`) and display resolution (`/display`).
+pub fn get_gpu_identity() -> String {
+    static CACHE: OnceLock<String> = OnceLock::new();
+    CACHE
+        .get_or_init(|| {
+            let output = Command::new("/usr/sbin/system_profiler")
+                .args(["SPDisplaysDataType", "-json"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            let Ok(output) = output else {
+                debug3!("gpu identity: system_profiler spawn failed");
+                return String::new();
+            };
+            if !output.status.success() {
+                debug3!("gpu identity: system_profiler non-zero");
+                return String::new();
+            }
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            let Ok(json) = serde_json::from_str::<serde_json::Value>(&stdout) else {
+                debug3!("gpu identity: JSON parse failed");
+                return String::new();
+            };
+            let Some(gpus) = json.get("SPDisplaysDataType").and_then(|v| v.as_array()) else {
+                return String::new();
+            };
+            let mut parts: Vec<String> = Vec::new();
+            for gpu in gpus {
+                let model = gpu
+                    .get("sppci_model")
+                    .and_then(|v| v.as_str())
+                    .or_else(|| gpu.get("_name").and_then(|v| v.as_str()))
+                    .unwrap_or("")
+                    .trim();
+                if model.is_empty() {
+                    continue;
+                }
+                let mut piece = model.to_string();
+                let cores = gpu.get("sppci_cores").and_then(|v| {
+                    v.as_str()
+                        .map(|s| s.trim().to_string())
+                        .filter(|s| !s.is_empty())
+                        .or_else(|| v.as_u64().map(|n| n.to_string()))
+                });
+                if let Some(cores) = cores {
+                    piece.push_str(" · ");
+                    piece.push_str(&cores);
+                    piece.push_str(" cores");
+                }
+                if let Some(metal_raw) = gpu
+                    .get("spdisplays_mtlgpufamilysupport")
+                    .and_then(|v| v.as_str())
+                {
+                    let metal = metal_raw
+                        .trim()
+                        .strip_prefix("spdisplays_metal")
+                        .unwrap_or("")
+                        .trim();
+                    if !metal.is_empty() {
+                        piece.push_str(" · Metal ");
+                        piece.push_str(metal);
+                    }
+                }
+                parts.push(piece);
+            }
+            if parts.is_empty() {
+                debug3!("gpu identity: no GPUs");
+                return String::new();
+            }
+            let info = parts.join(" · ");
+            debug3!("gpu identity: '{}'", info);
+            info
+        })
+        .clone()
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

@@ -9106,6 +9106,208 @@ pub fn format_display_resolution_report() -> String {
     format!("**Display** · `{v}`")
 }
 
+/// GPU chipset · cores · Metal — not GPU usage ring `/gpu`, not CPU `/chip`, not `/display`.
+/// Slash + view/open NL (`/gpu-name` · `/gpu-model` · `view gpu name`); bare `gpu` /
+/// `view gpu` / `what's the gpu` stay the usage ring; `/chip` stays Apple CPU chip.
+pub fn looks_like_gpu_identity_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("usage")
+        || n.contains("percent")
+        || n.contains("high")
+        || n.contains("busy")
+        || n.contains("hot")
+        || n.contains("ring")
+        || n.contains("gauge")
+        || n.contains("path")
+        || n.contains("size")
+        || contains_age_token(&n)
+        || n.contains("screenshot")
+        || n.contains("display")
+        || n.contains("resolution")
+        || n.contains("screen")
+        || n.contains("monitor")
+        || n.contains("process")
+        || n.contains("temp")
+        || n.contains("freq")
+        || n.contains("clock")
+        || n.contains("watt")
+        || n.contains("power")
+        || n.contains("keep")
+        || n.contains("discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        // GPU usage ring owns bare `/gpu` · `view gpu` · `what's the gpu`.
+        || n == "/gpu"
+        || n == "/gpu-ring"
+        || n == "/gpuring"
+        || n == "gpu"
+        || n == "the gpu"
+        || n == "view gpu"
+        || n == "view the gpu"
+        || n == "see gpu"
+        || n == "see the gpu"
+        || n == "open gpu"
+        || n == "open the gpu"
+        || n == "list gpu"
+        || n == "list the gpu"
+        || n == "show gpu"
+        || n == "show the gpu"
+        || n == "show me gpu"
+        || n == "show me the gpu"
+        || n == "what's the gpu"
+        || n == "whats the gpu"
+        || n == "what is the gpu"
+        || n == "how's the gpu"
+        || n == "hows the gpu"
+        || n == "how much gpu"
+        || n == "how much gpu do i have"
+        // CPU chip stays `/chip`.
+        || n == "/chip"
+        || n == "chip"
+        || n == "the chip"
+        || n == "view chip"
+        || n == "view the chip"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/gpu-name"
+            | "/gpuname"
+            | "/gpu-model"
+            | "/gpumodel"
+            | "/gpu-chip"
+            | "/gpuchip"
+            | "/gpu-chipset"
+            | "/gpuchipset"
+            | "/chipset"
+            | "/gpu-cores"
+            | "/gpucores"
+            | "/metal"
+            | "/metal-support"
+            | "/metalsupport"
+            | "gpu name"
+            | "the gpu name"
+            | "gpu model"
+            | "the gpu model"
+            | "gpu chip"
+            | "the gpu chip"
+            | "gpu chipset"
+            | "the gpu chipset"
+            | "chipset"
+            | "the chipset"
+            | "gpu cores"
+            | "the gpu cores"
+            | "metal support"
+            | "the metal support"
+            | "what gpu"
+            | "what gpu is this"
+            | "what gpu do i have"
+            | "what gpu does this mac have"
+            | "which gpu"
+            | "which gpu is this"
+            | "which gpu do i have"
+            | "which gpu does this mac have"
+            | "what's my gpu"
+            | "whats my gpu"
+            | "what is my gpu"
+            | "what's my gpu name"
+            | "whats my gpu name"
+            | "what is my gpu name"
+            | "what's my gpu model"
+            | "whats my gpu model"
+            | "what is my gpu model"
+            | "what's the gpu name"
+            | "whats the gpu name"
+            | "what is the gpu name"
+            | "what's the gpu model"
+            | "whats the gpu model"
+            | "what is the gpu model"
+            | "what's the chipset"
+            | "whats the chipset"
+            | "what is the chipset"
+            | "what's my chipset"
+            | "whats my chipset"
+            | "what is my chipset"
+            | "how many gpu cores"
+            | "how many gpu cores do i have"
+            // View/see/show me/open/list (bare view gpu stays usage ring).
+            | "view gpu name"
+            | "view the gpu name"
+            | "view gpu model"
+            | "view the gpu model"
+            | "view gpu chip"
+            | "view the gpu chip"
+            | "view gpu chipset"
+            | "view the gpu chipset"
+            | "view chipset"
+            | "view the chipset"
+            | "view gpu cores"
+            | "view the gpu cores"
+            | "view metal"
+            | "view the metal"
+            | "view metal support"
+            | "view the metal support"
+            | "see gpu name"
+            | "see the gpu name"
+            | "see gpu model"
+            | "see the gpu model"
+            | "see chipset"
+            | "see the chipset"
+            | "see gpu cores"
+            | "see the gpu cores"
+            | "open gpu name"
+            | "open the gpu name"
+            | "open gpu model"
+            | "open the gpu model"
+            | "open chipset"
+            | "open the chipset"
+            | "open gpu cores"
+            | "open the gpu cores"
+            | "list gpu name"
+            | "list the gpu name"
+            | "list gpu model"
+            | "list the gpu model"
+            | "list chipset"
+            | "list the chipset"
+            | "list gpu cores"
+            | "list the gpu cores"
+            | "show gpu name"
+            | "show the gpu name"
+            | "show me gpu name"
+            | "show me the gpu name"
+            | "show gpu model"
+            | "show the gpu model"
+            | "show me gpu model"
+            | "show me the gpu model"
+            | "show chipset"
+            | "show the chipset"
+            | "show me chipset"
+            | "show me the chipset"
+            | "show gpu cores"
+            | "show the gpu cores"
+            | "show me gpu cores"
+            | "show me the gpu cores"
+    )
+}
+
+/// Zero-LLM GPU chipset · cores · Metal from `system_profiler SPDisplaysDataType`.
+pub fn format_gpu_identity_report() -> String {
+    let v = crate::metrics::get_gpu_identity();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**GPU** — _no GPU name on this Mac right now._".to_string();
+    }
+    format!("**GPU** · `{v}`")
+}
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

@@ -1793,6 +1793,61 @@ mod tests {
         }
     }
 
+    #[test]
+    fn gpu_identity_slash_and_view_open_do_not_steal_usage_ring_or_chip() {
+        // Slash + view/open NL → GPU chipset · cores · Metal (`/chip` · `/display` parity).
+        // Bare `gpu` / `view gpu` / `what's the gpu` stay usage ring; `/chip` stays CPU chip.
+        assert!(looks_like_gpu_identity_request("/gpu-name"));
+        assert!(looks_like_gpu_identity_request("/gpu-model"));
+        assert!(looks_like_gpu_identity_request("/gpu-chip"));
+        assert!(looks_like_gpu_identity_request("/gpu-chipset"));
+        assert!(looks_like_gpu_identity_request("/chipset"));
+        assert!(looks_like_gpu_identity_request("/gpu-cores"));
+        assert!(looks_like_gpu_identity_request("/metal"));
+        assert!(looks_like_gpu_identity_request("/metal-support"));
+        assert!(looks_like_gpu_identity_request("view gpu name"));
+        assert!(looks_like_gpu_identity_request("open chipset"));
+        assert!(looks_like_gpu_identity_request("list gpu cores"));
+        assert!(looks_like_gpu_identity_request("gpu name"));
+        assert!(looks_like_gpu_identity_request("what gpu do i have"));
+        assert!(looks_like_gpu_identity_request("what's my gpu"));
+        assert!(looks_like_gpu_identity_request("how many gpu cores"));
+        assert!(!looks_like_gpu_identity_request("/gpu"));
+        assert!(!looks_like_gpu_identity_request("gpu"));
+        assert!(!looks_like_gpu_identity_request("view gpu"));
+        assert!(!looks_like_gpu_identity_request("what's the gpu"));
+        assert!(!looks_like_gpu_identity_request("/gpu-ring"));
+        assert!(!looks_like_gpu_identity_request("/chip"));
+        assert!(!looks_like_gpu_identity_request("view chip"));
+        assert!(!looks_like_gpu_identity_request("/display"));
+        assert!(!looks_like_gpu_identity_request("view display"));
+        let id = try_operator_instant_reply("/gpu-name").unwrap();
+        assert!(
+            id.contains("**GPU**") && id.contains('`') && !id.to_lowercase().contains("execution"),
+            "got: {id}"
+        );
+        let viewed = try_operator_instant_reply("view gpu name").unwrap();
+        assert!(
+            viewed.contains("**GPU**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let chipset = try_operator_instant_reply("/chipset").unwrap();
+        assert!(
+            chipset.contains("**GPU**") && !chipset.to_lowercase().contains("execution"),
+            "got: {chipset}"
+        );
+        let usage = try_operator_instant_reply("/gpu").unwrap();
+        assert!(
+            usage.contains("**GPU**") && !usage.contains('`'),
+            "/gpu must stay usage ring (no identity backticks): {usage}"
+        );
+        let chip = try_operator_instant_reply("/chip").unwrap();
+        assert!(
+            chip.contains("**Chip**") && !chip.contains("**GPU**"),
+            "/chip must stay CPU chip: {chip}"
+        );
+    }
+
 #[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).

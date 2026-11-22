@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2960] - 2026-11-22
+
+### Added
+- Instant GPU chipset · cores · Metal accepts `/gpu-name` · `/gpu-model` · `/gpu-chip` · `/gpu-chipset` · `/chipset` · `/gpu-cores` · `/metal` · `/metal-support` and view/see/open/list NL (`view gpu name`, `open chipset`, `list gpu cores`, …), matching “gpu name” / “gpu model” / “chipset” / “what gpu” / “what gpu do i have” / “what's my gpu” / “what's my gpu name” / “how many gpu cores”. Bare `gpu` / `view gpu` / `what's the gpu` stay GPU usage ring; `/chip` stays Apple CPU chip; `/display` stays connected displays.
+
 ## [0.1.2959] - 2026-11-22
 
 ### Added
