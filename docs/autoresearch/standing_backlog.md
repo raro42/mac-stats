@@ -1,7 +1,10 @@
+## Overnight merge — v0.1.2938
+
+- Product fuel after Mac model `/mac-model` NL v0.1.2937: login username already answered via agent/`whoami`/`$USER` but lacked `/username` · `/whoami` · `/login-name` · `/account-name` and view/see/open/list phrases while chip `/chip`, RAM `/ram-size`, SSD `/ssd-size`, macOS `/macos`, hostname `/hostname`, and Mac model `/mac-model` already had slash+NL. Bare `user` / `view user` stay with the agent; `user info` / `user-info.json` path·size·age stay the Discord map file. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — username slash NL closed; not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2937
 
 - Product fuel after hostname `/hostname` NL v0.1.2936: Mac marketing name · machine model already readable via `system_profiler` / `sysctl hw.model` but lacked `/mac-model` · `/hardware-model` · `/machine-model` · `/model-id` · `/hw-model` and view/see/open/list phrases while chip `/chip`, hostname `/hostname`, and macOS `/macos` already had slash+NL. Bare `/model` / `which model` / `model name` stay Ollama; `/chip` stays Apple chip. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — Mac model slash NL closed; not another keep-pNN clone.
-
 ## Overnight merge — v0.1.2936
 
 - Product fuel after macOS version `/macos` NL v0.1.2935: ComputerName · LocalHostName already answered via agent/`hostname`/`scutil` but lacked `/hostname` · `/computer-name` · `/machine-name` · `/local-hostname` and view/see/open/list phrases while chip `/chip`, RAM `/ram-size`, SSD `/ssd-size`, and macOS `/macos` already had slash+NL. Bare `host` / `view host` stay with the agent (monitors/URLs). Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — hostname slash NL closed; not another keep-pNN clone.
