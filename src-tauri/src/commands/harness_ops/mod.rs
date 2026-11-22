@@ -1674,6 +1674,49 @@ mod tests {
     }
 
 #[test]
+    fn vpn_status_slash_and_view_open_do_not_steal_wifi_or_signal() {
+        // Slash + view/open NL → VPN status (`/wifi` · `/link-status` parity).
+        // Bare `vpn` stays with the agent; `/wifi` stays SSID; `/signal` stays alerts; `/ip` stays LAN.
+        assert!(looks_like_vpn_status_request("/vpn"));
+        assert!(looks_like_vpn_status_request("/vpn-status"));
+        assert!(looks_like_vpn_status_request("/vpn-state"));
+        assert!(looks_like_vpn_status_request("/is-vpn"));
+        assert!(looks_like_vpn_status_request("/on-vpn"));
+        assert!(looks_like_vpn_status_request("view vpn"));
+        assert!(looks_like_vpn_status_request("open vpn status"));
+        assert!(looks_like_vpn_status_request("list vpn"));
+        assert!(looks_like_vpn_status_request("vpn status"));
+        assert!(looks_like_vpn_status_request("am i on vpn"));
+        assert!(looks_like_vpn_status_request("is vpn connected"));
+        assert!(looks_like_vpn_status_request("what's my vpn"));
+        assert!(looks_like_vpn_status_request("what's my vpn status"));
+        assert!(!looks_like_vpn_status_request("vpn"));
+        assert!(!looks_like_vpn_status_request("/wifi"));
+        assert!(!looks_like_vpn_status_request("view wifi"));
+        assert!(!looks_like_vpn_status_request("/signal"));
+        assert!(!looks_like_vpn_status_request("/ip"));
+        assert!(!looks_like_vpn_status_request("/link-status"));
+        let vpn = try_operator_instant_reply("/vpn").unwrap();
+        assert!(
+            vpn.contains("**VPN**") && !vpn.to_lowercase().contains("execution"),
+            "got: {vpn}"
+        );
+        let viewed = try_operator_instant_reply("view vpn").unwrap();
+        assert!(
+            viewed.contains("**VPN**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("vpn").is_none());
+        let wifi = try_operator_instant_reply("/wifi");
+        if let Some(reply) = wifi {
+            assert!(
+                !reply.contains("**VPN**"),
+                "/wifi must stay SSID, not VPN: {reply}"
+            );
+        }
+    }
+
+#[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).
         // Bare `charger` / `adapter` stay with the agent; `/watts` stays CPU+GPU; `/battery` · is it charging stay Bat %.

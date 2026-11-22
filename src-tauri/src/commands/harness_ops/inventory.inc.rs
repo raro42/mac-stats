@@ -9308,6 +9308,139 @@ pub fn format_gpu_identity_report() -> String {
     format!("**GPU** · `{v}`")
 }
 
+/// VPN connection status — not LAN `/ip`, not Wi-Fi `/wifi`, not primary `/link-status`.
+/// Slash + view/open NL (`/vpn` · `/vpn-status` · `view vpn`) match `/wifi` · `/link-status` shape;
+/// bare `vpn` stays with the agent; Signal `/signal` stays alerts.
+pub fn looks_like_vpn_status_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("password")
+        || n.contains("credential")
+        || n.contains("keychain")
+        || n.contains("install")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("connect to")
+        || n.contains("disconnect from")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("keep")
+        || n.contains("discard")
+        // Signal alerts / LAN / Wi-Fi stay elsewhere.
+        || n == "/signal"
+        || n == "signal"
+        || n == "the signal"
+        || n.contains("wifi")
+        || n.contains("wi-fi")
+        || n.contains("ssid")
+        || n.contains("airport")
+        || n.contains("wlan")
+        || n == "/ip"
+        || n == "/local-ip"
+        || n == "/link-status"
+        || n == "/media"
+        || n == "/link-speed"
+        // Bare short / ambiguous stay with the agent.
+        || n == "vpn"
+        || n == "the vpn"
+        || n == "tunnel"
+        || n == "the tunnel"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/vpn"
+            | "/vpn-status"
+            | "/vpnstatus"
+            | "/vpn-state"
+            | "/vpnstate"
+            | "/vpn-connection"
+            | "/vpnconnection"
+            | "/is-vpn"
+            | "/isvpn"
+            | "/on-vpn"
+            | "/onvpn"
+            | "vpn status"
+            | "the vpn status"
+            | "vpn state"
+            | "the vpn state"
+            | "vpn connection"
+            | "the vpn connection"
+            | "my vpn"
+            | "my vpn status"
+            | "am i on vpn"
+            | "am i on a vpn"
+            | "am i connected to vpn"
+            | "am i connected to a vpn"
+            | "is vpn connected"
+            | "is the vpn connected"
+            | "is vpn up"
+            | "is the vpn up"
+            | "is vpn on"
+            | "is the vpn on"
+            | "what's my vpn"
+            | "whats my vpn"
+            | "what is my vpn"
+            | "what's my vpn status"
+            | "whats my vpn status"
+            | "what is my vpn status"
+            | "what's the vpn"
+            | "whats the vpn"
+            | "what is the vpn"
+            | "what's the vpn status"
+            | "whats the vpn status"
+            | "what is the vpn status"
+            | "which vpn"
+            | "which vpn am i on"
+            // View/see/show me/open/list.
+            | "view vpn"
+            | "view the vpn"
+            | "view vpn status"
+            | "view the vpn status"
+            | "see vpn"
+            | "see the vpn"
+            | "see vpn status"
+            | "see the vpn status"
+            | "open vpn"
+            | "open the vpn"
+            | "open vpn status"
+            | "open the vpn status"
+            | "list vpn"
+            | "list the vpn"
+            | "list vpn status"
+            | "list the vpn status"
+            | "show vpn"
+            | "show the vpn"
+            | "show me vpn"
+            | "show me the vpn"
+            | "show vpn status"
+            | "show the vpn status"
+            | "show me vpn status"
+            | "show me the vpn status"
+    )
+}
+
+/// Zero-LLM VPN status from `scutil --nc list` (+ utun fallback).
+pub fn format_vpn_status_report() -> String {
+    let v = crate::metrics::get_vpn_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**VPN** — _no VPN reading on this Mac right now._".to_string();
+    }
+    format!("**VPN** · `{v}`")
+}
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

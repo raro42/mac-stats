@@ -1784,6 +1784,130 @@ pub fn get_gpu_identity() -> String {
         })
         .clone()
 }
+/// Parse `scutil --nc list` lines into a short VPN status string.
+/// Prefers Connected services; falls back to Disconnected names when none are up.
+pub(crate) fn parse_scutil_nc_vpn_list(stdout: &str) -> String {
+    let mut connected: Vec<String> = Vec::new();
+    let mut disconnected: Vec<String> = Vec::new();
+    for line in stdout.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let lower = t.to_ascii_lowercase();
+        // Prefer VPN / PPP / IPSec / IKEv2 rows; skip plain Ethernet/Wi-Fi services.
+        let looks_vpn = lower.contains("vpn")
+            || lower.contains("[ppp")
+            || lower.contains("ppp:")
+            || lower.contains("ipsec")
+            || lower.contains("ikev2")
+            || lower.contains("l2tp")
+            || lower.contains("wireguard")
+            || lower.contains("openvpn")
+            || lower.contains("anyconnect");
+        if !looks_vpn {
+            continue;
+        }
+        let state = if lower.contains("(connected)") {
+            "connected"
+        } else if lower.contains("(connecting)") {
+            "connecting"
+        } else if lower.contains("(disconnecting)") {
+            "disconnecting"
+        } else if lower.contains("(disconnected)") {
+            "disconnected"
+        } else {
+            continue;
+        };
+        let name = t
+            .find('"')
+            .and_then(|start| {
+                let rest = &t[start + 1..];
+                rest.find('"').map(|end| rest[..end].trim().to_string())
+            })
+            .filter(|s| !s.is_empty())
+            .unwrap_or_else(|| "VPN".to_string());
+        match state {
+            "connected" | "connecting" | "disconnecting" => {
+                if !connected.iter().any(|n| n == &name) {
+                    connected.push(name);
+                }
+            }
+            _ => {
+                if !disconnected.iter().any(|n| n == &name) {
+                    disconnected.push(name);
+                }
+            }
+        }
+    }
+    if !connected.is_empty() {
+        let names = connected.join(", ");
+        return format!("connected · {names}");
+    }
+    if !disconnected.is_empty() {
+        let names = disconnected.join(", ");
+        return format!("disconnected · {names}");
+    }
+    String::new()
+}
+
+/// VPN connection status from `scutil --nc list` (live; not OnceLock).
+/// Distinct from LAN `/ip`, Wi-Fi `/wifi`, and primary `/link-status`.
+/// Used by Discord/operator instant `/vpn` · `/vpn-status` lane.
+pub fn get_vpn_status() -> String {
+    let output = Command::new("/usr/sbin/scutil")
+        .args(["--nc", "list"])
+        .stderr(std::process::Stdio::null())
+        .output();
+    let Ok(output) = output else {
+        debug3!("vpn status: scutil spawn failed");
+        return String::new();
+    };
+    if !output.status.success() {
+        debug3!("vpn status: scutil non-zero");
+        return String::new();
+    }
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let info = parse_scutil_nc_vpn_list(&stdout);
+    if info.is_empty() {
+        // Fallback: a live utun with an IPv4 often means a tunnel is up (WireGuard etc.).
+        if utun_has_ipv4() {
+            debug3!("vpn status: utun fallback connected");
+            return "connected · utun".to_string();
+        }
+        debug3!("vpn status: no VPN services");
+        return String::new();
+    }
+    debug3!("vpn status: '{}'", info);
+    info
+}
+
+fn utun_has_ipv4() -> bool {
+    let output = Command::new("/sbin/ifconfig")
+        .stderr(std::process::Stdio::null())
+        .output();
+    let Ok(output) = output else {
+        return false;
+    };
+    if !output.status.success() {
+        return false;
+    }
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let mut in_utun = false;
+    for line in stdout.lines() {
+        if line.starts_with('\t') || line.starts_with(' ') {
+            if in_utun {
+                let t = line.trim_start();
+                if t.starts_with("inet ") {
+                    return true;
+                }
+            }
+        } else {
+            in_utun = line.starts_with("utun");
+        }
+    }
+    false
+}
 
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
@@ -2861,6 +2985,45 @@ fn homebrew_cask_staged_at(candidates: &[&str]) -> bool {
 #[tauri::command]
 pub fn is_homebrew_cask_install() -> bool {
     homebrew_cask_staged_at(HOMEBREW_CASKROOM_MAC_STATS)
+}
+
+#[cfg(test)]
+mod vpn_status_parse_tests {
+    use super::parse_scutil_nc_vpn_list;
+
+    #[test]
+    fn prefers_connected_vpn_name() {
+        let sample = r#"
+Available network connection services in the current set (*=enabled):
+* (Connected)      A1B2C3D4-E5F6-7890-ABCD-EF1234567890 VPN "NordLayer" [VPN:IKEv2]
+* (Disconnected)   11111111-2222-3333-4444-555555555555 VPN "Work" [VPN:L2TP]
+"#;
+        assert_eq!(
+            parse_scutil_nc_vpn_list(sample),
+            "connected · NordLayer"
+        );
+    }
+
+    #[test]
+    fn reports_disconnected_when_none_up() {
+        let sample = r#"
+* (Disconnected)   11111111-2222-3333-4444-555555555555 VPN "Work" [VPN:L2TP]
+* (Disconnected)   AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE PPP "Legacy" [PPP:PPTP]
+"#;
+        assert_eq!(
+            parse_scutil_nc_vpn_list(sample),
+            "disconnected · Work, Legacy"
+        );
+    }
+
+    #[test]
+    fn ignores_non_vpn_services() {
+        let sample = r#"
+* (Connected)      00000000-0000-0000-0000-000000000001 Ethernet "USB 10/100/1000 LAN"
+* (Disconnected)   00000000-0000-0000-0000-000000000002 Wi-Fi "Wi-Fi"
+"#;
+        assert!(parse_scutil_nc_vpn_list(sample).is_empty());
+    }
 }
 
 #[cfg(test)]

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2961] - 2026-11-22
+
+### Added
+- Instant VPN status accepts `/vpn` · `/vpn-status` · `/vpn-state` · `/vpn-connection` · `/is-vpn` · `/on-vpn` and view/see/open/list NL (`view vpn`, `open vpn status`, `list vpn`, …), matching “vpn status” / “am i on vpn” / “is vpn connected” / “what's my vpn” / “what's my vpn status”. Bare `vpn` stays with the agent; `/wifi` stays SSID; `/ip` stays LAN; `/link-status` stays primary link; `/signal` stays alerts. Rebased after remote GPU identity took v0.1.2960.
+
 ## [0.1.2960] - 2026-11-22
 
 ### Added
