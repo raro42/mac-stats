@@ -1,3 +1,10 @@
+## Overnight note 2026-11-22 ~23:31
+- Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Neon layout-daily next calendar quota.
+
+## Overnight merge — v0.1.2973
+
+- Product fuel after Screen Sharing `/screen-sharing` NL v0.1.2972: File Sharing (SMB) already readable via `launchctl print-disabled` / `launchctl print system/com.apple.smbd` but lacked `/file-sharing` · `/filesharing` · `/file-sharing-status` · `/file-share` · `/smb` · `/smb-status` · `/smb-state` · `/smbd` · `/smbd-status` · `/mac-smb` and view/see/open/list phrases while Screen Sharing `/screen-sharing` · `/vnc` and Remote Login `/remote-login` · `/ssh` already had slash+NL. Bare `file sharing` / `smb` / `smbd` stay with the agent; `/screen-sharing` · `/vnc` stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login; `/filevault` stays FileVault. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Dark marked today (Neon due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Neon layout-daily next calendar day · sibling/product fuel — File Sharing slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-22 ~23:15
 - Shipped v0.1.2972 Screen Sharing `/screen-sharing` · `/vnc` · `/mac-vnc` + view/open NL; bare screen sharing/vnc stay with agent; `/remote-login` · `/ssh` · `/screen` intact.
 - Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Neon layout-daily next calendar quota.
