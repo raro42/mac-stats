@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2968] - 2026-11-22
+
+### Added
+- Instant Application Firewall status accepts `/firewall` · `/firewall-status` · `/fw` · `/fw-status` · `/afw` · `/afw-status` · `/app-firewall` · `/application-firewall` · `/socketfilterfw` and view/see/open/list NL (`view firewall`, `open firewall status`, `list application firewall`, …), matching “firewall status” / “is firewall on” / “is firewall enabled” / “what's my firewall” / “what's the firewall status”. Bare `firewall` / `afw` stay with the agent; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP; `/filevault` stays FileVault.
+
 ## [0.1.2967] - 2026-11-22
 
 ### Added

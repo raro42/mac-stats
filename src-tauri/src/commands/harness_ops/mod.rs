@@ -1999,6 +1999,71 @@ mod tests {
         }
     }
 
+    #[test]
+    fn firewall_slash_and_view_open_do_not_steal_gatekeeper_or_bare_firewall() {
+        // Slash + view/open NL → Application Firewall (`/gatekeeper` · `/sip` parity).
+        // Bare `firewall` / `afw` stay with the agent; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP.
+        assert!(looks_like_firewall_request("/firewall"));
+        assert!(looks_like_firewall_request("/firewall-status"));
+        assert!(looks_like_firewall_request("/fw"));
+        assert!(looks_like_firewall_request("/fw-status"));
+        assert!(looks_like_firewall_request("/afw"));
+        assert!(looks_like_firewall_request("/afw-status"));
+        assert!(looks_like_firewall_request("/app-firewall"));
+        assert!(looks_like_firewall_request("/application-firewall"));
+        assert!(looks_like_firewall_request("/socketfilterfw"));
+        assert!(looks_like_firewall_request("view firewall"));
+        assert!(looks_like_firewall_request("open firewall status"));
+        assert!(looks_like_firewall_request("list application firewall"));
+        assert!(looks_like_firewall_request("firewall status"));
+        assert!(looks_like_firewall_request("is firewall on"));
+        assert!(looks_like_firewall_request("is firewall enabled"));
+        assert!(looks_like_firewall_request("what's my firewall"));
+        assert!(looks_like_firewall_request("view application firewall"));
+        assert!(!looks_like_firewall_request("firewall"));
+        assert!(!looks_like_firewall_request("afw"));
+        assert!(!looks_like_firewall_request("application firewall"));
+        assert!(!looks_like_firewall_request("app firewall"));
+        assert!(!looks_like_firewall_request("/gatekeeper"));
+        assert!(!looks_like_firewall_request("view gatekeeper"));
+        assert!(!looks_like_firewall_request("/sip"));
+        assert!(!looks_like_firewall_request("view sip"));
+        assert!(!looks_like_firewall_request("/filevault"));
+        assert!(!looks_like_firewall_request("enable firewall"));
+        assert!(!looks_like_firewall_request("disable firewall"));
+        assert!(!looks_like_gatekeeper_request("/firewall"));
+        assert!(!looks_like_gatekeeper_request("view firewall"));
+        assert!(!looks_like_sip_request("/firewall"));
+        assert!(!looks_like_sip_request("view firewall"));
+        assert!(!looks_like_filevault_request("/firewall"));
+        let fw = try_operator_instant_reply("/firewall").unwrap();
+        assert!(
+            fw.contains("**Firewall**") && !fw.to_lowercase().contains("execution"),
+            "got: {fw}"
+        );
+        let viewed = try_operator_instant_reply("view firewall").unwrap();
+        assert!(
+            viewed.contains("**Firewall**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("firewall").is_none());
+        assert!(try_operator_instant_reply("afw").is_none());
+        let gk = try_operator_instant_reply("/gatekeeper");
+        if let Some(reply) = gk {
+            assert!(
+                !reply.contains("**Firewall**"),
+                "/gatekeeper must stay Gatekeeper, not Firewall: {reply}"
+            );
+        }
+        let sip = try_operator_instant_reply("/sip");
+        if let Some(reply) = sip {
+            assert!(
+                !reply.contains("**Firewall**"),
+                "/sip must stay SIP, not Firewall: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

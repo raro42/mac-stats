@@ -10147,11 +10147,15 @@ pub fn looks_like_gatekeeper_request(content: &str) -> bool {
         || n.contains("filevault")
         || n.contains("file vault")
         || n.contains("system integrity")
+        || n.contains("firewall")
         || n == "/sip"
         || n == "/csrutil"
         || n == "/filevault"
         || n == "/fv"
         || n == "/fde"
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
         || n == "/boot-volume"
         || n == "/startup-disk"
         || n == "view disk"
@@ -10295,6 +10299,188 @@ pub fn format_gatekeeper_report() -> String {
         return "**Gatekeeper** — _no Gatekeeper reading on this Mac right now._".to_string();
     }
     format!("**Gatekeeper** · `{v}`")
+}
+
+/// Application Firewall global state — not Gatekeeper, not SIP, not FileVault.
+/// Slash + view/open NL (`/firewall` · `/afw` · `view firewall`) match `/gatekeeper` · `/sip` shape;
+/// bare `firewall` / `afw` stay with the agent; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP.
+pub fn looks_like_firewall_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        // Action verbs (leave status asks like "is firewall enabled").
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("allow ")
+        || n.contains("block ")
+        || n.contains("password")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("gatekeeper")
+        || n.contains("spctl")
+        || n.contains("system integrity")
+        || n.contains("sip")
+        || n.contains("csrutil")
+        // Gatekeeper / SIP / FileVault / boot volume / Disk Cleanup stay elsewhere.
+        || n == "/gatekeeper"
+        || n == "/gk"
+        || n == "/spctl"
+        || n == "/sip"
+        || n == "/csrutil"
+        || n == "/filevault"
+        || n == "/fv"
+        || n == "/fde"
+        || n == "/boot-volume"
+        || n == "/startup-disk"
+        || n == "view disk"
+        || n == "open disk"
+        || n == "/ssd"
+        || n == "/storage"
+        || n == "/free"
+        // Bare short / ambiguous stay with the agent.
+        || n == "firewall"
+        || n == "the firewall"
+        || n == "afw"
+        || n == "the afw"
+        || n == "application firewall"
+        || n == "the application firewall"
+        || n == "app firewall"
+        || n == "the app firewall"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/firewall"
+            | "/firewall-status"
+            | "/firewallstatus"
+            | "/fw"
+            | "/fw-status"
+            | "/fwstatus"
+            | "/afw"
+            | "/afw-status"
+            | "/afwstatus"
+            | "/app-firewall"
+            | "/appfirewall"
+            | "/application-firewall"
+            | "/applicationfirewall"
+            | "/socketfilterfw"
+            | "/os-firewall"
+            | "/macos-firewall"
+            | "firewall status"
+            | "the firewall status"
+            | "afw status"
+            | "the afw status"
+            | "fw status"
+            | "the fw status"
+            | "application firewall status"
+            | "the application firewall status"
+            | "app firewall status"
+            | "the app firewall status"
+            | "my firewall"
+            | "my firewall status"
+            | "my application firewall"
+            | "my app firewall"
+            | "is firewall on"
+            | "is firewall off"
+            | "is firewall enabled"
+            | "is firewall disabled"
+            | "is the firewall on"
+            | "is the firewall enabled"
+            | "is application firewall on"
+            | "is application firewall enabled"
+            | "is app firewall on"
+            | "is app firewall enabled"
+            | "what's my firewall"
+            | "whats my firewall"
+            | "what is my firewall"
+            | "what's my firewall status"
+            | "whats my firewall status"
+            | "what is my firewall status"
+            | "what's the firewall"
+            | "whats the firewall"
+            | "what is the firewall"
+            | "what's the firewall status"
+            | "whats the firewall status"
+            | "what is the firewall status"
+            | "what's my application firewall"
+            | "whats my application firewall"
+            | "what is my application firewall"
+            | "which firewall"
+            | "how's firewall"
+            | "hows firewall"
+            | "how's the firewall"
+            | "hows the firewall"
+            // View/see/show me/open/list.
+            | "view firewall"
+            | "view the firewall"
+            | "view firewall status"
+            | "view the firewall status"
+            | "view afw"
+            | "view the afw"
+            | "view application firewall"
+            | "view the application firewall"
+            | "view app firewall"
+            | "view the app firewall"
+            | "see firewall"
+            | "see the firewall"
+            | "see firewall status"
+            | "see the firewall status"
+            | "see application firewall"
+            | "see the application firewall"
+            | "open firewall"
+            | "open the firewall"
+            | "open firewall status"
+            | "open the firewall status"
+            | "open afw"
+            | "open the afw"
+            | "open application firewall"
+            | "open the application firewall"
+            | "list firewall"
+            | "list the firewall"
+            | "list firewall status"
+            | "list the firewall status"
+            | "list application firewall"
+            | "list the application firewall"
+            | "show firewall"
+            | "show the firewall"
+            | "show me firewall"
+            | "show me the firewall"
+            | "show firewall status"
+            | "show the firewall status"
+            | "show me firewall status"
+            | "show me the firewall status"
+            | "show application firewall"
+            | "show the application firewall"
+            | "show me application firewall"
+            | "show me the application firewall"
+    )
+}
+
+/// Zero-LLM Application Firewall status from `socketfilterfw --getglobalstate` (macOS-only; empty elsewhere).
+pub fn format_firewall_report() -> String {
+    let v = crate::metrics::get_firewall_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Firewall** — _no Application Firewall reading on this Mac right now._".to_string();
+    }
+    format!("**Firewall** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
