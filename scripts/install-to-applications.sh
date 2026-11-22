@@ -162,3 +162,10 @@ pgrep -fl 'Contents/MacOS/mac_stats|Contents/MacOS/mac-stats' | head -1 || {
   exit 1
 }
 echo "Installed and restarted. Check: rg 'Bot connected' ~/.mac-stats/debug.log | tail -1"
+
+# Release binary is already copied into the .app — reclaim src-tauri/target.
+HOUSEKEEP="${HOME}/backoffice/scripts/rust_target_housekeep.py"
+if [[ "$need_rebuild" -eq 1 && -f "$HOUSEKEEP" ]]; then
+  echo "----- rust target housekeep (post-release)"
+  python3 "$HOUSEKEEP" --only mac-stats --only-if-release || true
+fi

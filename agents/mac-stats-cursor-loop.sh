@@ -429,6 +429,14 @@ run_once() {
   step_004_handoff
   step_003_tester
   step_004_handoff
+  # If a release build left target/release behind, reclaim disk.
+  if [[ -d "${REPO_ROOT}/src-tauri/target/release" ]]; then
+    local hk="${HOME}/backoffice/scripts/rust_target_housekeep.py"
+    if [[ -f "$hk" ]]; then
+      echo "----- rust target housekeep (post-release)"
+      python3 "$hk" --only mac-stats --only-if-release || true
+    fi
+  fi
   echo "===== cycle done ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
   tick "cycle_done"
 }
