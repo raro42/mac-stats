@@ -1,3 +1,11 @@
+## Overnight note 2026-11-23 ~00:35
+- Shipped v0.1.2978 Internet Sharing `/internet-sharing` · `/ics` · `/network-sharing` + view/open NL; bare internet/nat/ics stay with agent; `/vpn` · `/content-caching` · `/smb` · `/ard` intact.
+- Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Futuristic layout-daily next calendar quota.
+
+## Overnight merge — v0.1.2978
+
+- Product fuel after Content Caching `/content-caching` NL v0.1.2977 (local Content Caching race discarded): Internet Sharing already readable via NAT plist `:NAT:Enabled` (PlistBuddy) + `com.apple.NetworkSharing` / `InternetSharing` but lacked `/internet-sharing` · `/internetsharing` · `/internet-sharing-status` · `/internet-share` · `/network-sharing` · `/networksharing` · `/ics` · `/ics-status` · `/nat-sharing` · `/mac-internet-sharing` · `/mac-ics` and view/see/open/list phrases while Content Caching `/content-caching` · `/asset-cache`, File Sharing `/file-sharing` · `/smb`, and Remote Management `/remote-management` · `/ard` already had slash+NL. Bare `internet` / `nat` / `ics` / `internet sharing` stay with the agent; `/vpn` stays VPN; `/content-caching` · `/asset-cache` stay Content Caching; `/file-sharing` · `/smb` stay File Sharing; `/remote-management` · `/ard` stay Remote Management; `/ip` stays LAN. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · Bluetooth Sharing sibling/product fuel — Internet Sharing slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~00:25
 - Shipped v0.1.2977 Content Caching `/content-caching` · `/asset-cache` · `/mac-content-caching` + view/open NL; bare caching/content caching/asset cache stay with agent; `/remote-management` · `/ard` · `/smb` · `/printer-sharing` · `/vnc` · `/ssh` intact.
 - Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Futuristic layout-daily next calendar quota.
