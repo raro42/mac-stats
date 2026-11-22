@@ -1,3 +1,11 @@
+## Overnight note 2026-11-22 ~22:35
+- Shipped v0.1.2969 Firewall stealth `/stealth` · `/firewall-stealth` · `/fw-stealth` · `/afw-stealth` + view/open NL; bare stealth stays with agent; `/firewall` stays global; `/gatekeeper` · `/sip` · `/filevault` intact.
+- Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Neon layout-daily next calendar quota.
+
+## Overnight merge — v0.1.2969
+
+- Product fuel after Application Firewall `/firewall` NL v0.1.2968: Firewall stealth mode already readable via `socketfilterfw --getstealthmode` but lacked `/stealth` · `/stealth-mode` · `/stealth-status` · `/firewall-stealth` · `/fw-stealth` · `/afw-stealth` · `/app-firewall-stealth` · `/application-firewall-stealth` · `/socketfilterfw-stealth` and view/see/open/list phrases while Firewall `/firewall` already had slash+NL. Bare `stealth` / `stealth mode` stay with the agent; `/firewall` stays global Firewall; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP; `/filevault` stays FileVault. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Dark marked today (Neon due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Neon layout-daily next calendar day · sibling/product fuel — Firewall stealth slash NL closed; not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2968
 
 - Product fuel after Gatekeeper `/gatekeeper` NL v0.1.2967 (local Gatekeeper race discarded): Application Firewall global state already readable via `socketfilterfw --getglobalstate` but lacked `/firewall` · `/firewall-status` · `/fw` · `/fw-status` · `/afw` · `/afw-status` · `/app-firewall` · `/application-firewall` · `/socketfilterfw` and view/see/open/list phrases while Gatekeeper `/gatekeeper` and SIP `/sip` already had slash+NL. Bare `firewall` / `afw` stay with the agent; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP; `/filevault` stays FileVault. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Dark marked today (Neon due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Neon layout-daily next calendar day · sibling/product fuel — Firewall slash NL closed; not another keep-pNN clone.
