@@ -7195,6 +7195,177 @@ pub fn format_dns_servers_report() -> String {
 }
 
 
+/// Current Wi-Fi SSID — not password, not settings, not LAN IP / gateway / DNS.
+/// Slash + view/open NL (`/wifi` · `/ssid` · `view wifi`) match `/dns` · `/gateway` ·
+/// `/ip` shape; bare `wifi` / `ssid` / password·settings·enable·disable stay with the agent;
+/// `/ip` stays LAN address; `/dns` stays nameservers; `/gateway` stays default route.
+pub fn looks_like_wifi_ssid_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("password")
+        || n.contains("passwd")
+        || n.contains("passphrase")
+        || n.contains("settings")
+        || n.contains("prefer")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("connect")
+        || n.contains("disconnect")
+        || n.contains("join")
+        || n.contains("forget")
+        || n.contains("speed")
+        || n.contains("signal")
+        || n.contains("channel")
+        || n.contains("bluetooth")
+        || n.contains("hotspot")
+        || n.contains("gateway")
+        || n.contains("router")
+        || n.contains("dns")
+        || n.contains("local ip")
+        || n.contains("lan ip")
+        // Bare short / settings asks stay with the agent.
+        || n == "wifi"
+        || n == "the wifi"
+        || n == "wi-fi"
+        || n == "the wi-fi"
+        || n == "ssid"
+        || n == "the ssid"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/wifi"
+            | "/wi-fi"
+            | "/ssid"
+            | "/wifi-ssid"
+            | "/wifissid"
+            | "/wifi-network"
+            | "/wifinetwork"
+            | "/airport"
+            | "/wlan"
+            | "wifi network"
+            | "the wifi network"
+            | "wi-fi network"
+            | "the wi-fi network"
+            | "wifi name"
+            | "the wifi name"
+            | "wi-fi name"
+            | "the wi-fi name"
+            | "wifi ssid"
+            | "the wifi ssid"
+            | "wi-fi ssid"
+            | "the wi-fi ssid"
+            | "current wifi"
+            | "the current wifi"
+            | "current wi-fi"
+            | "the current wi-fi"
+            | "current ssid"
+            | "the current ssid"
+            | "my wifi"
+            | "my wifi network"
+            | "my wifi name"
+            | "my ssid"
+            | "what's my wifi"
+            | "whats my wifi"
+            | "what is my wifi"
+            | "what's the wifi"
+            | "whats the wifi"
+            | "what is the wifi"
+            | "what's my wifi network"
+            | "whats my wifi network"
+            | "what is my wifi network"
+            | "what's my wifi name"
+            | "whats my wifi name"
+            | "what is my wifi name"
+            | "what's my ssid"
+            | "whats my ssid"
+            | "what is my ssid"
+            | "what's the ssid"
+            | "whats the ssid"
+            | "what is the ssid"
+            | "which wifi"
+            | "which wifi network"
+            | "which ssid"
+            | "what wifi am i on"
+            | "what wifi network am i on"
+            | "what network am i on"
+            // View/see/show me/open/list.
+            | "view wifi"
+            | "view the wifi"
+            | "view wifi network"
+            | "view the wifi network"
+            | "view wifi name"
+            | "view the wifi name"
+            | "view wifi ssid"
+            | "view the wifi ssid"
+            | "view ssid"
+            | "view the ssid"
+            | "view wi-fi"
+            | "view the wi-fi"
+            | "see wifi"
+            | "see the wifi"
+            | "see wifi network"
+            | "see the wifi network"
+            | "see wifi name"
+            | "see ssid"
+            | "see the ssid"
+            | "open wifi"
+            | "open the wifi"
+            | "open wifi network"
+            | "open the wifi network"
+            | "open wifi name"
+            | "open ssid"
+            | "open the ssid"
+            | "list wifi"
+            | "list the wifi"
+            | "list wifi network"
+            | "list the wifi network"
+            | "list wifi name"
+            | "list ssid"
+            | "list the ssid"
+            | "show wifi"
+            | "show the wifi"
+            | "show me wifi"
+            | "show me the wifi"
+            | "show wifi network"
+            | "show the wifi network"
+            | "show me wifi network"
+            | "show me the wifi network"
+            | "show wifi name"
+            | "show the wifi name"
+            | "show me wifi name"
+            | "show me the wifi name"
+            | "show ssid"
+            | "show the ssid"
+            | "show me ssid"
+            | "show me the ssid"
+    )
+}
+
+
+/// Zero-LLM current Wi-Fi SSID from `networksetup -getairportnetwork`.
+pub fn format_wifi_ssid_report() -> String {
+    let v = crate::metrics::get_wifi_ssid();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Wi-Fi** — _no SSID right now._".to_string();
+    }
+    format!("**Wi-Fi** · `{v}`")
+}
+
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

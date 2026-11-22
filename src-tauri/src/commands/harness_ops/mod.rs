@@ -1100,6 +1100,67 @@ mod tests {
         }
     }
 
+    #[test]
+    fn wifi_ssid_slash_and_view_open_do_not_steal_password_or_lan() {
+        // Slash + view/open NL → current Wi-Fi SSID (`/dns` · `/gateway` · `/ip` parity).
+        // Bare `wifi` / `ssid` / password·settings stay with the agent; `/ip` stays LAN.
+        assert!(looks_like_wifi_ssid_request("/wifi"));
+        assert!(looks_like_wifi_ssid_request("/wi-fi"));
+        assert!(looks_like_wifi_ssid_request("/ssid"));
+        assert!(looks_like_wifi_ssid_request("/wifi-ssid"));
+        assert!(looks_like_wifi_ssid_request("/wifi-network"));
+        assert!(looks_like_wifi_ssid_request("/airport"));
+        assert!(looks_like_wifi_ssid_request("/wlan"));
+        assert!(looks_like_wifi_ssid_request("view wifi"));
+        assert!(looks_like_wifi_ssid_request("open wifi network"));
+        assert!(looks_like_wifi_ssid_request("list ssid"));
+        assert!(looks_like_wifi_ssid_request("wifi network"));
+        assert!(looks_like_wifi_ssid_request("wifi name"));
+        assert!(looks_like_wifi_ssid_request("what's my wifi"));
+        assert!(looks_like_wifi_ssid_request("what's my ssid"));
+        assert!(looks_like_wifi_ssid_request("which wifi"));
+        assert!(looks_like_wifi_ssid_request("what wifi am i on"));
+        assert!(!looks_like_wifi_ssid_request("wifi"));
+        assert!(!looks_like_wifi_ssid_request("ssid"));
+        assert!(!looks_like_wifi_ssid_request("wifi password"));
+        assert!(!looks_like_wifi_ssid_request("wifi settings"));
+        assert!(!looks_like_wifi_ssid_request("enable wifi"));
+        assert!(!looks_like_wifi_ssid_request("/ip"));
+        assert!(!looks_like_wifi_ssid_request("/dns"));
+        assert!(!looks_like_wifi_ssid_request("/gateway"));
+        let wifi = try_operator_instant_reply("/wifi").unwrap();
+        assert!(
+            wifi.contains("**Wi-Fi**") && !wifi.to_lowercase().contains("execution"),
+            "got: {wifi}"
+        );
+        let viewed = try_operator_instant_reply("view wifi").unwrap();
+        assert!(
+            viewed.contains("**Wi-Fi**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let short = try_operator_instant_reply("/ssid").unwrap();
+        assert!(
+            short.contains("**Wi-Fi**") && !short.to_lowercase().contains("execution"),
+            "got: {short}"
+        );
+        assert!(try_operator_instant_reply("wifi").is_none());
+        assert!(try_operator_instant_reply("ssid").is_none());
+        let ip = try_operator_instant_reply("/ip");
+        if let Some(reply) = ip {
+            assert!(
+                !reply.contains("**Wi-Fi**"),
+                "/ip must stay LAN IP, not Wi-Fi: {reply}"
+            );
+        }
+        let dns = try_operator_instant_reply("/dns");
+        if let Some(reply) = dns {
+            assert!(
+                !reply.contains("**Wi-Fi**"),
+                "/dns must stay nameservers, not Wi-Fi: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).

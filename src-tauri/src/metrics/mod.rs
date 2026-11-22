@@ -862,6 +862,57 @@ pub fn get_dns_servers() -> String {
     info
 }
 
+/// Current Wi-Fi SSID from `networksetup -getairportnetwork` (en0/en1/en2).
+/// Live (not OnceLock): join/leave AP can change while the process stays up.
+/// Used by the Discord/operator instant `/wifi` · `/ssid` lane.
+/// Distinct from local LAN IP (`/ip`), default gateway (`/gateway`), and DNS (`/dns`).
+pub fn get_wifi_ssid() -> String {
+    let parse = |stdout: &str| -> Option<String> {
+        for line in stdout.lines() {
+            let t = line.trim();
+            // networksetup: "Current Wi-Fi Network: MySSID"
+            if let Some(rest) = t.strip_prefix("Current Wi-Fi Network:") {
+                let ssid = rest.trim();
+                if !ssid.is_empty()
+                    && !ssid.eq_ignore_ascii_case("you are not associated with an airport network.")
+                {
+                    return Some(ssid.to_string());
+                }
+            }
+            // Some locales / tools: "Current Network: MySSID"
+            if let Some(rest) = t.strip_prefix("Current Network:") {
+                let ssid = rest.trim();
+                if !ssid.is_empty() {
+                    return Some(ssid.to_string());
+                }
+            }
+        }
+        None
+    };
+    let probe = |iface: &str| -> Option<String> {
+        let output = Command::new("/usr/sbin/networksetup")
+            .args(["-getairportnetwork", iface])
+            .stderr(std::process::Stdio::null())
+            .output()
+            .ok()?;
+        if !output.status.success() {
+            return None;
+        }
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        parse(&stdout)
+    };
+    let info = ["en0", "en1", "en2"]
+        .into_iter()
+        .find_map(probe)
+        .unwrap_or_default();
+    if info.is_empty() {
+        debug3!("wifi ssid: networksetup empty");
+    } else {
+        debug3!("wifi ssid: '{}'", info);
+    }
+    info
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

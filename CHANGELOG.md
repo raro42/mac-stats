@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2949] - 2026-11-22
+
+### Added
+- Instant Wi-Fi SSID accepts `/wifi` · `/wi-fi` · `/ssid` · `/wifi-ssid` · `/wifi-network` · `/airport` · `/wlan` and view/see/open/list NL (`view wifi`, `open wifi network`, `list ssid`, …), matching “wifi network” / “wifi name” / “what's my wifi” / “what's my ssid” / “which wifi” / “what wifi am i on”. Bare `wifi` / `ssid` / password·settings·enable·disable stay with the agent; `/ip` stays LAN address; `/dns` stays nameservers; `/gateway` stays default route.
+
 ## [0.1.2948] - 2026-11-22
 
 ### Added

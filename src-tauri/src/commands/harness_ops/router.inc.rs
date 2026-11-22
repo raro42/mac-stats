@@ -1030,6 +1030,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_dns_servers_request(content) {
         return Some(format_dns_servers_report());
     }
+    // Wi-Fi SSID (bare `wifi` / `ssid` / password·settings stay with the agent; `/ip` stays LAN).
+    if looks_like_wifi_ssid_request(content) {
+        return Some(format_wifi_ssid_report());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());
