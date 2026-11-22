@@ -1,11 +1,12 @@
 # Morning surprise — 2026-11-23
 
-Refreshed: 2026-11-23 00:35 CET
+Refreshed: 2026-11-23 00:56 CET
 
 ## Shipped this overnight window (keep)
 
 | Version | What |
 |---------|------|
+| **v0.1.2979** | Bluetooth Sharing `/bluetooth-sharing` · `/bt-sharing` · `/bts` · `/obex` + view/open NL |
 | **v0.1.2978** | Internet Sharing `/internet-sharing` · `/ics` · `/network-sharing` + view/open NL |
 | **v0.1.2977** | Content Caching `/content-caching` · `/asset-cache` · `/mac-content-caching` + view/open NL |
 | **v0.1.2976** | Neon layout-daily: AI Chat `.chat-messages:focus-within` → neon `--accent` on `#08120c` |
@@ -17,9 +18,9 @@ Refreshed: 2026-11-23 00:35 CET
 | **v0.1.2970** | Time Machine `/timemachine` · `/tm` + view/open NL |
 | **v0.1.2969**–**2960** | Firewall stealth → GPU identity slash+NL family (earlier tonight) |
 
-## This tick (~00:35 CET)
+## This tick (~00:50 CET)
 
 - Digester open empty; design-review due=false; layout-daily Neon already done (marked today); Futuristic next calendar quota.
-- Fuel attempt 1 Content Caching discarded (origin already at v0.1.2977); shipped Internet Sharing slash+NL as **v0.1.2978**.
+- Shipped Bluetooth Sharing slash+NL as **v0.1.2979**; backfilled keep for **v0.1.2978**.
 - Cream/Swiss Send fill white-on-blue left intentional.
-- Next: Futuristic layout-daily · cream/Swiss Send fill intentional · Bluetooth Sharing product fuel — not keep-pNN.
+- Next: Futuristic layout-daily · cream/Swiss Send fill intentional · Media Sharing / DVD or DVD Sharing / leftover soft-states — not keep-pNN.

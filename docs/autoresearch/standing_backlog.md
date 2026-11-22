@@ -1,3 +1,10 @@
+## Overnight note 2026-11-23 ~00:50
+- Shipped v0.1.2979 Bluetooth Sharing `/bluetooth-sharing` · `/bt-sharing` · `/bts` · `/obex` + view/open NL; bare bluetooth/obex/bts stay with agent; `/internet-sharing` · `/ics` · `/smb` · `/wifi` · `/content-caching` intact.
+- Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Futuristic layout-daily next calendar quota.
+
+## Overnight merge — v0.1.2979
+
+- Product fuel after Internet Sharing `/internet-sharing` NL v0.1.2978: Bluetooth Sharing (OBEX file exchange) already readable via Bluetooth prefs `FileTransferEnabledServer` / `BluetoothFileTransferEnabled` + `BluetoothFileExchange` but lacked `/bluetooth-sharing` · `/bluetoothsharing` · `/bluetooth-sharing-status` · `/bluetooth-share` · `/bt-sharing` · `/bt-share` · `/bts` · `/bts-status` · `/obex` · `/obex-sharing` · `/file-exchange` · `/bluetooth-file-exchange` · `/mac-bluetooth-sharing` · `/mac-bt-sharing` and view/see/open/list phrases while Internet Sharing `/internet-sharing` · `/ics`, File Sharing `/file-sharing` · `/smb`, and Content Caching `/content-caching` · `/asset-cache` already had slash+NL. Bare `bluetooth` / `bluetooth sharing` / `obex` / `bts` stay with the agent; `/internet-sharing` · `/ics` stay Internet Sharing; `/file-sharing` · `/smb` stay File Sharing; `/wifi` stays SSID; `/content-caching` · `/asset-cache` stay Content Caching. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · Media Sharing / soft-state sibling/product fuel — Bluetooth Sharing slash NL closed; not another keep-pNN clone.
 ## Overnight note 2026-11-23 ~00:35
 - Shipped v0.1.2978 Internet Sharing `/internet-sharing` · `/ics` · `/network-sharing` + view/open NL; bare internet/nat/ics stay with agent; `/vpn` · `/content-caching` · `/smb` · `/ard` intact.
 - Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Futuristic layout-daily next calendar quota.
