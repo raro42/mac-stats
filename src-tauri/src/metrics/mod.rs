@@ -959,6 +959,85 @@ pub fn get_remote_login_status() -> String {
     info
 }
 
+/// macOS Screen Sharing enablement from `launchctl print-disabled` + live state.
+/// Distinct from Remote Login `/remote-login` · `/ssh`, Firewall `/firewall`, and display `/screen`.
+/// Used by Discord/operator instant `/screen-sharing` · `/vnc` lane.
+pub fn get_screen_sharing_status() -> String {
+    let enabled = {
+        let output = Command::new("/bin/launchctl")
+            .args(["print-disabled", "system"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        match output {
+            Ok(output) => {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                let mut found: Option<bool> = None;
+                for line in stdout.lines() {
+                    let l = line.trim();
+                    if !l.contains("com.apple.screensharing") {
+                        continue;
+                    }
+                    let lower = l.to_ascii_lowercase();
+                    if lower.contains("=> disabled") || lower.ends_with("disabled") {
+                        found = Some(false);
+                    } else if lower.contains("=> enabled") || lower.ends_with("enabled") {
+                        found = Some(true);
+                    }
+                    break;
+                }
+                found
+            }
+            Err(_) => {
+                debug3!("screen-sharing: launchctl print-disabled spawn failed");
+                None
+            }
+        }
+    };
+    let running = {
+        let output = Command::new("/bin/launchctl")
+            .args(["print", "system/com.apple.screensharing"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        match output {
+            Ok(output) => {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                let lower = stdout.to_ascii_lowercase();
+                if lower.contains("state = running") {
+                    Some(true)
+                } else if lower.contains("state = not running")
+                    || lower.contains("state = waiting")
+                    || lower.contains("could not find")
+                {
+                    Some(false)
+                } else if stdout.trim().is_empty() {
+                    None
+                } else {
+                    Some(false)
+                }
+            }
+            Err(_) => {
+                debug3!("screen-sharing: launchctl print spawn failed");
+                None
+            }
+        }
+    };
+    let info = match (enabled, running) {
+        (Some(true), Some(true)) => "On · active".to_string(),
+        (Some(true), Some(false)) => "On · idle".to_string(),
+        (Some(true), None) => "On".to_string(),
+        (Some(false), _) => "Off".to_string(),
+        (None, Some(true)) => "active".to_string(),
+        (None, Some(false)) => "idle".to_string(),
+        (None, None) => String::new(),
+    };
+    if info.is_empty() {
+        debug3!("screen-sharing: empty status");
+    } else {
+        debug3!("screen-sharing status: '{}'", info);
+    }
+    info
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.

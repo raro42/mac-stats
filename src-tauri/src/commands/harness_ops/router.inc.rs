@@ -1047,9 +1047,14 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         return Some(format_time_machine_report());
     }
     // Remote Login / SSH (bare `ssh` / `sshd` / `remote login` stay with the agent; `/vpn` stays VPN;
-    // `/firewall` stays Firewall; `/timemachine` stays Time Machine).
+    // `/firewall` stays Firewall; `/timemachine` stays Time Machine; Screen Sharing stays `/screen-sharing`).
     if looks_like_remote_login_request(content) {
         return Some(format_remote_login_report());
+    }
+    // Screen Sharing / VNC (bare `screen sharing` / `vnc` stay with the agent; `/remote-login` · `/ssh`
+    // stay Remote Login; `/screen` · `/screens` stay display resolution).
+    if looks_like_screen_sharing_request(content) {
+        return Some(format_screen_sharing_report());
     }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).

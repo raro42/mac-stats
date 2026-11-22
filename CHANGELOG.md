@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2972] - 2026-11-22
+
+### Added
+- Instant Screen Sharing status accepts `/screen-sharing` · `/screensharing` · `/screen-sharing-status` · `/screen-share` · `/vnc` · `/vnc-status` · `/vnc-state` · `/mac-vnc` and view/see/open/list NL (`view screen sharing`, `open vnc status`, `list screen sharing`, …), matching “screen sharing status” / “is screen sharing on” / “is vnc enabled” / “what's my screen sharing” / “what's the screen sharing status”. Bare `screen sharing` / `vnc` stay with the agent; `/remote-login` · `/ssh` stay Remote Login; `/screen` · `/screens` stay display resolution.
+
 ## [0.1.2971] - 2026-11-22
 
 ### Added

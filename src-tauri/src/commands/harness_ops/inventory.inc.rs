@@ -8945,6 +8945,17 @@ pub fn looks_like_display_resolution_request(content: &str) -> bool {
         || n.contains("change")
         || n.contains("set ")
         || n.contains("reset")
+        // Screen Sharing / VNC / Remote Login stay elsewhere (not display resolution).
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen share")
+        || n.contains("vnc")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n == "/ssh"
+        || n == "/sshd"
+        || n == "/remote-login"
         // Website monitors / GPU ring / screenshots stay elsewhere.
         || n.contains("monitor")
         || n == "/gpu"
@@ -10895,6 +10906,8 @@ pub fn looks_like_remote_login_request(content: &str) -> bool {
         || n.contains("connect")
         || n.contains("screen sharing")
         || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen share")
         || n.contains("vnc")
         || n.contains("ard")
         || n.contains("remote management")
@@ -10924,6 +10937,13 @@ pub fn looks_like_remote_login_request(content: &str) -> bool {
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
+        || n == "/screen-sharing"
+        || n == "/screensharing"
+        || n == "/screen-share"
+        || n == "/vnc"
+        || n == "/vnc-status"
+        || n == "/screen"
+        || n == "/screens"
         // Bare short / ambiguous stay with the agent.
         || n == "ssh"
         || n == "the ssh"
@@ -11084,6 +11104,229 @@ pub fn format_remote_login_report() -> String {
         return "**Remote Login** — _no Remote Login reading on this Mac right now._".to_string();
     }
     format!("**Remote Login** · `{v}`")
+}
+
+/// Screen Sharing / VNC — Sharing pref enablement + daemon idle/active.
+/// "Why" / enable/disable stay with the agent. Slash + view/open NL (`/screen-sharing` · `/vnc`).
+/// Bare `screen sharing` / `vnc` stay with the agent; `/remote-login` · `/ssh` stay Remote Login;
+/// `/screen` · `/screens` stay display resolution.
+pub fn looks_like_screen_sharing_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("display")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/remotelogin"
+        || n == "/ssh"
+        || n == "/sshd"
+        || n == "/ssh-status"
+        || n == "/sshd-status"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        // Bare short / ambiguous stay with the agent.
+        || n == "vnc"
+        || n == "the vnc"
+        || n == "screen sharing"
+        || n == "the screen sharing"
+        || n == "screensharing"
+        || n == "the screensharing"
+        || n == "screen-sharing"
+        || n == "the screen-sharing"
+        || n == "screen share"
+        || n == "the screen share"
+        || n == "ard"
+        || n == "the ard"
+        || n == "remote management"
+        || n == "the remote management"
+        || n == "remote desktop"
+        || n == "the remote desktop"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/screen-sharing"
+            | "/screensharing"
+            | "/screen-sharing-status"
+            | "/screensharing-status"
+            | "/screen-share"
+            | "/screenshare"
+            | "/screen-share-status"
+            | "/vnc"
+            | "/vnc-status"
+            | "/vnc-state"
+            | "/vnc-sharing"
+            | "/mac-vnc"
+            | "/sharing-screen"
+            | "screen sharing status"
+            | "the screen sharing status"
+            | "screensharing status"
+            | "the screensharing status"
+            | "screen-sharing status"
+            | "the screen-sharing status"
+            | "screen share status"
+            | "the screen share status"
+            | "vnc status"
+            | "the vnc status"
+            | "my screen sharing"
+            | "my screen sharing status"
+            | "my screensharing"
+            | "my vnc"
+            | "my vnc status"
+            | "is screen sharing on"
+            | "is screen sharing off"
+            | "is screen sharing enabled"
+            | "is screen sharing disabled"
+            | "is screensharing on"
+            | "is screensharing enabled"
+            | "is screen-sharing on"
+            | "is screen-sharing enabled"
+            | "is vnc on"
+            | "is vnc off"
+            | "is vnc enabled"
+            | "is vnc disabled"
+            | "what's my screen sharing"
+            | "whats my screen sharing"
+            | "what is my screen sharing"
+            | "what's my screen sharing status"
+            | "whats my screen sharing status"
+            | "what is my screen sharing status"
+            | "what's the screen sharing"
+            | "whats the screen sharing"
+            | "what is the screen sharing"
+            | "what's the screen sharing status"
+            | "whats the screen sharing status"
+            | "what is the screen sharing status"
+            | "what's my vnc"
+            | "whats my vnc"
+            | "what is my vnc"
+            | "what's my vnc status"
+            | "whats my vnc status"
+            | "what is my vnc status"
+            | "what's the vnc status"
+            | "whats the vnc status"
+            | "what is the vnc status"
+            | "how's screen sharing"
+            | "hows screen sharing"
+            | "how's the screen sharing"
+            | "hows the screen sharing"
+            // View/see/show me/open/list.
+            | "view screen sharing"
+            | "view the screen sharing"
+            | "view screen sharing status"
+            | "view the screen sharing status"
+            | "view screensharing"
+            | "view the screensharing"
+            | "view screen-sharing"
+            | "view the screen-sharing"
+            | "view screen share"
+            | "view the screen share"
+            | "view vnc"
+            | "view the vnc"
+            | "view vnc status"
+            | "view the vnc status"
+            | "see screen sharing"
+            | "see the screen sharing"
+            | "see screen sharing status"
+            | "see the screen sharing status"
+            | "see vnc"
+            | "see the vnc"
+            | "see vnc status"
+            | "see the vnc status"
+            | "open screen sharing"
+            | "open the screen sharing"
+            | "open screen sharing status"
+            | "open the screen sharing status"
+            | "open screensharing"
+            | "open the screensharing"
+            | "open vnc"
+            | "open the vnc"
+            | "open vnc status"
+            | "open the vnc status"
+            | "list screen sharing"
+            | "list the screen sharing"
+            | "list screen sharing status"
+            | "list the screen sharing status"
+            | "list vnc"
+            | "list the vnc"
+            | "list vnc status"
+            | "list the vnc status"
+            | "show screen sharing"
+            | "show the screen sharing"
+            | "show me screen sharing"
+            | "show me the screen sharing"
+            | "show screen sharing status"
+            | "show the screen sharing status"
+            | "show me screen sharing status"
+            | "show me the screen sharing status"
+            | "show vnc"
+            | "show the vnc"
+            | "show me vnc"
+            | "show me the vnc"
+            | "show vnc status"
+            | "show the vnc status"
+            | "show me vnc status"
+            | "show me the vnc status"
+    )
+}
+
+/// Zero-LLM Screen Sharing status from `launchctl` (macOS-only; empty elsewhere).
+pub fn format_screen_sharing_report() -> String {
+    let v = crate::metrics::get_screen_sharing_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Screen Sharing** — _no Screen Sharing reading on this Mac right now._".to_string();
+    }
+    format!("**Screen Sharing** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.

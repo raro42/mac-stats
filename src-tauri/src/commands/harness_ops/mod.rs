@@ -2215,6 +2215,8 @@ mod tests {
         assert!(!looks_like_remote_login_request("/tasks"));
         assert!(!looks_like_remote_login_request("enable remote login"));
         assert!(!looks_like_remote_login_request("screen sharing"));
+        assert!(!looks_like_remote_login_request("/screen-sharing"));
+        assert!(!looks_like_remote_login_request("/vnc"));
         assert!(!looks_like_firewall_request("/remote-login"));
         assert!(!looks_like_firewall_request("view remote login"));
         assert!(!looks_like_time_machine_request("/remote-login"));
@@ -2244,6 +2246,69 @@ mod tests {
             assert!(
                 !reply.contains("**Remote Login**"),
                 "/firewall must stay Firewall, not Remote Login: {reply}"
+            );
+        }
+    }
+
+    #[test]
+    fn screen_sharing_slash_and_view_open_do_not_steal_ssh_display_or_bare_vnc() {
+        // Slash + view/open NL → Screen Sharing (`/remote-login` · `/display` parity).
+        // Bare `screen sharing` / `vnc` stay with the agent; `/ssh` stays Remote Login; `/screen` stays display.
+        assert!(looks_like_screen_sharing_request("/screen-sharing"));
+        assert!(looks_like_screen_sharing_request("/screensharing"));
+        assert!(looks_like_screen_sharing_request("/screen-share"));
+        assert!(looks_like_screen_sharing_request("/vnc"));
+        assert!(looks_like_screen_sharing_request("/vnc-status"));
+        assert!(looks_like_screen_sharing_request("/mac-vnc"));
+        assert!(looks_like_screen_sharing_request("view screen sharing"));
+        assert!(looks_like_screen_sharing_request("open vnc status"));
+        assert!(looks_like_screen_sharing_request("list screen sharing"));
+        assert!(looks_like_screen_sharing_request("screen sharing status"));
+        assert!(looks_like_screen_sharing_request("is screen sharing on"));
+        assert!(looks_like_screen_sharing_request("is vnc enabled"));
+        assert!(looks_like_screen_sharing_request("what's my screen sharing"));
+        assert!(looks_like_screen_sharing_request("view vnc"));
+        assert!(!looks_like_screen_sharing_request("vnc"));
+        assert!(!looks_like_screen_sharing_request("screen sharing"));
+        assert!(!looks_like_screen_sharing_request("screensharing"));
+        assert!(!looks_like_screen_sharing_request("/remote-login"));
+        assert!(!looks_like_screen_sharing_request("/ssh"));
+        assert!(!looks_like_screen_sharing_request("/sshd"));
+        assert!(!looks_like_screen_sharing_request("/firewall"));
+        assert!(!looks_like_screen_sharing_request("/screen"));
+        assert!(!looks_like_screen_sharing_request("/screens"));
+        assert!(!looks_like_screen_sharing_request("/display"));
+        assert!(!looks_like_screen_sharing_request("/tasks"));
+        assert!(!looks_like_screen_sharing_request("enable screen sharing"));
+        assert!(!looks_like_remote_login_request("/screen-sharing"));
+        assert!(!looks_like_remote_login_request("view screen sharing"));
+        assert!(!looks_like_display_resolution_request("/screen-sharing"));
+        assert!(!looks_like_display_resolution_request("view screen sharing"));
+        assert!(!looks_like_display_resolution_request("/vnc"));
+        let ss = try_operator_instant_reply("/screen-sharing").unwrap();
+        assert!(
+            ss.contains("**Screen Sharing**") && !ss.to_lowercase().contains("execution"),
+            "got: {ss}"
+        );
+        let viewed = try_operator_instant_reply("view screen sharing").unwrap();
+        assert!(
+            viewed.contains("**Screen Sharing**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("vnc").is_none());
+        assert!(try_operator_instant_reply("screen sharing").is_none());
+        let ssh = try_operator_instant_reply("/ssh");
+        if let Some(reply) = ssh {
+            assert!(
+                !reply.contains("**Screen Sharing**"),
+                "/ssh must stay Remote Login, not Screen Sharing: {reply}"
+            );
+        }
+        let screen = try_operator_instant_reply("/screen");
+        if let Some(reply) = screen {
+            assert!(
+                !reply.contains("**Screen Sharing**"),
+                "/screen must stay display resolution, not Screen Sharing: {reply}"
             );
         }
     }
