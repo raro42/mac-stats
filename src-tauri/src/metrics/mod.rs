@@ -235,6 +235,77 @@ pub fn get_hostname() -> String {
         .clone()
 }
 
+/// Cached Mac marketing name · machine model (`system_profiler` / `sysctl hw.model`).
+/// Used by the Discord/operator instant `/mac-model` · `/hardware-model` lane.
+/// Distinct from Apple chip (`/chip`) and Ollama (`/model`).
+pub fn get_mac_model() -> String {
+    MAC_MODEL_CACHE
+        .get_or_init(|| {
+            let from_profiler = || -> Option<String> {
+                let output = Command::new("/usr/sbin/system_profiler")
+                    .arg("SPHardwareDataType")
+                    .arg("-json")
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                let json: serde_json::Value = serde_json::from_str(&stdout).ok()?;
+                let hardware = json
+                    .get("SPHardwareDataType")
+                    .and_then(|v| v.as_array())
+                    .and_then(|a| a.first())?;
+                let pick = |keys: &[&str]| -> Option<String> {
+                    for k in keys {
+                        if let Some(s) = hardware.get(*k).and_then(|v| v.as_str()) {
+                            let t = s.trim();
+                            if !t.is_empty() {
+                                return Some(t.to_string());
+                            }
+                        }
+                    }
+                    None
+                };
+                let name = pick(&["machine_name", "model_name"]);
+                let model = pick(&["machine_model", "model_identifier"]);
+                match (name, model) {
+                    (Some(n), Some(m)) if !n.eq_ignore_ascii_case(&m) => Some(format!("{n} · {m}")),
+                    (Some(n), _) => Some(n),
+                    (_, Some(m)) => Some(m),
+                    (None, None) => None,
+                }
+            };
+            let from_sysctl = || -> Option<String> {
+                let output = Command::new("/usr/sbin/sysctl")
+                    .arg("-n")
+                    .arg("hw.model")
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                let s = String::from_utf8_lossy(&output.stdout);
+                let t = s.trim();
+                if t.is_empty() {
+                    None
+                } else {
+                    Some(t.to_string())
+                }
+            };
+            let info = from_profiler().or_else(from_sysctl).unwrap_or_default();
+            if info.is_empty() {
+                debug3!("mac model: system_profiler/sysctl empty");
+            } else {
+                debug3!("mac model cached: '{}'", info);
+            }
+            info
+        })
+        .clone()
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

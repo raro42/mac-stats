@@ -5425,6 +5425,151 @@ pub fn format_hostname_gateway() -> String {
 }
 
 
+/// Mac marketing name · machine model — not Apple chip (`/chip`), not Ollama (`/model`).
+/// Slash + view/open NL (`/mac-model` · `/hardware-model` · `view mac model` · `what mac is this`)
+/// match chip `/chip` · hostname `/hostname` shape; bare `/model` · `which model` · `model name` stay Ollama.
+pub fn looks_like_mac_model_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("ollama")
+        || n.contains("llm")
+        || n.contains("chip")
+        || n.contains("processor")
+        || n.contains("path")
+        || n.contains("size")
+        || contains_age_token(&n)
+        // Ollama owns bare `/model` · `which model` · `model name` · `what model`.
+        || n == "/model"
+        || n == "model"
+        || n == "the model"
+        || n == "which model"
+        || n == "what model"
+        || n == "current model"
+        || n == "your model"
+        || n == "model name"
+        || n == "the model name"
+        || n == "view model"
+        || n == "view the model"
+        || n == "see model"
+        || n == "see the model"
+        || n == "open model"
+        || n == "open the model"
+        || n == "list model"
+        || n == "list the model"
+        || n == "what model are you"
+        || n == "which model are you"
+        || n == "what model are you using"
+        || n == "which model are you using"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/mac-model"
+            | "/macmodel"
+            | "/mac-model-name"
+            | "/hardware-model"
+            | "/hardwaremodel"
+            | "/machine-model"
+            | "/machinemodel"
+            | "/model-id"
+            | "/modelid"
+            | "/hw-model"
+            | "/hwmodel"
+            | "mac model"
+            | "the mac model"
+            | "mac model name"
+            | "the mac model name"
+            | "hardware model"
+            | "the hardware model"
+            | "machine model"
+            | "the machine model"
+            | "model id"
+            | "the model id"
+            | "hw model"
+            | "the hw model"
+            | "what mac"
+            | "what mac is this"
+            | "what mac do i have"
+            | "which mac"
+            | "which mac is this"
+            | "which mac do i have"
+            | "what's my mac"
+            | "whats my mac"
+            | "what is my mac"
+            | "what macbook"
+            | "what macbook is this"
+            | "what macbook do i have"
+            | "which macbook"
+            | "which macbook is this"
+            | "what's my macbook"
+            | "whats my macbook"
+            | "what is my macbook"
+            | "what kind of mac"
+            | "what kind of mac is this"
+            | "what type of mac"
+            | "what type of mac is this"
+            // View/see/show me/open/list (bare view model stays Ollama).
+            | "view mac model"
+            | "view the mac model"
+            | "view hardware model"
+            | "view the hardware model"
+            | "view machine model"
+            | "view the machine model"
+            | "view model id"
+            | "view the model id"
+            | "view hw model"
+            | "view the hw model"
+            | "see mac model"
+            | "see the mac model"
+            | "see hardware model"
+            | "see the hardware model"
+            | "see machine model"
+            | "see the machine model"
+            | "open mac model"
+            | "open the mac model"
+            | "open hardware model"
+            | "open the hardware model"
+            | "open machine model"
+            | "open the machine model"
+            | "list mac model"
+            | "list the mac model"
+            | "list hardware model"
+            | "list the hardware model"
+            | "list machine model"
+            | "list the machine model"
+            | "show mac model"
+            | "show the mac model"
+            | "show me mac model"
+            | "show me the mac model"
+            | "show hardware model"
+            | "show the hardware model"
+            | "show me hardware model"
+            | "show me the hardware model"
+            | "show machine model"
+            | "show the machine model"
+            | "show me machine model"
+            | "show me the machine model"
+    )
+}
+
+
+/// Zero-LLM Mac model from cached `system_profiler` / `sysctl hw.model` (e.g. `MacBook Pro · Mac16,1`).
+pub fn format_mac_model_gateway() -> String {
+    let v = crate::metrics::get_mac_model();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Mac** — _no Mac model right now._".to_string();
+    }
+    format!("**Mac** · {v}")
+}
+
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

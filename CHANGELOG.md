@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2937] - 2026-11-22
+
+### Added
+- Instant Mac model accepts `/mac-model` · `/hardware-model` · `/machine-model` · `/model-id` · `/hw-model` and view/see/open/list NL (`view mac model`, `open hardware model`, `list machine model`, …), matching “what mac is this” / “mac model” / “what macbook”. Bare `/model` / `which model` / `model name` stay Ollama; `/chip` stays Apple chip.
+
 ## [0.1.2936] - 2026-11-22
 
 ### Added

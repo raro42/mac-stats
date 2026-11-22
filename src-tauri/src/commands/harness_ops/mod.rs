@@ -501,6 +501,46 @@ mod tests {
     }
 
     #[test]
+    fn mac_model_slash_and_view_open_do_not_steal_ollama_model() {
+        // Slash + view/open NL → Mac marketing name · machine model (chip `/chip` · hostname parity).
+        // Bare /model · which model · model name stay Ollama Ready.
+        assert!(looks_like_mac_model_request("/mac-model"));
+        assert!(looks_like_mac_model_request("/hardware-model"));
+        assert!(looks_like_mac_model_request("/machine-model"));
+        assert!(looks_like_mac_model_request("/model-id"));
+        assert!(looks_like_mac_model_request("/hw-model"));
+        assert!(looks_like_mac_model_request("view mac model"));
+        assert!(looks_like_mac_model_request("open hardware model"));
+        assert!(looks_like_mac_model_request("list machine model"));
+        assert!(looks_like_mac_model_request("mac model"));
+        assert!(looks_like_mac_model_request("what mac is this"));
+        assert!(looks_like_mac_model_request("what macbook"));
+        assert!(looks_like_mac_model_request("hardware model"));
+        assert!(!looks_like_mac_model_request("/model"));
+        assert!(!looks_like_mac_model_request("which model"));
+        assert!(!looks_like_mac_model_request("model name"));
+        assert!(!looks_like_mac_model_request("view model"));
+        assert!(!looks_like_mac_model_request("/chip"));
+        assert!(looks_like_ollama_ready_request("/model"));
+        assert!(looks_like_ollama_ready_request("which model"));
+        let mac = try_operator_instant_reply("/mac-model").unwrap();
+        assert!(
+            mac.contains("**Mac**") && !mac.to_lowercase().contains("execution"),
+            "got: {mac}"
+        );
+        let viewed = try_operator_instant_reply("view mac model").unwrap();
+        assert!(
+            viewed.contains("**Mac**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let ollama = try_operator_instant_reply("/model").unwrap();
+        assert!(
+            !ollama.contains("**Mac**"),
+            "bare /model must stay Ollama, not Mac model: {ollama}"
+        );
+    }
+
+    #[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.
