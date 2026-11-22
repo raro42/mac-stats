@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2938] - 2026-11-22
+
+### Added
+- Instant login username accepts `/username` · `/whoami` · `/login-name` · `/account-name` and view/see/open/list NL (`view username`, `open whoami`, `list login name`, …), matching “whoami” / “who am i” / “what's my username” / “login name”. Bare `user` / `view user` stay with the agent; `user info` / `user-info.json` path·size·age stay the Discord map file.
+
 ## [0.1.2937] - 2026-11-22
 
 ### Added

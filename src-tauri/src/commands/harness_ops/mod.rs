@@ -541,6 +541,54 @@ mod tests {
     }
 
     #[test]
+
+    #[test]
+    fn username_slash_and_view_open_do_not_steal_bare_user_or_user_info() {
+        // Slash + view/open NL → login username (hostname `/hostname` · chip `/chip` parity).
+        // Bare user / view user stay with the agent; user info path/size/age stay Discord map.
+        assert!(looks_like_username_request("/username"));
+        assert!(looks_like_username_request("/whoami"));
+        assert!(looks_like_username_request("/login-name"));
+        assert!(looks_like_username_request("/account-name"));
+        assert!(looks_like_username_request("view username"));
+        assert!(looks_like_username_request("open whoami"));
+        assert!(looks_like_username_request("list login name"));
+        assert!(looks_like_username_request("username"));
+        assert!(looks_like_username_request("whoami"));
+        assert!(looks_like_username_request("who am i"));
+        assert!(looks_like_username_request("what's my username"));
+        assert!(looks_like_username_request("login name"));
+        assert!(!looks_like_username_request("/user"));
+        assert!(!looks_like_username_request("user"));
+        assert!(!looks_like_username_request("view user"));
+        assert!(!looks_like_username_request("user info"));
+        assert!(!looks_like_username_request("user info path"));
+        assert!(!looks_like_username_request("user-info.json"));
+        let user = try_operator_instant_reply("/username").unwrap();
+        assert!(
+            user.contains("**User**") && !user.to_lowercase().contains("execution"),
+            "got: {user}"
+        );
+        let viewed = try_operator_instant_reply("view username").unwrap();
+        assert!(
+            viewed.contains("**User**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let who = try_operator_instant_reply("whoami").unwrap();
+        assert!(
+            who.contains("**User**") && !who.to_lowercase().contains("execution"),
+            "got: {who}"
+        );
+        assert!(try_operator_instant_reply("view user").is_none());
+        assert!(try_operator_instant_reply("/user").is_none());
+        // Discord map file stays on its resource-stat lane (not this instant username reply).
+        let info = try_operator_instant_reply("user info path");
+        assert!(
+            info.as_ref().is_none_or(|r| !r.contains("**User** · `")),
+            "user info path must not become login username: {info:?}"
+        );
+    }
+
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.

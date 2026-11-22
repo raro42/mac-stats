@@ -5570,6 +5570,141 @@ pub fn format_mac_model_gateway() -> String {
 }
 
 
+
+/// Login username — not Discord `user-info.json`, not bare "user" (too ambiguous).
+/// Slash + view/open NL (`/username` · `/whoami` · `view username`) match hostname `/hostname` ·
+/// chip `/chip` shape; `user info path` / size / age stay the Discord map file.
+pub fn looks_like_username_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("info")
+        || n.contains("json")
+        || n.contains("discord")
+        || n.contains("display")
+        || n.contains("monitor")
+        || n.contains("website")
+        || n.contains("url")
+        || n.contains("http")
+        || n.contains("agent")
+        || n.contains("chat")
+        || n.contains("filter")
+        // Bare "user" is too ambiguous (Discord / chat You / user-info file).
+        || n == "/user"
+        || n == "user"
+        || n == "the user"
+        || n == "view user"
+        || n == "view the user"
+        || n == "see user"
+        || n == "see the user"
+        || n == "open user"
+        || n == "open the user"
+        || n == "list user"
+        || n == "list the user"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/username"
+            | "/user-name"
+            | "/whoami"
+            | "/who-am-i"
+            | "/login-name"
+            | "/loginname"
+            | "/account-name"
+            | "/accountname"
+            | "username"
+            | "the username"
+            | "user name"
+            | "the user name"
+            | "login name"
+            | "the login name"
+            | "account name"
+            | "the account name"
+            | "whoami"
+            | "who am i"
+            | "who am i logged in as"
+            | "what username"
+            | "what username is this"
+            | "what username do i have"
+            | "what's the username"
+            | "whats the username"
+            | "what is the username"
+            | "what's my username"
+            | "whats my username"
+            | "what is my username"
+            | "what's my user name"
+            | "whats my user name"
+            | "what is my user name"
+            | "what's my login name"
+            | "whats my login name"
+            | "what is my login name"
+            | "which username"
+            | "which username is this"
+            | "my username"
+            | "my user name"
+            | "my login name"
+            | "my account name"
+            // View/see/show me/open/list (bare view user / bare login stay out).
+            | "view username"
+            | "view the username"
+            | "view user name"
+            | "view the user name"
+            | "view whoami"
+            | "view login name"
+            | "view the login name"
+            | "view account name"
+            | "view the account name"
+            | "see username"
+            | "see the username"
+            | "see login name"
+            | "see the login name"
+            | "see whoami"
+            | "open username"
+            | "open the username"
+            | "open whoami"
+            | "open login name"
+            | "open the login name"
+            | "open account name"
+            | "open the account name"
+            | "list username"
+            | "list the username"
+            | "list login name"
+            | "list the login name"
+            | "list whoami"
+            | "show username"
+            | "show the username"
+            | "show me username"
+            | "show me the username"
+            | "show login name"
+            | "show the login name"
+            | "show me login name"
+            | "show me the login name"
+            | "show whoami"
+            | "show me whoami"
+    )
+}
+
+
+/// Zero-LLM login username from cached `$USER` / `id -un` / `whoami`.
+pub fn format_username_gateway() -> String {
+    let v = crate::metrics::get_username();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**User** — _no login name right now._".to_string();
+    }
+    format!("**User** · `{v}`")
+}
+
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

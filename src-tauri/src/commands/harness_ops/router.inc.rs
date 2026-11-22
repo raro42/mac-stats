@@ -986,6 +986,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_mac_model_request(content) {
         return Some(format_mac_model_gateway());
     }
+    // Login username (bare "user" / user-info.json stay out).
+    if looks_like_username_request(content) {
+        return Some(format_username_gateway());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());

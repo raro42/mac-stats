@@ -306,6 +306,46 @@ pub fn get_mac_model() -> String {
         .clone()
 }
 
+
+/// Cached login username (`$USER` / `id -un` / `whoami`).
+/// Used by the Discord/operator instant `/username` · `/whoami` lane.
+pub fn get_username() -> String {
+    USERNAME_CACHE
+        .get_or_init(|| {
+            let from_cmd = |bin: &str, args: &[&str]| -> Option<String> {
+                let output = Command::new(bin)
+                    .args(args)
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                let s = String::from_utf8_lossy(&output.stdout);
+                let t = s.trim();
+                if t.is_empty() {
+                    None
+                } else {
+                    Some(t.to_string())
+                }
+            };
+            let info = std::env::var("USER")
+                .ok()
+                .map(|u| u.trim().to_string())
+                .filter(|u| !u.is_empty())
+                .or_else(|| from_cmd("/usr/bin/id", &["-un"]))
+                .or_else(|| from_cmd("/usr/bin/whoami", &[]))
+                .unwrap_or_default();
+            if info.is_empty() {
+                debug3!("username: USER/id/whoami empty");
+            } else {
+                debug3!("username cached: '{}'", info);
+            }
+            info
+        })
+        .clone()
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

@@ -114,6 +114,8 @@ pub(crate) static MACOS_VERSION_CACHE: OnceLock<String> = OnceLock::new();
 pub(crate) static HOSTNAME_CACHE: OnceLock<String> = OnceLock::new();
 /// Cached Mac marketing name · machine model (instant `/mac-model` · `/hardware-model` lane).
 pub(crate) static MAC_MODEL_CACHE: OnceLock<String> = OnceLock::new();
+/// Cached login username (`$USER` / `id -un` / `whoami`; instant `/username` · `/whoami` lane).
+pub(crate) static USERNAME_CACHE: OnceLock<String> = OnceLock::new();
 
 pub(crate) static CAN_READ_FREQUENCY: OnceLock<bool> = OnceLock::new();
 pub(crate) static CAN_READ_CPU_POWER: OnceLock<bool> = OnceLock::new();
