@@ -6,20 +6,20 @@ Overnight autoresearch (Track B) kept shipping operator instant lanes. Digester 
 
 | Version | What |
 |---------|------|
-| **v0.1.2953** | Primary / default-route iface `/iface` · `/ifname` · `/interface` + view/open NL |
+| **v0.1.2954** | Primary IPv4 broadcast `/broadcast` · `/bcast` + view/open NL |
+| v0.1.2953 | Primary iface `/iface` · `/ifname` + view/open NL |
 | v0.1.2952 | Primary IPv4 netmask `/netmask` · `/subnet` · `/cidr` + view/open NL |
 | v0.1.2951 | Primary interface MTU `/mtu` · `/if-mtu` · `/interface-mtu` + view/open NL |
 | v0.1.2950 | Primary MAC `/mac-address` · `/ether` · `/en0-mac` + view/open NL |
 | v0.1.2949 | Wi-Fi SSID `/wifi` · `/ssid` + view/open NL |
 | v0.1.2948 | DNS nameservers `/dns` · `/nameserver` + view/open NL |
-| v0.1.2947 | Default gateway `/gateway` · `/router` + view/open NL |
-| earlier | ip · boot · cores · kernel · locale · arch · tz · serial · username · mac-model · … |
+| earlier | gateway · local IP · boot · cores · kernel · locale · arch · tz · serial · … |
 
-## This tick (~04:58 CET)
+## This tick (~05:10 CET)
 
-- Fuel: standing product after netmask — default-route iface name was the missing twin of `/ip` · `/mac-address` · `/mtu` · `/netmask` (those already print `(iface)` but had no dedicated lane).
-- Verify OK → keep @ `b15dd73` → push `main`.
-- Bare `iface` / `interface` stay with the agent; `/iface-mtu` stays MTU; `/en0` stays LAN IP.
+- Fuel: standing product after iface `/ifname` — broadcast completes the LAN twin set with `/ip` · `/netmask` · `/gateway` · `/iface`.
+- Verify OK → keep @ `6e339579e` → install/kickstart → push `main`.
+- Bare `broadcast` / `bcast` stay with the agent on purpose.
 
 ## Still open
 
