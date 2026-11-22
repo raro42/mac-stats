@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2964] - 2026-11-22
+
+### Added
+- Instant FileVault status accepts `/filevault` · `/file-vault` · `/fv` · `/fv-status` · `/fde` · `/disk-encryption` · `/encryption-status` and view/see/open/list NL (`view filevault`, `open filevault status`, `list encryption`, …), matching “filevault status” / “is filevault on” / “what's my filevault” / “what's the filevault status”. Bare `filevault` / `fv` / `encryption` stay with the agent; `/boot-volume` stays startup disk name; `view disk` stays Disk Cleanup; `/ssd` · `/free` stay capacity · free.
+
 ## [0.1.2963] - 2026-11-22
 
 ### Added

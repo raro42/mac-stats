@@ -9754,6 +9754,192 @@ pub fn format_boot_volume_report() -> String {
     format!("**Boot volume** · `{v}`")
 }
 
+/// FileVault full-disk encryption status — not boot volume, not SSD % / free, not Disk Cleanup.
+/// Slash + view/open NL (`/filevault` · `/fv` · `view filevault`) match `/boot-volume` · `/uuid`
+/// shape; bare `filevault` / `fv` / `encryption` stay with the agent; `/boot-volume` stays volume
+/// name; `view disk` stays Disk Cleanup; `/ssd` · `/free` stay capacity · free.
+pub fn looks_like_filevault_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("unlock")
+        || n.contains("password")
+        || n.contains("recovery key")
+        || n.contains("keep")
+        || n.contains("discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("sip")
+        || n.contains("csrutil")
+        || n.contains("gatekeeper")
+        // Boot volume / Disk Cleanup / capacity stay elsewhere.
+        || n == "/boot-volume"
+        || n == "/startup-disk"
+        || n == "/boot"
+        || n == "view disk"
+        || n == "open disk"
+        || n == "/ssd"
+        || n == "/storage"
+        || n == "/free"
+        || n == "/ssd-size"
+        || n == "/disk-size"
+        // Bare short / ambiguous stay with the agent.
+        || n == "filevault"
+        || n == "the filevault"
+        || n == "fv"
+        || n == "the fv"
+        || n == "encryption"
+        || n == "the encryption"
+        || n == "disk encryption"
+        || n == "the disk encryption"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/filevault"
+            | "/file-vault"
+            | "/filevault-status"
+            | "/filevaultstatus"
+            | "/fv"
+            | "/fv-status"
+            | "/fvstatus"
+            | "/fde"
+            | "/fde-status"
+            | "/fdestatus"
+            | "/full-disk-encryption"
+            | "/fulldiskencryption"
+            | "/disk-encryption"
+            | "/diskencryption"
+            | "/encryption-status"
+            | "/encryptionstatus"
+            | "filevault status"
+            | "the filevault status"
+            | "file vault status"
+            | "the file vault status"
+            | "fv status"
+            | "the fv status"
+            | "fde status"
+            | "the fde status"
+            | "encryption status"
+            | "the encryption status"
+            | "disk encryption status"
+            | "the disk encryption status"
+            | "full disk encryption"
+            | "the full disk encryption"
+            | "full disk encryption status"
+            | "the full disk encryption status"
+            | "my filevault"
+            | "my filevault status"
+            | "my encryption"
+            | "my encryption status"
+            | "is filevault on"
+            | "is filevault off"
+            | "is filevault enabled"
+            | "is filevault disabled"
+            | "is file vault on"
+            | "is file vault enabled"
+            | "is encryption on"
+            | "is disk encryption on"
+            | "is disk encryption enabled"
+            | "is fde on"
+            | "is fde enabled"
+            | "what's my filevault"
+            | "whats my filevault"
+            | "what is my filevault"
+            | "what's my filevault status"
+            | "whats my filevault status"
+            | "what is my filevault status"
+            | "what's the filevault"
+            | "whats the filevault"
+            | "what is the filevault"
+            | "what's the filevault status"
+            | "whats the filevault status"
+            | "what is the filevault status"
+            | "what's my encryption"
+            | "whats my encryption"
+            | "what is my encryption"
+            | "what's the encryption status"
+            | "whats the encryption status"
+            | "what is the encryption status"
+            | "which filevault"
+            | "how's filevault"
+            | "hows filevault"
+            | "how's the filevault"
+            | "hows the filevault"
+            // View/see/show me/open/list.
+            | "view filevault"
+            | "view the filevault"
+            | "view filevault status"
+            | "view the filevault status"
+            | "view file vault"
+            | "view the file vault"
+            | "view encryption"
+            | "view the encryption"
+            | "view encryption status"
+            | "view the encryption status"
+            | "view disk encryption"
+            | "view the disk encryption"
+            | "view fde"
+            | "view the fde"
+            | "see filevault"
+            | "see the filevault"
+            | "see filevault status"
+            | "see the filevault status"
+            | "see encryption"
+            | "see the encryption"
+            | "open filevault"
+            | "open the filevault"
+            | "open filevault status"
+            | "open the filevault status"
+            | "open encryption"
+            | "open the encryption"
+            | "list filevault"
+            | "list the filevault"
+            | "list filevault status"
+            | "list the filevault status"
+            | "list encryption"
+            | "list the encryption"
+            | "show filevault"
+            | "show the filevault"
+            | "show me filevault"
+            | "show me the filevault"
+            | "show filevault status"
+            | "show the filevault status"
+            | "show me filevault status"
+            | "show me the filevault status"
+            | "show encryption"
+            | "show the encryption"
+            | "show me encryption"
+            | "show me the encryption"
+    )
+}
+
+/// Zero-LLM FileVault status from `fdesetup status` (macOS-only; empty elsewhere).
+pub fn format_filevault_report() -> String {
+    let v = crate::metrics::get_filevault_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**FileVault** — _no FileVault reading on this Mac right now._".to_string();
+    }
+    format!("**FileVault** · `{v}`")
+}
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

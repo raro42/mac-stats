@@ -1824,6 +1824,66 @@ mod tests {
         }
     }
 
+    #[test]
+    fn filevault_slash_and_view_open_do_not_steal_boot_volume_or_bare_encryption() {
+        // Slash + view/open NL → FileVault (`/boot-volume` · `/uuid` parity).
+        // Bare `filevault` / `fv` / `encryption` stay with the agent; `/boot-volume` stays volume;
+        // `view disk` stays Disk Cleanup; `/ssd` · `/free` stay capacity · free.
+        assert!(looks_like_filevault_request("/filevault"));
+        assert!(looks_like_filevault_request("/file-vault"));
+        assert!(looks_like_filevault_request("/fv"));
+        assert!(looks_like_filevault_request("/fv-status"));
+        assert!(looks_like_filevault_request("/fde"));
+        assert!(looks_like_filevault_request("/disk-encryption"));
+        assert!(looks_like_filevault_request("/encryption-status"));
+        assert!(looks_like_filevault_request("view filevault"));
+        assert!(looks_like_filevault_request("open filevault status"));
+        assert!(looks_like_filevault_request("list encryption"));
+        assert!(looks_like_filevault_request("filevault status"));
+        assert!(looks_like_filevault_request("is filevault on"));
+        assert!(looks_like_filevault_request("what's my filevault"));
+        assert!(!looks_like_filevault_request("filevault"));
+        assert!(!looks_like_filevault_request("fv"));
+        assert!(!looks_like_filevault_request("encryption"));
+        assert!(!looks_like_filevault_request("disk encryption"));
+        assert!(!looks_like_filevault_request("/boot-volume"));
+        assert!(!looks_like_filevault_request("view boot volume"));
+        assert!(!looks_like_filevault_request("view disk"));
+        assert!(!looks_like_filevault_request("/ssd"));
+        assert!(!looks_like_filevault_request("/free"));
+        assert!(!looks_like_filevault_request("enable filevault"));
+        assert!(!looks_like_boot_volume_request("/filevault"));
+        assert!(!looks_like_boot_volume_request("view filevault"));
+        assert!(!looks_like_disk_cleanup_request("/filevault"));
+        assert!(!looks_like_disk_cleanup_request("view filevault"));
+        let fv = try_operator_instant_reply("/filevault").unwrap();
+        assert!(
+            fv.contains("**FileVault**") && !fv.to_lowercase().contains("execution"),
+            "got: {fv}"
+        );
+        let viewed = try_operator_instant_reply("view filevault").unwrap();
+        assert!(
+            viewed.contains("**FileVault**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("filevault").is_none());
+        assert!(try_operator_instant_reply("encryption").is_none());
+        let vol = try_operator_instant_reply("/boot-volume");
+        if let Some(reply) = vol {
+            assert!(
+                !reply.contains("**FileVault**"),
+                "/boot-volume must stay boot volume, not FileVault: {reply}"
+            );
+        }
+        let cleanup = try_operator_instant_reply("view disk");
+        if let Some(reply) = cleanup {
+            assert!(
+                !reply.contains("**FileVault**"),
+                "view disk must stay Disk Cleanup, not FileVault: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

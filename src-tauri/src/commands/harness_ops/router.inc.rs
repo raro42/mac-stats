@@ -1019,6 +1019,11 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_boot_volume_request(content) {
         return Some(format_boot_volume_report());
     }
+    // FileVault status (bare `filevault` / `fv` / `encryption` stay with the agent; `/boot-volume` stays volume;
+    // `view disk` stays Disk Cleanup; `/ssd` · `/free` stay capacity · free).
+    if looks_like_filevault_request(content) {
+        return Some(format_filevault_report());
+    }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
     if looks_like_boot_time_request(content) {

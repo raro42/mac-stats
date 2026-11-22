@@ -603,6 +603,45 @@ pub fn get_boot_volume() -> String {
         .clone()
 }
 
+/// FileVault full-disk encryption status from `fdesetup status` (live; not OnceLock).
+/// Distinct from boot volume `/boot-volume`, SSD `/ssd` · `/free`, and Disk Cleanup.
+/// Used by Discord/operator instant `/filevault` · `/fv` lane.
+pub fn get_filevault_status() -> String {
+    let output = Command::new("/usr/bin/fdesetup")
+        .arg("status")
+        .stderr(std::process::Stdio::null())
+        .output();
+    let Ok(output) = output else {
+        debug3!("filevault: fdesetup spawn failed");
+        return String::new();
+    };
+    if !output.status.success() {
+        debug3!("filevault: fdesetup non-zero");
+        return String::new();
+    }
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let lower = stdout.to_ascii_lowercase();
+    // Prefer On before Off so "On." wins over any trailing Off chatter.
+    let info = if lower.contains("filevault is on") || lower.contains("filevault is enabled") {
+        "On".to_string()
+    } else if lower.contains("filevault is off") || lower.contains("filevault is disabled") {
+        "Off".to_string()
+    } else {
+        let t = stdout.lines().next().unwrap_or("").trim();
+        if t.is_empty() {
+            String::new()
+        } else {
+            t.to_string()
+        }
+    };
+    if info.is_empty() {
+        debug3!("filevault: empty status");
+    } else {
+        debug3!("filevault status: '{}'", info);
+    }
+    info
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
