@@ -1,20 +1,11 @@
 # Morning surprise — 2026-11-22
 
-Generated: 2026-11-22 20:06 CET
+Overnight autoresearch (Track B) so far:
 
-## Shipped overnight
+## Shipped
+- **v0.1.2960** — GPU chipset · cores · Metal instant slash+NL (`/gpu-name` · `/chipset` · `/gpu-cores` · `/metal` + view/open). Bare `/gpu` stays usage ring; `/chip` stays CPU.
+- Earlier same calendar window (pre-20:00 / early night): display resolution **v0.1.2959**, battery-time **v0.1.2958**, charger/cycles/network identity train through **v0.1.2957**.
 
-- **v0.1.2959** — Instant connected display names · resolutions: `/display` · `/displays` · `/resolution` · `/screen-resolution` · `/display-resolution` · `/display-res` · `/screen-res` · `/pixel-resolution` · `/main-display` · `/screen` · `/screens` + view/open NL. Source: `system_profiler SPDisplaysDataType`. Bare display/resolution/screen stay with the agent; `/gpu` stays GPU ring; screenshots and website Monitors stay put.
-- Prior same window: **v0.1.2958** battery time-to-empty/full (parallel tick), **v0.1.2957** AC charger/adapter.
-
-## Digester / tracks
-
-- Digester open: empty (no Slowest / latency candidates).
-- Design review: due=false (Agent Ops still in grace; Mac TCC polish-without-capture).
-- Layout daily: data-poster marked today; Dark due next calendar quota.
-
-## Next fuel
-
-- Dark layout-daily (next calendar day).
-- cream/Swiss Send fill white-on-blue intentional (skip).
-- Sibling/product fuel — not another keep-pNN clone of the same slash+NL shape if a real UI/correctness gap appears.
+## Notes
+- Digester open empty; design-review grace; layout-daily data-poster already marked (Dark next day).
+- Cream/Swiss Send fill white-on-blue left intentional.
