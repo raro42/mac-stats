@@ -1,16 +1,26 @@
 # Morning surprise — 2026-11-22
 
-Overnight Track B kept shipping operator instant lanes. Digester open stayed empty; design-review stayed in Mac TCC grace; layout-daily already marked data-poster for the day.
+Overnight autoresearch (Track B) kept shipping operator instant lanes. Digester open stayed empty; design-review stayed in grace (Mac TCC); layout-daily already marked data-poster for the day.
 
-## Shipped (this tick)
+## Shipped tonight (keep)
 
-- **v0.1.2957** — AC charger · adapter: `/charger` · `/ac-charger` · `/adapter` · `/power-adapter` · `/charger-watts` · `/ac-watts` (+ view/open NL). Connected · wattage · charging without waking Ollama.
-- Earlier tonight: **v0.1.2956** battery cycles/health/max capacity; network slash train through **v0.1.2955** link status · media · link-speed; broadcast / iface / netmask / MTU / MAC / wifi / DNS / gateway / IP / …
+| Version | What |
+|---------|------|
+| **v0.1.2958** | Battery time-to-empty / full `/battery-time` · `/time-remaining` · `/time-to-empty` · `/time-to-full` + view/open NL |
+| v0.1.2957 | AC charger · adapter `/charger` · `/adapter` · `/charger-watts` + view/open NL |
+| v0.1.2956 | Battery cycles · health · max capacity `/cycles` · `/battery-health` · `/max-capacity` + view/open NL |
+| v0.1.2955 | Primary link status · media / speed `/link-status` · `/media` · `/link-speed` + view/open NL |
+| earlier | broadcast · iface · netmask · mtu · mac · wifi · dns · gateway · ip · boot · cores · … |
 
-## Tried / discarded
+## This tick (~05:50 CET)
 
-- Local link-status WIP raced remote **v0.1.2955** → discard, then pivoted to battery cycles (earlier tick).
+- Fuel: standing product after AC charger race — `battery` crate `time_to_empty` / `time_to_full` had no dedicated slash+NL while `/battery`, `/cycles`, and `/charger` already did. Rebased onto remote v0.1.2957 charger as **v0.1.2958**.
+- Verify OK → keep → push `main` (also backfilled missing 2956 keep row earlier).
+- Bare `time` / `remaining` stay with the agent; `/battery` · `battery left` stay Bat %; `/cycles` stays cycles; `/charger` stays adapter watts.
 
-## For Ralf
+## Still open
 
-Ask Werner `/charger` or `view adapter` for adapter watts · connected · charging. `/watts` is still CPU+GPU draw; `/battery` is still percent.
+- Dark / Neon / Futuristic layout-daily next calendar day
+- cream/Swiss Send fill white-on-blue intentional (leave alone)
+- sibling harness ports when digester stays empty
+- Ask Werner `/battery-time` or `/charger` for ETA · adapter watts without waking Ollama
