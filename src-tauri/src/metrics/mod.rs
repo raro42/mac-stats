@@ -1038,6 +1038,89 @@ pub fn get_screen_sharing_status() -> String {
     info
 }
 
+/// macOS File Sharing (SMB) enablement from `launchctl print-disabled` + live state.
+/// Distinct from Screen Sharing `/screen-sharing` · `/vnc`, Remote Login `/remote-login` · `/ssh`,
+/// and FileVault `/filevault`.
+/// Used by Discord/operator instant `/file-sharing` · `/smb` lane.
+pub fn get_file_sharing_status() -> String {
+    let enabled = {
+        let output = Command::new("/bin/launchctl")
+            .args(["print-disabled", "system"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        match output {
+            Ok(output) => {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                let mut found: Option<bool> = None;
+                for line in stdout.lines() {
+                    let l = line.trim();
+                    // Prefer smbd; accept older com.apple.AppleFileServer when present.
+                    if !(l.contains("com.apple.smbd") || l.contains("com.apple.AppleFileServer")) {
+                        continue;
+                    }
+                    let lower = l.to_ascii_lowercase();
+                    if lower.contains("=> disabled") || lower.ends_with("disabled") {
+                        found = Some(false);
+                    } else if lower.contains("=> enabled") || lower.ends_with("enabled") {
+                        found = Some(true);
+                    }
+                    if l.contains("com.apple.smbd") {
+                        break;
+                    }
+                }
+                found
+            }
+            Err(_) => {
+                debug3!("file-sharing: launchctl print-disabled spawn failed");
+                None
+            }
+        }
+    };
+    let running = {
+        let output = Command::new("/bin/launchctl")
+            .args(["print", "system/com.apple.smbd"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        match output {
+            Ok(output) => {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                let lower = stdout.to_ascii_lowercase();
+                if lower.contains("state = running") {
+                    Some(true)
+                } else if lower.contains("state = not running")
+                    || lower.contains("state = waiting")
+                    || lower.contains("could not find")
+                {
+                    Some(false)
+                } else if stdout.trim().is_empty() {
+                    None
+                } else {
+                    Some(false)
+                }
+            }
+            Err(_) => {
+                debug3!("file-sharing: launchctl print spawn failed");
+                None
+            }
+        }
+    };
+    let info = match (enabled, running) {
+        (Some(true), Some(true)) => "On · active".to_string(),
+        (Some(true), Some(false)) => "On · idle".to_string(),
+        (Some(true), None) => "On".to_string(),
+        (Some(false), _) => "Off".to_string(),
+        (None, Some(true)) => "active".to_string(),
+        (None, Some(false)) => "idle".to_string(),
+        (None, None) => String::new(),
+    };
+    if info.is_empty() {
+        debug3!("file-sharing: empty status");
+    } else {
+        debug3!("file-sharing status: '{}'", info);
+    }
+    info
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.

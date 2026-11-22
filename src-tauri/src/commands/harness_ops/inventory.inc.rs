@@ -9798,6 +9798,14 @@ pub fn looks_like_filevault_request(content: &str) -> bool {
         || n.contains("sip")
         || n.contains("csrutil")
         || n.contains("gatekeeper")
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n.contains("file share")
+        || n == "/file-sharing"
+        || n == "/filesharing"
+        || n == "/smb"
+        || n == "/smbd"
         // Boot volume / Disk Cleanup / capacity stay elsewhere.
         || n == "/boot-volume"
         || n == "/startup-disk"
@@ -10912,6 +10920,10 @@ pub fn looks_like_remote_login_request(content: &str) -> bool {
         || n.contains("ard")
         || n.contains("remote management")
         || n.contains("remote desktop")
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n.contains("file share")
         || n.split_whitespace().any(|w| w == "keep" || w == "discard")
         || n.contains("change")
         || n.contains("set ")
@@ -10942,6 +10954,10 @@ pub fn looks_like_remote_login_request(content: &str) -> bool {
         || n == "/screen-share"
         || n == "/vnc"
         || n == "/vnc-status"
+        || n == "/file-sharing"
+        || n == "/filesharing"
+        || n == "/smb"
+        || n == "/smbd"
         || n == "/screen"
         || n == "/screens"
         // Bare short / ambiguous stay with the agent.
@@ -11165,6 +11181,10 @@ pub fn looks_like_screen_sharing_request(content: &str) -> bool {
         || n == "/sshd"
         || n == "/ssh-status"
         || n == "/sshd-status"
+        || n == "/file-sharing"
+        || n == "/filesharing"
+        || n == "/smb"
+        || n == "/smbd"
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
@@ -11172,6 +11192,11 @@ pub fn looks_like_screen_sharing_request(content: &str) -> bool {
         || n == "/screens"
         || n == "/display"
         || n == "/displays"
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n == "smb"
+        || n == "smbd"
         // Bare short / ambiguous stay with the agent.
         || n == "vnc"
         || n == "the vnc"
@@ -11327,6 +11352,248 @@ pub fn format_screen_sharing_report() -> String {
         return "**Screen Sharing** — _no Screen Sharing reading on this Mac right now._".to_string();
     }
     format!("**Screen Sharing** · `{v}`")
+}
+
+/// File Sharing / SMB — Sharing pref enablement + daemon idle/active.
+/// "Why" / enable/disable stay with the agent. Slash + view/open NL (`/file-sharing` · `/smb`).
+/// Bare `file sharing` / `smb` / `smbd` stay with the agent; `/screen-sharing` · `/vnc` stay Screen Sharing;
+/// `/remote-login` · `/ssh` stay Remote Login; `/filevault` stays FileVault.
+pub fn looks_like_file_sharing_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("display")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen share")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/remotelogin"
+        || n == "/ssh"
+        || n == "/sshd"
+        || n == "/ssh-status"
+        || n == "/sshd-status"
+        || n == "/screen-sharing"
+        || n == "/screensharing"
+        || n == "/screen-share"
+        || n == "/vnc"
+        || n == "/vnc-status"
+        || n == "/mac-vnc"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        // Bare short / ambiguous stay with the agent.
+        || n == "smb"
+        || n == "the smb"
+        || n == "smbd"
+        || n == "the smbd"
+        || n == "file sharing"
+        || n == "the file sharing"
+        || n == "filesharing"
+        || n == "the filesharing"
+        || n == "file-sharing"
+        || n == "the file-sharing"
+        || n == "file share"
+        || n == "the file share"
+        || n == "afp"
+        || n == "the afp"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/file-sharing"
+            | "/filesharing"
+            | "/file-sharing-status"
+            | "/filesharing-status"
+            | "/file-share"
+            | "/fileshare"
+            | "/file-share-status"
+            | "/smb"
+            | "/smb-status"
+            | "/smb-state"
+            | "/smbd"
+            | "/smbd-status"
+            | "/mac-smb"
+            | "/mac-smbd"
+            | "/sharing-files"
+            | "file sharing status"
+            | "the file sharing status"
+            | "filesharing status"
+            | "the filesharing status"
+            | "file-sharing status"
+            | "the file-sharing status"
+            | "file share status"
+            | "the file share status"
+            | "smb status"
+            | "the smb status"
+            | "smbd status"
+            | "the smbd status"
+            | "my file sharing"
+            | "my file sharing status"
+            | "my filesharing"
+            | "my smb"
+            | "my smb status"
+            | "is file sharing on"
+            | "is file sharing off"
+            | "is file sharing enabled"
+            | "is file sharing disabled"
+            | "is filesharing on"
+            | "is filesharing enabled"
+            | "is file-sharing on"
+            | "is file-sharing enabled"
+            | "is smb on"
+            | "is smb off"
+            | "is smb enabled"
+            | "is smb disabled"
+            | "is smbd on"
+            | "is smbd enabled"
+            | "what's my file sharing"
+            | "whats my file sharing"
+            | "what is my file sharing"
+            | "what's my file sharing status"
+            | "whats my file sharing status"
+            | "what is my file sharing status"
+            | "what's the file sharing"
+            | "whats the file sharing"
+            | "what is the file sharing"
+            | "what's the file sharing status"
+            | "whats the file sharing status"
+            | "what is the file sharing status"
+            | "what's my smb"
+            | "whats my smb"
+            | "what is my smb"
+            | "what's my smb status"
+            | "whats my smb status"
+            | "what is my smb status"
+            | "what's the smb status"
+            | "whats the smb status"
+            | "what is the smb status"
+            | "how's file sharing"
+            | "hows file sharing"
+            | "how's the file sharing"
+            | "hows the file sharing"
+            // View/see/show me/open/list.
+            | "view file sharing"
+            | "view the file sharing"
+            | "view file sharing status"
+            | "view the file sharing status"
+            | "view filesharing"
+            | "view the filesharing"
+            | "view file-sharing"
+            | "view the file-sharing"
+            | "view file share"
+            | "view the file share"
+            | "view smb"
+            | "view the smb"
+            | "view smb status"
+            | "view the smb status"
+            | "view smbd"
+            | "view the smbd"
+            | "see file sharing"
+            | "see the file sharing"
+            | "see file sharing status"
+            | "see the file sharing status"
+            | "see smb"
+            | "see the smb"
+            | "see smb status"
+            | "see the smb status"
+            | "open file sharing"
+            | "open the file sharing"
+            | "open file sharing status"
+            | "open the file sharing status"
+            | "open filesharing"
+            | "open the filesharing"
+            | "open smb"
+            | "open the smb"
+            | "open smb status"
+            | "open the smb status"
+            | "list file sharing"
+            | "list the file sharing"
+            | "list file sharing status"
+            | "list the file sharing status"
+            | "list smb"
+            | "list the smb"
+            | "list smb status"
+            | "list the smb status"
+            | "show file sharing"
+            | "show the file sharing"
+            | "show me file sharing"
+            | "show me the file sharing"
+            | "show file sharing status"
+            | "show the file sharing status"
+            | "show me file sharing status"
+            | "show me the file sharing status"
+            | "show smb"
+            | "show the smb"
+            | "show me smb"
+            | "show me the smb"
+            | "show smb status"
+            | "show the smb status"
+            | "show me smb status"
+            | "show me the smb status"
+    )
+}
+
+/// Zero-LLM File Sharing status from `launchctl` (macOS-only; empty elsewhere).
+pub fn format_file_sharing_report() -> String {
+    let v = crate::metrics::get_file_sharing_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**File Sharing** — _no File Sharing reading on this Mac right now._".to_string();
+    }
+    format!("**File Sharing** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.

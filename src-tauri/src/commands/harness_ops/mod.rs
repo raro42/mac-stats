@@ -2311,6 +2311,77 @@ mod tests {
                 "/screen must stay display resolution, not Screen Sharing: {reply}"
             );
         }
+        assert!(!looks_like_screen_sharing_request("/file-sharing"));
+        assert!(!looks_like_screen_sharing_request("/smb"));
+        assert!(!looks_like_screen_sharing_request("view file sharing"));
+    }
+
+    #[test]
+    fn file_sharing_slash_and_view_open_do_not_steal_vnc_filevault_or_bare_smb() {
+        // Slash + view/open NL → File Sharing (`/screen-sharing` · `/filevault` parity).
+        // Bare `file sharing` / `smb` / `smbd` stay with the agent; `/vnc` stays Screen Sharing;
+        // `/filevault` stays FileVault; `/ssh` stays Remote Login.
+        assert!(looks_like_file_sharing_request("/file-sharing"));
+        assert!(looks_like_file_sharing_request("/filesharing"));
+        assert!(looks_like_file_sharing_request("/file-share"));
+        assert!(looks_like_file_sharing_request("/smb"));
+        assert!(looks_like_file_sharing_request("/smb-status"));
+        assert!(looks_like_file_sharing_request("/smbd"));
+        assert!(looks_like_file_sharing_request("/mac-smb"));
+        assert!(looks_like_file_sharing_request("view file sharing"));
+        assert!(looks_like_file_sharing_request("open smb status"));
+        assert!(looks_like_file_sharing_request("list file sharing"));
+        assert!(looks_like_file_sharing_request("file sharing status"));
+        assert!(looks_like_file_sharing_request("is file sharing on"));
+        assert!(looks_like_file_sharing_request("is smb enabled"));
+        assert!(looks_like_file_sharing_request("what's my file sharing"));
+        assert!(looks_like_file_sharing_request("view smb"));
+        assert!(!looks_like_file_sharing_request("smb"));
+        assert!(!looks_like_file_sharing_request("smbd"));
+        assert!(!looks_like_file_sharing_request("file sharing"));
+        assert!(!looks_like_file_sharing_request("filesharing"));
+        assert!(!looks_like_file_sharing_request("/screen-sharing"));
+        assert!(!looks_like_file_sharing_request("/vnc"));
+        assert!(!looks_like_file_sharing_request("/remote-login"));
+        assert!(!looks_like_file_sharing_request("/ssh"));
+        assert!(!looks_like_file_sharing_request("/filevault"));
+        assert!(!looks_like_file_sharing_request("/file-vault"));
+        assert!(!looks_like_file_sharing_request("/firewall"));
+        assert!(!looks_like_file_sharing_request("/tasks"));
+        assert!(!looks_like_file_sharing_request("enable file sharing"));
+        assert!(!looks_like_screen_sharing_request("/file-sharing"));
+        assert!(!looks_like_screen_sharing_request("view file sharing"));
+        assert!(!looks_like_remote_login_request("/file-sharing"));
+        assert!(!looks_like_remote_login_request("view file sharing"));
+        assert!(!looks_like_filevault_request("/file-sharing"));
+        assert!(!looks_like_filevault_request("view file sharing"));
+        assert!(!looks_like_filevault_request("/smb"));
+        let fs = try_operator_instant_reply("/file-sharing").unwrap();
+        assert!(
+            fs.contains("**File Sharing**") && !fs.to_lowercase().contains("execution"),
+            "got: {fs}"
+        );
+        let viewed = try_operator_instant_reply("view file sharing").unwrap();
+        assert!(
+            viewed.contains("**File Sharing**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("smb").is_none());
+        assert!(try_operator_instant_reply("file sharing").is_none());
+        let vnc = try_operator_instant_reply("/vnc");
+        if let Some(reply) = vnc {
+            assert!(
+                !reply.contains("**File Sharing**"),
+                "/vnc must stay Screen Sharing, not File Sharing: {reply}"
+            );
+        }
+        let fv = try_operator_instant_reply("/filevault");
+        if let Some(reply) = fv {
+            assert!(
+                !reply.contains("**File Sharing**"),
+                "/filevault must stay FileVault, not File Sharing: {reply}"
+            );
+        }
     }
 
 #[test]

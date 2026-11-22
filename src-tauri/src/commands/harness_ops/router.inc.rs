@@ -1052,9 +1052,14 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         return Some(format_remote_login_report());
     }
     // Screen Sharing / VNC (bare `screen sharing` / `vnc` stay with the agent; `/remote-login` · `/ssh`
-    // stay Remote Login; `/screen` · `/screens` stay display resolution).
+    // stay Remote Login; `/screen` · `/screens` stay display resolution; File Sharing stays `/file-sharing`).
     if looks_like_screen_sharing_request(content) {
         return Some(format_screen_sharing_report());
+    }
+    // File Sharing / SMB (bare `file sharing` / `smb` / `smbd` stay with the agent; `/screen-sharing` · `/vnc`
+    // stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login; `/filevault` stays FileVault).
+    if looks_like_file_sharing_request(content) {
+        return Some(format_file_sharing_report());
     }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).

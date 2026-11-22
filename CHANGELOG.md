@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2973] - 2026-11-22
+
+### Added
+- Instant File Sharing (SMB) status accepts `/file-sharing` · `/filesharing` · `/file-sharing-status` · `/file-share` · `/smb` · `/smb-status` · `/smb-state` · `/smbd` · `/smbd-status` · `/mac-smb` and view/see/open/list NL (`view file sharing`, `open smb status`, `list file sharing`, …), matching “file sharing status” / “is file sharing on” / “is smb enabled” / “what's my file sharing” / “what's the file sharing status”. Bare `file sharing` / `smb` / `smbd` stay with the agent; `/screen-sharing` · `/vnc` stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login; `/filevault` stays FileVault.
+
 ## [0.1.2972] - 2026-11-22
 
 ### Added
