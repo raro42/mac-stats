@@ -677,6 +677,44 @@ pub fn get_sip_status() -> String {
     info
 }
 
+/// Gatekeeper assessment status from `spctl --status` (live; not OnceLock).
+/// Distinct from SIP `/sip`, FileVault `/filevault`, and boot volume.
+/// Used by Discord/operator instant `/gatekeeper` · `/spctl` lane.
+pub fn get_gatekeeper_status() -> String {
+    let output = Command::new("/usr/sbin/spctl")
+        .arg("--status")
+        .stderr(std::process::Stdio::null())
+        .output();
+    let Ok(output) = output else {
+        debug3!("gatekeeper: spctl spawn failed");
+        return String::new();
+    };
+    // spctl may exit non-zero when disabled; still parse stdout.
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let lower = stdout.to_ascii_lowercase();
+    // Prefer Enabled before Disabled so "assessments enabled" wins.
+    let info = if lower.contains("assessments enabled")
+        || (lower.contains("enabled") && !lower.contains("disabled"))
+    {
+        "Enabled".to_string()
+    } else if lower.contains("assessments disabled") || lower.contains("disabled") {
+        "Disabled".to_string()
+    } else {
+        let t = stdout.lines().next().unwrap_or("").trim();
+        if t.is_empty() {
+            String::new()
+        } else {
+            t.to_string()
+        }
+    };
+    if info.is_empty() {
+        debug3!("gatekeeper: empty status (exit={})", output.status);
+    } else {
+        debug3!("gatekeeper status: '{}'", info);
+    }
+    info
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.

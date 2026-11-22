@@ -1887,7 +1887,7 @@ mod tests {
     #[test]
     fn sip_slash_and_view_open_do_not_steal_filevault_or_bare_sip() {
         // Slash + view/open NL → SIP (`/filevault` · `/uuid` parity).
-        // Bare `sip` / `csrutil` stay with the agent; `/filevault` stays FileVault; Gatekeeper stays out.
+        // Bare `sip` / `csrutil` stay with the agent; `/filevault` stays FileVault; `/gatekeeper` stays Gatekeeper.
         assert!(looks_like_sip_request("/sip"));
         assert!(looks_like_sip_request("/sip-status"));
         assert!(looks_like_sip_request("/csrutil"));
@@ -1933,6 +1933,68 @@ mod tests {
             assert!(
                 !reply.contains("**SIP**"),
                 "/filevault must stay FileVault, not SIP: {reply}"
+            );
+        }
+    }
+
+    #[test]
+    fn gatekeeper_slash_and_view_open_do_not_steal_sip_or_bare_gatekeeper() {
+        // Slash + view/open NL → Gatekeeper (`/sip` · `/filevault` parity).
+        // Bare `gatekeeper` / `spctl` stay with the agent; `/sip` stays SIP; `/filevault` stays FileVault.
+        assert!(looks_like_gatekeeper_request("/gatekeeper"));
+        assert!(looks_like_gatekeeper_request("/gatekeeper-status"));
+        assert!(looks_like_gatekeeper_request("/gk"));
+        assert!(looks_like_gatekeeper_request("/gk-status"));
+        assert!(looks_like_gatekeeper_request("/spctl"));
+        assert!(looks_like_gatekeeper_request("/spctl-status"));
+        assert!(looks_like_gatekeeper_request("/assessments"));
+        assert!(looks_like_gatekeeper_request("view gatekeeper"));
+        assert!(looks_like_gatekeeper_request("open gatekeeper status"));
+        assert!(looks_like_gatekeeper_request("list spctl"));
+        assert!(looks_like_gatekeeper_request("gatekeeper status"));
+        assert!(looks_like_gatekeeper_request("is gatekeeper on"));
+        assert!(looks_like_gatekeeper_request("is gatekeeper enabled"));
+        assert!(looks_like_gatekeeper_request("what's my gatekeeper"));
+        assert!(looks_like_gatekeeper_request("view gk"));
+        assert!(!looks_like_gatekeeper_request("gatekeeper"));
+        assert!(!looks_like_gatekeeper_request("spctl"));
+        assert!(!looks_like_gatekeeper_request("gk"));
+        assert!(!looks_like_gatekeeper_request("assessments"));
+        assert!(!looks_like_gatekeeper_request("/sip"));
+        assert!(!looks_like_gatekeeper_request("view sip"));
+        assert!(!looks_like_gatekeeper_request("/filevault"));
+        assert!(!looks_like_gatekeeper_request("view filevault"));
+        assert!(!looks_like_gatekeeper_request("enable gatekeeper"));
+        assert!(!looks_like_gatekeeper_request("disable gatekeeper"));
+        assert!(!looks_like_sip_request("/gatekeeper"));
+        assert!(!looks_like_sip_request("view gatekeeper"));
+        assert!(!looks_like_sip_request("/spctl"));
+        assert!(!looks_like_filevault_request("/gatekeeper"));
+        assert!(!looks_like_filevault_request("view gatekeeper"));
+        let gk = try_operator_instant_reply("/gatekeeper").unwrap();
+        assert!(
+            gk.contains("**Gatekeeper**") && !gk.to_lowercase().contains("execution"),
+            "got: {gk}"
+        );
+        let viewed = try_operator_instant_reply("view gatekeeper").unwrap();
+        assert!(
+            viewed.contains("**Gatekeeper**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("gatekeeper").is_none());
+        assert!(try_operator_instant_reply("spctl").is_none());
+        let sip = try_operator_instant_reply("/sip");
+        if let Some(reply) = sip {
+            assert!(
+                !reply.contains("**Gatekeeper**"),
+                "/sip must stay SIP, not Gatekeeper: {reply}"
+            );
+        }
+        let fv = try_operator_instant_reply("/filevault");
+        if let Some(reply) = fv {
+            assert!(
+                !reply.contains("**Gatekeeper**"),
+                "/filevault must stay FileVault, not Gatekeeper: {reply}"
             );
         }
     }

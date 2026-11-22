@@ -1,9 +1,14 @@
 ## [Unreleased]
 
+## [0.1.2967] - 2026-11-22
+
+### Added
+- Instant Gatekeeper status accepts `/gatekeeper` · `/gatekeeper-status` · `/gk` · `/gk-status` · `/spctl` · `/spctl-status` · `/assessments` · `/assessments-status` and view/see/open/list NL (`view gatekeeper`, `open gatekeeper status`, `list spctl`, …), matching “gatekeeper status” / “is gatekeeper on” / “is gatekeeper enabled” / “what's my gatekeeper” / “what's the gatekeeper status”. Bare `gatekeeper` / `spctl` stay with the agent; `/sip` stays SIP; `/filevault` stays FileVault.
+
 ## [0.1.2966] - 2026-11-22
 
 ### Added
-- Instant System Integrity Protection (SIP) status accepts `/sip` · `/sip-status` · `/csrutil` · `/csrutil-status` · `/system-integrity` · `/system-integrity-protection` · `/sip-protection` and view/see/open/list NL (`view sip`, `open sip status`, `list sip`, …), matching “sip status” / “is sip on” / “is sip enabled” / “what's my sip” / “what's the sip status”. Bare `sip` / `csrutil` stay with the agent; `/filevault` stays FileVault; Gatekeeper stays with the agent.
+- Instant System Integrity Protection (SIP) status accepts `/sip` · `/sip-status` · `/csrutil` · `/csrutil-status` · `/system-integrity` · `/system-integrity-protection` · `/sip-protection` and view/see/open/list NL (`view sip`, `open sip status`, `list sip`, …), matching “sip status” / “is sip on” / “is sip enabled” / “what's my sip” / “what's the sip status”. Bare `sip` / `csrutil` stay with the agent; `/filevault` stays FileVault; `/gatekeeper` stays Gatekeeper.
 
 ## [0.1.2965] - 2026-11-22
 

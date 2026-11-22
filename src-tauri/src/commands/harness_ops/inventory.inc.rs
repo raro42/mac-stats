@@ -10113,6 +10113,190 @@ pub fn format_sip_report() -> String {
     format!("**SIP** · `{v}`")
 }
 
+/// Gatekeeper assessment status — not SIP, not FileVault, not boot volume.
+/// Slash + view/open NL (`/gatekeeper` · `/spctl` · `view gatekeeper`) match `/sip` · `/filevault` shape;
+/// bare `gatekeeper` / `spctl` stay with the agent; `/sip` stays SIP; `/filevault` stays FileVault.
+pub fn looks_like_gatekeeper_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        // Action verbs (leave status asks like "is gatekeeper enabled").
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("assess ")
+        || n.contains("notariz")
+        || n.contains("quarantine")
+        || n.contains("password")
+        // Token keep/discard only — do not substring-match inside "gatekeeper".
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("system integrity")
+        || n == "/sip"
+        || n == "/csrutil"
+        || n == "/filevault"
+        || n == "/fv"
+        || n == "/fde"
+        || n == "/boot-volume"
+        || n == "/startup-disk"
+        || n == "view disk"
+        || n == "open disk"
+        || n == "/ssd"
+        || n == "/storage"
+        || n == "/free"
+        // Bare short / ambiguous stay with the agent.
+        || n == "gatekeeper"
+        || n == "the gatekeeper"
+        || n == "gk"
+        || n == "the gk"
+        || n == "spctl"
+        || n == "the spctl"
+        || n == "assessments"
+        || n == "the assessments"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/gatekeeper"
+            | "/gatekeeper-status"
+            | "/gatekeeperstatus"
+            | "/gk"
+            | "/gk-status"
+            | "/gkstatus"
+            | "/spctl"
+            | "/spctl-status"
+            | "/spctlstatus"
+            | "/assessments"
+            | "/assessments-status"
+            | "/assessmentsstatus"
+            | "gatekeeper status"
+            | "the gatekeeper status"
+            | "gk status"
+            | "the gk status"
+            | "spctl status"
+            | "the spctl status"
+            | "assessments status"
+            | "the assessments status"
+            | "my gatekeeper"
+            | "my gatekeeper status"
+            | "my gk"
+            | "my gk status"
+            | "is gatekeeper on"
+            | "is gatekeeper off"
+            | "is gatekeeper enabled"
+            | "is gatekeeper disabled"
+            | "is gk on"
+            | "is gk enabled"
+            | "is spctl on"
+            | "is spctl enabled"
+            | "are assessments enabled"
+            | "are assessments disabled"
+            | "what's my gatekeeper"
+            | "whats my gatekeeper"
+            | "what is my gatekeeper"
+            | "what's my gatekeeper status"
+            | "whats my gatekeeper status"
+            | "what is my gatekeeper status"
+            | "what's the gatekeeper"
+            | "whats the gatekeeper"
+            | "what is the gatekeeper"
+            | "what's the gatekeeper status"
+            | "whats the gatekeeper status"
+            | "what is the gatekeeper status"
+            | "what's my gk"
+            | "whats my gk"
+            | "what is my gk"
+            | "what's the gk status"
+            | "whats the gk status"
+            | "what is the gk status"
+            | "which gatekeeper"
+            | "how's gatekeeper"
+            | "hows gatekeeper"
+            | "how's the gatekeeper"
+            | "hows the gatekeeper"
+            // View/see/show me/open/list.
+            | "view gatekeeper"
+            | "view the gatekeeper"
+            | "view gatekeeper status"
+            | "view the gatekeeper status"
+            | "view gk"
+            | "view the gk"
+            | "view gk status"
+            | "view spctl"
+            | "view the spctl"
+            | "view spctl status"
+            | "view assessments"
+            | "view the assessments"
+            | "view assessments status"
+            | "see gatekeeper"
+            | "see the gatekeeper"
+            | "see gatekeeper status"
+            | "see the gatekeeper status"
+            | "see gk"
+            | "see the gk"
+            | "see spctl"
+            | "see the spctl"
+            | "open gatekeeper"
+            | "open the gatekeeper"
+            | "open gatekeeper status"
+            | "open the gatekeeper status"
+            | "open gk"
+            | "open the gk"
+            | "open spctl"
+            | "open the spctl"
+            | "list gatekeeper"
+            | "list the gatekeeper"
+            | "list gatekeeper status"
+            | "list the gatekeeper status"
+            | "list gk"
+            | "list the gk"
+            | "list spctl"
+            | "list the spctl"
+            | "show gatekeeper"
+            | "show the gatekeeper"
+            | "show me gatekeeper"
+            | "show me the gatekeeper"
+            | "show gatekeeper status"
+            | "show the gatekeeper status"
+            | "show me gatekeeper status"
+            | "show me the gatekeeper status"
+            | "show gk"
+            | "show the gk"
+            | "show me gk"
+            | "show me the gk"
+            | "show spctl"
+            | "show the spctl"
+            | "show me spctl"
+            | "show me the spctl"
+    )
+}
+
+/// Zero-LLM Gatekeeper status from `spctl --status` (macOS-only; empty elsewhere).
+pub fn format_gatekeeper_report() -> String {
+    let v = crate::metrics::get_gatekeeper_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Gatekeeper** — _no Gatekeeper reading on this Mac right now._".to_string();
+    }
+    format!("**Gatekeeper** · `{v}`")
+}
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·
