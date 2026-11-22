@@ -1,31 +1,16 @@
 # Morning surprise — 2026-11-22
 
-Refreshed: 2026-11-22 22:45 CET
+## Shipped overnight
 
-## Shipped tonight (keep)
+- **v0.1.2971** Remote Login (SSH) instant lane: `/remote-login` · `/ssh` · `/sshd` (+ aliases) and view/open NL. Bare `ssh` / `remote login` stay with the agent.
+- Earlier same night: **v0.1.2970** Time Machine `/timemachine` · `/tm`; **v0.1.2969** Firewall stealth `/stealth`; Gatekeeper / SIP / FileVault / layout-daily Dark earlier.
 
-| Version | What |
-|---------|------|
-| **v0.1.2970** | Time Machine `/timemachine` · `/tm` · `/tmutil` · `/backup-status` + view/open NL |
-| **v0.1.2969** | Firewall stealth `/stealth` · `/firewall-stealth` · `/fw-stealth` + view/open NL |
-| **v0.1.2968** | Application Firewall `/firewall` · `/fw` · `/afw` · `/app-firewall` · `/socketfilterfw` + view/open NL |
-| **v0.1.2967** | Gatekeeper status `/gatekeeper` · `/gk` · `/spctl` · `/assessments` + view/open NL |
-| **v0.1.2966** | SIP status `/sip` · `/csrutil` · `/system-integrity` + view/open NL |
-| **v0.1.2965** | Dark layout-daily: AI Chat `.chat-messages:focus-within` → Matrix `--accent` |
-| **v0.1.2964** | FileVault status `/filevault` · `/fv` · `/fde` · `/disk-encryption` + view/open NL |
-| **v0.1.2963** | Boot volume / startup disk `/boot-volume` · `/startup-disk` + view/open NL |
-| **v0.1.2962** | Hardware UUID `/uuid` · `/hw-uuid` + view/open NL |
-| **v0.1.2961** | VPN status `/vpn` · `/vpn-status` + view/open NL |
-| **v0.1.2960** | GPU chipset · cores · Metal `/gpu-name` · `/metal` + view/open NL |
+## Tried / notes
 
-## This tick (~22:45 CET)
+- Digester empty all night (0 turns / 7d). Design-review in grace (Mac TCC). Layout-daily Dark already marked; Neon waits for next calendar quota.
+- Soft-state: cream/Swiss Send fill white-on-blue stays intentional.
+- Ratchet: keep for 2971 + backfill keep for 2970.
 
-- Digester open empty; design-review due=false; layout-daily Dark already marked (Neon next calendar quota).
-- Parallel tick already shipped **v0.1.2969** Firewall stealth; this tick kept **v0.1.2970** Time Machine slash+NL (not another security keep-pNN).
-- Cream/Swiss Send fill white-on-blue left intentional.
+## For Ralf
 
-## Still open
-
-- Neon layout-daily (next calendar quota)
-- cream/Swiss Send fill white-on-blue intentional
-- sibling/product fuel (not another keep-pNN clone)
+Remote Login is now a one-slash glance next to Firewall / Stealth / Time Machine. Try `/ssh` or `view remote login` in Discord or AI Chat.

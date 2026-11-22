@@ -1,3 +1,11 @@
+## Overnight note 2026-11-22 ~23:05
+- Shipped v0.1.2971 Remote Login `/remote-login` · `/ssh` · `/sshd` + view/open NL; bare ssh/sshd/remote login stay with agent; `/vpn` · `/firewall` · `/timemachine` intact.
+- Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Neon layout-daily next calendar quota.
+
+## Overnight merge — v0.1.2971
+
+- Product fuel after Time Machine `/timemachine` NL v0.1.2970: Remote Login (SSH) already readable via `systemsetup -getremotelogin` but lacked `/remote-login` · `/remotelogin` · `/remote-login-status` · `/ssh` · `/sshd` · `/ssh-status` · `/sshd-status` · `/ssh-login` · `/remote-ssh` and view/see/open/list phrases while Firewall `/firewall` · stealth `/stealth` · Time Machine `/timemachine` already had slash+NL. Bare `ssh` / `sshd` / `remote login` stay with the agent; `/vpn` stays VPN; `/firewall` stays Firewall; `/timemachine` stays Time Machine. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Dark marked today (Neon due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Neon layout-daily next calendar day · sibling/product fuel — Remote Login slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-22 ~22:35
 - Shipped v0.1.2969 Firewall stealth `/stealth` · `/firewall-stealth` · `/fw-stealth` · `/afw-stealth` + view/open NL; bare stealth stays with agent; `/firewall` stays global; `/gatekeeper` · `/sip` · `/filevault` intact.
 - Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Neon layout-daily next calendar quota.
