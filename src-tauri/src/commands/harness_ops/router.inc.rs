@@ -1057,9 +1057,15 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         return Some(format_screen_sharing_report());
     }
     // File Sharing / SMB (bare `file sharing` / `smb` / `smbd` stay with the agent; `/screen-sharing` · `/vnc`
-    // stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login; `/filevault` stays FileVault).
+    // stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login; `/filevault` stays FileVault;
+    // Printer Sharing stays `/printer-sharing`).
     if looks_like_file_sharing_request(content) {
         return Some(format_file_sharing_report());
+    }
+    // Printer Sharing (bare `printer` / `printers` / `cups` stay with the agent; `/file-sharing` · `/smb`
+    // stay File Sharing; `/screen-sharing` · `/vnc` stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login).
+    if looks_like_printer_sharing_request(content) {
+        return Some(format_printer_sharing_report());
     }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).

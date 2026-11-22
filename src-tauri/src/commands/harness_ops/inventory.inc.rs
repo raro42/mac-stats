@@ -11426,6 +11426,18 @@ pub fn looks_like_file_sharing_request(content: &str) -> bool {
         || n == "/vnc"
         || n == "/vnc-status"
         || n == "/mac-vnc"
+        || n == "/printer-sharing"
+        || n == "/printersharing"
+        || n == "/printer-share"
+        || n == "/share-printers"
+        || n == "/cups-share"
+        || n == "/cups-sharing"
+        || n.contains("printer sharing")
+        || n.contains("printersharing")
+        || n.contains("printer-sharing")
+        || n.contains("share printers")
+        || n.contains("cups share")
+        || n.contains("cups sharing")
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
@@ -11594,6 +11606,280 @@ pub fn format_file_sharing_report() -> String {
         return "**File Sharing** — _no File Sharing reading on this Mac right now._".to_string();
     }
     format!("**File Sharing** · `{v}`")
+}
+
+/// Printer Sharing — CUPS `_share_printers` from `cupsctl`.
+/// "Why" / enable/disable stay with the agent. Slash + view/open NL (`/printer-sharing` · `/share-printers`).
+/// Bare `printer` / `printers` / `cups` stay with the agent; `/file-sharing` · `/smb` stay File Sharing;
+/// `/screen-sharing` · `/vnc` stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login.
+pub fn looks_like_printer_sharing_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("display")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen share")
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n.contains("file share")
+        || n.contains("remote management")
+        || n.contains("remote desktop")
+        || n.contains("queue")
+        || n.contains("job")
+        || n.contains("spool")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/remotelogin"
+        || n == "/ssh"
+        || n == "/sshd"
+        || n == "/ssh-status"
+        || n == "/sshd-status"
+        || n == "/screen-sharing"
+        || n == "/screensharing"
+        || n == "/screen-share"
+        || n == "/vnc"
+        || n == "/vnc-status"
+        || n == "/mac-vnc"
+        || n == "/file-sharing"
+        || n == "/filesharing"
+        || n == "/file-share"
+        || n == "/smb"
+        || n == "/smb-status"
+        || n == "/smbd"
+        || n == "/mac-smb"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        // Bare short / ambiguous stay with the agent.
+        || n == "printer"
+        || n == "the printer"
+        || n == "printers"
+        || n == "the printers"
+        || n == "cups"
+        || n == "the cups"
+        || n == "print"
+        || n == "the print"
+        || n == "printer sharing"
+        || n == "the printer sharing"
+        || n == "printersharing"
+        || n == "the printersharing"
+        || n == "printer-sharing"
+        || n == "the printer-sharing"
+        || n == "printer share"
+        || n == "the printer share"
+        || n == "share printers"
+        || n == "the share printers"
+        || n == "ard"
+        || n == "the ard"
+        || n == "remote management"
+        || n == "the remote management"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/printer-sharing"
+            | "/printersharing"
+            | "/printer-sharing-status"
+            | "/printersharing-status"
+            | "/printer-share"
+            | "/printershare"
+            | "/printer-share-status"
+            | "/share-printers"
+            | "/shareprinters"
+            | "/share-printers-status"
+            | "/cups-share"
+            | "/cups-sharing"
+            | "/cups-share-status"
+            | "/cups-sharing-status"
+            | "/mac-printer-sharing"
+            | "/sharing-printers"
+            | "printer sharing status"
+            | "the printer sharing status"
+            | "printersharing status"
+            | "the printersharing status"
+            | "printer-sharing status"
+            | "the printer-sharing status"
+            | "printer share status"
+            | "the printer share status"
+            | "share printers status"
+            | "the share printers status"
+            | "cups share status"
+            | "the cups share status"
+            | "cups sharing status"
+            | "the cups sharing status"
+            | "my printer sharing"
+            | "my printer sharing status"
+            | "my printersharing"
+            | "my cups share"
+            | "my cups sharing"
+            | "is printer sharing on"
+            | "is printer sharing off"
+            | "is printer sharing enabled"
+            | "is printer sharing disabled"
+            | "is printersharing on"
+            | "is printersharing enabled"
+            | "is printer-sharing on"
+            | "is printer-sharing enabled"
+            | "is share printers on"
+            | "is share printers enabled"
+            | "is cups share on"
+            | "is cups share enabled"
+            | "is cups sharing on"
+            | "is cups sharing enabled"
+            | "what's my printer sharing"
+            | "whats my printer sharing"
+            | "what is my printer sharing"
+            | "what's my printer sharing status"
+            | "whats my printer sharing status"
+            | "what is my printer sharing status"
+            | "what's the printer sharing"
+            | "whats the printer sharing"
+            | "what is the printer sharing"
+            | "what's the printer sharing status"
+            | "whats the printer sharing status"
+            | "what is the printer sharing status"
+            | "how's printer sharing"
+            | "hows printer sharing"
+            | "how's the printer sharing"
+            | "hows the printer sharing"
+            // View/see/show me/open/list.
+            | "view printer sharing"
+            | "view the printer sharing"
+            | "view printer sharing status"
+            | "view the printer sharing status"
+            | "view printersharing"
+            | "view the printersharing"
+            | "view printer-sharing"
+            | "view the printer-sharing"
+            | "view printer share"
+            | "view the printer share"
+            | "view share printers"
+            | "view the share printers"
+            | "view cups share"
+            | "view the cups share"
+            | "view cups sharing"
+            | "view the cups sharing"
+            | "view cups share status"
+            | "view the cups share status"
+            | "see printer sharing"
+            | "see the printer sharing"
+            | "see printer sharing status"
+            | "see the printer sharing status"
+            | "see share printers"
+            | "see the share printers"
+            | "see cups share"
+            | "see the cups share"
+            | "see cups sharing"
+            | "see the cups sharing"
+            | "open printer sharing"
+            | "open the printer sharing"
+            | "open printer sharing status"
+            | "open the printer sharing status"
+            | "open printersharing"
+            | "open the printersharing"
+            | "open share printers"
+            | "open the share printers"
+            | "open cups share"
+            | "open the cups share"
+            | "open cups sharing"
+            | "open the cups sharing"
+            | "open cups share status"
+            | "open the cups share status"
+            | "list printer sharing"
+            | "list the printer sharing"
+            | "list printer sharing status"
+            | "list the printer sharing status"
+            | "list share printers"
+            | "list the share printers"
+            | "list cups share"
+            | "list the cups share"
+            | "list cups sharing"
+            | "list the cups sharing"
+            | "show printer sharing"
+            | "show the printer sharing"
+            | "show me printer sharing"
+            | "show me the printer sharing"
+            | "show printer sharing status"
+            | "show the printer sharing status"
+            | "show me printer sharing status"
+            | "show me the printer sharing status"
+            | "show share printers"
+            | "show the share printers"
+            | "show me share printers"
+            | "show me the share printers"
+            | "show cups share"
+            | "show the cups share"
+            | "show me cups share"
+            | "show me the cups share"
+            | "show cups sharing"
+            | "show the cups sharing"
+            | "show me cups sharing"
+            | "show me the cups sharing"
+    )
+}
+
+/// Zero-LLM Printer Sharing status from `cupsctl` (macOS-only; empty elsewhere).
+pub fn format_printer_sharing_report() -> String {
+    let v = crate::metrics::get_printer_sharing_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Printer Sharing** — _no Printer Sharing reading on this Mac right now._".to_string();
+    }
+    format!("**Printer Sharing** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.

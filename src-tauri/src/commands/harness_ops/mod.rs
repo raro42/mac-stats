@@ -2382,6 +2382,77 @@ mod tests {
                 "/filevault must stay FileVault, not File Sharing: {reply}"
             );
         }
+        assert!(!looks_like_file_sharing_request("/printer-sharing"));
+        assert!(!looks_like_file_sharing_request("/share-printers"));
+        assert!(!looks_like_file_sharing_request("view printer sharing"));
+    }
+
+    #[test]
+    fn printer_sharing_slash_and_view_open_do_not_steal_smb_vnc_or_bare_printer() {
+        // Slash + view/open NL → Printer Sharing (`/file-sharing` · `/screen-sharing` parity).
+        // Bare `printer` / `printers` / `cups` stay with the agent; `/smb` stays File Sharing;
+        // `/vnc` stays Screen Sharing; `/ssh` stays Remote Login.
+        assert!(looks_like_printer_sharing_request("/printer-sharing"));
+        assert!(looks_like_printer_sharing_request("/printersharing"));
+        assert!(looks_like_printer_sharing_request("/printer-share"));
+        assert!(looks_like_printer_sharing_request("/share-printers"));
+        assert!(looks_like_printer_sharing_request("/cups-share"));
+        assert!(looks_like_printer_sharing_request("/cups-sharing"));
+        assert!(looks_like_printer_sharing_request("/mac-printer-sharing"));
+        assert!(looks_like_printer_sharing_request("view printer sharing"));
+        assert!(looks_like_printer_sharing_request("open cups share"));
+        assert!(looks_like_printer_sharing_request("list printer sharing"));
+        assert!(looks_like_printer_sharing_request("printer sharing status"));
+        assert!(looks_like_printer_sharing_request("is printer sharing on"));
+        assert!(looks_like_printer_sharing_request("is cups sharing enabled"));
+        assert!(looks_like_printer_sharing_request("what's my printer sharing"));
+        assert!(looks_like_printer_sharing_request("view share printers"));
+        assert!(!looks_like_printer_sharing_request("printer"));
+        assert!(!looks_like_printer_sharing_request("printers"));
+        assert!(!looks_like_printer_sharing_request("cups"));
+        assert!(!looks_like_printer_sharing_request("printer sharing"));
+        assert!(!looks_like_printer_sharing_request("/file-sharing"));
+        assert!(!looks_like_printer_sharing_request("/smb"));
+        assert!(!looks_like_printer_sharing_request("/screen-sharing"));
+        assert!(!looks_like_printer_sharing_request("/vnc"));
+        assert!(!looks_like_printer_sharing_request("/remote-login"));
+        assert!(!looks_like_printer_sharing_request("/ssh"));
+        assert!(!looks_like_printer_sharing_request("/filevault"));
+        assert!(!looks_like_printer_sharing_request("/firewall"));
+        assert!(!looks_like_printer_sharing_request("/tasks"));
+        assert!(!looks_like_printer_sharing_request("enable printer sharing"));
+        assert!(!looks_like_file_sharing_request("/printer-sharing"));
+        assert!(!looks_like_file_sharing_request("view printer sharing"));
+        assert!(!looks_like_screen_sharing_request("/printer-sharing"));
+        assert!(!looks_like_screen_sharing_request("view printer sharing"));
+        assert!(!looks_like_remote_login_request("/printer-sharing"));
+        assert!(!looks_like_remote_login_request("view printer sharing"));
+        let ps = try_operator_instant_reply("/printer-sharing").unwrap();
+        assert!(
+            ps.contains("**Printer Sharing**") && !ps.to_lowercase().contains("execution"),
+            "got: {ps}"
+        );
+        let viewed = try_operator_instant_reply("view printer sharing").unwrap();
+        assert!(
+            viewed.contains("**Printer Sharing**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("printer").is_none());
+        assert!(try_operator_instant_reply("printer sharing").is_none());
+        let smb = try_operator_instant_reply("/smb");
+        if let Some(reply) = smb {
+            assert!(
+                !reply.contains("**Printer Sharing**"),
+                "/smb must stay File Sharing, not Printer Sharing: {reply}"
+            );
+        }
+        let vnc = try_operator_instant_reply("/vnc");
+        if let Some(reply) = vnc {
+            assert!(
+                !reply.contains("**Printer Sharing**"),
+                "/vnc must stay Screen Sharing, not Printer Sharing: {reply}"
+            );
+        }
     }
 
 #[test]

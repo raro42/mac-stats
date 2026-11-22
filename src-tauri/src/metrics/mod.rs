@@ -1121,6 +1121,53 @@ pub fn get_file_sharing_status() -> String {
     info
 }
 
+/// macOS Printer Sharing from `cupsctl` `_share_printers`.
+/// Distinct from File Sharing `/file-sharing` · `/smb`, Screen Sharing `/screen-sharing` · `/vnc`,
+/// and Remote Login `/remote-login` · `/ssh`.
+/// Used by Discord/operator instant `/printer-sharing` · `/share-printers` lane.
+pub fn get_printer_sharing_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/sbin/cupsctl")
+            .stderr(std::process::Stdio::null())
+            .output();
+        let info = match output {
+            Ok(output) => {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                let mut found: Option<bool> = None;
+                for line in stdout.lines() {
+                    let l = line.trim();
+                    if !l.starts_with("_share_printers=") {
+                        continue;
+                    }
+                    let val = l.split_once('=').map(|(_, v)| v.trim()).unwrap_or("");
+                    found = Some(val == "1" || val.eq_ignore_ascii_case("true") || val == "yes");
+                    break;
+                }
+                match found {
+                    Some(true) => "On".to_string(),
+                    Some(false) => "Off".to_string(),
+                    None => String::new(),
+                }
+            }
+            Err(_) => {
+                debug3!("printer-sharing: cupsctl spawn failed");
+                String::new()
+            }
+        };
+        if info.is_empty() {
+            debug3!("printer-sharing: empty status");
+        } else {
+            debug3!("printer-sharing status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.

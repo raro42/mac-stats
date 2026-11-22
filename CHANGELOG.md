@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2974] - 2026-11-22
+
+### Added
+- Instant Printer Sharing status accepts `/printer-sharing` · `/printersharing` · `/printer-sharing-status` · `/printer-share` · `/share-printers` · `/cups-share` · `/cups-sharing` · `/mac-printer-sharing` and view/see/open/list NL (`view printer sharing`, `open cups share`, `list printer sharing`, …), matching “printer sharing status” / “is printer sharing on” / “is cups sharing enabled” / “what's my printer sharing” / “what's the printer sharing status”. Bare `printer` / `printers` / `cups` stay with the agent; `/file-sharing` · `/smb` stay File Sharing; `/screen-sharing` · `/vnc` stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login.
+
 ## [0.1.2973] - 2026-11-22
 
 ### Added
