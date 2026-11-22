@@ -3,6 +3,7 @@
 Overnight autoresearch (Track B) so far:
 
 ## Shipped
+- **v0.1.2963** — boot volume / startup disk instant slash+NL (`/boot-volume` · `/boot-disk` · `/startup-disk` · `/startup-volume` · `/volume-name` · `/boot-volume-name` + view/open). Bare `boot` / `volume` / `disk` stay with the agent; `/boot` stays last boot wall-clock; `view disk` stays Disk Cleanup; `/ssd` · `/free` intact.
 - **v0.1.2962** — hardware UUID instant slash+NL (`/uuid` · `/hw-uuid` · `/hardware-uuid` · `/platform-uuid` · `/device-uuid` · `/mac-uuid` + view/open). Bare `uuid` stays with the agent; `/serial` stays serial; `/udid` stays with the agent.
 - **v0.1.2961** — VPN status slash+NL (`/vpn` · `/vpn-status` · …).
 - **v0.1.2960** — GPU chipset · cores · Metal instant slash+NL.
