@@ -1,22 +1,26 @@
 # Morning surprise — 2026-11-22
 
-Overnight Track B kept shipping operator instant network facts after digester stayed empty.
+Overnight autoresearch (Track B) kept shipping operator instant lanes. Digester open stayed empty; design-review stayed in grace (Mac TCC); layout-daily already marked data-poster for the day.
 
-## Shipped tonight (selected)
+## Shipped tonight (keep)
 
-- **v0.1.2949** — `/wifi` · `/wi-fi` · `/ssid` · `/wifi-ssid` · `/wifi-network` · `/airport` · `/wlan` + view/open NL (current SSID via `networksetup -getairportnetwork`). Bare `wifi` / `ssid` / password·settings·enable·disable stay with the agent; `/ip` · `/dns` · `/gateway` intact.
-- **v0.1.2948** — `/dns` · `/dns-servers` · `/nameserver` · `/ns` · `/resolver` + view/open NL (first `scutil --dns` resolver). Bare `dns` / dig·lookup·flush stay with the agent.
-- **v0.1.2947** — `/gateway` · `/router` · `/gw` + view/open NL (default IPv4 from `route`). Discord gateway status stays Discord.
-- **v0.1.2946** — `/ip` · `/local-ip` · `/lan-ip` + view/open NL (LAN IPv4). Bare `ip` / public·wan stay with the agent.
-- Earlier same night: boot `/boot`, cores `/cores`, kernel `/kernel`, locale `/locale`, arch `/arch`, timezone `/tz`, serial, username, Mac model, hostname, macOS version — slash+NL train.
+| Version | What |
+|---------|------|
+| **v0.1.2950** | Primary MAC `/mac-address` · `/ether` · `/en0-mac` + view/open NL |
+| v0.1.2949 | Wi-Fi SSID `/wifi` · `/ssid` + view/open NL (parallel tick) |
+| v0.1.2948 | DNS nameservers `/dns` · `/nameserver` + view/open NL |
+| v0.1.2947 | Default gateway `/gateway` · `/router` + view/open NL |
+| v0.1.2946 | Local LAN IPv4 `/ip` · `/lan-ip` + view/open NL |
+| earlier | boot · cores · kernel · locale · arch · tz · serial · username · mac-model · hostname · macos · ssd-size · … |
 
-## Skipped / held
+## This tick (~04:15 CET)
 
-- Cream/Swiss AI Chat Send fill stays white-on-blue **intentional**.
-- Dark layout-daily: day quota already used by Data Poster; Dark/Neon/Futuristic next calendar day.
-- Design-review screenshots: Mac TCC grace — polish-without-capture only.
-- Digester open: empty (no Slowest / Improve-task fuel).
+- Fuel: standing product after remote Wi-Fi SSID — MAC was the missing link-layer twin of `/ip` · `/gateway` · `/dns`.
+- Verify OK → keep @ `6997c3a71` → push `main`.
+- `/wifi-id` intentionally **not** used (SSID owns wifi namespace).
 
-## Next fuel
+## Still open
 
-Dark layout-daily when the day quota opens · cream/Swiss Send fill intentional · sibling/product fuel · not another keep-pNN Disk Cleanup clone.
+- Dark / Neon / Futuristic layout-daily next calendar day
+- cream/Swiss Send fill white-on-blue intentional (leave alone)
+- sibling harness ports when digester stays empty
