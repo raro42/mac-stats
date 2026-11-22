@@ -11438,6 +11438,20 @@ pub fn looks_like_file_sharing_request(content: &str) -> bool {
         || n.contains("share printers")
         || n.contains("cups share")
         || n.contains("cups sharing")
+        || n.contains("remote management")
+        || n.contains("remotemanagement")
+        || n.contains("remote-management")
+        || n.contains("remote desktop")
+        || n.contains("apple remote desktop")
+        || n == "/remote-management"
+        || n == "/remotemanagement"
+        || n == "/remote-mgmt"
+        || n == "/ard"
+        || n == "/ard-status"
+        || n == "/ard-state"
+        || n == "/ard-agent"
+        || n == "/apple-remote-desktop"
+        || n == "/mac-ard"
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
@@ -11696,6 +11710,15 @@ pub fn looks_like_printer_sharing_request(content: &str) -> bool {
         || n == "/smb-status"
         || n == "/smbd"
         || n == "/mac-smb"
+        || n == "/remote-management"
+        || n == "/remotemanagement"
+        || n == "/remote-mgmt"
+        || n == "/ard"
+        || n == "/ard-status"
+        || n == "/ard-state"
+        || n == "/ard-agent"
+        || n == "/apple-remote-desktop"
+        || n == "/mac-ard"
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
@@ -11880,6 +11903,294 @@ pub fn format_printer_sharing_report() -> String {
         return "**Printer Sharing** — _no Printer Sharing reading on this Mac right now._".to_string();
     }
     format!("**Printer Sharing** · `{v}`")
+}
+
+/// Remote Management (ARD) — launchd marker + ARDAgent.
+/// "Why" / enable/disable stay with the agent. Slash + view/open NL (`/remote-management` · `/ard`).
+/// Bare `ard` / `remote management` / `remote desktop` stay with the agent; `/screen-sharing` · `/vnc`
+/// stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login; `/file-sharing` · `/smb` stay File Sharing;
+/// `/printer-sharing` stays Printer Sharing.
+pub fn looks_like_remote_management_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("display")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen share")
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n.contains("file share")
+        || n.contains("printer sharing")
+        || n.contains("printersharing")
+        || n.contains("printer-sharing")
+        || n.contains("share printers")
+        || n.contains("cups share")
+        || n.contains("cups sharing")
+        || n.contains("content caching")
+        || n.contains("content-caching")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/remotelogin"
+        || n == "/ssh"
+        || n == "/sshd"
+        || n == "/ssh-status"
+        || n == "/sshd-status"
+        || n == "/screen-sharing"
+        || n == "/screensharing"
+        || n == "/screen-share"
+        || n == "/vnc"
+        || n == "/vnc-status"
+        || n == "/mac-vnc"
+        || n == "/file-sharing"
+        || n == "/filesharing"
+        || n == "/file-share"
+        || n == "/smb"
+        || n == "/smb-status"
+        || n == "/smbd"
+        || n == "/mac-smb"
+        || n == "/printer-sharing"
+        || n == "/printersharing"
+        || n == "/printer-share"
+        || n == "/share-printers"
+        || n == "/cups-share"
+        || n == "/cups-sharing"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        // Bare short / ambiguous stay with the agent.
+        || n == "ard"
+        || n == "the ard"
+        || n == "remote management"
+        || n == "the remote management"
+        || n == "remotemanagement"
+        || n == "the remotemanagement"
+        || n == "remote-management"
+        || n == "the remote-management"
+        || n == "remote desktop"
+        || n == "the remote desktop"
+        || n == "apple remote desktop"
+        || n == "the apple remote desktop"
+        || n == "ard agent"
+        || n == "the ard agent"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/remote-management"
+            | "/remotemanagement"
+            | "/remote-management-status"
+            | "/remotemanagement-status"
+            | "/remote-mgmt"
+            | "/remotemgmt"
+            | "/remote-mgmt-status"
+            | "/ard"
+            | "/ard-status"
+            | "/ard-state"
+            | "/ard-agent"
+            | "/ardagent"
+            | "/apple-remote-desktop"
+            | "/apple-remote-desktop-status"
+            | "/mac-ard"
+            | "/mac-remote-management"
+            | "remote management status"
+            | "the remote management status"
+            | "remotemanagement status"
+            | "the remotemanagement status"
+            | "remote-management status"
+            | "the remote-management status"
+            | "remote mgmt status"
+            | "the remote mgmt status"
+            | "ard status"
+            | "the ard status"
+            | "ard state"
+            | "the ard state"
+            | "apple remote desktop status"
+            | "the apple remote desktop status"
+            | "my remote management"
+            | "my remote management status"
+            | "my remotemanagement"
+            | "my ard"
+            | "my ard status"
+            | "my apple remote desktop"
+            | "is remote management on"
+            | "is remote management off"
+            | "is remote management enabled"
+            | "is remote management disabled"
+            | "is remotemanagement on"
+            | "is remotemanagement enabled"
+            | "is remote-management on"
+            | "is remote-management enabled"
+            | "is ard on"
+            | "is ard off"
+            | "is ard enabled"
+            | "is ard disabled"
+            | "is apple remote desktop on"
+            | "is apple remote desktop enabled"
+            | "what's my remote management"
+            | "whats my remote management"
+            | "what is my remote management"
+            | "what's my remote management status"
+            | "whats my remote management status"
+            | "what is my remote management status"
+            | "what's my ard"
+            | "whats my ard"
+            | "what is my ard"
+            | "what's my ard status"
+            | "whats my ard status"
+            | "what is my ard status"
+            | "what's the remote management"
+            | "whats the remote management"
+            | "what is the remote management"
+            | "what's the remote management status"
+            | "whats the remote management status"
+            | "what is the remote management status"
+            | "what's the ard status"
+            | "whats the ard status"
+            | "what is the ard status"
+            | "how's remote management"
+            | "hows remote management"
+            | "how's the remote management"
+            | "hows the remote management"
+            | "how's ard"
+            | "hows ard"
+            // View/see/show me/open/list.
+            | "view remote management"
+            | "view the remote management"
+            | "view remote management status"
+            | "view the remote management status"
+            | "view remotemanagement"
+            | "view the remotemanagement"
+            | "view remote-management"
+            | "view the remote-management"
+            | "view remote mgmt"
+            | "view the remote mgmt"
+            | "view ard"
+            | "view the ard"
+            | "view ard status"
+            | "view the ard status"
+            | "view ard state"
+            | "view the ard state"
+            | "view apple remote desktop"
+            | "view the apple remote desktop"
+            | "view apple remote desktop status"
+            | "view the apple remote desktop status"
+            | "see remote management"
+            | "see the remote management"
+            | "see remote management status"
+            | "see the remote management status"
+            | "see ard"
+            | "see the ard"
+            | "see ard status"
+            | "see the ard status"
+            | "see apple remote desktop"
+            | "see the apple remote desktop"
+            | "open remote management"
+            | "open the remote management"
+            | "open remote management status"
+            | "open the remote management status"
+            | "open remotemanagement"
+            | "open the remotemanagement"
+            | "open ard"
+            | "open the ard"
+            | "open ard status"
+            | "open the ard status"
+            | "open apple remote desktop"
+            | "open the apple remote desktop"
+            | "list remote management"
+            | "list the remote management"
+            | "list remote management status"
+            | "list the remote management status"
+            | "list ard"
+            | "list the ard"
+            | "list ard status"
+            | "list the ard status"
+            | "list apple remote desktop"
+            | "list the apple remote desktop"
+            | "show remote management"
+            | "show the remote management"
+            | "show me remote management"
+            | "show me the remote management"
+            | "show remote management status"
+            | "show the remote management status"
+            | "show me remote management status"
+            | "show me the remote management status"
+            | "show ard"
+            | "show the ard"
+            | "show me ard"
+            | "show me the ard"
+            | "show ard status"
+            | "show the ard status"
+            | "show me ard status"
+            | "show me the ard status"
+            | "show apple remote desktop"
+            | "show the apple remote desktop"
+            | "show me apple remote desktop"
+            | "show me the apple remote desktop"
+    )
+}
+
+/// Zero-LLM Remote Management status from launchd marker + ARDAgent (macOS-only; empty elsewhere).
+pub fn format_remote_management_report() -> String {
+    let v = crate::metrics::get_remote_management_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Remote Management** — _no Remote Management reading on this Mac right now._".to_string();
+    }
+    format!("**Remote Management** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.

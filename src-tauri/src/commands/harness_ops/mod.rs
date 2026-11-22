@@ -2453,6 +2453,84 @@ mod tests {
                 "/vnc must stay Screen Sharing, not Printer Sharing: {reply}"
             );
         }
+        assert!(!looks_like_printer_sharing_request("/remote-management"));
+        assert!(!looks_like_printer_sharing_request("/ard"));
+        assert!(!looks_like_printer_sharing_request("view remote management"));
+    }
+
+    #[test]
+    fn remote_management_slash_and_view_open_do_not_steal_vnc_ssh_or_bare_ard() {
+        // Slash + view/open NL → Remote Management (`/screen-sharing` · `/remote-login` parity).
+        // Bare `ard` / `remote management` / `remote desktop` stay with the agent; `/vnc` stays Screen Sharing;
+        // `/ssh` stays Remote Login; `/smb` stays File Sharing; `/printer-sharing` stays Printer Sharing.
+        assert!(looks_like_remote_management_request("/remote-management"));
+        assert!(looks_like_remote_management_request("/remotemanagement"));
+        assert!(looks_like_remote_management_request("/remote-mgmt"));
+        assert!(looks_like_remote_management_request("/ard"));
+        assert!(looks_like_remote_management_request("/ard-status"));
+        assert!(looks_like_remote_management_request("/ard-state"));
+        assert!(looks_like_remote_management_request("/apple-remote-desktop"));
+        assert!(looks_like_remote_management_request("/mac-ard"));
+        assert!(looks_like_remote_management_request("/ard-agent"));
+        assert!(looks_like_remote_management_request("view remote management"));
+        assert!(looks_like_remote_management_request("open ard status"));
+        assert!(looks_like_remote_management_request("list remote management"));
+        assert!(looks_like_remote_management_request("remote management status"));
+        assert!(looks_like_remote_management_request("is remote management on"));
+        assert!(looks_like_remote_management_request("is ard enabled"));
+        assert!(looks_like_remote_management_request("what's my remote management"));
+        assert!(looks_like_remote_management_request("view ard"));
+        assert!(!looks_like_remote_management_request("ard"));
+        assert!(!looks_like_remote_management_request("remote management"));
+        assert!(!looks_like_remote_management_request("remote desktop"));
+        assert!(!looks_like_remote_management_request("/screen-sharing"));
+        assert!(!looks_like_remote_management_request("/vnc"));
+        assert!(!looks_like_remote_management_request("/remote-login"));
+        assert!(!looks_like_remote_management_request("/ssh"));
+        assert!(!looks_like_remote_management_request("/file-sharing"));
+        assert!(!looks_like_remote_management_request("/smb"));
+        assert!(!looks_like_remote_management_request("/printer-sharing"));
+        assert!(!looks_like_remote_management_request("/filevault"));
+        assert!(!looks_like_remote_management_request("/firewall"));
+        assert!(!looks_like_remote_management_request("/tasks"));
+        assert!(!looks_like_remote_management_request("enable remote management"));
+        assert!(!looks_like_screen_sharing_request("/remote-management"));
+        assert!(!looks_like_screen_sharing_request("/ard"));
+        assert!(!looks_like_screen_sharing_request("view remote management"));
+        assert!(!looks_like_remote_login_request("/remote-management"));
+        assert!(!looks_like_remote_login_request("/ard"));
+        assert!(!looks_like_remote_login_request("view remote management"));
+        assert!(!looks_like_file_sharing_request("/remote-management"));
+        assert!(!looks_like_file_sharing_request("/ard"));
+        assert!(!looks_like_printer_sharing_request("/remote-management"));
+        assert!(!looks_like_printer_sharing_request("/ard"));
+        let rm = try_operator_instant_reply("/remote-management").unwrap();
+        assert!(
+            rm.contains("**Remote Management**") && !rm.to_lowercase().contains("execution"),
+            "got: {rm}"
+        );
+        let viewed = try_operator_instant_reply("view remote management").unwrap();
+        assert!(
+            viewed.contains("**Remote Management**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("ard").is_none());
+        assert!(try_operator_instant_reply("remote management").is_none());
+        let vnc = try_operator_instant_reply("/vnc");
+        if let Some(reply) = vnc {
+            assert!(
+                !reply.contains("**Remote Management**"),
+                "/vnc must stay Screen Sharing, not Remote Management: {reply}"
+            );
+        }
+        let ssh = try_operator_instant_reply("/ssh");
+        if let Some(reply) = ssh {
+            assert!(
+                !reply.contains("**Remote Management**"),
+                "/ssh must stay Remote Login, not Remote Management: {reply}"
+            );
+        }
     }
 
 #[test]

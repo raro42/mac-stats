@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2975] - 2026-11-22
+
+### Added
+- Instant Remote Management (ARD) status accepts `/remote-management` · `/remotemanagement` · `/remote-management-status` · `/ard` · `/ard-status` · `/ard-state` · `/apple-remote-desktop` · `/mac-ard` · `/ard-agent` and view/see/open/list NL (`view remote management`, `open ard status`, `list remote management`, …), matching “remote management status” / “is remote management on” / “is ard enabled” / “what's my remote management” / “what's the ard status”. Bare `ard` / `remote management` / `remote desktop` stay with the agent; `/screen-sharing` · `/vnc` stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login; `/file-sharing` · `/smb` stay File Sharing; `/printer-sharing` stays Printer Sharing.
+
 ## [0.1.2974] - 2026-11-22
 
 ### Added

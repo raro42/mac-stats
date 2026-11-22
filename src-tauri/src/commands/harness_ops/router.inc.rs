@@ -1067,6 +1067,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_printer_sharing_request(content) {
         return Some(format_printer_sharing_report());
     }
+    // Remote Management / ARD (bare `ard` / `remote management` / `remote desktop` stay with the agent;
+    // `/screen-sharing` · `/vnc` stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login;
+    // `/file-sharing` · `/smb` stay File Sharing; `/printer-sharing` stays Printer Sharing).
+    if looks_like_remote_management_request(content) {
+        return Some(format_remote_management_report());
+    }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
     if looks_like_boot_time_request(content) {

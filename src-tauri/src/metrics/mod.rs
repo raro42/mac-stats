@@ -1168,6 +1168,80 @@ pub fn get_printer_sharing_status() -> String {
     }
 }
 
+/// macOS Remote Management (ARD) from `RemoteManagement.launchd` marker + `ARDAgent` process.
+/// Distinct from Screen Sharing `/screen-sharing` · `/vnc`, Remote Login `/remote-login` · `/ssh`,
+/// File Sharing `/file-sharing` · `/smb`, and Printer Sharing `/printer-sharing`.
+/// Used by Discord/operator instant `/remote-management` · `/ard` lane.
+pub fn get_remote_management_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let marker = [
+            "/Library/Application Support/Apple/Remote Desktop/RemoteManagement.launchd",
+            "/private/etc/RemoteManagement.launchd",
+            "/etc/RemoteManagement.launchd",
+        ]
+        .iter()
+        .any(|p| std::path::Path::new(p).is_file());
+
+        let agent = {
+            let output = Command::new("/bin/ps")
+                .args(["-axc", "-o", "comm="])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    stdout.lines().any(|l| {
+                        let t = l.trim();
+                        t == "ARDAgent" || t.ends_with("/ARDAgent")
+                    })
+                }
+                Err(_) => {
+                    debug3!("remote-management: ps spawn failed");
+                    false
+                }
+            }
+        };
+
+        let launchd_hint = {
+            let output = Command::new("/bin/launchctl")
+                .args(["list"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    stdout.lines().any(|l| {
+                        let lower = l.to_ascii_lowercase();
+                        lower.contains("remotedesktop")
+                            || lower.contains("remote_desktop")
+                            || lower.contains("ardagent")
+                    })
+                }
+                Err(_) => {
+                    debug3!("remote-management: launchctl list spawn failed");
+                    false
+                }
+            }
+        };
+
+        let enabled = marker || launchd_hint || agent;
+        let info = match (enabled, agent) {
+            (true, true) if marker || launchd_hint => "On · active".to_string(),
+            (true, false) if marker || launchd_hint => "On · idle".to_string(),
+            (true, true) => "active".to_string(),
+            (true, false) => "On".to_string(),
+            (false, _) => "Off".to_string(),
+        };
+        debug3!("remote-management status: '{}'", info);
+        info
+    }
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
