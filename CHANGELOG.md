@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2976] - 2026-11-23
+
+### Fixed
+- Neon AI Chat: `.chat-messages:focus-within` now uses opaque neon `--accent` wash on `#08120c` (parity with Dark · Data Poster). Shared Apple `#007aff` focus no longer paints a blue slab when the messages pane holds focus.
+
 ## [0.1.2975] - 2026-11-22
 
 ### Added

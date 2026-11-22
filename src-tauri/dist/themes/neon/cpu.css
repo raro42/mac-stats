@@ -2368,6 +2368,14 @@ body::before {
   border: 1px solid color-mix(in srgb, #46ff78 14%, #08120c);
   border-radius: 8px;
   font-size: 13px;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chat-messages:focus-within {
+  /* Opaque neon accent — Apple #007aff lagged --accent / Dark+Data Poster chat-messages focus (#14 / P2; layout-daily Neon AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 28%, #08120c);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6dff7b) 12%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 5%, #08120c);
 }
 
 .chat-message {
