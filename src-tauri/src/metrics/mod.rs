@@ -513,6 +513,96 @@ pub fn get_hardware_uuid() -> String {
         .clone()
 }
 
+/// Boot volume / startup disk name — not last boot wall-clock, not SSD % / free / Disk Cleanup.
+/// Cached; used by the Discord/operator instant `/boot-volume` · `/startup-disk` lane.
+pub fn get_boot_volume() -> String {
+    BOOT_VOLUME_CACHE
+        .get_or_init(|| {
+            let usable = |s: &str| -> Option<String> {
+                let t = s.trim();
+                if t.is_empty() {
+                    return None;
+                }
+                let lower = t.to_ascii_lowercase();
+                if matches!(
+                    lower.as_str(),
+                    "none" | "not specified" | "not set" | "n/a" | "unknown" | "-"
+                ) {
+                    return None;
+                }
+                Some(t.to_string())
+            };
+            // macOS: `diskutil info /` → Volume Name
+            let from_diskutil = || -> Option<String> {
+                let output = Command::new("/usr/sbin/diskutil")
+                    .args(["info", "/"])
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                for line in stdout.lines() {
+                    let t = line.trim();
+                    if let Some(rest) = t.strip_prefix("Volume Name:") {
+                        if let Some(s) = usable(rest) {
+                            return Some(s);
+                        }
+                    }
+                }
+                None
+            };
+            // Linux / generic: findmnt LABEL on /
+            let from_findmnt = || -> Option<String> {
+                let output = Command::new("findmnt")
+                    .args(["-n", "-o", "LABEL", "/"])
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                usable(String::from_utf8_lossy(&output.stdout).trim())
+            };
+            // Linux fallback: lsblk LABEL for the / source device
+            let from_lsblk = || -> Option<String> {
+                let src = Command::new("findmnt")
+                    .args(["-n", "-o", "SOURCE", "/"])
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !src.status.success() {
+                    return None;
+                }
+                let source = String::from_utf8_lossy(&src.stdout).trim().to_string();
+                if source.is_empty() {
+                    return None;
+                }
+                let output = Command::new("lsblk")
+                    .args(["-no", "LABEL", &source])
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                usable(String::from_utf8_lossy(&output.stdout).trim())
+            };
+            let info = from_diskutil()
+                .or_else(from_findmnt)
+                .or_else(from_lsblk)
+                .unwrap_or_default();
+            if info.is_empty() {
+                debug3!("boot volume: diskutil/findmnt/lsblk empty");
+            } else {
+                debug3!("boot volume cached: '{}'", info);
+            }
+            info
+        })
+        .clone()
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.

@@ -1760,6 +1760,69 @@ mod tests {
         }
     }
 
+    #[test]
+    fn boot_volume_slash_and_view_open_do_not_steal_boot_time_or_disk_cleanup() {
+        // Slash + view/open NL → boot volume / startup disk (`/boot` · `/uuid` parity).
+        // Bare `boot` / `volume` / `disk` stay with the agent; `/boot` stays boot time;
+        // `view disk` stays Disk Cleanup; `/ssd` · `/free` stay capacity · free.
+        assert!(looks_like_boot_volume_request("/boot-volume"));
+        assert!(looks_like_boot_volume_request("/boot-disk"));
+        assert!(looks_like_boot_volume_request("/startup-disk"));
+        assert!(looks_like_boot_volume_request("/startup-volume"));
+        assert!(looks_like_boot_volume_request("/volume-name"));
+        assert!(looks_like_boot_volume_request("/boot-volume-name"));
+        assert!(looks_like_boot_volume_request("view boot volume"));
+        assert!(looks_like_boot_volume_request("open startup disk"));
+        assert!(looks_like_boot_volume_request("list boot disk"));
+        assert!(looks_like_boot_volume_request("boot volume"));
+        assert!(looks_like_boot_volume_request("startup disk"));
+        assert!(looks_like_boot_volume_request("what's my startup disk"));
+        assert!(!looks_like_boot_volume_request("boot"));
+        assert!(!looks_like_boot_volume_request("volume"));
+        assert!(!looks_like_boot_volume_request("disk"));
+        assert!(!looks_like_boot_volume_request("/boot"));
+        assert!(!looks_like_boot_volume_request("view boot"));
+        assert!(!looks_like_boot_volume_request("view boot time"));
+        assert!(!looks_like_boot_volume_request("view disk"));
+        assert!(!looks_like_boot_volume_request("/ssd"));
+        assert!(!looks_like_boot_volume_request("/free"));
+        assert!(!looks_like_boot_time_request("/boot-volume"));
+        assert!(!looks_like_boot_time_request("view boot volume"));
+        assert!(!looks_like_boot_time_request("startup disk"));
+        assert!(!looks_like_disk_cleanup_request("/boot-volume"));
+        assert!(!looks_like_disk_cleanup_request("view boot volume"));
+        let vol = try_operator_instant_reply("/boot-volume").unwrap();
+        assert!(
+            vol.contains("**Boot volume**") && !vol.to_lowercase().contains("execution"),
+            "got: {vol}"
+        );
+        let viewed = try_operator_instant_reply("view boot volume").unwrap();
+        assert!(
+            viewed.contains("**Boot volume**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        if let Some(reply) = try_operator_instant_reply("boot") {
+            assert!(
+                !reply.contains("**Boot volume**"),
+                "bare boot must not be boot volume: {reply}"
+            );
+        }
+        let boot = try_operator_instant_reply("/boot");
+        if let Some(reply) = boot {
+            assert!(
+                !reply.contains("**Boot volume**"),
+                "/boot must stay boot time, not volume: {reply}"
+            );
+        }
+        let cleanup = try_operator_instant_reply("view disk");
+        if let Some(reply) = cleanup {
+            assert!(
+                !reply.contains("**Boot volume**"),
+                "view disk must stay Disk Cleanup, not boot volume: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

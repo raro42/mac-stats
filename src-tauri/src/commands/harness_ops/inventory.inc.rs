@@ -6552,7 +6552,7 @@ pub fn format_cpu_cores_gateway() -> String {
 /// Last boot wall-clock — not Mac Up duration, not app process uptime.
 /// Slash + view/open NL (`/boot` · `/boot-time` · `view boot time`) match cores `/cores` ·
 /// kernel `/kernel` shape; bare `/uptime` / `view uptime` / `what's the uptime` stay Mac Up;
-/// `/app-uptime` stays process uptime; boot disk / boot volume stay with the agent.
+/// `/app-uptime` stays process uptime; `/boot-volume` · `/startup-disk` stay boot volume name.
 pub fn looks_like_boot_time_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 64 {
@@ -9572,6 +9572,186 @@ pub fn format_hardware_uuid_report() -> String {
         return "**UUID** — _no hardware UUID on this Mac right now._".to_string();
     }
     format!("**UUID** · `{v}`")
+}
+
+/// Boot volume / startup disk name — not last boot wall-clock, not SSD % / free / Disk Cleanup.
+/// Slash + view/open NL (`/boot-volume` · `/startup-disk` · `view boot volume`) match `/boot` ·
+/// `/uuid` shape; bare `boot` / `volume` / `disk` stay with the agent; `/boot` stays boot time;
+/// `view disk` stays Disk Cleanup; `/ssd` · `/free` stay capacity · free.
+pub fn looks_like_boot_volume_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.contains("free")
+        || n.contains("capacity")
+        || n.contains("percent")
+        || n.contains('%')
+        || n.contains("used")
+        || n.contains("usage")
+        || n.contains("uuid")
+        || n.contains("serial")
+        || n.contains("time")
+        || n.contains("reboot")
+        || n.contains("uptime")
+        || n.contains("recovery")
+        || n.contains("safe boot")
+        || n.contains("firmware")
+        || n.contains("efi")
+        || n.contains("partition")
+        || n.contains("format")
+        || n.contains("erase")
+        || n.contains("keep")
+        || n.contains("discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        // Last boot wall-clock / Mac Up / Disk Cleanup / capacity stay elsewhere.
+        || n == "/boot"
+        || n == "/boot-time"
+        || n == "/boottime"
+        || n == "/last-boot"
+        || n == "/last-reboot"
+        || n == "/reboot-time"
+        || n == "/uptime"
+        || n == "/up"
+        || n == "boot"
+        || n == "the boot"
+        || n == "volume"
+        || n == "the volume"
+        || n == "disk"
+        || n == "the disk"
+        || n == "view disk"
+        || n == "open disk"
+        || n == "view boot"
+        || n == "open boot"
+        || n == "see boot"
+        || n == "list boot"
+        || n == "/ssd"
+        || n == "/storage"
+        || n == "/free"
+        || n == "/ssd-size"
+        || n == "/disk-size"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/boot-volume"
+            | "/bootvolume"
+            | "/boot-vol"
+            | "/bootvol"
+            | "/boot-disk"
+            | "/bootdisk"
+            | "/startup-disk"
+            | "/startupdisk"
+            | "/startup-volume"
+            | "/startupvolume"
+            | "/startup-vol"
+            | "/startupvol"
+            | "/volume-name"
+            | "/volumename"
+            | "/boot-volume-name"
+            | "/bootvolumename"
+            | "boot volume"
+            | "the boot volume"
+            | "boot disk"
+            | "the boot disk"
+            | "startup disk"
+            | "the startup disk"
+            | "startup volume"
+            | "the startup volume"
+            | "volume name"
+            | "the volume name"
+            | "boot volume name"
+            | "the boot volume name"
+            | "my boot volume"
+            | "my boot disk"
+            | "my startup disk"
+            | "my startup volume"
+            | "what boot volume"
+            | "what boot disk"
+            | "what startup disk"
+            | "what's my boot volume"
+            | "whats my boot volume"
+            | "what is my boot volume"
+            | "what's my boot disk"
+            | "whats my boot disk"
+            | "what is my boot disk"
+            | "what's my startup disk"
+            | "whats my startup disk"
+            | "what is my startup disk"
+            | "what's the boot volume"
+            | "whats the boot volume"
+            | "what is the boot volume"
+            | "what's the startup disk"
+            | "whats the startup disk"
+            | "what is the startup disk"
+            | "which boot volume"
+            | "which startup disk"
+            | "how's the boot volume"
+            | "hows the boot volume"
+            // View/see/show me/open/list.
+            | "view boot volume"
+            | "view the boot volume"
+            | "view boot disk"
+            | "view the boot disk"
+            | "view startup disk"
+            | "view the startup disk"
+            | "view startup volume"
+            | "view the startup volume"
+            | "view volume name"
+            | "view the volume name"
+            | "see boot volume"
+            | "see the boot volume"
+            | "see boot disk"
+            | "see the boot disk"
+            | "see startup disk"
+            | "see the startup disk"
+            | "open boot volume"
+            | "open the boot volume"
+            | "open boot disk"
+            | "open the boot disk"
+            | "open startup disk"
+            | "open the startup disk"
+            | "list boot volume"
+            | "list the boot volume"
+            | "list boot disk"
+            | "list the boot disk"
+            | "list startup disk"
+            | "list the startup disk"
+            | "show boot volume"
+            | "show the boot volume"
+            | "show me boot volume"
+            | "show me the boot volume"
+            | "show boot disk"
+            | "show the boot disk"
+            | "show me boot disk"
+            | "show me the boot disk"
+            | "show startup disk"
+            | "show the startup disk"
+            | "show me startup disk"
+            | "show me the startup disk"
+    )
+}
+
+/// Zero-LLM boot volume / startup disk name from `diskutil info /` (Linux: findmnt/lsblk LABEL).
+pub fn format_boot_volume_report() -> String {
+    let v = crate::metrics::get_boot_volume();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Boot volume** — _no boot volume name right now._".to_string();
+    }
+    format!("**Boot volume** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.

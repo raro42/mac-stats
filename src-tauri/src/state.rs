@@ -120,6 +120,8 @@ pub(crate) static USERNAME_CACHE: OnceLock<String> = OnceLock::new();
 pub(crate) static SERIAL_NUMBER_CACHE: OnceLock<String> = OnceLock::new();
 /// Cached hardware UUID (`system_profiler` platform_UUID / `ioreg` IOPlatformUUID; instant `/uuid` lane).
 pub(crate) static HARDWARE_UUID_CACHE: OnceLock<String> = OnceLock::new();
+/// Cached boot volume / startup disk name (`diskutil info /` Volume Name; instant `/boot-volume` lane).
+pub(crate) static BOOT_VOLUME_CACHE: OnceLock<String> = OnceLock::new();
 /// Cached machine arch (`uname -m` / `std::env::consts::ARCH`; instant `/arch` lane).
 pub(crate) static ARCHITECTURE_CACHE: OnceLock<String> = OnceLock::new();
 /// Cached AppleLocale / LANG (instant `/locale` · `/language` lane).

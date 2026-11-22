@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2963] - 2026-11-22
+
+### Added
+- Instant boot volume / startup disk accepts `/boot-volume` · `/boot-disk` · `/startup-disk` · `/startup-volume` · `/volume-name` · `/boot-volume-name` and view/see/open/list NL (`view boot volume`, `open startup disk`, `list boot disk`, …), matching “boot volume” / “startup disk” / “what's my startup disk” / “what's the boot volume”. Bare `boot` / `volume` / `disk` stay with the agent; `/boot` stays last boot wall-clock; `view disk` stays Disk Cleanup; `/ssd` · `/free` stay capacity · free.
+
 ## [0.1.2962] - 2026-11-22
 
 ### Added
