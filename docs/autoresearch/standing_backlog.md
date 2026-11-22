@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2965
+
+- Layout-daily Dark (AI Chat + Monitors): `.chat-messages:focus-within` still inherited shared Apple `#007aff` focus wash while Data Poster already remapped onto cyan and Dark `.chat-input-container:focus-within` already sat on Matrix `#00cc66`. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Dark marked today (Neon due next calendar quota). Next: Neon layout-daily · cream/Swiss Send fill white-on-blue intentional · sibling/product fuel — Dark chat-messages focus closed; not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2964
 
 - Product fuel after boot volume `/boot-volume` NL v0.1.2963: FileVault full-disk encryption already readable via `fdesetup status` but lacked `/filevault` · `/file-vault` · `/fv` · `/fv-status` · `/fde` · `/disk-encryption` · `/encryption-status` and view/see/open/list phrases while boot volume `/boot-volume` and UUID `/uuid` already had slash+NL. Bare `filevault` / `fv` / `encryption` stay with the agent; `/boot-volume` stays startup disk name; `view disk` stays Disk Cleanup; `/ssd` · `/free` stay capacity · free. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — FileVault slash NL closed; not another keep-pNN clone.
