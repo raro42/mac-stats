@@ -1,3 +1,11 @@
+## Overnight note 2026-11-23 ~00:25
+- Shipped v0.1.2977 Content Caching `/content-caching` · `/asset-cache` · `/mac-content-caching` + view/open NL; bare caching/content caching/asset cache stay with agent; `/remote-management` · `/ard` · `/smb` · `/printer-sharing` · `/vnc` · `/ssh` intact.
+- Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Futuristic layout-daily next calendar quota.
+
+## Overnight merge — v0.1.2977
+
+- Product fuel after Remote Management `/remote-management` NL v0.1.2975 (+ Neon layout-daily v0.1.2976): Content Caching (AssetCache) already readable via `AssetCacheManagerUtil` / AssetCache prefs + `AssetCache` process but lacked `/content-caching` · `/contentcaching` · `/content-caching-status` · `/content-cache` · `/contentcache` · `/asset-cache` · `/assetcache` · `/asset-caching` · `/mac-content-caching` · `/mac-asset-cache` and view/see/open/list phrases while Remote Management `/remote-management` · `/ard`, File Sharing `/file-sharing` · `/smb`, and Printer Sharing `/printer-sharing` already had slash+NL. Bare `caching` / `content caching` / `asset cache` stay with the agent; `/remote-management` · `/ard` stay Remote Management; `/file-sharing` · `/smb` stay File Sharing; `/printer-sharing` stays Printer Sharing; `/screen-sharing` · `/vnc` stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · Internet Sharing / Bluetooth Sharing sibling/product fuel — Content Caching slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~00:05
 - Shipped v0.1.2976 Neon layout-daily: AI Chat `.chat-messages:focus-within` → neon `--accent` on `#08120c` (Dark/Data Poster parity); Apple `#007aff` focus slab gone.
 - Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Futuristic layout-daily next calendar quota.
