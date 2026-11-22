@@ -17,7 +17,7 @@ pub(crate) mod smc_temperature;
 
 use battery::{Manager as BatteryManager, State};
 use std::process::Command;
-use std::sync::Mutex;
+use std::sync::{Mutex, OnceLock};
 use std::time::{Duration, Instant};
 use sysinfo::{Disks, System};
 use tauri::Manager;
@@ -1399,8 +1399,68 @@ pub fn get_primary_link_status() -> String {
     info
 }
 
-
-
+/// Battery cycle count · health · max capacity from `system_profiler SPPowerDataType` (JSON).
+/// Cached (OnceLock): cycle count changes slowly; Discord/operator instant `/cycles` lane.
+/// Distinct from Bat % chip (`/battery`) and charging / left / low phrases.
+pub fn get_battery_cycles() -> String {
+    static CACHE: OnceLock<String> = OnceLock::new();
+    CACHE
+        .get_or_init(|| {
+            let output = Command::new("/usr/sbin/system_profiler")
+                .args(["SPPowerDataType", "-json"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            let Ok(output) = output else {
+                debug3!("battery cycles: system_profiler spawn failed");
+                return String::new();
+            };
+            if !output.status.success() {
+                debug3!("battery cycles: system_profiler non-zero");
+                return String::new();
+            }
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            let Ok(json) = serde_json::from_str::<serde_json::Value>(&stdout) else {
+                debug3!("battery cycles: JSON parse failed");
+                return String::new();
+            };
+            let Some(entries) = json.get("SPPowerDataType").and_then(|v| v.as_array()) else {
+                return String::new();
+            };
+            for entry in entries {
+                let Some(health) = entry.get("sppower_battery_health_info") else {
+                    continue;
+                };
+                let cycles = health
+                    .get("sppower_battery_cycle_count")
+                    .and_then(|v| v.as_u64().or_else(|| v.as_i64().map(|n| n as u64)));
+                let cond = health
+                    .get("sppower_battery_health")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .trim();
+                let max_cap = health
+                    .get("sppower_battery_health_maximum_capacity")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .trim();
+                if let Some(n) = cycles {
+                    let mut parts = vec![format!("{n} cycles")];
+                    if !cond.is_empty() {
+                        parts.push(cond.to_string());
+                    }
+                    if !max_cap.is_empty() {
+                        parts.push(format!("{max_cap} max"));
+                    }
+                    let info = parts.join(" · ");
+                    debug3!("battery cycles: '{}'", info);
+                    return info;
+                }
+            }
+            debug3!("battery cycles: no health_info / cycle_count");
+            String::new()
+        })
+        .clone()
+}
 
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {

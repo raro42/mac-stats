@@ -4298,6 +4298,11 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
         || n.contains(" age")
         || n.ends_with(" age")
         || n.starts_with("where ")
+        || n.contains("cycle")
+        || n.contains("health")
+        || n.contains("condition")
+        || n.contains("max capacity")
+        || n.contains("maximum capacity")
         // Disk Cleanup owns bare `open disk` / `view disk` (not SSD %).
         || n == "open disk"
         || n == "open the disk"
@@ -8351,10 +8356,183 @@ pub fn format_link_status_report() -> String {
     format!("**Link** · `{v}`")
 }
 
+/// Battery cycle count · health · max capacity — not the Bat % chip, not charging / left / low.
+/// Slash + view/open NL (`/cycles` · `/battery-cycles` · `view cycle count`) match `/battery` · `/chip` shape;
+/// bare `cycles` / `health` stay with the agent; `/battery` · `view battery` · `how much battery` stay Bat %.
+pub fn looks_like_battery_cycles_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("charging")
+        || n.contains("plugged")
+        || n.contains("percent")
+        || n.contains('%')
+        || n.contains("left")
+        || n.contains("remaining")
+        || n.contains("low")
+        || n.contains("strip")
+        || n.contains("watts")
+        || n.contains("power")
+        || n.contains("heat")
+        || n.contains("thermal")
+        || n.contains("cpu")
+        || n.contains("gpu")
+        || n.contains("ram")
+        || n.contains("disk")
+        || n.contains("ssd")
+        || n.contains("keep")
+        || n.contains("discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        // Bare short / ambiguous / Bat-% asks stay with the agent or `/battery`.
+        || n == "cycles"
+        || n == "the cycles"
+        || n == "health"
+        || n == "the health"
+        || n == "condition"
+        || n == "the condition"
+        || n == "capacity"
+        || n == "the capacity"
+        || n == "battery"
+        || n == "the battery"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "view battery"
+        || n == "view the battery"
+        || n == "open battery"
+        || n == "open the battery"
+        || n == "how much battery"
+        || n == "battery status"
+        || n == "battery charge"
+        || n == "battery level"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/cycles"
+            | "/cycle-count"
+            | "/cyclecount"
+            | "/battery-cycles"
+            | "/batterycycles"
+            | "/battery-cycle-count"
+            | "/batterycyclecount"
+            | "/bat-cycles"
+            | "/batcycles"
+            | "/battery-health"
+            | "/batteryhealth"
+            | "/battery-condition"
+            | "/batterycondition"
+            | "/max-capacity"
+            | "/maxcapacity"
+            | "/battery-max-capacity"
+            | "/batterymaxcapacity"
+            | "cycle count"
+            | "the cycle count"
+            | "battery cycles"
+            | "the battery cycles"
+            | "battery cycle count"
+            | "the battery cycle count"
+            | "battery health"
+            | "the battery health"
+            | "battery condition"
+            | "the battery condition"
+            | "max capacity"
+            | "the max capacity"
+            | "battery max capacity"
+            | "the battery max capacity"
+            | "maximum capacity"
+            | "the maximum capacity"
+            | "my cycle count"
+            | "my battery cycles"
+            | "what's my cycle count"
+            | "whats my cycle count"
+            | "what is my cycle count"
+            | "what's the cycle count"
+            | "whats the cycle count"
+            | "what is the cycle count"
+            | "what's my battery health"
+            | "whats my battery health"
+            | "what is my battery health"
+            | "what's the battery health"
+            | "whats the battery health"
+            | "what is the battery health"
+            | "which cycle count"
+            | "how many cycles"
+            | "how many battery cycles"
+            | "how many cycles on the battery"
+            // View/see/show me/open/list.
+            | "view cycles"
+            | "view the cycles"
+            | "view cycle count"
+            | "view the cycle count"
+            | "view battery cycles"
+            | "view the battery cycles"
+            | "view battery health"
+            | "view the battery health"
+            | "view battery condition"
+            | "view the battery condition"
+            | "view max capacity"
+            | "view the max capacity"
+            | "see cycles"
+            | "see the cycles"
+            | "see cycle count"
+            | "see the cycle count"
+            | "see battery cycles"
+            | "see the battery cycles"
+            | "see battery health"
+            | "see the battery health"
+            | "open cycles"
+            | "open the cycles"
+            | "open cycle count"
+            | "open the cycle count"
+            | "open battery cycles"
+            | "open the battery cycles"
+            | "open battery health"
+            | "open the battery health"
+            | "list cycles"
+            | "list the cycles"
+            | "list cycle count"
+            | "list the cycle count"
+            | "list battery cycles"
+            | "list the battery cycles"
+            | "show cycles"
+            | "show the cycles"
+            | "show me cycles"
+            | "show me the cycles"
+            | "show cycle count"
+            | "show the cycle count"
+            | "show me cycle count"
+            | "show me the cycle count"
+            | "show battery cycles"
+            | "show the battery cycles"
+            | "show me battery cycles"
+            | "show me the battery cycles"
+            | "show battery health"
+            | "show the battery health"
+            | "show me battery health"
+            | "show me the battery health"
+    )
+}
 
-
-
-
+/// Zero-LLM battery cycle count · health · max capacity from `system_profiler SPPowerDataType`.
+pub fn format_battery_cycles_report() -> String {
+    let v = crate::metrics::get_battery_cycles();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Cycles** — _no battery cycle reading on this Mac right now._".to_string();
+    }
+    format!("**Cycles** · `{v}`")
+}
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.

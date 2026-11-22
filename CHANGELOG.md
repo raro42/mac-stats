@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2956] - 2026-11-22
+
+### Added
+- Instant battery cycle count · health · max capacity accepts `/cycles` · `/cycle-count` · `/battery-cycles` · `/battery-cycle-count` · `/bat-cycles` · `/battery-health` · `/battery-condition` · `/max-capacity` · `/battery-max-capacity` and view/see/open/list NL (`view cycle count`, `open battery health`, `list cycles`, …), matching “cycle count” / “battery cycles” / “battery health” / “what's my cycle count” / “how many battery cycles”. Bare `cycles` / `health` stay with the agent; `/battery` · `view battery` · `how much battery` stay Bat %.
+
 ## [0.1.2955] - 2026-11-22
 
 ### Added

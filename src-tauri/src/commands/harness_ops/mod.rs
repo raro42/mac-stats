@@ -1561,6 +1561,66 @@ mod tests {
     }
 
 #[test]
+    fn battery_cycles_slash_and_view_open_do_not_steal_bat_percent() {
+        // Slash + view/open NL → cycle count · health · max capacity (`/battery` · `/chip` parity).
+        // Bare `cycles` / `health` stay with the agent; `/battery` · view battery stay Bat %.
+        assert!(looks_like_battery_cycles_request("/cycles"));
+        assert!(looks_like_battery_cycles_request("/cycle-count"));
+        assert!(looks_like_battery_cycles_request("/battery-cycles"));
+        assert!(looks_like_battery_cycles_request("/battery-cycle-count"));
+        assert!(looks_like_battery_cycles_request("/bat-cycles"));
+        assert!(looks_like_battery_cycles_request("/battery-health"));
+        assert!(looks_like_battery_cycles_request("/battery-condition"));
+        assert!(looks_like_battery_cycles_request("/max-capacity"));
+        assert!(looks_like_battery_cycles_request("/battery-max-capacity"));
+        assert!(looks_like_battery_cycles_request("view cycle count"));
+        assert!(looks_like_battery_cycles_request("open battery health"));
+        assert!(looks_like_battery_cycles_request("list cycles"));
+        assert!(looks_like_battery_cycles_request("cycle count"));
+        assert!(looks_like_battery_cycles_request("battery cycles"));
+        assert!(looks_like_battery_cycles_request("battery health"));
+        assert!(looks_like_battery_cycles_request("what's my cycle count"));
+        assert!(looks_like_battery_cycles_request("how many battery cycles"));
+        assert!(!looks_like_battery_cycles_request("cycles"));
+        assert!(!looks_like_battery_cycles_request("health"));
+        assert!(!looks_like_battery_cycles_request("/battery"));
+        assert!(!looks_like_battery_cycles_request("view battery"));
+        assert!(!looks_like_battery_cycles_request("how much battery"));
+        assert!(!looks_like_battery_cycles_request("battery charge"));
+        assert!(!looks_like_battery_cycles_request("is it charging"));
+        let cycles = try_operator_instant_reply("/cycles").unwrap();
+        assert!(
+            cycles.contains("**Cycles**") && !cycles.to_lowercase().contains("execution"),
+            "got: {cycles}"
+        );
+        let viewed = try_operator_instant_reply("view cycle count").unwrap();
+        assert!(
+            viewed.contains("**Cycles**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let health = try_operator_instant_reply("/battery-health").unwrap();
+        assert!(
+            health.contains("**Cycles**") && !health.to_lowercase().contains("execution"),
+            "got: {health}"
+        );
+        assert!(try_operator_instant_reply("cycles").is_none());
+        let bat = try_operator_instant_reply("/battery");
+        if let Some(reply) = bat {
+            assert!(
+                !reply.contains("**Cycles**"),
+                "/battery must stay Bat %, not cycles: {reply}"
+            );
+        }
+        let viewed_bat = try_operator_instant_reply("view battery");
+        if let Some(reply) = viewed_bat {
+            assert!(
+                !reply.contains("**Cycles**"),
+                "view battery must stay Bat %, not cycles: {reply}"
+            );
+        }
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.
