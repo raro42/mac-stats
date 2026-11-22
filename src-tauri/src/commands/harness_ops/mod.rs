@@ -1292,6 +1292,70 @@ mod tests {
     }
 
 #[test]
+    fn netmask_slash_and_view_open_do_not_steal_lan_ip_or_mac() {
+        // Slash + view/open NL → primary IPv4 netmask (`/mac-address` · `/ip` parity).
+        // Bare `netmask` / `subnet` / `mask` stay with the agent; `/ip` stays LAN; `/mac-address` stays ethernet.
+        assert!(looks_like_netmask_request("/netmask"));
+        assert!(looks_like_netmask_request("/subnet"));
+        assert!(looks_like_netmask_request("/subnet-mask"));
+        assert!(looks_like_netmask_request("/network-mask"));
+        assert!(looks_like_netmask_request("/ip-netmask"));
+        assert!(looks_like_netmask_request("/lan-netmask"));
+        assert!(looks_like_netmask_request("/cidr"));
+        assert!(looks_like_netmask_request("/prefix-len"));
+        assert!(looks_like_netmask_request("/prefix-length"));
+        assert!(looks_like_netmask_request("view netmask"));
+        assert!(looks_like_netmask_request("open subnet"));
+        assert!(looks_like_netmask_request("list cidr"));
+        assert!(looks_like_netmask_request("subnet mask"));
+        assert!(looks_like_netmask_request("network mask"));
+        assert!(looks_like_netmask_request("what's my netmask"));
+        assert!(looks_like_netmask_request("what's my subnet mask"));
+        assert!(looks_like_netmask_request("which netmask"));
+        assert!(!looks_like_netmask_request("netmask"));
+        assert!(!looks_like_netmask_request("subnet"));
+        assert!(!looks_like_netmask_request("mask"));
+        assert!(!looks_like_netmask_request("cidr"));
+        assert!(!looks_like_netmask_request("/ip"));
+        assert!(!looks_like_netmask_request("/mac-address"));
+        assert!(!looks_like_netmask_request("/wifi"));
+        assert!(!looks_like_netmask_request("/gateway"));
+        assert!(!looks_like_netmask_request("/dns"));
+        assert!(!looks_like_netmask_request("/mtu"));
+        let mask = try_operator_instant_reply("/netmask").unwrap();
+        assert!(
+            mask.contains("**Netmask**") && !mask.to_lowercase().contains("execution"),
+            "got: {mask}"
+        );
+        let viewed = try_operator_instant_reply("view netmask").unwrap();
+        assert!(
+            viewed.contains("**Netmask**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let short = try_operator_instant_reply("/subnet").unwrap();
+        assert!(
+            short.contains("**Netmask**") && !short.to_lowercase().contains("execution"),
+            "got: {short}"
+        );
+        assert!(try_operator_instant_reply("netmask").is_none());
+        assert!(try_operator_instant_reply("subnet").is_none());
+        let ip = try_operator_instant_reply("/ip");
+        if let Some(reply) = ip {
+            assert!(
+                !reply.contains("**Netmask**"),
+                "/ip must stay LAN IP, not netmask: {reply}"
+            );
+        }
+        let mac = try_operator_instant_reply("/mac-address");
+        if let Some(reply) = mac {
+            assert!(
+                !reply.contains("**Netmask**"),
+                "/mac-address must stay ethernet, not netmask: {reply}"
+            );
+        }
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.

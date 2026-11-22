@@ -7659,6 +7659,174 @@ pub fn format_mtu_report() -> String {
 }
 
 
+/// Primary IPv4 netmask / subnet mask — not LAN IP, not gateway, not DNS, not MAC.
+/// Slash + view/open NL (`/netmask` · `/subnet` · `view netmask`) match `/mac-address` ·
+/// `/ip` shape; bare `netmask` / `subnet` / `mask` stay with the agent; `/ip` stays LAN;
+/// `/mac-address` stays ethernet; `/wifi` stays SSID; `/mtu` stays MTU.
+pub fn looks_like_netmask_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("gateway")
+        || n.contains("router")
+        || n.contains("dns")
+        || n.contains("nameserver")
+        || n.contains("mac address")
+        || n.contains("ethernet")
+        || n.contains("ether")
+        || n.contains("wifi")
+        || n.contains("mtu")
+        || n.contains("ssid")
+        || n.contains("wlan")
+        || n.contains("airport")
+        || n.contains("public")
+        || n.contains("external")
+        || n.contains("wan")
+        || n.contains("vpn")
+        || n.contains("calculator")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("spoof")
+        // Bare short / ambiguous asks stay with the agent.
+        || n == "netmask"
+        || n == "the netmask"
+        || n == "subnet"
+        || n == "the subnet"
+        || n == "mask"
+        || n == "the mask"
+        || n == "cidr"
+        || n == "the cidr"
+        || n == "prefix"
+        || n == "the prefix"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/netmask"
+            | "/subnet"
+            | "/subnet-mask"
+            | "/subnetmask"
+            | "/network-mask"
+            | "/networkmask"
+            | "/ip-netmask"
+            | "/ipnetmask"
+            | "/lan-netmask"
+            | "/lannetmask"
+            | "/cidr"
+            | "/prefix-len"
+            | "/prefixlen"
+            | "/prefix-length"
+            | "/prefixlength"
+            | "subnet mask"
+            | "the subnet mask"
+            | "network mask"
+            | "the network mask"
+            | "ip netmask"
+            | "the ip netmask"
+            | "lan netmask"
+            | "the lan netmask"
+            | "my netmask"
+            | "my subnet mask"
+            | "my network mask"
+            | "what's my netmask"
+            | "whats my netmask"
+            | "what is my netmask"
+            | "what's the netmask"
+            | "whats the netmask"
+            | "what is the netmask"
+            | "what's my subnet mask"
+            | "whats my subnet mask"
+            | "what is my subnet mask"
+            | "what's the subnet mask"
+            | "whats the subnet mask"
+            | "what is the subnet mask"
+            | "what's my subnet"
+            | "whats my subnet"
+            | "what is my subnet"
+            | "what's the subnet"
+            | "whats the subnet"
+            | "what is the subnet"
+            | "which netmask"
+            | "which subnet mask"
+            | "what cidr"
+            | "what's my cidr"
+            | "whats my cidr"
+            | "what is my cidr"
+            // View/see/show me/open/list.
+            | "view netmask"
+            | "view the netmask"
+            | "view subnet mask"
+            | "view the subnet mask"
+            | "view subnet"
+            | "view the subnet"
+            | "view network mask"
+            | "view the network mask"
+            | "view cidr"
+            | "view the cidr"
+            | "see netmask"
+            | "see the netmask"
+            | "see subnet mask"
+            | "see the subnet mask"
+            | "see subnet"
+            | "see the subnet"
+            | "see cidr"
+            | "open netmask"
+            | "open the netmask"
+            | "open subnet mask"
+            | "open the subnet mask"
+            | "open subnet"
+            | "open the subnet"
+            | "open cidr"
+            | "list netmask"
+            | "list the netmask"
+            | "list subnet mask"
+            | "list the subnet mask"
+            | "list subnet"
+            | "list the subnet"
+            | "list cidr"
+            | "show netmask"
+            | "show the netmask"
+            | "show me netmask"
+            | "show me the netmask"
+            | "show subnet mask"
+            | "show the subnet mask"
+            | "show me subnet mask"
+            | "show me the subnet mask"
+            | "show subnet"
+            | "show the subnet"
+            | "show me subnet"
+            | "show me the subnet"
+            | "show cidr"
+            | "show the cidr"
+            | "show me cidr"
+            | "show me the cidr"
+    )
+}
+
+
+/// Zero-LLM primary interface IPv4 netmask from `route` default iface + `ifconfig`.
+pub fn format_netmask_report() -> String {
+    let v = crate::metrics::get_primary_netmask();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Netmask** — _no subnet mask right now._".to_string();
+    }
+    format!("**Netmask** · `{v}`")
+}
+
+
+
+
+
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2952] - 2026-11-22
+
+### Added
+- Instant primary IPv4 netmask / subnet mask accepts `/netmask` · `/subnet` · `/subnet-mask` · `/network-mask` · `/ip-netmask` · `/lan-netmask` · `/cidr` · `/prefix-len` · `/prefix-length` and view/see/open/list NL (`view netmask`, `open subnet`, `list cidr`, …), matching “subnet mask” / “network mask” / “what's my netmask” / “what's my subnet mask” / “which netmask”. Bare `netmask` / `subnet` / `mask` / `cidr` stay with the agent; `/ip` stays LAN address; `/mac-address` stays ethernet; `/wifi` stays SSID; `/mtu` stays MTU; `/gateway` stays default route.
+
 ## [0.1.2951] - 2026-11-22
 
 ### Added

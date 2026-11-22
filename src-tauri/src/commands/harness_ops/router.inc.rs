@@ -1042,6 +1042,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_mtu_request(content) {
         return Some(format_mtu_report());
     }
+    // Primary IPv4 netmask (bare `netmask` / `subnet` / `mask` stay with the agent; `/ip` stays LAN; `/mtu` stays MTU).
+    if looks_like_netmask_request(content) {
+        return Some(format_netmask_report());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());

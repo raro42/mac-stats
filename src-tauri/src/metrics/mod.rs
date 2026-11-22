@@ -1058,6 +1058,128 @@ pub fn get_primary_mtu() -> String {
 }
 
 
+/// Primary interface IPv4 netmask / subnet mask (default-route iface via `route` + `ifconfig`).
+/// Live (not OnceLock): Wi-Fi / USB / VPN iface can change while the process stays up.
+/// Used by the Discord/operator instant `/netmask` · `/subnet` lane.
+/// Distinct from local LAN IP (`/ip`), gateway (`/gateway`), DNS (`/dns`), MAC (`/mac-address`), MTU (`/mtu`).
+pub fn get_primary_netmask() -> String {
+    let default_iface = || -> Option<String> {
+        let output = Command::new("/sbin/route")
+            .args(["-n", "get", "default"])
+            .stderr(std::process::Stdio::null())
+            .output()
+            .ok()?;
+        if !output.status.success() {
+            return None;
+        }
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        for line in stdout.lines() {
+            let t = line.trim();
+            if let Some(rest) = t.strip_prefix("interface:") {
+                let iface = rest.trim();
+                if !iface.is_empty() {
+                    return Some(iface.to_string());
+                }
+            }
+        }
+        None
+    };
+    let hex_to_dotted = |raw: &str| -> Option<String> {
+        let hex = raw.strip_prefix("0x").or_else(|| raw.strip_prefix("0X"))?;
+        if hex.len() != 8 {
+            return None;
+        }
+        let value = u32::from_str_radix(hex, 16).ok()?;
+        Some(format!(
+            "{}.{}.{}.{}",
+            (value >> 24) & 0xff,
+            (value >> 16) & 0xff,
+            (value >> 8) & 0xff,
+            value & 0xff
+        ))
+    };
+    let cidr_of = |dotted: &str| -> Option<u8> {
+        let mut parts = dotted.split('.');
+        let mut bits: u32 = 0;
+        let mut seen_zero = false;
+        for _ in 0..4 {
+            let octet: u8 = parts.next()?.parse().ok()?;
+            for shift in (0..8).rev() {
+                let on = (octet >> shift) & 1 == 1;
+                if on {
+                    if seen_zero {
+                        return None;
+                    }
+                    bits += 1;
+                } else {
+                    seen_zero = true;
+                }
+            }
+        }
+        if parts.next().is_some() {
+            return None;
+        }
+        Some(bits as u8)
+    };
+    let netmask_of = |iface: &str| -> Option<String> {
+        let output = Command::new("/sbin/ifconfig")
+            .arg(iface)
+            .stderr(std::process::Stdio::null())
+            .output()
+            .ok()?;
+        if !output.status.success() {
+            return None;
+        }
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        for line in stdout.lines() {
+            let t = line.trim();
+            if !t.starts_with("inet ") {
+                continue;
+            }
+            let parts: Vec<&str> = t.split_whitespace().collect();
+            let mut i = 0;
+            while i + 1 < parts.len() {
+                if parts[i] == "netmask" {
+                    let raw = parts[i + 1];
+                    let dotted = if raw.contains('.') {
+                        raw.to_string()
+                    } else {
+                        hex_to_dotted(raw)?
+                    };
+                    let cidr = cidr_of(&dotted)
+                        .map(|c| format!(" /{c}"))
+                        .unwrap_or_default();
+                    return Some(format!("{dotted}{cidr} ({iface})"));
+                }
+                i += 1;
+            }
+        }
+        None
+    };
+    let from_default = || -> Option<String> {
+        let iface = default_iface()?;
+        netmask_of(&iface)
+    };
+    let from_fallback = || -> Option<String> {
+        for iface in ["en0", "en1", "en2"] {
+            if let Some(mask) = netmask_of(iface) {
+                return Some(mask);
+            }
+        }
+        None
+    };
+    let info = from_default().or_else(from_fallback).unwrap_or_default();
+    if info.is_empty() {
+        debug3!("primary netmask: ifconfig empty");
+    } else {
+        debug3!("primary netmask: '{}'", info);
+    }
+    info
+}
+
+
+
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once
