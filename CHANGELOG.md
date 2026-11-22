@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2965] - 2026-11-22
+
+### Changed
+- Dark layout-daily (AI Chat messages pane): `.chat-messages:focus-within` remaps leftover Apple `#007aff` focus wash onto Matrix `--accent` `#00cc66` (border · soft fill · ring), matching Data Poster chat-messages focus and Dark `.chat-input-container:focus-within` (polish-without-capture while Mac TCC blocks window-only theme screenshots; cream/Swiss Send fill white-on-blue intentional).
+
 ## [0.1.2964] - 2026-11-22
 
 ### Added

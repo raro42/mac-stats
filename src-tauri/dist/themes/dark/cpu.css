@@ -2272,6 +2272,14 @@ body {
   border: 1px solid color-mix(in srgb, #00ff00 18%, #0a0a0a);
   border-radius: 8px;
   font-size: 13px;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chat-messages:focus-within {
+  /* Opaque Matrix accent — Apple #007aff lagged --accent / Data Poster chat-messages focus (#14 / P2; layout-daily Dark AI Chat). */
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #00cc66) 12%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 5%, #0a0a0a);
 }
 
 .chat-message {
