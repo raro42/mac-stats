@@ -764,6 +764,50 @@ pub fn get_local_ipv4() -> String {
     info
 }
 
+/// Default IPv4 gateway from `route -n get default` (same probe as local IP iface).
+/// Live (not OnceLock): Wi-Fi / DHCP / VPN can change while the process stays up.
+/// Used by the Discord/operator instant `/gateway` · `/router` lane.
+/// Distinct from Discord bot gateway (`/discord`) and local LAN IP (`/ip`).
+pub fn get_default_gateway() -> String {
+    let output = Command::new("/sbin/route")
+        .args(["-n", "get", "default"])
+        .stderr(std::process::Stdio::null())
+        .output();
+    let info = match output {
+        Ok(output) if output.status.success() => {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            let mut gateway = None;
+            let mut iface = None;
+            for line in stdout.lines() {
+                let t = line.trim();
+                if let Some(rest) = t.strip_prefix("gateway:") {
+                    let g = rest.trim();
+                    if !g.is_empty() && g != "default" {
+                        gateway = Some(g.to_string());
+                    }
+                } else if let Some(rest) = t.strip_prefix("interface:") {
+                    let i = rest.trim();
+                    if !i.is_empty() {
+                        iface = Some(i.to_string());
+                    }
+                }
+            }
+            match (gateway, iface) {
+                (Some(g), Some(i)) => format!("{g} ({i})"),
+                (Some(g), None) => g,
+                _ => String::new(),
+            }
+        }
+        _ => String::new(),
+    };
+    if info.is_empty() {
+        debug3!("default gateway: route empty");
+    } else {
+        debug3!("default gateway: '{}'", info);
+    }
+    info
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

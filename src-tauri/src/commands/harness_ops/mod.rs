@@ -981,6 +981,66 @@ mod tests {
         }
     }
 
+    #[test]
+    fn default_gateway_slash_and_view_open_do_not_steal_discord_or_lan_ip() {
+        // Slash + view/open NL → default IPv4 gateway (`/ip` parity).
+        // Discord gateway status/ready stay Discord; bare gateway/router stay with agent; /ip stays LAN.
+        assert!(looks_like_default_gateway_request("/gateway"));
+        assert!(looks_like_default_gateway_request("/default-gateway"));
+        assert!(looks_like_default_gateway_request("/router"));
+        assert!(looks_like_default_gateway_request("/gw"));
+        assert!(looks_like_default_gateway_request("/default-route"));
+        assert!(looks_like_default_gateway_request("/router-ip"));
+        assert!(looks_like_default_gateway_request("/gateway-ip"));
+        assert!(looks_like_default_gateway_request("view default gateway"));
+        assert!(looks_like_default_gateway_request("open router"));
+        assert!(looks_like_default_gateway_request("list gateway"));
+        assert!(looks_like_default_gateway_request("default gateway"));
+        assert!(looks_like_default_gateway_request("router ip"));
+        assert!(looks_like_default_gateway_request("what's my gateway"));
+        assert!(looks_like_default_gateway_request("what's the default gateway"));
+        assert!(!looks_like_default_gateway_request("gateway"));
+        assert!(!looks_like_default_gateway_request("router"));
+        assert!(!looks_like_default_gateway_request("gateway status"));
+        assert!(!looks_like_default_gateway_request("gateway ready"));
+        assert!(!looks_like_default_gateway_request("discord gateway"));
+        assert!(!looks_like_default_gateway_request("bot gateway"));
+        assert!(!looks_like_default_gateway_request("/ip"));
+        assert!(!looks_like_default_gateway_request("local ip"));
+        let gw = try_operator_instant_reply("/gateway").unwrap();
+        assert!(
+            gw.contains("**Gateway**") && !gw.to_lowercase().contains("execution"),
+            "got: {gw}"
+        );
+        let viewed = try_operator_instant_reply("view default gateway").unwrap();
+        assert!(
+            viewed.contains("**Gateway**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let short = try_operator_instant_reply("/router").unwrap();
+        assert!(
+            short.contains("**Gateway**") && !short.to_lowercase().contains("execution"),
+            "got: {short}"
+        );
+        assert!(try_operator_instant_reply("gateway").is_none());
+        assert!(try_operator_instant_reply("router").is_none());
+        // Discord chip still owns gateway status (not default-route).
+        let discord = try_operator_instant_reply("gateway status");
+        if let Some(reply) = discord {
+            assert!(
+                !reply.contains("**Gateway** · `"),
+                "gateway status must stay Discord, not default route: {reply}"
+            );
+        }
+        let ip = try_operator_instant_reply("/ip");
+        if let Some(reply) = ip {
+            assert!(
+                !reply.contains("**Gateway**"),
+                "/ip must stay LAN IP, not default gateway: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).

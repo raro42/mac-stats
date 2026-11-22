@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2947] - 2026-11-22
+
+### Added
+- Instant default IPv4 gateway accepts `/gateway` · `/default-gateway` · `/router` · `/gw` · `/default-route` · `/router-ip` · `/gateway-ip` and view/see/open/list NL (`view default gateway`, `open router`, `list gateway`, …), matching “default gateway” / “router ip” / “what's my gateway” / “what's the default gateway”. Discord `/discord` · `gateway status` · `gateway ready` stay Discord; bare `gateway` / bare `router` stay with the agent; `/ip` stays LAN address.
+
 ## [0.1.2946] - 2026-11-22
 
 ### Added

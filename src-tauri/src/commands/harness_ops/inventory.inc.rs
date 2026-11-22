@@ -6860,6 +6860,165 @@ pub fn format_local_ip_gateway() -> String {
 }
 
 
+/// Default IPv4 gateway / router — not Discord bot gateway, not local LAN IP.
+/// Slash + view/open NL (`/gateway` · `/router` · `view default gateway`) match `/ip` shape;
+/// Discord `/discord` · `gateway status` · `gateway ready` stay Discord; bare `gateway` /
+/// bare `router` stay with the agent; `/ip` stays LAN address.
+pub fn looks_like_default_gateway_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("discord")
+        || n.contains("bot")
+        || n.contains("shard")
+        || n.contains("ready")
+        || n.contains("offline")
+        || n.contains("connected")
+        || n.contains("status")
+        || n.contains("public")
+        || n.contains("external")
+        || n.contains("wan")
+        || n.contains("internet")
+        || n.contains("dns")
+        || n.contains("vpn")
+        || n.contains("hostname")
+        || n.contains("local ip")
+        || n.contains("lan ip")
+        // Bare short / Discord-adjacent asks stay with the agent (or Discord chip).
+        || n == "gateway"
+        || n == "the gateway"
+        || n == "router"
+        || n == "the router"
+        || n == "gw"
+        || n == "the gw"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/gateway"
+            | "/default-gateway"
+            | "/defaultgateway"
+            | "/gw"
+            | "/router"
+            | "/router-ip"
+            | "/routerip"
+            | "/gateway-ip"
+            | "/gatewayip"
+            | "/default-route"
+            | "/defaultroute"
+            | "default gateway"
+            | "the default gateway"
+            | "default route"
+            | "the default route"
+            | "gateway ip"
+            | "the gateway ip"
+            | "gateway address"
+            | "the gateway address"
+            | "router ip"
+            | "the router ip"
+            | "router address"
+            | "the router address"
+            | "router gateway"
+            | "the router gateway"
+            | "what's my gateway"
+            | "whats my gateway"
+            | "what is my gateway"
+            | "what's the gateway"
+            | "whats the gateway"
+            | "what is the gateway"
+            | "what's my default gateway"
+            | "whats my default gateway"
+            | "what is my default gateway"
+            | "what's the default gateway"
+            | "whats the default gateway"
+            | "what is the default gateway"
+            | "what's my router"
+            | "whats my router"
+            | "what is my router"
+            | "what's the router ip"
+            | "whats the router ip"
+            | "what is the router ip"
+            | "my default gateway"
+            | "my gateway ip"
+            | "my router ip"
+            // View/see/show me/open/list.
+            | "view gateway"
+            | "view the gateway"
+            | "view default gateway"
+            | "view the default gateway"
+            | "view gateway ip"
+            | "view the gateway ip"
+            | "view router"
+            | "view the router"
+            | "view router ip"
+            | "view the router ip"
+            | "view default route"
+            | "see gateway"
+            | "see the gateway"
+            | "see default gateway"
+            | "see the default gateway"
+            | "see gateway ip"
+            | "see router"
+            | "see router ip"
+            | "open gateway"
+            | "open the gateway"
+            | "open default gateway"
+            | "open the default gateway"
+            | "open gateway ip"
+            | "open router"
+            | "open the router"
+            | "open router ip"
+            | "list gateway"
+            | "list the gateway"
+            | "list default gateway"
+            | "list the default gateway"
+            | "list gateway ip"
+            | "list router"
+            | "list router ip"
+            | "show gateway"
+            | "show the gateway"
+            | "show me gateway"
+            | "show me the gateway"
+            | "show default gateway"
+            | "show the default gateway"
+            | "show me default gateway"
+            | "show me the default gateway"
+            | "show gateway ip"
+            | "show the gateway ip"
+            | "show me gateway ip"
+            | "show me the gateway ip"
+            | "show router"
+            | "show the router"
+            | "show me router"
+            | "show me the router"
+            | "show router ip"
+            | "show the router ip"
+            | "show me router ip"
+            | "show me the router ip"
+    )
+}
+
+
+/// Zero-LLM default IPv4 gateway from `route -n get default`.
+pub fn format_default_gateway_report() -> String {
+    let v = crate::metrics::get_default_gateway();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Gateway** — _no default gateway right now._".to_string();
+    }
+    format!("**Gateway** · `{v}`")
+}
+
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·
