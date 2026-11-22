@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2959] - 2026-11-22
+
+### Added
+- Instant connected display names · resolutions accepts `/display` · `/displays` · `/resolution` · `/screen-resolution` · `/display-resolution` · `/display-res` · `/screen-res` · `/pixel-resolution` · `/main-display` · `/screen` · `/screens` and view/see/open/list NL (`view display`, `open resolution`, `list displays`, …), matching “display resolution” / “screen resolution” / “what's my resolution” / “what's my display” / “what's my screen resolution”. Bare `display` / `resolution` / `screen` stay with the agent; `/gpu` · `view gpu` stay GPU ring; screenshot path/size/age stay screenshots; `view monitors` stays website Monitors.
+
 ## [0.1.2958] - 2026-11-22
 
 ### Added

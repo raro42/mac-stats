@@ -8910,6 +8910,202 @@ pub fn format_battery_time_report() -> String {
     format!("**Battery time** · `{v}`")
 }
 
+/// Connected displays · resolutions — not GPU ring `/gpu`, not screenshot folder lanes,
+/// not website Monitors. Slash + view/open NL (`/display` · `/resolution` · `view display`);
+/// bare `display` / `resolution` / `screen` stay with the agent; `view monitors` stays Monitors.
+pub fn looks_like_display_resolution_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("screenshot")
+        || n.contains("browser")
+        || n.contains("bright")
+        || n.contains("sleep")
+        || n.contains("mirror")
+        || n.contains("theme")
+        || n.contains("window")
+        || n.contains("cpu")
+        || n.contains("gpu")
+        || n.contains("ram")
+        || n.contains("disk")
+        || n.contains("ssd")
+        || n.contains("battery")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("keep")
+        || n.contains("discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        // Website monitors / GPU ring / screenshots stay elsewhere.
+        || n.contains("monitor")
+        || n == "/gpu"
+        || n == "/gpu-ring"
+        || n == "gpu"
+        || n == "the gpu"
+        || n == "view gpu"
+        || n == "view the gpu"
+        || n == "open gpu"
+        || n == "open the gpu"
+        // Bare short / ambiguous stay with the agent.
+        || n == "display"
+        || n == "the display"
+        || n == "displays"
+        || n == "the displays"
+        || n == "resolution"
+        || n == "the resolution"
+        || n == "screen"
+        || n == "the screen"
+        || n == "screens"
+        || n == "the screens"
+        || n == "res"
+        || n == "the res"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/display"
+            | "/displays"
+            | "/resolution"
+            | "/screen-resolution"
+            | "/screenresolution"
+            | "/display-resolution"
+            | "/displayresolution"
+            | "/display-res"
+            | "/displayres"
+            | "/screen-res"
+            | "/screenres"
+            | "/pixel-resolution"
+            | "/pixelresolution"
+            | "/main-display"
+            | "/maindisplay"
+            | "/screen"
+            | "/screens"
+            | "display resolution"
+            | "the display resolution"
+            | "screen resolution"
+            | "the screen resolution"
+            | "pixel resolution"
+            | "the pixel resolution"
+            | "main display"
+            | "the main display"
+            | "my display"
+            | "my displays"
+            | "my resolution"
+            | "my screen resolution"
+            | "my display resolution"
+            | "what's my display"
+            | "whats my display"
+            | "what is my display"
+            | "what's my displays"
+            | "whats my displays"
+            | "what is my displays"
+            | "what's my resolution"
+            | "whats my resolution"
+            | "what is my resolution"
+            | "what's my screen resolution"
+            | "whats my screen resolution"
+            | "what is my screen resolution"
+            | "what's my display resolution"
+            | "whats my display resolution"
+            | "what is my display resolution"
+            | "what's the display"
+            | "whats the display"
+            | "what is the display"
+            | "what's the resolution"
+            | "whats the resolution"
+            | "what is the resolution"
+            | "what's the screen resolution"
+            | "whats the screen resolution"
+            | "what is the screen resolution"
+            | "which display"
+            | "which resolution"
+            | "which screen"
+            // View/see/show me/open/list.
+            | "view display"
+            | "view the display"
+            | "view displays"
+            | "view the displays"
+            | "view resolution"
+            | "view the resolution"
+            | "view screen resolution"
+            | "view the screen resolution"
+            | "view display resolution"
+            | "view the display resolution"
+            | "view screen"
+            | "view the screen"
+            | "view screens"
+            | "view the screens"
+            | "view main display"
+            | "view the main display"
+            | "see display"
+            | "see the display"
+            | "see displays"
+            | "see the displays"
+            | "see resolution"
+            | "see the resolution"
+            | "see screen resolution"
+            | "see the screen resolution"
+            | "open display"
+            | "open the display"
+            | "open displays"
+            | "open the displays"
+            | "open resolution"
+            | "open the resolution"
+            | "open screen resolution"
+            | "open the screen resolution"
+            | "open display resolution"
+            | "open the display resolution"
+            | "list display"
+            | "list the display"
+            | "list displays"
+            | "list the displays"
+            | "list resolution"
+            | "list the resolution"
+            | "list screen resolution"
+            | "list the screen resolution"
+            | "show display"
+            | "show the display"
+            | "show me display"
+            | "show me the display"
+            | "show displays"
+            | "show the displays"
+            | "show me displays"
+            | "show me the displays"
+            | "show resolution"
+            | "show the resolution"
+            | "show me resolution"
+            | "show me the resolution"
+            | "show screen resolution"
+            | "show the screen resolution"
+            | "show me screen resolution"
+            | "show me the screen resolution"
+            | "show display resolution"
+            | "show the display resolution"
+            | "show me display resolution"
+            | "show me the display resolution"
+    )
+}
+
+/// Zero-LLM connected display names · resolutions from `system_profiler SPDisplaysDataType`.
+pub fn format_display_resolution_report() -> String {
+    let v = crate::metrics::get_display_resolution();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Display** — _no display reading on this Mac right now._".to_string();
+    }
+    format!("**Display** · `{v}`")
+}
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

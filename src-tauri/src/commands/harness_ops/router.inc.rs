@@ -1070,6 +1070,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_battery_time_request(content) {
         return Some(format_battery_time_report());
     }
+    // Connected displays · resolutions (bare `display` / `resolution` / `screen` stay with the agent; `/gpu` stays GPU ring; screenshots / view monitors stay elsewhere).
+    if looks_like_display_resolution_request(content) {
+        return Some(format_display_resolution_report());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());

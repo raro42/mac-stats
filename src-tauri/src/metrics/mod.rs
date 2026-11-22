@@ -1623,6 +1623,91 @@ pub fn get_ac_charger() -> String {
     String::new()
 }
 
+/// Connected display names · resolutions from `system_profiler SPDisplaysDataType` (JSON).
+/// Live (not OnceLock): plug / unplug / mirror / resolution change while the process stays up.
+/// Distinct from GPU usage ring (`/gpu`) and screenshot folder path/size/age lanes.
+pub fn get_display_resolution() -> String {
+    let output = Command::new("/usr/sbin/system_profiler")
+        .args(["SPDisplaysDataType", "-json"])
+        .stderr(std::process::Stdio::null())
+        .output();
+    let Ok(output) = output else {
+        debug3!("display resolution: system_profiler spawn failed");
+        return String::new();
+    };
+    if !output.status.success() {
+        debug3!("display resolution: system_profiler non-zero");
+        return String::new();
+    }
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let Ok(json) = serde_json::from_str::<serde_json::Value>(&stdout) else {
+        debug3!("display resolution: JSON parse failed");
+        return String::new();
+    };
+    let Some(gpus) = json.get("SPDisplaysDataType").and_then(|v| v.as_array()) else {
+        return String::new();
+    };
+    let mut parts: Vec<String> = Vec::new();
+    for gpu in gpus {
+        let Some(ndrvs) = gpu.get("spdisplays_ndrvs").and_then(|v| v.as_array()) else {
+            continue;
+        };
+        for disp in ndrvs {
+            let online = disp
+                .get("spdisplays_online")
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .contains("yes");
+            if !online {
+                // Still accept when the key is missing (older dumps); only skip explicit offline.
+                let has_online = disp.get("spdisplays_online").is_some();
+                if has_online {
+                    continue;
+                }
+            }
+            let name = disp
+                .get("_name")
+                .and_then(|v| v.as_str())
+                .unwrap_or("Display")
+                .trim();
+            let res = disp
+                .get("_spdisplays_resolution")
+                .and_then(|v| v.as_str())
+                .or_else(|| {
+                    disp.get("_spdisplays_pixels")
+                        .and_then(|v| v.as_str())
+                })
+                .unwrap_or("")
+                .trim();
+            if res.is_empty() {
+                continue;
+            }
+            let main = disp
+                .get("spdisplays_main")
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .contains("yes");
+            let label = if name.is_empty() {
+                "Display".to_string()
+            } else {
+                name.to_string()
+            };
+            if main {
+                parts.push(format!("{label} {res} (main)"));
+            } else {
+                parts.push(format!("{label} {res}"));
+            }
+        }
+    }
+    if parts.is_empty() {
+        debug3!("display resolution: no online displays");
+        return String::new();
+    }
+    let info = parts.join(" · ");
+    debug3!("display resolution: '{}'", info);
+    info
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

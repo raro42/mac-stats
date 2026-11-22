@@ -1736,6 +1736,64 @@ mod tests {
     }
 
 #[test]
+    fn display_resolution_slash_and_view_open_do_not_steal_gpu_or_screenshots() {
+        // Slash + view/open NL → display names · resolutions (`/charger` · `/chip` parity).
+        // Bare `display` / `resolution` / `screen` stay with the agent; `/gpu` stays GPU ring;
+        // screenshot path/size/age stay screenshots; monitor phrases stay website Monitors.
+        assert!(looks_like_display_resolution_request("/display"));
+        assert!(looks_like_display_resolution_request("/displays"));
+        assert!(looks_like_display_resolution_request("/resolution"));
+        assert!(looks_like_display_resolution_request("/screen-resolution"));
+        assert!(looks_like_display_resolution_request("/display-resolution"));
+        assert!(looks_like_display_resolution_request("/display-res"));
+        assert!(looks_like_display_resolution_request("/screen-res"));
+        assert!(looks_like_display_resolution_request("/pixel-resolution"));
+        assert!(looks_like_display_resolution_request("/main-display"));
+        assert!(looks_like_display_resolution_request("/screen"));
+        assert!(looks_like_display_resolution_request("/screens"));
+        assert!(looks_like_display_resolution_request("view display"));
+        assert!(looks_like_display_resolution_request("open resolution"));
+        assert!(looks_like_display_resolution_request("list displays"));
+        assert!(looks_like_display_resolution_request("display resolution"));
+        assert!(looks_like_display_resolution_request("screen resolution"));
+        assert!(looks_like_display_resolution_request("what's my resolution"));
+        assert!(looks_like_display_resolution_request("what's my display"));
+        assert!(looks_like_display_resolution_request("what's my screen resolution"));
+        assert!(!looks_like_display_resolution_request("display"));
+        assert!(!looks_like_display_resolution_request("resolution"));
+        assert!(!looks_like_display_resolution_request("screen"));
+        assert!(!looks_like_display_resolution_request("/gpu"));
+        assert!(!looks_like_display_resolution_request("view gpu"));
+        assert!(!looks_like_display_resolution_request("screenshot path"));
+        assert!(!looks_like_display_resolution_request("screenshots size"));
+        assert!(!looks_like_display_resolution_request("view monitors"));
+        assert!(!looks_like_display_resolution_request("monitors"));
+        let display = try_operator_instant_reply("/display").unwrap();
+        assert!(
+            display.contains("**Display**") && !display.to_lowercase().contains("execution"),
+            "got: {display}"
+        );
+        let viewed = try_operator_instant_reply("view display").unwrap();
+        assert!(
+            viewed.contains("**Display**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let res_lane = try_operator_instant_reply("/resolution").unwrap();
+        assert!(
+            res_lane.contains("**Display**") && !res_lane.to_lowercase().contains("execution"),
+            "got: {res_lane}"
+        );
+        assert!(try_operator_instant_reply("display").is_none());
+        let gpu = try_operator_instant_reply("/gpu");
+        if let Some(reply) = gpu {
+            assert!(
+                !reply.contains("**Display**"),
+                "/gpu must stay GPU ring, not display: {reply}"
+            );
+        }
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.
