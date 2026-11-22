@@ -1022,10 +1022,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_local_ip_request(content) {
         return Some(format_local_ip_gateway());
     }
-    // Default IPv4 gateway / router (Discord `/discord` · gateway status/ready stay Discord;
-    // bare `gateway` / bare `router` stay with the agent; `/ip` stays LAN address).
+    // Default gateway (Discord `/discord` · bare gateway/router stay out; `/ip` stays LAN).
     if looks_like_default_gateway_request(content) {
         return Some(format_default_gateway_report());
+    }
+    // DNS nameservers (bare `dns` / lookup·dig·flush stay with the agent; `/gateway` stays route).
+    if looks_like_dns_servers_request(content) {
+        return Some(format_dns_servers_report());
     }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {

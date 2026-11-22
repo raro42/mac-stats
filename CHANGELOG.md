@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2948] - 2026-11-22
+
+### Added
+- Instant DNS nameservers accept `/dns` · `/dns-servers` · `/dns-server` · `/nameserver` · `/nameservers` · `/ns` · `/resolver` and view/see/open/list NL (`view dns servers`, `open nameserver`, `list dns`, …), matching “dns servers” / “what's my dns” / “which dns”. Bare `dns` / lookup·resolve·dig·flush stay with the agent; `/gateway` stays default route; `/ip` stays LAN address.
+
 ## [0.1.2947] - 2026-11-22
 
 ### Added

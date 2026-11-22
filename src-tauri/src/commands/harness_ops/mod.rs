@@ -1041,6 +1041,65 @@ mod tests {
         }
     }
 
+    #[test]
+    fn dns_servers_slash_and_view_open_do_not_steal_lookup_or_gateway() {
+        // Slash + view/open NL → DNS nameservers (`/gateway` · `/ip` parity).
+        // Bare `dns` / dig·lookup·flush stay with the agent; `/gateway` stays default route.
+        assert!(looks_like_dns_servers_request("/dns"));
+        assert!(looks_like_dns_servers_request("/dns-servers"));
+        assert!(looks_like_dns_servers_request("/dns-server"));
+        assert!(looks_like_dns_servers_request("/nameserver"));
+        assert!(looks_like_dns_servers_request("/nameservers"));
+        assert!(looks_like_dns_servers_request("/ns"));
+        assert!(looks_like_dns_servers_request("/resolver"));
+        assert!(looks_like_dns_servers_request("view dns servers"));
+        assert!(looks_like_dns_servers_request("open nameserver"));
+        assert!(looks_like_dns_servers_request("list dns"));
+        assert!(looks_like_dns_servers_request("dns servers"));
+        assert!(looks_like_dns_servers_request("dns server"));
+        assert!(looks_like_dns_servers_request("what's my dns"));
+        assert!(looks_like_dns_servers_request("what's my dns servers"));
+        assert!(looks_like_dns_servers_request("which dns"));
+        assert!(!looks_like_dns_servers_request("dns"));
+        assert!(!looks_like_dns_servers_request("nameserver"));
+        assert!(!looks_like_dns_servers_request("dns lookup"));
+        assert!(!looks_like_dns_servers_request("dig google.com"));
+        assert!(!looks_like_dns_servers_request("flush dns"));
+        assert!(!looks_like_dns_servers_request("/gateway"));
+        assert!(!looks_like_dns_servers_request("default gateway"));
+        assert!(!looks_like_dns_servers_request("/ip"));
+        let dns = try_operator_instant_reply("/dns").unwrap();
+        assert!(
+            dns.contains("**DNS**") && !dns.to_lowercase().contains("execution"),
+            "got: {dns}"
+        );
+        let viewed = try_operator_instant_reply("view dns servers").unwrap();
+        assert!(
+            viewed.contains("**DNS**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let short = try_operator_instant_reply("/nameserver").unwrap();
+        assert!(
+            short.contains("**DNS**") && !short.to_lowercase().contains("execution"),
+            "got: {short}"
+        );
+        assert!(try_operator_instant_reply("dns").is_none());
+        let gw = try_operator_instant_reply("/gateway");
+        if let Some(reply) = gw {
+            assert!(
+                !reply.contains("**DNS**"),
+                "/gateway must stay default route, not DNS: {reply}"
+            );
+        }
+        let ip = try_operator_instant_reply("/ip");
+        if let Some(reply) = ip {
+            assert!(
+                !reply.contains("**DNS**"),
+                "/ip must stay LAN IP, not DNS: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).

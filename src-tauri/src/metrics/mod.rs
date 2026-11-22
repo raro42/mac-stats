@@ -808,6 +808,60 @@ pub fn get_default_gateway() -> String {
     info
 }
 
+/// DNS nameservers from the first `scutil --dns` resolver block.
+/// Live (not OnceLock): Wi-Fi / DHCP / VPN can change while the process stays up.
+/// Used by the Discord/operator instant `/dns` · `/nameserver` lane.
+/// Distinct from default gateway (`/gateway`) and local LAN IP (`/ip`).
+pub fn get_dns_servers() -> String {
+    let output = Command::new("/usr/sbin/scutil")
+        .arg("--dns")
+        .stderr(std::process::Stdio::null())
+        .output();
+    let info = match output {
+        Ok(output) if output.status.success() => {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            let mut servers: Vec<String> = Vec::new();
+            let mut in_first = false;
+            for line in stdout.lines() {
+                if line.starts_with("resolver #") {
+                    if !servers.is_empty() {
+                        break;
+                    }
+                    in_first = true;
+                    continue;
+                }
+                if !in_first {
+                    continue;
+                }
+                let t = line.trim();
+                if let Some(rest) = t.strip_prefix("nameserver[") {
+                    if let Some(colon) = rest.find(':') {
+                        let addr = rest[colon + 1..].trim();
+                        if !addr.is_empty() && !servers.iter().any(|s| s == addr) {
+                            servers.push(addr.to_string());
+                        }
+                    }
+                } else if !t.is_empty()
+                    && !line.starts_with(' ')
+                    && !line.starts_with('\t')
+                    && !servers.is_empty()
+                {
+                    // Left the indented resolver body.
+                    break;
+                }
+            }
+            servers.join(", ")
+        }
+        _ => String::new(),
+    };
+    if info.is_empty() {
+        debug3!("dns servers: scutil empty");
+    } else {
+        debug3!("dns servers: '{}'", info);
+    }
+    info
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

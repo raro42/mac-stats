@@ -7019,6 +7019,182 @@ pub fn format_default_gateway_report() -> String {
 }
 
 
+/// DNS nameservers — not default gateway, not local LAN IP, not dig/lookup.
+/// Slash + view/open NL (`/dns` · `/nameserver` · `view dns servers`) match `/gateway` ·
+/// `/ip` shape; bare `dns` / lookup·resolve·dig·flush stay with the agent; `/gateway` stays
+/// default route; `/ip` stays LAN address.
+pub fn looks_like_dns_servers_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("lookup")
+        || n.contains("nslookup")
+        || n.contains("dig")
+        || n.contains("flush")
+        || n.contains("cache")
+        || n.contains("query")
+        || n.contains("record")
+        || n.contains("mx")
+        || n.contains("public")
+        || n.contains("external")
+        || n.contains("wan")
+        || n.contains("internet")
+        || n.contains("vpn")
+        || n.contains("hostname")
+        || n.contains("gateway")
+        || n.contains("router")
+        || n.contains("local ip")
+        || n.contains("lan ip")
+        // "resolve" as a verb — do not veto `/resolver` · `/resolvers`.
+        || n == "resolve"
+        || n.starts_with("resolve ")
+        || n.ends_with(" resolve")
+        || n.contains(" resolve ")
+        || n.contains("dns resolve")
+        || n.contains("resolve dns")
+        // Bare short / tooling asks stay with the agent.
+        || n == "dns"
+        || n == "the dns"
+        || n == "nameserver"
+        || n == "the nameserver"
+        || n == "nameservers"
+        || n == "the nameservers"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/dns"
+            | "/dns-servers"
+            | "/dnsservers"
+            | "/dns-server"
+            | "/dnsserver"
+            | "/nameserver"
+            | "/nameservers"
+            | "/ns"
+            | "/dns-ns"
+            | "/resolver"
+            | "/resolvers"
+            | "dns servers"
+            | "the dns servers"
+            | "dns server"
+            | "the dns server"
+            | "dns addresses"
+            | "the dns addresses"
+            | "dns address"
+            | "the dns address"
+            | "name servers"
+            | "the name servers"
+            | "name server"
+            | "the name server"
+            | "my dns servers"
+            | "my dns server"
+            | "my nameservers"
+            | "my nameserver"
+            | "what's my dns"
+            | "whats my dns"
+            | "what is my dns"
+            | "what's the dns"
+            | "whats the dns"
+            | "what is the dns"
+            | "what's my dns server"
+            | "whats my dns server"
+            | "what is my dns server"
+            | "what's my dns servers"
+            | "whats my dns servers"
+            | "what is my dns servers"
+            | "what's the dns server"
+            | "whats the dns server"
+            | "what is the dns server"
+            | "what's the dns servers"
+            | "whats the dns servers"
+            | "what is the dns servers"
+            | "what's my nameserver"
+            | "whats my nameserver"
+            | "what is my nameserver"
+            | "what's my nameservers"
+            | "whats my nameservers"
+            | "what is my nameservers"
+            | "which dns"
+            | "which dns server"
+            | "which dns servers"
+            | "which nameserver"
+            | "which nameservers"
+            // View/see/show me/open/list.
+            | "view dns"
+            | "view the dns"
+            | "view dns servers"
+            | "view the dns servers"
+            | "view dns server"
+            | "view the dns server"
+            | "view nameserver"
+            | "view the nameserver"
+            | "view nameservers"
+            | "view the nameservers"
+            | "see dns"
+            | "see the dns"
+            | "see dns servers"
+            | "see the dns servers"
+            | "see dns server"
+            | "see nameserver"
+            | "see nameservers"
+            | "open dns"
+            | "open the dns"
+            | "open dns servers"
+            | "open the dns servers"
+            | "open dns server"
+            | "open nameserver"
+            | "open nameservers"
+            | "list dns"
+            | "list the dns"
+            | "list dns servers"
+            | "list the dns servers"
+            | "list dns server"
+            | "list nameserver"
+            | "list nameservers"
+            | "show dns"
+            | "show the dns"
+            | "show me dns"
+            | "show me the dns"
+            | "show dns servers"
+            | "show the dns servers"
+            | "show me dns servers"
+            | "show me the dns servers"
+            | "show dns server"
+            | "show the dns server"
+            | "show me dns server"
+            | "show me the dns server"
+            | "show nameserver"
+            | "show the nameserver"
+            | "show me nameserver"
+            | "show me the nameserver"
+            | "show nameservers"
+            | "show the nameservers"
+            | "show me nameservers"
+            | "show me the nameservers"
+    )
+}
+
+
+/// Zero-LLM DNS nameservers from the first `scutil --dns` resolver.
+pub fn format_dns_servers_report() -> String {
+    let v = crate::metrics::get_dns_servers();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**DNS** — _no nameservers right now._".to_string();
+    }
+    format!("**DNS** · `{v}`")
+}
+
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·
