@@ -1002,6 +1002,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_locale_request(content) {
         return Some(format_locale_gateway());
     }
+    // Kernel release (bare `uname` / `/uname` stay with the agent; `/uname-m` stays arch).
+    if looks_like_kernel_request(content) {
+        return Some(format_kernel_gateway());
+    }
     // Machine arch (bare "architect" theme / chip name stay out).
     if looks_like_architecture_request(content) {
         return Some(format_architecture_gateway());

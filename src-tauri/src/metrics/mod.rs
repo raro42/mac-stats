@@ -515,6 +515,42 @@ pub fn get_architecture() -> String {
         .clone()
 }
 
+/// Cached kernel release (`uname -r`).
+/// Used by the Discord/operator instant `/kernel` · `/uname-r` lane.
+/// Distinct from machine arch (`/arch` · `uname -m`) and macOS ProductVersion (`/macos`).
+pub fn get_kernel_release() -> String {
+    KERNEL_RELEASE_CACHE
+        .get_or_init(|| {
+            let run_uname = |bin: &str| -> Option<String> {
+                let output = Command::new(bin)
+                    .arg("-r")
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                let s = String::from_utf8_lossy(&output.stdout);
+                let t = s.trim();
+                if t.is_empty() {
+                    None
+                } else {
+                    Some(t.to_string())
+                }
+            };
+            let info = run_uname("/usr/bin/uname")
+                .or_else(|| run_uname("uname"))
+                .unwrap_or_default();
+            if info.is_empty() {
+                debug3!("kernel release: uname -r empty");
+            } else {
+                debug3!("kernel release cached: '{}'", info);
+            }
+            info
+        })
+        .clone()
+}
+
 /// Cached system locale (`defaults AppleLocale`, else `LANG` without encoding).
 /// Used by the Discord/operator instant `/locale` · `/language` lane.
 /// Distinct from timezone (`/tz`) — this is language · region, not wall-clock zone.

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2943] - 2026-11-22
+
+### Added
+- Instant kernel release accepts `/kernel` · `/kernel-release` · `/kernel-version` · `/uname-r` · `/kern` and view/see/open/list NL (`view kernel`, `open kernel release`, `list kernel`, …), matching “kernel” / “what's my kernel” / “what kernel is this” / “kernel version”. Bare `uname` / `/uname` stay with the agent; `/uname-m` / `/arch` stay machine arch; `/macos` stays ProductVersion.
+
 ## [0.1.2942] - 2026-11-22
 
 ### Added

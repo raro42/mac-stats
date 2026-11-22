@@ -6235,6 +6235,136 @@ pub fn format_locale_gateway() -> String {
 }
 
 
+/// Kernel release — not machine arch (`uname -m`), not macOS ProductVersion, not full `uname`.
+/// Slash + view/open NL (`/kernel` · `/uname-r` · `view kernel`) match arch `/arch` ·
+/// locale `/locale` shape; bare `uname` / `/uname` stay with the agent; `/uname-m` stays arch.
+pub fn looks_like_kernel_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("panic")
+        || n.contains("module")
+        || n.contains("driver")
+        || n.contains("compile")
+        || n.contains("build")
+        || n.contains("exploit")
+        || n.contains("cve")
+        || n.contains("patch")
+        || n.contains("update")
+        || n.contains("macos")
+        || n.contains("os version")
+        || n.contains("system version")
+        // Arch lane owns uname -m / machine arch.
+        || n.contains("uname-m")
+        || n.contains("uname_m")
+        || n.contains("uname -m")
+        || n.contains("architecture")
+        || n.contains("machine arch")
+        || n.contains("cpu arch")
+        || n.contains("hw arch")
+        // Bare / short uname dump stays with the agent.
+        || n == "uname"
+        || n == "the uname"
+        || n == "/uname"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/kernel"
+            | "/kernel-release"
+            | "/kernelrelease"
+            | "/kernel-version"
+            | "/kernelversion"
+            | "/uname-r"
+            | "/uname_r"
+            | "/kern"
+            | "kernel"
+            | "the kernel"
+            | "kernel release"
+            | "the kernel release"
+            | "kernel version"
+            | "the kernel version"
+            | "kernel rev"
+            | "the kernel rev"
+            | "uname -r"
+            | "uname r"
+            | "what kernel"
+            | "what kernel is this"
+            | "what kernel release"
+            | "what kernel version"
+            | "what's the kernel"
+            | "whats the kernel"
+            | "what is the kernel"
+            | "what's my kernel"
+            | "whats my kernel"
+            | "what is my kernel"
+            | "what's the kernel release"
+            | "whats the kernel release"
+            | "what is the kernel release"
+            | "what's the kernel version"
+            | "whats the kernel version"
+            | "what is the kernel version"
+            | "which kernel"
+            | "which kernel is this"
+            | "my kernel"
+            | "my kernel release"
+            | "my kernel version"
+            // View/see/show me/open/list.
+            | "view kernel"
+            | "view the kernel"
+            | "view kernel release"
+            | "view the kernel release"
+            | "view kernel version"
+            | "view the kernel version"
+            | "see kernel"
+            | "see the kernel"
+            | "see kernel release"
+            | "see the kernel release"
+            | "open kernel"
+            | "open the kernel"
+            | "open kernel release"
+            | "open the kernel release"
+            | "open kernel version"
+            | "list kernel"
+            | "list the kernel"
+            | "list kernel release"
+            | "list the kernel release"
+            | "show kernel"
+            | "show the kernel"
+            | "show me kernel"
+            | "show me the kernel"
+            | "show kernel release"
+            | "show the kernel release"
+            | "show me kernel release"
+            | "show me the kernel release"
+            | "show kernel version"
+            | "show the kernel version"
+            | "show me kernel version"
+            | "show me the kernel version"
+    )
+}
+
+
+/// Zero-LLM kernel release from cached `uname -r`.
+pub fn format_kernel_gateway() -> String {
+    let v = crate::metrics::get_kernel_release();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Kernel** — _no kernel release right now._".to_string();
+    }
+    format!("**Kernel** · `{v}`")
+}
+
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

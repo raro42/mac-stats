@@ -765,6 +765,58 @@ mod tests {
     }
 
 #[test]
+    fn kernel_slash_and_view_open_do_not_steal_uname_or_arch() {
+        // Slash + view/open NL → kernel release (arch `/arch` · locale `/locale` parity).
+        // Bare `uname` / `/uname` stay with the agent; `/uname-m` stays arch; `/macos` stays OS.
+        assert!(looks_like_kernel_request("/kernel"));
+        assert!(looks_like_kernel_request("/kernel-release"));
+        assert!(looks_like_kernel_request("/kernel-version"));
+        assert!(looks_like_kernel_request("/uname-r"));
+        assert!(looks_like_kernel_request("/kern"));
+        assert!(looks_like_kernel_request("view kernel"));
+        assert!(looks_like_kernel_request("open kernel release"));
+        assert!(looks_like_kernel_request("list kernel"));
+        assert!(looks_like_kernel_request("kernel"));
+        assert!(looks_like_kernel_request("kernel release"));
+        assert!(looks_like_kernel_request("kernel version"));
+        assert!(looks_like_kernel_request("what's my kernel"));
+        assert!(looks_like_kernel_request("what kernel is this"));
+        assert!(looks_like_kernel_request("uname -r"));
+        assert!(!looks_like_kernel_request("uname"));
+        assert!(!looks_like_kernel_request("/uname"));
+        assert!(!looks_like_kernel_request("/uname-m"));
+        assert!(!looks_like_kernel_request("kernel panic"));
+        assert!(!looks_like_kernel_request("kernel module"));
+        let kern = try_operator_instant_reply("/kernel").unwrap();
+        assert!(
+            kern.contains("**Kernel**") && !kern.to_lowercase().contains("execution"),
+            "got: {kern}"
+        );
+        let viewed = try_operator_instant_reply("view kernel").unwrap();
+        assert!(
+            viewed.contains("**Kernel**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let short = try_operator_instant_reply("/uname-r").unwrap();
+        assert!(
+            short.contains("**Kernel**") && !short.to_lowercase().contains("execution"),
+            "got: {short}"
+        );
+        assert!(try_operator_instant_reply("uname").is_none());
+        assert!(try_operator_instant_reply("/uname").is_none());
+        let arch = try_operator_instant_reply("/uname-m").unwrap();
+        assert!(
+            arch.contains("**Arch**") && !arch.contains("**Kernel**"),
+            "/uname-m must stay arch, not kernel: {arch}"
+        );
+        let arch2 = try_operator_instant_reply("/arch").unwrap();
+        assert!(
+            arch2.contains("**Arch**") && !arch2.contains("**Kernel**"),
+            "/arch must stay arch, not kernel: {arch2}"
+        );
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.
