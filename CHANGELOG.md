@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2971] - 2026-11-22
+
+### Added
+- Instant Remote Login (SSH) status accepts `/remote-login` · `/remotelogin` · `/remote-login-status` · `/ssh` · `/sshd` · `/ssh-status` · `/sshd-status` · `/ssh-login` · `/remote-ssh` and view/see/open/list NL (`view remote login`, `open ssh status`, `list remote login`, …), matching “remote login status” / “is remote login on” / “is ssh enabled” / “what's my remote login” / “what's the remote login status”. Bare `ssh` / `sshd` / `remote login` stay with the agent; `/vpn` stays VPN; `/firewall` stays Firewall; `/timemachine` stays Time Machine.
+
 ## [0.1.2970] - 2026-11-22
 
 ### Added

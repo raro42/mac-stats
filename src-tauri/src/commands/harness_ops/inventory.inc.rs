@@ -10352,6 +10352,9 @@ pub fn looks_like_firewall_request(content: &str) -> bool {
         || n == "/firewall-stealth"
         || n == "/boot-volume"
         || n == "/startup-disk"
+        || n == "/remote-login"
+        || n == "/ssh"
+        || n == "/sshd"
         || n == "view disk"
         || n == "open disk"
         || n == "/ssd"
@@ -10540,6 +10543,9 @@ pub fn looks_like_firewall_stealth_request(content: &str) -> bool {
         || n == "/filevault"
         || n == "/fv"
         || n == "/fde"
+        || n == "/remote-login"
+        || n == "/ssh"
+        || n == "/sshd"
         // Bare short / ambiguous stay with the agent.
         || n == "stealth"
         || n == "the stealth"
@@ -10721,6 +10727,10 @@ pub fn looks_like_time_machine_request(content: &str) -> bool {
         || n == "/filevault"
         || n == "/boot-volume"
         || n == "/startup-disk"
+        || n == "/remote-login"
+        || n == "/remotelogin"
+        || n == "/ssh"
+        || n == "/sshd"
         || n == "view disk"
         || n == "open disk"
         || n == "/ssd"
@@ -10852,6 +10862,228 @@ pub fn format_time_machine_report() -> String {
         return "**Time Machine** — _no Time Machine reading on this Mac right now._".to_string();
     }
     format!("**Time Machine** · `{v}`")
+}
+
+/// Remote Login (SSH) — not Firewall, not stealth, not VPN, not Time Machine.
+/// Slash + view/open NL (`/remote-login` · `/ssh` · `view remote login`) match `/firewall` · `/sip` shape;
+/// bare `ssh` / `sshd` / `remote login` stay with the agent; `/vpn` stays VPN; `/firewall` stays Firewall.
+pub fn looks_like_remote_login_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        // Action verbs (leave status asks like "is remote login on").
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("key ")
+        || n.contains(" keys")
+        || n.contains("tunnel")
+        || n.contains("scp")
+        || n.contains("sftp")
+        || n.contains("connect")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("vnc")
+        || n.contains("ard")
+        || n.contains("remote management")
+        || n.contains("remote desktop")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/tasks"
+        // Bare short / ambiguous stay with the agent.
+        || n == "ssh"
+        || n == "the ssh"
+        || n == "sshd"
+        || n == "the sshd"
+        || n == "remote login"
+        || n == "the remote login"
+        || n == "remote-login"
+        || n == "the remote-login"
+        || n == "remotelogin"
+        || n == "the remotelogin"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/remote-login"
+            | "/remotelogin"
+            | "/remote-login-status"
+            | "/remotelogin-status"
+            | "/remote-login-state"
+            | "/ssh"
+            | "/sshd"
+            | "/ssh-status"
+            | "/sshd-status"
+            | "/ssh-login"
+            | "/sshlogin"
+            | "/remote-ssh"
+            | "/remotessh"
+            | "/ssh-remote"
+            | "/sshd-remote"
+            | "remote login status"
+            | "the remote login status"
+            | "remote-login status"
+            | "the remote-login status"
+            | "remotelogin status"
+            | "the remotelogin status"
+            | "ssh status"
+            | "the ssh status"
+            | "sshd status"
+            | "the sshd status"
+            | "ssh login status"
+            | "the ssh login status"
+            | "my remote login"
+            | "my remote login status"
+            | "my ssh"
+            | "my ssh status"
+            | "my sshd"
+            | "my sshd status"
+            | "is remote login on"
+            | "is remote login off"
+            | "is remote login enabled"
+            | "is remote login disabled"
+            | "is remotelogin on"
+            | "is remotelogin enabled"
+            | "is ssh on"
+            | "is ssh off"
+            | "is ssh enabled"
+            | "is ssh disabled"
+            | "is sshd on"
+            | "is sshd enabled"
+            | "is ssh login on"
+            | "is ssh login enabled"
+            | "what's my remote login"
+            | "whats my remote login"
+            | "what is my remote login"
+            | "what's my remote login status"
+            | "whats my remote login status"
+            | "what is my remote login status"
+            | "what's the remote login"
+            | "whats the remote login"
+            | "what is the remote login"
+            | "what's the remote login status"
+            | "whats the remote login status"
+            | "what is the remote login status"
+            | "what's my ssh"
+            | "whats my ssh"
+            | "what is my ssh"
+            | "what's my ssh status"
+            | "whats my ssh status"
+            | "what is my ssh status"
+            | "what's the ssh status"
+            | "whats the ssh status"
+            | "what is the ssh status"
+            | "how's remote login"
+            | "hows remote login"
+            | "how's the remote login"
+            | "hows the remote login"
+            // View/see/show me/open/list.
+            | "view remote login"
+            | "view the remote login"
+            | "view remote login status"
+            | "view the remote login status"
+            | "view remotelogin"
+            | "view the remotelogin"
+            | "view ssh"
+            | "view the ssh"
+            | "view ssh status"
+            | "view the ssh status"
+            | "view sshd"
+            | "view the sshd"
+            | "view sshd status"
+            | "view the sshd status"
+            | "view ssh login"
+            | "view the ssh login"
+            | "see remote login"
+            | "see the remote login"
+            | "see remote login status"
+            | "see the remote login status"
+            | "see ssh"
+            | "see the ssh"
+            | "see ssh status"
+            | "see the ssh status"
+            | "open remote login"
+            | "open the remote login"
+            | "open remote login status"
+            | "open the remote login status"
+            | "open ssh"
+            | "open the ssh"
+            | "open ssh status"
+            | "open the ssh status"
+            | "open sshd"
+            | "open the sshd"
+            | "open sshd status"
+            | "open the sshd status"
+            | "list remote login"
+            | "list the remote login"
+            | "list remote login status"
+            | "list the remote login status"
+            | "list ssh"
+            | "list the ssh"
+            | "list ssh status"
+            | "list the ssh status"
+            | "show remote login"
+            | "show the remote login"
+            | "show me remote login"
+            | "show me the remote login"
+            | "show remote login status"
+            | "show the remote login status"
+            | "show me remote login status"
+            | "show me the remote login status"
+            | "show ssh"
+            | "show the ssh"
+            | "show me ssh"
+            | "show me the ssh"
+            | "show ssh status"
+            | "show the ssh status"
+            | "show me ssh status"
+            | "show me the ssh status"
+    )
+}
+
+/// Zero-LLM Remote Login (SSH) status from `systemsetup -getremotelogin` (macOS-only; empty elsewhere).
+pub fn format_remote_login_report() -> String {
+    let v = crate::metrics::get_remote_login_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Remote Login** — _no Remote Login reading on this Mac right now._".to_string();
+    }
+    format!("**Remote Login** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.

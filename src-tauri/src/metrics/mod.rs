@@ -911,6 +911,54 @@ pub fn get_time_machine_status() -> String {
     info
 }
 
+/// macOS Remote Login (SSH) from `systemsetup -getremotelogin` (live; not OnceLock).
+/// Distinct from Firewall `/firewall`, stealth `/stealth`, VPN `/vpn`, and Time Machine `/timemachine`.
+/// Used by Discord/operator instant `/remote-login` · `/ssh` lane.
+pub fn get_remote_login_status() -> String {
+    let output = Command::new("/usr/sbin/systemsetup")
+        .arg("-getremotelogin")
+        .stderr(std::process::Stdio::null())
+        .output();
+    let Ok(output) = output else {
+        debug3!("remote-login: systemsetup spawn failed");
+        return String::new();
+    };
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let lower = stdout.to_ascii_lowercase();
+    let info = if lower.contains("remote login: on")
+        || lower.contains("remote login:on")
+        || (lower.contains("on") && !lower.contains("off") && lower.contains("remote"))
+    {
+        "On".to_string()
+    } else if lower.contains("remote login: off")
+        || lower.contains("remote login:off")
+        || (lower.contains("off") && lower.contains("remote"))
+    {
+        "Off".to_string()
+    } else if lower.contains("enabled") && !lower.contains("disabled") {
+        "On".to_string()
+    } else if lower.contains("disabled") {
+        "Off".to_string()
+    } else {
+        let t = stdout.lines().next().unwrap_or("").trim();
+        if t.is_empty() {
+            String::new()
+        } else {
+            // Strip the "Remote Login:" label when present.
+            t.trim_start_matches("Remote Login:")
+                .trim_start_matches("remote login:")
+                .trim()
+                .to_string()
+        }
+    };
+    if info.is_empty() {
+        debug3!("remote-login: empty status (exit={})", output.status);
+    } else {
+        debug3!("remote-login status: '{}'", info);
+    }
+    info
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.

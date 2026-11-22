@@ -2184,7 +2184,69 @@ mod tests {
         }
     }
 
-
+    #[test]
+    fn remote_login_slash_and_view_open_do_not_steal_vpn_firewall_or_bare_ssh() {
+        // Slash + view/open NL → Remote Login (`/firewall` · `/sip` parity).
+        // Bare `ssh` / `sshd` / `remote login` stay with the agent; `/vpn` stays VPN; `/firewall` stays Firewall.
+        assert!(looks_like_remote_login_request("/remote-login"));
+        assert!(looks_like_remote_login_request("/remotelogin"));
+        assert!(looks_like_remote_login_request("/ssh"));
+        assert!(looks_like_remote_login_request("/sshd"));
+        assert!(looks_like_remote_login_request("/ssh-status"));
+        assert!(looks_like_remote_login_request("/sshd-status"));
+        assert!(looks_like_remote_login_request("/ssh-login"));
+        assert!(looks_like_remote_login_request("/remote-ssh"));
+        assert!(looks_like_remote_login_request("view remote login"));
+        assert!(looks_like_remote_login_request("open ssh status"));
+        assert!(looks_like_remote_login_request("list remote login"));
+        assert!(looks_like_remote_login_request("remote login status"));
+        assert!(looks_like_remote_login_request("is remote login on"));
+        assert!(looks_like_remote_login_request("is ssh enabled"));
+        assert!(looks_like_remote_login_request("what's my remote login"));
+        assert!(looks_like_remote_login_request("view ssh"));
+        assert!(!looks_like_remote_login_request("ssh"));
+        assert!(!looks_like_remote_login_request("sshd"));
+        assert!(!looks_like_remote_login_request("remote login"));
+        assert!(!looks_like_remote_login_request("remotelogin"));
+        assert!(!looks_like_remote_login_request("/vpn"));
+        assert!(!looks_like_remote_login_request("/firewall"));
+        assert!(!looks_like_remote_login_request("/stealth"));
+        assert!(!looks_like_remote_login_request("/timemachine"));
+        assert!(!looks_like_remote_login_request("/tasks"));
+        assert!(!looks_like_remote_login_request("enable remote login"));
+        assert!(!looks_like_remote_login_request("screen sharing"));
+        assert!(!looks_like_firewall_request("/remote-login"));
+        assert!(!looks_like_firewall_request("view remote login"));
+        assert!(!looks_like_time_machine_request("/remote-login"));
+        assert!(!looks_like_time_machine_request("view remote login"));
+        let rl = try_operator_instant_reply("/remote-login").unwrap();
+        assert!(
+            rl.contains("**Remote Login**") && !rl.to_lowercase().contains("execution"),
+            "got: {rl}"
+        );
+        let viewed = try_operator_instant_reply("view remote login").unwrap();
+        assert!(
+            viewed.contains("**Remote Login**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("ssh").is_none());
+        assert!(try_operator_instant_reply("sshd").is_none());
+        assert!(try_operator_instant_reply("remote login").is_none());
+        let vpn = try_operator_instant_reply("/vpn");
+        if let Some(reply) = vpn {
+            assert!(
+                !reply.contains("**Remote Login**"),
+                "/vpn must stay VPN, not Remote Login: {reply}"
+            );
+        }
+        let fw = try_operator_instant_reply("/firewall");
+        if let Some(reply) = fw {
+            assert!(
+                !reply.contains("**Remote Login**"),
+                "/firewall must stay Firewall, not Remote Login: {reply}"
+            );
+        }
+    }
 
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
