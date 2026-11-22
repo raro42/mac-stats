@@ -118,6 +118,8 @@ pub(crate) static MAC_MODEL_CACHE: OnceLock<String> = OnceLock::new();
 pub(crate) static USERNAME_CACHE: OnceLock<String> = OnceLock::new();
 /// Cached hardware serial (`system_profiler` / `ioreg` / DMI; instant `/serial` lane).
 pub(crate) static SERIAL_NUMBER_CACHE: OnceLock<String> = OnceLock::new();
+/// Cached hardware UUID (`system_profiler` platform_UUID / `ioreg` IOPlatformUUID; instant `/uuid` lane).
+pub(crate) static HARDWARE_UUID_CACHE: OnceLock<String> = OnceLock::new();
 /// Cached machine arch (`uname -m` / `std::env::consts::ARCH`; instant `/arch` lane).
 pub(crate) static ARCHITECTURE_CACHE: OnceLock<String> = OnceLock::new();
 /// Cached AppleLocale / LANG (instant `/locale` · `/language` lane).

@@ -433,6 +433,86 @@ pub fn get_serial_number() -> String {
         .clone()
 }
 
+/// Hardware UUID (platform UUID) — not serial, not provisioning UDID.
+/// Cached; used by the Discord/operator instant `/uuid` · `/hw-uuid` lane.
+pub fn get_hardware_uuid() -> String {
+    HARDWARE_UUID_CACHE
+        .get_or_init(|| {
+            let usable = |s: &str| -> Option<String> {
+                let t = s.trim();
+                if t.is_empty() {
+                    return None;
+                }
+                let lower = t.to_ascii_lowercase();
+                if matches!(
+                    lower.as_str(),
+                    "none" | "not specified" | "not set" | "default string" | "to be filled by o.e.m."
+                ) {
+                    return None;
+                }
+                // Hardware UUID is a dashed hex form; reject obvious junk.
+                if t.len() < 8 {
+                    return None;
+                }
+                Some(t.to_string())
+            };
+            let from_profiler = || -> Option<String> {
+                let output = Command::new("/usr/sbin/system_profiler")
+                    .arg("SPHardwareDataType")
+                    .arg("-json")
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                let json: serde_json::Value = serde_json::from_str(&stdout).ok()?;
+                let hardware = json
+                    .get("SPHardwareDataType")
+                    .and_then(|v| v.as_array())
+                    .and_then(|a| a.first())?;
+                for k in ["platform_UUID", "platform_uuid", "hardware_UUID", "hardware_uuid"] {
+                    if let Some(s) = hardware.get(k).and_then(|v| v.as_str()).and_then(usable) {
+                        return Some(s);
+                    }
+                }
+                None
+            };
+            let from_ioreg = || -> Option<String> {
+                let output = Command::new("/usr/sbin/ioreg")
+                    .args(["-c", "IOPlatformExpertDevice", "-d", "2"])
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                for line in stdout.lines() {
+                    if !line.contains("IOPlatformUUID") {
+                        continue;
+                    }
+                    if let Some(rest) = line.split('=').nth(1) {
+                        let cleaned = rest.trim().trim_matches('"').trim();
+                        if let Some(s) = usable(cleaned) {
+                            return Some(s);
+                        }
+                    }
+                }
+                None
+            };
+            let info = from_profiler().or_else(from_ioreg).unwrap_or_default();
+            if info.is_empty() {
+                debug3!("hardware uuid: system_profiler/ioreg empty");
+            } else {
+                debug3!("hardware uuid cached: '{}'", info);
+            }
+            info
+        })
+        .clone()
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.

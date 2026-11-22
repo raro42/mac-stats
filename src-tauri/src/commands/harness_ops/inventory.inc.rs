@@ -9441,6 +9441,139 @@ pub fn format_vpn_status_report() -> String {
     format!("**VPN** · `{v}`")
 }
 
+/// Hardware UUID (platform UUID) — not serial, not provisioning UDID, not generate-uuid.
+/// Slash + view/open NL (`/uuid` · `/hw-uuid` · `view uuid`) match `/serial` · `/mac-model` shape;
+/// bare `uuid` stays with the agent; `/serial` stays hardware serial; `/udid` stays with the agent.
+pub fn looks_like_hardware_uuid_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("generate")
+        || n.contains("create")
+        || n.contains("random")
+        || n.contains("session")
+        || n.contains("discord")
+        || n.contains("snowflake")
+        || n.contains("provision")
+        || n.contains("udid")
+        || n.contains("serial")
+        || n.contains("keep")
+        || n.contains("discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        // Serial / bare short stay elsewhere.
+        || n == "/serial"
+        || n == "/sn"
+        || n == "serial"
+        || n == "the serial"
+        || n == "view serial"
+        || n == "open serial"
+        || n == "/udid"
+        || n == "udid"
+        || n == "the udid"
+        || n == "uuid"
+        || n == "the uuid"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/uuid"
+            | "/hw-uuid"
+            | "/hwuuid"
+            | "/hardware-uuid"
+            | "/hardwareuuid"
+            | "/platform-uuid"
+            | "/platformuuid"
+            | "/device-uuid"
+            | "/deviceuuid"
+            | "/mac-uuid"
+            | "/macuuid"
+            | "hardware uuid"
+            | "the hardware uuid"
+            | "platform uuid"
+            | "the platform uuid"
+            | "device uuid"
+            | "the device uuid"
+            | "mac uuid"
+            | "the mac uuid"
+            | "hw uuid"
+            | "the hw uuid"
+            | "my uuid"
+            | "my hardware uuid"
+            | "my platform uuid"
+            | "what uuid"
+            | "what uuid is this"
+            | "what hardware uuid"
+            | "what hardware uuid is this"
+            | "what's my uuid"
+            | "whats my uuid"
+            | "what is my uuid"
+            | "what's my hardware uuid"
+            | "whats my hardware uuid"
+            | "what is my hardware uuid"
+            | "what's the uuid"
+            | "whats the uuid"
+            | "what is the uuid"
+            | "what's the hardware uuid"
+            | "whats the hardware uuid"
+            | "what is the hardware uuid"
+            | "what's the platform uuid"
+            | "whats the platform uuid"
+            | "what is the platform uuid"
+            | "which uuid"
+            | "which hardware uuid"
+            // View/see/show me/open/list.
+            | "view uuid"
+            | "view the uuid"
+            | "view hardware uuid"
+            | "view the hardware uuid"
+            | "view platform uuid"
+            | "view the platform uuid"
+            | "see uuid"
+            | "see the uuid"
+            | "see hardware uuid"
+            | "see the hardware uuid"
+            | "open uuid"
+            | "open the uuid"
+            | "open hardware uuid"
+            | "open the hardware uuid"
+            | "list uuid"
+            | "list the uuid"
+            | "list hardware uuid"
+            | "list the hardware uuid"
+            | "list platform uuid"
+            | "list the platform uuid"
+            | "show uuid"
+            | "show the uuid"
+            | "show me uuid"
+            | "show me the uuid"
+            | "show hardware uuid"
+            | "show the hardware uuid"
+            | "show me hardware uuid"
+            | "show me the hardware uuid"
+    )
+}
+
+/// Zero-LLM hardware UUID from `system_profiler` / `ioreg` IOPlatformUUID.
+pub fn format_hardware_uuid_report() -> String {
+    let v = crate::metrics::get_hardware_uuid();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**UUID** — _no hardware UUID on this Mac right now._".to_string();
+    }
+    format!("**UUID** · `{v}`")
+}
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2962] - 2026-11-22
+
+### Added
+- Instant hardware UUID accepts `/uuid` · `/hw-uuid` · `/hardware-uuid` · `/platform-uuid` · `/device-uuid` · `/mac-uuid` and view/see/open/list NL (`view uuid`, `open hardware uuid`, `list platform uuid`, …), matching “hardware uuid” / “platform uuid” / “what's my uuid” / “what's my hardware uuid” / “what's the platform uuid”. Bare `uuid` stays with the agent; `/serial` stays hardware serial; `/udid` · provisioning UDID stay with the agent.
+
 ## [0.1.2961] - 2026-11-22
 
 ### Added

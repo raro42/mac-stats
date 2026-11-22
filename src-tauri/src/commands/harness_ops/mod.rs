@@ -1716,6 +1716,50 @@ mod tests {
         }
     }
 
+    #[test]
+    fn hardware_uuid_slash_and_view_open_do_not_steal_serial_or_bare_uuid() {
+        // Slash + view/open NL → hardware UUID (`/serial` parity).
+        // Bare `uuid` stays with the agent; `/serial` stays serial; `/udid` stays with the agent.
+        assert!(looks_like_hardware_uuid_request("/uuid"));
+        assert!(looks_like_hardware_uuid_request("/hw-uuid"));
+        assert!(looks_like_hardware_uuid_request("/hardware-uuid"));
+        assert!(looks_like_hardware_uuid_request("/platform-uuid"));
+        assert!(looks_like_hardware_uuid_request("/device-uuid"));
+        assert!(looks_like_hardware_uuid_request("/mac-uuid"));
+        assert!(looks_like_hardware_uuid_request("view uuid"));
+        assert!(looks_like_hardware_uuid_request("open hardware uuid"));
+        assert!(looks_like_hardware_uuid_request("list platform uuid"));
+        assert!(looks_like_hardware_uuid_request("hardware uuid"));
+        assert!(looks_like_hardware_uuid_request("what's my uuid"));
+        assert!(looks_like_hardware_uuid_request("what's my hardware uuid"));
+        assert!(!looks_like_hardware_uuid_request("uuid"));
+        assert!(!looks_like_hardware_uuid_request("/serial"));
+        assert!(!looks_like_hardware_uuid_request("view serial"));
+        assert!(!looks_like_hardware_uuid_request("/udid"));
+        assert!(!looks_like_hardware_uuid_request("udid"));
+        assert!(!looks_like_hardware_uuid_request("generate uuid"));
+        assert!(!looks_like_serial_request("/uuid"));
+        assert!(!looks_like_serial_request("view uuid"));
+        let id = try_operator_instant_reply("/uuid").unwrap();
+        assert!(
+            id.contains("**UUID**") && id.contains('`') && !id.to_lowercase().contains("execution"),
+            "got: {id}"
+        );
+        let viewed = try_operator_instant_reply("view uuid").unwrap();
+        assert!(
+            viewed.contains("**UUID**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("uuid").is_none());
+        let serial = try_operator_instant_reply("/serial");
+        if let Some(reply) = serial {
+            assert!(
+                !reply.contains("**UUID**"),
+                "/serial must stay serial, not UUID: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

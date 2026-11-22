@@ -1082,6 +1082,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_vpn_status_request(content) {
         return Some(format_vpn_status_report());
     }
+    // Hardware UUID (bare `uuid` stays with the agent; `/serial` stays serial; `/udid` stays with the agent).
+    if looks_like_hardware_uuid_request(content) {
+        return Some(format_hardware_uuid_report());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());
