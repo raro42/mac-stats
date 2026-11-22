@@ -8534,6 +8534,209 @@ pub fn format_battery_cycles_report() -> String {
     format!("**Cycles** · `{v}`")
 }
 
+/// AC charger · adapter wattage — not CPU+GPU `/watts`, not Bat % / `is it charging`.
+/// Slash + view/open NL (`/charger` · `/adapter` · `view charger`) match `/cycles` · `/watts` shape;
+/// bare `charger` / `adapter` stay with the agent; `/watts` · `how many watts` stay system power draw.
+pub fn looks_like_ac_charger_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cycle")
+        || n.contains("health")
+        || n.contains("condition")
+        || n.contains("max capacity")
+        || n.contains("percent")
+        || n.contains('%')
+        || n.contains("left")
+        || n.contains("remaining")
+        || n.contains("low")
+        || n.contains("strip")
+        || n.contains("heat")
+        || n.contains("thermal")
+        || n.contains("cpu")
+        || n.contains("gpu")
+        || n.contains("ram")
+        || n.contains("disk")
+        || n.contains("ssd")
+        || n.contains("keep")
+        || n.contains("discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        // System power draw / full strip / Bat % stay elsewhere.
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/power"
+        || n == "watts"
+        || n == "the watts"
+        || n == "power draw"
+        || n == "the power draw"
+        || n == "how many watts"
+        || n == "how much power"
+        || n == "view watts"
+        || n == "view the watts"
+        || n == "open watts"
+        || n == "open the watts"
+        || n == "view power"
+        || n == "view the power"
+        || n == "open power"
+        || n == "open the power"
+        || n == "power"
+        || n == "the power"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "battery"
+        || n == "the battery"
+        || n == "view battery"
+        || n == "view the battery"
+        || n == "open battery"
+        || n == "open the battery"
+        || n == "how much battery"
+        || n == "is it charging"
+        || n == "is the battery charging"
+        || n == "is it plugged in"
+        || n == "is the battery plugged in"
+        || n == "battery charge"
+        || n == "battery level"
+        || n == "battery status"
+        // Bare short / ambiguous stay with the agent.
+        || n == "charger"
+        || n == "the charger"
+        || n == "adapter"
+        || n == "the adapter"
+        || n == "ac"
+        || n == "the ac"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/charger"
+            | "/ac-charger"
+            | "/accharger"
+            | "/adapter"
+            | "/power-adapter"
+            | "/poweradapter"
+            | "/ac-adapter"
+            | "/acadapter"
+            | "/charger-watts"
+            | "/chargerwatts"
+            | "/ac-watts"
+            | "/acwatts"
+            | "/adapter-watts"
+            | "/adapterwatts"
+            | "/charger-wattage"
+            | "/adapter-wattage"
+            | "charger watts"
+            | "the charger watts"
+            | "adapter watts"
+            | "the adapter watts"
+            | "ac charger"
+            | "the ac charger"
+            | "ac adapter"
+            | "the ac adapter"
+            | "power adapter"
+            | "the power adapter"
+            | "charger wattage"
+            | "the charger wattage"
+            | "adapter wattage"
+            | "the adapter wattage"
+            | "my charger"
+            | "my adapter"
+            | "my ac charger"
+            | "my power adapter"
+            | "what's my charger"
+            | "whats my charger"
+            | "what is my charger"
+            | "what's my adapter"
+            | "whats my adapter"
+            | "what is my adapter"
+            | "what's my charger watts"
+            | "whats my charger watts"
+            | "what is my charger watts"
+            | "what's my adapter watts"
+            | "whats my adapter watts"
+            | "what is my adapter watts"
+            | "what's the charger"
+            | "whats the charger"
+            | "what is the charger"
+            | "what's the adapter"
+            | "whats the adapter"
+            | "what is the adapter"
+            | "which charger"
+            | "which adapter"
+            | "how many charger watts"
+            | "how many adapter watts"
+            // View/see/show me/open/list.
+            | "view charger"
+            | "view the charger"
+            | "view adapter"
+            | "view the adapter"
+            | "view ac charger"
+            | "view the ac charger"
+            | "view power adapter"
+            | "view the power adapter"
+            | "view charger watts"
+            | "view the charger watts"
+            | "view adapter watts"
+            | "view the adapter watts"
+            | "see charger"
+            | "see the charger"
+            | "see adapter"
+            | "see the adapter"
+            | "see charger watts"
+            | "see the charger watts"
+            | "open charger"
+            | "open the charger"
+            | "open adapter"
+            | "open the adapter"
+            | "open ac charger"
+            | "open the ac charger"
+            | "open charger watts"
+            | "open the charger watts"
+            | "list charger"
+            | "list the charger"
+            | "list adapter"
+            | "list the adapter"
+            | "list charger watts"
+            | "list the charger watts"
+            | "show charger"
+            | "show the charger"
+            | "show me charger"
+            | "show me the charger"
+            | "show adapter"
+            | "show the adapter"
+            | "show me adapter"
+            | "show me the adapter"
+            | "show charger watts"
+            | "show the charger watts"
+            | "show me charger watts"
+            | "show me the charger watts"
+            | "show adapter watts"
+            | "show the adapter watts"
+            | "show me adapter watts"
+            | "show me the adapter watts"
+    )
+}
+
+/// Zero-LLM AC charger · adapter wattage from `system_profiler SPPowerDataType`.
+pub fn format_ac_charger_report() -> String {
+    let v = crate::metrics::get_ac_charger();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Charger** — _no AC charger reading on this Mac right now._".to_string();
+    }
+    format!("**Charger** · `{v}`")
+}
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

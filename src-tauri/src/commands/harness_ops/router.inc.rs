@@ -1062,6 +1062,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_battery_cycles_request(content) {
         return Some(format_battery_cycles_report());
     }
+    // AC charger · adapter watts (bare `charger` / `adapter` stay with the agent; `/watts` stays CPU+GPU draw; `/battery` · is it charging stay Bat %).
+    if looks_like_ac_charger_request(content) {
+        return Some(format_ac_charger_report());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());

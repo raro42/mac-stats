@@ -1621,6 +1621,68 @@ mod tests {
     }
 
 #[test]
+    fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
+        // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).
+        // Bare `charger` / `adapter` stay with the agent; `/watts` stays CPU+GPU; `/battery` · is it charging stay Bat %.
+        assert!(looks_like_ac_charger_request("/charger"));
+        assert!(looks_like_ac_charger_request("/ac-charger"));
+        assert!(looks_like_ac_charger_request("/adapter"));
+        assert!(looks_like_ac_charger_request("/power-adapter"));
+        assert!(looks_like_ac_charger_request("/ac-adapter"));
+        assert!(looks_like_ac_charger_request("/charger-watts"));
+        assert!(looks_like_ac_charger_request("/ac-watts"));
+        assert!(looks_like_ac_charger_request("/adapter-watts"));
+        assert!(looks_like_ac_charger_request("view charger"));
+        assert!(looks_like_ac_charger_request("open adapter"));
+        assert!(looks_like_ac_charger_request("list charger watts"));
+        assert!(looks_like_ac_charger_request("charger watts"));
+        assert!(looks_like_ac_charger_request("ac charger"));
+        assert!(looks_like_ac_charger_request("power adapter"));
+        assert!(looks_like_ac_charger_request("what's my charger"));
+        assert!(looks_like_ac_charger_request("what's my adapter watts"));
+        assert!(!looks_like_ac_charger_request("charger"));
+        assert!(!looks_like_ac_charger_request("adapter"));
+        assert!(!looks_like_ac_charger_request("/watts"));
+        assert!(!looks_like_ac_charger_request("how many watts"));
+        assert!(!looks_like_ac_charger_request("view watts"));
+        assert!(!looks_like_ac_charger_request("/battery"));
+        assert!(!looks_like_ac_charger_request("view battery"));
+        assert!(!looks_like_ac_charger_request("is it charging"));
+        assert!(!looks_like_ac_charger_request("is it plugged in"));
+        assert!(!looks_like_ac_charger_request("/cycles"));
+        let charger = try_operator_instant_reply("/charger").unwrap();
+        assert!(
+            charger.contains("**Charger**") && !charger.to_lowercase().contains("execution"),
+            "got: {charger}"
+        );
+        let viewed = try_operator_instant_reply("view charger").unwrap();
+        assert!(
+            viewed.contains("**Charger**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let watts_lane = try_operator_instant_reply("/charger-watts").unwrap();
+        assert!(
+            watts_lane.contains("**Charger**") && !watts_lane.to_lowercase().contains("execution"),
+            "got: {watts_lane}"
+        );
+        assert!(try_operator_instant_reply("charger").is_none());
+        let sys_watts = try_operator_instant_reply("/watts");
+        if let Some(reply) = sys_watts {
+            assert!(
+                !reply.contains("**Charger**"),
+                "/watts must stay system power draw, not charger: {reply}"
+            );
+        }
+        let bat = try_operator_instant_reply("/battery");
+        if let Some(reply) = bat {
+            assert!(
+                !reply.contains("**Charger**"),
+                "/battery must stay Bat %, not charger: {reply}"
+            );
+        }
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.

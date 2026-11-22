@@ -1462,6 +1462,89 @@ pub fn get_battery_cycles() -> String {
         .clone()
 }
 
+/// AC charger connected · wattage · charging from `system_profiler SPPowerDataType` (JSON).
+/// Live (not OnceLock): plug / unplug / adapter swap can change while the process stays up.
+/// Distinct from system CPU+GPU `/watts` and Bat % chip (`/battery` · `is it charging`).
+pub fn get_ac_charger() -> String {
+    let output = Command::new("/usr/sbin/system_profiler")
+        .args(["SPPowerDataType", "-json"])
+        .stderr(std::process::Stdio::null())
+        .output();
+    let Ok(output) = output else {
+        debug3!("ac charger: system_profiler spawn failed");
+        return String::new();
+    };
+    if !output.status.success() {
+        debug3!("ac charger: system_profiler non-zero");
+        return String::new();
+    }
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let Ok(json) = serde_json::from_str::<serde_json::Value>(&stdout) else {
+        debug3!("ac charger: JSON parse failed");
+        return String::new();
+    };
+    let Some(entries) = json.get("SPPowerDataType").and_then(|v| v.as_array()) else {
+        return String::new();
+    };
+    for entry in entries {
+        let has_charger_keys = entry.get("sppower_battery_charger_connected").is_some()
+            || entry.get("sppower_ac_charger_watts").is_some()
+            || entry.get("sppower_battery_is_charging").is_some();
+        if !has_charger_keys {
+            continue;
+        }
+        let connected = entry
+            .get("sppower_battery_charger_connected")
+            .and_then(|v| match v {
+                serde_json::Value::Bool(b) => Some(*b),
+                serde_json::Value::String(s) => {
+                    let t = s.trim();
+                    Some(t.eq_ignore_ascii_case("TRUE") || t.eq_ignore_ascii_case("Yes") || t == "1")
+                }
+                _ => None,
+            })
+            .unwrap_or(false);
+        let charging = entry
+            .get("sppower_battery_is_charging")
+            .and_then(|v| match v {
+                serde_json::Value::Bool(b) => Some(*b),
+                serde_json::Value::String(s) => {
+                    let t = s.trim();
+                    Some(t.eq_ignore_ascii_case("TRUE") || t.eq_ignore_ascii_case("Yes") || t == "1")
+                }
+                _ => None,
+            })
+            .unwrap_or(false);
+        let watts = entry
+            .get("sppower_ac_charger_watts")
+            .and_then(|v| v.as_u64().or_else(|| v.as_i64().map(|n| n as u64)).or_else(|| {
+                v.as_str()
+                    .and_then(|s| s.trim().parse::<u64>().ok())
+            }));
+        let mut parts: Vec<String> = Vec::new();
+        if let Some(w) = watts {
+            if w > 0 {
+                parts.push(format!("{w} W"));
+            }
+        }
+        if connected {
+            parts.push("connected".to_string());
+        } else {
+            parts.push("disconnected".to_string());
+        }
+        if charging {
+            parts.push("charging".to_string());
+        } else if connected {
+            parts.push("not charging".to_string());
+        }
+        let info = parts.join(" · ");
+        debug3!("ac charger: '{}'", info);
+        return info;
+    }
+    debug3!("ac charger: no charger keys");
+    String::new()
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2957] - 2026-11-22
+
+### Added
+- Instant AC charger · adapter wattage accepts `/charger` · `/ac-charger` · `/adapter` · `/power-adapter` · `/ac-adapter` · `/charger-watts` · `/ac-watts` · `/adapter-watts` · `/charger-wattage` · `/adapter-wattage` and view/see/open/list NL (`view charger`, `open adapter`, `list charger watts`, …), matching “charger watts” / “ac charger” / “power adapter” / “what's my charger” / “what's my adapter watts”. Bare `charger` / `adapter` stay with the agent; `/watts` · `how many watts` stay CPU+GPU draw; `/battery` · `is it charging` · `is it plugged in` stay Bat %.
+
 ## [0.1.2956] - 2026-11-22
 
 ### Added
