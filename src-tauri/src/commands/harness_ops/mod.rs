@@ -817,6 +817,64 @@ mod tests {
     }
 
 #[test]
+    fn cpu_cores_slash_and_view_open_do_not_steal_p_core_or_chip() {
+        // Slash + view/open NL → core count (RAM `/ram-size` · locale `/locale` parity).
+        // `/p-core` · `/e-core` stay cluster clocks; `/chip` stays name; bare `core` / `/cpu` stay out.
+        assert!(looks_like_cpu_cores_request("/cores"));
+        assert!(looks_like_cpu_cores_request("/ncpu"));
+        assert!(looks_like_cpu_cores_request("/cpu-count"));
+        assert!(looks_like_cpu_cores_request("/core-count"));
+        assert!(looks_like_cpu_cores_request("/cpu-cores"));
+        assert!(looks_like_cpu_cores_request("/logical-cpus"));
+        assert!(looks_like_cpu_cores_request("/hw-ncpu"));
+        assert!(looks_like_cpu_cores_request("view cores"));
+        assert!(looks_like_cpu_cores_request("open ncpu"));
+        assert!(looks_like_cpu_cores_request("list cpu cores"));
+        assert!(looks_like_cpu_cores_request("cores"));
+        assert!(looks_like_cpu_cores_request("core count"));
+        assert!(looks_like_cpu_cores_request("how many cores"));
+        assert!(looks_like_cpu_cores_request("what's the core count"));
+        assert!(!looks_like_cpu_cores_request("core"));
+        assert!(!looks_like_cpu_cores_request("/p-core"));
+        assert!(!looks_like_cpu_cores_request("/e-cores"));
+        assert!(!looks_like_cpu_cores_request("p cores"));
+        assert!(!looks_like_cpu_cores_request("e cores"));
+        assert!(!looks_like_cpu_cores_request("/chip"));
+        assert!(!looks_like_cpu_cores_request("/cpu"));
+        assert!(!looks_like_cpu_cores_request("view cpu"));
+        let cores = try_operator_instant_reply("/cores").unwrap();
+        assert!(
+            cores.contains("**Cores**") && !cores.to_lowercase().contains("execution"),
+            "got: {cores}"
+        );
+        let viewed = try_operator_instant_reply("view cores").unwrap();
+        assert!(
+            viewed.contains("**Cores**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let short = try_operator_instant_reply("/ncpu").unwrap();
+        assert!(
+            short.contains("**Cores**") && !short.to_lowercase().contains("execution"),
+            "got: {short}"
+        );
+        assert!(try_operator_instant_reply("core").is_none());
+        let p = try_operator_instant_reply("/p-core");
+        if let Some(reply) = p {
+            assert!(
+                !reply.contains("**Cores**"),
+                "/p-core must stay cluster clock, not cores: {reply}"
+            );
+        }
+        let chip = try_operator_instant_reply("/chip");
+        if let Some(c) = chip {
+            assert!(
+                !c.contains("**Cores**"),
+                "/chip must stay chip, not cores: {c}"
+            );
+        }
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.

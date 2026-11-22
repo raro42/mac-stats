@@ -124,6 +124,8 @@ pub(crate) static ARCHITECTURE_CACHE: OnceLock<String> = OnceLock::new();
 pub(crate) static LOCALE_CACHE: OnceLock<String> = OnceLock::new();
 /// Cached kernel release (`uname -r`; instant `/kernel` · `/uname-r` lane).
 pub(crate) static KERNEL_RELEASE_CACHE: OnceLock<String> = OnceLock::new();
+/// Cached CPU core count (`sysctl` / `system_profiler`; instant `/cores` · `/ncpu` lane).
+pub(crate) static CPU_CORES_CACHE: OnceLock<String> = OnceLock::new();
 
 pub(crate) static CAN_READ_FREQUENCY: OnceLock<bool> = OnceLock::new();
 pub(crate) static CAN_READ_CPU_POWER: OnceLock<bool> = OnceLock::new();

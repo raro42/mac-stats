@@ -604,6 +604,89 @@ pub fn get_locale() -> String {
         .clone()
 }
 
+/// Cached CPU core count (`system_profiler` P/E breakdown, else `sysctl hw.logicalcpu`).
+/// Used by the Discord/operator instant `/cores` · `/ncpu` lane.
+/// Distinct from `/chip` (name · cores string) and `/p-core` / `/e-core` (cluster clocks).
+pub fn get_cpu_cores() -> String {
+    CPU_CORES_CACHE
+        .get_or_init(|| {
+            let from_profiler = || -> Option<String> {
+                let output = Command::new("/usr/sbin/system_profiler")
+                    .args(["SPHardwareDataType", "-json"])
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                let json: serde_json::Value = serde_json::from_str(&stdout).ok()?;
+                let hardware = json
+                    .get("SPHardwareDataType")?
+                    .as_array()?
+                    .first()?;
+                let num_procs = hardware.get("number_processors")?.as_str()?;
+                let clean = num_procs.strip_prefix("proc ").unwrap_or(num_procs);
+                let parts: Vec<&str> = clean.split(':').collect();
+                // "16:12:4" → total:P:E
+                if parts.len() >= 3 {
+                    let total = parts[0].parse::<u32>().ok()?;
+                    let p = parts[1].parse::<u32>().ok().unwrap_or(0);
+                    let e = parts[2].parse::<u32>().ok().unwrap_or(0);
+                    if total == 0 {
+                        return None;
+                    }
+                    if p > 0 || e > 0 {
+                        return Some(format!("{total} ({p}P + {e}E)"));
+                    }
+                    return Some(total.to_string());
+                }
+                if parts.len() == 1 {
+                    let total = parts[0].parse::<u32>().ok()?;
+                    if total > 0 {
+                        return Some(total.to_string());
+                    }
+                }
+                None
+            };
+            let sysctl_u32 = |key: &str| -> Option<u32> {
+                let output = Command::new("/usr/sbin/sysctl")
+                    .args(["-n", key])
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                let s = String::from_utf8_lossy(&output.stdout);
+                let n = s.trim().parse::<u32>().ok()?;
+                if n == 0 {
+                    None
+                } else {
+                    Some(n)
+                }
+            };
+            let from_sysctl = || -> Option<String> {
+                let logical = sysctl_u32("hw.logicalcpu")?;
+                let physical = sysctl_u32("hw.physicalcpu");
+                match physical {
+                    Some(p) if p != logical => Some(format!("{logical} logical · {p} physical")),
+                    _ => Some(format!("{logical} logical")),
+                }
+            };
+            let info = from_profiler()
+                .or_else(from_sysctl)
+                .unwrap_or_default();
+            if info.is_empty() {
+                debug3!("cpu cores: profiler/sysctl empty");
+            } else {
+                debug3!("cpu cores cached: '{}'", info);
+            }
+            info
+        })
+        .clone()
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

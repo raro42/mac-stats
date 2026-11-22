@@ -6233,8 +6233,6 @@ pub fn format_locale_gateway() -> String {
     }
     format!("**Locale** · `{v}`")
 }
-
-
 /// Kernel release — not machine arch (`uname -m`), not macOS ProductVersion, not full `uname`.
 /// Slash + view/open NL (`/kernel` · `/uname-r` · `view kernel`) match arch `/arch` ·
 /// locale `/locale` shape; bare `uname` / `/uname` stay with the agent; `/uname-m` stays arch.
@@ -6362,6 +6360,179 @@ pub fn format_kernel_gateway() -> String {
         return "**Kernel** — _no kernel release right now._".to_string();
     }
     format!("**Kernel** · `{v}`")
+}
+
+
+/// CPU core count — not chip name, not P/E cluster clocks, not CPU usage ring.
+/// Slash + view/open NL (`/cores` · `/ncpu` · `view cores`) match RAM `/ram-size` ·
+/// locale `/locale` shape; `/p-core` · `/e-core` stay cluster clocks; `/chip` stays name;
+/// bare `core` stays with the agent.
+pub fn looks_like_cpu_cores_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("freq")
+        || n.contains("clock")
+        || n.contains("ghz")
+        || n.contains("fast")
+        || n.contains("usage")
+        || n.contains("percent")
+        || n.contains('%')
+        || n.contains("hot")
+        || n.contains("high")
+        || n.contains("busy")
+        || n.contains("gpu")
+        || n.contains("process")
+        // P/E cluster clock lanes own these (do not use bare "e core" — matches "the core").
+        || n.contains("p-core")
+        || n.contains("p core")
+        || n.contains("e-core")
+        || n.contains("performance")
+        || n.contains("efficiency")
+        || n.contains("/pcore")
+        || n.contains("/ecore")
+        || n.starts_with("e core")
+        || n.starts_with("e-cores")
+        || n.contains(" e core")
+        || n.contains(" e-core")
+        || n == "/e-cores"
+        || n == "/ecore"
+        // Chip name owns /chip; CPU ring owns bare /cpu · view cpu.
+        || n.contains("chip")
+        || n == "/cpu"
+        || n == "cpu"
+        || n == "the cpu"
+        || n == "view cpu"
+        || n == "view the cpu"
+        || n == "see cpu"
+        || n == "see the cpu"
+        || n == "open cpu"
+        || n == "open the cpu"
+        || n == "list cpu"
+        || n == "list the cpu"
+        // Bare short token — too ambiguous.
+        || n == "core"
+        || n == "the core"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/cores"
+            | "/core-count"
+            | "/corecount"
+            | "/cpu-cores"
+            | "/cpucores"
+            | "/cpu-count"
+            | "/cpucount"
+            | "/ncpu"
+            | "/logical-cpus"
+            | "/logicalcpus"
+            | "/logical-cores"
+            | "/logicalcores"
+            | "/physical-cpus"
+            | "/physicalcpus"
+            | "/hw-ncpu"
+            | "/hwncpu"
+            | "cores"
+            | "the cores"
+            | "cpu cores"
+            | "the cpu cores"
+            | "core count"
+            | "the core count"
+            | "cpu count"
+            | "the cpu count"
+            | "cpu core count"
+            | "the cpu core count"
+            | "logical cpus"
+            | "the logical cpus"
+            | "logical cores"
+            | "the logical cores"
+            | "physical cpus"
+            | "the physical cpus"
+            | "physical cores"
+            | "the physical cores"
+            | "ncpu"
+            | "the ncpu"
+            | "how many cores"
+            | "how many cpu cores"
+            | "how many logical cores"
+            | "how many physical cores"
+            | "how many cpus"
+            | "number of cores"
+            | "number of cpu cores"
+            | "what's the core count"
+            | "whats the core count"
+            | "what is the core count"
+            | "what's my core count"
+            | "whats my core count"
+            | "what is my core count"
+            | "what's the cpu count"
+            | "whats the cpu count"
+            | "what is the cpu count"
+            | "how many cores do i have"
+            | "how many cores does this mac have"
+            | "how many cores does this have"
+            // View/see/show me/open/list.
+            | "view cores"
+            | "view the cores"
+            | "view core count"
+            | "view the core count"
+            | "view cpu cores"
+            | "view the cpu cores"
+            | "view cpu count"
+            | "view ncpu"
+            | "see cores"
+            | "see the cores"
+            | "see core count"
+            | "see the core count"
+            | "see cpu cores"
+            | "see cpu count"
+            | "open cores"
+            | "open the cores"
+            | "open core count"
+            | "open the core count"
+            | "open cpu cores"
+            | "open cpu count"
+            | "open ncpu"
+            | "list cores"
+            | "list the cores"
+            | "list core count"
+            | "list the core count"
+            | "list cpu cores"
+            | "list cpu count"
+            | "show cores"
+            | "show the cores"
+            | "show me cores"
+            | "show me the cores"
+            | "show core count"
+            | "show the core count"
+            | "show me core count"
+            | "show me the core count"
+            | "show cpu cores"
+            | "show me cpu cores"
+            | "show cpu count"
+            | "show me cpu count"
+    )
+}
+
+
+/// Zero-LLM CPU core count from cached profiler / sysctl.
+pub fn format_cpu_cores_gateway() -> String {
+    let v = crate::metrics::get_cpu_cores();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Cores** — _no core count right now._".to_string();
+    }
+    format!("**Cores** · {v}")
 }
 
 

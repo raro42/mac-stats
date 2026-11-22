@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2944] - 2026-11-22
+
+### Added
+- Instant CPU core count accepts `/cores` · `/ncpu` · `/cpu-count` · `/core-count` · `/cpu-cores` · `/logical-cpus` · `/hw-ncpu` and view/see/open/list NL (`view cores`, `open ncpu`, `list cpu cores`, …), matching “how many cores” / “core count” / “what's the core count”. `/p-core` · `/e-core` stay cluster clocks; `/chip` stays Apple chip name; bare `core` / bare `/cpu` stay with the agent / CPU ring.
+
 ## [0.1.2943] - 2026-11-22
 
 ### Added
