@@ -1014,6 +1014,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_cpu_cores_request(content) {
         return Some(format_cpu_cores_gateway());
     }
+    // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process).
+    if looks_like_boot_time_request(content) {
+        return Some(format_boot_time_gateway());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());

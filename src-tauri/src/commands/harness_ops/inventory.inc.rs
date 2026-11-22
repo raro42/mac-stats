@@ -6536,6 +6536,181 @@ pub fn format_cpu_cores_gateway() -> String {
 }
 
 
+/// Last boot wall-clock — not Mac Up duration, not app process uptime.
+/// Slash + view/open NL (`/boot` · `/boot-time` · `view boot time`) match cores `/cores` ·
+/// kernel `/kernel` shape; bare `/uptime` / `view uptime` / `what's the uptime` stay Mac Up;
+/// `/app-uptime` stays process uptime; boot disk / boot volume stay with the agent.
+pub fn looks_like_boot_time_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("disk")
+        || n.contains("volume")
+        || n.contains("camp")
+        || n.contains("safe boot")
+        || n.contains("recovery")
+        || n.contains("firmware")
+        || n.contains("efi")
+        || n.contains("loader")
+        || n.contains("partition")
+        || n.contains("app uptime")
+        || n.contains("process uptime")
+        || n.contains("bot uptime")
+        || n.contains("mac-stats uptime")
+        // Mac Up duration chip owns bare uptime phrases.
+        || n == "/uptime"
+        || n == "/up"
+        || n == "uptime"
+        || n == "the uptime"
+        || n == "up time"
+        || n == "system uptime"
+        || n == "view uptime"
+        || n == "view the uptime"
+        || n == "see uptime"
+        || n == "see the uptime"
+        || n == "open uptime"
+        || n == "open the uptime"
+        || n == "list uptime"
+        || n == "list the uptime"
+        || n == "what's the uptime"
+        || n == "whats the uptime"
+        || n == "what is the uptime"
+        || n == "how's the uptime"
+        || n == "hows the uptime"
+        || n == "how long up"
+        || n == "how long has it been up"
+        || n == "how long has the mac been up"
+        // Bare "boot" alone is ambiguous (boot disk / recovery).
+        || n == "boot"
+        || n == "the boot"
+        || n == "reboot"
+        || n == "the reboot"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/boot"
+            | "/boot-time"
+            | "/boottime"
+            | "/boot-timestamp"
+            | "/boottimestamp"
+            | "/last-boot"
+            | "/lastboot"
+            | "/last-reboot"
+            | "/lastreboot"
+            | "/reboot-time"
+            | "/reboottime"
+            | "boot time"
+            | "the boot time"
+            | "boot timestamp"
+            | "the boot timestamp"
+            | "last boot"
+            | "the last boot"
+            | "last reboot"
+            | "the last reboot"
+            | "last boot time"
+            | "the last boot time"
+            | "last reboot time"
+            | "the last reboot time"
+            | "reboot time"
+            | "the reboot time"
+            | "when did this boot"
+            | "when did it boot"
+            | "when did the mac boot"
+            | "when did this mac boot"
+            | "when was the last boot"
+            | "when was the last reboot"
+            | "when was last boot"
+            | "when was last reboot"
+            | "what's the boot time"
+            | "whats the boot time"
+            | "what is the boot time"
+            | "what's my boot time"
+            | "whats my boot time"
+            | "what is my boot time"
+            | "what's the last boot"
+            | "whats the last boot"
+            | "what is the last boot"
+            | "what's the last reboot"
+            | "whats the last reboot"
+            | "what is the last reboot"
+            | "when did we last reboot"
+            | "when did i last reboot"
+            // View/see/show me/open/list.
+            | "view boot"
+            | "view the boot"
+            | "view boot time"
+            | "view the boot time"
+            | "view last boot"
+            | "view the last boot"
+            | "view last reboot"
+            | "view the last reboot"
+            | "view reboot time"
+            | "see boot"
+            | "see the boot"
+            | "see boot time"
+            | "see the boot time"
+            | "see last boot"
+            | "see the last boot"
+            | "see last reboot"
+            | "open boot"
+            | "open the boot"
+            | "open boot time"
+            | "open the boot time"
+            | "open last boot"
+            | "open the last boot"
+            | "open last reboot"
+            | "open reboot time"
+            | "list boot"
+            | "list the boot"
+            | "list boot time"
+            | "list the boot time"
+            | "list last boot"
+            | "list last reboot"
+            | "show boot"
+            | "show the boot"
+            | "show me boot"
+            | "show me the boot"
+            | "show boot time"
+            | "show the boot time"
+            | "show me boot time"
+            | "show me the boot time"
+            | "show last boot"
+            | "show the last boot"
+            | "show me last boot"
+            | "show me the last boot"
+            | "show last reboot"
+            | "show the last reboot"
+            | "show me last reboot"
+            | "show me the last reboot"
+            | "show reboot time"
+            | "show the reboot time"
+            | "show me reboot time"
+            | "show me the reboot time"
+    )
+}
+
+
+/// Zero-LLM last boot wall-clock from uptime + local clock.
+pub fn format_boot_time_gateway() -> String {
+    let v = crate::metrics::get_boot_time();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Boot** — _no boot time right now._".to_string();
+    }
+    format!("**Boot** · `{v}`")
+}
+
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

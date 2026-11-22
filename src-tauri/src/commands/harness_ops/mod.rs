@@ -875,6 +875,63 @@ mod tests {
     }
 
 #[test]
+    fn boot_time_slash_and_view_open_do_not_steal_uptime_or_app_uptime() {
+        // Slash + view/open NL → last boot wall-clock (cores `/cores` · kernel `/kernel` parity).
+        // Bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process; bare `boot` stays out.
+        assert!(looks_like_boot_time_request("/boot"));
+        assert!(looks_like_boot_time_request("/boot-time"));
+        assert!(looks_like_boot_time_request("/last-boot"));
+        assert!(looks_like_boot_time_request("/last-reboot"));
+        assert!(looks_like_boot_time_request("/reboot-time"));
+        assert!(looks_like_boot_time_request("view boot time"));
+        assert!(looks_like_boot_time_request("open last reboot"));
+        assert!(looks_like_boot_time_request("list boot time"));
+        assert!(looks_like_boot_time_request("boot time"));
+        assert!(looks_like_boot_time_request("last reboot"));
+        assert!(looks_like_boot_time_request("when did this mac boot"));
+        assert!(looks_like_boot_time_request("when was the last reboot"));
+        assert!(looks_like_boot_time_request("what's the boot time"));
+        assert!(!looks_like_boot_time_request("boot"));
+        assert!(!looks_like_boot_time_request("reboot"));
+        assert!(!looks_like_boot_time_request("/uptime"));
+        assert!(!looks_like_boot_time_request("view uptime"));
+        assert!(!looks_like_boot_time_request("what's the uptime"));
+        assert!(!looks_like_boot_time_request("boot disk"));
+        assert!(!looks_like_boot_time_request("boot volume"));
+        assert!(!looks_like_boot_time_request("/app-uptime"));
+        let boot = try_operator_instant_reply("/boot").unwrap();
+        assert!(
+            boot.contains("**Boot**") && !boot.to_lowercase().contains("execution"),
+            "got: {boot}"
+        );
+        let viewed = try_operator_instant_reply("view boot time").unwrap();
+        assert!(
+            viewed.contains("**Boot**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let short = try_operator_instant_reply("/boot-time").unwrap();
+        assert!(
+            short.contains("**Boot**") && !short.to_lowercase().contains("execution"),
+            "got: {short}"
+        );
+        assert!(try_operator_instant_reply("boot").is_none());
+        let up = try_operator_instant_reply("/uptime");
+        if let Some(reply) = up {
+            assert!(
+                !reply.contains("**Boot**"),
+                "/uptime must stay Mac Up duration, not boot: {reply}"
+            );
+        }
+        let app = try_operator_instant_reply("/app-uptime");
+        if let Some(reply) = app {
+            assert!(
+                !reply.contains("**Boot**"),
+                "/app-uptime must stay process uptime, not boot: {reply}"
+            );
+        }
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.

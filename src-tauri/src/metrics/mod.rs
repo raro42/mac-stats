@@ -687,6 +687,18 @@ pub fn get_cpu_cores() -> String {
         .clone()
 }
 
+/// Wall-clock last boot time from `sysinfo` uptime + local clock.
+/// Used by the Discord/operator instant `/boot` · `/boot-time` lane.
+/// Distinct from Mac Up duration (`/uptime`) and app process uptime (`/app-uptime`).
+pub fn get_boot_time() -> String {
+    let uptime = System::uptime();
+    let now = chrono::Local::now();
+    let boot = now - chrono::Duration::seconds(uptime as i64);
+    let formatted = boot.format("%Y-%m-%d %H:%M %Z").to_string();
+    debug3!("boot time: '{}' (uptime {}s)", formatted, uptime);
+    formatted
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2945] - 2026-11-22
+
+### Added
+- Instant last boot wall-clock accepts `/boot` · `/boot-time` · `/last-boot` · `/last-reboot` · `/reboot-time` and view/see/open/list NL (`view boot time`, `open last reboot`, `list boot time`, …), matching “boot time” / “last reboot” / “when did this mac boot” / “when was the last reboot”. Bare `/uptime` / `view uptime` / “what's the uptime” stay Mac Up duration; `/app-uptime` stays process uptime; bare `boot` / boot disk / boot volume stay with the agent.
+
 ## [0.1.2944] - 2026-11-22
 
 ### Added
