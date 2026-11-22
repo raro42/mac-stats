@@ -1066,6 +1066,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_ac_charger_request(content) {
         return Some(format_ac_charger_report());
     }
+    // Battery time-to-empty / time-to-full (bare `time` / `remaining` stay with the agent; `battery left` / `/battery` stay Bat %).
+    if looks_like_battery_time_request(content) {
+        return Some(format_battery_time_report());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());

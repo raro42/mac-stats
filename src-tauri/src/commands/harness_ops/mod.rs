@@ -1561,6 +1561,59 @@ mod tests {
     }
 
 #[test]
+    fn battery_time_slash_and_view_open_do_not_steal_bat_percent_or_cycles() {
+        // Slash + view/open NL → time-to-empty / full (`/cycles` · `/battery` parity).
+        // Bare `time` / `remaining` stay with the agent; Bat % · cycles stay their lanes.
+        assert!(looks_like_battery_time_request("/battery-time"));
+        assert!(looks_like_battery_time_request("/bat-time"));
+        assert!(looks_like_battery_time_request("/time-remaining"));
+        assert!(looks_like_battery_time_request("/time-to-empty"));
+        assert!(looks_like_battery_time_request("/time-to-full"));
+        assert!(looks_like_battery_time_request("/eta-empty"));
+        assert!(looks_like_battery_time_request("/eta-full"));
+        assert!(looks_like_battery_time_request("view battery time"));
+        assert!(looks_like_battery_time_request("open time remaining"));
+        assert!(looks_like_battery_time_request("list battery time"));
+        assert!(looks_like_battery_time_request("battery time"));
+        assert!(looks_like_battery_time_request("time remaining"));
+        assert!(looks_like_battery_time_request("time to empty"));
+        assert!(looks_like_battery_time_request("how long until empty"));
+        assert!(looks_like_battery_time_request("what's my battery time"));
+        assert!(!looks_like_battery_time_request("time"));
+        assert!(!looks_like_battery_time_request("remaining"));
+        assert!(!looks_like_battery_time_request("/battery"));
+        assert!(!looks_like_battery_time_request("view battery"));
+        assert!(!looks_like_battery_time_request("battery left"));
+        assert!(!looks_like_battery_time_request("battery remaining"));
+        assert!(!looks_like_battery_time_request("/cycles"));
+        assert!(!looks_like_battery_time_request("battery health"));
+        assert!(!looks_like_battery_time_request("is it charging"));
+        assert_eq!(parse_strip_chip_ask("battery time remaining"), None);
+        assert_eq!(parse_strip_chip_ask("time to empty"), None);
+        assert_eq!(parse_strip_chip_ask("battery left"), Some(StripChipAsk::Battery));
+        let time = try_operator_instant_reply("/battery-time").unwrap();
+        assert!(
+            time.contains("**Battery time**") && !time.to_lowercase().contains("execution"),
+            "got: {time}"
+        );
+        let viewed = try_operator_instant_reply("view battery time").unwrap();
+        assert!(
+            viewed.contains("**Battery time**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let bat = try_operator_instant_reply("/battery").unwrap();
+        assert!(
+            !bat.contains("**Battery time**"),
+            "/battery must stay Bat %, not time: {bat}"
+        );
+        let cycles = try_operator_instant_reply("/cycles").unwrap();
+        assert!(
+            !cycles.contains("**Battery time**"),
+            "/cycles must stay Cycles, not time: {cycles}"
+        );
+    }
+
+    #[test]
     fn battery_cycles_slash_and_view_open_do_not_steal_bat_percent() {
         // Slash + view/open NL → cycle count · health · max capacity (`/battery` · `/chip` parity).
         // Bare `cycles` / `health` stay with the agent; `/battery` · view battery stay Bat %.

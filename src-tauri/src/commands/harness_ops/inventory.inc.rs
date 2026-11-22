@@ -4303,6 +4303,14 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
         || n.contains("condition")
         || n.contains("max capacity")
         || n.contains("maximum capacity")
+        // Battery time-to-empty / full owns these (not Bat %).
+        || n.contains("time remaining")
+        || n.contains("time to empty")
+        || n.contains("time to full")
+        || n.contains("until empty")
+        || n.contains("until full")
+        || n.contains("battery time")
+        || n.contains("bat time")
         // Disk Cleanup owns bare `open disk` / `view disk` (not SSD %).
         || n == "open disk"
         || n == "open the disk"
@@ -8381,6 +8389,8 @@ pub fn looks_like_battery_cycles_request(content: &str) -> bool {
         || n.contains("strip")
         || n.contains("watts")
         || n.contains("power")
+        || n.contains("charger")
+        || n.contains("adapter")
         || n.contains("heat")
         || n.contains("thermal")
         || n.contains("cpu")
@@ -8735,6 +8745,169 @@ pub fn format_ac_charger_report() -> String {
         return "**Charger** — _no AC charger reading on this Mac right now._".to_string();
     }
     format!("**Charger** · `{v}`")
+}
+
+/// Battery time-to-empty / time-to-full (not Bat % · not cycles).
+/// Slash + view/open NL (`/battery-time` · `/time-remaining` · `view battery time`) match `/cycles` shape;
+/// `battery left` / `battery remaining` / `/battery` stay Bat %; bare `time` / `remaining` stay with the agent.
+pub fn looks_like_battery_time_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cycle")
+        || n.contains("health")
+        || n.contains("condition")
+        || n.contains("capacity")
+        || n.contains("percent")
+        || n.contains('%')
+        || n.contains("charging")
+        || n.contains("plugged")
+        || n.contains("low")
+        || n.contains("strip")
+        || n.contains("watts")
+        || n.contains("power")
+        || n.contains("heat")
+        || n.contains("thermal")
+        || n.contains("cpu")
+        || n.contains("gpu")
+        || n.contains("ram")
+        || n.contains("disk")
+        || n.contains("ssd")
+        || n.contains("keep")
+        || n.contains("discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        // Bare / Bat-% asks stay with the agent or `/battery`.
+        || n == "time"
+        || n == "the time"
+        || n == "remaining"
+        || n == "the remaining"
+        || n == "battery"
+        || n == "the battery"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "view battery"
+        || n == "view the battery"
+        || n == "open battery"
+        || n == "open the battery"
+        || n == "how much battery"
+        || n == "battery left"
+        || n == "battery remaining"
+        || n == "charge left"
+        || n == "charge remaining"
+        || n == "battery status"
+        || n == "battery charge"
+        || n == "battery level"
+        || n == "how much battery left"
+        || n == "how much battery is left"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/battery-time"
+            | "/batterytime"
+            | "/bat-time"
+            | "/battime"
+            | "/time-remaining"
+            | "/timeremaining"
+            | "/time-to-empty"
+            | "/timetoempty"
+            | "/time-to-full"
+            | "/timetofull"
+            | "/eta-empty"
+            | "/etaempty"
+            | "/eta-full"
+            | "/etafull"
+            | "battery time"
+            | "the battery time"
+            | "battery time remaining"
+            | "the battery time remaining"
+            | "time remaining"
+            | "the time remaining"
+            | "time to empty"
+            | "the time to empty"
+            | "time to full"
+            | "the time to full"
+            | "until empty"
+            | "until full"
+            | "how long until empty"
+            | "how long until full"
+            | "how long until the battery dies"
+            | "how long until the battery is empty"
+            | "how long until the battery is full"
+            | "how long left on the battery"
+            | "how long left on battery"
+            | "what's my battery time"
+            | "whats my battery time"
+            | "what is my battery time"
+            | "what's the battery time"
+            | "whats the battery time"
+            | "what is the battery time"
+            | "what's my time remaining"
+            | "whats my time remaining"
+            | "what is my time remaining"
+            | "what's the time remaining"
+            | "whats the time remaining"
+            | "what is the time remaining"
+            | "which battery time"
+            // View/see/show me/open/list.
+            | "view battery time"
+            | "view the battery time"
+            | "view time remaining"
+            | "view the time remaining"
+            | "view time to empty"
+            | "view the time to empty"
+            | "view time to full"
+            | "view the time to full"
+            | "see battery time"
+            | "see the battery time"
+            | "see time remaining"
+            | "see the time remaining"
+            | "open battery time"
+            | "open the battery time"
+            | "open time remaining"
+            | "open the time remaining"
+            | "list battery time"
+            | "list the battery time"
+            | "list time remaining"
+            | "list the time remaining"
+            | "show battery time"
+            | "show the battery time"
+            | "show me battery time"
+            | "show me the battery time"
+            | "show time remaining"
+            | "show the time remaining"
+            | "show me time remaining"
+            | "show me the time remaining"
+            | "show time to empty"
+            | "show the time to empty"
+            | "show me time to empty"
+            | "show me the time to empty"
+            | "show time to full"
+            | "show the time to full"
+            | "show me time to full"
+            | "show me the time to full"
+    )
+}
+
+/// Zero-LLM battery time-to-empty / time-to-full from the `battery` crate.
+pub fn format_battery_time_report() -> String {
+    let v = crate::metrics::get_battery_time_remaining();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Battery time** — _no time-to-empty / time-to-full estimate right now._".to_string();
+    }
+    format!("**Battery time** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2958] - 2026-11-22
+
+### Added
+- Instant battery time-to-empty / time-to-full accepts `/battery-time` · `/bat-time` · `/time-remaining` · `/time-to-empty` · `/time-to-full` · `/eta-empty` · `/eta-full` and view/see/open/list NL (`view battery time`, `open time remaining`, `list battery time`, …), matching “battery time” / “time remaining” / “time to empty” / “how long until empty” / “what's my battery time”. Bare `time` / `remaining` stay with the agent; `/battery` · `view battery` · `battery left` · `battery remaining` stay Bat %; `/cycles` stays cycle count · health; `/charger` stays AC adapter.
+
 ## [0.1.2957] - 2026-11-22
 
 ### Added

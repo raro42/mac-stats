@@ -1399,6 +1399,84 @@ pub fn get_primary_link_status() -> String {
     info
 }
 
+/// Format a battery crate `Time` as compact `Xh Ym` / `Ym` / `Zs`.
+fn format_battery_eta_secs(secs: f32) -> String {
+    let secs = secs.max(0.0).round() as u64;
+    let h = secs / 3600;
+    let m = (secs % 3600) / 60;
+    let s = secs % 60;
+    if h > 0 {
+        if m > 0 {
+            format!("{h}h {m}m")
+        } else {
+            format!("{h}h")
+        }
+    } else if m > 0 {
+        format!("{m}m")
+    } else {
+        format!("{s}s")
+    }
+}
+
+/// Battery time-to-empty / time-to-full from the `battery` crate (short TTL cache).
+/// Distinct from Bat % (`/battery` · `battery left`) and cycles (`/cycles`).
+pub fn get_battery_time_remaining() -> String {
+    static CACHE: OnceLock<Mutex<Option<(String, Instant)>>> = OnceLock::new();
+    let cache = CACHE.get_or_init(|| Mutex::new(None));
+    if let Ok(guard) = cache.lock() {
+        if let Some((ref info, ts)) = *guard {
+            if ts.elapsed() < Duration::from_secs(5) {
+                return info.clone();
+            }
+        }
+    }
+
+    let info = match BatteryManager::new() {
+        Ok(manager) => match manager.batteries() {
+            Ok(mut batteries) => match batteries.next() {
+                Some(Ok(battery)) => {
+                    use battery::units::time::second;
+                    match battery.state() {
+                        State::Full => "full".to_string(),
+                        State::Charging => battery
+                            .time_to_full()
+                            .map(|t| {
+                                format!(
+                                    "{} until full",
+                                    format_battery_eta_secs(t.get::<second>())
+                                )
+                            })
+                            .unwrap_or_default(),
+                        State::Discharging => battery
+                            .time_to_empty()
+                            .map(|t| {
+                                format!(
+                                    "{} until empty",
+                                    format_battery_eta_secs(t.get::<second>())
+                                )
+                            })
+                            .unwrap_or_default(),
+                        _ => String::new(),
+                    }
+                }
+                _ => String::new(),
+            },
+            Err(_) => String::new(),
+        },
+        Err(_) => String::new(),
+    };
+
+    if !info.is_empty() {
+        debug3!("battery time remaining: '{}'", info);
+        if let Ok(mut guard) = cache.lock() {
+            *guard = Some((info.clone(), Instant::now()));
+        }
+    } else {
+        debug3!("battery time remaining: no estimate");
+    }
+    info
+}
+
 /// Battery cycle count · health · max capacity from `system_profiler SPPowerDataType` (JSON).
 /// Cached (OnceLock): cycle count changes slowly; Discord/operator instant `/cycles` lane.
 /// Distinct from Bat % chip (`/battery`) and charging / left / low phrases.
