@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2970] - 2026-11-22
+
+### Added
+- Instant Time Machine status accepts `/timemachine` · `/time-machine` · `/tm` · `/tm-status` · `/tmutil` · `/backup-status` · `/tm-backup` and view/see/open/list NL (`view time machine`, `open tm status`, `list backup status`, …), matching “time machine status” / “is time machine running” / “what's my time machine” / “what's the time machine status”. Bare `backup` / `tm` / `time machine` stay with the agent; `view disk` stays Disk Cleanup; `/ssd` · `/free` stay capacity · free; `/boot-volume` stays startup disk.
+
 ## [0.1.2969] - 2026-11-22
 
 ### Added

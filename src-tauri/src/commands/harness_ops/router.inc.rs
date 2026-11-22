@@ -1041,6 +1041,11 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_firewall_request(content) {
         return Some(format_firewall_report());
     }
+    // Time Machine (bare `backup` / `tm` / `time machine` stay with the agent; `view disk` stays Disk Cleanup;
+    // `/ssd` · `/free` stay capacity · free; `/boot-volume` stays startup disk).
+    if looks_like_time_machine_request(content) {
+        return Some(format_time_machine_report());
+    }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
     if looks_like_boot_time_request(content) {

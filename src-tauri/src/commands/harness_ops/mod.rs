@@ -2126,6 +2126,66 @@ mod tests {
         }
     }
 
+    #[test]
+    fn time_machine_slash_and_view_open_do_not_steal_disk_cleanup_or_bare_backup() {
+        // Slash + view/open NL → Time Machine (`/firewall` · `/sip` parity).
+        // Bare `backup` / `tm` / `time machine` stay with the agent; `view disk` stays Disk Cleanup.
+        assert!(looks_like_time_machine_request("/timemachine"));
+        assert!(looks_like_time_machine_request("/time-machine"));
+        assert!(looks_like_time_machine_request("/tm"));
+        assert!(looks_like_time_machine_request("/tm-status"));
+        assert!(looks_like_time_machine_request("/tmutil"));
+        assert!(looks_like_time_machine_request("/backup-status"));
+        assert!(looks_like_time_machine_request("/tm-backup"));
+        assert!(looks_like_time_machine_request("view time machine"));
+        assert!(looks_like_time_machine_request("open tm status"));
+        assert!(looks_like_time_machine_request("list backup status"));
+        assert!(looks_like_time_machine_request("time machine status"));
+        assert!(looks_like_time_machine_request("is time machine running"));
+        assert!(looks_like_time_machine_request("what's my time machine"));
+        assert!(looks_like_time_machine_request("view backup status"));
+        assert!(!looks_like_time_machine_request("backup"));
+        assert!(!looks_like_time_machine_request("tm"));
+        assert!(!looks_like_time_machine_request("time machine"));
+        assert!(!looks_like_time_machine_request("timemachine"));
+        assert!(!looks_like_time_machine_request("view disk"));
+        assert!(!looks_like_time_machine_request("open disk"));
+        assert!(!looks_like_time_machine_request("/ssd"));
+        assert!(!looks_like_time_machine_request("/free"));
+        assert!(!looks_like_time_machine_request("/boot-volume"));
+        assert!(!looks_like_time_machine_request("/firewall"));
+        assert!(!looks_like_time_machine_request("/stealth"));
+        assert!(!looks_like_time_machine_request("/tasks"));
+        assert!(!looks_like_time_machine_request("enable time machine"));
+        assert!(!looks_like_time_machine_request("thin localsnapshots"));
+        assert!(!looks_like_disk_cleanup_request("/timemachine"));
+        assert!(!looks_like_disk_cleanup_request("view time machine"));
+        assert!(!looks_like_firewall_request("/timemachine"));
+        assert!(!looks_like_firewall_request("view time machine"));
+        let tm = try_operator_instant_reply("/timemachine").unwrap();
+        assert!(
+            tm.contains("**Time Machine**") && !tm.to_lowercase().contains("execution"),
+            "got: {tm}"
+        );
+        let viewed = try_operator_instant_reply("view time machine").unwrap();
+        assert!(
+            viewed.contains("**Time Machine**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("backup").is_none());
+        assert!(try_operator_instant_reply("tm").is_none());
+        assert!(try_operator_instant_reply("time machine").is_none());
+        let cleanup = try_operator_instant_reply("view disk");
+        if let Some(reply) = cleanup {
+            assert!(
+                !reply.contains("**Time Machine**"),
+                "view disk must stay Disk Cleanup, not Time Machine: {reply}"
+            );
+        }
+    }
+
+
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

@@ -10674,6 +10674,186 @@ pub fn format_firewall_stealth_report() -> String {
     format!("**Stealth** · `{v}`")
 }
 
+/// Time Machine session + destination — not Disk Cleanup, not SSD % / free, not boot volume.
+/// Slash + view/open NL (`/timemachine` · `/tm` · `view time machine`) match `/firewall` · `/sip` shape;
+/// bare `backup` / `tm` / `time machine` stay with the agent; `view disk` stays Disk Cleanup.
+pub fn looks_like_time_machine_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.contains("thin")
+        || n.contains("snapshot")
+        || n.contains("prune")
+        // Action verbs (leave status asks like "is time machine running").
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("start ")
+        || n.contains("stop ")
+        || n.contains("exclude")
+        || n.contains("password")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("system integrity")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/boot-volume"
+        || n == "/startup-disk"
+        || n == "view disk"
+        || n == "open disk"
+        || n == "/ssd"
+        || n == "/storage"
+        || n == "/free"
+        || n == "/tasks"
+        // Bare short / ambiguous stay with the agent.
+        || n == "tm"
+        || n == "the tm"
+        || n == "backup"
+        || n == "the backup"
+        || n == "backups"
+        || n == "time machine"
+        || n == "the time machine"
+        || n == "timemachine"
+        || n == "the timemachine"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/timemachine"
+            | "/time-machine"
+            | "/timemachine-status"
+            | "/time-machine-status"
+            | "/tm"
+            | "/tm-status"
+            | "/tmstatus"
+            | "/tmutil"
+            | "/tmutil-status"
+            | "/backup-status"
+            | "/backupstatus"
+            | "/tm-backup"
+            | "/tmbackup"
+            | "/time-machine-backup"
+            | "time machine status"
+            | "the time machine status"
+            | "timemachine status"
+            | "the timemachine status"
+            | "tm status"
+            | "the tm status"
+            | "backup status"
+            | "the backup status"
+            | "my time machine"
+            | "my time machine status"
+            | "my timemachine"
+            | "my backup status"
+            | "is time machine on"
+            | "is time machine off"
+            | "is time machine running"
+            | "is time machine idle"
+            | "is timemachine on"
+            | "is timemachine running"
+            | "is tm running"
+            | "is backup running"
+            | "what's my time machine"
+            | "whats my time machine"
+            | "what is my time machine"
+            | "what's my time machine status"
+            | "whats my time machine status"
+            | "what is my time machine status"
+            | "what's the time machine"
+            | "whats the time machine"
+            | "what is the time machine"
+            | "what's the time machine status"
+            | "whats the time machine status"
+            | "what is the time machine status"
+            | "what's my backup status"
+            | "whats my backup status"
+            | "what is my backup status"
+            | "how's time machine"
+            | "hows time machine"
+            | "how's the time machine"
+            | "hows the time machine"
+            // View/see/show me/open/list.
+            | "view time machine"
+            | "view the time machine"
+            | "view time machine status"
+            | "view the time machine status"
+            | "view timemachine"
+            | "view the timemachine"
+            | "view tm"
+            | "view the tm"
+            | "view tm status"
+            | "view backup status"
+            | "view the backup status"
+            | "see time machine"
+            | "see the time machine"
+            | "see time machine status"
+            | "see the time machine status"
+            | "see backup status"
+            | "see the backup status"
+            | "open time machine"
+            | "open the time machine"
+            | "open time machine status"
+            | "open the time machine status"
+            | "open tm"
+            | "open the tm"
+            | "open tm status"
+            | "open the tm status"
+            | "open backup status"
+            | "open the backup status"
+            | "list time machine"
+            | "list the time machine"
+            | "list time machine status"
+            | "list the time machine status"
+            | "list backup status"
+            | "list the backup status"
+            | "show time machine"
+            | "show the time machine"
+            | "show me time machine"
+            | "show me the time machine"
+            | "show time machine status"
+            | "show the time machine status"
+            | "show me time machine status"
+            | "show me the time machine status"
+            | "show backup status"
+            | "show the backup status"
+            | "show me backup status"
+            | "show me the backup status"
+    )
+}
+
+/// Zero-LLM Time Machine status from `tmutil status` + `destinationinfo` (macOS-only; empty elsewhere).
+pub fn format_time_machine_report() -> String {
+    let v = crate::metrics::get_time_machine_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Time Machine** — _no Time Machine reading on this Mac right now._".to_string();
+    }
+    format!("**Time Machine** · `{v}`")
+}
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

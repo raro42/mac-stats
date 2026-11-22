@@ -794,6 +794,123 @@ pub fn get_firewall_stealth_status() -> String {
     info
 }
 
+
+/// Time Machine session + destination from `tmutil status` / `destinationinfo` (live; not OnceLock).
+/// Distinct from Disk Cleanup `view disk` / `tmutil-thin`, SSD `/ssd` · `/free`, and boot volume.
+/// Used by Discord/operator instant `/timemachine` · `/tm` lane. Does not need Full Disk Access.
+pub fn get_time_machine_status() -> String {
+    let phase = {
+        let output = Command::new("/usr/bin/tmutil")
+            .arg("status")
+            .stderr(std::process::Stdio::null())
+            .output();
+        match output {
+            Ok(output) => {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                let running = stdout.lines().any(|l| {
+                    let t = l.trim();
+                    t.starts_with("Running")
+                        && (t.contains("= 1") || t.contains("=1") || t.ends_with("1;"))
+                });
+                let percent = stdout.lines().find_map(|l| {
+                    let t = l.trim();
+                    if !t.starts_with("Percent") {
+                        return None;
+                    }
+                    let raw = t
+                        .split('=')
+                        .nth(1)?
+                        .trim()
+                        .trim_matches(|c: char| c == '"' || c == ';')
+                        .trim();
+                    if raw.is_empty() || raw == "-1" {
+                        return None;
+                    }
+                    // tmutil Percent is 0..1 float when running.
+                    if let Ok(f) = raw.parse::<f64>() {
+                        if (0.0..1.0).contains(&f) {
+                            return Some(format!("{:.0}%", f * 100.0));
+                        }
+                        if (1.0..=100.0).contains(&f) {
+                            return Some(format!("{:.0}%", f));
+                        }
+                    }
+                    Some(raw.to_string())
+                });
+                if running {
+                    match percent {
+                        Some(p) => format!("Running ({p})"),
+                        None => "Running".to_string(),
+                    }
+                } else if !stdout.trim().is_empty() {
+                    "Idle".to_string()
+                } else {
+                    String::new()
+                }
+            }
+            Err(_) => {
+                debug3!("timemachine: tmutil status spawn failed");
+                String::new()
+            }
+        }
+    };
+
+    let dest = {
+        let output = Command::new("/usr/bin/tmutil")
+            .arg("destinationinfo")
+            .stderr(std::process::Stdio::null())
+            .output();
+        match output {
+            Ok(output) => {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                let mut name: Option<String> = None;
+                let mut mount: Option<String> = None;
+                for line in stdout.lines() {
+                    let t = line.trim();
+                    if let Some(rest) = t.strip_prefix("Name") {
+                        let v = rest
+                            .trim_start_matches(|c: char| c == ':' || c.is_whitespace())
+                            .trim();
+                        if !v.is_empty() && name.is_none() {
+                            name = Some(v.to_string());
+                        }
+                    } else if let Some(rest) = t.strip_prefix("Mount Point") {
+                        let v = rest
+                            .trim_start_matches(|c: char| c == ':' || c.is_whitespace())
+                            .trim();
+                        if !v.is_empty() && mount.is_none() {
+                            mount = Some(v.to_string());
+                        }
+                    }
+                }
+                match (name, mount) {
+                    (Some(n), Some(m)) => format!("{n} ({m})"),
+                    (Some(n), None) => n,
+                    (None, Some(m)) => m,
+                    (None, None) => String::new(),
+                }
+            }
+            Err(_) => {
+                debug3!("timemachine: tmutil destinationinfo spawn failed");
+                String::new()
+            }
+        }
+    };
+
+    let info = match (phase.is_empty(), dest.is_empty()) {
+        (true, true) => String::new(),
+        (false, true) => format!("{phase} · no destination"),
+        (true, false) => format!("dest {dest}"),
+        (false, false) => format!("{phase} · dest {dest}"),
+    };
+    if info.is_empty() {
+        debug3!("timemachine: empty status");
+    } else {
+        debug3!("timemachine status: '{}'", info);
+    }
+    info
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
