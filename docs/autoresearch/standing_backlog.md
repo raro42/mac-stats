@@ -1,3 +1,10 @@
+## Overnight note 2026-11-22 ~23:55
+- Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Neon layout-daily next calendar quota.
+
+## Overnight merge — v0.1.2975
+
+- Product fuel after Printer Sharing `/printer-sharing` NL v0.1.2974: Remote Management (ARD) already readable via `RemoteManagement.launchd` + `ARDAgent` / `launchctl list` but lacked `/remote-management` · `/remotemanagement` · `/remote-management-status` · `/ard` · `/ard-status` · `/ard-state` · `/apple-remote-desktop` · `/mac-ard` · `/ard-agent` and view/see/open/list phrases while Screen Sharing `/screen-sharing` · `/vnc`, Remote Login `/remote-login` · `/ssh`, File Sharing `/file-sharing` · `/smb`, and Printer Sharing `/printer-sharing` already had slash+NL. Bare `ard` / `remote management` / `remote desktop` stay with the agent; `/screen-sharing` · `/vnc` stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login; `/file-sharing` · `/smb` stay File Sharing; `/printer-sharing` stays Printer Sharing. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Dark marked today (Neon due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Neon layout-daily next calendar day · Content Caching sibling/product fuel — Remote Management slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-22 ~23:40
 - Shipped v0.1.2974 Printer Sharing `/printer-sharing` · `/share-printers` · `/cups-share` + view/open NL; bare printer/cups stay with agent; `/file-sharing` · `/smb` · `/screen-sharing` · `/vnc` · `/remote-login` · `/ssh` intact.
 - Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Neon layout-daily next calendar quota.
