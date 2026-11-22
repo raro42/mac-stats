@@ -2,6 +2,10 @@
 - Shipped v0.1.2969 Firewall stealth `/stealth` · `/firewall-stealth` · `/fw-stealth` · `/afw-stealth` + view/open NL; bare stealth stays with agent; `/firewall` stays global; `/gatekeeper` · `/sip` · `/filevault` intact.
 - Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Neon layout-daily next calendar quota.
 
+## Overnight merge — v0.1.2970
+
+- Product fuel after Firewall stealth `/stealth` NL v0.1.2969: Time Machine session + destination already readable via `tmutil status` / `destinationinfo` but lacked `/timemachine` · `/time-machine` · `/tm` · `/tm-status` · `/tmutil` · `/backup-status` · `/tm-backup` and view/see/open/list phrases while Firewall `/firewall` · stealth `/stealth` already had slash+NL. Bare `backup` / `tm` / `time machine` stay with the agent; `view disk` stays Disk Cleanup; `/ssd` · `/free` stay capacity · free; `/boot-volume` stays startup disk. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Dark marked today (Neon due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Neon layout-daily next calendar day · sibling/product fuel — Time Machine slash NL closed; not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2969
 
 - Product fuel after Application Firewall `/firewall` NL v0.1.2968: Firewall stealth mode already readable via `socketfilterfw --getstealthmode` but lacked `/stealth` · `/stealth-mode` · `/stealth-status` · `/firewall-stealth` · `/fw-stealth` · `/afw-stealth` · `/app-firewall-stealth` · `/application-firewall-stealth` · `/socketfilterfw-stealth` and view/see/open/list phrases while Firewall `/firewall` already had slash+NL. Bare `stealth` / `stealth mode` stay with the agent; `/firewall` stays global Firewall; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP; `/filevault` stays FileVault. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Dark marked today (Neon due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Neon layout-daily next calendar day · sibling/product fuel — Firewall stealth slash NL closed; not another keep-pNN clone.
