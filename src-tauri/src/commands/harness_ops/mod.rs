@@ -1234,6 +1234,64 @@ mod tests {
     }
 
 #[test]
+    fn mtu_slash_and_view_open_do_not_steal_mac_or_lan_ip() {
+        // Slash + view/open NL → primary MTU (`/mac-address` · `/ip` parity).
+        // Bare `mtu` stays with the agent; `/mac-address` stays ethernet; `/ip` stays LAN.
+        assert!(looks_like_mtu_request("/mtu"));
+        assert!(looks_like_mtu_request("/if-mtu"));
+        assert!(looks_like_mtu_request("/iface-mtu"));
+        assert!(looks_like_mtu_request("/interface-mtu"));
+        assert!(looks_like_mtu_request("/link-mtu"));
+        assert!(looks_like_mtu_request("/en0-mtu"));
+        assert!(looks_like_mtu_request("/network-mtu"));
+        assert!(looks_like_mtu_request("view mtu"));
+        assert!(looks_like_mtu_request("open interface mtu"));
+        assert!(looks_like_mtu_request("list mtu"));
+        assert!(looks_like_mtu_request("mtu size"));
+        assert!(looks_like_mtu_request("interface mtu"));
+        assert!(looks_like_mtu_request("what's my mtu"));
+        assert!(looks_like_mtu_request("what's the mtu"));
+        assert!(looks_like_mtu_request("which mtu"));
+        assert!(!looks_like_mtu_request("mtu"));
+        assert!(!looks_like_mtu_request("/mac-address"));
+        assert!(!looks_like_mtu_request("mac address"));
+        assert!(!looks_like_mtu_request("/ether"));
+        assert!(!looks_like_mtu_request("/ip"));
+        assert!(!looks_like_mtu_request("/wifi"));
+        assert!(!looks_like_mtu_request("what's my wifi"));
+        let mtu = try_operator_instant_reply("/mtu").unwrap();
+        assert!(
+            mtu.contains("**MTU**") && !mtu.to_lowercase().contains("execution"),
+            "got: {mtu}"
+        );
+        let viewed = try_operator_instant_reply("view mtu").unwrap();
+        assert!(
+            viewed.contains("**MTU**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let short = try_operator_instant_reply("/if-mtu").unwrap();
+        assert!(
+            short.contains("**MTU**") && !short.to_lowercase().contains("execution"),
+            "got: {short}"
+        );
+        assert!(try_operator_instant_reply("mtu").is_none());
+        let mac = try_operator_instant_reply("/mac-address");
+        if let Some(reply) = mac {
+            assert!(
+                !reply.contains("**MTU**"),
+                "/mac-address must stay MAC, not MTU: {reply}"
+            );
+        }
+        let ip = try_operator_instant_reply("/ip");
+        if let Some(reply) = ip {
+            assert!(
+                !reply.contains("**MTU**"),
+                "/ip must stay LAN IP, not MTU: {reply}"
+            );
+        }
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.

@@ -7534,6 +7534,131 @@ pub fn format_mac_address_report() -> String {
 }
 
 
+/// Primary interface MTU — not MAC, not LAN IP, not Wi-Fi SSID.
+/// Slash + view/open NL (`/mtu` · `/if-mtu` · `view mtu`) match `/mac-address` · `/ip` shape;
+/// bare `mtu` stays with the agent; `/mac-address` stays ethernet address; `/ip` stays LAN;
+/// `/wifi` stays SSID.
+pub fn looks_like_mtu_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("json")
+        || n.contains("mac address")
+        || n.contains("ethernet")
+        || n.contains("ether")
+        || n.contains("serial")
+        || n.contains("gateway")
+        || n.contains("router")
+        || n.contains("dns")
+        || n.contains("nameserver")
+        || n.contains("local ip")
+        || n.contains("lan ip")
+        || n.contains("ipv4")
+        || n.contains("public")
+        || n.contains("external")
+        || n.contains("wan")
+        || n.contains("wifi")
+        || n.contains("ssid")
+        || n.contains("wlan")
+        || n.contains("airport")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("jumbo")
+        || n.contains("fragment")
+        // Resource-stat size nouns (vault/config/notes) stay out; "mtu size" is allowed below.
+        || (n.contains("size") && !n.contains("mtu"))
+        // Bare short / ambiguous asks stay with the agent.
+        || n == "mtu"
+        || n == "the mtu"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/mtu"
+            | "/if-mtu"
+            | "/ifmtu"
+            | "/iface-mtu"
+            | "/ifacemtu"
+            | "/interface-mtu"
+            | "/interfacemtu"
+            | "/link-mtu"
+            | "/linkmtu"
+            | "/en0-mtu"
+            | "/en0mtu"
+            | "/network-mtu"
+            | "/networkmtu"
+            | "mtu size"
+            | "the mtu size"
+            | "interface mtu"
+            | "the interface mtu"
+            | "iface mtu"
+            | "the iface mtu"
+            | "link mtu"
+            | "the link mtu"
+            | "network mtu"
+            | "the network mtu"
+            | "my mtu"
+            | "my interface mtu"
+            | "what's my mtu"
+            | "whats my mtu"
+            | "what is my mtu"
+            | "what's the mtu"
+            | "whats the mtu"
+            | "what is the mtu"
+            | "what's my interface mtu"
+            | "whats my interface mtu"
+            | "what is my interface mtu"
+            | "which mtu"
+            | "which interface mtu"
+            // View/see/show me/open/list.
+            | "view mtu"
+            | "view the mtu"
+            | "view interface mtu"
+            | "view the interface mtu"
+            | "view iface mtu"
+            | "view link mtu"
+            | "see mtu"
+            | "see the mtu"
+            | "see interface mtu"
+            | "see the interface mtu"
+            | "open mtu"
+            | "open the mtu"
+            | "open interface mtu"
+            | "open the interface mtu"
+            | "list mtu"
+            | "list the mtu"
+            | "list interface mtu"
+            | "list the interface mtu"
+            | "show mtu"
+            | "show the mtu"
+            | "show me mtu"
+            | "show me the mtu"
+            | "show interface mtu"
+            | "show the interface mtu"
+            | "show me interface mtu"
+            | "show me the interface mtu"
+    )
+}
+
+
+/// Zero-LLM primary interface MTU from `route` default iface + `ifconfig`.
+pub fn format_mtu_report() -> String {
+    let v = crate::metrics::get_primary_mtu();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**MTU** — _no interface MTU right now._".to_string();
+    }
+    format!("**MTU** · `{v}`")
+}
+
+
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.

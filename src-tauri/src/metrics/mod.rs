@@ -982,6 +982,81 @@ pub fn get_primary_mac_address() -> String {
     info
 }
 
+/// Primary interface MTU (default-route iface via `route` + `ifconfig`).
+/// Live (not OnceLock): Wi-Fi / USB / VPN iface can change while the process stays up.
+/// Used by the Discord/operator instant `/mtu` · `/if-mtu` lane.
+/// Distinct from MAC (`/mac-address`), LAN IP (`/ip`), and Wi-Fi SSID (`/wifi`).
+pub fn get_primary_mtu() -> String {
+    let default_iface = || -> Option<String> {
+        let output = Command::new("/sbin/route")
+            .args(["-n", "get", "default"])
+            .stderr(std::process::Stdio::null())
+            .output()
+            .ok()?;
+        if !output.status.success() {
+            return None;
+        }
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        for line in stdout.lines() {
+            let t = line.trim();
+            if let Some(rest) = t.strip_prefix("interface:") {
+                let iface = rest.trim();
+                if !iface.is_empty() {
+                    return Some(iface.to_string());
+                }
+            }
+        }
+        None
+    };
+    let mtu_of = |iface: &str| -> Option<String> {
+        let output = Command::new("/sbin/ifconfig")
+            .arg(iface)
+            .stderr(std::process::Stdio::null())
+            .output()
+            .ok()?;
+        if !output.status.success() {
+            return None;
+        }
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        for line in stdout.lines() {
+            let t = line.trim();
+            // macOS / BSD: `en0: flags=… mtu 1500` (often on the header line).
+            if let Some(idx) = t.find("mtu ") {
+                let rest = &t[idx + 4..];
+                let mtu = rest
+                    .split(|c: char| !c.is_ascii_digit())
+                    .next()
+                    .unwrap_or("")
+                    .trim();
+                if !mtu.is_empty() && mtu.chars().all(|c| c.is_ascii_digit()) {
+                    return Some(mtu.to_string());
+                }
+            }
+        }
+        None
+    };
+    let from_default = || -> Option<String> {
+        let iface = default_iface()?;
+        let mtu = mtu_of(&iface)?;
+        Some(format!("{mtu} ({iface})"))
+    };
+    let from_fallback = || -> Option<String> {
+        for iface in ["en0", "en1", "en2"] {
+            if let Some(mtu) = mtu_of(iface) {
+                return Some(format!("{mtu} ({iface})"));
+            }
+        }
+        None
+    };
+    let info = from_default().or_else(from_fallback).unwrap_or_default();
+    if info.is_empty() {
+        debug3!("primary mtu: ifconfig empty");
+    } else {
+        debug3!("primary mtu: '{}'", info);
+    }
+    info
+}
+
 
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {

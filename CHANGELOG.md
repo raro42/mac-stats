@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2951] - 2026-11-22
+
+### Added
+- Instant primary interface MTU accepts `/mtu` · `/if-mtu` · `/iface-mtu` · `/interface-mtu` · `/link-mtu` · `/en0-mtu` · `/network-mtu` and view/see/open/list NL (`view mtu`, `open interface mtu`, `list mtu`, …), matching “mtu size” / “interface mtu” / “what's my mtu” / “what's the mtu” / “which mtu”. Bare `mtu` stays with the agent; `/mac-address` stays ethernet address; `/ip` stays LAN address; `/wifi` stays SSID.
+
 ## [0.1.2950] - 2026-11-22
 
 ### Added
