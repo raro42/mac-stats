@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2979] - 2026-11-23
+
+### Added
+- Instant Bluetooth Sharing status accepts `/bluetooth-sharing` · `/bluetoothsharing` · `/bluetooth-sharing-status` · `/bluetooth-share` · `/bt-sharing` · `/bt-share` · `/bts` · `/bts-status` · `/obex` · `/obex-sharing` · `/file-exchange` · `/bluetooth-file-exchange` · `/mac-bluetooth-sharing` · `/mac-bt-sharing` and view/see/open/list NL (`view bluetooth sharing`, `open bts status`, `list bluetooth sharing`, …), matching “bluetooth sharing status” / “is bluetooth sharing on” / “is bts enabled” / “what's my bluetooth sharing” / “what's the bts status”. Bare `bluetooth` / `bluetooth sharing` / `obex` / `bts` stay with the agent; `/internet-sharing` · `/ics` stay Internet Sharing; `/file-sharing` · `/smb` stay File Sharing; `/wifi` stays SSID; `/content-caching` · `/asset-cache` stay Content Caching.
+
 ## [0.1.2978] - 2026-11-23
 
 ### Added

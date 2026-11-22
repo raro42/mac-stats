@@ -1083,9 +1083,16 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     // Internet Sharing / ICS / NAT (bare `internet` / `nat` / `ics` / `internet sharing` stay with the agent;
     // `/vpn` stays VPN; `/content-caching` · `/asset-cache` stay Content Caching; `/file-sharing` · `/smb`
-    // stay File Sharing; `/remote-management` · `/ard` stay Remote Management; `/ip` stays LAN).
+    // stay File Sharing; `/remote-management` · `/ard` stay Remote Management; `/ip` stays LAN;
+    // Bluetooth Sharing stays `/bluetooth-sharing` · `/bt-sharing`).
     if looks_like_internet_sharing_request(content) {
         return Some(format_internet_sharing_report());
+    }
+    // Bluetooth Sharing / OBEX file exchange (bare `bluetooth` / `bluetooth sharing` / `obex` / `bts` stay
+    // with the agent; `/internet-sharing` · `/ics` stay Internet Sharing; `/file-sharing` · `/smb` stay
+    // File Sharing; `/wifi` stays SSID; `/content-caching` stays Content Caching).
+    if looks_like_bluetooth_sharing_request(content) {
+        return Some(format_bluetooth_sharing_report());
     }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).

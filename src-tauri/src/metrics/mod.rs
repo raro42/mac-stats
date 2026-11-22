@@ -1491,6 +1491,86 @@ pub fn get_internet_sharing_status() -> String {
     }
 }
 
+/// macOS Bluetooth Sharing (OBEX file exchange) from Bluetooth prefs + `BluetoothFileExchange`.
+/// Prefs: `FileTransferEnabledServer` / `BluetoothFileTransferEnabled` via PlistBuddy (0/1).
+/// Distinct from Internet Sharing `/internet-sharing` · `/ics`, File Sharing `/file-sharing` · `/smb`,
+/// Content Caching `/content-caching`, and Wi-Fi `/wifi`.
+/// Used by Discord/operator instant `/bluetooth-sharing` · `/bt-sharing` lane.
+pub fn get_bluetooth_sharing_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let enabled = {
+            let mut found: Option<bool> = None;
+            for key in [
+                "Print :FileTransferEnabledServer",
+                "Print :BluetoothFileTransferEnabled",
+            ] {
+                let output = Command::new("/usr/libexec/PlistBuddy")
+                    .args([
+                        "-c",
+                        key,
+                        "/Library/Preferences/com.apple.Bluetooth.plist",
+                    ])
+                    .stderr(std::process::Stdio::null())
+                    .output();
+                match output {
+                    Ok(output) if output.status.success() => {
+                        let stdout = String::from_utf8_lossy(&output.stdout);
+                        if let Some(v) = parse_nat_enabled_plistbuddy(&stdout) {
+                            found = Some(v);
+                            break;
+                        }
+                    }
+                    Ok(_) => {}
+                    Err(_) => {
+                        debug3!("bluetooth-sharing: PlistBuddy spawn failed");
+                    }
+                }
+            }
+            found
+        };
+
+        let exchange = {
+            let output = Command::new("/bin/ps")
+                .args(["-axc", "-o", "comm="])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    stdout.lines().any(|l| {
+                        let t = l.trim();
+                        t == "BluetoothFileExchange"
+                            || t.ends_with("/BluetoothFileExchange")
+                    })
+                }
+                Err(_) => {
+                    debug3!("bluetooth-sharing: ps spawn failed");
+                    false
+                }
+            }
+        };
+
+        let info = match (enabled, exchange) {
+            (Some(true), true) => "On · active".to_string(),
+            (Some(true), false) => "On · idle".to_string(),
+            (Some(false), _) => "Off".to_string(),
+            (None, true) => "active".to_string(),
+            (None, false) => String::new(),
+        };
+        if info.is_empty() {
+            debug3!("bluetooth-sharing: empty status");
+        } else {
+            debug3!("bluetooth-sharing status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.

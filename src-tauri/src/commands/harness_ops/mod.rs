@@ -2648,6 +2648,9 @@ mod tests {
         assert!(!looks_like_internet_sharing_request("/ard"));
         assert!(!looks_like_internet_sharing_request("/ip"));
         assert!(!looks_like_internet_sharing_request("/tasks"));
+        assert!(!looks_like_internet_sharing_request("/bluetooth-sharing"));
+        assert!(!looks_like_internet_sharing_request("/bts"));
+        assert!(!looks_like_internet_sharing_request("view bluetooth sharing"));
         assert!(!looks_like_internet_sharing_request("enable internet sharing"));
         assert!(!looks_like_content_caching_request("/internet-sharing"));
         assert!(!looks_like_content_caching_request("view internet sharing"));
@@ -2678,6 +2681,79 @@ mod tests {
             assert!(
                 !reply.contains("**Internet Sharing**"),
                 "/smb must stay File Sharing, not Internet Sharing: {reply}"
+            );
+        }
+    }
+
+    #[test]
+    fn bluetooth_sharing_slash_and_view_open_do_not_steal_ics_smb_or_bare_bluetooth() {
+        // Slash + view/open NL → Bluetooth Sharing (`/internet-sharing` · `/file-sharing` parity).
+        // Bare `bluetooth` / `bluetooth sharing` / `obex` / `bts` stay with the agent; `/ics` stays
+        // Internet Sharing; `/smb` stays File Sharing; `/wifi` stays SSID; `/content-caching` stays Content Caching.
+        assert!(looks_like_bluetooth_sharing_request("/bluetooth-sharing"));
+        assert!(looks_like_bluetooth_sharing_request("/bluetoothsharing"));
+        assert!(looks_like_bluetooth_sharing_request("/bluetooth-share"));
+        assert!(looks_like_bluetooth_sharing_request("/bt-sharing"));
+        assert!(looks_like_bluetooth_sharing_request("/bt-share"));
+        assert!(looks_like_bluetooth_sharing_request("/bts"));
+        assert!(looks_like_bluetooth_sharing_request("/bts-status"));
+        assert!(looks_like_bluetooth_sharing_request("/obex"));
+        assert!(looks_like_bluetooth_sharing_request("/obex-sharing"));
+        assert!(looks_like_bluetooth_sharing_request("/file-exchange"));
+        assert!(looks_like_bluetooth_sharing_request("/bluetooth-file-exchange"));
+        assert!(looks_like_bluetooth_sharing_request("/mac-bluetooth-sharing"));
+        assert!(looks_like_bluetooth_sharing_request("/mac-bt-sharing"));
+        assert!(looks_like_bluetooth_sharing_request("view bluetooth sharing"));
+        assert!(looks_like_bluetooth_sharing_request("open bts status"));
+        assert!(looks_like_bluetooth_sharing_request("list bluetooth sharing"));
+        assert!(looks_like_bluetooth_sharing_request("bluetooth sharing status"));
+        assert!(looks_like_bluetooth_sharing_request("is bluetooth sharing on"));
+        assert!(looks_like_bluetooth_sharing_request("is bts enabled"));
+        assert!(looks_like_bluetooth_sharing_request("what's my bluetooth sharing"));
+        assert!(looks_like_bluetooth_sharing_request("view bts"));
+        assert!(!looks_like_bluetooth_sharing_request("bluetooth"));
+        assert!(!looks_like_bluetooth_sharing_request("bluetooth sharing"));
+        assert!(!looks_like_bluetooth_sharing_request("obex"));
+        assert!(!looks_like_bluetooth_sharing_request("bts"));
+        assert!(!looks_like_bluetooth_sharing_request("/internet-sharing"));
+        assert!(!looks_like_bluetooth_sharing_request("/ics"));
+        assert!(!looks_like_bluetooth_sharing_request("/file-sharing"));
+        assert!(!looks_like_bluetooth_sharing_request("/smb"));
+        assert!(!looks_like_bluetooth_sharing_request("/content-caching"));
+        assert!(!looks_like_bluetooth_sharing_request("/asset-cache"));
+        assert!(!looks_like_bluetooth_sharing_request("/wifi"));
+        assert!(!looks_like_bluetooth_sharing_request("/ip"));
+        assert!(!looks_like_bluetooth_sharing_request("/tasks"));
+        assert!(!looks_like_bluetooth_sharing_request("enable bluetooth sharing"));
+        assert!(!looks_like_internet_sharing_request("/bluetooth-sharing"));
+        assert!(!looks_like_internet_sharing_request("view bluetooth sharing"));
+        assert!(!looks_like_content_caching_request("/bluetooth-sharing"));
+        assert!(!looks_like_file_sharing_request("/bluetooth-sharing"));
+        let bts = try_operator_instant_reply("/bluetooth-sharing").unwrap();
+        assert!(
+            bts.contains("**Bluetooth Sharing**") && !bts.to_lowercase().contains("execution"),
+            "got: {bts}"
+        );
+        let viewed = try_operator_instant_reply("view bluetooth sharing").unwrap();
+        assert!(
+            viewed.contains("**Bluetooth Sharing**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("bluetooth").is_none());
+        assert!(try_operator_instant_reply("bluetooth sharing").is_none());
+        let ics = try_operator_instant_reply("/internet-sharing");
+        if let Some(reply) = ics {
+            assert!(
+                !reply.contains("**Bluetooth Sharing**"),
+                "/internet-sharing must stay Internet Sharing, not Bluetooth Sharing: {reply}"
+            );
+        }
+        let smb = try_operator_instant_reply("/smb");
+        if let Some(reply) = smb {
+            assert!(
+                !reply.contains("**Bluetooth Sharing**"),
+                "/smb must stay File Sharing, not Bluetooth Sharing: {reply}"
             );
         }
     }

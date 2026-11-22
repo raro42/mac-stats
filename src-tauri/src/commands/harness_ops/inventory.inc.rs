@@ -12331,6 +12331,15 @@ pub fn looks_like_content_caching_request(content: &str) -> bool {
         || n.contains("network sharing")
         || n.contains("networksharing")
         || n.contains("network-sharing")
+        || n.contains("bluetooth sharing")
+        || n.contains("bluetoothsharing")
+        || n.contains("bluetooth-sharing")
+        || n.contains("bluetooth share")
+        || n.contains("bt sharing")
+        || n.contains("bt-sharing")
+        || n.contains("file exchange")
+        || n.contains("file-exchange")
+        || n.contains("obex")
         || n == "/internet-sharing"
         || n == "/internetsharing"
         || n == "/internet-share"
@@ -12339,6 +12348,18 @@ pub fn looks_like_content_caching_request(content: &str) -> bool {
         || n == "/ics-status"
         || n == "/nat-sharing"
         || n == "/mac-internet-sharing"
+        || n == "/bluetooth-sharing"
+        || n == "/bluetoothsharing"
+        || n == "/bluetooth-share"
+        || n == "/bt-sharing"
+        || n == "/bt-share"
+        || n == "/bts"
+        || n == "/bts-status"
+        || n == "/obex"
+        || n == "/obex-sharing"
+        || n == "/file-exchange"
+        || n == "/bluetooth-file-exchange"
+        || n == "/mac-bluetooth-sharing"
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
@@ -12862,6 +12883,384 @@ pub fn format_internet_sharing_report() -> String {
         return "**Internet Sharing** — _no Internet Sharing reading on this Mac right now._".to_string();
     }
     format!("**Internet Sharing** · `{v}`")
+}
+
+/// Bluetooth Sharing / OBEX file exchange — Bluetooth prefs + BluetoothFileExchange.
+/// "Why" / enable/disable stay with the agent. Slash + view/open NL (`/bluetooth-sharing` · `/bt-sharing`).
+/// Bare `bluetooth` / `bluetooth sharing` / `obex` / `bts` stay with the agent; `/internet-sharing` · `/ics`
+/// stay Internet Sharing; `/file-sharing` · `/smb` stay File Sharing; `/wifi` stays SSID;
+/// `/content-caching` · `/asset-cache` stay Content Caching.
+pub fn looks_like_bluetooth_sharing_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("display")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        // Word-boundary "change" only — bare `contains("change")` false-positives on "exchange".
+        || n == "change"
+        || n.starts_with("change ")
+        || n.contains(" change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen share")
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n.contains("file share")
+        || n.contains("printer sharing")
+        || n.contains("printersharing")
+        || n.contains("printer-sharing")
+        || n.contains("share printers")
+        || n.contains("cups share")
+        || n.contains("cups sharing")
+        || n.contains("remote management")
+        || n.contains("remotemanagement")
+        || n.contains("remote-management")
+        || n.contains("remote desktop")
+        || n.contains("apple remote desktop")
+        || n.contains("content caching")
+        || n.contains("contentcaching")
+        || n.contains("content-caching")
+        || n.contains("content cache")
+        || n.contains("asset cache")
+        || n.contains("assetcache")
+        || n.contains("asset-cache")
+        || n.contains("caching server")
+        || n.contains("internet sharing")
+        || n.contains("internetsharing")
+        || n.contains("internet-sharing")
+        || n.contains("network sharing")
+        || n.contains("networksharing")
+        || n.contains("network-sharing")
+        || n.contains("wifi")
+        || n.contains("wi-fi")
+        || n.contains("ssid")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/remotelogin"
+        || n == "/ssh"
+        || n == "/sshd"
+        || n == "/ssh-status"
+        || n == "/sshd-status"
+        || n == "/screen-sharing"
+        || n == "/screensharing"
+        || n == "/screen-share"
+        || n == "/vnc"
+        || n == "/vnc-status"
+        || n == "/mac-vnc"
+        || n == "/file-sharing"
+        || n == "/filesharing"
+        || n == "/file-share"
+        || n == "/smb"
+        || n == "/smb-status"
+        || n == "/smbd"
+        || n == "/mac-smb"
+        || n == "/printer-sharing"
+        || n == "/printersharing"
+        || n == "/printer-share"
+        || n == "/share-printers"
+        || n == "/cups-share"
+        || n == "/cups-sharing"
+        || n == "/remote-management"
+        || n == "/remotemanagement"
+        || n == "/remote-mgmt"
+        || n == "/ard"
+        || n == "/ard-status"
+        || n == "/ard-state"
+        || n == "/ard-agent"
+        || n == "/apple-remote-desktop"
+        || n == "/mac-ard"
+        || n == "/content-caching"
+        || n == "/contentcaching"
+        || n == "/content-cache"
+        || n == "/asset-cache"
+        || n == "/assetcache"
+        || n == "/caching-server"
+        || n == "/mac-content-caching"
+        || n == "/internet-sharing"
+        || n == "/internetsharing"
+        || n == "/internet-share"
+        || n == "/network-sharing"
+        || n == "/ics"
+        || n == "/ics-status"
+        || n == "/nat-sharing"
+        || n == "/mac-internet-sharing"
+        || n == "/mac-ics"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/wi-fi"
+        || n == "/ssid"
+        || n == "/gateway"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        // Bare short / ambiguous stay with the agent.
+        || n == "bluetooth"
+        || n == "the bluetooth"
+        || n == "bluetooth sharing"
+        || n == "the bluetooth sharing"
+        || n == "bluetoothsharing"
+        || n == "the bluetoothsharing"
+        || n == "bluetooth-sharing"
+        || n == "the bluetooth-sharing"
+        || n == "bluetooth share"
+        || n == "the bluetooth share"
+        || n == "bt sharing"
+        || n == "the bt sharing"
+        || n == "bt-sharing"
+        || n == "the bt-sharing"
+        || n == "bts"
+        || n == "the bts"
+        || n == "obex"
+        || n == "the obex"
+        || n == "file exchange"
+        || n == "the file exchange"
+        || n == "file-exchange"
+        || n == "the file-exchange"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/bluetooth-sharing"
+            | "/bluetoothsharing"
+            | "/bluetooth-sharing-status"
+            | "/bluetoothsharing-status"
+            | "/bluetooth-share"
+            | "/bluetoothshare"
+            | "/bt-sharing"
+            | "/btsharing"
+            | "/bt-sharing-status"
+            | "/bt-share"
+            | "/btshare"
+            | "/bts"
+            | "/bts-status"
+            | "/bts-state"
+            | "/obex"
+            | "/obex-status"
+            | "/obex-sharing"
+            | "/obex-share"
+            | "/file-exchange"
+            | "/fileexchange"
+            | "/bluetooth-file-exchange"
+            | "/bluetoothfileexchange"
+            | "/mac-bluetooth-sharing"
+            | "/mac-bt-sharing"
+            | "bluetooth sharing status"
+            | "the bluetooth sharing status"
+            | "bluetoothsharing status"
+            | "the bluetoothsharing status"
+            | "bluetooth-sharing status"
+            | "the bluetooth-sharing status"
+            | "bluetooth share status"
+            | "the bluetooth share status"
+            | "bt sharing status"
+            | "the bt sharing status"
+            | "bt-sharing status"
+            | "the bt-sharing status"
+            | "bts status"
+            | "the bts status"
+            | "bts state"
+            | "the bts state"
+            | "obex status"
+            | "the obex status"
+            | "obex sharing status"
+            | "the obex sharing status"
+            | "file exchange status"
+            | "the file exchange status"
+            | "my bluetooth sharing"
+            | "my bluetooth sharing status"
+            | "my bluetoothsharing"
+            | "my bt sharing"
+            | "my bt-sharing"
+            | "my bts"
+            | "my bts status"
+            | "is bluetooth sharing on"
+            | "is bluetooth sharing off"
+            | "is bluetooth sharing enabled"
+            | "is bluetooth sharing disabled"
+            | "is bluetoothsharing on"
+            | "is bluetoothsharing enabled"
+            | "is bluetooth-sharing on"
+            | "is bluetooth-sharing enabled"
+            | "is bt sharing on"
+            | "is bt sharing enabled"
+            | "is bt-sharing on"
+            | "is bt-sharing enabled"
+            | "is bts on"
+            | "is bts off"
+            | "is bts enabled"
+            | "is bts disabled"
+            | "is obex on"
+            | "is obex enabled"
+            | "is file exchange on"
+            | "is file exchange enabled"
+            | "what's my bluetooth sharing"
+            | "whats my bluetooth sharing"
+            | "what is my bluetooth sharing"
+            | "what's my bluetooth sharing status"
+            | "whats my bluetooth sharing status"
+            | "what is my bluetooth sharing status"
+            | "what's my bts"
+            | "whats my bts"
+            | "what is my bts"
+            | "what's my bts status"
+            | "whats my bts status"
+            | "what is my bts status"
+            | "what's the bluetooth sharing"
+            | "whats the bluetooth sharing"
+            | "what is the bluetooth sharing"
+            | "what's the bluetooth sharing status"
+            | "whats the bluetooth sharing status"
+            | "what is the bluetooth sharing status"
+            | "what's the bts status"
+            | "whats the bts status"
+            | "what is the bts status"
+            | "how's bluetooth sharing"
+            | "hows bluetooth sharing"
+            | "how's the bluetooth sharing"
+            | "hows the bluetooth sharing"
+            | "how's bts"
+            | "hows bts"
+            // View/see/show me/open/list.
+            | "view bluetooth sharing"
+            | "view the bluetooth sharing"
+            | "view bluetooth sharing status"
+            | "view the bluetooth sharing status"
+            | "view bluetoothsharing"
+            | "view the bluetoothsharing"
+            | "view bluetooth-sharing"
+            | "view the bluetooth-sharing"
+            | "view bluetooth share"
+            | "view the bluetooth share"
+            | "view bt sharing"
+            | "view the bt sharing"
+            | "view bt-sharing"
+            | "view the bt-sharing"
+            | "view bts"
+            | "view the bts"
+            | "view bts status"
+            | "view the bts status"
+            | "view obex"
+            | "view the obex"
+            | "view obex status"
+            | "view the obex status"
+            | "view file exchange"
+            | "view the file exchange"
+            | "see bluetooth sharing"
+            | "see the bluetooth sharing"
+            | "see bluetooth sharing status"
+            | "see the bluetooth sharing status"
+            | "see bt sharing"
+            | "see the bt sharing"
+            | "see bts"
+            | "see the bts"
+            | "see bts status"
+            | "see the bts status"
+            | "see obex"
+            | "see the obex"
+            | "open bluetooth sharing"
+            | "open the bluetooth sharing"
+            | "open bluetooth sharing status"
+            | "open the bluetooth sharing status"
+            | "open bluetoothsharing"
+            | "open the bluetoothsharing"
+            | "open bt sharing"
+            | "open the bt sharing"
+            | "open bts"
+            | "open the bts"
+            | "open bts status"
+            | "open the bts status"
+            | "open obex"
+            | "open the obex"
+            | "list bluetooth sharing"
+            | "list the bluetooth sharing"
+            | "list bluetooth sharing status"
+            | "list the bluetooth sharing status"
+            | "list bt sharing"
+            | "list the bt sharing"
+            | "list bts"
+            | "list the bts"
+            | "list bts status"
+            | "list the bts status"
+            | "show bluetooth sharing"
+            | "show the bluetooth sharing"
+            | "show me bluetooth sharing"
+            | "show me the bluetooth sharing"
+            | "show bluetooth sharing status"
+            | "show the bluetooth sharing status"
+            | "show me bluetooth sharing status"
+            | "show me the bluetooth sharing status"
+            | "show bt sharing"
+            | "show the bt sharing"
+            | "show me bt sharing"
+            | "show me the bt sharing"
+            | "show bts"
+            | "show the bts"
+            | "show me bts"
+            | "show me the bts"
+            | "show bts status"
+            | "show the bts status"
+            | "show me bts status"
+            | "show me the bts status"
+    )
+}
+
+/// Zero-LLM Bluetooth Sharing status from Bluetooth prefs + BluetoothFileExchange (macOS-only; empty elsewhere).
+pub fn format_bluetooth_sharing_report() -> String {
+    let v = crate::metrics::get_bluetooth_sharing_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Bluetooth Sharing** — _no Bluetooth Sharing reading on this Mac right now._".to_string();
+    }
+    format!("**Bluetooth Sharing** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
