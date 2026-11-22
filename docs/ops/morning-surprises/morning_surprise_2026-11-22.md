@@ -4,6 +4,7 @@ Overnight autoresearch kept shipping instant operator lanes after digester staye
 
 ## Shipped
 
+- **v0.1.2947** — default IPv4 gateway `/gateway` · `/default-gateway` · `/router` · `/gw` · `/default-route` · `/router-ip` · `/gateway-ip` (+ view/open NL). Discord `/discord` · `gateway status` · `gateway ready` stay Discord; bare `gateway` / bare `router` stay with the agent; `/ip` stays LAN address.
 - **v0.1.2946** — local LAN IPv4 `/ip` · `/local-ip` · `/lan-ip` · `/ipv4` · `/primary-ip` · `/en0` (+ view/open NL). Default-route iface + `ipconfig getifaddr`. Bare `ip` / “what's my ip” / public·wan stay with the agent; `/hostname` stays ComputerName.
 - **v0.1.2945** — last boot wall-clock `/boot` · `/boot-time` · `/last-boot` · `/last-reboot` · `/reboot-time` (+ view/open NL).
 - **v0.1.2944** — CPU core count `/cores` · `/ncpu` · `/cpu-count` (+ view/open NL).
