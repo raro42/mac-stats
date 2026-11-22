@@ -5705,6 +5705,121 @@ pub fn format_username_gateway() -> String {
 }
 
 
+/// Hardware serial number — not Mac model, not chip, not UUID.
+/// Slash + view/open NL (`/serial` · `/serial-number` · `view serial`) match username `/username` ·
+/// Mac model `/mac-model` shape; bare `sn` alone stays with the agent (too short).
+pub fn looks_like_serial_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("serializ")
+        || n.contains("serialis")
+        || n.contains("console")
+        || n.contains("port")
+        || n.contains("usb")
+        || n.contains("cable")
+        || n.contains("monitor")
+        || n.contains("display")
+        || n.contains("uuid")
+        || n.contains("json")
+        || n.contains("agent")
+        || n.contains("chat")
+        // Bare "sn" is too short / ambiguous.
+        || n == "sn"
+        || n == "the sn"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/serial"
+            | "/serial-number"
+            | "/serialnumber"
+            | "/hw-serial"
+            | "/hardware-serial"
+            | "/device-serial"
+            | "/sn"
+            | "serial"
+            | "the serial"
+            | "serial number"
+            | "the serial number"
+            | "hardware serial"
+            | "the hardware serial"
+            | "device serial"
+            | "the device serial"
+            | "hw serial"
+            | "the hw serial"
+            | "what serial"
+            | "what serial is this"
+            | "what serial number"
+            | "what serial number is this"
+            | "what's the serial"
+            | "whats the serial"
+            | "what is the serial"
+            | "what's the serial number"
+            | "whats the serial number"
+            | "what is the serial number"
+            | "what's my serial"
+            | "whats my serial"
+            | "what is my serial"
+            | "what's my serial number"
+            | "whats my serial number"
+            | "what is my serial number"
+            | "which serial"
+            | "which serial is this"
+            | "which serial number"
+            | "my serial"
+            | "my serial number"
+            // View/see/show me/open/list.
+            | "view serial"
+            | "view the serial"
+            | "view serial number"
+            | "view the serial number"
+            | "view hardware serial"
+            | "view the hardware serial"
+            | "see serial"
+            | "see the serial"
+            | "see serial number"
+            | "see the serial number"
+            | "open serial"
+            | "open the serial"
+            | "open serial number"
+            | "open the serial number"
+            | "open hardware serial"
+            | "list serial"
+            | "list the serial"
+            | "list serial number"
+            | "list the serial number"
+            | "show serial"
+            | "show the serial"
+            | "show me serial"
+            | "show me the serial"
+            | "show serial number"
+            | "show the serial number"
+            | "show me serial number"
+            | "show me the serial number"
+    )
+}
+
+
+/// Zero-LLM hardware serial from cached `system_profiler` / `ioreg` / DMI.
+pub fn format_serial_gateway() -> String {
+    let v = crate::metrics::get_serial_number();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Serial** — _no serial number right now._".to_string();
+    }
+    format!("**Serial** · `{v}`")
+}
+
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

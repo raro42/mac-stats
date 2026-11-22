@@ -990,6 +990,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_username_request(content) {
         return Some(format_username_gateway());
     }
+    // Hardware serial (bare "sn" stays with the agent; Mac model / chip stay their lanes).
+    if looks_like_serial_request(content) {
+        return Some(format_serial_gateway());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());

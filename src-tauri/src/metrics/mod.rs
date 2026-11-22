@@ -346,6 +346,93 @@ pub fn get_username() -> String {
         .clone()
 }
 
+/// Cached hardware serial number (`system_profiler` / `ioreg` / DMI product_serial).
+/// Used by the Discord/operator instant `/serial` · `/serial-number` lane.
+/// Distinct from Mac model (`/mac-model`) and chip (`/chip`).
+pub fn get_serial_number() -> String {
+    SERIAL_NUMBER_CACHE
+        .get_or_init(|| {
+            let usable = |s: &str| -> Option<String> {
+                let t = s.trim();
+                if t.is_empty() {
+                    return None;
+                }
+                let lower = t.to_ascii_lowercase();
+                // DMI / VM placeholders are not useful answers.
+                if matches!(
+                    lower.as_str(),
+                    "none" | "not specified" | "not set" | "default string" | "to be filled by o.e.m." | "system serial number"
+                ) {
+                    return None;
+                }
+                Some(t.to_string())
+            };
+            let from_profiler = || -> Option<String> {
+                let output = Command::new("/usr/sbin/system_profiler")
+                    .arg("SPHardwareDataType")
+                    .arg("-json")
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                let json: serde_json::Value = serde_json::from_str(&stdout).ok()?;
+                let hardware = json
+                    .get("SPHardwareDataType")
+                    .and_then(|v| v.as_array())
+                    .and_then(|a| a.first())?;
+                for k in ["serial_number", "serial_number_key"] {
+                    if let Some(s) = hardware.get(k).and_then(|v| v.as_str()).and_then(usable) {
+                        return Some(s);
+                    }
+                }
+                None
+            };
+            let from_ioreg = || -> Option<String> {
+                let output = Command::new("/usr/sbin/ioreg")
+                    .args(["-c", "IOPlatformExpertDevice", "-d", "2"])
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                for line in stdout.lines() {
+                    if !line.contains("IOPlatformSerialNumber") {
+                        continue;
+                    }
+                    // "IOPlatformSerialNumber" = "C02XXXXX"
+                    if let Some(rest) = line.split('=').nth(1) {
+                        let cleaned = rest.trim().trim_matches('"').trim();
+                        if let Some(s) = usable(cleaned) {
+                            return Some(s);
+                        }
+                    }
+                }
+                None
+            };
+            let from_dmi = || -> Option<String> {
+                let path = std::path::Path::new("/sys/class/dmi/id/product_serial");
+                let raw = std::fs::read_to_string(path).ok()?;
+                usable(&raw)
+            };
+            let info = from_profiler()
+                .or_else(from_ioreg)
+                .or_else(from_dmi)
+                .unwrap_or_default();
+            if info.is_empty() {
+                debug3!("serial: system_profiler/ioreg/dmi empty");
+            } else {
+                debug3!("serial cached: '{}'", info);
+            }
+            info
+        })
+        .clone()
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

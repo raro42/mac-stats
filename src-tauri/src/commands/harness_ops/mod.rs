@@ -541,8 +541,6 @@ mod tests {
     }
 
     #[test]
-
-    #[test]
     fn username_slash_and_view_open_do_not_steal_bare_user_or_user_info() {
         // Slash + view/open NL → login username (hostname `/hostname` · chip `/chip` parity).
         // Bare user / view user stay with the agent; user info path/size/age stay Discord map.
@@ -589,6 +587,47 @@ mod tests {
         );
     }
 
+    #[test]
+    fn serial_slash_and_view_open_do_not_steal_bare_sn_or_model() {
+        // Slash + view/open NL → hardware serial (username `/username` · Mac model parity).
+        // Bare sn stays with the agent; /mac-model stays marketing name; /chip stays chip.
+        assert!(looks_like_serial_request("/serial"));
+        assert!(looks_like_serial_request("/serial-number"));
+        assert!(looks_like_serial_request("/hw-serial"));
+        assert!(looks_like_serial_request("/hardware-serial"));
+        assert!(looks_like_serial_request("/device-serial"));
+        assert!(looks_like_serial_request("/sn"));
+        assert!(looks_like_serial_request("view serial"));
+        assert!(looks_like_serial_request("open serial number"));
+        assert!(looks_like_serial_request("list serial"));
+        assert!(looks_like_serial_request("serial"));
+        assert!(looks_like_serial_request("serial number"));
+        assert!(looks_like_serial_request("what's my serial"));
+        assert!(looks_like_serial_request("what serial is this"));
+        assert!(!looks_like_serial_request("sn"));
+        assert!(!looks_like_serial_request("serialize"));
+        assert!(!looks_like_serial_request("serial port"));
+        assert!(!looks_like_serial_request("/mac-model"));
+        assert!(!looks_like_serial_request("/chip"));
+        let serial = try_operator_instant_reply("/serial").unwrap();
+        assert!(
+            serial.contains("**Serial**") && !serial.to_lowercase().contains("execution"),
+            "got: {serial}"
+        );
+        let viewed = try_operator_instant_reply("view serial").unwrap();
+        assert!(
+            viewed.contains("**Serial**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("sn").is_none());
+        let mac = try_operator_instant_reply("/mac-model").unwrap();
+        assert!(
+            !mac.contains("**Serial**"),
+            "/mac-model must stay Mac model, not serial: {mac}"
+        );
+    }
+
+    #[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2939] - 2026-11-22
+
+### Added
+- Instant hardware serial accepts `/serial` · `/serial-number` · `/hw-serial` · `/hardware-serial` · `/device-serial` · `/sn` and view/see/open/list NL (`view serial`, `open serial number`, `list serial`, …), matching “serial number” / “what's my serial” / “what serial is this”. Bare `sn` stays with the agent; `/mac-model` stays marketing name · machine model; `/chip` stays Apple chip.
+
 ## [0.1.2938] - 2026-11-22
 
 ### Added
