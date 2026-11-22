@@ -1,22 +1,21 @@
 # Morning surprise — 2026-11-22
 
-Overnight autoresearch kept shipping instant operator lanes after digester stayed empty.
+Overnight Track B kept shipping operator instant network facts after digester stayed empty.
 
-## Shipped
+## Shipped tonight (selected)
 
-- **v0.1.2947** — default IPv4 gateway `/gateway` · `/default-gateway` · `/router` · `/gw` · `/default-route` · `/router-ip` · `/gateway-ip` (+ view/open NL). Discord `/discord` · `gateway status` · `gateway ready` stay Discord; bare `gateway` / bare `router` stay with the agent; `/ip` stays LAN address.
-- **v0.1.2946** — local LAN IPv4 `/ip` · `/local-ip` · `/lan-ip` · `/ipv4` · `/primary-ip` · `/en0` (+ view/open NL). Default-route iface + `ipconfig getifaddr`. Bare `ip` / “what's my ip” / public·wan stay with the agent; `/hostname` stays ComputerName.
-- **v0.1.2945** — last boot wall-clock `/boot` · `/boot-time` · `/last-boot` · `/last-reboot` · `/reboot-time` (+ view/open NL).
-- **v0.1.2944** — CPU core count `/cores` · `/ncpu` · `/cpu-count` (+ view/open NL).
-- **v0.1.2943** — kernel release `/kernel` · `/uname-r` (+ view/open NL).
-- **v0.1.2942** — system locale `/locale` · `/lang` (+ view/open NL).
-- Earlier tonight: arch, timezone, serial, username, Mac model, hostname, macOS version, SSD capacity, and related slash+NL lanes.
+- **v0.1.2948** — `/dns` · `/dns-servers` · `/nameserver` · `/ns` · `/resolver` + view/open NL (first `scutil --dns` resolver). Bare `dns` / dig·lookup·flush stay with the agent.
+- **v0.1.2947** — `/gateway` · `/router` · `/gw` + view/open NL (default IPv4 from `route`). Discord gateway status stays Discord.
+- **v0.1.2946** — `/ip` · `/local-ip` · `/lan-ip` + view/open NL (LAN IPv4). Bare `ip` / public·wan stay with the agent.
+- Earlier same night: boot `/boot`, cores `/cores`, kernel `/kernel`, locale `/locale`, arch `/arch`, timezone `/tz`, serial, username, Mac model, hostname, macOS version — slash+NL train.
 
-## Context
+## Skipped / held
 
-- Digester open empty all night; design-review grace (Mac TCC); layout-daily data-poster marked (Dark next calendar day).
-- cream/Swiss Send fill remains intentional white-on-blue.
+- Cream/Swiss AI Chat Send fill stays white-on-blue **intentional**.
+- Dark layout-daily: day quota already used by Data Poster; Dark/Neon/Futuristic next calendar day.
+- Design-review screenshots: Mac TCC grace — polish-without-capture only.
+- Digester open: empty (no Slowest / Improve-task fuel).
 
-## Next
+## Next fuel
 
-- Dark layout-daily next calendar quota · sibling/product fuel · not another keep-pNN clone.
+Dark layout-daily when the day quota opens · cream/Swiss Send fill intentional · Wi-Fi SSID / sibling ports if a clear fit · not another keep-pNN Disk Cleanup clone.
