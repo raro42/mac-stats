@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2936
+
+- Product fuel after macOS version `/macos` NL v0.1.2935: ComputerName · LocalHostName already answered via agent/`hostname`/`scutil` but lacked `/hostname` · `/computer-name` · `/machine-name` · `/local-hostname` and view/see/open/list phrases while chip `/chip`, RAM `/ram-size`, SSD `/ssd-size`, and macOS `/macos` already had slash+NL. Bare `host` / `view host` stay with the agent (monitors/URLs). Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — hostname slash NL closed; not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2935
 
 - Product fuel after SSD capacity `/ssd-size` NL v0.1.2934: macOS version already answered via agent/`sw_vers` but lacked `/macos` · `/os` · `/os-version` · `/macos-version` · `/system-version` · `/sw-vers` · `/build` · `/build-version` and view/see/open/list phrases while chip `/chip`, RAM `/ram-size`, and SSD `/ssd-size` already had slash+NL. Bare `/version` / `view version` / `what version` stay app status. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked today (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · sibling/product fuel — macOS version slash NL closed; not another keep-pNN clone.
