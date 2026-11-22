@@ -1,3 +1,11 @@
+## Overnight note 2026-11-22 ~23:40
+- Shipped v0.1.2974 Printer Sharing `/printer-sharing` · `/share-printers` · `/cups-share` + view/open NL; bare printer/cups stay with agent; `/file-sharing` · `/smb` · `/screen-sharing` · `/vnc` · `/remote-login` · `/ssh` intact.
+- Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Neon layout-daily next calendar quota.
+
+## Overnight merge — v0.1.2974
+
+- Product fuel after File Sharing `/file-sharing` NL v0.1.2973: Printer Sharing already readable via `cupsctl` `_share_printers` but lacked `/printer-sharing` · `/printersharing` · `/printer-sharing-status` · `/printer-share` · `/share-printers` · `/cups-share` · `/cups-sharing` · `/mac-printer-sharing` and view/see/open/list phrases while File Sharing `/file-sharing` · `/smb` and Screen Sharing `/screen-sharing` · `/vnc` already had slash+NL. Bare `printer` / `printers` / `cups` stay with the agent; `/file-sharing` · `/smb` stay File Sharing; `/screen-sharing` · `/vnc` stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Dark marked today (Neon due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Neon layout-daily next calendar day · Remote Management / Content Caching sibling/product fuel — Printer Sharing slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-22 ~23:31
 - Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Neon layout-daily next calendar quota.
 
