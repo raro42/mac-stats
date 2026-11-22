@@ -1356,6 +1356,76 @@ mod tests {
     }
 
 #[test]
+    fn primary_iface_slash_and_view_open_do_not_steal_mtu_or_lan_ip() {
+        // Slash + view/open NL → default-route iface name (`/ip` · `/mtu` parity).
+        // Bare `iface` / `interface` stay with the agent; `/iface-mtu` stays MTU; `/en0` stays LAN.
+        assert!(looks_like_primary_iface_request("/iface"));
+        assert!(looks_like_primary_iface_request("/ifname"));
+        assert!(looks_like_primary_iface_request("/if-name"));
+        assert!(looks_like_primary_iface_request("/interface"));
+        assert!(looks_like_primary_iface_request("/interface-name"));
+        assert!(looks_like_primary_iface_request("/default-iface"));
+        assert!(looks_like_primary_iface_request("/default-interface"));
+        assert!(looks_like_primary_iface_request("/primary-iface"));
+        assert!(looks_like_primary_iface_request("/primary-interface"));
+        assert!(looks_like_primary_iface_request("/netif"));
+        assert!(looks_like_primary_iface_request("/nic"));
+        assert!(looks_like_primary_iface_request("view interface"));
+        assert!(looks_like_primary_iface_request("open iface"));
+        assert!(looks_like_primary_iface_request("list interface"));
+        assert!(looks_like_primary_iface_request("default interface"));
+        assert!(looks_like_primary_iface_request("primary interface"));
+        assert!(looks_like_primary_iface_request("network interface"));
+        assert!(looks_like_primary_iface_request("what's my interface"));
+        assert!(looks_like_primary_iface_request("which interface"));
+        assert!(looks_like_primary_iface_request("what interface am i on"));
+        assert!(!looks_like_primary_iface_request("iface"));
+        assert!(!looks_like_primary_iface_request("interface"));
+        assert!(!looks_like_primary_iface_request("nic"));
+        assert!(!looks_like_primary_iface_request("/iface-mtu"));
+        assert!(!looks_like_primary_iface_request("/interface-mtu"));
+        assert!(!looks_like_primary_iface_request("interface mtu"));
+        assert!(!looks_like_primary_iface_request("/mtu"));
+        assert!(!looks_like_primary_iface_request("/en0"));
+        assert!(!looks_like_primary_iface_request("/ip"));
+        assert!(!looks_like_primary_iface_request("/mac-address"));
+        assert!(!looks_like_primary_iface_request("/netmask"));
+        assert!(!looks_like_primary_iface_request("/wifi"));
+        assert!(!looks_like_primary_iface_request("list interfaces"));
+        let iface = try_operator_instant_reply("/iface").unwrap();
+        assert!(
+            iface.contains("**Iface**") && !iface.to_lowercase().contains("execution"),
+            "got: {iface}"
+        );
+        let viewed = try_operator_instant_reply("view interface").unwrap();
+        assert!(
+            viewed.contains("**Iface**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let short = try_operator_instant_reply("/ifname").unwrap();
+        assert!(
+            short.contains("**Iface**") && !short.to_lowercase().contains("execution"),
+            "got: {short}"
+        );
+        assert!(try_operator_instant_reply("iface").is_none());
+        assert!(try_operator_instant_reply("interface").is_none());
+        let mtu = try_operator_instant_reply("/iface-mtu");
+        if let Some(reply) = mtu {
+            assert!(
+                !reply.contains("**Iface**"),
+                "/iface-mtu must stay MTU, not iface name: {reply}"
+            );
+        }
+        let ip = try_operator_instant_reply("/en0");
+        if let Some(reply) = ip {
+            assert!(
+                !reply.contains("**Iface**"),
+                "/en0 must stay LAN IP, not iface name: {reply}"
+            );
+        }
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.

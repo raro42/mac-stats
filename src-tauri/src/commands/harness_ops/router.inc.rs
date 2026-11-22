@@ -1046,6 +1046,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_netmask_request(content) {
         return Some(format_netmask_report());
     }
+    // Primary / default-route iface name (bare `iface` / `interface` stay with the agent; `/iface-mtu` stays MTU; `/en0` stays LAN).
+    if looks_like_primary_iface_request(content) {
+        return Some(format_primary_iface_report());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());

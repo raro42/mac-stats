@@ -7823,6 +7823,185 @@ pub fn format_netmask_report() -> String {
     format!("**Netmask** · `{v}`")
 }
 
+/// Primary / default-route interface name — not LAN IP, not MAC, not MTU, not netmask.
+/// Slash + view/open NL (`/iface` · `/ifname` · `view interface`) match `/ip` · `/mtu` shape;
+/// bare `iface` / `interface` stay with the agent; `/iface-mtu` · `/interface-mtu` stay MTU;
+/// `/en0` stays LAN IP.
+pub fn looks_like_primary_iface_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("mtu")
+        || n.contains("netmask")
+        || n.contains("subnet")
+        || n.contains("cidr")
+        || n.contains("mac")
+        || n.contains("ether")
+        || n.contains("address")
+        || n.contains("wifi")
+        || n.contains("ssid")
+        || n.contains("wlan")
+        || n.contains("airport")
+        || n.contains("gateway")
+        || n.contains("router")
+        || n.contains("dns")
+        || n.contains("nameserver")
+        || n.contains("ip")
+        || n.contains("vpn")
+        || n.contains("user")
+        || n.contains("ui")
+        || n.contains("api")
+        || n.contains("interfaces")
+        || n.contains("list all")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("rename")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("add ")
+        // Bare short / ambiguous asks stay with the agent.
+        || n == "iface"
+        || n == "the iface"
+        || n == "interface"
+        || n == "the interface"
+        || n == "ifname"
+        || n == "the ifname"
+        || n == "nic"
+        || n == "the nic"
+        || n == "netif"
+        || n == "the netif"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/iface"
+            | "/ifname"
+            | "/if-name"
+            | "/interface"
+            | "/interface-name"
+            | "/interfacename"
+            | "/default-iface"
+            | "/defaultiface"
+            | "/default-interface"
+            | "/defaultinterface"
+            | "/primary-iface"
+            | "/primaryiface"
+            | "/primary-interface"
+            | "/primaryinterface"
+            | "/netif"
+            | "/nic"
+            | "default interface"
+            | "the default interface"
+            | "default iface"
+            | "the default iface"
+            | "primary interface"
+            | "the primary interface"
+            | "primary iface"
+            | "the primary iface"
+            | "network interface"
+            | "the network interface"
+            | "network iface"
+            | "the network iface"
+            | "interface name"
+            | "the interface name"
+            | "iface name"
+            | "the iface name"
+            | "my interface"
+            | "my iface"
+            | "my network interface"
+            | "what's my interface"
+            | "whats my interface"
+            | "what is my interface"
+            | "what's the interface"
+            | "whats the interface"
+            | "what is the interface"
+            | "what's my iface"
+            | "whats my iface"
+            | "what is my iface"
+            | "what's the iface"
+            | "whats the iface"
+            | "what is the iface"
+            | "what's my default interface"
+            | "whats my default interface"
+            | "what is my default interface"
+            | "what's the default interface"
+            | "whats the default interface"
+            | "what is the default interface"
+            | "what's my primary interface"
+            | "whats my primary interface"
+            | "what is my primary interface"
+            | "which interface"
+            | "which iface"
+            | "which network interface"
+            | "what interface am i on"
+            | "what iface am i on"
+            // View/see/show me/open/list.
+            | "view interface"
+            | "view the interface"
+            | "view iface"
+            | "view the iface"
+            | "view default interface"
+            | "view the default interface"
+            | "view primary interface"
+            | "view the primary interface"
+            | "view interface name"
+            | "view the interface name"
+            | "see interface"
+            | "see the interface"
+            | "see iface"
+            | "see the iface"
+            | "see default interface"
+            | "see the default interface"
+            | "open interface"
+            | "open the interface"
+            | "open iface"
+            | "open the iface"
+            | "open default interface"
+            | "open the default interface"
+            | "list interface"
+            | "list the interface"
+            | "list iface"
+            | "list the iface"
+            | "list default interface"
+            | "list the default interface"
+            | "show interface"
+            | "show the interface"
+            | "show me interface"
+            | "show me the interface"
+            | "show iface"
+            | "show the iface"
+            | "show me iface"
+            | "show me the iface"
+            | "show default interface"
+            | "show the default interface"
+            | "show me default interface"
+            | "show me the default interface"
+            | "show primary interface"
+            | "show the primary interface"
+            | "show me primary interface"
+            | "show me the primary interface"
+    )
+}
+
+/// Zero-LLM primary / default-route interface name from `route -n get default`.
+pub fn format_primary_iface_report() -> String {
+    let v = crate::metrics::get_primary_iface();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Iface** — _no default interface right now._".to_string();
+    }
+    format!("**Iface** · `{v}`")
+}
+
 
 
 

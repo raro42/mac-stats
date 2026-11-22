@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2953] - 2026-11-22
+
+### Added
+- Instant primary / default-route interface name accepts `/iface` · `/ifname` · `/if-name` · `/interface` · `/interface-name` · `/default-iface` · `/default-interface` · `/primary-iface` · `/primary-interface` · `/netif` · `/nic` and view/see/open/list NL (`view interface`, `open iface`, `list interface`, …), matching “default interface” / “primary interface” / “network interface” / “what's my interface” / “which interface” / “what interface am i on”. Bare `iface` / `interface` / `nic` stay with the agent; `/iface-mtu` · `/interface-mtu` stay MTU; `/en0` stays LAN IP; `/ip` stays LAN address; `/mac-address` stays ethernet; `/mtu` stays MTU; `/netmask` stays subnet.
+
 ## [0.1.2952] - 2026-11-22
 
 ### Added

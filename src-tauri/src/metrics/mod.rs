@@ -1177,6 +1177,56 @@ pub fn get_primary_netmask() -> String {
     info
 }
 
+/// Primary / default-route interface name (from `route -n get default`).
+/// Live (not OnceLock): Wi-Fi / USB / VPN iface can change while the process stays up.
+/// Used by the Discord/operator instant `/iface` · `/ifname` lane.
+/// Distinct from LAN IP (`/ip`), MAC (`/mac-address`), MTU (`/mtu`), netmask (`/netmask`).
+pub fn get_primary_iface() -> String {
+    let default_iface = || -> Option<String> {
+        let output = Command::new("/sbin/route")
+            .args(["-n", "get", "default"])
+            .stderr(std::process::Stdio::null())
+            .output()
+            .ok()?;
+        if !output.status.success() {
+            return None;
+        }
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        for line in stdout.lines() {
+            let t = line.trim();
+            if let Some(rest) = t.strip_prefix("interface:") {
+                let iface = rest.trim();
+                if !iface.is_empty() {
+                    return Some(iface.to_string());
+                }
+            }
+        }
+        None
+    };
+    let exists = |iface: &str| -> bool {
+        let output = Command::new("/sbin/ifconfig")
+            .arg(iface)
+            .stderr(std::process::Stdio::null())
+            .output();
+        matches!(output, Ok(o) if o.status.success())
+    };
+    let from_fallback = || -> Option<String> {
+        for iface in ["en0", "en1", "en2"] {
+            if exists(iface) {
+                return Some(iface.to_string());
+            }
+        }
+        None
+    };
+    let info = default_iface().or_else(from_fallback).unwrap_or_default();
+    if info.is_empty() {
+        debug3!("primary iface: route/ifconfig empty");
+    } else {
+        debug3!("primary iface: '{}'", info);
+    }
+    info
+}
+
 
 
 
