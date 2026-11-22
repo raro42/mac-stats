@@ -10301,9 +10301,10 @@ pub fn format_gatekeeper_report() -> String {
     format!("**Gatekeeper** · `{v}`")
 }
 
-/// Application Firewall global state — not Gatekeeper, not SIP, not FileVault.
+/// Application Firewall global state — not Gatekeeper, not SIP, not FileVault, not stealth.
 /// Slash + view/open NL (`/firewall` · `/afw` · `view firewall`) match `/gatekeeper` · `/sip` shape;
-/// bare `firewall` / `afw` stay with the agent; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP.
+/// bare `firewall` / `afw` stay with the agent; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP;
+/// `/stealth` · `/firewall-stealth` stay stealth.
 pub fn looks_like_firewall_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -10337,7 +10338,8 @@ pub fn looks_like_firewall_request(content: &str) -> bool {
         || n.contains("system integrity")
         || n.contains("sip")
         || n.contains("csrutil")
-        // Gatekeeper / SIP / FileVault / boot volume / Disk Cleanup stay elsewhere.
+        || n.contains("stealth")
+        // Gatekeeper / SIP / FileVault / stealth / boot volume / Disk Cleanup stay elsewhere.
         || n == "/gatekeeper"
         || n == "/gk"
         || n == "/spctl"
@@ -10346,6 +10348,8 @@ pub fn looks_like_firewall_request(content: &str) -> bool {
         || n == "/filevault"
         || n == "/fv"
         || n == "/fde"
+        || n == "/stealth"
+        || n == "/firewall-stealth"
         || n == "/boot-volume"
         || n == "/startup-disk"
         || n == "view disk"
@@ -10481,6 +10485,193 @@ pub fn format_firewall_report() -> String {
         return "**Firewall** — _no Application Firewall reading on this Mac right now._".to_string();
     }
     format!("**Firewall** · `{v}`")
+}
+
+/// Application Firewall stealth mode — not global Firewall `/firewall`, not Gatekeeper, not SIP.
+/// Slash + view/open NL (`/stealth` · `/firewall-stealth` · `view stealth`) match `/firewall` shape;
+/// bare `stealth` stays with the agent; `/firewall` stays global state.
+pub fn looks_like_firewall_stealth_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("allow ")
+        || n.contains("block ")
+        || n.contains("password")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("gatekeeper")
+        || n.contains("spctl")
+        || n.contains("system integrity")
+        || n.contains("sip")
+        || n.contains("csrutil")
+        // Global Firewall / Gatekeeper / SIP / FileVault stay elsewhere.
+        || n == "/firewall"
+        || n == "/firewall-status"
+        || n == "/fw"
+        || n == "/fw-status"
+        || n == "/afw"
+        || n == "/afw-status"
+        || n == "/app-firewall"
+        || n == "/application-firewall"
+        || n == "/socketfilterfw"
+        || n == "/gatekeeper"
+        || n == "/gk"
+        || n == "/spctl"
+        || n == "/sip"
+        || n == "/csrutil"
+        || n == "/filevault"
+        || n == "/fv"
+        || n == "/fde"
+        // Bare short / ambiguous stay with the agent.
+        || n == "stealth"
+        || n == "the stealth"
+        || n == "stealth mode"
+        || n == "the stealth mode"
+        || n == "firewall stealth"
+        || n == "the firewall stealth"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/stealth"
+            | "/stealth-mode"
+            | "/stealthmode"
+            | "/stealth-status"
+            | "/stealthstatus"
+            | "/firewall-stealth"
+            | "/firewallstealth"
+            | "/fw-stealth"
+            | "/fwstealth"
+            | "/afw-stealth"
+            | "/afwstealth"
+            | "/app-firewall-stealth"
+            | "/application-firewall-stealth"
+            | "/socketfilterfw-stealth"
+            | "stealth status"
+            | "the stealth status"
+            | "stealth mode status"
+            | "the stealth mode status"
+            | "firewall stealth status"
+            | "the firewall stealth status"
+            | "fw stealth status"
+            | "afw stealth status"
+            | "my stealth"
+            | "my stealth status"
+            | "my stealth mode"
+            | "my firewall stealth"
+            | "is stealth on"
+            | "is stealth off"
+            | "is stealth enabled"
+            | "is stealth disabled"
+            | "is the stealth on"
+            | "is the stealth enabled"
+            | "is stealth mode on"
+            | "is stealth mode enabled"
+            | "is firewall stealth on"
+            | "is firewall stealth enabled"
+            | "what's my stealth"
+            | "whats my stealth"
+            | "what is my stealth"
+            | "what's my stealth status"
+            | "whats my stealth status"
+            | "what is my stealth status"
+            | "what's my stealth mode"
+            | "whats my stealth mode"
+            | "what is my stealth mode"
+            | "what's the stealth"
+            | "whats the stealth"
+            | "what is the stealth"
+            | "what's the stealth status"
+            | "whats the stealth status"
+            | "what is the stealth status"
+            | "what's the stealth mode"
+            | "whats the stealth mode"
+            | "what is the stealth mode"
+            | "how's stealth"
+            | "hows stealth"
+            | "how's the stealth"
+            | "hows the stealth"
+            | "how's stealth mode"
+            | "hows stealth mode"
+            // View/see/show me/open/list.
+            | "view stealth"
+            | "view the stealth"
+            | "view stealth status"
+            | "view the stealth status"
+            | "view stealth mode"
+            | "view the stealth mode"
+            | "view firewall stealth"
+            | "view the firewall stealth"
+            | "see stealth"
+            | "see the stealth"
+            | "see stealth status"
+            | "see the stealth status"
+            | "see stealth mode"
+            | "see the stealth mode"
+            | "see firewall stealth"
+            | "see the firewall stealth"
+            | "open stealth"
+            | "open the stealth"
+            | "open stealth status"
+            | "open the stealth status"
+            | "open stealth mode"
+            | "open the stealth mode"
+            | "open firewall stealth"
+            | "open the firewall stealth"
+            | "list stealth"
+            | "list the stealth"
+            | "list stealth status"
+            | "list the stealth status"
+            | "list stealth mode"
+            | "list the stealth mode"
+            | "list firewall stealth"
+            | "list the firewall stealth"
+            | "show stealth"
+            | "show the stealth"
+            | "show me stealth"
+            | "show me the stealth"
+            | "show stealth status"
+            | "show the stealth status"
+            | "show me stealth status"
+            | "show me the stealth status"
+            | "show stealth mode"
+            | "show the stealth mode"
+            | "show me stealth mode"
+            | "show me the stealth mode"
+            | "show firewall stealth"
+            | "show the firewall stealth"
+            | "show me firewall stealth"
+            | "show me the firewall stealth"
+    )
+}
+
+/// Zero-LLM Firewall stealth status from `socketfilterfw --getstealthmode` (macOS-only; empty elsewhere).
+pub fn format_firewall_stealth_report() -> String {
+    let v = crate::metrics::get_firewall_stealth_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Stealth** — _no Firewall stealth reading on this Mac right now._".to_string();
+    }
+    format!("**Stealth** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.

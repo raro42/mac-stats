@@ -2002,7 +2002,8 @@ mod tests {
     #[test]
     fn firewall_slash_and_view_open_do_not_steal_gatekeeper_or_bare_firewall() {
         // Slash + view/open NL → Application Firewall (`/gatekeeper` · `/sip` parity).
-        // Bare `firewall` / `afw` stay with the agent; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP.
+        // Bare `firewall` / `afw` stay with the agent; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP;
+        // `/stealth` stays stealth.
         assert!(looks_like_firewall_request("/firewall"));
         assert!(looks_like_firewall_request("/firewall-status"));
         assert!(looks_like_firewall_request("/fw"));
@@ -2029,6 +2030,8 @@ mod tests {
         assert!(!looks_like_firewall_request("/sip"));
         assert!(!looks_like_firewall_request("view sip"));
         assert!(!looks_like_firewall_request("/filevault"));
+        assert!(!looks_like_firewall_request("/stealth"));
+        assert!(!looks_like_firewall_request("view stealth"));
         assert!(!looks_like_firewall_request("enable firewall"));
         assert!(!looks_like_firewall_request("disable firewall"));
         assert!(!looks_like_gatekeeper_request("/firewall"));
@@ -2060,6 +2063,65 @@ mod tests {
             assert!(
                 !reply.contains("**Firewall**"),
                 "/sip must stay SIP, not Firewall: {reply}"
+            );
+        }
+    }
+
+    #[test]
+    fn firewall_stealth_slash_and_view_open_do_not_steal_firewall_or_bare_stealth() {
+        // Slash + view/open NL → Firewall stealth (`/firewall` · `/gatekeeper` parity).
+        // Bare `stealth` stays with the agent; `/firewall` stays global state; `/gatekeeper` stays Gatekeeper.
+        assert!(looks_like_firewall_stealth_request("/stealth"));
+        assert!(looks_like_firewall_stealth_request("/stealth-mode"));
+        assert!(looks_like_firewall_stealth_request("/stealth-status"));
+        assert!(looks_like_firewall_stealth_request("/firewall-stealth"));
+        assert!(looks_like_firewall_stealth_request("/fw-stealth"));
+        assert!(looks_like_firewall_stealth_request("/afw-stealth"));
+        assert!(looks_like_firewall_stealth_request("view stealth"));
+        assert!(looks_like_firewall_stealth_request("open stealth status"));
+        assert!(looks_like_firewall_stealth_request("list stealth mode"));
+        assert!(looks_like_firewall_stealth_request("stealth status"));
+        assert!(looks_like_firewall_stealth_request("is stealth on"));
+        assert!(looks_like_firewall_stealth_request("is stealth enabled"));
+        assert!(looks_like_firewall_stealth_request("what's my stealth"));
+        assert!(looks_like_firewall_stealth_request("view firewall stealth"));
+        assert!(!looks_like_firewall_stealth_request("stealth"));
+        assert!(!looks_like_firewall_stealth_request("stealth mode"));
+        assert!(!looks_like_firewall_stealth_request("firewall stealth"));
+        assert!(!looks_like_firewall_stealth_request("/firewall"));
+        assert!(!looks_like_firewall_stealth_request("view firewall"));
+        assert!(!looks_like_firewall_stealth_request("/gatekeeper"));
+        assert!(!looks_like_firewall_stealth_request("/sip"));
+        assert!(!looks_like_firewall_stealth_request("/filevault"));
+        assert!(!looks_like_firewall_stealth_request("enable stealth"));
+        assert!(!looks_like_firewall_stealth_request("disable stealth"));
+        assert!(!looks_like_firewall_request("/stealth"));
+        assert!(!looks_like_firewall_request("view stealth"));
+        assert!(!looks_like_firewall_request("/firewall-stealth"));
+        let stealth = try_operator_instant_reply("/stealth").unwrap();
+        assert!(
+            stealth.contains("**Stealth**") && !stealth.to_lowercase().contains("execution"),
+            "got: {stealth}"
+        );
+        let viewed = try_operator_instant_reply("view stealth").unwrap();
+        assert!(
+            viewed.contains("**Stealth**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("stealth").is_none());
+        assert!(try_operator_instant_reply("stealth mode").is_none());
+        let fw = try_operator_instant_reply("/firewall");
+        if let Some(reply) = fw {
+            assert!(
+                !reply.contains("**Stealth**"),
+                "/firewall must stay Firewall, not Stealth: {reply}"
+            );
+        }
+        let gk = try_operator_instant_reply("/gatekeeper");
+        if let Some(reply) = gk {
+            assert!(
+                !reply.contains("**Stealth**"),
+                "/gatekeeper must stay Gatekeeper, not Stealth: {reply}"
             );
         }
     }

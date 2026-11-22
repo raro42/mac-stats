@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2969] - 2026-11-22
+
+### Added
+- Instant Application Firewall stealth mode accepts `/stealth` · `/stealth-mode` · `/stealth-status` · `/firewall-stealth` · `/fw-stealth` · `/afw-stealth` · `/app-firewall-stealth` · `/application-firewall-stealth` · `/socketfilterfw-stealth` and view/see/open/list NL (`view stealth`, `open stealth status`, `list stealth mode`, …), matching “stealth status” / “is stealth on” / “is stealth enabled” / “what's my stealth” / “what's the stealth mode”. Bare `stealth` / `stealth mode` stay with the agent; `/firewall` stays global Firewall; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP; `/filevault` stays FileVault.
+
 ## [0.1.2968] - 2026-11-22
 
 ### Added

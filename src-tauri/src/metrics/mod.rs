@@ -756,6 +756,44 @@ pub fn get_firewall_status() -> String {
     info
 }
 
+/// macOS Application Firewall stealth mode from `socketfilterfw --getstealthmode` (live; not OnceLock).
+/// Distinct from Firewall global `/firewall`, Gatekeeper `/gatekeeper`, SIP `/sip`, and FileVault `/filevault`.
+/// Used by Discord/operator instant `/stealth` · `/firewall-stealth` lane.
+pub fn get_firewall_stealth_status() -> String {
+    let output = Command::new("/usr/libexec/ApplicationFirewall/socketfilterfw")
+        .arg("--getstealthmode")
+        .stderr(std::process::Stdio::null())
+        .output();
+    let Ok(output) = output else {
+        debug3!("firewall-stealth: socketfilterfw spawn failed");
+        return String::new();
+    };
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let lower = stdout.to_ascii_lowercase();
+    let info = if lower.contains("enabled") && !lower.contains("disabled") {
+        "Enabled".to_string()
+    } else if lower.contains("disabled") {
+        "Disabled".to_string()
+    } else if lower.contains("on") && !lower.contains("off") {
+        "Enabled".to_string()
+    } else if lower.contains("off") {
+        "Disabled".to_string()
+    } else {
+        let t = stdout.lines().next().unwrap_or("").trim();
+        if t.is_empty() {
+            String::new()
+        } else {
+            t.to_string()
+        }
+    };
+    if info.is_empty() {
+        debug3!("firewall-stealth: empty status (exit={})", output.status);
+    } else {
+        debug3!("firewall-stealth status: '{}'", info);
+    }
+    info
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
