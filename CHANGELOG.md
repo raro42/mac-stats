@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2978] - 2026-11-23
+
+### Added
+- Instant Internet Sharing status accepts `/internet-sharing` · `/internetsharing` · `/internet-sharing-status` · `/internet-share` · `/network-sharing` · `/ics` · `/ics-status` · `/nat-sharing` · `/mac-internet-sharing` · `/mac-ics` and view/see/open/list NL (`view internet sharing`, `open ics status`, `list internet sharing`, …), matching “internet sharing status” / “is internet sharing on” / “is ics enabled” / “what's my internet sharing” / “what's the ics status”. Bare `internet` / `nat` / `ics` / `internet sharing` stay with the agent; `/vpn` stays VPN; `/content-caching` · `/asset-cache` stay Content Caching; `/file-sharing` · `/smb` stay File Sharing; `/remote-management` · `/ard` stay Remote Management; `/ip` stays LAN.
+
 ## [0.1.2977] - 2026-11-23
 
 ### Added

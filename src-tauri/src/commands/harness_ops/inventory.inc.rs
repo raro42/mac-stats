@@ -12325,6 +12325,20 @@ pub fn looks_like_content_caching_request(content: &str) -> bool {
         || n == "/ard-agent"
         || n == "/apple-remote-desktop"
         || n == "/mac-ard"
+        || n.contains("internet sharing")
+        || n.contains("internetsharing")
+        || n.contains("internet-sharing")
+        || n.contains("network sharing")
+        || n.contains("networksharing")
+        || n.contains("network-sharing")
+        || n == "/internet-sharing"
+        || n == "/internetsharing"
+        || n == "/internet-share"
+        || n == "/network-sharing"
+        || n == "/ics"
+        || n == "/ics-status"
+        || n == "/nat-sharing"
+        || n == "/mac-internet-sharing"
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
@@ -12522,6 +12536,332 @@ pub fn format_content_caching_report() -> String {
         return "**Content Caching** — _no Content Caching reading on this Mac right now._".to_string();
     }
     format!("**Content Caching** · `{v}`")
+}
+
+/// Internet Sharing / ICS / NAT — plist `:NAT:Enabled` + `com.apple.NetworkSharing` daemon.
+/// "Why" / enable/disable stay with the agent. Slash + view/open NL (`/internet-sharing` · `/ics`).
+/// Bare `internet` / `nat` / `ics` / `internet sharing` stay with the agent; `/vpn` stays VPN;
+/// `/content-caching` · `/asset-cache` stay Content Caching; `/file-sharing` · `/smb` stay File Sharing;
+/// `/remote-management` · `/ard` stay Remote Management; `/ip` stays LAN.
+pub fn looks_like_internet_sharing_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("display")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen share")
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n.contains("file share")
+        || n.contains("printer sharing")
+        || n.contains("printersharing")
+        || n.contains("printer-sharing")
+        || n.contains("share printers")
+        || n.contains("cups share")
+        || n.contains("cups sharing")
+        || n.contains("remote management")
+        || n.contains("remotemanagement")
+        || n.contains("remote-management")
+        || n.contains("remote desktop")
+        || n.contains("apple remote desktop")
+        || n.contains("content caching")
+        || n.contains("contentcaching")
+        || n.contains("content-caching")
+        || n.contains("content cache")
+        || n.contains("asset cache")
+        || n.contains("assetcache")
+        || n.contains("asset-cache")
+        || n.contains("caching server")
+        || n.contains("bluetooth")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/remotelogin"
+        || n == "/ssh"
+        || n == "/sshd"
+        || n == "/ssh-status"
+        || n == "/sshd-status"
+        || n == "/screen-sharing"
+        || n == "/screensharing"
+        || n == "/screen-share"
+        || n == "/vnc"
+        || n == "/vnc-status"
+        || n == "/mac-vnc"
+        || n == "/file-sharing"
+        || n == "/filesharing"
+        || n == "/file-share"
+        || n == "/smb"
+        || n == "/smb-status"
+        || n == "/smbd"
+        || n == "/mac-smb"
+        || n == "/printer-sharing"
+        || n == "/printersharing"
+        || n == "/printer-share"
+        || n == "/share-printers"
+        || n == "/cups-share"
+        || n == "/cups-sharing"
+        || n == "/remote-management"
+        || n == "/remotemanagement"
+        || n == "/remote-mgmt"
+        || n == "/ard"
+        || n == "/ard-status"
+        || n == "/ard-state"
+        || n == "/ard-agent"
+        || n == "/apple-remote-desktop"
+        || n == "/mac-ard"
+        || n == "/content-caching"
+        || n == "/contentcaching"
+        || n == "/content-cache"
+        || n == "/asset-cache"
+        || n == "/assetcache"
+        || n == "/caching-server"
+        || n == "/mac-content-caching"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/gateway"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        // Bare short / ambiguous stay with the agent.
+        || n == "internet"
+        || n == "the internet"
+        || n == "nat"
+        || n == "the nat"
+        || n == "ics"
+        || n == "the ics"
+        || n == "internet sharing"
+        || n == "the internet sharing"
+        || n == "internetsharing"
+        || n == "the internetsharing"
+        || n == "internet-sharing"
+        || n == "the internet-sharing"
+        || n == "network sharing"
+        || n == "the network sharing"
+        || n == "networksharing"
+        || n == "the networksharing"
+        || n == "network-sharing"
+        || n == "the network-sharing"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/internet-sharing"
+            | "/internetsharing"
+            | "/internet-sharing-status"
+            | "/internetsharing-status"
+            | "/internet-share"
+            | "/internetshare"
+            | "/network-sharing"
+            | "/networksharing"
+            | "/network-sharing-status"
+            | "/ics"
+            | "/ics-status"
+            | "/ics-state"
+            | "/nat-sharing"
+            | "/nat-share"
+            | "/mac-internet-sharing"
+            | "/mac-ics"
+            | "internet sharing status"
+            | "the internet sharing status"
+            | "internetsharing status"
+            | "the internetsharing status"
+            | "internet-sharing status"
+            | "the internet-sharing status"
+            | "internet share status"
+            | "the internet share status"
+            | "network sharing status"
+            | "the network sharing status"
+            | "network-sharing status"
+            | "the network-sharing status"
+            | "ics status"
+            | "the ics status"
+            | "ics state"
+            | "the ics state"
+            | "nat sharing status"
+            | "the nat sharing status"
+            | "my internet sharing"
+            | "my internet sharing status"
+            | "my internetsharing"
+            | "my ics"
+            | "my ics status"
+            | "is internet sharing on"
+            | "is internet sharing off"
+            | "is internet sharing enabled"
+            | "is internet sharing disabled"
+            | "is internetsharing on"
+            | "is internetsharing enabled"
+            | "is internet-sharing on"
+            | "is internet-sharing enabled"
+            | "is network sharing on"
+            | "is network sharing enabled"
+            | "is ics on"
+            | "is ics off"
+            | "is ics enabled"
+            | "is ics disabled"
+            | "what's my internet sharing"
+            | "whats my internet sharing"
+            | "what is my internet sharing"
+            | "what's my internet sharing status"
+            | "whats my internet sharing status"
+            | "what is my internet sharing status"
+            | "what's my ics"
+            | "whats my ics"
+            | "what is my ics"
+            | "what's my ics status"
+            | "whats my ics status"
+            | "what is my ics status"
+            | "what's the internet sharing"
+            | "whats the internet sharing"
+            | "what is the internet sharing"
+            | "what's the internet sharing status"
+            | "whats the internet sharing status"
+            | "what is the internet sharing status"
+            | "what's the ics status"
+            | "whats the ics status"
+            | "what is the ics status"
+            | "how's internet sharing"
+            | "hows internet sharing"
+            | "how's the internet sharing"
+            | "hows the internet sharing"
+            | "how's ics"
+            | "hows ics"
+            // View/see/show me/open/list.
+            | "view internet sharing"
+            | "view the internet sharing"
+            | "view internet sharing status"
+            | "view the internet sharing status"
+            | "view internetsharing"
+            | "view the internetsharing"
+            | "view internet-sharing"
+            | "view the internet-sharing"
+            | "view internet share"
+            | "view the internet share"
+            | "view network sharing"
+            | "view the network sharing"
+            | "view network-sharing"
+            | "view the network-sharing"
+            | "view ics"
+            | "view the ics"
+            | "view ics status"
+            | "view the ics status"
+            | "view ics state"
+            | "view the ics state"
+            | "view nat sharing"
+            | "view the nat sharing"
+            | "see internet sharing"
+            | "see the internet sharing"
+            | "see internet sharing status"
+            | "see the internet sharing status"
+            | "see network sharing"
+            | "see the network sharing"
+            | "see ics"
+            | "see the ics"
+            | "see ics status"
+            | "see the ics status"
+            | "open internet sharing"
+            | "open the internet sharing"
+            | "open internet sharing status"
+            | "open the internet sharing status"
+            | "open internetsharing"
+            | "open the internetsharing"
+            | "open network sharing"
+            | "open the network sharing"
+            | "open ics"
+            | "open the ics"
+            | "open ics status"
+            | "open the ics status"
+            | "list internet sharing"
+            | "list the internet sharing"
+            | "list internet sharing status"
+            | "list the internet sharing status"
+            | "list network sharing"
+            | "list the network sharing"
+            | "list ics"
+            | "list the ics"
+            | "list ics status"
+            | "list the ics status"
+            | "show internet sharing"
+            | "show the internet sharing"
+            | "show me internet sharing"
+            | "show me the internet sharing"
+            | "show internet sharing status"
+            | "show the internet sharing status"
+            | "show me internet sharing status"
+            | "show me the internet sharing status"
+            | "show network sharing"
+            | "show the network sharing"
+            | "show me network sharing"
+            | "show me the network sharing"
+            | "show ics"
+            | "show the ics"
+            | "show me ics"
+            | "show me the ics"
+            | "show ics status"
+            | "show the ics status"
+            | "show me ics status"
+            | "show me the ics status"
+    )
+}
+
+/// Zero-LLM Internet Sharing status from NAT plist + NetworkSharing daemon (macOS-only; empty elsewhere).
+pub fn format_internet_sharing_report() -> String {
+    let v = crate::metrics::get_internet_sharing_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Internet Sharing** — _no Internet Sharing reading on this Mac right now._".to_string();
+    }
+    format!("**Internet Sharing** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.

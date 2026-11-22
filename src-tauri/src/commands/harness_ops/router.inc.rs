@@ -1077,9 +1077,15 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // Content Caching / AssetCache (bare `caching` / `content caching` / `asset cache` stay with the agent;
     // `/remote-management` · `/ard` stay Remote Management; `/file-sharing` · `/smb` stay File Sharing;
     // `/printer-sharing` stays Printer Sharing; `/screen-sharing` · `/vnc` stay Screen Sharing;
-    // `/remote-login` · `/ssh` stay Remote Login).
+    // `/remote-login` · `/ssh` stay Remote Login; Internet Sharing stays `/internet-sharing` · `/ics`).
     if looks_like_content_caching_request(content) {
         return Some(format_content_caching_report());
+    }
+    // Internet Sharing / ICS / NAT (bare `internet` / `nat` / `ics` / `internet sharing` stay with the agent;
+    // `/vpn` stays VPN; `/content-caching` · `/asset-cache` stay Content Caching; `/file-sharing` · `/smb`
+    // stay File Sharing; `/remote-management` · `/ard` stay Remote Management; `/ip` stays LAN).
+    if looks_like_internet_sharing_request(content) {
+        return Some(format_internet_sharing_report());
     }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).

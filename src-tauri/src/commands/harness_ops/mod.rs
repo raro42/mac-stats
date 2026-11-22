@@ -2608,6 +2608,78 @@ mod tests {
                 "/smb must stay File Sharing, not Content Caching: {reply}"
             );
         }
+        assert!(!looks_like_content_caching_request("/internet-sharing"));
+        assert!(!looks_like_content_caching_request("/ics"));
+        assert!(!looks_like_content_caching_request("view internet sharing"));
+    }
+
+    #[test]
+    fn internet_sharing_slash_and_view_open_do_not_steal_vpn_smb_or_bare_internet() {
+        // Slash + view/open NL → Internet Sharing (`/content-caching` · `/file-sharing` parity).
+        // Bare `internet` / `nat` / `ics` / `internet sharing` stay with the agent; `/vpn` stays VPN;
+        // `/smb` stays File Sharing; `/ard` stays Remote Management; `/content-caching` stays Content Caching.
+        assert!(looks_like_internet_sharing_request("/internet-sharing"));
+        assert!(looks_like_internet_sharing_request("/internetsharing"));
+        assert!(looks_like_internet_sharing_request("/internet-share"));
+        assert!(looks_like_internet_sharing_request("/network-sharing"));
+        assert!(looks_like_internet_sharing_request("/ics"));
+        assert!(looks_like_internet_sharing_request("/ics-status"));
+        assert!(looks_like_internet_sharing_request("/nat-sharing"));
+        assert!(looks_like_internet_sharing_request("/mac-internet-sharing"));
+        assert!(looks_like_internet_sharing_request("/mac-ics"));
+        assert!(looks_like_internet_sharing_request("view internet sharing"));
+        assert!(looks_like_internet_sharing_request("open ics status"));
+        assert!(looks_like_internet_sharing_request("list internet sharing"));
+        assert!(looks_like_internet_sharing_request("internet sharing status"));
+        assert!(looks_like_internet_sharing_request("is internet sharing on"));
+        assert!(looks_like_internet_sharing_request("is ics enabled"));
+        assert!(looks_like_internet_sharing_request("what's my internet sharing"));
+        assert!(looks_like_internet_sharing_request("view ics"));
+        assert!(!looks_like_internet_sharing_request("internet"));
+        assert!(!looks_like_internet_sharing_request("nat"));
+        assert!(!looks_like_internet_sharing_request("ics"));
+        assert!(!looks_like_internet_sharing_request("internet sharing"));
+        assert!(!looks_like_internet_sharing_request("/vpn"));
+        assert!(!looks_like_internet_sharing_request("/file-sharing"));
+        assert!(!looks_like_internet_sharing_request("/smb"));
+        assert!(!looks_like_internet_sharing_request("/content-caching"));
+        assert!(!looks_like_internet_sharing_request("/asset-cache"));
+        assert!(!looks_like_internet_sharing_request("/remote-management"));
+        assert!(!looks_like_internet_sharing_request("/ard"));
+        assert!(!looks_like_internet_sharing_request("/ip"));
+        assert!(!looks_like_internet_sharing_request("/tasks"));
+        assert!(!looks_like_internet_sharing_request("enable internet sharing"));
+        assert!(!looks_like_content_caching_request("/internet-sharing"));
+        assert!(!looks_like_content_caching_request("view internet sharing"));
+        assert!(!looks_like_file_sharing_request("/internet-sharing"));
+        assert!(!looks_like_remote_management_request("/internet-sharing"));
+        let ics = try_operator_instant_reply("/internet-sharing").unwrap();
+        assert!(
+            ics.contains("**Internet Sharing**") && !ics.to_lowercase().contains("execution"),
+            "got: {ics}"
+        );
+        let viewed = try_operator_instant_reply("view internet sharing").unwrap();
+        assert!(
+            viewed.contains("**Internet Sharing**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("internet").is_none());
+        assert!(try_operator_instant_reply("internet sharing").is_none());
+        let vpn = try_operator_instant_reply("/vpn");
+        if let Some(reply) = vpn {
+            assert!(
+                !reply.contains("**Internet Sharing**"),
+                "/vpn must stay VPN, not Internet Sharing: {reply}"
+            );
+        }
+        let smb = try_operator_instant_reply("/smb");
+        if let Some(reply) = smb {
+            assert!(
+                !reply.contains("**Internet Sharing**"),
+                "/smb must stay File Sharing, not Internet Sharing: {reply}"
+            );
+        }
     }
 
 #[test]

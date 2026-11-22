@@ -1393,6 +1393,104 @@ pub fn get_content_caching_status() -> String {
     }
 }
 
+/// Parse PlistBuddy `Print :NAT:Enabled` stdout (0/1 / true/false).
+pub(crate) fn parse_nat_enabled_plistbuddy(stdout: &str) -> Option<bool> {
+    let t = stdout.trim();
+    if t == "1" || t.eq_ignore_ascii_case("true") || t.eq_ignore_ascii_case("yes") {
+        Some(true)
+    } else if t == "0" || t.eq_ignore_ascii_case("false") || t.eq_ignore_ascii_case("no") {
+        Some(false)
+    } else {
+        None
+    }
+}
+
+/// Parse `launchctl print system/com.apple.NetworkSharing` for running state.
+pub(crate) fn parse_network_sharing_running(stdout: &str) -> Option<bool> {
+    for line in stdout.lines() {
+        let t = line.trim();
+        if let Some(rest) = t.strip_prefix("state = ") {
+            let v = rest.trim();
+            if v == "running" {
+                return Some(true);
+            }
+            if v == "not running" || v.starts_with("not running") {
+                return Some(false);
+            }
+        }
+    }
+    None
+}
+
+/// macOS Internet Sharing from NAT plist `Enabled` + `com.apple.NetworkSharing` daemon.
+/// Reads only `:NAT:Enabled` via PlistBuddy (never dumps NetworkPassword).
+/// Distinct from Content Caching `/content-caching`, File Sharing `/file-sharing` · `/smb`,
+/// Remote Management `/remote-management` · `/ard`, and VPN `/vpn`.
+/// Used by Discord/operator instant `/internet-sharing` · `/ics` lane.
+pub fn get_internet_sharing_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let enabled = {
+            let output = Command::new("/usr/libexec/PlistBuddy")
+                .args([
+                    "-c",
+                    "Print :NAT:Enabled",
+                    "/Library/Preferences/SystemConfiguration/com.apple.nat.plist",
+                ])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_nat_enabled_plistbuddy(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("internet-sharing: PlistBuddy spawn failed");
+                    None
+                }
+            }
+        };
+
+        let running = {
+            let output = Command::new("/bin/launchctl")
+                .args(["print", "system/com.apple.NetworkSharing"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_network_sharing_running(&stdout)
+                }
+                Err(_) => {
+                    debug3!("internet-sharing: launchctl print spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = match (enabled, running) {
+            (Some(true), Some(true)) => "On · active".to_string(),
+            (Some(true), Some(false)) => "On · idle".to_string(),
+            (Some(true), None) => "On".to_string(),
+            (Some(false), _) => "Off".to_string(),
+            (None, Some(true)) => "active".to_string(),
+            (None, Some(false)) => "idle".to_string(),
+            (None, None) => String::new(),
+        };
+        if info.is_empty() {
+            debug3!("internet-sharing: empty status");
+        } else {
+            debug3!("internet-sharing status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
@@ -3945,6 +4043,28 @@ fn homebrew_cask_staged_at(candidates: &[&str]) -> bool {
 #[tauri::command]
 pub fn is_homebrew_cask_install() -> bool {
     homebrew_cask_staged_at(HOMEBREW_CASKROOM_MAC_STATS)
+}
+
+#[cfg(test)]
+mod internet_sharing_parse_tests {
+    use super::{parse_nat_enabled_plistbuddy, parse_network_sharing_running};
+
+    #[test]
+    fn parses_nat_enabled_flags() {
+        assert_eq!(parse_nat_enabled_plistbuddy("0\n"), Some(false));
+        assert_eq!(parse_nat_enabled_plistbuddy("1"), Some(true));
+        assert_eq!(parse_nat_enabled_plistbuddy("true"), Some(true));
+        assert_eq!(parse_nat_enabled_plistbuddy("nope"), None);
+    }
+
+    #[test]
+    fn parses_network_sharing_running_state() {
+        let idle = "active count = 0\n\tstate = not running\n\tprogram = /usr/libexec/InternetSharing\n";
+        assert_eq!(parse_network_sharing_running(idle), Some(false));
+        let active = "\tstate = running\n";
+        assert_eq!(parse_network_sharing_running(active), Some(true));
+        assert_eq!(parse_network_sharing_running("path = /tmp\n"), None);
+    }
 }
 
 #[cfg(test)]
