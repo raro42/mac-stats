@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2977] - 2026-11-23
+
+### Added
+- Instant Content Caching status accepts `/content-caching` · `/contentcaching` · `/content-caching-status` · `/content-cache` · `/contentcache` · `/asset-cache` · `/assetcache` · `/asset-caching` · `/mac-content-caching` · `/mac-asset-cache` and view/see/open/list NL (`view content caching`, `open asset cache status`, `list content caching`, …), matching “content caching status” / “is content caching on” / “is asset cache enabled” / “what's my content caching” / “what's the asset cache status”. Bare `caching` / `content caching` / `asset cache` stay with the agent; `/remote-management` · `/ard` stay Remote Management; `/file-sharing` · `/smb` stay File Sharing; `/printer-sharing` stays Printer Sharing; `/screen-sharing` · `/vnc` stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login.
+
 ## [0.1.2976] - 2026-11-23
 
 ### Fixed

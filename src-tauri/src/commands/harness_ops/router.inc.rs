@@ -1069,9 +1069,17 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     // Remote Management / ARD (bare `ard` / `remote management` / `remote desktop` stay with the agent;
     // `/screen-sharing` · `/vnc` stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login;
-    // `/file-sharing` · `/smb` stay File Sharing; `/printer-sharing` stays Printer Sharing).
+    // `/file-sharing` · `/smb` stay File Sharing; `/printer-sharing` stays Printer Sharing;
+    // Content Caching stays `/content-caching` · `/asset-cache`).
     if looks_like_remote_management_request(content) {
         return Some(format_remote_management_report());
+    }
+    // Content Caching / AssetCache (bare `caching` / `content caching` / `asset cache` stay with the agent;
+    // `/remote-management` · `/ard` stay Remote Management; `/file-sharing` · `/smb` stay File Sharing;
+    // `/printer-sharing` stays Printer Sharing; `/screen-sharing` · `/vnc` stay Screen Sharing;
+    // `/remote-login` · `/ssh` stay Remote Login).
+    if looks_like_content_caching_request(content) {
+        return Some(format_content_caching_report());
     }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).

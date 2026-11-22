@@ -2531,6 +2531,83 @@ mod tests {
                 "/ssh must stay Remote Login, not Remote Management: {reply}"
             );
         }
+        assert!(!looks_like_remote_management_request("/content-caching"));
+        assert!(!looks_like_remote_management_request("/asset-cache"));
+        assert!(!looks_like_remote_management_request("view content caching"));
+    }
+
+    #[test]
+    fn content_caching_slash_and_view_open_do_not_steal_ard_smb_or_bare_caching() {
+        // Slash + view/open NL → Content Caching (`/remote-management` · `/printer-sharing` parity).
+        // Bare `caching` / `content caching` / `asset cache` stay with the agent; `/ard` stays Remote Management;
+        // `/smb` stays File Sharing; `/printer-sharing` stays Printer Sharing; `/vnc` stays Screen Sharing;
+        // `/ssh` stays Remote Login.
+        assert!(looks_like_content_caching_request("/content-caching"));
+        assert!(looks_like_content_caching_request("/contentcaching"));
+        assert!(looks_like_content_caching_request("/content-cache"));
+        assert!(looks_like_content_caching_request("/asset-cache"));
+        assert!(looks_like_content_caching_request("/assetcache"));
+        assert!(looks_like_content_caching_request("/asset-caching"));
+        assert!(looks_like_content_caching_request("/mac-content-caching"));
+        assert!(looks_like_content_caching_request("/mac-asset-cache"));
+        assert!(looks_like_content_caching_request("view content caching"));
+        assert!(looks_like_content_caching_request("open asset cache status"));
+        assert!(looks_like_content_caching_request("list content caching"));
+        assert!(looks_like_content_caching_request("content caching status"));
+        assert!(looks_like_content_caching_request("is content caching on"));
+        assert!(looks_like_content_caching_request("is asset cache enabled"));
+        assert!(looks_like_content_caching_request("what's my content caching"));
+        assert!(looks_like_content_caching_request("view asset cache"));
+        assert!(!looks_like_content_caching_request("caching"));
+        assert!(!looks_like_content_caching_request("content caching"));
+        assert!(!looks_like_content_caching_request("asset cache"));
+        assert!(!looks_like_content_caching_request("/cache"));
+        assert!(!looks_like_content_caching_request("/remote-management"));
+        assert!(!looks_like_content_caching_request("/ard"));
+        assert!(!looks_like_content_caching_request("/file-sharing"));
+        assert!(!looks_like_content_caching_request("/smb"));
+        assert!(!looks_like_content_caching_request("/printer-sharing"));
+        assert!(!looks_like_content_caching_request("/screen-sharing"));
+        assert!(!looks_like_content_caching_request("/vnc"));
+        assert!(!looks_like_content_caching_request("/remote-login"));
+        assert!(!looks_like_content_caching_request("/ssh"));
+        assert!(!looks_like_content_caching_request("/tasks"));
+        assert!(!looks_like_content_caching_request("enable content caching"));
+        assert!(!looks_like_remote_management_request("/content-caching"));
+        assert!(!looks_like_remote_management_request("/asset-cache"));
+        assert!(!looks_like_remote_management_request("view content caching"));
+        assert!(!looks_like_printer_sharing_request("/content-caching"));
+        assert!(!looks_like_printer_sharing_request("/asset-cache"));
+        assert!(!looks_like_file_sharing_request("/content-caching"));
+        assert!(!looks_like_screen_sharing_request("/content-caching"));
+        assert!(!looks_like_remote_login_request("/content-caching"));
+        let cc = try_operator_instant_reply("/content-caching").unwrap();
+        assert!(
+            cc.contains("**Content Caching**") && !cc.to_lowercase().contains("execution"),
+            "got: {cc}"
+        );
+        let viewed = try_operator_instant_reply("view content caching").unwrap();
+        assert!(
+            viewed.contains("**Content Caching**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("caching").is_none());
+        assert!(try_operator_instant_reply("content caching").is_none());
+        assert!(try_operator_instant_reply("asset cache").is_none());
+        let ard = try_operator_instant_reply("/ard");
+        if let Some(reply) = ard {
+            assert!(
+                !reply.contains("**Content Caching**"),
+                "/ard must stay Remote Management, not Content Caching: {reply}"
+            );
+        }
+        let smb = try_operator_instant_reply("/smb");
+        if let Some(reply) = smb {
+            assert!(
+                !reply.contains("**Content Caching**"),
+                "/smb must stay File Sharing, not Content Caching: {reply}"
+            );
+        }
     }
 
 #[test]

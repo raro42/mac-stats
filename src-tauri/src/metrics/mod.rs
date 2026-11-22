@@ -1242,6 +1242,157 @@ pub fn get_remote_management_status() -> String {
     }
 }
 
+/// macOS Content Caching (AssetCache) from `AssetCacheManagerUtil` / prefs + `AssetCache` process.
+/// Distinct from Remote Management `/remote-management` · `/ard`, File Sharing `/file-sharing` · `/smb`,
+/// Printer Sharing `/printer-sharing`, Screen Sharing `/screen-sharing` · `/vnc`, and Remote Login
+/// `/remote-login` · `/ssh`.
+/// Used by Discord/operator instant `/content-caching` · `/asset-cache` lane.
+pub fn get_content_caching_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let activated = {
+            // Prefer AssetCacheManagerUtil status (Activated: YES/NO).
+            let from_util = {
+                let output = Command::new("/usr/bin/AssetCacheManagerUtil")
+                    .args(["status"])
+                    .stderr(std::process::Stdio::null())
+                    .output();
+                match output {
+                    Ok(output) => {
+                        let stdout = String::from_utf8_lossy(&output.stdout);
+                        let mut found: Option<bool> = None;
+                        for line in stdout.lines() {
+                            let lower = line.trim().to_ascii_lowercase();
+                            if !(lower.contains("activated") || lower.contains("activation")) {
+                                continue;
+                            }
+                            if lower.contains("yes")
+                                || lower.contains("true")
+                                || lower.ends_with(": 1")
+                                || lower.contains("= 1")
+                                || lower.contains("=1")
+                            {
+                                found = Some(true);
+                                break;
+                            }
+                            if lower.contains("no")
+                                || lower.contains("false")
+                                || lower.ends_with(": 0")
+                                || lower.contains("= 0")
+                                || lower.contains("=0")
+                            {
+                                found = Some(false);
+                                break;
+                            }
+                        }
+                        found
+                    }
+                    Err(_) => {
+                        debug3!("content-caching: AssetCacheManagerUtil spawn failed");
+                        None
+                    }
+                }
+            };
+            if from_util.is_some() {
+                from_util
+            } else {
+                // Fallback: defaults Activated on AssetCache plist.
+                let output = Command::new("/usr/bin/defaults")
+                    .args([
+                        "read",
+                        "/Library/Preferences/com.apple.AssetCache.plist",
+                        "Activated",
+                    ])
+                    .stderr(std::process::Stdio::null())
+                    .output();
+                match output {
+                    Ok(output) if output.status.success() => {
+                        let stdout = String::from_utf8_lossy(&output.stdout);
+                        let t = stdout.trim();
+                        if t == "1" || t.eq_ignore_ascii_case("true") || t.eq_ignore_ascii_case("yes")
+                        {
+                            Some(true)
+                        } else if t == "0"
+                            || t.eq_ignore_ascii_case("false")
+                            || t.eq_ignore_ascii_case("no")
+                        {
+                            Some(false)
+                        } else {
+                            None
+                        }
+                    }
+                    Ok(_) => None,
+                    Err(_) => {
+                        debug3!("content-caching: defaults read spawn failed");
+                        None
+                    }
+                }
+            }
+        };
+
+        let agent = {
+            let output = Command::new("/bin/ps")
+                .args(["-axc", "-o", "comm="])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    stdout.lines().any(|l| {
+                        let t = l.trim();
+                        t == "AssetCache"
+                            || t.ends_with("/AssetCache")
+                            || t == "AssetCacheTetherator"
+                            || t.ends_with("/AssetCacheTetherator")
+                    })
+                }
+                Err(_) => {
+                    debug3!("content-caching: ps spawn failed");
+                    false
+                }
+            }
+        };
+
+        let launchd_hint = {
+            let output = Command::new("/bin/launchctl")
+                .args(["list"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    stdout.lines().any(|l| {
+                        let lower = l.to_ascii_lowercase();
+                        lower.contains("assetcache") || lower.contains("asset_cache")
+                    })
+                }
+                Err(_) => {
+                    debug3!("content-caching: launchctl list spawn failed");
+                    false
+                }
+            }
+        };
+
+        let enabled = activated.unwrap_or(false) || launchd_hint || agent;
+        let info = match (activated, enabled, agent) {
+            (Some(true), _, true) => "On · active".to_string(),
+            (Some(true), _, false) => "On · idle".to_string(),
+            (Some(false), _, _) => "Off".to_string(),
+            (None, true, true) if launchd_hint => "On · active".to_string(),
+            (None, true, false) if launchd_hint => "On · idle".to_string(),
+            (None, true, true) => "active".to_string(),
+            (None, true, false) => "On".to_string(),
+            (None, false, _) => "Off".to_string(),
+        };
+        debug3!("content-caching status: '{}'", info);
+        info
+    }
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.

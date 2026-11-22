@@ -11719,6 +11719,14 @@ pub fn looks_like_printer_sharing_request(content: &str) -> bool {
         || n == "/ard-agent"
         || n == "/apple-remote-desktop"
         || n == "/mac-ard"
+        || n == "/content-caching"
+        || n == "/contentcaching"
+        || n == "/content-cache"
+        || n == "/contentcache"
+        || n == "/asset-cache"
+        || n == "/assetcache"
+        || n == "/asset-caching"
+        || n == "/mac-content-caching"
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
@@ -11909,7 +11917,7 @@ pub fn format_printer_sharing_report() -> String {
 /// "Why" / enable/disable stay with the agent. Slash + view/open NL (`/remote-management` · `/ard`).
 /// Bare `ard` / `remote management` / `remote desktop` stay with the agent; `/screen-sharing` · `/vnc`
 /// stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login; `/file-sharing` · `/smb` stay File Sharing;
-/// `/printer-sharing` stays Printer Sharing.
+/// `/printer-sharing` stays Printer Sharing; `/content-caching` · `/asset-cache` stay Content Caching.
 pub fn looks_like_remote_management_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -11967,6 +11975,10 @@ pub fn looks_like_remote_management_request(content: &str) -> bool {
         || n.contains("cups sharing")
         || n.contains("content caching")
         || n.contains("content-caching")
+        || n.contains("content cache")
+        || n.contains("asset cache")
+        || n.contains("asset-cache")
+        || n.contains("assetcache")
         || n == "/firewall"
         || n == "/fw"
         || n == "/afw"
@@ -12003,6 +12015,14 @@ pub fn looks_like_remote_management_request(content: &str) -> bool {
         || n == "/share-printers"
         || n == "/cups-share"
         || n == "/cups-sharing"
+        || n == "/content-caching"
+        || n == "/contentcaching"
+        || n == "/content-cache"
+        || n == "/contentcache"
+        || n == "/asset-cache"
+        || n == "/assetcache"
+        || n == "/asset-caching"
+        || n == "/mac-content-caching"
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
@@ -12191,6 +12211,317 @@ pub fn format_remote_management_report() -> String {
         return "**Remote Management** — _no Remote Management reading on this Mac right now._".to_string();
     }
     format!("**Remote Management** · `{v}`")
+}
+
+/// Content Caching (AssetCache) — AssetCacheManagerUtil / prefs + AssetCache process.
+/// "Why" / enable/disable stay with the agent. Slash + view/open NL (`/content-caching` · `/asset-cache`).
+/// Bare `caching` / `content caching` / `asset cache` stay with the agent; `/remote-management` · `/ard`
+/// stay Remote Management; `/file-sharing` · `/smb` stay File Sharing; `/printer-sharing` stays Printer Sharing;
+/// `/screen-sharing` · `/vnc` stay Screen Sharing; `/remote-login` · `/ssh` stay Remote Login.
+pub fn looks_like_content_caching_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("display")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        // Word-boundary "set " only — bare `contains("set ")` false-positives on "asset ".
+        || n.starts_with("set ")
+        || n.contains(" set ")
+        || n.contains("reset")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen share")
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n.contains("file share")
+        || n.contains("printer sharing")
+        || n.contains("printersharing")
+        || n.contains("printer-sharing")
+        || n.contains("share printers")
+        || n.contains("cups share")
+        || n.contains("cups sharing")
+        || n.contains("remote management")
+        || n.contains("remotemanagement")
+        || n.contains("remote-management")
+        || n.contains("remote desktop")
+        || n.contains("apple remote desktop")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/remotelogin"
+        || n == "/ssh"
+        || n == "/sshd"
+        || n == "/ssh-status"
+        || n == "/sshd-status"
+        || n == "/screen-sharing"
+        || n == "/screensharing"
+        || n == "/screen-share"
+        || n == "/vnc"
+        || n == "/vnc-status"
+        || n == "/mac-vnc"
+        || n == "/file-sharing"
+        || n == "/filesharing"
+        || n == "/file-share"
+        || n == "/smb"
+        || n == "/smb-status"
+        || n == "/smbd"
+        || n == "/mac-smb"
+        || n == "/printer-sharing"
+        || n == "/printersharing"
+        || n == "/printer-share"
+        || n == "/share-printers"
+        || n == "/cups-share"
+        || n == "/cups-sharing"
+        || n == "/remote-management"
+        || n == "/remotemanagement"
+        || n == "/remote-mgmt"
+        || n == "/ard"
+        || n == "/ard-status"
+        || n == "/ard-state"
+        || n == "/ard-agent"
+        || n == "/apple-remote-desktop"
+        || n == "/mac-ard"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        || n == "/cache"
+        || n == "/caches"
+        // Bare short / ambiguous stay with the agent.
+        || n == "caching"
+        || n == "the caching"
+        || n == "content caching"
+        || n == "the content caching"
+        || n == "contentcaching"
+        || n == "the contentcaching"
+        || n == "content-caching"
+        || n == "the content-caching"
+        || n == "content cache"
+        || n == "the content cache"
+        || n == "asset cache"
+        || n == "the asset cache"
+        || n == "assetcache"
+        || n == "the assetcache"
+        || n == "asset-cache"
+        || n == "the asset-cache"
+        || n == "asset caching"
+        || n == "the asset caching"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/content-caching"
+            | "/contentcaching"
+            | "/content-caching-status"
+            | "/contentcaching-status"
+            | "/content-cache"
+            | "/contentcache"
+            | "/content-cache-status"
+            | "/contentcache-status"
+            | "/asset-cache"
+            | "/assetcache"
+            | "/asset-cache-status"
+            | "/assetcache-status"
+            | "/asset-caching"
+            | "/assetcaching"
+            | "/mac-content-caching"
+            | "/mac-asset-cache"
+            | "content caching status"
+            | "the content caching status"
+            | "contentcaching status"
+            | "the contentcaching status"
+            | "content-caching status"
+            | "the content-caching status"
+            | "content cache status"
+            | "the content cache status"
+            | "asset cache status"
+            | "the asset cache status"
+            | "assetcache status"
+            | "the assetcache status"
+            | "asset-cache status"
+            | "the asset-cache status"
+            | "asset caching status"
+            | "the asset caching status"
+            | "my content caching"
+            | "my content caching status"
+            | "my contentcaching"
+            | "my content cache"
+            | "my asset cache"
+            | "my asset cache status"
+            | "is content caching on"
+            | "is content caching off"
+            | "is content caching enabled"
+            | "is content caching disabled"
+            | "is contentcaching on"
+            | "is contentcaching enabled"
+            | "is content-caching on"
+            | "is content-caching enabled"
+            | "is content cache on"
+            | "is content cache enabled"
+            | "is asset cache on"
+            | "is asset cache off"
+            | "is asset cache enabled"
+            | "is asset cache disabled"
+            | "is assetcache on"
+            | "is assetcache enabled"
+            | "is asset-cache on"
+            | "is asset-cache enabled"
+            | "is asset caching on"
+            | "is asset caching enabled"
+            | "what's my content caching"
+            | "whats my content caching"
+            | "what is my content caching"
+            | "what's my content caching status"
+            | "whats my content caching status"
+            | "what is my content caching status"
+            | "what's my asset cache"
+            | "whats my asset cache"
+            | "what is my asset cache"
+            | "what's my asset cache status"
+            | "whats my asset cache status"
+            | "what is my asset cache status"
+            | "what's the content caching"
+            | "whats the content caching"
+            | "what is the content caching"
+            | "what's the content caching status"
+            | "whats the content caching status"
+            | "what is the content caching status"
+            | "what's the asset cache"
+            | "whats the asset cache"
+            | "what is the asset cache"
+            | "what's the asset cache status"
+            | "whats the asset cache status"
+            | "what is the asset cache status"
+            | "how's content caching"
+            | "hows content caching"
+            | "how's the content caching"
+            | "hows the content caching"
+            | "how's asset cache"
+            | "hows asset cache"
+            // View/see/show me/open/list.
+            | "view content caching"
+            | "view the content caching"
+            | "view content caching status"
+            | "view the content caching status"
+            | "view contentcaching"
+            | "view the contentcaching"
+            | "view content-caching"
+            | "view the content-caching"
+            | "view content cache"
+            | "view the content cache"
+            | "view asset cache"
+            | "view the asset cache"
+            | "view asset cache status"
+            | "view the asset cache status"
+            | "view assetcache"
+            | "view the assetcache"
+            | "view asset-cache"
+            | "view the asset-cache"
+            | "view asset caching"
+            | "view the asset caching"
+            | "see content caching"
+            | "see the content caching"
+            | "see content caching status"
+            | "see the content caching status"
+            | "see asset cache"
+            | "see the asset cache"
+            | "see asset cache status"
+            | "see the asset cache status"
+            | "open content caching"
+            | "open the content caching"
+            | "open content caching status"
+            | "open the content caching status"
+            | "open contentcaching"
+            | "open the contentcaching"
+            | "open asset cache"
+            | "open the asset cache"
+            | "open asset cache status"
+            | "open the asset cache status"
+            | "open assetcache"
+            | "open the assetcache"
+            | "list content caching"
+            | "list the content caching"
+            | "list content caching status"
+            | "list the content caching status"
+            | "list asset cache"
+            | "list the asset cache"
+            | "list asset cache status"
+            | "list the asset cache status"
+            | "show content caching"
+            | "show the content caching"
+            | "show me content caching"
+            | "show me the content caching"
+            | "show content caching status"
+            | "show the content caching status"
+            | "show me content caching status"
+            | "show me the content caching status"
+            | "show asset cache"
+            | "show the asset cache"
+            | "show me asset cache"
+            | "show me the asset cache"
+            | "show asset cache status"
+            | "show the asset cache status"
+            | "show me asset cache status"
+            | "show me the asset cache status"
+    )
+}
+
+/// Zero-LLM Content Caching status from AssetCacheManagerUtil / prefs + AssetCache (macOS-only; empty elsewhere).
+pub fn format_content_caching_report() -> String {
+    let v = crate::metrics::get_content_caching_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Content Caching** — _no Content Caching reading on this Mac right now._".to_string();
+    }
+    format!("**Content Caching** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
