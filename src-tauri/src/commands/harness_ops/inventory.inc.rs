@@ -5820,6 +5820,164 @@ pub fn format_serial_gateway() -> String {
 }
 
 
+/// Local timezone — not wall-clock “what time”, not uptime / timers.
+/// Slash + view/open NL (`/timezone` · `/tz` · `view timezone`) match username `/username` ·
+/// hostname `/hostname` shape; bare `/time` / `what time` stay with the agent.
+pub fn looks_like_timezone_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("uptime")
+        || n.contains("timer")
+        || n.contains("timeout")
+        || n.contains("timestamp")
+        || n.contains("schedule")
+        || n.contains("cron")
+        || n.contains("deadline")
+        || n.contains("eta")
+        || n.contains("meeting")
+        || n.contains("calendar")
+        || n.contains("convert")
+        || n.contains("utc")
+        || n.contains("gmt")
+        || n.contains("epoch")
+        || n.contains("unix")
+        || n.contains("json")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        // Wall clock stays with the agent (not this lane).
+        || n == "/time"
+        || n == "time"
+        || n == "the time"
+        || n == "what time"
+        || n == "what's the time"
+        || n == "whats the time"
+        || n == "what is the time"
+        || n == "what's the time now"
+        || n == "whats the time now"
+        || n == "what time is it"
+        || n == "current time"
+        || n == "the current time"
+        || n == "local time"
+        || n == "the local time"
+        || n == "view time"
+        || n == "view the time"
+        || n == "see time"
+        || n == "see the time"
+        || n == "open time"
+        || n == "open the time"
+        || n == "list time"
+        || n == "list the time"
+        || n == "show time"
+        || n == "show the time"
+        || n == "show me time"
+        || n == "show me the time"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/timezone"
+            | "/time-zone"
+            | "/time_zone"
+            | "/tz"
+            | "/local-timezone"
+            | "/localtimezone"
+            | "/local-tz"
+            | "/localtz"
+            | "timezone"
+            | "the timezone"
+            | "time zone"
+            | "the time zone"
+            | "tz"
+            | "the tz"
+            | "local timezone"
+            | "the local timezone"
+            | "local time zone"
+            | "the local time zone"
+            | "local tz"
+            | "the local tz"
+            | "what timezone"
+            | "what timezone is this"
+            | "what timezone am i in"
+            | "what timezone do i have"
+            | "what's the timezone"
+            | "whats the timezone"
+            | "what is the timezone"
+            | "what's my timezone"
+            | "whats my timezone"
+            | "what is my timezone"
+            | "what time zone"
+            | "what time zone is this"
+            | "what time zone am i in"
+            | "what's the time zone"
+            | "whats the time zone"
+            | "what is the time zone"
+            | "what's my time zone"
+            | "whats my time zone"
+            | "what is my time zone"
+            | "which timezone"
+            | "which timezone is this"
+            | "which time zone"
+            | "which time zone is this"
+            | "my timezone"
+            | "my time zone"
+            | "my tz"
+            // View/see/show me/open/list (bare view time stays out).
+            | "view timezone"
+            | "view the timezone"
+            | "view time zone"
+            | "view the time zone"
+            | "view tz"
+            | "view the tz"
+            | "view local timezone"
+            | "view the local timezone"
+            | "see timezone"
+            | "see the timezone"
+            | "see time zone"
+            | "see the time zone"
+            | "see tz"
+            | "open timezone"
+            | "open the timezone"
+            | "open time zone"
+            | "open the time zone"
+            | "open tz"
+            | "open the tz"
+            | "list timezone"
+            | "list the timezone"
+            | "list time zone"
+            | "list the time zone"
+            | "list tz"
+            | "show timezone"
+            | "show the timezone"
+            | "show me timezone"
+            | "show me the timezone"
+            | "show time zone"
+            | "show the time zone"
+            | "show me time zone"
+            | "show me the time zone"
+            | "show tz"
+            | "show me tz"
+    )
+}
+
+
+/// Zero-LLM local timezone from `/etc/localtime` + chrono Local.
+pub fn format_timezone_gateway() -> String {
+    let v = crate::metrics::get_timezone();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Timezone** — _no timezone right now._".to_string();
+    }
+    format!("**Timezone** · {v}")
+}
+
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

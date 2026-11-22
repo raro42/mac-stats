@@ -433,6 +433,53 @@ pub fn get_serial_number() -> String {
         .clone()
 }
 
+/// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
+/// Live (not OnceLock): DST abbr/offset change while the process stays up.
+/// Used by the Discord/operator instant `/timezone` · `/tz` lane.
+pub fn get_timezone() -> String {
+    let iana = std::fs::read_link("/etc/localtime").ok().and_then(|p| {
+        let s = p.to_string_lossy().into_owned();
+        s.split("zoneinfo/")
+            .nth(1)
+            .map(|z| z.trim_matches('/').to_string())
+            .filter(|z| !z.is_empty())
+    });
+    let now = chrono::Local::now();
+    let abbr = now.format("%Z").to_string();
+    let off_raw = now.format("%z").to_string();
+    let offset = if off_raw.len() == 5 {
+        format!("{}:{}", &off_raw[..3], &off_raw[3..])
+    } else {
+        off_raw
+    };
+    let info = match (iana, !abbr.is_empty()) {
+        (Some(z), true) if !abbr.eq_ignore_ascii_case(&z) => {
+            format!("{z} · {abbr} ({offset})")
+        }
+        (Some(z), _) => {
+            if offset.is_empty() {
+                z
+            } else {
+                format!("{z} ({offset})")
+            }
+        }
+        (None, true) => {
+            if offset.is_empty() {
+                abbr
+            } else {
+                format!("{abbr} ({offset})")
+            }
+        }
+        (None, false) => offset,
+    };
+    if info.is_empty() {
+        debug3!("timezone: localtime/chrono empty");
+    } else {
+        debug3!("timezone: '{}'", info);
+    }
+    info
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

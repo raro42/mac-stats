@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2940] - 2026-11-22
+
+### Added
+- Instant timezone accepts `/timezone` · `/tz` · `/time-zone` · `/local-timezone` · `/local-tz` and view/see/open/list NL (`view timezone`, `open tz`, `list time zone`, …), matching “what's my timezone” / “what timezone am i in” / “time zone”. Bare `/time` / `what time` / `view time` stay with the agent.
+
 ## [0.1.2939] - 2026-11-22
 
 ### Added

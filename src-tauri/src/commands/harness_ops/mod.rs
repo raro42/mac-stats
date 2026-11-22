@@ -627,7 +627,49 @@ mod tests {
         );
     }
 
-    #[test]
+#[test]
+    fn timezone_slash_and_view_open_do_not_steal_wall_clock_time() {
+        // Slash + view/open NL → local timezone (username `/username` · hostname parity).
+        // Bare `/time` / what time / view time stay with the agent.
+        assert!(looks_like_timezone_request("/timezone"));
+        assert!(looks_like_timezone_request("/tz"));
+        assert!(looks_like_timezone_request("/time-zone"));
+        assert!(looks_like_timezone_request("/local-timezone"));
+        assert!(looks_like_timezone_request("/local-tz"));
+        assert!(looks_like_timezone_request("view timezone"));
+        assert!(looks_like_timezone_request("open tz"));
+        assert!(looks_like_timezone_request("list time zone"));
+        assert!(looks_like_timezone_request("timezone"));
+        assert!(looks_like_timezone_request("time zone"));
+        assert!(looks_like_timezone_request("what's my timezone"));
+        assert!(looks_like_timezone_request("what timezone am i in"));
+        assert!(!looks_like_timezone_request("/time"));
+        assert!(!looks_like_timezone_request("time"));
+        assert!(!looks_like_timezone_request("what time"));
+        assert!(!looks_like_timezone_request("what time is it"));
+        assert!(!looks_like_timezone_request("view time"));
+        assert!(!looks_like_timezone_request("current time"));
+        let tz = try_operator_instant_reply("/timezone").unwrap();
+        assert!(
+            tz.contains("**Timezone**") && !tz.to_lowercase().contains("execution"),
+            "got: {tz}"
+        );
+        let viewed = try_operator_instant_reply("view timezone").unwrap();
+        assert!(
+            viewed.contains("**Timezone**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let short = try_operator_instant_reply("/tz").unwrap();
+        assert!(
+            short.contains("**Timezone**") && !short.to_lowercase().contains("execution"),
+            "got: {short}"
+        );
+        assert!(try_operator_instant_reply("/time").is_none());
+        assert!(try_operator_instant_reply("what time").is_none());
+        assert!(try_operator_instant_reply("view time").is_none());
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.
