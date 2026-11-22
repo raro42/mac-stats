@@ -1,11 +1,12 @@
 # Morning surprise — 2026-11-22
 
-Refreshed: 2026-11-22 22:05 CET
+Refreshed: 2026-11-22 22:16 CET
 
 ## Shipped tonight (keep)
 
 | Version | What |
 |---------|------|
+| **v0.1.2968** | Application Firewall `/firewall` · `/fw` · `/afw` · `/app-firewall` · `/socketfilterfw` + view/open NL |
 | **v0.1.2967** | Gatekeeper status `/gatekeeper` · `/gk` · `/spctl` · `/assessments` + view/open NL |
 | **v0.1.2966** | SIP status `/sip` · `/csrutil` · `/system-integrity` + view/open NL |
 | **v0.1.2965** | Dark layout-daily: AI Chat `.chat-messages:focus-within` → Matrix `--accent` |
@@ -15,12 +16,11 @@ Refreshed: 2026-11-22 22:05 CET
 | **v0.1.2961** | VPN status `/vpn` · `/vpn-status` + view/open NL |
 | **v0.1.2960** | GPU chipset · cores · Metal `/gpu-name` · `/metal` + view/open NL |
 
-## This tick (~22:05 CET)
+## This tick (~22:16 CET)
 
 - Digester open empty; design-review due=false; layout-daily Dark already marked (Neon next calendar quota).
-- Kept **v0.1.2967** Gatekeeper slash+NL from standing backlog (after SIP).
+- Discarded duplicate Gatekeeper WIP (origin already **v0.1.2967**), then kept **v0.1.2968** Application Firewall slash+NL.
 - Cream/Swiss Send fill white-on-blue left intentional.
-- Linux rack: Rust-only (no install/kickstart).
 
 ## Still open
 
