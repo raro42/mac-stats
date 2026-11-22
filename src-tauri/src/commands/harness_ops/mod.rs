@@ -719,6 +719,52 @@ mod tests {
     }
 
 #[test]
+    fn locale_slash_and_view_open_do_not_steal_bare_lang_or_timezone() {
+        // Slash + view/open NL → system locale (timezone `/tz` · arch `/arch` parity).
+        // Bare `lang` / programming language / language model stay with the agent; `/tz` stays timezone.
+        assert!(looks_like_locale_request("/locale"));
+        assert!(looks_like_locale_request("/lang"));
+        assert!(looks_like_locale_request("/language"));
+        assert!(looks_like_locale_request("/apple-locale"));
+        assert!(looks_like_locale_request("/system-locale"));
+        assert!(looks_like_locale_request("/system-language"));
+        assert!(looks_like_locale_request("view locale"));
+        assert!(looks_like_locale_request("open language"));
+        assert!(looks_like_locale_request("list locale"));
+        assert!(looks_like_locale_request("locale"));
+        assert!(looks_like_locale_request("language"));
+        assert!(looks_like_locale_request("system language"));
+        assert!(looks_like_locale_request("what's my locale"));
+        assert!(looks_like_locale_request("what language is this"));
+        assert!(!looks_like_locale_request("lang"));
+        assert!(!looks_like_locale_request("programming language"));
+        assert!(!looks_like_locale_request("language model"));
+        assert!(!looks_like_locale_request("/tz"));
+        assert!(!looks_like_locale_request("timezone"));
+        let loc = try_operator_instant_reply("/locale").unwrap();
+        assert!(
+            loc.contains("**Locale**") && !loc.to_lowercase().contains("execution"),
+            "got: {loc}"
+        );
+        let viewed = try_operator_instant_reply("view language").unwrap();
+        assert!(
+            viewed.contains("**Locale**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let short = try_operator_instant_reply("/lang").unwrap();
+        assert!(
+            short.contains("**Locale**") && !short.to_lowercase().contains("execution"),
+            "got: {short}"
+        );
+        assert!(try_operator_instant_reply("lang").is_none());
+        let tz = try_operator_instant_reply("/tz").unwrap();
+        assert!(
+            tz.contains("**Timezone**") && !tz.contains("**Locale**"),
+            "/tz must stay timezone, not locale: {tz}"
+        );
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.

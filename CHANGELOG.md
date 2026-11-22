@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2942] - 2026-11-22
+
+### Added
+- Instant system locale accepts `/locale` · `/lang` · `/language` · `/apple-locale` · `/system-locale` · `/system-language` and view/see/open/list NL (`view locale`, `open language`, `list locale`, …), matching “locale” / “what's my locale” / “what language is this” / “system language”. Bare `lang` stays with the agent; programming language / language model stay with the agent; `/tz` stays timezone.
+
 ## [0.1.2941] - 2026-11-22
 
 ### Added

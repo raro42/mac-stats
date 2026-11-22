@@ -120,6 +120,8 @@ pub(crate) static USERNAME_CACHE: OnceLock<String> = OnceLock::new();
 pub(crate) static SERIAL_NUMBER_CACHE: OnceLock<String> = OnceLock::new();
 /// Cached machine arch (`uname -m` / `std::env::consts::ARCH`; instant `/arch` lane).
 pub(crate) static ARCHITECTURE_CACHE: OnceLock<String> = OnceLock::new();
+/// Cached AppleLocale / LANG (instant `/locale` · `/language` lane).
+pub(crate) static LOCALE_CACHE: OnceLock<String> = OnceLock::new();
 
 pub(crate) static CAN_READ_FREQUENCY: OnceLock<bool> = OnceLock::new();
 pub(crate) static CAN_READ_CPU_POWER: OnceLock<bool> = OnceLock::new();

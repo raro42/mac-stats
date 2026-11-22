@@ -998,6 +998,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_timezone_request(content) {
         return Some(format_timezone_gateway());
     }
+    // System locale / language (bare `lang` / programming language stay with the agent).
+    if looks_like_locale_request(content) {
+        return Some(format_locale_gateway());
+    }
     // Machine arch (bare "architect" theme / chip name stay out).
     if looks_like_architecture_request(content) {
         return Some(format_architecture_gateway());

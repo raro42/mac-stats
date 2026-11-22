@@ -6111,6 +6111,130 @@ pub fn format_architecture_gateway() -> String {
 }
 
 
+/// System locale / language — not timezone, not programming language, not LLM “language model”.
+/// Slash + view/open NL (`/locale` · `/language` · `view locale`) match timezone `/tz` ·
+/// arch `/arch` shape; bare `lang` stays with the agent.
+pub fn looks_like_locale_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("programming")
+        || n.contains("code")
+        || n.contains("script")
+        || n.contains("model")
+        || n.contains("ollama")
+        || n.contains("llm")
+        || n.contains("timezone")
+        || n.contains("time zone")
+        || n == "/tz"
+        || n == "tz"
+        || n == "the tz"
+        // Bare short token — too ambiguous (programming / chat slang).
+        || n == "lang"
+        || n == "the lang"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/locale"
+            | "/apple-locale"
+            | "/applelocale"
+            | "/system-locale"
+            | "/systemlocale"
+            | "/lang"
+            | "/language"
+            | "/system-language"
+            | "/systemlanguage"
+            | "/apple-language"
+            | "/applelanguage"
+            | "locale"
+            | "the locale"
+            | "apple locale"
+            | "the apple locale"
+            | "system locale"
+            | "the system locale"
+            | "language"
+            | "the language"
+            | "system language"
+            | "the system language"
+            | "apple language"
+            | "the apple language"
+            | "what locale"
+            | "what locale is this"
+            | "what language"
+            | "what language is this"
+            | "what language am i using"
+            | "what's the locale"
+            | "whats the locale"
+            | "what is the locale"
+            | "what's my locale"
+            | "whats my locale"
+            | "what is my locale"
+            | "what's the language"
+            | "whats the language"
+            | "what is the language"
+            | "what's my language"
+            | "whats my language"
+            | "what is my language"
+            | "which locale"
+            | "which locale is this"
+            | "which language"
+            | "which language is this"
+            | "my locale"
+            | "my language"
+            | "my system language"
+            // View/see/show me/open/list.
+            | "view locale"
+            | "view the locale"
+            | "view language"
+            | "view the language"
+            | "view system locale"
+            | "view apple locale"
+            | "see locale"
+            | "see the locale"
+            | "see language"
+            | "see the language"
+            | "open locale"
+            | "open the locale"
+            | "open language"
+            | "open the language"
+            | "open system locale"
+            | "list locale"
+            | "list the locale"
+            | "list language"
+            | "list the language"
+            | "show locale"
+            | "show the locale"
+            | "show me locale"
+            | "show me the locale"
+            | "show language"
+            | "show the language"
+            | "show me language"
+            | "show me the language"
+    )
+}
+
+
+/// Zero-LLM system locale from cached AppleLocale / LANG.
+pub fn format_locale_gateway() -> String {
+    let v = crate::metrics::get_locale();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Locale** — _no locale right now._".to_string();
+    }
+    format!("**Locale** · `{v}`")
+}
+
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

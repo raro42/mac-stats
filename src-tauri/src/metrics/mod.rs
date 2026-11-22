@@ -515,6 +515,59 @@ pub fn get_architecture() -> String {
         .clone()
 }
 
+/// Cached system locale (`defaults AppleLocale`, else `LANG` without encoding).
+/// Used by the Discord/operator instant `/locale` · `/language` lane.
+/// Distinct from timezone (`/tz`) — this is language · region, not wall-clock zone.
+pub fn get_locale() -> String {
+    LOCALE_CACHE
+        .get_or_init(|| {
+            let from_defaults = || -> Option<String> {
+                let output = Command::new("/usr/bin/defaults")
+                    .args(["read", "-g", "AppleLocale"])
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                let s = String::from_utf8_lossy(&output.stdout);
+                let t = s.trim();
+                if t.is_empty() {
+                    None
+                } else {
+                    Some(t.to_string())
+                }
+            };
+            let from_lang_env = || -> Option<String> {
+                let raw = std::env::var("LANG").ok()?;
+                let t = raw.trim();
+                if t.is_empty() {
+                    return None;
+                }
+                // "en_US.UTF-8" → "en_US"; skip C / POSIX.
+                let base = t.split('.').next().unwrap_or(t).trim();
+                if base.is_empty()
+                    || base.eq_ignore_ascii_case("C")
+                    || base.eq_ignore_ascii_case("POSIX")
+                {
+                    None
+                } else {
+                    Some(base.to_string())
+                }
+            };
+            let info = from_defaults()
+                .or_else(from_lang_env)
+                .unwrap_or_default();
+            if info.is_empty() {
+                debug3!("locale: AppleLocale/LANG empty");
+            } else {
+                debug3!("locale cached: '{}'", info);
+            }
+            info
+        })
+        .clone()
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once
