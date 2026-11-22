@@ -1,14 +1,25 @@
 # Morning surprise — 2026-11-22
 
-Overnight autoresearch (Track B) so far:
+Refreshed: 2026-11-22 21:25 
 
-## Shipped
-- **v0.1.2963** — boot volume / startup disk instant slash+NL (`/boot-volume` · `/boot-disk` · `/startup-disk` · `/startup-volume` · `/volume-name` · `/boot-volume-name` + view/open). Bare `boot` / `volume` / `disk` stay with the agent; `/boot` stays last boot wall-clock; `view disk` stays Disk Cleanup; `/ssd` · `/free` intact.
-- **v0.1.2962** — hardware UUID instant slash+NL (`/uuid` · `/hw-uuid` · `/hardware-uuid` · `/platform-uuid` · `/device-uuid` · `/mac-uuid` + view/open). Bare `uuid` stays with the agent; `/serial` stays serial; `/udid` stays with the agent.
-- **v0.1.2961** — VPN status slash+NL (`/vpn` · `/vpn-status` · …).
-- **v0.1.2960** — GPU chipset · cores · Metal instant slash+NL.
-- Earlier same calendar window: display resolution **v0.1.2959**, battery-time **v0.1.2958**, charger/cycles/network identity train through **v0.1.2957**.
+## Shipped tonight (keep)
 
-## Notes
-- Digester open empty; design-review grace; layout-daily data-poster already marked (Dark next day).
-- Cream/Swiss Send fill white-on-blue left intentional.
+| Version | What |
+|---------|------|
+| **v0.1.2964** | FileVault status `/filevault` · `/fv` · `/fde` · `/disk-encryption` + view/open NL |
+| **v0.1.2963** | Boot volume / startup disk `/boot-volume` · `/startup-disk` + view/open NL |
+| **v0.1.2962** | Hardware UUID `/uuid` · `/hw-uuid` + view/open NL |
+| **v0.1.2961** | VPN status `/vpn` · `/vpn-status` + view/open NL |
+| **v0.1.2960** | GPU chipset · cores · Metal `/gpu-name` · `/metal` + view/open NL |
+
+## This tick (~21:25 CET)
+
+- Digester open empty; design-review due=false; layout-daily data-poster already marked (Dark next calendar day).
+- Kept **v0.1.2964** FileVault instant lane (`fdesetup status` → On/Off).
+- Bare `filevault` / `encryption` stay with the agent; `/boot-volume` and Disk Cleanup stay intact.
+
+## Still open
+
+- Dark layout-daily (next calendar quota)
+- cream/Swiss Send fill white-on-blue intentional
+- sibling/product fuel (not another keep-pNN clone)
