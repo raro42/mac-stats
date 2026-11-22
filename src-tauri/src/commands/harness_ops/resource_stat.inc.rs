@@ -16,35 +16,81 @@ pub struct ResourceLane {
     pub age_phrases: &'static [&'static str],
 }
 
+/// Nouns that only describe the stat kind (size/path/age), not the resource.
+/// Matching on these alone used to let early lanes (e.g. execution_prompt with bare
+/// `size`) steal later asks such as `/ori-vault-size` or `config size`.
+pub(super) fn is_generic_stat_noun(noun: &str) -> bool {
+    matches!(
+        noun,
+        "size"
+            | "big"
+            | "large"
+            | "bytes"
+            | " mb"
+            | " kb"
+            | " gi"
+            | "path"
+            | "where"
+            | "location"
+            | "folder"
+            | "directory"
+            | "dir"
+            | "file"
+            | "old"
+            | "stale"
+            | "when"
+            | "updated"
+            | "modified"
+            | "mtime"
+    )
+}
+
+pub(super) fn lane_has_substantive_noun(n: &str, lane: &ResourceLane) -> bool {
+    lane.nouns
+        .iter()
+        .any(|noun| !is_generic_stat_noun(noun) && n.contains(noun))
+}
+
 pub fn looks_like_resource_stat(content: &str, lane: &ResourceLane, kind: StatKind) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > lane.max_len {
         return false;
     }
-    if !lane.nouns.iter().any(|noun| n.contains(noun)) {
-        // Exact phrase lists may already include the noun.
-        let phrases = match kind {
-            StatKind::Path => lane.path_phrases,
-            StatKind::Size => lane.size_phrases,
-            StatKind::Age => lane.age_phrases,
+    let phrases = match kind {
+        StatKind::Path => lane.path_phrases,
+        StatKind::Size => lane.size_phrases,
+        StatKind::Age => lane.age_phrases,
+    };
+    // Exact phrase lists always win (slash aliases + canonical NL).
+    if phrases.iter().any(|p| *p == n) {
+        return match kind {
+            StatKind::Path => !is_size_ask(&n) && !is_age_ask(&n),
+            StatKind::Size => {
+                !n.contains("path")
+                    && !n.contains("where")
+                    && !n.contains("location")
+                    && !is_age_ask(&n)
+            }
+            StatKind::Age => {
+                !n.contains("path")
+                    && !n.contains("where")
+                    && !n.contains("location")
+                    && !is_size_ask(&n)
+            }
         };
-        if !phrases.iter().any(|p| *p == n) {
-            return false;
-        }
+    }
+    if !lane_has_substantive_noun(&n, lane) {
+        return false;
     }
     match kind {
         StatKind::Path => {
             if is_size_ask(&n) || is_age_ask(&n) {
                 return false;
             }
-            if n.contains("path")
+            n.contains("path")
                 || n.contains("where")
                 || n.contains("location")
                 || n.contains("file is")
-            {
-                return true;
-            }
-            lane.path_phrases.iter().any(|p| *p == n)
         }
         StatKind::Size => {
             if n.contains("path")
@@ -54,10 +100,7 @@ pub fn looks_like_resource_stat(content: &str, lane: &ResourceLane, kind: StatKi
             {
                 return false;
             }
-            if is_size_ask(&n) {
-                return true;
-            }
-            lane.size_phrases.iter().any(|p| *p == n)
+            is_size_ask(&n)
         }
         StatKind::Age => {
             if n.contains("path")
@@ -67,10 +110,7 @@ pub fn looks_like_resource_stat(content: &str, lane: &ResourceLane, kind: StatKi
             {
                 return false;
             }
-            if is_age_ask(&n) {
-                return true;
-            }
-            lane.age_phrases.iter().any(|p| *p == n)
+            is_age_ask(&n)
         }
     }
 }
@@ -373,12 +413,63 @@ pub static RESOURCE_LANES: &[ResourceLane] = &[
         age_phrases: &["morning_surprise age", "morning-surprise age", "morning surprise age", "morning_surprise.md age", "morning-surprise.md age", "morning surprise.md age"],
     },
     ResourceLane {
+        // Nouns must stay vault-specific — bare `ori` / `size` / `vault` used to noun-hit every
+        // size ask and steal `/ori` Ready plus later lanes (config size, overnight log size, …).
         id: "ori_vault",
-        nouns: &["ori vault", "ori-vault", "ori_vault", "vault", "mnemos vault", "orivault", "ori", "size", "big", "large", "bytes", "folder"],
+        nouns: &[
+            "ori vault",
+            "ori-vault",
+            "ori_vault",
+            "mnemos vault",
+            "mnemos-vault",
+            "orivault",
+            "ori-mnemos vault",
+        ],
         max_len: 88,
-        path_phrases: &["ori vault path", "ori vault folder", "ori vault directory", "ori vault dir", "ori vault location", "mnemos vault path"],
-        size_phrases: &["/ori", "/mnemos", "/ori-mnemos", "ori", "mnemos", "ori vault"],
-        age_phrases: &["/ori", "/mnemos", "/ori-mnemos", "ori", "mnemos", "ori vault"],
+        path_phrases: &[
+            "/ori-vault-path",
+            "/mnemos-vault-path",
+            "/vault-path",
+            "ori vault path",
+            "ori vault folder",
+            "ori vault directory",
+            "ori vault dir",
+            "ori vault location",
+            "mnemos vault path",
+            "view ori vault path",
+            "open ori vault path",
+            "list ori vault path",
+        ],
+        size_phrases: &[
+            "/ori-vault-size",
+            "/mnemos-vault-size",
+            "/vault-size",
+            "/ori-vault-capacity",
+            "ori vault size",
+            "mnemos vault size",
+            "ori-vault size",
+            "how big is ori vault",
+            "how big is the ori vault",
+            "how big is mnemos vault",
+            "view ori vault size",
+            "open ori vault size",
+            "list ori vault size",
+            "see ori vault size",
+            "show me the ori vault size",
+        ],
+        age_phrases: &[
+            "/ori-vault-age",
+            "/mnemos-vault-age",
+            "/vault-age",
+            "ori vault age",
+            "mnemos vault age",
+            "ori-vault age",
+            "how old is ori vault",
+            "how old is the ori vault",
+            "view ori vault age",
+            "open ori vault age",
+            "list ori vault age",
+        ],
     },
     ResourceLane {
         id: "overnight_agent_log",

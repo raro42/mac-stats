@@ -2055,7 +2055,7 @@ pub fn looks_like_ori_ready_request(content: &str) -> bool {
         return false;
     }
     // Tool / memory actions and how-tos stay with pre-route / agent / scrub / MCP.
-    // Vault path-only asks go to looks_like_ori_vault_path_request (not Ready).
+    // Vault path/size/age asks go to looks_like_ori_vault_* (not Ready).
     if n.starts_with("mcp:")
         || n.contains("mcp:")
         || n.contains("ori_")
@@ -2099,7 +2099,15 @@ pub fn looks_like_ori_ready_request(content: &str) -> bool {
                 || n.contains("location")
                 || n.contains("folder")
                 || n.contains("directory")
-                || n.contains("dir")))
+                || n.contains("dir")
+                || n.contains("size")
+                || n.contains("how big")
+                || n.contains("bytes")
+                || n.contains("capacity")
+                || n.contains("age")
+                || n.contains("how old")
+                || n.contains("mtime")
+                || n.contains("modified")))
         || n.chars().any(|c| c.is_ascii_digit())
     {
         return false;
@@ -3122,8 +3130,9 @@ pub fn format_ops_help_gateway() -> String {
 • `/compact` · `/menu-bar` · `/cpu-window` · `view compact` · `see compact` · `show me the compact` · `open compact` · `list the compact` · `view menu bar` · `open menu-bar` · `view cpu window` · `open cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
 • `/downloads` · `/organizer` · `view downloads` · `see downloads` · `show me the downloads` · `open downloads` · `list the downloads` · `view organizer` · `see organizer` · `show me the organizer` · `open organizer` · `list the organizer` — Downloads organizer On/Off (Settings Product · interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
 • `/ori` · `/mnemos` · `view ori` · `see ori` · `show me the ori` · `open ori` · `list the ori` · `view mnemos` · `see mnemos` · `show me the mnemos` · `open mnemos` · `list the mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (Settings Product · ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub / vault path·size·age)\n\
-• `ori vault size` · `how big is ori vault` · `mnemos vault size` — Ori vault folder size on disk (recursive file bytes; no list/MCP; does not steal `ori vault path` / `/ori` Ready)\n\
-• `ori vault path` · `where is ori vault` · `ORI_VAULT path` — Ori vault root path (config/env only; `ori vault size` for on-disk bytes; no list/MCP; does not steal `/ori` Ready)\n\
+• `/ori-vault-size` · `/mnemos-vault-size` · `/vault-size` · `ori vault size` · `how big is ori vault` · `mnemos vault size` · `view ori vault size` · `open ori vault size` — Ori vault folder size on disk (recursive file bytes; no list/MCP; does not steal `ori vault path` / `/ori` Ready)\n\
+• `/ori-vault-path` · `/vault-path` · `ori vault path` · `where is ori vault` · `ORI_VAULT path` · `view ori vault path` — Ori vault root path (config/env only; `ori vault size` for on-disk bytes; no list/MCP; does not steal `/ori` Ready)\n\
+• `/ori-vault-age` · `/vault-age` · `ori vault age` · `how old is ori vault` · `view ori vault age` — Ori vault newest write age (mtime; no list/MCP; does not steal path / size / `/ori` Ready)\n\
 • `/having_fun` · `/fun` · `/idle` · `view having fun` · `see having fun` · `show me the having fun` · `open having fun` · `list the having fun` · `view fun` · `open fun` · `view idle` · `see idle` · `show me the idle` · `open idle` · `list the idle` · `view idle thoughts` · `open idle thoughts` — Having fun / idle thoughts On/Off (Settings Product · channel count · idle · reply delays; config only; does not steal send/post)\n\
 • `/voice` · `/stt` · `view voice` · `see voice` · `show me the voice` · `open voice` · `list the voice` · `view stt` · `see stt` · `show me the stt` · `open stt` · `list the stt` · `view speech` · `open speech to text` — Discord voice STT Ready / Off / Partial / Not set (Settings Product · model · ffmpeg · Ollama; config only; does not steal transcribe)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` · `view telegram` · `see telegram` · `show me the telegram` · `open telegram` · `list the telegram` · `view slack` · `see slack` · `show me the slack` · `open slack` · `list the slack` · `view signal` · `see signal` · `show me the signal` · `open signal` · `list the signal` · `view alerts` · `see alerts` · `show me the alerts` · `open alerts` · `list the alerts` — alert channel Ready / Not set (Keychain + registry; config only; no live send)\n\

@@ -549,6 +549,56 @@ mod tests {
     }
 
     #[test]
+    fn ori_vault_size_slash_does_not_steal_ori_ready_or_other_sizes() {
+        // Broad ori_vault nouns (bare `ori` / `size`) used to make `/ori` and `config size`
+        // hit vault-size before Ready / config lanes. Slash + size NL stay vault bytes.
+        assert!(looks_like_ori_vault_size_request("/ori-vault-size"));
+        assert!(looks_like_ori_vault_size_request("/vault-size"));
+        assert!(looks_like_ori_vault_size_request("/mnemos-vault-size"));
+        assert!(looks_like_ori_vault_size_request("ori vault size"));
+        assert!(looks_like_ori_vault_size_request("how big is ori vault"));
+        assert!(looks_like_ori_vault_size_request("view ori vault size"));
+        assert!(looks_like_ori_vault_size_request("open ori vault size"));
+        assert!(!looks_like_ori_vault_size_request("/ori"));
+        assert!(!looks_like_ori_vault_size_request("/mnemos"));
+        assert!(!looks_like_ori_vault_size_request("ori"));
+        assert!(!looks_like_ori_vault_size_request("ori vault"));
+        assert!(!looks_like_ori_vault_size_request("view ori"));
+        assert!(!looks_like_ori_vault_size_request("config size"));
+        assert!(!looks_like_ori_vault_size_request("overnight agent log size"));
+        assert!(looks_like_ori_ready_request("/ori"));
+        assert!(looks_like_ori_ready_request("view ori"));
+        assert!(looks_like_ori_ready_request("ori vault"));
+        assert!(!looks_like_ori_ready_request("/ori-vault-size"));
+        assert!(!looks_like_ori_ready_request("ori vault size"));
+        let ready = try_operator_instant_reply("/ori").unwrap();
+        assert!(
+            ready.contains("**Ori**") && !ready.to_lowercase().contains("on disk"),
+            "bare /ori must stay Ready chip, not vault size: {ready}"
+        );
+        let sized = try_operator_instant_reply("/ori-vault-size").unwrap();
+        assert!(
+            sized.contains("**Ori vault:**"),
+            "got: {sized}"
+        );
+        let viewed = try_operator_instant_reply("view ori vault size").unwrap();
+        assert!(
+            viewed.contains("**Ori vault:**"),
+            "got: {viewed}"
+        );
+        let cfg = try_operator_instant_reply("config size").unwrap();
+        assert!(
+            cfg.to_lowercase().contains("config") && !cfg.contains("**Ori vault:"),
+            "config size must stay config lane, not ori/execution: {cfg}"
+        );
+        let exec = try_operator_instant_reply("execution prompt size").unwrap();
+        assert!(
+            exec.contains("**Execution prompt:**"),
+            "execution prompt size must still resolve: {exec}"
+        );
+    }
+
+    #[test]
     fn disk_free_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → free bytes (SSD `/storage` · watts `/watts` parity).
         // Bare free space / disk free stay SSD %; view disk stays Disk Cleanup.
