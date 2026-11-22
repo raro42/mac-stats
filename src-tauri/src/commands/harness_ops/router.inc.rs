@@ -1054,6 +1054,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_broadcast_request(content) {
         return Some(format_broadcast_report());
     }
+    // Primary link status · media / speed (bare `status` / `media` / `speed` / `link` stay with the agent; `/link-mtu` stays MTU; `/link-address` stays MAC).
+    if looks_like_link_status_request(content) {
+        return Some(format_link_status_report());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());

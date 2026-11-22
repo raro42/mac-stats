@@ -1487,6 +1487,80 @@ mod tests {
     }
 
 #[test]
+    fn link_status_slash_and_view_open_do_not_steal_mtu_or_mac() {
+        // Slash + view/open NL → primary link status · media (`/broadcast` · `/mtu` parity).
+        // Bare `status` / `media` / `speed` / `link` stay with the agent; `/link-mtu` stays MTU; `/link-address` stays MAC.
+        assert!(looks_like_link_status_request("/link-status"));
+        assert!(looks_like_link_status_request("/link-state"));
+        assert!(looks_like_link_status_request("/if-status"));
+        assert!(looks_like_link_status_request("/iface-status"));
+        assert!(looks_like_link_status_request("/interface-status"));
+        assert!(looks_like_link_status_request("/media"));
+        assert!(looks_like_link_status_request("/link-media"));
+        assert!(looks_like_link_status_request("/link-speed"));
+        assert!(looks_like_link_status_request("/if-speed"));
+        assert!(looks_like_link_status_request("/network-speed"));
+        assert!(looks_like_link_status_request("view link status"));
+        assert!(looks_like_link_status_request("open link speed"));
+        assert!(looks_like_link_status_request("list link status"));
+        assert!(looks_like_link_status_request("link status"));
+        assert!(looks_like_link_status_request("interface status"));
+        assert!(looks_like_link_status_request("what's my link status"));
+        assert!(looks_like_link_status_request("what's my link speed"));
+        assert!(looks_like_link_status_request("is the link up"));
+        assert!(!looks_like_link_status_request("status"));
+        assert!(!looks_like_link_status_request("media"));
+        assert!(!looks_like_link_status_request("speed"));
+        assert!(!looks_like_link_status_request("link"));
+        assert!(!looks_like_link_status_request("/link-mtu"));
+        assert!(!looks_like_link_status_request("/link-address"));
+        assert!(!looks_like_link_status_request("/mtu"));
+        assert!(!looks_like_link_status_request("/mac-address"));
+        assert!(!looks_like_link_status_request("/iface"));
+        assert!(!looks_like_link_status_request("/broadcast"));
+        assert!(!looks_like_link_status_request("/ip"));
+        let link = try_operator_instant_reply("/link-status").unwrap();
+        assert!(
+            link.contains("**Link**") && !link.to_lowercase().contains("execution"),
+            "got: {link}"
+        );
+        let viewed = try_operator_instant_reply("view link status").unwrap();
+        assert!(
+            viewed.contains("**Link**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let media = try_operator_instant_reply("/media").unwrap();
+        assert!(
+            media.contains("**Link**") && !media.to_lowercase().contains("execution"),
+            "got: {media}"
+        );
+        // Bare `status` is app health (`/status`); must not become link status.
+        if let Some(reply) = try_operator_instant_reply("status") {
+            assert!(
+                !reply.contains("**Link**"),
+                "bare status must stay app health, not link: {reply}"
+            );
+        }
+        assert!(try_operator_instant_reply("media").is_none());
+        assert!(try_operator_instant_reply("speed").is_none());
+        assert!(try_operator_instant_reply("link").is_none());
+        let mtu = try_operator_instant_reply("/link-mtu");
+        if let Some(reply) = mtu {
+            assert!(
+                !reply.contains("**Link**"),
+                "/link-mtu must stay MTU, not link status: {reply}"
+            );
+        }
+        let mac = try_operator_instant_reply("/link-address");
+        if let Some(reply) = mac {
+            assert!(
+                !reply.contains("**Link**"),
+                "/link-address must stay MAC, not link status: {reply}"
+            );
+        }
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.

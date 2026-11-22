@@ -7689,6 +7689,14 @@ pub fn looks_like_netmask_request(content: &str) -> bool {
         || n.contains("airport")
         || n.contains("broadcast")
         || n.contains("bcast")
+        || n.contains("link status")
+        || n.contains("link-status")
+        || n.contains("link state")
+        || n.contains("link-speed")
+        || n.contains("link speed")
+        || n.contains("link media")
+        || n.contains("network speed")
+        || n.contains("network media")
         || n.contains("public")
         || n.contains("external")
         || n.contains("wan")
@@ -7847,6 +7855,10 @@ pub fn looks_like_primary_iface_request(content: &str) -> bool {
         || n.contains("cidr")
         || n.contains("broadcast")
         || n.contains("bcast")
+        || n.contains("status")
+        || n.contains("speed")
+        || n.contains("media")
+        || n.contains("link-")
         || n.contains("mac")
         || n.contains("ether")
         || n.contains("address")
@@ -8039,6 +8051,14 @@ pub fn looks_like_broadcast_request(content: &str) -> bool {
         || n.contains("cidr")
         || n.contains("iface")
         || n.contains("ifname")
+        || n.contains("link status")
+        || n.contains("link-status")
+        || n.contains("link state")
+        || n.contains("link-speed")
+        || n.contains("link speed")
+        || n.contains("link media")
+        || n.contains("network speed")
+        || n.contains("network media")
         || n.contains("public")
         || n.contains("external")
         || n.contains("wan")
@@ -8139,6 +8159,196 @@ pub fn format_broadcast_report() -> String {
         return "**Broadcast** — _no broadcast address right now._".to_string();
     }
     format!("**Broadcast** · `{v}`")
+}
+
+/// Primary interface link status · media / speed — not MTU, not MAC, not iface name, not broadcast.
+/// Slash + view/open NL (`/link-status` · `/media` · `/link-speed` · `view link status`) match
+/// `/broadcast` · `/mtu` shape; bare `status` / `media` / `speed` / `link` stay with the agent;
+/// `/link-mtu` stays MTU; `/link-address` stays MAC; `/iface` stays interface name.
+pub fn looks_like_link_status_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("mtu")
+        || n.contains("link-mtu")
+        || n.contains("link-address")
+        || n.contains("link address")
+        || n.contains("mac address")
+        || n.contains("ethernet")
+        || n.contains("ether")
+        || n.contains("broadcast")
+        || n.contains("bcast")
+        || n.contains("netmask")
+        || n.contains("subnet")
+        || n.contains("cidr")
+        || n.contains("gateway")
+        || n.contains("router")
+        || n.contains("dns")
+        || n.contains("nameserver")
+        || n.contains("wifi")
+        || n.contains("ssid")
+        || n.contains("wlan")
+        || n.contains("airport")
+        || n.contains("discord")
+        || n.contains("channel")
+        || n.contains("message")
+        || n.contains("typing")
+        || n.contains("send")
+        || n.contains("storm")
+        || n.contains("median")
+        || n.contains("keep")
+        || n.contains("discard")
+        || n.contains("public")
+        || n.contains("external")
+        || n.contains("wan")
+        || n.contains("vpn")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("spoof")
+        // Bare short / ambiguous asks stay with the agent (multi-word NL matches below).
+        || n == "status"
+        || n == "the status"
+        || n == "link"
+        || n == "the link"
+        || n == "media"
+        || n == "the media"
+        || n == "speed"
+        || n == "the speed"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/link-status"
+            | "/linkstatus"
+            | "/link-state"
+            | "/linkstate"
+            | "/if-status"
+            | "/ifstatus"
+            | "/iface-status"
+            | "/ifacestatus"
+            | "/interface-status"
+            | "/interfacestatus"
+            | "/if-state"
+            | "/ifstate"
+            | "/media"
+            | "/link-media"
+            | "/linkmedia"
+            | "/network-media"
+            | "/networkmedia"
+            | "/link-speed"
+            | "/linkspeed"
+            | "/if-speed"
+            | "/ifspeed"
+            | "/iface-speed"
+            | "/ifacespeed"
+            | "/interface-speed"
+            | "/interfacespeed"
+            | "/network-speed"
+            | "/networkspeed"
+            | "link status"
+            | "the link status"
+            | "interface status"
+            | "the interface status"
+            | "iface status"
+            | "the iface status"
+            | "link state"
+            | "the link state"
+            | "interface state"
+            | "the interface state"
+            | "link media"
+            | "the link media"
+            | "network media"
+            | "the network media"
+            | "link speed"
+            | "the link speed"
+            | "interface speed"
+            | "the interface speed"
+            | "network speed"
+            | "the network speed"
+            | "my link status"
+            | "my interface status"
+            | "my link speed"
+            | "my network speed"
+            | "what's my link status"
+            | "whats my link status"
+            | "what is my link status"
+            | "what's the link status"
+            | "whats the link status"
+            | "what is the link status"
+            | "what's my link speed"
+            | "whats my link speed"
+            | "what is my link speed"
+            | "what's the link speed"
+            | "whats the link speed"
+            | "what is the link speed"
+            | "what's my network speed"
+            | "whats my network speed"
+            | "what is my network speed"
+            | "which link status"
+            | "which link speed"
+            | "is the link up"
+            | "is my link up"
+            // View/see/show me/open/list.
+            | "view link status"
+            | "view the link status"
+            | "view interface status"
+            | "view the interface status"
+            | "view link state"
+            | "view the link state"
+            | "view link media"
+            | "view the link media"
+            | "view link speed"
+            | "view the link speed"
+            | "view network speed"
+            | "view the network speed"
+            | "view media"
+            | "view the media"
+            | "see link status"
+            | "see the link status"
+            | "see link speed"
+            | "see the link speed"
+            | "open link status"
+            | "open the link status"
+            | "open link speed"
+            | "open the link speed"
+            | "open media"
+            | "open the media"
+            | "list link status"
+            | "list the link status"
+            | "list link speed"
+            | "list the link speed"
+            | "show link status"
+            | "show the link status"
+            | "show me link status"
+            | "show me the link status"
+            | "show link speed"
+            | "show the link speed"
+            | "show me link speed"
+            | "show me the link speed"
+            | "show media"
+            | "show the media"
+            | "show me media"
+            | "show me the media"
+    )
+}
+
+/// Zero-LLM primary interface link status · media from `route` default iface + `ifconfig`.
+pub fn format_link_status_report() -> String {
+    let v = crate::metrics::get_primary_link_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Link** — _no link status right now._".to_string();
+    }
+    format!("**Link** · `{v}`")
 }
 
 

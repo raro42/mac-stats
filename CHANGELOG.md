@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2955] - 2026-11-22
+
+### Added
+- Instant primary link status · media / speed accepts `/link-status` · `/link-state` · `/if-status` · `/iface-status` · `/interface-status` · `/media` · `/link-media` · `/network-media` · `/link-speed` · `/if-speed` · `/iface-speed` · `/network-speed` and view/see/open/list NL (`view link status`, `open link speed`, `list link status`, …), matching “link status” / “interface status” / “link speed” / “network speed” / “what's my link status” / “what's my link speed” / “is the link up”. Bare `status` / `media` / `speed` / `link` stay with the agent; `/link-mtu` stays MTU; `/link-address` stays MAC; `/iface` stays interface name; `/broadcast` stays broadcast.
+
 ## [0.1.2954] - 2026-11-22
 
 ### Added

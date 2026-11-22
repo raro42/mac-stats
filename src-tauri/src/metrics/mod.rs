@@ -1303,6 +1303,102 @@ pub fn get_primary_broadcast() -> String {
     info
 }
 
+/// Primary interface link status · media / speed (default-route iface via `route` + `ifconfig`).
+/// Live (not OnceLock): Wi-Fi / USB / VPN iface can change while the process stays up.
+/// Used by the Discord/operator instant `/link-status` · `/media` · `/link-speed` lane.
+/// Distinct from MTU (`/link-mtu`), MAC (`/link-address`), iface name (`/iface`), broadcast (`/broadcast`).
+pub fn get_primary_link_status() -> String {
+    let default_iface = || -> Option<String> {
+        let output = Command::new("/sbin/route")
+            .args(["-n", "get", "default"])
+            .stderr(std::process::Stdio::null())
+            .output()
+            .ok()?;
+        if !output.status.success() {
+            return None;
+        }
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        for line in stdout.lines() {
+            let t = line.trim();
+            if let Some(rest) = t.strip_prefix("interface:") {
+                let iface = rest.trim();
+                if !iface.is_empty() {
+                    return Some(iface.to_string());
+                }
+            }
+        }
+        None
+    };
+    let link_of = |iface: &str| -> Option<String> {
+        let output = Command::new("/sbin/ifconfig")
+            .arg(iface)
+            .stderr(std::process::Stdio::null())
+            .output()
+            .ok()?;
+        if !output.status.success() {
+            return None;
+        }
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let mut status: Option<String> = None;
+        let mut media: Option<String> = None;
+        for line in stdout.lines() {
+            let t = line.trim();
+            if let Some(rest) = t.strip_prefix("status:") {
+                let s = rest.trim();
+                if !s.is_empty() {
+                    status = Some(s.to_string());
+                }
+            } else if let Some(rest) = t.strip_prefix("media:") {
+                // Prefer negotiated speed in parens when present: "autoselect (1000baseT <full-duplex>)"
+                let raw = rest.trim();
+                if raw.is_empty() {
+                    continue;
+                }
+                let pretty = if let (Some(open), Some(close)) = (raw.find('('), raw.rfind(')')) {
+                    if open < close {
+                        let inner = raw[open + 1..close].trim();
+                        if !inner.is_empty() {
+                            inner.to_string()
+                        } else {
+                            raw.to_string()
+                        }
+                    } else {
+                        raw.to_string()
+                    }
+                } else {
+                    raw.to_string()
+                };
+                media = Some(pretty);
+            }
+        }
+        match (status, media) {
+            (Some(s), Some(m)) => Some(format!("{s} · {m} ({iface})")),
+            (Some(s), None) => Some(format!("{s} ({iface})")),
+            (None, Some(m)) => Some(format!("{m} ({iface})")),
+            (None, None) => None,
+        }
+    };
+    let from_default = || -> Option<String> {
+        let iface = default_iface()?;
+        link_of(&iface)
+    };
+    let from_fallback = || -> Option<String> {
+        for iface in ["en0", "en1", "en2"] {
+            if let Some(link) = link_of(iface) {
+                return Some(link);
+            }
+        }
+        None
+    };
+    let info = from_default().or_else(from_fallback).unwrap_or_default();
+    if info.is_empty() {
+        debug3!("primary link status: ifconfig empty");
+    } else {
+        debug3!("primary link status: '{}'", info);
+    }
+    info
+}
+
 
 
 
