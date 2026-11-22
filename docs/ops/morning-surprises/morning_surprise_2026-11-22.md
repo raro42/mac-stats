@@ -6,21 +6,20 @@ Overnight autoresearch (Track B) kept shipping operator instant lanes. Digester 
 
 | Version | What |
 |---------|------|
-| **v0.1.2952** | Primary IPv4 netmask `/netmask` · `/subnet` · `/cidr` + view/open NL |
+| **v0.1.2953** | Primary / default-route iface `/iface` · `/ifname` · `/interface` + view/open NL |
+| v0.1.2952 | Primary IPv4 netmask `/netmask` · `/subnet` · `/cidr` + view/open NL |
 | v0.1.2951 | Primary interface MTU `/mtu` · `/if-mtu` · `/interface-mtu` + view/open NL |
 | v0.1.2950 | Primary MAC `/mac-address` · `/ether` · `/en0-mac` + view/open NL |
 | v0.1.2949 | Wi-Fi SSID `/wifi` · `/ssid` + view/open NL |
 | v0.1.2948 | DNS nameservers `/dns` · `/nameserver` + view/open NL |
 | v0.1.2947 | Default gateway `/gateway` · `/router` + view/open NL |
-| v0.1.2946 | Local LAN IPv4 `/ip` · `/lan-ip` + view/open NL |
-| earlier | boot · cores · kernel · locale · arch · tz · serial · username · mac-model · hostname · macos · ssd-size · … |
+| earlier | ip · boot · cores · kernel · locale · arch · tz · serial · username · mac-model · … |
 
-## This tick (~04:45 CET)
+## This tick (~04:58 CET)
 
-- Fuel: standing product after MAC/MTU — netmask/CIDR completes the LAN twin set with `/ip` · `/gateway` · `/dns` · `/mac-address` · `/mtu`.
-- Parallel tick owned **v0.1.2951** for MTU; this tick shipped netmask as **v0.1.2952**.
-- Verify OK → keep @ `8aa9a0c82` → install/kickstart → push `main`.
-- Bare `netmask` / `subnet` / `mask` / `cidr` stay with the agent on purpose.
+- Fuel: standing product after netmask — default-route iface name was the missing twin of `/ip` · `/mac-address` · `/mtu` · `/netmask` (those already print `(iface)` but had no dedicated lane).
+- Verify OK → keep @ `b15dd73` → push `main`.
+- Bare `iface` / `interface` stay with the agent; `/iface-mtu` stays MTU; `/en0` stays LAN IP.
 
 ## Still open
 
