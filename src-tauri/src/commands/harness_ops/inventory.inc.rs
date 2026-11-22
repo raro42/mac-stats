@@ -5978,6 +5978,139 @@ pub fn format_timezone_gateway() -> String {
 }
 
 
+/// Machine architecture — not Apple chip name, not Architect theme, not software design.
+/// Slash + view/open NL (`/arch` · `/architecture` · `view arch`) match timezone `/tz` ·
+/// serial `/serial` shape; bare `architect` / theme Architect stay out; `/chip` stays chip.
+pub fn looks_like_architecture_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("software")
+        || n.contains("design")
+        || n.contains("pattern")
+        || n.contains("review")
+        || n.contains("theme")
+        || n.contains("json")
+        || n.contains("chip")
+        || n.contains("processor")
+        || n.contains("core")
+        || n.contains("m1")
+        || n.contains("m2")
+        || n.contains("m3")
+        || n.contains("m4")
+        // Theme / product name "Architect" (not "architecture").
+        || (n.contains("architect") && !n.contains("architecture"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/arch"
+            | "/architecture"
+            | "/uname-m"
+            | "/uname_m"
+            | "/machine-arch"
+            | "/machinearch"
+            | "/cpu-arch"
+            | "/cpuarch"
+            | "/hw-arch"
+            | "/hwarch"
+            | "arch"
+            | "the arch"
+            | "architecture"
+            | "the architecture"
+            | "cpu architecture"
+            | "the cpu architecture"
+            | "machine architecture"
+            | "the machine architecture"
+            | "machine arch"
+            | "the machine arch"
+            | "cpu arch"
+            | "the cpu arch"
+            | "hw arch"
+            | "the hw arch"
+            | "hardware architecture"
+            | "the hardware architecture"
+            | "uname -m"
+            | "uname m"
+            | "what arch"
+            | "what arch is this"
+            | "what architecture"
+            | "what architecture is this"
+            | "what's the arch"
+            | "whats the arch"
+            | "what is the arch"
+            | "what's the architecture"
+            | "whats the architecture"
+            | "what is the architecture"
+            | "what's my arch"
+            | "whats my arch"
+            | "what is my arch"
+            | "what's my architecture"
+            | "whats my architecture"
+            | "what is my architecture"
+            | "which arch"
+            | "which arch is this"
+            | "which architecture"
+            | "which architecture is this"
+            | "my arch"
+            | "my architecture"
+            | "am i on arm"
+            | "am i on arm64"
+            | "am i on aarch64"
+            | "am i on x86"
+            | "am i on x86_64"
+            | "am i on intel"
+            // View/see/show me/open/list.
+            | "view arch"
+            | "view the arch"
+            | "view architecture"
+            | "view the architecture"
+            | "view cpu architecture"
+            | "view machine arch"
+            | "see arch"
+            | "see the arch"
+            | "see architecture"
+            | "see the architecture"
+            | "open arch"
+            | "open the arch"
+            | "open architecture"
+            | "open the architecture"
+            | "open cpu architecture"
+            | "list arch"
+            | "list the arch"
+            | "list architecture"
+            | "list the architecture"
+            | "show arch"
+            | "show the arch"
+            | "show me arch"
+            | "show me the arch"
+            | "show architecture"
+            | "show the architecture"
+            | "show me architecture"
+            | "show me the architecture"
+    )
+}
+
+
+/// Zero-LLM machine arch from cached `uname -m` / consts::ARCH.
+pub fn format_architecture_gateway() -> String {
+    let v = crate::metrics::get_architecture();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Arch** — _no architecture right now._".to_string();
+    }
+    format!("**Arch** · `{v}`")
+}
+
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

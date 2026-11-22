@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2941] - 2026-11-22
+
+### Added
+- Instant machine architecture accepts `/arch` · `/architecture` · `/uname-m` · `/machine-arch` · `/cpu-arch` · `/hw-arch` and view/see/open/list NL (`view arch`, `open architecture`, `list arch`, …), matching “what's my arch” / “what architecture is this” / “cpu architecture” / “am i on arm64”. Bare `architect` / theme Architect stay out; `/chip` stays Apple chip.
+
 ## [0.1.2940] - 2026-11-22
 
 ### Added

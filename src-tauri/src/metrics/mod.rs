@@ -480,6 +480,41 @@ pub fn get_timezone() -> String {
     info
 }
 
+/// Cached machine architecture (`uname -m`, else `std::env::consts::ARCH`).
+/// Used by the Discord/operator instant `/arch` · `/architecture` lane.
+pub fn get_architecture() -> String {
+    ARCHITECTURE_CACHE
+        .get_or_init(|| {
+            let run_uname = |bin: &str| -> Option<String> {
+                let output = Command::new(bin)
+                    .arg("-m")
+                    .stderr(std::process::Stdio::null())
+                    .output()
+                    .ok()?;
+                if !output.status.success() {
+                    return None;
+                }
+                let s = String::from_utf8_lossy(&output.stdout);
+                let t = s.trim();
+                if t.is_empty() {
+                    None
+                } else {
+                    Some(t.to_string())
+                }
+            };
+            let info = run_uname("/usr/bin/uname")
+                .or_else(|| run_uname("uname"))
+                .unwrap_or_else(|| std::env::consts::ARCH.to_string());
+            if info.is_empty() {
+                debug3!("architecture: uname/consts empty");
+            } else {
+                debug3!("architecture cached: '{}'", info);
+            }
+            info
+        })
+        .clone()
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

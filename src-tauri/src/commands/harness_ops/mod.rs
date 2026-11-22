@@ -670,6 +670,55 @@ mod tests {
     }
 
 #[test]
+    fn architecture_slash_and_view_open_do_not_steal_chip_or_architect_theme() {
+        // Slash + view/open NL → machine arch (timezone `/tz` · serial `/serial` parity).
+        // Bare architect / theme Architect stay out; /chip stays Apple chip.
+        assert!(looks_like_architecture_request("/arch"));
+        assert!(looks_like_architecture_request("/architecture"));
+        assert!(looks_like_architecture_request("/uname-m"));
+        assert!(looks_like_architecture_request("/machine-arch"));
+        assert!(looks_like_architecture_request("/cpu-arch"));
+        assert!(looks_like_architecture_request("/hw-arch"));
+        assert!(looks_like_architecture_request("view arch"));
+        assert!(looks_like_architecture_request("open architecture"));
+        assert!(looks_like_architecture_request("list arch"));
+        assert!(looks_like_architecture_request("arch"));
+        assert!(looks_like_architecture_request("architecture"));
+        assert!(looks_like_architecture_request("cpu architecture"));
+        assert!(looks_like_architecture_request("what's my arch"));
+        assert!(looks_like_architecture_request("what architecture is this"));
+        assert!(looks_like_architecture_request("am i on arm64"));
+        assert!(!looks_like_architecture_request("architect"));
+        assert!(!looks_like_architecture_request("theme architect"));
+        assert!(!looks_like_architecture_request("what chip"));
+        assert!(!looks_like_architecture_request("/chip"));
+        assert!(!looks_like_architecture_request("software architecture"));
+        let arch = try_operator_instant_reply("/arch").unwrap();
+        assert!(
+            arch.contains("**Arch**") && !arch.to_lowercase().contains("execution"),
+            "got: {arch}"
+        );
+        let viewed = try_operator_instant_reply("view architecture").unwrap();
+        assert!(
+            viewed.contains("**Arch**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let short = try_operator_instant_reply("/uname-m").unwrap();
+        assert!(
+            short.contains("**Arch**") && !short.to_lowercase().contains("execution"),
+            "got: {short}"
+        );
+        assert!(try_operator_instant_reply("architect").is_none());
+        let chip = try_operator_instant_reply("/chip");
+        if let Some(c) = chip {
+            assert!(
+                !c.contains("**Arch**"),
+                "/chip must stay chip, not arch: {c}"
+            );
+        }
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.
