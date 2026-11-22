@@ -7366,6 +7366,175 @@ pub fn format_wifi_ssid_report() -> String {
 }
 
 
+/// Primary interface MAC / ethernet address — not Mac model, not serial, not LAN IP.
+/// Slash + view/open NL (`/mac-address` · `/ether` · `view mac address`) match `/dns` ·
+/// `/ip` shape; bare `mac` / `ether` / `address` stay with the agent; `/mac-model` stays
+/// marketing name · machine model; `/serial` stays hardware serial; `/ip` stays LAN address.
+pub fn looks_like_mac_address_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("model")
+        || n.contains("serial")
+        || n.contains("chip")
+        || n.contains("processor")
+        || n.contains("macbook")
+        || n.contains("gateway")
+        || n.contains("router")
+        || n.contains("dns")
+        || n.contains("nameserver")
+        || n.contains("local ip")
+        || n.contains("lan ip")
+        || n.contains("ipv4")
+        || n.contains("public")
+        || n.contains("external")
+        || n.contains("wan")
+        || n.contains("wifi")
+        || n.contains("ssid")
+        || n.contains("wlan")
+        || n.contains("airport")
+        || n.contains("bluetooth")
+        || n.contains("spoof")
+        || n.contains("change")
+        || n.contains("set ")
+        // Bare short / ambiguous asks stay with the agent.
+        || n == "mac"
+        || n == "the mac"
+        || n == "ether"
+        || n == "the ether"
+        || n == "ethernet"
+        || n == "the ethernet"
+        || n == "address"
+        || n == "the address"
+        // "what's my mac" / "what mac is this" stay Mac model.
+        || n == "what's my mac"
+        || n == "whats my mac"
+        || n == "what is my mac"
+        || n == "what mac"
+        || n == "what mac is this"
+        || n == "which mac"
+        || n == "which mac is this"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/mac-address"
+            | "/macaddress"
+            | "/mac-addr"
+            | "/macaddr"
+            | "/ether"
+            | "/ethernet"
+            | "/ethernet-address"
+            | "/ethernetaddress"
+            | "/hw-address"
+            | "/hwaddress"
+            | "/hardware-address"
+            | "/hardwareaddress"
+            | "/link-address"
+            | "/linkaddress"
+            | "/en0-mac"
+            | "/en0mac"
+            | "mac address"
+            | "the mac address"
+            | "mac addr"
+            | "the mac addr"
+            | "ethernet address"
+            | "the ethernet address"
+            | "ether address"
+            | "the ether address"
+            | "hardware address"
+            | "the hardware address"
+            | "hw address"
+            | "the hw address"
+            | "hardware mac"
+            | "the hardware mac"
+            | "link address"
+            | "the link address"
+            | "my mac address"
+            | "my ethernet address"
+            | "my ether address"
+            | "what's my mac address"
+            | "whats my mac address"
+            | "what is my mac address"
+            | "what's the mac address"
+            | "whats the mac address"
+            | "what is the mac address"
+            | "what's my ethernet address"
+            | "whats my ethernet address"
+            | "what is my ethernet address"
+            | "what's my ether address"
+            | "whats my ether address"
+            | "what is my ether address"
+            | "which mac address"
+            | "which ethernet address"
+            // View/see/show me/open/list.
+            | "view mac address"
+            | "view the mac address"
+            | "view ethernet address"
+            | "view the ethernet address"
+            | "view ether"
+            | "view the ether"
+            | "view ethernet"
+            | "view the ethernet"
+            | "see mac address"
+            | "see the mac address"
+            | "see ethernet address"
+            | "see the ethernet address"
+            | "see ether"
+            | "see ethernet"
+            | "open mac address"
+            | "open the mac address"
+            | "open ethernet address"
+            | "open the ethernet address"
+            | "open ether"
+            | "open ethernet"
+            | "list mac address"
+            | "list the mac address"
+            | "list ethernet address"
+            | "list the ethernet address"
+            | "list ether"
+            | "list ethernet"
+            | "show mac address"
+            | "show the mac address"
+            | "show me mac address"
+            | "show me the mac address"
+            | "show ethernet address"
+            | "show the ethernet address"
+            | "show me ethernet address"
+            | "show me the ethernet address"
+            | "show ether"
+            | "show the ether"
+            | "show me ether"
+            | "show me the ether"
+            | "show ethernet"
+            | "show the ethernet"
+            | "show me ethernet"
+            | "show me the ethernet"
+    )
+}
+
+
+/// Zero-LLM primary interface MAC from `route` default iface + `ifconfig ether`.
+pub fn format_mac_address_report() -> String {
+    let v = crate::metrics::get_primary_mac_address();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**MAC** — _no ethernet address right now._".to_string();
+    }
+    format!("**MAC** · `{v}`")
+}
+
+
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

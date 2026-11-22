@@ -913,6 +913,76 @@ pub fn get_wifi_ssid() -> String {
     info
 }
 
+/// Primary interface MAC / ethernet address (default-route iface via `route` + `ifconfig`).
+/// Live (not OnceLock): Wi-Fi / USB / VPN iface can change while the process stays up.
+/// Used by the Discord/operator instant `/mac-address` · `/ether` lane.
+/// Distinct from Mac marketing model (`/mac-model`) and hardware serial (`/serial`).
+pub fn get_primary_mac_address() -> String {
+    let default_iface = || -> Option<String> {
+        let output = Command::new("/sbin/route")
+            .args(["-n", "get", "default"])
+            .stderr(std::process::Stdio::null())
+            .output()
+            .ok()?;
+        if !output.status.success() {
+            return None;
+        }
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        for line in stdout.lines() {
+            let t = line.trim();
+            if let Some(rest) = t.strip_prefix("interface:") {
+                let iface = rest.trim();
+                if !iface.is_empty() {
+                    return Some(iface.to_string());
+                }
+            }
+        }
+        None
+    };
+    let ether_of = |iface: &str| -> Option<String> {
+        let output = Command::new("/sbin/ifconfig")
+            .arg(iface)
+            .stderr(std::process::Stdio::null())
+            .output()
+            .ok()?;
+        if !output.status.success() {
+            return None;
+        }
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        for line in stdout.lines() {
+            let t = line.trim();
+            if let Some(rest) = t.strip_prefix("ether ") {
+                let mac = rest.split_whitespace().next().unwrap_or("").trim();
+                if mac.len() >= 11 && mac.contains(':') {
+                    return Some(mac.to_string());
+                }
+            }
+        }
+        None
+    };
+    let from_default = || -> Option<String> {
+        let iface = default_iface()?;
+        let mac = ether_of(&iface)?;
+        Some(format!("{mac} ({iface})"))
+    };
+    let from_fallback = || -> Option<String> {
+        for iface in ["en0", "en1", "en2"] {
+            if let Some(mac) = ether_of(iface) {
+                return Some(format!("{mac} ({iface})"));
+            }
+        }
+        None
+    };
+    let info = from_default().or_else(from_fallback).unwrap_or_default();
+    if info.is_empty() {
+        debug3!("primary mac address: ifconfig empty");
+    } else {
+        debug3!("primary mac address: '{}'", info);
+    }
+    info
+}
+
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

@@ -1162,6 +1162,78 @@ mod tests {
     }
 
 #[test]
+    fn mac_address_slash_and_view_open_do_not_steal_mac_model_or_lan_ip() {
+        // Slash + view/open NL → primary MAC (`/dns` · `/ip` parity).
+        // Bare `mac` / `ether` stay with the agent; `/mac-model` · `what's my mac` stay model.
+        assert!(looks_like_mac_address_request("/mac-address"));
+        assert!(looks_like_mac_address_request("/mac-addr"));
+        assert!(looks_like_mac_address_request("/ether"));
+        assert!(looks_like_mac_address_request("/ethernet"));
+        assert!(looks_like_mac_address_request("/ethernet-address"));
+        assert!(looks_like_mac_address_request("/hw-address"));
+        assert!(looks_like_mac_address_request("/hardware-address"));
+        assert!(looks_like_mac_address_request("/link-address"));
+        assert!(looks_like_mac_address_request("/en0-mac"));
+        assert!(looks_like_mac_address_request("view mac address"));
+        assert!(looks_like_mac_address_request("open ether"));
+        assert!(looks_like_mac_address_request("list ethernet"));
+        assert!(looks_like_mac_address_request("mac address"));
+        assert!(looks_like_mac_address_request("ethernet address"));
+        assert!(looks_like_mac_address_request("what's my mac address"));
+        assert!(looks_like_mac_address_request("which mac address"));
+        assert!(!looks_like_mac_address_request("mac"));
+        assert!(!looks_like_mac_address_request("ether"));
+        assert!(!looks_like_mac_address_request("ethernet"));
+        assert!(!looks_like_mac_address_request("what's my mac"));
+        assert!(!looks_like_mac_address_request("what mac is this"));
+        assert!(!looks_like_mac_address_request("/mac-model"));
+        assert!(!looks_like_mac_address_request("mac model"));
+        assert!(!looks_like_mac_address_request("/serial"));
+        assert!(!looks_like_mac_address_request("/ip"));
+        assert!(!looks_like_mac_address_request("/dns"));
+        assert!(!looks_like_mac_address_request("/wifi"));
+        assert!(!looks_like_mac_address_request("what's my wifi"));
+        let mac = try_operator_instant_reply("/mac-address").unwrap();
+        assert!(
+            mac.contains("**MAC**") && !mac.to_lowercase().contains("execution"),
+            "got: {mac}"
+        );
+        let viewed = try_operator_instant_reply("view mac address").unwrap();
+        assert!(
+            viewed.contains("**MAC**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let short = try_operator_instant_reply("/ether").unwrap();
+        assert!(
+            short.contains("**MAC**") && !short.to_lowercase().contains("execution"),
+            "got: {short}"
+        );
+        assert!(try_operator_instant_reply("mac").is_none());
+        assert!(try_operator_instant_reply("ether").is_none());
+        let model = try_operator_instant_reply("/mac-model");
+        if let Some(reply) = model {
+            assert!(
+                !reply.contains("**MAC** · `"),
+                "/mac-model must stay marketing name, not ethernet MAC: {reply}"
+            );
+        }
+        let whats_mac = try_operator_instant_reply("what's my mac");
+        if let Some(reply) = whats_mac {
+            assert!(
+                !reply.contains("**MAC** · `"),
+                "what's my mac must stay Mac model, not ethernet MAC: {reply}"
+            );
+        }
+        let ip = try_operator_instant_reply("/ip");
+        if let Some(reply) = ip {
+            assert!(
+                !reply.contains("**MAC**"),
+                "/ip must stay LAN IP, not MAC: {reply}"
+            );
+        }
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.

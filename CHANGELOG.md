@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2950] - 2026-11-22
+
+### Added
+- Instant primary MAC / ethernet address accepts `/mac-address` · `/mac-addr` · `/ether` · `/ethernet` · `/ethernet-address` · `/hw-address` · `/hardware-address` · `/link-address` · `/en0-mac` and view/see/open/list NL (`view mac address`, `open ether`, `list ethernet`, …), matching “mac address” / “ethernet address” / “what's my mac address” / “which mac address”. Bare `mac` / `ether` / `ethernet` / `address` stay with the agent; `/mac-model` · “what's my mac” stay marketing name · machine model; `/serial` stays hardware serial; `/wifi` stays SSID; `/ip` stays LAN address.
+
+
 ## [0.1.2949] - 2026-11-22
 
 ### Added
