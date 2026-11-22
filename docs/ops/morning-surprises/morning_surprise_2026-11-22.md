@@ -1,26 +1,20 @@
 # Morning surprise — 2026-11-22
 
-Overnight autoresearch (Track B) kept shipping operator instant lanes. Digester open stayed empty; design-review stayed in grace (Mac TCC); layout-daily already marked data-poster for the day.
+Generated: 2026-11-22 20:06 CET
 
-## Shipped tonight (keep)
+## Shipped overnight
 
-| Version | What |
-|---------|------|
-| **v0.1.2958** | Battery time-to-empty / full `/battery-time` · `/time-remaining` · `/time-to-empty` · `/time-to-full` + view/open NL |
-| v0.1.2957 | AC charger · adapter `/charger` · `/adapter` · `/charger-watts` + view/open NL |
-| v0.1.2956 | Battery cycles · health · max capacity `/cycles` · `/battery-health` · `/max-capacity` + view/open NL |
-| v0.1.2955 | Primary link status · media / speed `/link-status` · `/media` · `/link-speed` + view/open NL |
-| earlier | broadcast · iface · netmask · mtu · mac · wifi · dns · gateway · ip · boot · cores · … |
+- **v0.1.2959** — Instant connected display names · resolutions: `/display` · `/displays` · `/resolution` · `/screen-resolution` · `/display-resolution` · `/display-res` · `/screen-res` · `/pixel-resolution` · `/main-display` · `/screen` · `/screens` + view/open NL. Source: `system_profiler SPDisplaysDataType`. Bare display/resolution/screen stay with the agent; `/gpu` stays GPU ring; screenshots and website Monitors stay put.
+- Prior same window: **v0.1.2958** battery time-to-empty/full (parallel tick), **v0.1.2957** AC charger/adapter.
 
-## This tick (~05:50 CET)
+## Digester / tracks
 
-- Fuel: standing product after AC charger race — `battery` crate `time_to_empty` / `time_to_full` had no dedicated slash+NL while `/battery`, `/cycles`, and `/charger` already did. Rebased onto remote v0.1.2957 charger as **v0.1.2958**.
-- Verify OK → keep → push `main` (also backfilled missing 2956 keep row earlier).
-- Bare `time` / `remaining` stay with the agent; `/battery` · `battery left` stay Bat %; `/cycles` stays cycles; `/charger` stays adapter watts.
+- Digester open: empty (no Slowest / latency candidates).
+- Design review: due=false (Agent Ops still in grace; Mac TCC polish-without-capture).
+- Layout daily: data-poster marked today; Dark due next calendar quota.
 
-## Still open
+## Next fuel
 
-- Dark / Neon / Futuristic layout-daily next calendar day
-- cream/Swiss Send fill white-on-blue intentional (leave alone)
-- sibling harness ports when digester stays empty
-- Ask Werner `/battery-time` or `/charger` for ETA · adapter watts without waking Ollama
+- Dark layout-daily (next calendar day).
+- cream/Swiss Send fill white-on-blue intentional (skip).
+- Sibling/product fuel — not another keep-pNN clone of the same slash+NL shape if a real UI/correctness gap appears.
