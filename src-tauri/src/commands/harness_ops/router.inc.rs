@@ -1018,6 +1018,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_boot_time_request(content) {
         return Some(format_boot_time_gateway());
     }
+    // Local LAN IPv4 (bare `ip` / `what's my ip` / public·wan stay with the agent).
+    if looks_like_local_ip_request(content) {
+        return Some(format_local_ip_gateway());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());

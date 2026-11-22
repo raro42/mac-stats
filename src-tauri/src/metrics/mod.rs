@@ -699,6 +699,71 @@ pub fn get_boot_time() -> String {
     formatted
 }
 
+/// Primary local LAN IPv4 (default-route iface via `route` + `ipconfig getifaddr`).
+/// Live (not OnceLock): Wi-Fi / DHCP / VPN can change while the process stays up.
+/// Used by the Discord/operator instant `/ip` · `/local-ip` lane.
+/// Distinct from public/WAN IP (agent) — this is the Mac's LAN address only.
+pub fn get_local_ipv4() -> String {
+    let default_iface = || -> Option<String> {
+        let output = Command::new("/sbin/route")
+            .args(["-n", "get", "default"])
+            .stderr(std::process::Stdio::null())
+            .output()
+            .ok()?;
+        if !output.status.success() {
+            return None;
+        }
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        for line in stdout.lines() {
+            let t = line.trim();
+            if let Some(rest) = t.strip_prefix("interface:") {
+                let iface = rest.trim();
+                if !iface.is_empty() {
+                    return Some(iface.to_string());
+                }
+            }
+        }
+        None
+    };
+    let ifaddr = |iface: &str| -> Option<String> {
+        let output = Command::new("/usr/sbin/ipconfig")
+            .args(["getifaddr", iface])
+            .stderr(std::process::Stdio::null())
+            .output()
+            .ok()?;
+        if !output.status.success() {
+            return None;
+        }
+        let s = String::from_utf8_lossy(&output.stdout);
+        let ip = s.trim();
+        if ip.is_empty() || !ip.contains('.') {
+            None
+        } else {
+            Some(ip.to_string())
+        }
+    };
+    let from_default = || -> Option<String> {
+        let iface = default_iface()?;
+        let ip = ifaddr(&iface)?;
+        Some(format!("{ip} ({iface})"))
+    };
+    let from_fallback = || -> Option<String> {
+        for iface in ["en0", "en1", "en2"] {
+            if let Some(ip) = ifaddr(iface) {
+                return Some(format!("{ip} ({iface})"));
+            }
+        }
+        None
+    };
+    let info = from_default().or_else(from_fallback).unwrap_or_default();
+    if info.is_empty() {
+        debug3!("local ipv4: route/ipconfig empty");
+    } else {
+        debug3!("local ipv4: '{}'", info);
+    }
+    info
+}
+
 /// Get chip information (cached)
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once

@@ -932,6 +932,56 @@ mod tests {
     }
 
 #[test]
+    fn local_ip_slash_and_view_open_do_not_steal_public_ip_asks() {
+        // Slash + view/open NL → local LAN IPv4 (boot `/boot` · hostname `/hostname` parity).
+        // Bare `ip` / `what's my ip` stay with the agent (often public/WAN).
+        assert!(looks_like_local_ip_request("/ip"));
+        assert!(looks_like_local_ip_request("/local-ip"));
+        assert!(looks_like_local_ip_request("/lan-ip"));
+        assert!(looks_like_local_ip_request("/ipv4"));
+        assert!(looks_like_local_ip_request("/primary-ip"));
+        assert!(looks_like_local_ip_request("/en0"));
+        assert!(looks_like_local_ip_request("view local ip"));
+        assert!(looks_like_local_ip_request("open lan ip"));
+        assert!(looks_like_local_ip_request("list ipv4"));
+        assert!(looks_like_local_ip_request("local ip"));
+        assert!(looks_like_local_ip_request("lan ip"));
+        assert!(looks_like_local_ip_request("what's my local ip"));
+        assert!(looks_like_local_ip_request("view ip"));
+        assert!(!looks_like_local_ip_request("ip"));
+        assert!(!looks_like_local_ip_request("my ip"));
+        assert!(!looks_like_local_ip_request("what's my ip"));
+        assert!(!looks_like_local_ip_request("what is my ip"));
+        assert!(!looks_like_local_ip_request("public ip"));
+        assert!(!looks_like_local_ip_request("external ip"));
+        assert!(!looks_like_local_ip_request("wan ip"));
+        let ip = try_operator_instant_reply("/ip").unwrap();
+        assert!(
+            ip.contains("**IP**") && !ip.to_lowercase().contains("execution"),
+            "got: {ip}"
+        );
+        let viewed = try_operator_instant_reply("view local ip").unwrap();
+        assert!(
+            viewed.contains("**IP**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let short = try_operator_instant_reply("/local-ip").unwrap();
+        assert!(
+            short.contains("**IP**") && !short.to_lowercase().contains("execution"),
+            "got: {short}"
+        );
+        assert!(try_operator_instant_reply("ip").is_none());
+        assert!(try_operator_instant_reply("what's my ip").is_none());
+        let host = try_operator_instant_reply("/hostname");
+        if let Some(reply) = host {
+            assert!(
+                !reply.contains("**IP**"),
+                "/hostname must stay hostname, not IP: {reply}"
+            );
+        }
+    }
+
+#[test]
     fn disk_capacity_slash_and_view_open_do_not_steal_ssd_percent_or_cleanup() {
         // Slash + view/open NL → capacity (RAM `/ram-size` · SSD `/free` parity).
         // Bare /ssd · /storage · view ssd · how much storage stay %; view disk stays Cleanup; /free stays free.

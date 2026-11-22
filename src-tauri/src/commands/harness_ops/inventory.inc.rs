@@ -6711,6 +6711,155 @@ pub fn format_boot_time_gateway() -> String {
 }
 
 
+/// Primary local LAN IPv4 — not public/WAN IP, not hostname.
+/// Slash + view/open NL (`/ip` · `/local-ip` · `view local ip`) match boot `/boot` ·
+/// hostname `/hostname` shape; bare `ip` / `what's my ip` / public·wan·external stay with the agent.
+pub fn looks_like_local_ip_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("public")
+        || n.contains("external")
+        || n.contains("wan")
+        || n.contains("internet")
+        || n.contains("website")
+        || n.contains("dns")
+        || n.contains("gateway")
+        || n.contains("router")
+        || n.contains("vpn")
+        || n.contains("hostname")
+        || n.contains("computer name")
+        || n.contains("machine name")
+        // Bare short / classic public-IP asks stay with the agent.
+        || n == "ip"
+        || n == "the ip"
+        || n == "my ip"
+        || n == "what's my ip"
+        || n == "whats my ip"
+        || n == "what is my ip"
+        || n == "what's the ip"
+        || n == "whats the ip"
+        || n == "what is the ip"
+        || n == "what is my ip address"
+        || n == "what's my ip address"
+        || n == "whats my ip address"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/ip"
+            | "/local-ip"
+            | "/localip"
+            | "/lan-ip"
+            | "/lanip"
+            | "/ipv4"
+            | "/primary-ip"
+            | "/primaryip"
+            | "/en0-ip"
+            | "/en0ip"
+            | "/en0"
+            | "local ip"
+            | "the local ip"
+            | "local ipv4"
+            | "the local ipv4"
+            | "lan ip"
+            | "the lan ip"
+            | "lan address"
+            | "the lan address"
+            | "local address"
+            | "the local address"
+            | "primary ip"
+            | "the primary ip"
+            | "ipv4"
+            | "the ipv4"
+            | "en0 ip"
+            | "the en0 ip"
+            | "what's my local ip"
+            | "whats my local ip"
+            | "what is my local ip"
+            | "what's the local ip"
+            | "whats the local ip"
+            | "what is the local ip"
+            | "what's my lan ip"
+            | "whats my lan ip"
+            | "what is my lan ip"
+            | "what's my ipv4"
+            | "whats my ipv4"
+            | "what is my ipv4"
+            | "what's the lan ip"
+            | "whats the lan ip"
+            | "what is the lan ip"
+            | "my local ip"
+            | "my lan ip"
+            | "my ipv4"
+            // View/see/show me/open/list.
+            | "view ip"
+            | "view the ip"
+            | "view local ip"
+            | "view the local ip"
+            | "view lan ip"
+            | "view the lan ip"
+            | "view ipv4"
+            | "view the ipv4"
+            | "view primary ip"
+            | "see ip"
+            | "see the ip"
+            | "see local ip"
+            | "see the local ip"
+            | "see lan ip"
+            | "see ipv4"
+            | "open ip"
+            | "open the ip"
+            | "open local ip"
+            | "open the local ip"
+            | "open lan ip"
+            | "open ipv4"
+            | "list ip"
+            | "list the ip"
+            | "list local ip"
+            | "list the local ip"
+            | "list lan ip"
+            | "list ipv4"
+            | "show ip"
+            | "show the ip"
+            | "show me ip"
+            | "show me the ip"
+            | "show local ip"
+            | "show the local ip"
+            | "show me local ip"
+            | "show me the local ip"
+            | "show lan ip"
+            | "show the lan ip"
+            | "show me lan ip"
+            | "show me the lan ip"
+            | "show ipv4"
+            | "show the ipv4"
+            | "show me ipv4"
+            | "show me the ipv4"
+    )
+}
+
+
+/// Zero-LLM primary local LAN IPv4 from default-route iface + ipconfig.
+pub fn format_local_ip_gateway() -> String {
+    let v = crate::metrics::get_local_ipv4();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**IP** — _no local IPv4 right now._".to_string();
+    }
+    format!("**IP** · `{v}`")
+}
+
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

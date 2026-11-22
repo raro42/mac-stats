@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2946] - 2026-11-22
+
+### Added
+- Instant local LAN IPv4 accepts `/ip` · `/local-ip` · `/lan-ip` · `/ipv4` · `/primary-ip` · `/en0` and view/see/open/list NL (`view local ip`, `open lan ip`, `list ipv4`, …), matching “local ip” / “lan ip” / “what's my local ip”. Bare `ip` / “what's my ip” / public·wan·external stay with the agent; `/hostname` stays ComputerName.
+
 ## [0.1.2945] - 2026-11-22
 
 ### Added
