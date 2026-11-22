@@ -1,3 +1,11 @@
+## Overnight note 2026-11-22 ~23:15
+- Shipped v0.1.2972 Screen Sharing `/screen-sharing` · `/vnc` · `/mac-vnc` + view/open NL; bare screen sharing/vnc stay with agent; `/remote-login` · `/ssh` · `/screen` intact.
+- Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Neon layout-daily next calendar quota.
+
+## Overnight merge — v0.1.2972
+
+- Product fuel after Remote Login `/remote-login` NL v0.1.2971: Screen Sharing enablement + daemon idle/active already readable via `launchctl print-disabled` / `launchctl print system/com.apple.screensharing` but lacked `/screen-sharing` · `/screensharing` · `/screen-sharing-status` · `/screen-share` · `/vnc` · `/vnc-status` · `/vnc-state` · `/mac-vnc` and view/see/open/list phrases while Remote Login `/remote-login` · `/ssh` already had slash+NL and explicitly left screen sharing / vnc with the agent. Bare `screen sharing` / `vnc` stay with the agent; `/remote-login` · `/ssh` stay Remote Login; `/screen` · `/screens` stay display resolution. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Dark marked today (Neon due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Neon layout-daily next calendar day · sibling/product fuel — Screen Sharing slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-22 ~23:05
 - Shipped v0.1.2971 Remote Login `/remote-login` · `/ssh` · `/sshd` + view/open NL; bare ssh/sshd/remote login stay with agent; `/vpn` · `/firewall` · `/timemachine` intact.
 - Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Neon layout-daily next calendar quota.
