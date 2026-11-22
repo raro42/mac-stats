@@ -642,6 +642,41 @@ pub fn get_filevault_status() -> String {
     info
 }
 
+/// System Integrity Protection status from `csrutil status` (live; not OnceLock).
+/// Distinct from FileVault `/filevault`, Gatekeeper, and boot volume.
+/// Used by Discord/operator instant `/sip` · `/csrutil` lane.
+pub fn get_sip_status() -> String {
+    let output = Command::new("/usr/bin/csrutil")
+        .arg("status")
+        .stderr(std::process::Stdio::null())
+        .output();
+    let Ok(output) = output else {
+        debug3!("sip: csrutil spawn failed");
+        return String::new();
+    };
+    // csrutil may exit non-zero when disabled; still parse stdout.
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let lower = stdout.to_ascii_lowercase();
+    let info = if lower.contains("enabled") {
+        "Enabled".to_string()
+    } else if lower.contains("disabled") {
+        "Disabled".to_string()
+    } else {
+        let t = stdout.lines().next().unwrap_or("").trim();
+        if t.is_empty() {
+            String::new()
+        } else {
+            t.to_string()
+        }
+    };
+    if info.is_empty() {
+        debug3!("sip: empty status (exit={})", output.status);
+    } else {
+        debug3!("sip status: '{}'", info);
+    }
+    info
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.

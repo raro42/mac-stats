@@ -1024,6 +1024,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_filevault_request(content) {
         return Some(format_filevault_report());
     }
+    // SIP status (bare `sip` / `csrutil` stay with the agent; `/filevault` stays FileVault; Gatekeeper stays out).
+    if looks_like_sip_request(content) {
+        return Some(format_sip_report());
+    }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
     if looks_like_boot_time_request(content) {

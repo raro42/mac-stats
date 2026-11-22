@@ -9940,6 +9940,179 @@ pub fn format_filevault_report() -> String {
     format!("**FileVault** · `{v}`")
 }
 
+/// System Integrity Protection (SIP) — not FileVault, not Gatekeeper, not boot volume.
+/// Slash + view/open NL (`/sip` · `/csrutil` · `view sip`) match `/filevault` · `/uuid` shape;
+/// bare `sip` / `csrutil` stay with the agent; `/filevault` stays FileVault; Gatekeeper stays out.
+pub fn looks_like_sip_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        // Action verbs (leave status asks like "is sip enabled").
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("unlock")
+        || n.contains("password")
+        || n.contains("recovery key")
+        || n.contains("keep")
+        || n.contains("discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("gatekeeper")
+        || n.contains("spctl")
+        // FileVault / boot volume / Disk Cleanup stay elsewhere.
+        || n == "/filevault"
+        || n == "/fv"
+        || n == "/fde"
+        || n == "/boot-volume"
+        || n == "/startup-disk"
+        || n == "view disk"
+        || n == "open disk"
+        || n == "/ssd"
+        || n == "/storage"
+        || n == "/free"
+        // Bare short / ambiguous stay with the agent.
+        || n == "sip"
+        || n == "the sip"
+        || n == "csrutil"
+        || n == "the csrutil"
+        || n == "system integrity"
+        || n == "the system integrity"
+        || n == "system integrity protection"
+        || n == "the system integrity protection"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/sip"
+            | "/sip-status"
+            | "/sipstatus"
+            | "/csrutil"
+            | "/csrutil-status"
+            | "/csrutilstatus"
+            | "/system-integrity"
+            | "/systemintegrity"
+            | "/system-integrity-protection"
+            | "/systemintegrityprotection"
+            | "/sip-protection"
+            | "/sipprotection"
+            | "sip status"
+            | "the sip status"
+            | "csrutil status"
+            | "the csrutil status"
+            | "system integrity status"
+            | "the system integrity status"
+            | "system integrity protection status"
+            | "the system integrity protection status"
+            | "my sip"
+            | "my sip status"
+            | "my system integrity"
+            | "my system integrity protection"
+            | "is sip on"
+            | "is sip off"
+            | "is sip enabled"
+            | "is sip disabled"
+            | "is system integrity on"
+            | "is system integrity enabled"
+            | "is system integrity protection on"
+            | "is system integrity protection enabled"
+            | "what's my sip"
+            | "whats my sip"
+            | "what is my sip"
+            | "what's my sip status"
+            | "whats my sip status"
+            | "what is my sip status"
+            | "what's the sip"
+            | "whats the sip"
+            | "what is the sip"
+            | "what's the sip status"
+            | "whats the sip status"
+            | "what is the sip status"
+            | "what's my system integrity"
+            | "whats my system integrity"
+            | "what is my system integrity"
+            | "what's the system integrity status"
+            | "whats the system integrity status"
+            | "what is the system integrity status"
+            | "which sip"
+            | "how's sip"
+            | "hows sip"
+            | "how's the sip"
+            | "hows the sip"
+            // View/see/show me/open/list.
+            | "view sip"
+            | "view the sip"
+            | "view sip status"
+            | "view the sip status"
+            | "view csrutil"
+            | "view the csrutil"
+            | "view csrutil status"
+            | "view system integrity"
+            | "view the system integrity"
+            | "view system integrity protection"
+            | "view the system integrity protection"
+            | "view system integrity status"
+            | "view the system integrity status"
+            | "see sip"
+            | "see the sip"
+            | "see sip status"
+            | "see the sip status"
+            | "see system integrity"
+            | "see the system integrity"
+            | "open sip"
+            | "open the sip"
+            | "open sip status"
+            | "open the sip status"
+            | "open csrutil"
+            | "open the csrutil"
+            | "open system integrity"
+            | "open the system integrity"
+            | "list sip"
+            | "list the sip"
+            | "list sip status"
+            | "list the sip status"
+            | "list system integrity"
+            | "list the system integrity"
+            | "show sip"
+            | "show the sip"
+            | "show me sip"
+            | "show me the sip"
+            | "show sip status"
+            | "show the sip status"
+            | "show me sip status"
+            | "show me the sip status"
+            | "show system integrity"
+            | "show the system integrity"
+            | "show me system integrity"
+            | "show me the system integrity"
+    )
+}
+
+/// Zero-LLM SIP status from `csrutil status` (macOS-only; empty elsewhere).
+pub fn format_sip_report() -> String {
+    let v = crate::metrics::get_sip_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**SIP** — _no System Integrity Protection reading on this Mac right now._".to_string();
+    }
+    format!("**SIP** · `{v}`")
+}
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

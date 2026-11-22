@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2966
+
+- Product fuel after FileVault `/filevault` NL v0.1.2964 (+ Dark layout-daily v0.1.2965): System Integrity Protection already readable via `csrutil status` but lacked `/sip` · `/sip-status` · `/csrutil` · `/csrutil-status` · `/system-integrity` · `/system-integrity-protection` · `/sip-protection` and view/see/open/list phrases while FileVault `/filevault` already had slash+NL and explicitly left sip/csrutil/gatekeeper with the agent. Bare `sip` / `csrutil` stay with the agent; `/filevault` stays FileVault; Gatekeeper stays with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Dark marked today (Neon due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Neon layout-daily next calendar day · Gatekeeper slash NL · sibling/product fuel — SIP slash NL closed; not another keep-pNN clone.
+
 ## Overnight merge — v0.1.2965
 
 - Layout-daily Dark (AI Chat + Monitors): `.chat-messages:focus-within` still inherited shared Apple `#007aff` focus wash while Data Poster already remapped onto cyan and Dark `.chat-input-container:focus-within` already sat on Matrix `#00cc66`. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Dark marked today (Neon due next calendar quota). Next: Neon layout-daily · cream/Swiss Send fill white-on-blue intentional · sibling/product fuel — Dark chat-messages focus closed; not another keep-pNN clone.

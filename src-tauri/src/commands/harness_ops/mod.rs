@@ -1884,6 +1884,59 @@ mod tests {
         }
     }
 
+    #[test]
+    fn sip_slash_and_view_open_do_not_steal_filevault_or_bare_sip() {
+        // Slash + view/open NL → SIP (`/filevault` · `/uuid` parity).
+        // Bare `sip` / `csrutil` stay with the agent; `/filevault` stays FileVault; Gatekeeper stays out.
+        assert!(looks_like_sip_request("/sip"));
+        assert!(looks_like_sip_request("/sip-status"));
+        assert!(looks_like_sip_request("/csrutil"));
+        assert!(looks_like_sip_request("/csrutil-status"));
+        assert!(looks_like_sip_request("/system-integrity"));
+        assert!(looks_like_sip_request("/system-integrity-protection"));
+        assert!(looks_like_sip_request("/sip-protection"));
+        assert!(looks_like_sip_request("view sip"));
+        assert!(looks_like_sip_request("open sip status"));
+        assert!(looks_like_sip_request("list sip"));
+        assert!(looks_like_sip_request("sip status"));
+        assert!(looks_like_sip_request("is sip on"));
+        assert!(looks_like_sip_request("is sip enabled"));
+        assert!(looks_like_sip_request("what's my sip"));
+        assert!(looks_like_sip_request("view system integrity"));
+        assert!(!looks_like_sip_request("sip"));
+        assert!(!looks_like_sip_request("csrutil"));
+        assert!(!looks_like_sip_request("system integrity"));
+        assert!(!looks_like_sip_request("system integrity protection"));
+        assert!(!looks_like_sip_request("/filevault"));
+        assert!(!looks_like_sip_request("view filevault"));
+        assert!(!looks_like_sip_request("enable sip"));
+        assert!(!looks_like_sip_request("disable sip"));
+        assert!(!looks_like_sip_request("gatekeeper"));
+        assert!(!looks_like_sip_request("view gatekeeper"));
+        assert!(!looks_like_filevault_request("/sip"));
+        assert!(!looks_like_filevault_request("view sip"));
+        assert!(!looks_like_filevault_request("/csrutil"));
+        let sip = try_operator_instant_reply("/sip").unwrap();
+        assert!(
+            sip.contains("**SIP**") && !sip.to_lowercase().contains("execution"),
+            "got: {sip}"
+        );
+        let viewed = try_operator_instant_reply("view sip").unwrap();
+        assert!(
+            viewed.contains("**SIP**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("sip").is_none());
+        assert!(try_operator_instant_reply("csrutil").is_none());
+        let fv = try_operator_instant_reply("/filevault");
+        if let Some(reply) = fv {
+            assert!(
+                !reply.contains("**SIP**"),
+                "/filevault must stay FileVault, not SIP: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

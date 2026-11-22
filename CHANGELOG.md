@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2966] - 2026-11-22
+
+### Added
+- Instant System Integrity Protection (SIP) status accepts `/sip` · `/sip-status` · `/csrutil` · `/csrutil-status` · `/system-integrity` · `/system-integrity-protection` · `/sip-protection` and view/see/open/list NL (`view sip`, `open sip status`, `list sip`, …), matching “sip status” / “is sip on” / “is sip enabled” / “what's my sip” / “what's the sip status”. Bare `sip` / `csrutil` stay with the agent; `/filevault` stays FileVault; Gatekeeper stays with the agent.
+
 ## [0.1.2965] - 2026-11-22
 
 ### Changed
