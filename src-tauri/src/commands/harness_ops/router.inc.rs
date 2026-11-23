@@ -1185,6 +1185,11 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_screensaver_idle_request(content) {
         return Some(format_screensaver_idle_report());
     }
+    // Power Nap (bare `powernap` / `power nap` stay with the agent; `/lpm` stays Low Power Mode;
+    // `/power` stays the strip; `/watts` stays draw; `/screensaver` stays Screensaver idle).
+    if looks_like_power_nap_request(content) {
+        return Some(format_power_nap_report());
+    }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
     if looks_like_boot_time_request(content) {

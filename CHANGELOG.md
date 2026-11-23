@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3007] - 2026-11-23
+
+### Added
+- Instant Power Nap accepts `/powernap` · `/power-nap` · `/powernap-status` · `/power-nap-status` · `/powernap-state` · `/power-nap-state` · `/mac-powernap` · `/mac-power-nap` · `/mac-powernap-status` · `/mac-power-nap-status` and view/see/open/list NL (`view power nap`, `open powernap`, `list power nap`, …), matching “power nap status” / “is power nap on” / “is powernap enabled” / “what's my power nap” / “what's the powernap status”. Bare `powernap` / `power nap` stay with the agent; `/lpm` stays Low Power Mode; `/power` stays the strip; `/watts` · `/power-draw` stay draw; `/screensaver` · `/idle-time` stay Screensaver idle; `/battery` stays Bat %. Operator `/help` lists the new lane.
+
 ## [0.1.3006] - 2026-11-23
 
 ### Added

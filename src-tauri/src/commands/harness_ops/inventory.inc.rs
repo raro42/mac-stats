@@ -17439,6 +17439,210 @@ pub fn format_screensaver_idle_report() -> String {
     format!("**Screensaver** · `{v}`")
 }
 
+/// Power Nap — `pmset` Battery/AC `powernap` (+ active fallback).
+/// Slash + view/open NL (`/powernap` · `/power-nap` · `view power nap`).
+/// Bare `powernap` / `power nap` stay with the agent; `/lpm` stays Low Power Mode;
+/// `/power` stays the strip; `/watts` stays draw; `/screensaver` stays Screensaver idle;
+/// Wake for network stays with the agent (next soft-state).
+pub fn looks_like_power_nap_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("wake for")
+        || n.contains("wake-for")
+        || n.contains("wake on")
+        || n.contains("wake-on")
+        || n.contains("womp")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "powernap"
+        || n == "the powernap"
+        || n == "power nap"
+        || n == "the power nap"
+        || n == "power-nap"
+        || n == "the power-nap"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/powernap"
+            | "/power-nap"
+            | "/powernap-status"
+            | "/power-nap-status"
+            | "/powernap-state"
+            | "/power-nap-state"
+            | "/mac-powernap"
+            | "/mac-power-nap"
+            | "/mac-powernap-status"
+            | "/mac-power-nap-status"
+            | "powernap status"
+            | "the powernap status"
+            | "power nap status"
+            | "the power nap status"
+            | "power-nap status"
+            | "the power-nap status"
+            | "powernap state"
+            | "the powernap state"
+            | "power nap state"
+            | "the power nap state"
+            | "my powernap"
+            | "my powernap status"
+            | "my power nap"
+            | "my power nap status"
+            | "is powernap on"
+            | "is powernap off"
+            | "is powernap enabled"
+            | "is powernap disabled"
+            | "is power nap on"
+            | "is power nap off"
+            | "is power nap enabled"
+            | "is power nap disabled"
+            | "is power-nap on"
+            | "is power-nap enabled"
+            | "what's my powernap"
+            | "whats my powernap"
+            | "what is my powernap"
+            | "what's my powernap status"
+            | "whats my powernap status"
+            | "what is my powernap status"
+            | "what's my power nap"
+            | "whats my power nap"
+            | "what is my power nap"
+            | "what's my power nap status"
+            | "whats my power nap status"
+            | "what is my power nap status"
+            | "what's the powernap"
+            | "whats the powernap"
+            | "what is the powernap"
+            | "what's the powernap status"
+            | "whats the powernap status"
+            | "what is the powernap status"
+            | "what's the power nap"
+            | "whats the power nap"
+            | "what is the power nap"
+            | "what's the power nap status"
+            | "whats the power nap status"
+            | "what is the power nap status"
+            | "how's powernap"
+            | "hows powernap"
+            | "how's the powernap"
+            | "hows the powernap"
+            | "how's power nap"
+            | "hows power nap"
+            | "how's the power nap"
+            | "hows the power nap"
+            | "view powernap"
+            | "view the powernap"
+            | "view powernap status"
+            | "view the powernap status"
+            | "view power nap"
+            | "view the power nap"
+            | "view power nap status"
+            | "view the power nap status"
+            | "view power-nap"
+            | "view the power-nap"
+            | "see powernap"
+            | "see the powernap"
+            | "see powernap status"
+            | "see the powernap status"
+            | "see power nap"
+            | "see the power nap"
+            | "see power nap status"
+            | "see the power nap status"
+            | "open powernap"
+            | "open the powernap"
+            | "open powernap status"
+            | "open the powernap status"
+            | "open power nap"
+            | "open the power nap"
+            | "open power nap status"
+            | "open the power nap status"
+            | "open power-nap"
+            | "open the power-nap"
+            | "list powernap"
+            | "list the powernap"
+            | "list powernap status"
+            | "list the powernap status"
+            | "list power nap"
+            | "list the power nap"
+            | "list power nap status"
+            | "list the power nap status"
+    )
+}
+
+/// Zero-LLM Power Nap status from pmset Battery/AC (macOS-only; empty elsewhere).
+pub fn format_power_nap_report() -> String {
+    let v = crate::metrics::get_power_nap_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Power Nap** — _no Power Nap reading on this Mac right now._".to_string();
+    }
+    format!("**Power Nap** · `{v}`")
+}
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

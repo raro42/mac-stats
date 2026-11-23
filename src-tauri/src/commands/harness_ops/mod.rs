@@ -3838,6 +3838,83 @@ mod tests {
                 "/smb-guest must stay SMB Guest, not Screensaver: {reply}"
             );
         }
+        assert!(!looks_like_screensaver_idle_request("/powernap"));
+        assert!(!looks_like_screensaver_idle_request("view power nap"));
+    }
+
+    #[test]
+    fn power_nap_slash_and_view_open_do_not_steal_lpm_power_or_bare_nap() {
+        // Slash + view/open NL → Power Nap (`/lpm` · `/screensaver` parity).
+        // Bare `powernap` / `power nap` stay with the agent; `/lpm` stays Low Power Mode;
+        // `/power` stays the strip; `/watts` stays draw; `/screensaver` stays Screensaver idle.
+        assert!(looks_like_power_nap_request("/powernap"));
+        assert!(looks_like_power_nap_request("/power-nap"));
+        assert!(looks_like_power_nap_request("/powernap-status"));
+        assert!(looks_like_power_nap_request("/power-nap-status"));
+        assert!(looks_like_power_nap_request("/mac-powernap"));
+        assert!(looks_like_power_nap_request("/mac-power-nap"));
+        assert!(looks_like_power_nap_request("view power nap"));
+        assert!(looks_like_power_nap_request("open powernap"));
+        assert!(looks_like_power_nap_request("list power nap"));
+        assert!(looks_like_power_nap_request("power nap status"));
+        assert!(looks_like_power_nap_request("is power nap on"));
+        assert!(looks_like_power_nap_request("is powernap enabled"));
+        assert!(looks_like_power_nap_request("what's my power nap"));
+        assert!(looks_like_power_nap_request("view power-nap"));
+        assert!(!looks_like_power_nap_request("powernap"));
+        assert!(!looks_like_power_nap_request("power nap"));
+        assert!(!looks_like_power_nap_request("/lpm"));
+        assert!(!looks_like_power_nap_request("view lpm"));
+        assert!(!looks_like_power_nap_request("low power mode"));
+        assert!(!looks_like_power_nap_request("/power"));
+        assert!(!looks_like_power_nap_request("view power"));
+        assert!(!looks_like_power_nap_request("/watts"));
+        assert!(!looks_like_power_nap_request("/screensaver"));
+        assert!(!looks_like_power_nap_request("view screensaver"));
+        assert!(!looks_like_power_nap_request("/battery"));
+        assert!(!looks_like_power_nap_request("/tasks"));
+        assert!(!looks_like_power_nap_request("enable power nap"));
+        assert!(!looks_like_power_nap_request("wake for network"));
+        assert!(!looks_like_screensaver_idle_request("/powernap"));
+        assert!(!looks_like_screensaver_idle_request("view power nap"));
+        let s = try_operator_instant_reply("/powernap").unwrap();
+        assert!(
+            s.contains("**Power Nap**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view power nap").unwrap();
+        assert!(
+            viewed.contains("**Power Nap**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open powernap").unwrap();
+        assert!(
+            open.contains("**Power Nap**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("powernap").is_none());
+        assert!(try_operator_instant_reply("power nap").is_none());
+        let lpm = try_operator_instant_reply("/lpm");
+        if let Some(reply) = lpm {
+            assert!(
+                !reply.contains("**Power Nap**"),
+                "/lpm must stay Low Power Mode, not Power Nap: {reply}"
+            );
+        }
+        let ss = try_operator_instant_reply("/screensaver");
+        if let Some(reply) = ss {
+            assert!(
+                !reply.contains("**Power Nap**"),
+                "/screensaver must stay Screensaver, not Power Nap: {reply}"
+            );
+        }
+        let power = try_operator_instant_reply("/power");
+        if let Some(reply) = power {
+            assert!(
+                !reply.contains("**Power Nap**"),
+                "/power must stay strip, not Power Nap: {reply}"
+            );
+        }
     }
 
 #[test]
