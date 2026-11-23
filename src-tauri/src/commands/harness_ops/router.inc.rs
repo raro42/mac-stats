@@ -1208,6 +1208,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_disksleep_request(content) {
         return Some(format_disksleep_report());
     }
+    // Proximity Wake (bare `proximitywake` / `proximity wake` stay with the agent;
+    // `/womp` stays Wake for network; `/powernap` stays Power Nap; `/displaysleep` /
+    // `/disksleep` stay timers; system sleep / ttyskeepawake stay out).
+    if looks_like_proximitywake_request(content) {
+        return Some(format_proximitywake_report());
+    }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
     if looks_like_boot_time_request(content) {

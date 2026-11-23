@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3011] - 2026-11-23
+
+### Added
+- Instant Proximity Wake accepts `/proximitywake` · `/proximity-wake` · `/proximitywake-status` · `/proximity-wake-status` · `/proximitywake-state` · `/proximity-wake-state` · `/mac-proximitywake` · `/mac-proximity-wake` · `/mac-proximitywake-status` · `/mac-proximity-wake-status` and view/see/open/list NL (`view proximity wake`, `open proximitywake`, `list proximity wake`, …), matching “proximity wake status” / “is proximity wake on” / “is proximitywake enabled” / “what's my proximity wake” / “what's the proximitywake status”. Bare `proximitywake` / `proximity wake` stay with the agent; `/womp` · `/wake-for-network` stay Wake for network; `/powernap` · `/power-nap` stay Power Nap; `/displaysleep` · `/disksleep` stay sleep timers; system sleep / ttyskeepawake stay out. Operator `/help` lists the new lane.
+
 ## [0.1.3010] - 2026-11-23
 
 ### Added

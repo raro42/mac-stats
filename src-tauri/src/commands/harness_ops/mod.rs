@@ -4173,6 +4173,80 @@ mod tests {
         }
     }
 
+    #[test]
+    fn proximitywake_slash_and_view_open_do_not_steal_womp_or_bare() {
+        // Slash + view/open NL → Proximity Wake (`/womp` · `/powernap` parity).
+        // Bare `proximitywake` / `proximity wake` stay with the agent;
+        // `/womp` stays Wake for network; `/powernap` stays Power Nap;
+        // `/displaysleep` / `/disksleep` stay timers.
+        assert!(looks_like_proximitywake_request("/proximitywake"));
+        assert!(looks_like_proximitywake_request("/proximity-wake"));
+        assert!(looks_like_proximitywake_request("/proximitywake-status"));
+        assert!(looks_like_proximitywake_request("/mac-proximitywake"));
+        assert!(looks_like_proximitywake_request("/mac-proximity-wake"));
+        assert!(looks_like_proximitywake_request("view proximity wake"));
+        assert!(looks_like_proximitywake_request("open proximitywake"));
+        assert!(looks_like_proximitywake_request("list proximity wake"));
+        assert!(looks_like_proximitywake_request("proximity wake status"));
+        assert!(looks_like_proximitywake_request("is proximity wake on"));
+        assert!(looks_like_proximitywake_request("is proximitywake enabled"));
+        assert!(looks_like_proximitywake_request("what's my proximity wake"));
+        assert!(looks_like_proximitywake_request("view proximity-wake"));
+        assert!(!looks_like_proximitywake_request("proximitywake"));
+        assert!(!looks_like_proximitywake_request("proximity wake"));
+        assert!(!looks_like_proximitywake_request("/womp"));
+        assert!(!looks_like_proximitywake_request("view wake for network"));
+        assert!(!looks_like_proximitywake_request("/powernap"));
+        assert!(!looks_like_proximitywake_request("/displaysleep"));
+        assert!(!looks_like_proximitywake_request("/disksleep"));
+        assert!(!looks_like_proximitywake_request("/power"));
+        assert!(!looks_like_proximitywake_request("/tasks"));
+        assert!(!looks_like_proximitywake_request("enable proximity wake"));
+        assert!(!looks_like_wake_for_network_request("/proximitywake"));
+        assert!(!looks_like_wake_for_network_request("view proximity wake"));
+        assert!(!looks_like_power_nap_request("/proximitywake"));
+        assert!(!looks_like_displaysleep_request("/proximitywake"));
+        assert!(!looks_like_disksleep_request("/proximitywake"));
+        let s = try_operator_instant_reply("/proximitywake").unwrap();
+        assert!(
+            s.contains("**Proximity Wake**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view proximity wake").unwrap();
+        assert!(
+            viewed.contains("**Proximity Wake**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open proximitywake").unwrap();
+        assert!(
+            open.contains("**Proximity Wake**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("proximitywake").is_none());
+        assert!(try_operator_instant_reply("proximity wake").is_none());
+        let womp = try_operator_instant_reply("/womp");
+        if let Some(reply) = womp {
+            assert!(
+                !reply.contains("**Proximity Wake**"),
+                "/womp must stay Wake for network, not Proximity Wake: {reply}"
+            );
+        }
+        let nap = try_operator_instant_reply("/powernap");
+        if let Some(reply) = nap {
+            assert!(
+                !reply.contains("**Proximity Wake**"),
+                "/powernap must stay Power Nap, not Proximity Wake: {reply}"
+            );
+        }
+        let ds = try_operator_instant_reply("/disksleep");
+        if let Some(reply) = ds {
+            assert!(
+                !reply.contains("**Proximity Wake**"),
+                "/disksleep must stay Disk Sleep, not Proximity Wake: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

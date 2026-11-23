@@ -17733,6 +17733,9 @@ pub fn looks_like_wake_for_network_request(content: &str) -> bool {
         || n.contains("networkoversleep")
         || n.contains("ttyskeepawake")
         || n.contains("tcpkeepalive")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
         || n == "/lpm"
         || n == "/power"
         || n == "/watts"
@@ -17754,6 +17757,8 @@ pub fn looks_like_wake_for_network_request(content: &str) -> bool {
         || n == "/screen-lock"
         || n == "/lock-screen"
         || n == "/filevault"
+        || n == "/proximitywake"
+        || n == "/proximity-wake"
         || n == "/wifi"
         || n == "/ssid"
         || n == "/vpn"
@@ -18638,6 +18643,253 @@ pub fn format_disksleep_report() -> String {
         return "**Disk Sleep** — _no Disk Sleep reading on this Mac right now._".to_string();
     }
     format!("**Disk Sleep** · `{v}`")
+}
+
+/// Proximity Wake — `pmset` Battery/AC `proximitywake` (+ active fallback).
+/// Slash + view/open NL (`/proximitywake` · `/proximity-wake` · `view proximity wake`).
+/// Bare `proximitywake` / `proximity wake` stay with the agent;
+/// `/womp` stays Wake for network; `/powernap` stays Power Nap; `/displaysleep` /
+/// `/disksleep` stay timers; system sleep / ttyskeepawake stay out.
+pub fn looks_like_proximitywake_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("wake on network")
+        || n.contains("womp")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("hard disk sleep")
+        || n.contains("hdd sleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("ttys keep awake")
+        || n.contains("networkoversleep")
+        || n.contains("tcpkeepalive")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
+        || n == "/disksleep"
+        || n == "/disk-sleep"
+        || n == "/hard-disk-sleep"
+        || n == "/hdd-sleep"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "proximitywake"
+        || n == "the proximitywake"
+        || n == "proximity wake"
+        || n == "the proximity wake"
+        || n == "proximity-wake"
+        || n == "the proximity-wake"
+        || n == "proximity wake from devices"
+        || n == "the proximity wake from devices"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/proximitywake"
+            | "/proximity-wake"
+            | "/proximitywake-status"
+            | "/proximity-wake-status"
+            | "/proximitywake-state"
+            | "/proximity-wake-state"
+            | "/mac-proximitywake"
+            | "/mac-proximity-wake"
+            | "/mac-proximitywake-status"
+            | "/mac-proximity-wake-status"
+            | "proximitywake status"
+            | "the proximitywake status"
+            | "proximity wake status"
+            | "the proximity wake status"
+            | "proximity-wake status"
+            | "the proximity-wake status"
+            | "proximitywake state"
+            | "the proximitywake state"
+            | "proximity wake state"
+            | "the proximity wake state"
+            | "my proximitywake"
+            | "my proximitywake status"
+            | "my proximity wake"
+            | "my proximity wake status"
+            | "is proximitywake on"
+            | "is proximitywake off"
+            | "is proximitywake enabled"
+            | "is proximitywake disabled"
+            | "is proximity wake on"
+            | "is proximity wake off"
+            | "is proximity wake enabled"
+            | "is proximity wake disabled"
+            | "is proximity-wake on"
+            | "is proximity-wake enabled"
+            | "what's my proximitywake"
+            | "whats my proximitywake"
+            | "what is my proximitywake"
+            | "what's my proximitywake status"
+            | "whats my proximitywake status"
+            | "what is my proximitywake status"
+            | "what's my proximity wake"
+            | "whats my proximity wake"
+            | "what is my proximity wake"
+            | "what's my proximity wake status"
+            | "whats my proximity wake status"
+            | "what is my proximity wake status"
+            | "what's the proximitywake"
+            | "whats the proximitywake"
+            | "what is the proximitywake"
+            | "what's the proximitywake status"
+            | "whats the proximitywake status"
+            | "what is the proximitywake status"
+            | "what's the proximity wake"
+            | "whats the proximity wake"
+            | "what is the proximity wake"
+            | "what's the proximity wake status"
+            | "whats the proximity wake status"
+            | "what is the proximity wake status"
+            | "how's proximitywake"
+            | "hows proximitywake"
+            | "how's the proximitywake"
+            | "hows the proximitywake"
+            | "how's proximity wake"
+            | "hows proximity wake"
+            | "how's the proximity wake"
+            | "hows the proximity wake"
+            | "view proximitywake"
+            | "view the proximitywake"
+            | "view proximitywake status"
+            | "view the proximitywake status"
+            | "view proximity wake"
+            | "view the proximity wake"
+            | "view proximity wake status"
+            | "view the proximity wake status"
+            | "view proximity-wake"
+            | "view the proximity-wake"
+            | "see proximitywake"
+            | "see the proximitywake"
+            | "see proximitywake status"
+            | "see the proximitywake status"
+            | "see proximity wake"
+            | "see the proximity wake"
+            | "see proximity wake status"
+            | "see the proximity wake status"
+            | "open proximitywake"
+            | "open the proximitywake"
+            | "open proximitywake status"
+            | "open the proximitywake status"
+            | "open proximity wake"
+            | "open the proximity wake"
+            | "open proximity wake status"
+            | "open the proximity wake status"
+            | "open proximity-wake"
+            | "open the proximity-wake"
+            | "list proximitywake"
+            | "list the proximitywake"
+            | "list proximitywake status"
+            | "list the proximitywake status"
+            | "list proximity wake"
+            | "list the proximity wake"
+            | "list proximity wake status"
+            | "list the proximity wake status"
+            | "list proximity-wake"
+            | "list the proximity-wake"
+    )
+}
+
+/// Zero-LLM Proximity Wake status from pmset Battery/AC `proximitywake` (macOS-only; empty elsewhere).
+pub fn format_proximitywake_report() -> String {
+    let v = crate::metrics::get_proximitywake_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Proximity Wake** — _no Proximity Wake reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**Proximity Wake** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
