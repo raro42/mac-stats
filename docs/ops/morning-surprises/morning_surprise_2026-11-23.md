@@ -15,6 +15,7 @@ Overnight Track B shipped user-facing product work (not digester-empty).
 ## Tried / notes
 
 - Digester Slowest empty after noise filters; design-review polish-without-capture grace (Mac TCC) on monitors · disk-cleanup · cpu-metrics · processes · AI Chat · Agent Ops.
+- Parallel tick race on Monitors kb-hints: local WIP discarded after origin already shipped v0.1.2996.
 - Layout-daily Neon already marked for 2026-11-23; Futuristic waits for the next calendar quota.
 - cream/Swiss Send fill white-on-blue stays intentional (focus remaps already shipped).
 
