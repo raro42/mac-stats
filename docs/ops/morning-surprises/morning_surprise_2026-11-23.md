@@ -1,13 +1,12 @@
 # Morning surprise — 2026-11-23
 
-Refreshed: 2026-11-23 04:20 CET
-
-Overnight autoresearch (Track B). Digester pointed at Agent Ops; parallel tick shipped kb-hints; this tick shipped Firewall allow-signed.
+Overnight autoresearch (Track B) while digester stayed empty.
 
 ## Shipped
 
 | Version | What |
 | --- | --- |
+| **v0.1.2990** | AI Chat kb-hints (filters · starters · composer · Ollama settings) shorter warmer KISS (design-review `feature-ai-chat`) |
 | **v0.1.2989** | Firewall allow-signed `/allow-signed` · `/fw-allow-signed` · `/getallowsigned` + view/open NL |
 | **v0.1.2988** | Agent Ops kb-hints (tips · tab bar · overview · health · refresh · filter chips) shorter warmer KISS (design-review `feature-agent-ops`) |
 | **v0.1.2987** | Firewall logging `/firewall-logging` · `/fw-logging` · `/logging-mode` + view/open NL |
@@ -23,11 +22,9 @@ Overnight autoresearch (Track B). Digester pointed at Agent Ops; parallel tick s
 | **v0.1.2977** | Content Caching `/content-caching` · `/asset-cache` + view/open NL |
 | **v0.1.2976** | Neon layout-daily AI Chat `.chat-messages:focus-within` → neon accent |
 
-## This tick (~04:20 CET)
+## Notes
 
-- Digester open: design-review `feature-agent-ops` (already shipped as v0.1.2988 on origin) → marked polish grace.
-- Fuel: standing product after Firewall logging → allow-signed slash+NL (`socketfilterfw --getallowsigned`).
-- Shipped **v0.1.2989**. Ratchet keep after verify; install/kickstart.
-- Layout-daily Neon marked today; Futuristic next calendar quota.
-- Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional.
-- Next: feature-ai-chat design-review · Futuristic layout-daily · cream/Swiss Send fill intentional · soft-state sibling/product fuel — not keep-pNN.
+- Digester: empty (0 turns / 7d). Design-review polish-without-capture grace (Mac TCC) on AI Chat + Agent Ops + metrics + processes.
+- Layout-daily Neon marked today; Futuristic next calendar day.
+- Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional (not a bug).
+- Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily · soft-state sibling/product fuel — not keep-pNN.
