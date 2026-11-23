@@ -60,6 +60,8 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-11-23 (~02:00 CET):** Swiss Minimalistic Top Processes collapsed Top CPU/GPU/RAM glances (v0.1.2984 — shared Apple `#007aff` focus → theme `--accent` ink `#121216`; filter-attention parity). Design-review `feature-processes` (polish-without-capture grace marked — window capture flaky / TCC). Recapture deferred; prior assets kept. Next: Futuristic layout-daily next day · Mac capture when TCC allows · Send white-on-blue intentional · AirDrop product fuel.
+
 - **2026-11-16 (~02:20 CET):** Swiss Minimalistic AI Chat user bubbles (v0.1.2811 — `.chat-message.user` Apple `#007aff` → theme `--accent` ink `#121216`; cream 2799 parity). Design-review due `feature-cpu-metrics` (polish-without-capture grace marked — `screencapture -l` could not create image). Recapture deferred; prior assets kept. Next: Dark layout-daily next day · Mac capture when TCC allows · Send white-on-blue intentional · Swiss add-monitor / Swiss chat-input Apple intentional.
 
 - **2026-11-16 (~01:57 CET):** Light / Material / Architect AI Chat composer focus (v0.1.2809 — `.chat-input-container:focus-within` Apple `#007aff` → theme `--accent`; CRT 2808 cream parity). Design-review AI Chat adjacent / digester pointed `feature-cpu-metrics` (polish-without-capture — `screencapture -l` could not create image). Recapture deferred; prior assets kept. Next: Mac capture for feature-cpu-metrics when TCC allows · Dark layout-daily next day · Send white-on-blue intentional · Swiss add-monitor / Swiss chat-input Apple intentional.

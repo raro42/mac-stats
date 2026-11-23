@@ -1,12 +1,13 @@
 # Morning surprise — 2026-11-23
 
-Refreshed: 2026-11-23 01:52 CET
+Refreshed: 2026-11-23 02:00 CET
 
 ## Shipped this overnight window (keep)
 
 | Version | What |
 |---------|------|
-| **v0.1.2983** | DVD or CD Sharing `/dvd-sharing` · `/cd-sharing` · `/ods` + view/open NL |
+| **v0.1.2984** | Swiss Top Processes Top CPU/GPU/RAM glances → theme ink focus (design-review) |
+| **v0.1.2983** | DVD/CD Sharing `/dvd-sharing` · `/cd-sharing` · `/ods` + view/open NL |
 | **v0.1.2982** | AirPlay Receiver `/airplay` · `/airplay-receiver` · `/mac-airplay` + view/open NL |
 | **v0.1.2981** | Remote Apple Events `/remote-apple-events` · `/rae` · `/eppc` + view/open NL |
 | **v0.1.2980** | Media Sharing `/media-sharing` · `/home-sharing` · `/itunes-sharing` + view/open NL |
@@ -15,16 +16,11 @@ Refreshed: 2026-11-23 01:52 CET
 | **v0.1.2977** | Content Caching `/content-caching` · `/asset-cache` · `/mac-content-caching` + view/open NL |
 | **v0.1.2976** | Neon layout-daily: AI Chat `.chat-messages:focus-within` → neon `--accent` on `#08120c` |
 | **v0.1.2975** | Remote Management (ARD) `/remote-management` · `/ard` · `/apple-remote-desktop` + view/open NL |
-| **v0.1.2974** | Printer Sharing `/printer-sharing` · `/share-printers` · `/cups-share` + view/open NL |
-| **v0.1.2973** | File Sharing (SMB) `/file-sharing` · `/smb` + view/open NL |
-| **v0.1.2972** | Screen Sharing `/screen-sharing` · `/vnc` + view/open NL |
-| **v0.1.2971** | Remote Login `/remote-login` · `/ssh` + view/open NL |
-| **v0.1.2970** | Time Machine `/timemachine` · `/tm` + view/open NL |
-| **v0.1.2969**–**2960** | Firewall stealth → GPU identity slash+NL family (earlier tonight) |
+| **v0.1.2974**–**2960** | Printer Sharing → GPU identity slash+NL family (earlier tonight) |
 
-## This tick (~01:52 CET)
+## This tick (~02:00 CET)
 
-- Digester open empty; design-review due=false; layout-daily Neon already done (marked today); Futuristic next calendar quota.
-- Shipped DVD/CD Sharing (ODSAgent) slash+NL as **v0.1.2983**; backfilled keep for **v0.1.2982**.
+- Digester open: design-review `feature-processes` (STALE). Layout-daily Neon already done; Futuristic next calendar quota.
+- Pulled origin past DVD/CD Sharing v0.1.2983; shipped Swiss Top Processes glance focus as **v0.1.2984** (polish-without-capture; grace marked).
 - Cream/Swiss Send fill white-on-blue left intentional.
-- Next: Futuristic layout-daily · cream/Swiss Send fill intentional · soft-state sibling/product fuel — not keep-pNN.
+- Next: Futuristic layout-daily · cream/Swiss Send fill intentional · AirDrop product fuel — not keep-pNN.

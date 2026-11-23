@@ -1,3 +1,11 @@
+## Overnight note 2026-11-23 ~02:00
+- Shipped v0.1.2984 Swiss Top Processes glances focus → ink `#121216` (design-review feature-processes polish-without-capture); bare Send fill intentional; Futuristic layout-daily next calendar quota.
+- Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Futuristic layout-daily next calendar quota.
+
+## Overnight merge — v0.1.2984
+
+- Design-review fuel after DVD/CD Sharing `/dvd-sharing` NL v0.1.2983: Swiss Minimalistic collapsed Top CPU / GPU / RAM glances still inherited shared Apple `#007aff` focus fallback while Swiss already remapped `.processes-filter-attention-glance` · `.processes-hot-attention-glance` onto ink `#121216` and cream Light / Material / Architect already remapped top glances. Digester open design-review; layout-daily Neon marked today (Futuristic due next calendar quota). Recapture deferred (Mac TCC / window capture flaky); polish grace marked. Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · AirDrop / soft-state sibling/product fuel — Swiss top-glance focus closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~01:52
 - Shipped v0.1.2983 DVD/CD Sharing `/dvd-sharing` · `/cd-sharing` · `/ods` + view/open NL; bare dvd/cd/ods stay with agent; `/media-sharing` · `/airplay` · `/smb` · `/vnc` intact.
 - Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Futuristic layout-daily next calendar quota.
