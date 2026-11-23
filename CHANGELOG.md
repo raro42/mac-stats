@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3008] - 2026-11-23
+
+### Added
+- Instant Wake for network accepts `/womp` · `/womp-status` · `/womp-state` · `/wake-for-network` · `/wake-for-network-status` · `/wake-for-network-state` · `/wake-on-lan` · `/wake-on-lan-status` · `/wake-on-lan-state` · `/wake-on-network` · `/wake-on-network-status` · `/wol` · `/wol-status` · `/wol-state` · `/mac-womp` · `/mac-womp-status` · `/mac-wake-for-network` · `/mac-wake-on-lan` · `/mac-wol` and view/see/open/list NL (`view wake for network`, `open womp`, `list wake on lan`, …), matching “womp status” / “is wake for network on” / “is womp enabled” / “what's my womp” / “what's the wake for network status”. Bare `womp` / `wake for network` / `wake on lan` / `wol` stay with the agent; `/powernap` · `/power-nap` stay Power Nap; `/lpm` stays Low Power Mode; `/power` stays the strip; `/wifi` stays SSID; `/vpn` stays VPN. Operator `/help` lists the new lane.
+
 ## [0.1.3007] - 2026-11-23
 
 ### Added

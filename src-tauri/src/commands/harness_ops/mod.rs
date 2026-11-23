@@ -3917,6 +3917,84 @@ mod tests {
         }
     }
 
+    #[test]
+    fn wake_for_network_slash_and_view_open_do_not_steal_powernap_wifi_or_bare_womp() {
+        // Slash + view/open NL → Wake for network (`/powernap` · `/wifi` parity).
+        // Bare `womp` / `wake for network` / `wake on lan` / `wol` stay with the agent;
+        // `/powernap` stays Power Nap; `/lpm` stays Low Power Mode; `/power` stays the strip;
+        // `/wifi` stays SSID; `/vpn` stays VPN.
+        assert!(looks_like_wake_for_network_request("/womp"));
+        assert!(looks_like_wake_for_network_request("/womp-status"));
+        assert!(looks_like_wake_for_network_request("/wake-for-network"));
+        assert!(looks_like_wake_for_network_request("/wake-on-lan"));
+        assert!(looks_like_wake_for_network_request("/wol"));
+        assert!(looks_like_wake_for_network_request("/mac-womp"));
+        assert!(looks_like_wake_for_network_request("/mac-wake-for-network"));
+        assert!(looks_like_wake_for_network_request("view wake for network"));
+        assert!(looks_like_wake_for_network_request("open womp"));
+        assert!(looks_like_wake_for_network_request("list wake on lan"));
+        assert!(looks_like_wake_for_network_request("womp status"));
+        assert!(looks_like_wake_for_network_request("is wake for network on"));
+        assert!(looks_like_wake_for_network_request("is womp enabled"));
+        assert!(looks_like_wake_for_network_request("what's my womp"));
+        assert!(looks_like_wake_for_network_request("view wake-on-lan"));
+        assert!(!looks_like_wake_for_network_request("womp"));
+        assert!(!looks_like_wake_for_network_request("wake for network"));
+        assert!(!looks_like_wake_for_network_request("wake on lan"));
+        assert!(!looks_like_wake_for_network_request("wol"));
+        assert!(!looks_like_wake_for_network_request("/powernap"));
+        assert!(!looks_like_wake_for_network_request("view power nap"));
+        assert!(!looks_like_wake_for_network_request("/lpm"));
+        assert!(!looks_like_wake_for_network_request("/power"));
+        assert!(!looks_like_wake_for_network_request("/wifi"));
+        assert!(!looks_like_wake_for_network_request("/vpn"));
+        assert!(!looks_like_wake_for_network_request("/tasks"));
+        assert!(!looks_like_wake_for_network_request("enable womp"));
+        assert!(!looks_like_power_nap_request("/womp"));
+        assert!(!looks_like_power_nap_request("view wake for network"));
+        let s = try_operator_instant_reply("/womp").unwrap();
+        assert!(
+            s.contains("**Wake for network**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view wake for network").unwrap();
+        assert!(
+            viewed.contains("**Wake for network**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open womp").unwrap();
+        assert!(
+            open.contains("**Wake for network**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("womp").is_none());
+        assert!(try_operator_instant_reply("wake for network").is_none());
+        assert!(try_operator_instant_reply("wake on lan").is_none());
+        assert!(try_operator_instant_reply("wol").is_none());
+        let nap = try_operator_instant_reply("/powernap");
+        if let Some(reply) = nap {
+            assert!(
+                !reply.contains("**Wake for network**"),
+                "/powernap must stay Power Nap, not Wake for network: {reply}"
+            );
+        }
+        let wifi = try_operator_instant_reply("/wifi");
+        if let Some(reply) = wifi {
+            assert!(
+                !reply.contains("**Wake for network**"),
+                "/wifi must stay SSID, not Wake for network: {reply}"
+            );
+        }
+        let power = try_operator_instant_reply("/power");
+        if let Some(reply) = power {
+            assert!(
+                !reply.contains("**Wake for network**"),
+                "/power must stay strip, not Wake for network: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

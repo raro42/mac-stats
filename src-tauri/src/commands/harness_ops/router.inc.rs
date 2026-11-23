@@ -1190,6 +1190,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_power_nap_request(content) {
         return Some(format_power_nap_report());
     }
+    // Wake for network / womp (bare `womp` / `wake for network` / `wake on lan` / `wol` stay with
+    // the agent; `/powernap` stays Power Nap; `/lpm` stays Low Power Mode; `/power` stays the strip;
+    // `/wifi` stays SSID; `/vpn` stays VPN).
+    if looks_like_wake_for_network_request(content) {
+        return Some(format_wake_for_network_report());
+    }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
     if looks_like_boot_time_request(content) {

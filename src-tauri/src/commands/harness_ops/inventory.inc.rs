@@ -17443,7 +17443,7 @@ pub fn format_screensaver_idle_report() -> String {
 /// Slash + view/open NL (`/powernap` · `/power-nap` · `view power nap`).
 /// Bare `powernap` / `power nap` stay with the agent; `/lpm` stays Low Power Mode;
 /// `/power` stays the strip; `/watts` stays draw; `/screensaver` stays Screensaver idle;
-/// Wake for network stays with the agent (next soft-state).
+/// Wake for network `/womp` · `/wake-for-network` stays its own lane.
 pub fn looks_like_power_nap_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 64 {
@@ -17641,6 +17641,355 @@ pub fn format_power_nap_report() -> String {
         return "**Power Nap** — _no Power Nap reading on this Mac right now._".to_string();
     }
     format!("**Power Nap** · `{v}`")
+}
+
+/// Wake for network access — `pmset` Battery/AC `womp` (+ active fallback).
+/// Slash + view/open NL (`/womp` · `/wake-for-network` · `view wake for network`).
+/// Bare `womp` / `wake for network` / `wake on lan` / `wol` stay with the agent;
+/// `/powernap` stays Power Nap; `/lpm` stays Low Power Mode; `/power` stays the strip;
+/// `/wifi` stays SSID; `/vpn` stays VPN.
+pub fn looks_like_wake_for_network_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n.contains("networkoversleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("tcpkeepalive")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "womp"
+        || n == "the womp"
+        || n == "wol"
+        || n == "the wol"
+        || n == "wake on lan"
+        || n == "the wake on lan"
+        || n == "wake-on-lan"
+        || n == "the wake-on-lan"
+        || n == "wake on network"
+        || n == "the wake on network"
+        || n == "wake-on-network"
+        || n == "the wake-on-network"
+        || n == "wake for network"
+        || n == "the wake for network"
+        || n == "wake-for-network"
+        || n == "the wake-for-network"
+        || n == "wake for network access"
+        || n == "the wake for network access"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/womp"
+            | "/womp-status"
+            | "/womp-state"
+            | "/wake-for-network"
+            | "/wake-for-network-status"
+            | "/wake-for-network-state"
+            | "/wake-on-lan"
+            | "/wake-on-lan-status"
+            | "/wake-on-lan-state"
+            | "/wake-on-network"
+            | "/wake-on-network-status"
+            | "/wol"
+            | "/wol-status"
+            | "/wol-state"
+            | "/mac-womp"
+            | "/mac-womp-status"
+            | "/mac-wake-for-network"
+            | "/mac-wake-on-lan"
+            | "/mac-wol"
+            | "womp status"
+            | "the womp status"
+            | "womp state"
+            | "the womp state"
+            | "my womp"
+            | "my womp status"
+            | "is womp on"
+            | "is womp off"
+            | "is womp enabled"
+            | "is womp disabled"
+            | "what's my womp"
+            | "whats my womp"
+            | "what is my womp"
+            | "what's my womp status"
+            | "whats my womp status"
+            | "what is my womp status"
+            | "what's the womp"
+            | "whats the womp"
+            | "what is the womp"
+            | "what's the womp status"
+            | "whats the womp status"
+            | "what is the womp status"
+            | "how's womp"
+            | "hows womp"
+            | "how's the womp"
+            | "hows the womp"
+            | "view womp"
+            | "view the womp"
+            | "view womp status"
+            | "view the womp status"
+            | "see womp"
+            | "see the womp"
+            | "see womp status"
+            | "see the womp status"
+            | "open womp"
+            | "open the womp"
+            | "open womp status"
+            | "open the womp status"
+            | "list womp"
+            | "list the womp"
+            | "list womp status"
+            | "list the womp status"
+            | "wake for network status"
+            | "the wake for network status"
+            | "wake-for-network status"
+            | "the wake-for-network status"
+            | "wake for network state"
+            | "the wake for network state"
+            | "wake for network access status"
+            | "the wake for network access status"
+            | "my wake for network"
+            | "my wake for network status"
+            | "my wake-for-network"
+            | "is wake for network on"
+            | "is wake for network off"
+            | "is wake for network enabled"
+            | "is wake for network disabled"
+            | "is wake-for-network on"
+            | "is wake-for-network enabled"
+            | "is wake for network access on"
+            | "is wake for network access enabled"
+            | "what's my wake for network"
+            | "whats my wake for network"
+            | "what is my wake for network"
+            | "what's my wake for network status"
+            | "whats my wake for network status"
+            | "what is my wake for network status"
+            | "what's the wake for network"
+            | "whats the wake for network"
+            | "what is the wake for network"
+            | "what's the wake for network status"
+            | "whats the wake for network status"
+            | "what is the wake for network status"
+            | "how's wake for network"
+            | "hows wake for network"
+            | "how's the wake for network"
+            | "hows the wake for network"
+            | "view wake for network"
+            | "view the wake for network"
+            | "view wake for network status"
+            | "view the wake for network status"
+            | "view wake-for-network"
+            | "view the wake-for-network"
+            | "view wake for network access"
+            | "view the wake for network access"
+            | "see wake for network"
+            | "see the wake for network"
+            | "see wake for network status"
+            | "see the wake for network status"
+            | "see wake-for-network"
+            | "see the wake-for-network"
+            | "open wake for network"
+            | "open the wake for network"
+            | "open wake for network status"
+            | "open the wake for network status"
+            | "open wake-for-network"
+            | "open the wake-for-network"
+            | "list wake for network"
+            | "list the wake for network"
+            | "list wake for network status"
+            | "list the wake for network status"
+            | "list wake-for-network"
+            | "list the wake-for-network"
+            | "wake on lan status"
+            | "the wake on lan status"
+            | "wake-on-lan status"
+            | "the wake-on-lan status"
+            | "wake on lan state"
+            | "the wake on lan state"
+            | "my wake on lan"
+            | "my wake on lan status"
+            | "is wake on lan on"
+            | "is wake on lan off"
+            | "is wake on lan enabled"
+            | "is wake on lan disabled"
+            | "is wake-on-lan on"
+            | "is wake-on-lan enabled"
+            | "what's my wake on lan"
+            | "whats my wake on lan"
+            | "what is my wake on lan"
+            | "what's my wake on lan status"
+            | "whats my wake on lan status"
+            | "what is my wake on lan status"
+            | "what's the wake on lan"
+            | "whats the wake on lan"
+            | "what is the wake on lan"
+            | "what's the wake on lan status"
+            | "whats the wake on lan status"
+            | "what is the wake on lan status"
+            | "view wake on lan"
+            | "view the wake on lan"
+            | "view wake on lan status"
+            | "view the wake on lan status"
+            | "view wake-on-lan"
+            | "view the wake-on-lan"
+            | "see wake on lan"
+            | "see the wake on lan"
+            | "see wake on lan status"
+            | "see the wake on lan status"
+            | "open wake on lan"
+            | "open the wake on lan"
+            | "open wake on lan status"
+            | "open the wake on lan status"
+            | "open wake-on-lan"
+            | "open the wake-on-lan"
+            | "list wake on lan"
+            | "list the wake on lan"
+            | "list wake on lan status"
+            | "list the wake on lan status"
+            | "wol status"
+            | "the wol status"
+            | "wol state"
+            | "the wol state"
+            | "my wol"
+            | "my wol status"
+            | "is wol on"
+            | "is wol off"
+            | "is wol enabled"
+            | "is wol disabled"
+            | "what's my wol"
+            | "whats my wol"
+            | "what is my wol"
+            | "what's my wol status"
+            | "whats my wol status"
+            | "what is my wol status"
+            | "what's the wol"
+            | "whats the wol"
+            | "what is the wol"
+            | "what's the wol status"
+            | "whats the wol status"
+            | "what is the wol status"
+            | "view wol"
+            | "view the wol"
+            | "view wol status"
+            | "view the wol status"
+            | "see wol"
+            | "see the wol"
+            | "see wol status"
+            | "see the wol status"
+            | "open wol"
+            | "open the wol"
+            | "open wol status"
+            | "open the wol status"
+            | "list wol"
+            | "list the wol"
+            | "list wol status"
+            | "list the wol status"
+            | "wake on network status"
+            | "the wake on network status"
+            | "wake-on-network status"
+            | "the wake-on-network status"
+            | "is wake on network on"
+            | "is wake on network enabled"
+            | "is wake-on-network on"
+            | "is wake-on-network enabled"
+            | "view wake on network"
+            | "view the wake on network"
+            | "view wake-on-network"
+            | "view the wake-on-network"
+            | "see wake on network"
+            | "see the wake on network"
+            | "open wake on network"
+            | "open the wake on network"
+            | "open wake-on-network"
+            | "open the wake-on-network"
+            | "list wake on network"
+            | "list the wake on network"
+            | "list wake-on-network"
+            | "list the wake-on-network"
+    )
+}
+
+/// Zero-LLM Wake for network status from pmset Battery/AC `womp` (macOS-only; empty elsewhere).
+pub fn format_wake_for_network_report() -> String {
+    let v = crate::metrics::get_wake_for_network_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Wake for network** — _no Wake for network reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**Wake for network** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
