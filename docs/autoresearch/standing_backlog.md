@@ -1,3 +1,19 @@
+## Overnight note 2026-11-23 ~23:12
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Sibling: OpenClaw/Hermes missing on rack.
+- Debug.log: soul/idle clusters only (not product ERROR/panic).
+- Fuel: product after Display Sleep v0.1.3009 — Disk Sleep / disksleep slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.3010** — `/disksleep` · `/disk-sleep` · `/hard-disk-sleep` · `/hdd-sleep` · `/mac-disksleep` + view/open NL; bare disksleep/disk sleep/hard disk sleep/hdd sleep stay with agent; `/displaysleep` · `/screensaver` · Disk Cleanup · `/ssd` · `/free` intact; `/help` lists lane.
+- Ratchet keep @ bbe1a97 for 3010; install/kickstart (Rust).
+- Morning surprise: refresh 2026-11-23 + archive.
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (proximitywake / system sleep / ttyskeepawake) — Disk Sleep slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3010
+
+- Product fuel after Display Sleep v0.1.3009: Disk Sleep already readable via `pmset -g custom` Battery/AC `disksleep` minutes (+ active `pmset -g`; 0 = Never) but lacked `/disksleep` · `/disk-sleep` · `/hard-disk-sleep` · `/hdd-sleep` · `/mac-disksleep` and view/see/open/list phrases while Display Sleep `/displaysleep`, Screensaver `/screensaver`, and Disk Cleanup `/disk` already had slash+NL. Bare `disksleep` / `disk sleep` / `hard disk sleep` / `hdd sleep` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (proximitywake / system sleep / ttyskeepawake) — Disk Sleep slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~23:05
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
