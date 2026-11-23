@@ -1,3 +1,16 @@
+## Overnight note 2026-11-23 ~04:55
+- Digester open: empty (0 turns / 7d); design-review recommended **feature-processes** (101d stale).
+- Design review due=true → polish Top Processes kb-hints; Mac TCC — polish-without-capture grace marked.
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Fuel: design-review processes kb-hint copy (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.2992** — shorter warmer All · Pinned · Hot chips · process list · Process Details header/name/PID · Force Quit.
+- Ratchet keep after verify; sync-dist (UI JS + theme seeds); backfill 2991 keep.
+- Next fuel: feature-cpu-metrics design-review (grace expired) · cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — feature-processes kb-hint copy closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.2992
+
+- Design-review fuel after AI Chat filter-chip kb-hint v0.1.2991: Top Processes All · Pinned · Hot chips · process list · Process Details header/name/PID · Force Quit still used long cold “Tab or click … / crosses to …” copy while Agent Ops · AI Chat · metrics rings already shipped shorter warmer KISS lines. Shortened process hints to match. Digester empty; layout-daily Neon marked today (Futuristic due next calendar quota). Recapture deferred (Mac TCC); polish grace marked. Next: feature-cpu-metrics design-review (grace expired) · cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — Top Processes kb-hint copy closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~04:45
 - Digester open: design-review `feature-ai-chat` (100.7d stale).
 - Design review due=true → polish AI Chat filter-chip kb-hint; Mac TCC — polish-without-capture grace marked.
