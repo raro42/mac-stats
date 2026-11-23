@@ -1,3 +1,15 @@
+## Overnight note 2026-11-23 ~04:20
+- Digester open: design-review `feature-agent-ops` already shipped as v0.1.2988 → polish grace marked (`due=false`).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Fuel: product after Firewall logging v0.1.2987 — allow-signed slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.2989** — `/allow-signed` · `/fw-allow-signed` · `/getallowsigned` · `/mac-allow-signed` + view/open NL; bare allow signed/signed stay with agent; `/firewall` · `/stealth` · `/firewall-logging` intact.
+- Ratchet keep after verify; install/kickstart (Rust).
+- Next fuel: feature-ai-chat design-review · cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — not another keep-pNN clone.
+
+## Overnight merge — v0.1.2989
+
+- Product fuel after Agent Ops kb-hints v0.1.2988 (design-review grace): Application Firewall allow-signed already readable via `socketfilterfw --getallowsigned` but lacked `/allow-signed` · `/allowsigned` · `/allow-signed-status` · `/allow-signed-apps` · `/allow-signed-software` · `/fw-allow-signed` · `/afw-allow-signed` · `/firewall-allow-signed` · `/getallowsigned` · `/mac-allow-signed` · `/mac-fw-allow-signed` and view/see/open/list phrases while Firewall `/firewall`, stealth `/stealth`, and logging `/firewall-logging` already had slash+NL. Bare `allow signed` / `signed` / `signed software` / `signed apps` stay with the agent. Digester design-review closed via grace; layout-daily Neon marked today (Futuristic due next calendar quota). Next: feature-ai-chat design-review · cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — allow-signed slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~04:10
 - Digester open: design-review `feature-agent-ops` (68d stale).
 - Design review due=true → polish Agent Ops kb-hints; Mac TCC — polish-without-capture grace marked.
