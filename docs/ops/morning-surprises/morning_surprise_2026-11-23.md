@@ -1,20 +1,27 @@
-# Morning surprise 2026-11-23
+# Morning surprise — 2026-11-23
 
-Overnight autoresearch (Track B) — product keeps for Ralf.
+Overnight autoresearch kept shipping soft-state instant lanes after digester stayed empty.
 
 ## Shipped tonight
-- **v0.1.3011** — Proximity Wake `/proximitywake` · `/proximity-wake` · `/mac-proximitywake` + view/open NL (`pmset` Battery/AC `proximitywake`; bare phrases stay with agent; `/womp` · `/powernap` · `/displaysleep` · `/disksleep` intact)
+- **v0.1.3012** — TTY keep awake `/ttyskeepawake` · `/tty-keep-awake` · `/ttys-keep-awake` · `/ttykeepawake` · `/mac-ttyskeepawake` + view/open NL (`pmset` Battery/AC `ttyskeepawake`; bare phrases stay with agent; `/proximitywake` · `/womp` · `/powernap` · `/displaysleep` · `/disksleep` intact)
+- **v0.1.3011** — Proximity Wake `/proximitywake` · `/proximity-wake` · `/mac-proximitywake` + view/open NL
 - **v0.1.3010** — Disk Sleep `/disksleep` · `/disk-sleep` · `/hard-disk-sleep` · `/hdd-sleep` · `/mac-disksleep` + view/open NL
 - **v0.1.3009** — Display Sleep `/displaysleep` · `/display-sleep` · `/screen-sleep` · `/mac-displaysleep` + view/open NL
-- **v0.1.3008** — Wake for network `/womp` · `/wake-for-network` · `/wake-on-lan` · `/wol` · `/mac-womp` + view/open NL
+- **v0.1.3008** — Wake for network `/womp` · `/wake-for-network` · `/wfon` · `/mac-womp` + view/open NL
 - **v0.1.3007** — Power Nap `/powernap` · `/power-nap` · `/mac-powernap` + view/open NL
-- Earlier in window: Screensaver idle, SMB Guest, Screen Lock, Automatic Login, Guest Account help, Settings kb-hints, …
+- **v0.1.3006** — Screensaver idle `/screensaver` · `/idle-time` · `/mac-screensaver` + view/open NL
+- **v0.1.3005** — SMB Guest Access `/smb-guest` · `/guest-access` + view/open NL
+- **v0.1.3004** — Screen Lock `/screen-lock` · `/lock-screen` + view/open NL
+- **v0.1.3003** — Automatic Login `/autologin` · `/auto-login` + view/open NL
+- Earlier in the window: Guest Account, firewall listapps, Perplexity/Logs · Settings kb-hints, design-review Monitors/Disk Cleanup polish
 
-## Context
-- Digester empty; design-review grace (Mac TCC polish-without-capture); layout-daily Neon marked (Futuristic next calendar day).
-- Sibling OpenClaw/Hermes missing on rack.
+## Tried / context
+- Digester open empty all night; design-review surfaces in polish grace (Mac TCC — no fresh captures)
+- Layout-daily Neon already marked for 2026-11-23 (Futuristic next calendar day)
+- cream/Swiss Send fill white-on-blue left intentional
+- ~23:33 tick: proximitywake already on origin as v0.1.3011; shipped ttyskeepawake as v0.1.3012 instead
 
 ## Next fuel
-- cream/Swiss Send fill white-on-blue intentional
-- Futuristic layout-daily next calendar day
-- soft-state sibling/product (system sleep / ttyskeepawake) — not keep-pNN clones
+- Futuristic layout-daily when the calendar quota opens
+- cream/Swiss Send fill intentional (leave alone unless contrast regresses)
+- soft-state sibling/product (system sleep) — TTY keep awake / proximitywake slash NL closed; not keep-pNN clones
