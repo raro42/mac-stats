@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2983] - 2026-11-23
+
+### Added
+- Instant DVD or CD Sharing status accepts `/dvd-sharing` · `/dvdsharing` · `/dvd-sharing-status` · `/dvd-share` · `/cd-sharing` · `/cdsharing` · `/cd-share` · `/dvd-cd-sharing` · `/dvd-or-cd-sharing` · `/optical-sharing` · `/optical-disk-sharing` · `/ods` · `/ods-status` · `/ods-state` · `/odsagent` · `/ods-agent` · `/mac-dvd-sharing` · `/mac-cd-sharing` · `/mac-ods` · `/mac-optical-sharing` and view/see/open/list NL (`view dvd sharing`, `open cd sharing status`, `list ods`, …), matching “dvd sharing status” / “is dvd sharing on” / “is cd sharing enabled” / “is ods enabled” / “what's my dvd sharing” / “what's the ods status”. Bare `dvd` / `cd` / `dvd sharing` / `cd sharing` / `ods` stay with the agent; `/media-sharing` · `/home-sharing` stay Media Sharing; `/airplay` · `/airplay-receiver` stay AirPlay Receiver; `/file-sharing` · `/smb` stay File Sharing; `/screen-sharing` · `/vnc` stay Screen Sharing.
+
 ## [0.1.2982] - 2026-11-23
 
 ### Added

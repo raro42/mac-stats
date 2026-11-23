@@ -2985,6 +2985,92 @@ mod tests {
                 "/rae must stay Remote Apple Events, not AirPlay Receiver: {reply}"
             );
         }
+        assert!(!looks_like_airplay_receiver_request("/dvd-sharing"));
+        assert!(!looks_like_airplay_receiver_request("/ods"));
+        assert!(!looks_like_airplay_receiver_request("view dvd sharing"));
+    }
+
+    #[test]
+    fn dvd_cd_sharing_slash_and_view_open_do_not_steal_media_airplay_or_bare_dvd() {
+        // Slash + view/open NL → DVD or CD Sharing (`/airplay` · `/media-sharing` parity).
+        // Bare `dvd` / `cd` / `dvd sharing` / `ods` stay with the agent; `/airplay` stays AirPlay;
+        // `/media-sharing` stays Media Sharing; `/smb` stays File Sharing; `/vnc` stays Screen Sharing.
+        assert!(looks_like_dvd_cd_sharing_request("/dvd-sharing"));
+        assert!(looks_like_dvd_cd_sharing_request("/dvdsharing"));
+        assert!(looks_like_dvd_cd_sharing_request("/dvd-sharing-status"));
+        assert!(looks_like_dvd_cd_sharing_request("/dvd-share"));
+        assert!(looks_like_dvd_cd_sharing_request("/cd-sharing"));
+        assert!(looks_like_dvd_cd_sharing_request("/cdsharing"));
+        assert!(looks_like_dvd_cd_sharing_request("/cd-share"));
+        assert!(looks_like_dvd_cd_sharing_request("/dvd-cd-sharing"));
+        assert!(looks_like_dvd_cd_sharing_request("/optical-sharing"));
+        assert!(looks_like_dvd_cd_sharing_request("/ods"));
+        assert!(looks_like_dvd_cd_sharing_request("/ods-status"));
+        assert!(looks_like_dvd_cd_sharing_request("/odsagent"));
+        assert!(looks_like_dvd_cd_sharing_request("/mac-dvd-sharing"));
+        assert!(looks_like_dvd_cd_sharing_request("/mac-ods"));
+        assert!(looks_like_dvd_cd_sharing_request("view dvd sharing"));
+        assert!(looks_like_dvd_cd_sharing_request("open cd sharing status"));
+        assert!(looks_like_dvd_cd_sharing_request("list ods"));
+        assert!(looks_like_dvd_cd_sharing_request("dvd sharing status"));
+        assert!(looks_like_dvd_cd_sharing_request("is dvd sharing on"));
+        assert!(looks_like_dvd_cd_sharing_request("is cd sharing enabled"));
+        assert!(looks_like_dvd_cd_sharing_request("is ods enabled"));
+        assert!(looks_like_dvd_cd_sharing_request("what's my dvd sharing"));
+        assert!(looks_like_dvd_cd_sharing_request("view optical sharing"));
+        assert!(!looks_like_dvd_cd_sharing_request("dvd"));
+        assert!(!looks_like_dvd_cd_sharing_request("cd"));
+        assert!(!looks_like_dvd_cd_sharing_request("dvd sharing"));
+        assert!(!looks_like_dvd_cd_sharing_request("cd sharing"));
+        assert!(!looks_like_dvd_cd_sharing_request("ods"));
+        assert!(!looks_like_dvd_cd_sharing_request("/media-sharing"));
+        assert!(!looks_like_dvd_cd_sharing_request("/home-sharing"));
+        assert!(!looks_like_dvd_cd_sharing_request("/airplay"));
+        assert!(!looks_like_dvd_cd_sharing_request("/airplay-receiver"));
+        assert!(!looks_like_dvd_cd_sharing_request("/file-sharing"));
+        assert!(!looks_like_dvd_cd_sharing_request("/smb"));
+        assert!(!looks_like_dvd_cd_sharing_request("/screen-sharing"));
+        assert!(!looks_like_dvd_cd_sharing_request("/vnc"));
+        assert!(!looks_like_dvd_cd_sharing_request("/tasks"));
+        assert!(!looks_like_dvd_cd_sharing_request("enable dvd sharing"));
+        assert!(!looks_like_airplay_receiver_request("/dvd-sharing"));
+        assert!(!looks_like_airplay_receiver_request("view dvd sharing"));
+        assert!(!looks_like_media_sharing_request("/dvd-sharing"));
+        assert!(!looks_like_media_sharing_request("view cd sharing"));
+        let dvd = try_operator_instant_reply("/dvd-sharing").unwrap();
+        assert!(
+            dvd.contains("**DVD or CD Sharing**") && !dvd.to_lowercase().contains("execution"),
+            "got: {dvd}"
+        );
+        let viewed = try_operator_instant_reply("view dvd sharing").unwrap();
+        assert!(
+            viewed.contains("**DVD or CD Sharing**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let ods = try_operator_instant_reply("/ods").unwrap();
+        assert!(
+            ods.contains("**DVD or CD Sharing**") && !ods.to_lowercase().contains("execution"),
+            "got: {ods}"
+        );
+        assert!(try_operator_instant_reply("dvd").is_none());
+        assert!(try_operator_instant_reply("cd").is_none());
+        assert!(try_operator_instant_reply("dvd sharing").is_none());
+        assert!(try_operator_instant_reply("ods").is_none());
+        let ap = try_operator_instant_reply("/airplay");
+        if let Some(reply) = ap {
+            assert!(
+                !reply.contains("**DVD or CD Sharing**"),
+                "/airplay must stay AirPlay Receiver, not DVD/CD Sharing: {reply}"
+            );
+        }
+        let ms = try_operator_instant_reply("/media-sharing");
+        if let Some(reply) = ms {
+            assert!(
+                !reply.contains("**DVD or CD Sharing**"),
+                "/media-sharing must stay Media Sharing, not DVD/CD Sharing: {reply}"
+            );
+        }
     }
 
 #[test]

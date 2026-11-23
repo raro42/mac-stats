@@ -13758,6 +13758,10 @@ pub fn looks_like_remote_apple_events_request(content: &str) -> bool {
         || n == "/airplay"
         || n == "/airplay-receiver"
         || n == "/airplayreceiver"
+        || n == "/dvd-sharing"
+        || n == "/cd-sharing"
+        || n == "/ods"
+        || n == "/odsagent"
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
@@ -13765,6 +13769,13 @@ pub fn looks_like_remote_apple_events_request(content: &str) -> bool {
         || n == "/screens"
         || n == "/display"
         || n == "/displays"
+        || n.contains("dvd sharing")
+        || n.contains("dvdsharing")
+        || n.contains("dvd-sharing")
+        || n.contains("cd sharing")
+        || n.contains("cdsharing")
+        || n.contains("cd-sharing")
+        || n.contains("optical sharing")
         // Bare short / ambiguous stay with the agent.
         || n == "rae"
         || n == "the rae"
@@ -14151,6 +14162,10 @@ pub fn looks_like_airplay_receiver_request(content: &str) -> bool {
         || n == "/rae"
         || n == "/eppc"
         || n == "/apple-events"
+        || n == "/dvd-sharing"
+        || n == "/cd-sharing"
+        || n == "/ods"
+        || n == "/odsagent"
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
@@ -14158,6 +14173,16 @@ pub fn looks_like_airplay_receiver_request(content: &str) -> bool {
         || n == "/screens"
         || n == "/display"
         || n == "/displays"
+        || n.contains("dvd sharing")
+        || n.contains("dvdsharing")
+        || n.contains("dvd-sharing")
+        || n.contains("cd sharing")
+        || n.contains("cdsharing")
+        || n.contains("cd-sharing")
+        || n.contains("dvd or cd")
+        || n.contains("dvd-cd")
+        || n.contains("optical sharing")
+        || n.contains("optical disk")
         || n == "airplay"
         || n == "the airplay"
         || n == "air play"
@@ -14307,6 +14332,406 @@ pub fn format_airplay_receiver_report() -> String {
         return "**AirPlay Receiver** — _no AirPlay Receiver reading on this Mac right now._".to_string();
     }
     format!("**AirPlay Receiver** · `{v}`")
+}
+
+/// DVD or CD Sharing (ODSAgent) — Sharing pane optical-disk share, not Media/AirPlay/File Sharing.
+/// Slash + view/open NL (`/dvd-sharing` · `/cd-sharing` · `/ods` · `view dvd sharing`).
+/// Bare `dvd` / `cd` / `dvd sharing` / `cd sharing` / `ods` stay with the agent.
+pub fn looks_like_dvd_cd_sharing_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen share")
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n.contains("file share")
+        || n.contains("printer sharing")
+        || n.contains("printersharing")
+        || n.contains("printer-sharing")
+        || n.contains("share printers")
+        || n.contains("cups share")
+        || n.contains("cups sharing")
+        || n.contains("remote management")
+        || n.contains("remotemanagement")
+        || n.contains("remote-management")
+        || n.contains("remote desktop")
+        || n.contains("apple remote desktop")
+        || n.contains("remote apple events")
+        || n.contains("remote-apple-events")
+        || n.contains("remoteappleevents")
+        || n.contains("apple events")
+        || n.contains("apple-events")
+        || n.contains("content caching")
+        || n.contains("contentcaching")
+        || n.contains("content-caching")
+        || n.contains("content cache")
+        || n.contains("asset cache")
+        || n.contains("assetcache")
+        || n.contains("asset-cache")
+        || n.contains("internet sharing")
+        || n.contains("internetsharing")
+        || n.contains("internet-sharing")
+        || n.contains("bluetooth sharing")
+        || n.contains("bluetoothsharing")
+        || n.contains("bluetooth-sharing")
+        || n.contains("media sharing")
+        || n.contains("mediasharing")
+        || n.contains("media-sharing")
+        || n.contains("home sharing")
+        || n.contains("homesharing")
+        || n.contains("home-sharing")
+        || n.contains("airplay")
+        || n.contains("air play")
+        || n.contains("airplay-receiver")
+        || n.contains("wifi")
+        || n.contains("wi-fi")
+        || n.contains("ssid")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/remotelogin"
+        || n == "/ssh"
+        || n == "/sshd"
+        || n == "/screen-sharing"
+        || n == "/screensharing"
+        || n == "/vnc"
+        || n == "/file-sharing"
+        || n == "/filesharing"
+        || n == "/smb"
+        || n == "/smb-status"
+        || n == "/smbd"
+        || n == "/printer-sharing"
+        || n == "/cups-share"
+        || n == "/remote-management"
+        || n == "/ard"
+        || n == "/content-caching"
+        || n == "/asset-cache"
+        || n == "/internet-sharing"
+        || n == "/ics"
+        || n == "/bluetooth-sharing"
+        || n == "/bts"
+        || n == "/obex"
+        || n == "/media-sharing"
+        || n == "/home-sharing"
+        || n == "/remote-apple-events"
+        || n == "/rae"
+        || n == "/eppc"
+        || n == "/apple-events"
+        || n == "/airplay"
+        || n == "/airplay-receiver"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        // Bare phrases stay with the agent (incl. bare `cd` / `dvd` / `ods`).
+        // Do NOT use contains() for our own tokens — that would kill "dvd sharing status".
+        || n == "dvd"
+        || n == "the dvd"
+        || n == "cd"
+        || n == "the cd"
+        || n == "ods"
+        || n == "the ods"
+        || n == "dvd sharing"
+        || n == "the dvd sharing"
+        || n == "cd sharing"
+        || n == "the cd sharing"
+        || n == "dvd or cd sharing"
+        || n == "the dvd or cd sharing"
+        || n == "dvd-cd sharing"
+        || n == "the dvd-cd sharing"
+        || n == "optical"
+        || n == "the optical"
+        || n == "optical sharing"
+        || n == "the optical sharing"
+        || n == "optical disk"
+        || n == "the optical disk"
+        || n == "optical disk sharing"
+        || n == "the optical disk sharing"
+        || n == "odsagent"
+        || n == "the odsagent"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/dvd-sharing"
+            | "/dvdsharing"
+            | "/dvd-sharing-status"
+            | "/dvdsharing-status"
+            | "/dvd-share"
+            | "/dvdshare"
+            | "/cd-sharing"
+            | "/cdsharing"
+            | "/cd-sharing-status"
+            | "/cdsharing-status"
+            | "/cd-share"
+            | "/cdshare"
+            | "/dvd-cd-sharing"
+            | "/dvdcdsharing"
+            | "/dvd-cd-share"
+            | "/dvd-or-cd-sharing"
+            | "/dvdorcdsharing"
+            | "/optical-sharing"
+            | "/opticalsharing"
+            | "/optical-disk-sharing"
+            | "/ods"
+            | "/ods-status"
+            | "/ods-state"
+            | "/odsagent"
+            | "/ods-agent"
+            | "/mac-dvd-sharing"
+            | "/mac-cd-sharing"
+            | "/mac-ods"
+            | "/mac-optical-sharing"
+            | "dvd sharing status"
+            | "the dvd sharing status"
+            | "dvd-sharing status"
+            | "the dvd-sharing status"
+            | "dvdsharing status"
+            | "the dvdsharing status"
+            | "cd sharing status"
+            | "the cd sharing status"
+            | "cd-sharing status"
+            | "the cd-sharing status"
+            | "cdsharing status"
+            | "the cdsharing status"
+            | "dvd or cd sharing status"
+            | "the dvd or cd sharing status"
+            | "dvd-cd sharing status"
+            | "the dvd-cd sharing status"
+            | "optical sharing status"
+            | "the optical sharing status"
+            | "optical disk sharing status"
+            | "the optical disk sharing status"
+            | "ods status"
+            | "the ods status"
+            | "ods state"
+            | "the ods state"
+            | "odsagent status"
+            | "the odsagent status"
+            | "my dvd sharing"
+            | "my dvd sharing status"
+            | "my cd sharing"
+            | "my cd sharing status"
+            | "my ods"
+            | "my ods status"
+            | "is dvd sharing on"
+            | "is dvd sharing off"
+            | "is dvd sharing enabled"
+            | "is dvd sharing disabled"
+            | "is cd sharing on"
+            | "is cd sharing off"
+            | "is cd sharing enabled"
+            | "is cd sharing disabled"
+            | "is dvd-cd sharing on"
+            | "is dvd-cd sharing enabled"
+            | "is dvd or cd sharing on"
+            | "is dvd or cd sharing enabled"
+            | "is optical sharing on"
+            | "is optical sharing enabled"
+            | "is ods on"
+            | "is ods off"
+            | "is ods enabled"
+            | "is ods disabled"
+            | "is odsagent on"
+            | "is odsagent enabled"
+            | "what's my dvd sharing"
+            | "whats my dvd sharing"
+            | "what is my dvd sharing"
+            | "what's my dvd sharing status"
+            | "whats my dvd sharing status"
+            | "what is my dvd sharing status"
+            | "what's my cd sharing"
+            | "whats my cd sharing"
+            | "what is my cd sharing"
+            | "what's my cd sharing status"
+            | "whats my cd sharing status"
+            | "what is my cd sharing status"
+            | "what's my ods"
+            | "whats my ods"
+            | "what is my ods"
+            | "what's my ods status"
+            | "whats my ods status"
+            | "what is my ods status"
+            | "what's the dvd sharing"
+            | "whats the dvd sharing"
+            | "what is the dvd sharing"
+            | "what's the dvd sharing status"
+            | "whats the dvd sharing status"
+            | "what is the dvd sharing status"
+            | "what's the cd sharing"
+            | "whats the cd sharing"
+            | "what is the cd sharing"
+            | "what's the cd sharing status"
+            | "whats the cd sharing status"
+            | "what is the cd sharing status"
+            | "what's the ods"
+            | "whats the ods"
+            | "what is the ods"
+            | "what's the ods status"
+            | "whats the ods status"
+            | "what is the ods status"
+            | "how's dvd sharing"
+            | "hows dvd sharing"
+            | "how's the dvd sharing"
+            | "hows the dvd sharing"
+            | "how's cd sharing"
+            | "hows cd sharing"
+            | "how's ods"
+            | "hows ods"
+            | "view dvd sharing"
+            | "view the dvd sharing"
+            | "view dvd sharing status"
+            | "view the dvd sharing status"
+            | "view dvd-sharing"
+            | "view the dvd-sharing"
+            | "view dvdsharing"
+            | "view the dvdsharing"
+            | "view cd sharing"
+            | "view the cd sharing"
+            | "view cd sharing status"
+            | "view the cd sharing status"
+            | "view cd-sharing"
+            | "view the cd-sharing"
+            | "view cdsharing"
+            | "view the cdsharing"
+            | "view dvd or cd sharing"
+            | "view the dvd or cd sharing"
+            | "view dvd-cd sharing"
+            | "view the dvd-cd sharing"
+            | "view optical sharing"
+            | "view the optical sharing"
+            | "view optical disk sharing"
+            | "view the optical disk sharing"
+            | "view ods"
+            | "view the ods"
+            | "view ods status"
+            | "view the ods status"
+            | "view odsagent"
+            | "view the odsagent"
+            | "see dvd sharing"
+            | "see the dvd sharing"
+            | "see dvd sharing status"
+            | "see the dvd sharing status"
+            | "see cd sharing"
+            | "see the cd sharing"
+            | "see cd sharing status"
+            | "see the cd sharing status"
+            | "see ods"
+            | "see the ods"
+            | "see ods status"
+            | "see the ods status"
+            | "open dvd sharing"
+            | "open the dvd sharing"
+            | "open dvd sharing status"
+            | "open the dvd sharing status"
+            | "open cd sharing"
+            | "open the cd sharing"
+            | "open cd sharing status"
+            | "open the cd sharing status"
+            | "open ods"
+            | "open the ods"
+            | "open ods status"
+            | "open the ods status"
+            | "list dvd sharing"
+            | "list the dvd sharing"
+            | "list dvd sharing status"
+            | "list the dvd sharing status"
+            | "list cd sharing"
+            | "list the cd sharing"
+            | "list cd sharing status"
+            | "list the cd sharing status"
+            | "list ods"
+            | "list the ods"
+            | "list ods status"
+            | "list the ods status"
+            | "show dvd sharing"
+            | "show the dvd sharing"
+            | "show me dvd sharing"
+            | "show me the dvd sharing"
+            | "show dvd sharing status"
+            | "show the dvd sharing status"
+            | "show me dvd sharing status"
+            | "show me the dvd sharing status"
+            | "show cd sharing"
+            | "show the cd sharing"
+            | "show me cd sharing"
+            | "show me the cd sharing"
+            | "show cd sharing status"
+            | "show the cd sharing status"
+            | "show me cd sharing status"
+            | "show me the cd sharing status"
+            | "show ods"
+            | "show the ods"
+            | "show me ods"
+            | "show me the ods"
+            | "show ods status"
+            | "show the ods status"
+            | "show me ods status"
+            | "show me the ods status"
+    )
+}
+
+/// Zero-LLM DVD or CD Sharing status from ODSAgent launchd (macOS-only; empty elsewhere).
+pub fn format_dvd_cd_sharing_report() -> String {
+    let v = crate::metrics::get_dvd_cd_sharing_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**DVD or CD Sharing** — _no DVD/CD Sharing reading on this Mac right now._".to_string();
+    }
+    format!("**DVD or CD Sharing** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
