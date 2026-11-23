@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3016] - 2026-11-24
+
+### Fixed
+- Data Poster layout-daily (AI Chat): `.chat-messages:focus-within` now uses a soft poster `--accent` fill on `#0b0b10` (parity with Dark · Neon). Focus no longer leaves the messages pane on a flat white-5% wash while only the border ring changed.
+
 ## [0.1.3015] - 2026-11-24
 
 ### Added

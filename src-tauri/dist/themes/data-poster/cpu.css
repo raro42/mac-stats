@@ -2295,9 +2295,10 @@ body {
 }
 
 .chat-messages:focus-within {
-  /* Opaque poster accent — Apple #007aff lagged --accent cyan (#14 / P2; layout-daily AI Chat). */
+  /* Opaque poster accent — Apple #007aff lagged --accent cyan (#14 / P2; layout-daily AI Chat). Soft fill matches Dark/Neon focus wash so the pane does not stay flat white-5% when focused. */
   border-color: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 5%, #0b0b10);
 }
 
 .chat-message {
