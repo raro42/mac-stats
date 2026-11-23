@@ -1,3 +1,16 @@
+## Overnight note 2026-11-23 ~20:34
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Fuel: product after Credentials kb-hints v0.1.2998 — Perplexity · Logs filter-chip kb-hints (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.2999** — shorter warmer All · Top · Snippet · Error · Warn chip tips.
+- Ratchet keep after verify; sync-dist + install/kickstart (UI JS + theme seeds).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · Guest Account / soft-state sibling/product fuel — not another keep-pNN clone.
+
+## Overnight merge — v0.1.2999
+
+- Product fuel after Credentials kb-hints v0.1.2998: Perplexity All/Top/Snippet and Debug Log All/Error/Warn filter chips still used long cold “Tab or click … / crosses …” copy while Monitors · AI Chat · processes · Disk Cleanup · Agent Ops already shipped shorter warmer KISS lines. Shortened chip hints to match. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · Guest Account / soft-state sibling/product fuel — Perplexity · Logs chip tips closed; not another keep-pNN clone.
+
 ## 2026-11-23 ~20:10 overnight tick
 - Digester open: empty (0 turns / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
