@@ -1032,29 +1032,40 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_gatekeeper_request(content) {
         return Some(format_gatekeeper_report());
     }
+    // Firewall listapps (bare `list apps` / `firewall apps` stay with the agent; `/firewall` stays global;
+    // `/stealth` stays stealth; `/firewall-logging` · `/fw-logging` stay logging; `/allow-signed` stays allow-signed;
+    // `/block-all` stays block-all; `list allow signed apps` stays allow-signed; `list app firewall` stays global).
+    if looks_like_firewall_listapps_request(content) {
+        return Some(format_firewall_listapps_report());
+    }
     // Firewall block-all (bare `block all` / `blockall` stay with the agent; `/firewall` stays global;
-    // `/stealth` stays stealth; `/firewall-logging` · `/fw-logging` stay logging; `/allow-signed` stays allow-signed).
+    // `/stealth` stays stealth; `/firewall-logging` · `/fw-logging` stay logging; `/allow-signed` stays allow-signed;
+    // `/listapps` · `/firewall-apps` stay listapps).
     if looks_like_firewall_block_all_request(content) {
         return Some(format_firewall_block_all_report());
     }
     // Firewall allow-signed (bare `allow signed` / `signed software` stay with the agent; `/firewall` stays global;
-    // `/stealth` stays stealth; `/firewall-logging` · `/fw-logging` stay logging; `/block-all` stays block-all).
+    // `/stealth` stays stealth; `/firewall-logging` · `/fw-logging` stay logging; `/block-all` stays block-all;
+    // `/listapps` · `/firewall-apps` stay listapps).
     if looks_like_firewall_allow_signed_request(content) {
         return Some(format_firewall_allow_signed_report());
     }
     // Firewall logging (bare `logging` / `firewall logging` stay with the agent; `/firewall` stays global;
-    // `/stealth` stays stealth; `/allow-signed` stays allow-signed; `/block-all` stays block-all; `/logs` stays debug log).
+    // `/stealth` stays stealth; `/allow-signed` stays allow-signed; `/block-all` stays block-all; `/logs` stays debug log;
+    // `/listapps` · `/firewall-apps` stay listapps).
     if looks_like_firewall_logging_request(content) {
         return Some(format_firewall_logging_report());
     }
     // Firewall stealth (bare `stealth` stays with the agent; `/firewall` stays global state; `/gatekeeper` stays Gatekeeper;
-    // `/firewall-logging` · `/fw-logging` stay logging; `/allow-signed` stays allow-signed; `/block-all` stays block-all).
+    // `/firewall-logging` · `/fw-logging` stay logging; `/allow-signed` stays allow-signed; `/block-all` stays block-all;
+    // `/listapps` · `/firewall-apps` stay listapps).
     if looks_like_firewall_stealth_request(content) {
         return Some(format_firewall_stealth_report());
     }
     // Application Firewall (bare `firewall` / `afw` stay with the agent; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP;
     // `/stealth` · `/firewall-stealth` stay stealth; `/firewall-logging` · `/fw-logging` stay logging;
-    // `/allow-signed` · `/fw-allow-signed` stay allow-signed; `/block-all` · `/fw-block-all` stay block-all).
+    // `/allow-signed` · `/fw-allow-signed` stay allow-signed; `/block-all` · `/fw-block-all` stay block-all;
+    // `/listapps` · `/firewall-apps` stay listapps).
     if looks_like_firewall_request(content) {
         return Some(format_firewall_report());
     }

@@ -1034,6 +1034,126 @@ pub fn get_firewall_block_all_status() -> String {
     }
 }
 
+/// One Application Firewall listed app from `socketfilterfw --listapps`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct FirewallListedApp {
+    pub path: String,
+    pub state: String,
+}
+
+/// Short label for a listed firewall app path (prefer `Foo.app`, else basename).
+pub(crate) fn firewall_listapps_label(path: &str) -> &str {
+    if let Some(idx) = path.find(".app") {
+        let through_app = &path[..idx + 4];
+        if let Some(slash) = through_app.rfind('/') {
+            return &through_app[slash + 1..];
+        }
+        return through_app;
+    }
+    if let Some(slash) = path.rfind('/') {
+        return &path[slash + 1..];
+    }
+    path
+}
+
+/// Parse `socketfilterfw --listapps` into (total, rows).
+pub(crate) fn parse_firewall_listapps(raw: &str) -> (usize, Vec<FirewallListedApp>) {
+    let mut total = 0usize;
+    let mut apps = Vec::new();
+    let mut pending_path: Option<String> = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let lower = t.to_ascii_lowercase();
+        if lower.starts_with("total number of apps") {
+            if let Some(n) = lower.rsplit('=').next() {
+                total = n.trim().parse().unwrap_or(0);
+            }
+            continue;
+        }
+        if let Some((idx, rest)) = t.split_once(':') {
+            let idx = idx.trim();
+            if !idx.is_empty() && idx.chars().all(|c| c.is_ascii_digit()) {
+                let path = rest.trim().to_string();
+                if !path.is_empty() {
+                    pending_path = Some(path);
+                }
+                continue;
+            }
+        }
+        if t.starts_with('(') && t.ends_with(')') {
+            if let Some(path) = pending_path.take() {
+                let inner = t.trim_matches(|c| c == '(' || c == ')').trim();
+                let inner_l = inner.to_ascii_lowercase();
+                let state = if inner_l.contains("block") {
+                    "Block".to_string()
+                } else if inner_l.contains("allow") {
+                    "Allow".to_string()
+                } else {
+                    inner.to_string()
+                };
+                apps.push(FirewallListedApp { path, state });
+            }
+        }
+    }
+    if total == 0 {
+        total = apps.len();
+    }
+    (total, apps)
+}
+
+/// Format listapps rows for the instant lane (cap rows; `+N more` when truncated).
+pub(crate) fn format_firewall_listapps_parts(
+    total: usize,
+    apps: &[FirewallListedApp],
+    max_rows: usize,
+) -> String {
+    if apps.is_empty() && total == 0 {
+        return String::new();
+    }
+    let mut lines = Vec::with_capacity(max_rows.saturating_add(2));
+    lines.push(total.to_string());
+    let show = apps.len().min(max_rows);
+    for app in apps.iter().take(show) {
+        lines.push(format!(
+            "· {} — {}",
+            firewall_listapps_label(&app.path),
+            app.state
+        ));
+    }
+    if apps.len() > show {
+        lines.push(format!("_… +{} more_", apps.len() - show));
+    }
+    lines.join("\n")
+}
+
+/// macOS Application Firewall app list from `socketfilterfw --listapps`.
+/// Distinct from Firewall global `/firewall`, stealth `/stealth`, logging `/firewall-logging`,
+/// allow-signed `/allow-signed`, block-all `/block-all`.
+/// Used by Discord/operator instant `/listapps` · `/firewall-apps` lane.
+pub fn get_firewall_listapps_status() -> String {
+    let output = Command::new("/usr/libexec/ApplicationFirewall/socketfilterfw")
+        .arg("--listapps")
+        .stderr(std::process::Stdio::null())
+        .output();
+    let Ok(output) = output else {
+        debug3!("firewall-listapps: socketfilterfw spawn failed");
+        return String::new();
+    };
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let (total, apps) = parse_firewall_listapps(&stdout);
+    let info = format_firewall_listapps_parts(total, &apps, 12);
+    if info.is_empty() {
+        debug3!("firewall-listapps: empty list (exit={})", output.status);
+        String::new()
+    } else {
+        debug3!("firewall-listapps: {} apps (showing up to 12)", total);
+        info
+    }
+}
+
 
 /// Time Machine session + destination from `tmutil status` / `destinationinfo` (live; not OnceLock).
 /// Distinct from Disk Cleanup `view disk` / `tmutil-thin`, SSD `/ssd` · `/free`, and boot volume.
@@ -4899,6 +5019,51 @@ mod firewall_block_all_parse_tests {
             Some("Enabled")
         );
         assert_eq!(parse_firewall_block_all("nope"), None);
+    }
+}
+
+#[cfg(test)]
+mod firewall_listapps_parse_tests {
+    use super::{
+        firewall_listapps_label, format_firewall_listapps_parts, parse_firewall_listapps,
+        FirewallListedApp,
+    };
+
+    #[test]
+    fn parses_listapps_rows_and_labels() {
+        let raw = "Total number of apps = 2 \n\
+1 : /Applications/Docker.app/Contents/MacOS/com.docker.backend \n\
+             (Allow incoming connections)\n\
+2 : /usr/sbin/cupsd \n\
+             (Block incoming connections)\n";
+        let (total, apps) = parse_firewall_listapps(raw);
+        assert_eq!(total, 2);
+        assert_eq!(apps.len(), 2);
+        assert_eq!(apps[0].state, "Allow");
+        assert_eq!(apps[1].state, "Block");
+        assert_eq!(
+            firewall_listapps_label(&apps[0].path),
+            "Docker.app"
+        );
+        assert_eq!(firewall_listapps_label(&apps[1].path), "cupsd");
+        let body = format_firewall_listapps_parts(total, &apps, 12);
+        assert!(body.starts_with("2\n"));
+        assert!(body.contains("· Docker.app — Allow"));
+        assert!(body.contains("· cupsd — Block"));
+    }
+
+    #[test]
+    fn truncates_long_listapps() {
+        let apps: Vec<FirewallListedApp> = (0..15)
+            .map(|i| FirewallListedApp {
+                path: format!("/tmp/app{i}"),
+                state: "Allow".into(),
+            })
+            .collect();
+        let body = format_firewall_listapps_parts(15, &apps, 3);
+        assert!(body.starts_with("15\n"));
+        assert!(body.contains("_… +12 more_"));
+        assert_eq!(body.lines().filter(|l| l.starts_with('·')).count(), 3);
     }
 }
 

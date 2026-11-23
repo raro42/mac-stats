@@ -2207,7 +2207,8 @@ mod tests {
     fn firewall_block_all_slash_and_view_open_do_not_steal_firewall_or_bare() {
         // Slash + view/open NL → Block all (`/allow-signed` · `/stealth` parity).
         // Bare `block all` / `blockall` stay with the agent; `/firewall` stays global;
-        // `/stealth` stays stealth; `/firewall-logging` stays logging; `/allow-signed` stays allow-signed.
+        // `/stealth` stays stealth; `/firewall-logging` stays logging; `/allow-signed` stays allow-signed;
+        // `/listapps` stays listapps.
         assert!(looks_like_firewall_block_all_request("/block-all"));
         assert!(looks_like_firewall_block_all_request("/blockall"));
         assert!(looks_like_firewall_block_all_request("/fw-block-all"));
@@ -2231,6 +2232,8 @@ mod tests {
         assert!(!looks_like_firewall_block_all_request("/firewall-logging"));
         assert!(!looks_like_firewall_block_all_request("/allow-signed"));
         assert!(!looks_like_firewall_block_all_request("view allow signed"));
+        assert!(!looks_like_firewall_block_all_request("/listapps"));
+        assert!(!looks_like_firewall_block_all_request("view firewall apps"));
         assert!(!looks_like_firewall_block_all_request("/logs"));
         assert!(!looks_like_firewall_block_all_request("/gatekeeper"));
         assert!(!looks_like_firewall_block_all_request("enable block all"));
@@ -2244,6 +2247,95 @@ mod tests {
         assert!(!looks_like_firewall_allow_signed_request("view block all"));
         assert!(!looks_like_firewall_logging_request("/block-all"));
         assert!(!looks_like_firewall_logging_request("view block all"));
+    }
+
+    #[test]
+    fn firewall_listapps_slash_and_view_open_do_not_steal_firewall_or_bare() {
+        // Slash + view/open NL → Firewall apps (`/block-all` · `/allow-signed` parity).
+        // Bare `list apps` / `firewall apps` / `apps` stay with the agent; `/firewall` stays global;
+        // `/stealth` stays stealth; `/firewall-logging` stays logging; `/allow-signed` stays allow-signed;
+        // `/block-all` stays block-all; `list allow signed apps` stays allow-signed; `list app firewall` stays global.
+        assert!(looks_like_firewall_listapps_request("/listapps"));
+        assert!(looks_like_firewall_listapps_request("/list-apps"));
+        assert!(looks_like_firewall_listapps_request("/firewall-apps"));
+        assert!(looks_like_firewall_listapps_request("/fw-apps"));
+        assert!(looks_like_firewall_listapps_request("/afw-apps"));
+        assert!(looks_like_firewall_listapps_request("/firewall-listapps"));
+        assert!(looks_like_firewall_listapps_request("/mac-firewall-apps"));
+        assert!(looks_like_firewall_listapps_request("view firewall apps"));
+        assert!(looks_like_firewall_listapps_request("open fw apps"));
+        assert!(looks_like_firewall_listapps_request("list firewall apps"));
+        assert!(looks_like_firewall_listapps_request("list afw apps"));
+        assert!(looks_like_firewall_listapps_request("firewall apps status"));
+        assert!(looks_like_firewall_listapps_request("what's my firewall apps"));
+        assert!(looks_like_firewall_listapps_request("what's the firewall apps status"));
+        assert!(!looks_like_firewall_listapps_request("list apps"));
+        assert!(!looks_like_firewall_listapps_request("listapps"));
+        assert!(!looks_like_firewall_listapps_request("apps"));
+        assert!(!looks_like_firewall_listapps_request("firewall apps"));
+        assert!(!looks_like_firewall_listapps_request("/firewall"));
+        assert!(!looks_like_firewall_listapps_request("view firewall"));
+        assert!(!looks_like_firewall_listapps_request("list app firewall"));
+        assert!(!looks_like_firewall_listapps_request("/stealth"));
+        assert!(!looks_like_firewall_listapps_request("/firewall-logging"));
+        assert!(!looks_like_firewall_listapps_request("/allow-signed"));
+        assert!(!looks_like_firewall_listapps_request("view allow signed"));
+        assert!(!looks_like_firewall_listapps_request("list allow signed apps"));
+        assert!(!looks_like_firewall_listapps_request("/block-all"));
+        assert!(!looks_like_firewall_listapps_request("view block all"));
+        assert!(!looks_like_firewall_listapps_request("/logs"));
+        assert!(!looks_like_firewall_listapps_request("/gatekeeper"));
+        assert!(!looks_like_firewall_listapps_request("enable listapps"));
+        assert!(!looks_like_firewall_request("/listapps"));
+        assert!(!looks_like_firewall_request("view firewall apps"));
+        assert!(!looks_like_firewall_request("/fw-apps"));
+        assert!(!looks_like_firewall_stealth_request("/listapps"));
+        assert!(!looks_like_firewall_stealth_request("view firewall apps"));
+        assert!(!looks_like_firewall_allow_signed_request("/listapps"));
+        assert!(!looks_like_firewall_allow_signed_request("view firewall apps"));
+        assert!(!looks_like_firewall_logging_request("/listapps"));
+        assert!(!looks_like_firewall_logging_request("view firewall apps"));
+        assert!(!looks_like_firewall_block_all_request("/listapps"));
+        assert!(!looks_like_firewall_block_all_request("view firewall apps"));
+        let apps = try_operator_instant_reply("/listapps").unwrap();
+        assert!(
+            apps.contains("**Firewall apps**") && !apps.to_lowercase().contains("execution"),
+            "got: {apps}"
+        );
+        let viewed = try_operator_instant_reply("view firewall apps").unwrap();
+        assert!(
+            viewed.contains("**Firewall apps**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let fw_alias = try_operator_instant_reply("/fw-apps").unwrap();
+        assert!(
+            fw_alias.contains("**Firewall apps**")
+                && !fw_alias.to_lowercase().contains("execution"),
+            "got: {fw_alias}"
+        );
+        assert!(try_operator_instant_reply("list apps").is_none());
+        assert!(try_operator_instant_reply("firewall apps").is_none());
+        let fw = try_operator_instant_reply("/firewall");
+        if let Some(reply) = fw {
+            assert!(
+                !reply.contains("**Firewall apps**"),
+                "/firewall must stay Firewall, not Firewall apps: {reply}"
+            );
+        }
+        let allow = try_operator_instant_reply("/allow-signed");
+        if let Some(reply) = allow {
+            assert!(
+                !reply.contains("**Firewall apps**"),
+                "/allow-signed must stay Allow signed, not Firewall apps: {reply}"
+            );
+        }
+        let block = try_operator_instant_reply("/block-all");
+        if let Some(reply) = block {
+            assert!(
+                !reply.contains("**Firewall apps**"),
+                "/block-all must stay Block all, not Firewall apps: {reply}"
+            );
+        }
     }
 
     #[test]

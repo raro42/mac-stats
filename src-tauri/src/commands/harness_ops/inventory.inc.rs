@@ -10386,6 +10386,18 @@ pub fn looks_like_firewall_request(content: &str) -> bool {
         || n == "/afw-block-all"
         || n == "/firewall-block-all"
         || n == "/getblockall"
+        || n == "/listapps"
+        || n == "/list-apps"
+        || n == "/firewall-apps"
+        || n == "/fw-apps"
+        || n == "/afw-apps"
+        || n == "/firewall-listapps"
+        || n == "/socketfilterfw-listapps"
+        || n == "/mac-firewall-apps"
+        || n.contains("firewall apps")
+        || n.contains("fw apps")
+        || n.contains("afw apps")
+        || n.contains("listapps")
         || n == "/boot-volume"
         || n == "/startup-disk"
         || n == "/remote-login"
@@ -10588,6 +10600,18 @@ pub fn looks_like_firewall_stealth_request(content: &str) -> bool {
         || n == "/afw-block-all"
         || n == "/firewall-block-all"
         || n == "/getblockall"
+        || n == "/listapps"
+        || n == "/list-apps"
+        || n == "/firewall-apps"
+        || n == "/fw-apps"
+        || n == "/afw-apps"
+        || n == "/firewall-listapps"
+        || n == "/socketfilterfw-listapps"
+        || n == "/mac-firewall-apps"
+        || n.contains("firewall apps")
+        || n.contains("fw apps")
+        || n.contains("afw apps")
+        || n.contains("listapps")
         || n == "/gatekeeper"
         || n == "/gk"
         || n == "/spctl"
@@ -10810,6 +10834,18 @@ pub fn looks_like_firewall_logging_request(content: &str) -> bool {
         || n == "/afw-block-all"
         || n == "/firewall-block-all"
         || n == "/getblockall"
+        || n == "/listapps"
+        || n == "/list-apps"
+        || n == "/firewall-apps"
+        || n == "/fw-apps"
+        || n == "/afw-apps"
+        || n == "/firewall-listapps"
+        || n == "/socketfilterfw-listapps"
+        || n == "/mac-firewall-apps"
+        || n.contains("firewall apps")
+        || n.contains("fw apps")
+        || n.contains("afw apps")
+        || n.contains("listapps")
         || n == "/remote-login"
         || n == "/ssh"
         || n == "/sshd"
@@ -11029,6 +11065,18 @@ pub fn looks_like_firewall_allow_signed_request(content: &str) -> bool {
         || n == "/afw-block-all"
         || n == "/firewall-block-all"
         || n == "/getblockall"
+        || n == "/listapps"
+        || n == "/list-apps"
+        || n == "/firewall-apps"
+        || n == "/fw-apps"
+        || n == "/afw-apps"
+        || n == "/firewall-listapps"
+        || n == "/socketfilterfw-listapps"
+        || n == "/mac-firewall-apps"
+        || n.contains("firewall apps")
+        || n.contains("fw apps")
+        || n.contains("afw apps")
+        || n.contains("listapps")
         || n == "/gatekeeper"
         || n == "/gk"
         || n == "/spctl"
@@ -11262,6 +11310,18 @@ pub fn looks_like_firewall_block_all_request(content: &str) -> bool {
         || n == "/afw-allow-signed"
         || n == "/firewall-allow-signed"
         || n == "/getallowsigned"
+        || n == "/listapps"
+        || n == "/list-apps"
+        || n == "/firewall-apps"
+        || n == "/fw-apps"
+        || n == "/afw-apps"
+        || n == "/firewall-listapps"
+        || n == "/socketfilterfw-listapps"
+        || n == "/mac-firewall-apps"
+        || n.contains("firewall apps")
+        || n.contains("fw apps")
+        || n.contains("afw apps")
+        || n.contains("listapps")
         || n == "/gatekeeper"
         || n == "/gk"
         || n == "/spctl"
@@ -11410,6 +11470,235 @@ pub fn format_firewall_block_all_report() -> String {
         return "**Block all** — _no Firewall block-all reading on this Mac right now._".to_string();
     }
     format!("**Block all** · `{v}`")
+}
+
+/// Application Firewall listed apps — not global Firewall `/firewall`, not stealth `/stealth`,
+/// not logging `/firewall-logging`, not allow-signed `/allow-signed`, not block-all `/block-all`.
+/// Slash + view/open NL (`/listapps` · `/firewall-apps` · `view firewall apps`) match `/block-all` shape;
+/// bare `list apps` / `firewall apps` / `apps` stay with the agent; `list allow signed apps` stays allow-signed;
+/// `list app firewall` stays global Firewall.
+pub fn looks_like_firewall_listapps_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("gatekeeper")
+        || n.contains("spctl")
+        || n.contains("system integrity")
+        || n.contains("sip")
+        || n.contains("csrutil")
+        || n.contains("stealth")
+        || n.contains("logging")
+        || n.contains("allow signed")
+        || n.contains("signed software")
+        || n.contains("signed apps")
+        || n.contains("block all")
+        || n.contains("blockall")
+        // Global Firewall / stealth / logging / allow-signed / block-all / Gatekeeper / SIP / FileVault stay elsewhere.
+        || n == "/firewall"
+        || n == "/firewall-status"
+        || n == "/fw"
+        || n == "/fw-status"
+        || n == "/afw"
+        || n == "/afw-status"
+        || n == "/app-firewall"
+        || n == "/application-firewall"
+        || n == "/socketfilterfw"
+        || n == "/stealth"
+        || n == "/stealth-mode"
+        || n == "/firewall-stealth"
+        || n == "/fw-stealth"
+        || n == "/afw-stealth"
+        || n == "/firewall-logging"
+        || n == "/fw-logging"
+        || n == "/afw-logging"
+        || n == "/logging-mode"
+        || n == "/logging-opt"
+        || n == "/allow-signed"
+        || n == "/allowsigned"
+        || n == "/fw-allow-signed"
+        || n == "/afw-allow-signed"
+        || n == "/firewall-allow-signed"
+        || n == "/getallowsigned"
+        || n == "/block-all"
+        || n == "/blockall"
+        || n == "/fw-block-all"
+        || n == "/afw-block-all"
+        || n == "/firewall-block-all"
+        || n == "/getblockall"
+        || n == "/gatekeeper"
+        || n == "/gk"
+        || n == "/spctl"
+        || n == "/sip"
+        || n == "/csrutil"
+        || n == "/filevault"
+        || n == "/fv"
+        || n == "/fde"
+        || n == "/logs"
+        || n == "/log"
+        || n == "/debug-log"
+        || n == "/remote-login"
+        || n == "/ssh"
+        || n == "/sshd"
+        || n == "list app firewall"
+        || n == "list the app firewall"
+        || n == "list application firewall"
+        || n == "list the application firewall"
+        // Bare short / ambiguous stay with the agent.
+        || n == "list apps"
+        || n == "the list apps"
+        || n == "listapps"
+        || n == "the listapps"
+        || n == "apps"
+        || n == "the apps"
+        || n == "firewall apps"
+        || n == "the firewall apps"
+        || n == "fw apps"
+        || n == "the fw apps"
+        || n == "afw apps"
+        || n == "the afw apps"
+        || n == "app firewall apps"
+        || n == "the app firewall apps"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/listapps"
+            | "/list-apps"
+            | "/listapps-status"
+            | "/list-apps-status"
+            | "/firewall-apps"
+            | "/firewallapps"
+            | "/firewall-apps-status"
+            | "/firewall-listapps"
+            | "/firewalllistapps"
+            | "/fw-apps"
+            | "/fwapps"
+            | "/fw-apps-status"
+            | "/fw-listapps"
+            | "/afw-apps"
+            | "/afwapps"
+            | "/afw-apps-status"
+            | "/afw-listapps"
+            | "/app-firewall-apps"
+            | "/application-firewall-apps"
+            | "/socketfilterfw-listapps"
+            | "/socketfilterfw-apps"
+            | "/mac-firewall-apps"
+            | "/mac-fw-apps"
+            | "/mac-listapps"
+            | "firewall apps status"
+            | "the firewall apps status"
+            | "fw apps status"
+            | "the fw apps status"
+            | "afw apps status"
+            | "the afw apps status"
+            | "listapps status"
+            | "the listapps status"
+            | "my firewall apps"
+            | "my firewall apps status"
+            | "my fw apps"
+            | "my listapps"
+            | "what's my firewall apps"
+            | "whats my firewall apps"
+            | "what is my firewall apps"
+            | "what's my firewall apps status"
+            | "whats my firewall apps status"
+            | "what is my firewall apps status"
+            | "what's the firewall apps"
+            | "whats the firewall apps"
+            | "what is the firewall apps"
+            | "what's the firewall apps status"
+            | "whats the firewall apps status"
+            | "what is the firewall apps status"
+            | "how's firewall apps"
+            | "hows firewall apps"
+            | "how's the firewall apps"
+            | "hows the firewall apps"
+            // View/see/show me/open/list.
+            | "view firewall apps"
+            | "view the firewall apps"
+            | "view firewall apps status"
+            | "view the firewall apps status"
+            | "view fw apps"
+            | "view the fw apps"
+            | "view afw apps"
+            | "view the afw apps"
+            | "view listapps"
+            | "view the listapps"
+            | "view app firewall apps"
+            | "view the app firewall apps"
+            | "see firewall apps"
+            | "see the firewall apps"
+            | "see firewall apps status"
+            | "see the firewall apps status"
+            | "see fw apps"
+            | "see the fw apps"
+            | "open firewall apps"
+            | "open the firewall apps"
+            | "open firewall apps status"
+            | "open the firewall apps status"
+            | "open fw apps"
+            | "open the fw apps"
+            | "open listapps"
+            | "open the listapps"
+            | "list firewall apps"
+            | "list the firewall apps"
+            | "list firewall apps status"
+            | "list the firewall apps status"
+            | "list fw apps"
+            | "list the fw apps"
+            | "list afw apps"
+            | "list the afw apps"
+            | "list app firewall apps"
+            | "list the app firewall apps"
+            | "list application firewall apps"
+            | "list the application firewall apps"
+            | "show firewall apps"
+            | "show the firewall apps"
+            | "show me firewall apps"
+            | "show me the firewall apps"
+            | "show firewall apps status"
+            | "show the firewall apps status"
+            | "show me firewall apps status"
+            | "show me the firewall apps status"
+            | "show fw apps"
+            | "show the fw apps"
+            | "show me fw apps"
+            | "show me the fw apps"
+    )
+}
+
+/// Zero-LLM Firewall listed apps from `socketfilterfw --listapps`.
+pub fn format_firewall_listapps_report() -> String {
+    let v = crate::metrics::get_firewall_listapps_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Firewall apps** — _no Application Firewall app list on this Mac right now._"
+            .to_string();
+    }
+    format!("**Firewall apps** · {v}")
 }
 
 /// Time Machine session + destination — not Disk Cleanup, not SSD % / free, not boot volume.

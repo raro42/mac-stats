@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.2997] - 2026-11-23
+
+### Added
+- Instant Application Firewall listed apps accepts `/listapps` · `/list-apps` · `/firewall-apps` · `/firewall-listapps` · `/fw-apps` · `/afw-apps` · `/app-firewall-apps` · `/application-firewall-apps` · `/socketfilterfw-listapps` · `/mac-firewall-apps` · `/mac-fw-apps` · `/mac-listapps` and view/see/open/list NL (`view firewall apps`, `open fw apps`, `list firewall apps`, …), matching “firewall apps status” / “what's my firewall apps” / “what's the firewall apps status”. Bare `list apps` / `firewall apps` / `apps` stay with the agent; `/firewall` stays global Firewall; `/stealth` stays stealth; `/firewall-logging` stays logging; `/allow-signed` stays allow-signed; `/block-all` stays block-all; `list allow signed apps` stays allow-signed; `list app firewall` stays global Firewall; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP; `/filevault` stays FileVault.
+
+
 ## [0.1.2996] - 2026-11-23
 
 ### Changed
