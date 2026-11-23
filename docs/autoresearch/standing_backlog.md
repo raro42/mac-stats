@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~00:32
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: **due** → Data Poster (Neon marked 2026-11-23).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: soul/idle clusters only (not product ERROR/panic).
+- Fuel: layout-daily Data Poster after Network over sleep v0.1.3015 (remote already closed networkoversleep).
+- Shipped **v0.1.3016** — Data Poster AI Chat `.chat-messages:focus-within` soft poster `--accent` fill on `#0b0b10` (Dark/Neon parity); pane no longer stays flat white-5% on focus.
+- Ratchet keep @ d2a8fc7 for 3016; layout marked data-poster 2026-11-24; install/kickstart (theme CSS embedded).
+- Morning surprise: refresh 2026-11-24 + archive.
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (hibernatemode) — Data Poster focus fill closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3016
+
+- Layout-daily Data Poster (AI Chat + Monitors): `.chat-messages:focus-within` already remapped border/box-shadow onto poster cyan but lacked the soft accent **background** wash while Dark/Neon already tinted the focused pane. Digester empty; design-review due=false — polish-without-capture (Mac TCC); Network over sleep already shipped as v0.1.3015. Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (hibernatemode) — Data Poster focus fill closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~00:29
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
