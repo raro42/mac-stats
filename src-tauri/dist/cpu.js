@@ -5847,7 +5847,8 @@ function wireFilterChipToolbarKeyboard(wrap) {
   ensureFilterChipKbStyles();
   const hint =
     wrap.id === 'processes-filter-chips'
-      ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → temperature ring · at end → process list · Enter / Space selects'
+      /* Design-review feature-processes: shorter, warmer chip hint (KISS; Agent Ops / AI Chat parity). */
+      ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to temperature ring or the process list'
       : wrap.id === 'rings-filter-chips'
         ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Details or Settings · at end → ring gauges · Enter / Space selects'
         : wrap.id === 'monitors-filter-chips'
@@ -6988,8 +6989,9 @@ function wireProcessDetailsHeaderToolbarKeyboard(header) {
     closeId: "close-process-details",
     ariaLabel: "Process details header",
     wireKey: "processDetailsHeaderToolbarKbWired",
+    /* Design-review feature-processes: shorter, warmer header tip (KISS). */
     hintText:
-      "← → / h l · Home/End move · Enter / Space on Close closes · at end crosses to name · at start crosses to Force Quit",
+      "← → / h l · Home/End · Enter closes · edges jump to name or Force Quit",
     chainForwardFromEnd: () => tryChainProcessDetailsHeaderToHero(),
     chainBackFromStart: () => tryChainProcessDetailsHeaderToForceQuitLast(),
   });
@@ -7243,13 +7245,14 @@ function refreshProcessDetailHeroToolbarRovingTabindex(hero, preferred) {
   }
 }
 
+/* Design-review feature-processes: shorter, warmer detail hero tips (KISS). */
 /** Closed Process Details panel: how to move across name and PID. */
 const PROCESS_DETAIL_HERO_KB_HINT_CLOSED =
-  "← → / h l · Home/End move · Enter / Space copies · at start crosses to header · at end crosses to Force Quit";
+  "← → / h l · Home/End · Enter copies · edges jump to Close or Force Quit";
 
 /** Open Process Details modal: how to move across name and PID. */
 const PROCESS_DETAIL_HERO_KB_HINT_OPEN =
-  "← → / h l · Home/End move · name ← process row · Force Quit → footer · Enter / Space copies";
+  "← → / h l · Home/End · Enter copies · name jumps back to the row · Force Quit jumps to footer";
 
 function processDetailHeroKbHintText() {
   return isProcessDetailsModalOpen()
@@ -7388,13 +7391,14 @@ function refreshForceQuitToolbarRovingTabindex(section, preferred) {
   }
 }
 
+/* Design-review feature-processes: shorter, warmer Force Quit tips (KISS). */
 /** Closed Process Details panel: how to move across Advanced and Force Quit. */
 const FORCE_QUIT_TOOLBAR_KB_HINT_CLOSED =
-  "← → / h l · Home/End move · Enter / Space on buttons · at start crosses to PID";
+  "← → / h l · Home/End · Enter activates · edge jumps to PID";
 
 /** Open Process Details modal: how to move across Advanced and Force Quit. */
 const FORCE_QUIT_TOOLBAR_KB_HINT_OPEN =
-  "← → / h l · Home/End move · Enter / Space on buttons · at start crosses to PID · at end crosses to footer version";
+  "← → / h l · Home/End · Enter activates · edges jump to PID or footer version";
 
 function forceQuitToolbarKbHintText() {
   return isProcessDetailsModalOpen()
@@ -7791,7 +7795,7 @@ async function showProcessDetails(pid) {
         <div class="settings-card">
           <div class="settings-header">
             <h2 id="process-details-title">Process Details</h2>
-            <div class="process-details-header-kb-hint" hidden aria-hidden="true">← → / h l · Home/End move · Enter / Space on Close closes · at end crosses to name · at start crosses to Force Quit</div>
+            <div class="process-details-header-kb-hint" hidden aria-hidden="true">← → / h l · Home/End · Enter closes · edges jump to name or Force Quit</div>
             <button id="close-process-details" class="icon-btn" aria-label="Close">×</button>
           </div>
           <div class="settings-body" id="process-details-body">
@@ -11206,9 +11210,10 @@ function syncMonitorsListTabOrder(monitorsList, preferId) {
   ensureMonitorsListKbHint(monitorsList, items.length > 0);
 }
 
+/* Design-review feature-processes: shorter, warmer list tip (KISS; AI Chat / metrics parity). */
 /** How to move across process rows when the list has rows. */
 const PROCESSES_LIST_KB_HINT =
-  'All · Pinned filters · click row for details · first row ↑ → Details last value · open row ↓ → name · name ← row · Force Quit → footer · click name / c copies · ↑↓ / j k / Home / End · PgUp/PgDn · Enter / d opens · P pin/unpin · Esc closes/clears';
+  'All · Pinned · Hot · ↑↓ / j k · Home/End · Enter / d opens · c copies · P pins · Esc clears';
 
 /** Theme HTML ships the hint above the process list. It stays hidden until rows exist. Create it only on older shells. */
 function ensureProcessesListKbHint(processList, show) {

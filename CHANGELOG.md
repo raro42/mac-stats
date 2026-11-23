@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2992] - 2026-11-23
+
+### Changed
+- Top Processes keyboard hints (All · Pinned · Hot filter chips · process list · Process Details header/name/PID · Force Quit): shorter, warmer copy so the process surface stays KISS when Tab focus shows the hint (design-review `feature-processes`; Mac capture still TCC-blocked — polish-without-capture grace).
+
 ## [0.1.2991] - 2026-11-23
 
 ### Changed
