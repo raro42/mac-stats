@@ -2469,6 +2469,131 @@ pub fn get_guest_account_status() -> String {
     }
 }
 
+/// Parse loginwindow `autoLoginUser` (username string when Automatic Login is on).
+pub(crate) fn parse_autologin_user_defaults(raw: &str) -> Option<String> {
+    let s = raw.trim();
+    if s.is_empty() || s.eq_ignore_ascii_case("does not exist") {
+        return None;
+    }
+    // `defaults` error text for missing key.
+    if s.to_ascii_lowercase().contains("does not exist") {
+        return None;
+    }
+    Some(s.to_string())
+}
+
+/// Parse `sysadminctl -autologin status` stdout/stderr into a short On/Off line.
+pub(crate) fn parse_autologin_sysadminctl(raw: &str) -> Option<String> {
+    let lower = raw.to_ascii_lowercase();
+    if lower.contains("filevault")
+        && (lower.contains("disabled") || lower.contains("because"))
+    {
+        return Some("Off · FileVault".to_string());
+    }
+    if lower.contains("system administrator") && lower.contains("disabled") {
+        return Some("Off · admin".to_string());
+    }
+    // “Automatic login user: name”
+    if let Some(idx) = lower.find("automatic login user:") {
+        let rest = raw[idx + "automatic login user:".len()..].trim();
+        let name = rest
+            .split(|c: char| c == '\n' || c == '\r')
+            .next()
+            .unwrap_or("")
+            .trim()
+            .trim_matches('"');
+        if !name.is_empty() {
+            return Some(format!("On · {name}"));
+        }
+    }
+    if lower.contains("automatic login is off")
+        || lower.contains("automatic login is disabled")
+        || (lower.contains("autologin") && lower.contains("off") && !lower.contains("on"))
+    {
+        return Some("Off".to_string());
+    }
+    if lower.contains("automatic login is on")
+        || lower.contains("automatic login is enabled")
+        || lower.contains("automatic login enabled")
+    {
+        return Some("On".to_string());
+    }
+    None
+}
+
+/// Prefer defaults username when set; else sysadminctl On/Off (+ FileVault reason).
+pub(crate) fn format_autologin_parts(
+    user: Option<&str>,
+    sysadmin: Option<&str>,
+) -> String {
+    if let Some(u) = user.map(str::trim).filter(|s| !s.is_empty()) {
+        return format!("On · {u}");
+    }
+    sysadmin.unwrap_or("").to_string()
+}
+
+/// macOS Automatic Login from loginwindow `autoLoginUser` (+ `sysadminctl -autologin status`).
+/// Distinct from Guest Account `/guest`, login username `/username` · `/whoami`, and
+/// Remote Login `/remote-login` · `/ssh`.
+/// Used by Discord/operator instant `/autologin` · `/auto-login` lane.
+pub fn get_autologin_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let user = {
+            let output = Command::new("/usr/bin/defaults")
+                .args([
+                    "read",
+                    "/Library/Preferences/com.apple.loginwindow",
+                    "autoLoginUser",
+                ])
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_autologin_user_defaults(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("autologin: defaults read spawn failed");
+                    None
+                }
+            }
+        };
+
+        let sysadmin = {
+            let output = Command::new("/usr/sbin/sysadminctl")
+                .args(["-autologin", "status"])
+                .output();
+            match output {
+                Ok(output) => {
+                    let mut buf = String::from_utf8_lossy(&output.stdout).into_owned();
+                    if !buf.is_empty() && !output.stderr.is_empty() {
+                        buf.push('\n');
+                    }
+                    buf.push_str(&String::from_utf8_lossy(&output.stderr));
+                    parse_autologin_sysadminctl(&buf)
+                }
+                Err(_) => {
+                    debug3!("autologin: sysadminctl spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_autologin_parts(user.as_deref(), sysadmin.as_deref());
+        if info.is_empty() {
+            debug3!("autologin: empty status");
+        } else {
+            debug3!("autologin status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
@@ -5343,6 +5468,68 @@ mod guest_account_parse_tests {
         assert_eq!(format_guest_account_parts(Some(false), Some("On")), "Off");
         assert_eq!(format_guest_account_parts(None, Some("On")), "On");
         assert_eq!(format_guest_account_parts(None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod autologin_parse_tests {
+    use super::{
+        format_autologin_parts, parse_autologin_sysadminctl, parse_autologin_user_defaults,
+    };
+
+    #[test]
+    fn parses_autologin_user_defaults() {
+        assert_eq!(
+            parse_autologin_user_defaults("raro42\n").as_deref(),
+            Some("raro42")
+        );
+        assert_eq!(parse_autologin_user_defaults(""), None);
+        assert_eq!(
+            parse_autologin_user_defaults(
+                "The domain/default pair of (/Library/Preferences/com.apple.loginwindow, autoLoginUser) does not exist\n"
+            ),
+            None
+        );
+    }
+
+    #[test]
+    fn parses_sysadminctl_autologin_status() {
+        assert_eq!(
+            parse_autologin_sysadminctl(
+                "Automatic login is disabled because FileVault is enabled.\n"
+            )
+            .as_deref(),
+            Some("Off · FileVault")
+        );
+        assert_eq!(
+            parse_autologin_sysadminctl(
+                "Automatic login is disabled by your system administrator.\n"
+            )
+            .as_deref(),
+            Some("Off · admin")
+        );
+        assert_eq!(
+            parse_autologin_sysadminctl("Automatic login is OFF.\n").as_deref(),
+            Some("Off")
+        );
+        assert_eq!(
+            parse_autologin_sysadminctl("Automatic login user: raro42\n").as_deref(),
+            Some("On · raro42")
+        );
+        assert_eq!(parse_autologin_sysadminctl("nope"), None);
+    }
+
+    #[test]
+    fn formats_user_over_sysadmin() {
+        assert_eq!(
+            format_autologin_parts(Some("raro42"), Some("Off · FileVault")),
+            "On · raro42"
+        );
+        assert_eq!(
+            format_autologin_parts(None, Some("Off · FileVault")),
+            "Off · FileVault"
+        );
+        assert_eq!(format_autologin_parts(None, None), "");
     }
 }
 

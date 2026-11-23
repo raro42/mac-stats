@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3003] - 2026-11-23
+
+### Added
+- Instant Automatic Login accepts `/autologin` · `/auto-login` · `/automatic-login` · `/automaticlogin` · `/autologin-status` · `/auto-login-status` · `/automatic-login-status` · `/autologin-state` · `/auto-login-state` · `/automatic-login-state` · `/mac-autologin` · `/mac-auto-login` · `/mac-automatic-login` and view/see/open/list NL (`view automatic login`, `open auto login`, `list automatic login`, …), matching “automatic login status” / “is automatic login on” / “is autologin enabled” / “what's my automatic login” / “what's the automatic login status”. Bare `autologin` / `auto login` / `automatic login` stay with the agent; `/guest` · `/guest-login` stay Guest Account; `/username` · `/whoami` stay login name; `/remote-login` · `/ssh` stay Remote Login; `/filevault` stays FileVault. Operator `/help` lists the new lane.
+
 ## [0.1.3002] - 2026-11-23
 
 ### Changed

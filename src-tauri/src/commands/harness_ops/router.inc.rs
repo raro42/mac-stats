@@ -1162,6 +1162,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_guest_account_request(content) {
         return Some(format_guest_account_report());
     }
+    // Automatic Login (bare `autologin` / `automatic login` stay with the agent; `/guest` ·
+    // `/guest-login` stay Guest Account; `/username` · `/whoami` stay login name; `/remote-login` ·
+    // `/ssh` stay Remote Login; `/filevault` stays FileVault).
+    if looks_like_autologin_request(content) {
+        return Some(format_autologin_report());
+    }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
     if looks_like_boot_time_request(content) {

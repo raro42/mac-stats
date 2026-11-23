@@ -3508,6 +3508,87 @@ mod tests {
         }
     }
 
+    #[test]
+    fn autologin_slash_and_view_open_do_not_steal_guest_username_or_bare_autologin() {
+        // Slash + view/open NL → Automatic Login (`/guest` · `/username` parity).
+        // Bare `autologin` / `automatic login` stay with the agent; `/guest` · `/guest-login` stay
+        // Guest Account; `/username` · `/whoami` stay login name; `/remote-login` · `/ssh` stay
+        // Remote Login; `/filevault` stays FileVault.
+        assert!(looks_like_autologin_request("/autologin"));
+        assert!(looks_like_autologin_request("/auto-login"));
+        assert!(looks_like_autologin_request("/automatic-login"));
+        assert!(looks_like_autologin_request("/autologin-status"));
+        assert!(looks_like_autologin_request("/auto-login-status"));
+        assert!(looks_like_autologin_request("/mac-autologin"));
+        assert!(looks_like_autologin_request("/mac-auto-login"));
+        assert!(looks_like_autologin_request("view automatic login"));
+        assert!(looks_like_autologin_request("open auto login"));
+        assert!(looks_like_autologin_request("list automatic login"));
+        assert!(looks_like_autologin_request("automatic login status"));
+        assert!(looks_like_autologin_request("is automatic login on"));
+        assert!(looks_like_autologin_request("is autologin enabled"));
+        assert!(looks_like_autologin_request("what's my automatic login"));
+        assert!(looks_like_autologin_request("view autologin"));
+        assert!(!looks_like_autologin_request("autologin"));
+        assert!(!looks_like_autologin_request("automatic login"));
+        assert!(!looks_like_autologin_request("auto login"));
+        assert!(!looks_like_autologin_request("/guest"));
+        assert!(!looks_like_autologin_request("/guest-login"));
+        assert!(!looks_like_autologin_request("view guest account"));
+        assert!(!looks_like_autologin_request("/username"));
+        assert!(!looks_like_autologin_request("/whoami"));
+        assert!(!looks_like_autologin_request("/remote-login"));
+        assert!(!looks_like_autologin_request("/ssh"));
+        assert!(!looks_like_autologin_request("/filevault"));
+        assert!(!looks_like_autologin_request("/tasks"));
+        assert!(!looks_like_autologin_request("enable automatic login"));
+        assert!(!looks_like_guest_account_request("/autologin"));
+        assert!(!looks_like_guest_account_request("view automatic login"));
+        assert!(!looks_like_username_request("/autologin"));
+        assert!(!looks_like_username_request("view automatic login"));
+        assert!(!looks_like_remote_login_request("/autologin"));
+        assert!(!looks_like_remote_login_request("view automatic login"));
+        let a = try_operator_instant_reply("/autologin").unwrap();
+        assert!(
+            a.contains("**Automatic Login**") && !a.to_lowercase().contains("execution"),
+            "got: {a}"
+        );
+        let viewed = try_operator_instant_reply("view automatic login").unwrap();
+        assert!(
+            viewed.contains("**Automatic Login**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open auto login").unwrap();
+        assert!(
+            open.contains("**Automatic Login**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("autologin").is_none());
+        assert!(try_operator_instant_reply("automatic login").is_none());
+        let g = try_operator_instant_reply("/guest");
+        if let Some(reply) = g {
+            assert!(
+                !reply.contains("**Automatic Login**"),
+                "/guest must stay Guest Account, not Automatic Login: {reply}"
+            );
+        }
+        let un = try_operator_instant_reply("/username");
+        if let Some(reply) = un {
+            assert!(
+                !reply.contains("**Automatic Login**"),
+                "/username must stay User, not Automatic Login: {reply}"
+            );
+        }
+        let rl = try_operator_instant_reply("/remote-login");
+        if let Some(reply) = rl {
+            assert!(
+                !reply.contains("**Automatic Login**"),
+                "/remote-login must stay Remote Login, not Automatic Login: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

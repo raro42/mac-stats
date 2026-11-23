@@ -16265,6 +16265,275 @@ pub fn format_guest_account_report() -> String {
     format!("**Guest Account** · `{v}`")
 }
 
+/// Automatic Login — loginwindow autoLoginUser (System Settings → Users & Groups).
+/// Slash + view/open NL (`/autologin` · `/auto-login` · `view automatic login`).
+/// Bare `autologin` / `automatic login` stay with the agent; `/guest` · `/guest-login` stay Guest Account;
+/// `/username` · `/whoami` stay login name; `/remote-login` · `/ssh` stay Remote Login;
+/// `/filevault` stays FileVault.
+pub fn looks_like_autologin_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n.contains("airdrop")
+        || n.contains("air drop")
+        || n.contains("air-drop")
+        || n.contains("airplay")
+        || n.contains("guest account")
+        || n.contains("guest user")
+        || n.contains("guest-account")
+        || n.contains("guest-user")
+        || n.contains("guest-login")
+        || n.contains("guestlogin")
+        || n.contains("automatic time")
+        || n.contains("automatic-time")
+        || n.contains("username")
+        || n.contains("user name")
+        || n.contains("whoami")
+        || n.contains("who am i")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/ssh"
+        || n == "/screen-sharing"
+        || n == "/vnc"
+        || n == "/file-sharing"
+        || n == "/smb"
+        || n == "/airdrop"
+        || n == "/air-drop"
+        || n == "/airplay"
+        || n == "/guest"
+        || n == "/guest-account"
+        || n == "/guestaccount"
+        || n == "/guest-login"
+        || n == "/guestlogin"
+        || n == "/guest-user"
+        || n == "/mac-guest"
+        || n == "/username"
+        || n == "/whoami"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        // Bare phrases stay with the agent.
+        || n == "autologin"
+        || n == "the autologin"
+        || n == "auto login"
+        || n == "the auto login"
+        || n == "automatic login"
+        || n == "the automatic login"
+        || n == "auto-login"
+        || n == "the auto-login"
+        || n == "login"
+        || n == "the login"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/autologin"
+            | "/auto-login"
+            | "/automatic-login"
+            | "/automaticlogin"
+            | "/autologin-status"
+            | "/auto-login-status"
+            | "/automatic-login-status"
+            | "/autologinstatus"
+            | "/autologin-state"
+            | "/auto-login-state"
+            | "/automatic-login-state"
+            | "/mac-autologin"
+            | "/mac-auto-login"
+            | "/mac-automatic-login"
+            | "autologin status"
+            | "the autologin status"
+            | "auto login status"
+            | "the auto login status"
+            | "automatic login status"
+            | "the automatic login status"
+            | "auto-login status"
+            | "the auto-login status"
+            | "autologin state"
+            | "the autologin state"
+            | "auto login state"
+            | "the auto login state"
+            | "automatic login state"
+            | "the automatic login state"
+            | "my autologin"
+            | "my autologin status"
+            | "my auto login"
+            | "my auto login status"
+            | "my automatic login"
+            | "my automatic login status"
+            | "is autologin on"
+            | "is autologin off"
+            | "is autologin enabled"
+            | "is autologin disabled"
+            | "is auto login on"
+            | "is auto login off"
+            | "is auto login enabled"
+            | "is auto login disabled"
+            | "is automatic login on"
+            | "is automatic login off"
+            | "is automatic login enabled"
+            | "is automatic login disabled"
+            | "is auto-login on"
+            | "is auto-login enabled"
+            | "what's my autologin"
+            | "whats my autologin"
+            | "what is my autologin"
+            | "what's my autologin status"
+            | "whats my autologin status"
+            | "what is my autologin status"
+            | "what's my auto login"
+            | "whats my auto login"
+            | "what is my auto login"
+            | "what's my auto login status"
+            | "whats my auto login status"
+            | "what is my auto login status"
+            | "what's my automatic login"
+            | "whats my automatic login"
+            | "what is my automatic login"
+            | "what's my automatic login status"
+            | "whats my automatic login status"
+            | "what is my automatic login status"
+            | "what's the autologin"
+            | "whats the autologin"
+            | "what is the autologin"
+            | "what's the autologin status"
+            | "whats the autologin status"
+            | "what is the autologin status"
+            | "what's the auto login"
+            | "whats the auto login"
+            | "what is the auto login"
+            | "what's the auto login status"
+            | "whats the auto login status"
+            | "what is the auto login status"
+            | "what's the automatic login"
+            | "whats the automatic login"
+            | "what is the automatic login"
+            | "what's the automatic login status"
+            | "whats the automatic login status"
+            | "what is the automatic login status"
+            | "how's autologin"
+            | "hows autologin"
+            | "how's the autologin"
+            | "hows the autologin"
+            | "how's automatic login"
+            | "hows automatic login"
+            | "how's the automatic login"
+            | "hows the automatic login"
+            | "view autologin"
+            | "view the autologin"
+            | "view autologin status"
+            | "view the autologin status"
+            | "view auto login"
+            | "view the auto login"
+            | "view auto login status"
+            | "view the auto login status"
+            | "view automatic login"
+            | "view the automatic login"
+            | "view automatic login status"
+            | "view the automatic login status"
+            | "view auto-login"
+            | "view the auto-login"
+            | "see autologin"
+            | "see the autologin"
+            | "see auto login"
+            | "see the auto login"
+            | "see automatic login"
+            | "see the automatic login"
+            | "see automatic login status"
+            | "see the automatic login status"
+            | "open autologin"
+            | "open the autologin"
+            | "open autologin status"
+            | "open the autologin status"
+            | "open auto login"
+            | "open the auto login"
+            | "open automatic login"
+            | "open the automatic login"
+            | "open automatic login status"
+            | "open the automatic login status"
+            | "list autologin"
+            | "list the autologin"
+            | "list autologin status"
+            | "list the autologin status"
+            | "list auto login"
+            | "list the auto login"
+            | "list automatic login"
+            | "list the automatic login"
+            | "list automatic login status"
+            | "list the automatic login status"
+    )
+}
+
+/// Zero-LLM Automatic Login status from loginwindow autoLoginUser (macOS-only; empty elsewhere).
+pub fn format_autologin_report() -> String {
+    let v = crate::metrics::get_autologin_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Automatic Login** — _no Automatic Login reading on this Mac right now._".to_string();
+    }
+    format!("**Automatic Login** · `{v}`")
+}
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·
