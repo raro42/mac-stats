@@ -12967,6 +12967,18 @@ pub fn looks_like_bluetooth_sharing_request(content: &str) -> bool {
         || n.contains("network sharing")
         || n.contains("networksharing")
         || n.contains("network-sharing")
+        || n.contains("media sharing")
+        || n.contains("mediasharing")
+        || n.contains("media-sharing")
+        || n.contains("home sharing")
+        || n.contains("homesharing")
+        || n.contains("home-sharing")
+        || n.contains("itunes sharing")
+        || n == "/media-sharing"
+        || n == "/mediasharing"
+        || n == "/home-sharing"
+        || n == "/homesharing"
+        || n == "/itunes-sharing"
         || n.contains("wifi")
         || n.contains("wi-fi")
         || n.contains("ssid")
@@ -13261,6 +13273,320 @@ pub fn format_bluetooth_sharing_report() -> String {
         return "**Bluetooth Sharing** — _no Bluetooth Sharing reading on this Mac right now._".to_string();
     }
     format!("**Bluetooth Sharing** · `{v}`")
+}
+
+
+/// Media Sharing / Home Sharing — `com.apple.amp.mediasharingd` prefs.
+/// "Why" / enable/disable stay with the agent. Slash + view/open NL (`/media-sharing` · `/home-sharing`).
+/// Bare `media` / `media sharing` / `home sharing` stay with the agent; `/bluetooth-sharing` · `/bts`
+/// stay Bluetooth Sharing; `/file-sharing` · `/smb` stay File Sharing; `/internet-sharing` · `/ics`
+/// stay Internet Sharing; `/wifi` stays SSID.
+pub fn looks_like_media_sharing_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("display")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen share")
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n.contains("file share")
+        || n.contains("printer sharing")
+        || n.contains("printersharing")
+        || n.contains("printer-sharing")
+        || n.contains("share printers")
+        || n.contains("cups share")
+        || n.contains("cups sharing")
+        || n.contains("remote management")
+        || n.contains("remotemanagement")
+        || n.contains("remote-management")
+        || n.contains("remote desktop")
+        || n.contains("apple remote desktop")
+        || n.contains("content caching")
+        || n.contains("contentcaching")
+        || n.contains("content-caching")
+        || n.contains("content cache")
+        || n.contains("asset cache")
+        || n.contains("assetcache")
+        || n.contains("asset-cache")
+        || n.contains("caching server")
+        || n.contains("internet sharing")
+        || n.contains("internetsharing")
+        || n.contains("internet-sharing")
+        || n.contains("network sharing")
+        || n.contains("networksharing")
+        || n.contains("network-sharing")
+        || n.contains("bluetooth sharing")
+        || n.contains("bluetoothsharing")
+        || n.contains("bluetooth-sharing")
+        || n.contains("bluetooth share")
+        || n.contains("file exchange")
+        || n.contains("obex")
+        || n.contains("wifi")
+        || n.contains("wi-fi")
+        || n.contains("ssid")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/remotelogin"
+        || n == "/ssh"
+        || n == "/sshd"
+        || n == "/screen-sharing"
+        || n == "/screensharing"
+        || n == "/vnc"
+        || n == "/file-sharing"
+        || n == "/filesharing"
+        || n == "/smb"
+        || n == "/smb-status"
+        || n == "/smbd"
+        || n == "/printer-sharing"
+        || n == "/cups-share"
+        || n == "/remote-management"
+        || n == "/ard"
+        || n == "/content-caching"
+        || n == "/asset-cache"
+        || n == "/internet-sharing"
+        || n == "/ics"
+        || n == "/nat-sharing"
+        || n == "/bluetooth-sharing"
+        || n == "/bluetoothsharing"
+        || n == "/bt-sharing"
+        || n == "/bts"
+        || n == "/obex"
+        || n == "/file-exchange"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/gateway"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        // Bare short / ambiguous stay with the agent.
+        || n == "media"
+        || n == "the media"
+        || n == "media sharing"
+        || n == "the media sharing"
+        || n == "mediasharing"
+        || n == "the mediasharing"
+        || n == "media-sharing"
+        || n == "the media-sharing"
+        || n == "home sharing"
+        || n == "the home sharing"
+        || n == "homesharing"
+        || n == "the homesharing"
+        || n == "home-sharing"
+        || n == "the home-sharing"
+        || n == "itunes sharing"
+        || n == "the itunes sharing"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/media-sharing"
+            | "/mediasharing"
+            | "/media-sharing-status"
+            | "/mediasharing-status"
+            | "/media-share"
+            | "/mediashare"
+            | "/home-sharing"
+            | "/homesharing"
+            | "/home-sharing-status"
+            | "/home-share"
+            | "/homeshare"
+            | "/itunes-sharing"
+            | "/itunes-share"
+            | "/amp-sharing"
+            | "/amp-media-sharing"
+            | "/mac-media-sharing"
+            | "/mac-home-sharing"
+            | "media sharing status"
+            | "the media sharing status"
+            | "mediasharing status"
+            | "the mediasharing status"
+            | "media-sharing status"
+            | "the media-sharing status"
+            | "home sharing status"
+            | "the home sharing status"
+            | "homesharing status"
+            | "the homesharing status"
+            | "home-sharing status"
+            | "the home-sharing status"
+            | "itunes sharing status"
+            | "the itunes sharing status"
+            | "my media sharing"
+            | "my media sharing status"
+            | "my home sharing"
+            | "my home sharing status"
+            | "is media sharing on"
+            | "is media sharing off"
+            | "is media sharing enabled"
+            | "is media sharing disabled"
+            | "is mediasharing on"
+            | "is mediasharing enabled"
+            | "is media-sharing on"
+            | "is media-sharing enabled"
+            | "is home sharing on"
+            | "is home sharing off"
+            | "is home sharing enabled"
+            | "is home sharing disabled"
+            | "is homesharing on"
+            | "is homesharing enabled"
+            | "is home-sharing on"
+            | "is home-sharing enabled"
+            | "what's my media sharing"
+            | "whats my media sharing"
+            | "what is my media sharing"
+            | "what's my media sharing status"
+            | "whats my media sharing status"
+            | "what is my media sharing status"
+            | "what's my home sharing"
+            | "whats my home sharing"
+            | "what is my home sharing"
+            | "what's my home sharing status"
+            | "whats my home sharing status"
+            | "what is my home sharing status"
+            | "what's the media sharing"
+            | "whats the media sharing"
+            | "what is the media sharing"
+            | "what's the media sharing status"
+            | "whats the media sharing status"
+            | "what is the media sharing status"
+            | "what's the home sharing"
+            | "whats the home sharing"
+            | "what is the home sharing"
+            | "what's the home sharing status"
+            | "whats the home sharing status"
+            | "what is the home sharing status"
+            | "how's media sharing"
+            | "hows media sharing"
+            | "how's the media sharing"
+            | "hows the media sharing"
+            | "how's home sharing"
+            | "hows home sharing"
+            // View/see/show me/open/list.
+            | "view media sharing"
+            | "view the media sharing"
+            | "view media sharing status"
+            | "view the media sharing status"
+            | "view mediasharing"
+            | "view the mediasharing"
+            | "view media-sharing"
+            | "view the media-sharing"
+            | "view media share"
+            | "view the media share"
+            | "view home sharing"
+            | "view the home sharing"
+            | "view home sharing status"
+            | "view the home sharing status"
+            | "view homesharing"
+            | "view the homesharing"
+            | "view home-sharing"
+            | "view the home-sharing"
+            | "view itunes sharing"
+            | "view the itunes sharing"
+            | "see media sharing"
+            | "see the media sharing"
+            | "see media sharing status"
+            | "see the media sharing status"
+            | "see home sharing"
+            | "see the home sharing"
+            | "see home sharing status"
+            | "see the home sharing status"
+            | "open media sharing"
+            | "open the media sharing"
+            | "open media sharing status"
+            | "open the media sharing status"
+            | "open mediasharing"
+            | "open the mediasharing"
+            | "open home sharing"
+            | "open the home sharing"
+            | "open home sharing status"
+            | "open the home sharing status"
+            | "list media sharing"
+            | "list the media sharing"
+            | "list media sharing status"
+            | "list the media sharing status"
+            | "list home sharing"
+            | "list the home sharing"
+            | "list home sharing status"
+            | "list the home sharing status"
+            | "show media sharing"
+            | "show the media sharing"
+            | "show me media sharing"
+            | "show me the media sharing"
+            | "show media sharing status"
+            | "show the media sharing status"
+            | "show me media sharing status"
+            | "show me the media sharing status"
+            | "show home sharing"
+            | "show the home sharing"
+            | "show me home sharing"
+            | "show me the home sharing"
+            | "show home sharing status"
+            | "show the home sharing status"
+            | "show me home sharing status"
+            | "show me the home sharing status"
+    )
+}
+
+/// Zero-LLM Media Sharing status from mediasharingd prefs (macOS-only; empty elsewhere).
+pub fn format_media_sharing_report() -> String {
+    let v = crate::metrics::get_media_sharing_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Media Sharing** — _no Media Sharing reading on this Mac right now._".to_string();
+    }
+    format!("**Media Sharing** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.

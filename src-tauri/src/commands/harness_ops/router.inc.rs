@@ -1090,9 +1090,16 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     // Bluetooth Sharing / OBEX file exchange (bare `bluetooth` / `bluetooth sharing` / `obex` / `bts` stay
     // with the agent; `/internet-sharing` · `/ics` stay Internet Sharing; `/file-sharing` · `/smb` stay
-    // File Sharing; `/wifi` stays SSID; `/content-caching` stays Content Caching).
+    // File Sharing; `/wifi` stays SSID; `/content-caching` stays Content Caching; Media Sharing stays
+    // `/media-sharing` · `/home-sharing`).
     if looks_like_bluetooth_sharing_request(content) {
         return Some(format_bluetooth_sharing_report());
+    }
+    // Media Sharing / Home Sharing (bare `media` / `media sharing` / `home sharing` stay with the agent;
+    // `/bluetooth-sharing` · `/bts` stay Bluetooth Sharing; `/file-sharing` · `/smb` stay File Sharing;
+    // `/internet-sharing` · `/ics` stay Internet Sharing; `/wifi` stays SSID).
+    if looks_like_media_sharing_request(content) {
+        return Some(format_media_sharing_report());
     }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).

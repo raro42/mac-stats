@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2980] - 2026-11-23
+
+### Added
+- Instant Media Sharing status accepts `/media-sharing` · `/mediasharing` · `/media-sharing-status` · `/media-share` · `/home-sharing` · `/homesharing` · `/home-share` · `/itunes-sharing` · `/amp-sharing` · `/mac-media-sharing` · `/mac-home-sharing` and view/see/open/list NL (`view media sharing`, `open home sharing status`, `list media sharing`, …), matching “media sharing status” / “is media sharing on” / “is home sharing enabled” / “what's my media sharing” / “what's the home sharing status”. Bare `media` / `media sharing` / `home sharing` stay with the agent; `/bluetooth-sharing` · `/bts` stay Bluetooth Sharing; `/file-sharing` · `/smb` stay File Sharing; `/internet-sharing` · `/ics` stay Internet Sharing; `/wifi` stays SSID.
+
 ## [0.1.2979] - 2026-11-23
 
 ### Added

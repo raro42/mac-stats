@@ -1571,6 +1571,89 @@ pub fn get_bluetooth_sharing_status() -> String {
     }
 }
 
+/// Combine Home Sharing / Photos flags + `mediasharingd` into a short status line.
+pub(crate) fn format_media_sharing_parts(
+    home: Option<bool>,
+    photos: Option<bool>,
+    daemon: bool,
+) -> String {
+    match (home, photos, daemon) {
+        (Some(true), Some(true), true) => "On · home · photos · active".to_string(),
+        (Some(true), Some(true), false) => "On · home · photos".to_string(),
+        (Some(true), _, true) => "On · home · active".to_string(),
+        (Some(true), _, false) => "On · home".to_string(),
+        (_, Some(true), true) => "On · photos · active".to_string(),
+        (_, Some(true), false) => "On · photos".to_string(),
+        (Some(false), Some(false), _) => "Off".to_string(),
+        (Some(false), None, _) => "Off".to_string(),
+        (None, Some(false), false) => "Off".to_string(),
+        (None, None, true) => "active".to_string(),
+        _ => String::new(),
+    }
+}
+
+/// macOS Media Sharing (Home Sharing / Photos) from `com.apple.amp.mediasharingd` prefs.
+/// Distinct from Bluetooth Sharing `/bluetooth-sharing` · `/bts`, File Sharing `/smb`,
+/// and Internet Sharing `/internet-sharing` · `/ics`.
+/// Used by Discord/operator instant `/media-sharing` · `/home-sharing` lane.
+pub fn get_media_sharing_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let read_flag = |key: &str| -> Option<bool> {
+            let output = Command::new("/usr/bin/defaults")
+                .args(["read", "com.apple.amp.mediasharingd", key])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_nat_enabled_plistbuddy(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("media-sharing: defaults read spawn failed ({key})");
+                    None
+                }
+            }
+        };
+
+        let home = read_flag("home-sharing-enabled");
+        let photos = read_flag("photo-sharing-enabled");
+
+        let daemon = {
+            let output = Command::new("/bin/ps")
+                .args(["-axc", "-o", "comm="])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    stdout.lines().any(|l| {
+                        let t = l.trim();
+                        t == "mediasharingd" || t.ends_with("/mediasharingd")
+                    })
+                }
+                Err(_) => {
+                    debug3!("media-sharing: ps spawn failed");
+                    false
+                }
+            }
+        };
+
+        let info = format_media_sharing_parts(home, photos, daemon);
+        if info.is_empty() {
+            debug3!("media-sharing: empty status");
+        } else {
+            debug3!("media-sharing status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
@@ -4123,6 +4206,35 @@ fn homebrew_cask_staged_at(candidates: &[&str]) -> bool {
 #[tauri::command]
 pub fn is_homebrew_cask_install() -> bool {
     homebrew_cask_staged_at(HOMEBREW_CASKROOM_MAC_STATS)
+}
+
+#[cfg(test)]
+mod media_sharing_parse_tests {
+    use super::format_media_sharing_parts;
+
+    #[test]
+    fn formats_off_home_and_photos() {
+        assert_eq!(
+            format_media_sharing_parts(Some(false), Some(false), false),
+            "Off"
+        );
+    }
+
+    #[test]
+    fn formats_home_on_idle() {
+        assert_eq!(
+            format_media_sharing_parts(Some(true), Some(false), false),
+            "On · home"
+        );
+    }
+
+    #[test]
+    fn formats_home_and_photos_active() {
+        assert_eq!(
+            format_media_sharing_parts(Some(true), Some(true), true),
+            "On · home · photos · active"
+        );
+    }
 }
 
 #[cfg(test)]

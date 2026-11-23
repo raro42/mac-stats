@@ -2756,6 +2756,78 @@ mod tests {
                 "/smb must stay File Sharing, not Bluetooth Sharing: {reply}"
             );
         }
+        assert!(!looks_like_bluetooth_sharing_request("/media-sharing"));
+        assert!(!looks_like_bluetooth_sharing_request("/home-sharing"));
+        assert!(!looks_like_bluetooth_sharing_request("view media sharing"));
+    }
+
+    #[test]
+    fn media_sharing_slash_and_view_open_do_not_steal_bts_smb_or_bare_media() {
+        // Slash + view/open NL → Media Sharing (`/bluetooth-sharing` · `/file-sharing` parity).
+        // Bare `media` / `media sharing` / `home sharing` stay with the agent; `/bts` stays Bluetooth
+        // Sharing; `/smb` stays File Sharing; `/ics` stays Internet Sharing; `/wifi` stays SSID.
+        assert!(looks_like_media_sharing_request("/media-sharing"));
+        assert!(looks_like_media_sharing_request("/mediasharing"));
+        assert!(looks_like_media_sharing_request("/media-share"));
+        assert!(looks_like_media_sharing_request("/home-sharing"));
+        assert!(looks_like_media_sharing_request("/homesharing"));
+        assert!(looks_like_media_sharing_request("/home-share"));
+        assert!(looks_like_media_sharing_request("/itunes-sharing"));
+        assert!(looks_like_media_sharing_request("/amp-sharing"));
+        assert!(looks_like_media_sharing_request("/mac-media-sharing"));
+        assert!(looks_like_media_sharing_request("/mac-home-sharing"));
+        assert!(looks_like_media_sharing_request("view media sharing"));
+        assert!(looks_like_media_sharing_request("open home sharing status"));
+        assert!(looks_like_media_sharing_request("list media sharing"));
+        assert!(looks_like_media_sharing_request("media sharing status"));
+        assert!(looks_like_media_sharing_request("is media sharing on"));
+        assert!(looks_like_media_sharing_request("is home sharing enabled"));
+        assert!(looks_like_media_sharing_request("what's my media sharing"));
+        assert!(looks_like_media_sharing_request("view home sharing"));
+        assert!(!looks_like_media_sharing_request("media"));
+        assert!(!looks_like_media_sharing_request("media sharing"));
+        assert!(!looks_like_media_sharing_request("home sharing"));
+        assert!(!looks_like_media_sharing_request("/bluetooth-sharing"));
+        assert!(!looks_like_media_sharing_request("/bts"));
+        assert!(!looks_like_media_sharing_request("/obex"));
+        assert!(!looks_like_media_sharing_request("/internet-sharing"));
+        assert!(!looks_like_media_sharing_request("/ics"));
+        assert!(!looks_like_media_sharing_request("/file-sharing"));
+        assert!(!looks_like_media_sharing_request("/smb"));
+        assert!(!looks_like_media_sharing_request("/wifi"));
+        assert!(!looks_like_media_sharing_request("/ip"));
+        assert!(!looks_like_media_sharing_request("/tasks"));
+        assert!(!looks_like_media_sharing_request("enable media sharing"));
+        assert!(!looks_like_bluetooth_sharing_request("/media-sharing"));
+        assert!(!looks_like_bluetooth_sharing_request("view media sharing"));
+        assert!(!looks_like_internet_sharing_request("/media-sharing"));
+        assert!(!looks_like_file_sharing_request("/media-sharing"));
+        let ms = try_operator_instant_reply("/media-sharing").unwrap();
+        assert!(
+            ms.contains("**Media Sharing**") && !ms.to_lowercase().contains("execution"),
+            "got: {ms}"
+        );
+        let viewed = try_operator_instant_reply("view home sharing").unwrap();
+        assert!(
+            viewed.contains("**Media Sharing**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("media").is_none());
+        assert!(try_operator_instant_reply("media sharing").is_none());
+        let bts = try_operator_instant_reply("/bluetooth-sharing");
+        if let Some(reply) = bts {
+            assert!(
+                !reply.contains("**Media Sharing**"),
+                "/bluetooth-sharing must stay Bluetooth Sharing, not Media Sharing: {reply}"
+            );
+        }
+        let smb = try_operator_instant_reply("/smb");
+        if let Some(reply) = smb {
+            assert!(
+                !reply.contains("**Media Sharing**"),
+                "/smb must stay File Sharing, not Media Sharing: {reply}"
+            );
+        }
     }
 
 #[test]
