@@ -1,21 +1,17 @@
 # Morning surprise — 2026-11-23
 
-Overnight autoresearch kept shipping soft-state instant lanes after digester stayed empty.
+Overnight autoresearch kept shipping soft-state instant lanes and kb-hint polish.
 
-## Shipped tonight
-- **v0.1.3007** — Power Nap `/powernap` · `/power-nap` · `/mac-powernap` + view/open NL (`pmset` Battery/AC `powernap`; bare phrases stay with agent; `/lpm` · `/power` · `/watts` · `/screensaver` intact)
-- **v0.1.3006** — Screensaver idle `/screensaver` · `/idle-time` · `/mac-screensaver` + view/open NL
-- **v0.1.3005** — SMB Guest Access `/smb-guest` · `/guest-access` + view/open NL
-- **v0.1.3004** — Screen Lock `/screen-lock` · `/lock-screen` + view/open NL
-- **v0.1.3003** — Automatic Login `/autologin` · `/auto-login` + view/open NL
-- Earlier in the window: Guest Account, firewall listapps, Perplexity/Logs · Settings kb-hints, design-review Monitors/Disk Cleanup polish
+## Shipped tonight (highlights)
+- **v0.1.3008** Wake for network — `/womp` · `/wake-for-network` · `/wake-on-lan` · `/wol` · `/mac-womp` + view/open NL (`pmset` Battery/AC `womp`). Distinct from Power Nap.
+- **v0.1.3007** Power Nap — `/powernap` · `/power-nap` · `/mac-powernap` + view/open NL.
+- **v0.1.3006** Screensaver idle — `/screensaver` · `/idle-time` · `/mac-screensaver` + view/open NL (`idleTime`; 0 = Never). Distinct from Screen Lock.
+- **v0.1.3005** SMB Guest Access — `/smb-guest` · `/guest-access` + view/open NL.
+- **v0.1.3004** Screen Lock — `/screen-lock` · `/lock-screen` + view/open NL.
+- **v0.1.3003** Automatic Login — `/autologin` + view/open NL.
+- Earlier tonight: Guest Account slash+NL + `/help` row, Settings Appearance/Changelog · Credentials kb-hints, Firewall listapps / block-all, design-review Monitors · Disk · CPU · processes · AI Chat · Agent Ops kb-hints.
 
-## Tried / context
-- Digester open empty all night; design-review surfaces in polish grace (Mac TCC — no fresh captures)
-- Layout-daily Neon already marked for 2026-11-23 (Futuristic next calendar day)
+## Left intentional / next
 - cream/Swiss Send fill white-on-blue left intentional
-
-## Next fuel
-- Futuristic layout-daily when the calendar quota opens
-- cream/Swiss Send fill intentional (leave alone unless contrast regresses)
-- soft-state sibling/product (Wake for network / `womp`) — not keep-pNN clones
+- Futuristic layout-daily next calendar day (Neon marked today)
+- soft-state sibling/product fuel continues (displaysleep / proximitywake; not another keep-pNN clone)

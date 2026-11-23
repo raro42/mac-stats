@@ -1,3 +1,21 @@
+## Overnight note 2026-11-23 ~22:38
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Sibling: OpenClaw/Hermes missing on rack.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Power Nap v0.1.3007 — Wake for network / womp slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.3008** — `/womp` · `/wake-for-network` · `/wake-on-lan` · `/wol` · `/mac-womp` + view/open NL; bare womp/wake for network/wake on lan/wol stay with agent; `/powernap` · `/lpm` · `/power` · `/wifi` · `/vpn` intact; `/help` lists lane.
+- Ratchet keep @ 49f9167 for 3008; backfill keep for 3007.
+- Morning surprise: refresh 2026-11-23 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- X: ensure-loops pids live; draft-only, no send.
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (displaysleep / proximitywake) — Wake for network slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3008
+
+- Product fuel after Power Nap v0.1.3007: Wake for network access already readable via `pmset -g custom` Battery/AC `womp` (+ active `pmset -g`) but lacked `/womp` · `/wake-for-network` · `/wake-on-lan` · `/wol` · `/mac-womp` and view/see/open/list phrases while Power Nap `/powernap`, Low Power Mode `/lpm`, power strip `/power`, Wi-Fi `/wifi`, and VPN `/vpn` already had slash+NL. Bare `womp` / `wake for network` / `wake on lan` / `wol` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (displaysleep / proximitywake) — Wake for network slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~22:20
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
