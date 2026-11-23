@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2998] - 2026-11-23
+
+### Changed
+- Settings Credentials keyboard hints (section tip · Discord · Perplexity · Brave · Redmine · Mastodon · MCP · Browser · Cursor Agent · Telegram · Slack toolbars): shorter, warmer copy so the credentials chain stays KISS when Tab focus shows the hint (product polish after Monitors kb-hints; cream/Swiss Send fill white-on-blue stays intentional).
+
 ## [0.1.2997] - 2026-11-23
 
 ### Added

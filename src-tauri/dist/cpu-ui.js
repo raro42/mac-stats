@@ -3586,9 +3586,10 @@
     }
   }
 
+  /* Settings Credentials: shorter, warmer section tip (KISS; toolbar parity). */
   /** How to move across Credentials controls when Settings is open. */
   const CREDENTIALS_SECTION_KB_HINT =
-    "← → / h l · Home/End move · arrows at token/key start/end · Discord token ↑ → Settings header · Perplexity key ↑ → icon · Clear / View logs end → footer · else Product / header";
+    "← → / h l · Home/End · arrows at token/key edges · Discord ↑ header · Perplexity ↑ icon · Clear/View logs → footer · else Product";
 
   function ensureCredentialsSectionKbStyles() {
     if (document.getElementById("mac-stats-credentials-section-kb-styles")) return;

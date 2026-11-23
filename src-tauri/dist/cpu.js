@@ -14483,9 +14483,10 @@ function refreshBraveSettingsToolbarRovingTabindex(wrap, preferred) {
   }
 }
 
+/* Settings Credentials: shorter, warmer Brave tip (KISS; Ollama / Monitors parity). */
 /** How to move across the Brave key, Save, and Clear when Settings is open. */
 const BRAVE_SETTINGS_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End move · arrows at key start/end · key first crosses to Perplexity · Clear last crosses to Redmine';
+  '← → / h l · Home/End · arrows at key edges · edges jump to Perplexity or Redmine';
 
 /**
  * Theme HTML ships the hint under the key field, Save, and Clear.
@@ -14856,8 +14857,9 @@ function refreshRedmineSettingsToolbarRovingTabindex(wrap, preferred) {
 }
 
 /** How to move across the Redmine URL, key, Save, and Clear when Settings is open. */
+/* Settings Credentials: shorter, warmer Redmine tip (KISS; Brave parity). */
 const REDMINE_SETTINGS_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End move · arrows at URL/key start/end · URL first crosses to Brave · Clear last crosses to Mastodon';
+  '← → / h l · Home/End · arrows at URL/key edges · edges jump to Brave or Mastodon';
 
 /**
  * Theme HTML ships the hint under the URL field, key field, Save, and Clear.
@@ -15197,8 +15199,9 @@ function refreshMastodonSettingsToolbarRovingTabindex(wrap, preferred) {
 }
 
 /** How to move across the Mastodon URL, token, Save, and Clear when Settings is open. */
+/* Settings Credentials: shorter, warmer Mastodon tip (KISS; Brave parity). */
 const MASTODON_SETTINGS_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End move · arrows at URL/token start/end · URL first crosses to Redmine · Clear last crosses to MCP';
+  '← → / h l · Home/End · arrows at URL/token edges · edges jump to Redmine or MCP';
 
 /**
  * Theme HTML ships the hint under the URL field, token field, Save, and Clear.
@@ -15566,8 +15569,9 @@ function refreshMcpSettingsToolbarRovingTabindex(wrap, preferred) {
 }
 
 /** How to move across the MCP URL, stdio, Save, and Clear when Settings is open. */
+/* Settings Credentials: shorter, warmer MCP tip (KISS; Brave parity). */
 const MCP_SETTINGS_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End move · arrows at URL/stdio start/end · URL first crosses to Mastodon · Clear last crosses to Browser';
+  '← → / h l · Home/End · arrows at URL/stdio edges · edges jump to Mastodon or Browser';
 
 /**
  * Theme HTML ships the hint under the URL field, stdio field, Save, and Clear.
@@ -15943,8 +15947,9 @@ function refreshBrowserSettingsToolbarRovingTabindex(wrap, preferred) {
 }
 
 /** How to move across the Browser path, port, Save, and Clear when Settings is open. */
+/* Settings Credentials: shorter, warmer Browser tip (KISS; Brave parity). */
 const BROWSER_SETTINGS_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End move · arrows at path/port start/end · path first crosses to MCP · Clear last crosses to Cursor';
+  '← → / h l · Home/End · arrows at path/port edges · edges jump to MCP or Cursor';
 
 /**
  * Theme HTML ships the hint under the path field, port field, Save, and Clear.
@@ -16397,8 +16402,9 @@ function refreshCursorAgentSettingsToolbarRovingTabindex(wrap, preferred) {
 }
 
 /** How to move across the Cursor workspace, executable, Save, and Clear when Settings is open. */
+/* Settings Credentials: shorter, warmer Cursor Agent tip (KISS; Brave parity). */
 const CURSOR_AGENT_SETTINGS_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End move · arrows at workspace/executable start/end · workspace first crosses to Browser · Clear last crosses to Telegram';
+  '← → / h l · Home/End · arrows at workspace/executable edges · edges jump to Browser or Telegram';
 
 /**
  * Theme HTML ships the hint under the workspace field, executable field, Save, and Clear.
@@ -16875,8 +16881,9 @@ function refreshTelegramSettingsToolbarRovingTabindex(wrap, preferred) {
 }
 
 /** How to move across the Telegram token, chat id, Save, and Clear when Settings is open. */
+/* Settings Credentials: shorter, warmer Telegram tip (KISS; Brave parity). */
 const TELEGRAM_SETTINGS_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End move · arrows at token/chat id start/end · token first crosses to Cursor · Clear last crosses to Slack';
+  '← → / h l · Home/End · arrows at token/chat id edges · edges jump to Cursor or Slack';
 
 /**
  * Theme HTML ships the hint under the token field, chat id field, Save, and Clear.
@@ -17226,8 +17233,9 @@ function refreshSlackSettingsToolbarRovingTabindex(wrap, preferred) {
 }
 
 /** How to move across the Slack webhook, Save, and Clear when Settings is open. */
+/* Settings Credentials: shorter, warmer Slack tip (KISS; Brave parity). */
 const SLACK_SETTINGS_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End move · arrows at webhook start/end · webhook first crosses to Telegram · Clear last crosses to header';
+  '← → / h l · Home/End · arrows at webhook edges · edges jump to Telegram or header';
 
 /**
  * Theme HTML ships the hint under the webhook field, Save, and Clear.
@@ -18619,8 +18627,9 @@ function refreshPerplexitySettingsToolbarRovingTabindex(wrap, preferred) {
 }
 
 /** How to move across the Perplexity key, Save, and Clear when Settings is open. */
+/* Settings Credentials: shorter, warmer Perplexity tip (KISS; Brave parity). */
 const PERPLEXITY_SETTINGS_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End move · arrows at key start/end · key first ↑ → Perplexity icon · at end crosses to footer version';
+  '← → / h l · Home/End · arrows at key edges · edges jump to Perplexity icon or footer version';
 
 /**
  * Theme HTML ships the hint under the key field, Save, and Clear.

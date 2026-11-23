@@ -850,7 +850,7 @@
                 <button type="button" class="settings-btn settings-btn-primary discord-btn" id="discord-save-token">Save token</button>
                 <button type="button" class="settings-btn discord-btn" id="discord-clear-token">Clear token</button>
                 <button type="button" class="settings-btn discord-btn" id="view-debug-log">View logs</button>
-                <div class="discord-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End move · arrows at token start/end · token first ↑ → Discord icon · at end crosses to footer version</div>
+                <div class="discord-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End · arrows at token edges · edges jump to Discord icon or footer version</div>
               </div>
               <div class="setting-note">Saving connects right away. Restart to disconnect after clearing. Logs include Discord and app output.</div>
             </div>
@@ -861,7 +861,7 @@
               <div class="settings-actions perplexity-actions">
                 <button type="button" class="settings-btn settings-btn-primary discord-btn" id="perplexity-save-key">Save key</button>
                 <button type="button" class="settings-btn discord-btn" id="perplexity-clear-key">Clear key</button>
-                <div class="perplexity-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End move · arrows at key start/end · key first ↑ → Perplexity icon · at end crosses to footer version</div>
+                <div class="perplexity-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End · arrows at key edges · edges jump to Perplexity icon or footer version</div>
               </div>
               <div class="setting-note">Get a key at <a href="https://www.perplexity.ai/settings/api" target="_blank" rel="noopener noreferrer">perplexity.ai/settings/api</a>. Stored in Keychain.</div>
             </div>
@@ -872,7 +872,7 @@
               <div class="settings-actions brave-actions">
                 <button type="button" class="settings-btn settings-btn-primary discord-btn" id="brave-save-key">Save key</button>
                 <button type="button" class="settings-btn discord-btn" id="brave-clear-key">Clear key</button>
-                <div class="brave-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End move · arrows at key start/end · key first crosses to Perplexity · Clear last crosses to Redmine</div>
+                <div class="brave-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End · arrows at key edges · edges jump to Perplexity or Redmine</div>
               </div>
               <div class="setting-note">Get a key at <a href="https://api-dashboard.search.brave.com/" target="_blank" rel="noopener noreferrer">api-dashboard.search.brave.com</a>. Stored in Keychain (or set BRAVE_API_KEY in .config.env).</div>
             </div>
@@ -884,7 +884,7 @@
               <div class="settings-actions redmine-actions">
                 <button type="button" class="settings-btn settings-btn-primary discord-btn" id="redmine-save">Save</button>
                 <button type="button" class="settings-btn discord-btn" id="redmine-clear">Clear</button>
-                <div class="redmine-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End move · arrows at URL/key start/end · URL first crosses to Brave · Clear last crosses to Mastodon</div>
+                <div class="redmine-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End · arrows at URL/key edges · edges jump to Brave or Mastodon</div>
               </div>
               <div class="setting-note">Base URL + API key for tickets and time entries. Stored in Keychain (or set REDMINE_URL / REDMINE_API_KEY in .config.env).</div>
             </div>
@@ -896,7 +896,7 @@
               <div class="settings-actions mastodon-actions">
                 <button type="button" class="settings-btn settings-btn-primary discord-btn" id="mastodon-save">Save</button>
                 <button type="button" class="settings-btn discord-btn" id="mastodon-clear">Clear</button>
-                <div class="mastodon-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End move · arrows at URL/token start/end · URL first crosses to Redmine · Clear last crosses to MCP</div>
+                <div class="mastodon-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End · arrows at URL/token edges · edges jump to Redmine or MCP</div>
               </div>
               <div class="setting-note">Instance URL + access token for MASTODON_POST. Stored in Keychain (or set MASTODON_INSTANCE_URL / MASTODON_ACCESS_TOKEN in .config.env).</div>
             </div>
@@ -908,7 +908,7 @@
               <div class="settings-actions mcp-actions">
                 <button type="button" class="settings-btn settings-btn-primary discord-btn" id="mcp-save">Save</button>
                 <button type="button" class="settings-btn discord-btn" id="mcp-clear">Clear</button>
-                <div class="mcp-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End move · arrows at URL/stdio start/end · URL first crosses to Mastodon · Clear last crosses to Browser</div>
+                <div class="mcp-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End · arrows at URL/stdio edges · edges jump to Mastodon or Browser</div>
               </div>
               <div class="setting-note">HTTP/SSE URL or stdio pipe string for MCP tools. Either is enough. Stored in Keychain (or set MCP_SERVER_URL / MCP_SERVER_STDIO in .config.env).</div>
             </div>
@@ -920,7 +920,7 @@
               <div class="settings-actions browser-actions">
                 <button type="button" class="settings-btn settings-btn-primary discord-btn" id="browser-save">Save</button>
                 <button type="button" class="settings-btn discord-btn" id="browser-clear">Clear</button>
-                <div class="browser-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End move · arrows at path/port start/end · path first crosses to MCP · Clear last crosses to Cursor</div>
+                <div class="browser-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End · arrows at path/port edges · edges jump to MCP or Cursor</div>
               </div>
               <div class="setting-note">Chromium executable + CDP port for BROWSER_* tools. Saved in ~/.mac-stats/config.json (browserChromiumExecutable / browserCdpPort). Clear restores default Chrome + port 9222.</div>
             </div>
@@ -932,7 +932,7 @@
               <div class="settings-actions cursor-agent-actions">
                 <button type="button" class="settings-btn settings-btn-primary discord-btn" id="cursor-agent-save">Save</button>
                 <button type="button" class="settings-btn discord-btn" id="cursor-agent-clear">Clear</button>
-                <div class="cursor-agent-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End move · arrows at workspace/executable start/end · workspace first crosses to Browser · Clear last crosses to Telegram</div>
+                <div class="cursor-agent-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End · arrows at workspace/executable edges · edges jump to Browser or Telegram</div>
               </div>
               <div class="setting-note">Workspace + optional binary for CURSOR_AGENT. Saved in ~/.mac-stats/config.json (cursorAgentWorkspace / cursorAgentExecutable). Clear restores PATH default + ~/projects/mac-stats when present.</div>
             </div>
@@ -944,7 +944,7 @@
               <div class="settings-actions telegram-actions">
                 <button type="button" class="settings-btn settings-btn-primary discord-btn" id="telegram-save">Save</button>
                 <button type="button" class="settings-btn discord-btn" id="telegram-clear">Clear</button>
-                <div class="telegram-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End move · arrows at token/chat id start/end · token first crosses to Cursor · Clear last crosses to Slack</div>
+                <div class="telegram-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End · arrows at token/chat id edges · edges jump to Cursor or Slack</div>
               </div>
               <div class="setting-note">Bot token + chat id for alert delivery. Stored in Keychain; channel registers on Save and restores at startup. /telegram shows Ready when both are set.</div>
             </div>
@@ -955,7 +955,7 @@
               <div class="settings-actions slack-actions">
                 <button type="button" class="settings-btn settings-btn-primary discord-btn" id="slack-save">Save</button>
                 <button type="button" class="settings-btn discord-btn" id="slack-clear">Clear</button>
-                <div class="slack-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End move · arrows at webhook start/end · webhook first crosses to Telegram · Clear last crosses to header</div>
+                <div class="slack-settings-toolbar-kb-hint" hidden aria-hidden="true">← → / h l · Home/End · arrows at webhook edges · edges jump to Telegram or header</div>
               </div>
               <div class="setting-note">Incoming webhook URL for alert delivery. Stored in Keychain; channel registers on Save and restores at startup. /slack shows Ready when set.</div>
             </div>
@@ -964,7 +964,7 @@
               <div class="signal-status settings-status" id="signal-settings-status">Not wired</div>
               <div class="setting-note" id="signal-settings-note">Signal REST API / signal-cli is not wired yet. Alerts cannot send to Signal. Use Telegram or Slack for now. /signal shows this status.</div>
             </div>
-            <div class="credentials-section-kb-hint" hidden aria-hidden="true">← → / h l · Home/End move · arrows at token/key start/end · Discord token ↑ → Settings header · Perplexity key ↑ → icon · Clear / View logs end → footer · else Product / header</div>
+            <div class="credentials-section-kb-hint" hidden aria-hidden="true">← → / h l · Home/End · arrows at token/key edges · Discord ↑ header · Perplexity ↑ icon · Clear/View logs → footer · else Product</div>
           </section>
         </div>
       </div>
