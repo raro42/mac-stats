@@ -1,3 +1,11 @@
+## Overnight note 2026-11-23 ~01:30
+- Shipped v0.1.2982 AirPlay Receiver `/airplay` · `/airplay-receiver` · `/mac-airplay` + view/open NL; bare airplay/airplay receiver stay with agent; `/media-sharing` · `/rae` · `/eppc` · `/vnc` · `/display` intact.
+- Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Futuristic layout-daily next calendar quota.
+
+## Overnight merge — v0.1.2982
+
+- Product fuel after Remote Apple Events `/remote-apple-events` NL v0.1.2981: AirPlay Receiver already readable via Control Center host prefs `AirplayReceiverEnabled` / `AirplayReceiverAdvertising` + listen ports 5000/7000 but lacked `/airplay` · `/airplay-status` · `/airplay-state` · `/airplay-receiver` · `/airplayreceiver` · `/airplay-receiver-status` · `/airplay-recv` · `/airplay-rx` · `/ap-receiver` · `/mac-airplay` · `/mac-airplay-receiver` and view/see/open/list phrases while Media Sharing `/media-sharing` · `/home-sharing`, Remote Apple Events `/remote-apple-events` · `/rae` · `/eppc`, and Screen Sharing `/screen-sharing` · `/vnc` already had slash+NL. Bare `airplay` / `airplay receiver` stay with the agent; `/media-sharing` · `/home-sharing` stay Media Sharing; `/remote-apple-events` · `/rae` · `/eppc` stay Remote Apple Events; `/screen-sharing` · `/vnc` stay Screen Sharing; `/display` stays connected displays. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · DVD/CD Sharing or soft-state sibling/product fuel — AirPlay Receiver slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~01:25
 - Shipped v0.1.2981 Remote Apple Events `/remote-apple-events` · `/rae` · `/eppc` + view/open NL; bare apple events/eppc/rae stay with agent; `/remote-login` · `/ssh` · `/ard` · `/vnc` · `/media-sharing` intact.
 - Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Futuristic layout-daily next calendar quota.

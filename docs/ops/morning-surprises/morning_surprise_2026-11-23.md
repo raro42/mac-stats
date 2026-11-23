@@ -1,11 +1,12 @@
 # Morning surprise — 2026-11-23
 
-Refreshed: 2026-11-23 01:25 CET
+Refreshed: 2026-11-23 01:30 CET
 
 ## Shipped this overnight window (keep)
 
 | Version | What |
 |---------|------|
+| **v0.1.2982** | AirPlay Receiver `/airplay` · `/airplay-receiver` · `/mac-airplay` + view/open NL |
 | **v0.1.2981** | Remote Apple Events `/remote-apple-events` · `/rae` · `/eppc` + view/open NL |
 | **v0.1.2980** | Media Sharing `/media-sharing` · `/home-sharing` · `/itunes-sharing` + view/open NL |
 | **v0.1.2979** | Bluetooth Sharing `/bluetooth-sharing` · `/bt-sharing` · `/bts` · `/obex` + view/open NL |
@@ -20,9 +21,9 @@ Refreshed: 2026-11-23 01:25 CET
 | **v0.1.2970** | Time Machine `/timemachine` · `/tm` + view/open NL |
 | **v0.1.2969**–**2960** | Firewall stealth → GPU identity slash+NL family (earlier tonight) |
 
-## This tick (~01:25 CET)
+## This tick (~01:30 CET)
 
 - Digester open empty; design-review due=false; layout-daily Neon already done (marked today); Futuristic next calendar quota.
-- Shipped Remote Apple Events slash+NL as **v0.1.2981**; backfilled keep for **v0.1.2980**.
+- Pulled origin past Remote Apple Events v0.1.2981; shipped AirPlay Receiver slash+NL as **v0.1.2982**.
 - Cream/Swiss Send fill white-on-blue left intentional.
-- Next: Futuristic layout-daily · cream/Swiss Send fill intentional · DVD/CD Sharing or AirPlay Receiver product fuel — not keep-pNN.
+- Next: Futuristic layout-daily · cream/Swiss Send fill intentional · DVD/CD Sharing product fuel — not keep-pNN.
