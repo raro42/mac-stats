@@ -1,3 +1,11 @@
+## Overnight note 2026-11-23 ~01:25
+- Shipped v0.1.2981 Remote Apple Events `/remote-apple-events` · `/rae` · `/eppc` + view/open NL; bare apple events/eppc/rae stay with agent; `/remote-login` · `/ssh` · `/ard` · `/vnc` · `/media-sharing` intact.
+- Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Futuristic layout-daily next calendar quota.
+
+## Overnight merge — v0.1.2981
+
+- Product fuel after Media Sharing `/media-sharing` NL v0.1.2980: Remote Apple Events already readable via `systemsetup -getremoteappleevents` but lacked `/remote-apple-events` · `/remoteappleevents` · `/remote-apple-events-status` · `/remote-apple-event` · `/apple-events` · `/appleevents` · `/apple-events-status` · `/rae` · `/rae-status` · `/rae-state` · `/eppc` · `/eppc-status` · `/aeserver` · `/ae-server` · `/mac-rae` · `/mac-eppc` · `/mac-remote-apple-events` · `/mac-apple-events` and view/see/open/list phrases while Remote Login `/remote-login` · `/ssh`, Remote Management `/remote-management` · `/ard`, Screen Sharing `/screen-sharing` · `/vnc`, and Media Sharing `/media-sharing` · `/home-sharing` already had slash+NL. Bare `apple events` / `remote apple events` / `eppc` / `rae` stay with the agent; `/remote-login` · `/ssh` stay Remote Login; `/remote-management` · `/ard` stay Remote Management; `/screen-sharing` · `/vnc` stay Screen Sharing; `/media-sharing` · `/home-sharing` stay Media Sharing. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · DVD/CD Sharing or AirPlay Receiver sibling/product fuel — Remote Apple Events slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~01:05
 - Shipped v0.1.2980 Media Sharing `/media-sharing` · `/home-sharing` · `/itunes-sharing` + view/open NL; bare media/home sharing stay with agent; `/bluetooth-sharing` · `/bts` · `/ics` · `/smb` · `/wifi` intact.
 - Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Futuristic layout-daily next calendar quota.
