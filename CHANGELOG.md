@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2991] - 2026-11-23
+
+### Changed
+- AI Chat message-filter chips keyboard hint: shorter, warmer copy (All · You · Assistant · Errors) so Tab focus matches Agent Ops / message-list KISS tips (design-review `feature-ai-chat`; Mac capture still TCC-blocked — polish-without-capture grace).
+
 ## [0.1.2990] - 2026-11-23
 
 ### Changed

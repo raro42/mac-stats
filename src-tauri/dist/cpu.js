@@ -5860,18 +5860,21 @@ function wireFilterChipToolbarKeyboard(wrap) {
                 ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Disk Cleanup icon · at end → scope list · Enter / Space selects'
                 : wrap.id === 'disk-cleanup-filter-chips'
                   ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Disk Cleanup icon · at end → category list · Enter / Space selects'
-                  : wrap.id === 'ops-agents-enabled-chips'
-                    /* Design-review feature-agent-ops: shorter, warmer chip hint (KISS). */
-                    ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the agent list'
-                    : wrap.id === 'ops-session-kind-chips'
-                      ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the session list'
-                      : wrap.id === 'ops-schedules-kind-chips'
-                        ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the schedule list'
-                        : wrap.id === 'ops-memory-kind-chips'
-                          ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the knowledge list'
-                          : wrap.id === 'ops-runs-lane-chips'
-                            ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the run list'
-                            : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
+                  : wrap.id === 'chat-filter-chips'
+                    /* Design-review feature-ai-chat: shorter, warmer chip hint (KISS; Agent Ops parity). */
+                    ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to AI Chat icon or the message list'
+                    : wrap.id === 'ops-agents-enabled-chips'
+                      /* Design-review feature-agent-ops: shorter, warmer chip hint (KISS). */
+                      ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the agent list'
+                      : wrap.id === 'ops-session-kind-chips'
+                        ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the session list'
+                        : wrap.id === 'ops-schedules-kind-chips'
+                          ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the schedule list'
+                          : wrap.id === 'ops-memory-kind-chips'
+                            ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the knowledge list'
+                            : wrap.id === 'ops-runs-lane-chips'
+                              ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the run list'
+                              : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
   if (wrap.dataset.filterChipChainKbWired !== '1') {
     wrap.dataset.filterChipChainKbWired = '1';
     wrap.addEventListener(

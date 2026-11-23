@@ -1,3 +1,16 @@
+## Overnight note 2026-11-23 ~04:45
+- Digester open: design-review `feature-ai-chat` (100.7d stale).
+- Design review due=true → polish AI Chat filter-chip kb-hint; Mac TCC — polish-without-capture grace marked.
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Fuel: design-review AI Chat filter chips (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.2991** — warmer All · You · Assistant · Errors chip tip (Agent Ops parity).
+- Ratchet keep after verify; sync-dist (UI JS + themes).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — not another keep-pNN clone.
+
+## Overnight merge — v0.1.2991
+
+- Design-review fuel after AI Chat kb-hints v0.1.2990: `#chat-filter-chips` still used long cold “Tab or click … crosses …” copy while message list · starters · composer · Ollama settings already shipped shorter warmer KISS lines. Shortened chat filter chips to match Agent Ops. Digester design-review closed via grace; layout-daily Neon marked today (Futuristic due next calendar quota). Recapture deferred (Mac TCC); polish grace marked. Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — AI Chat filter-chip hint closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~04:35
 - Digester open: empty (0 turns / 7d); design-review recommended **feature-ai-chat** (100d stale).
 - Design review due=true → polish AI Chat kb-hints; Mac TCC — polish-without-capture grace marked.
