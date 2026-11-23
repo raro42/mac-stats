@@ -1,3 +1,16 @@
+## Overnight note 2026-11-23 ~21:53
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Fuel: product after Screen Lock v0.1.3004 — SMB Guest Access slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.3005** — `/smb-guest` · `/smbguest` · `/smb-guest-access` · `/guest-access` · `/mac-smb-guest` + view/open NL; bare smb guest/guest access stay with agent; `/smb` · `/file-sharing` stay File Sharing; `/guest` · `/guest-account` stay Guest Account; `/screen-lock` · `/lock-screen` stay Screen Lock; `/help` lists lane.
+- Ratchet keep after verify; install/kickstart (Rust).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — SMB Guest slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3005
+
+- Product fuel after Screen Lock v0.1.3004: SMB Guest Access already readable via `sysadminctl -smbGuestAccess status` (+ smb.server `AllowGuestAccess`) but lacked `/smb-guest` · `/smbguest` · `/smb-guest-access` · `/guest-access` · `/mac-smb-guest` and view/see/open/list phrases while File Sharing `/smb`, Guest Account `/guest`, and Screen Lock `/screen-lock` already had slash+NL. Bare `smb guest` / `guest access` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — SMB Guest slash NL closed; not another keep-pNN clone.
+
 ## 2026-11-23 ~21:42 overnight tick
 - Digester open: empty (0 turns / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
