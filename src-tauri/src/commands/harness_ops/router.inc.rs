@@ -1216,9 +1216,15 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     // TTY keep awake (bare `ttyskeepawake` / `tty keep awake` stay with the agent;
     // `/proximitywake` stays Proximity Wake; `/womp` stays Wake for network;
-    // `/powernap` stays Power Nap; system sleep stays out).
+    // `/powernap` stays Power Nap; `/systemsleep` stays System Sleep).
     if looks_like_ttyskeepawake_request(content) {
         return Some(format_ttyskeepawake_report());
+    }
+    // System Sleep (bare `systemsleep` / `system sleep` / `computer sleep` / `sleep` stay with
+    // the agent; `/displaysleep` stays Display Sleep; `/disksleep` stays Disk Sleep;
+    // `/screensaver` stays Screensaver; `/ttyskeepawake` stays TTY keep awake).
+    if looks_like_systemsleep_request(content) {
+        return Some(format_systemsleep_report());
     }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3013] - 2026-11-23
+
+### Added
+- Instant System Sleep accepts `/systemsleep` · `/system-sleep` · `/systemsleep-status` · `/system-sleep-status` · `/systemsleep-state` · `/system-sleep-state` · `/systemsleep-timer` · `/system-sleep-timer` · `/computer-sleep` · `/computersleep` · `/computer-sleep-status` · `/computer-sleep-timer` · `/mac-systemsleep` · `/mac-system-sleep` · `/mac-systemsleep-status` · `/mac-system-sleep-status` · `/mac-computer-sleep` · `/mac-computersleep` · `/sleep` · `/sleep-status` · `/sleep-state` · `/sleep-timer` and view/see/open/list NL (`view system sleep`, `open systemsleep`, `list computer sleep`, …), matching “system sleep status” / “is system sleep on” / “is systemsleep enabled” / “what's my system sleep” / “what's the systemsleep status”. Bare `systemsleep` / `system sleep` / `computer sleep` / `sleep` stay with the agent; `/displaysleep` · `/display-sleep` · `/screen-sleep` stay Display Sleep; `/disksleep` · `/disk-sleep` stay Disk Sleep; `/screensaver` · `/idle-time` stay Screensaver idle; `/ttyskeepawake` · `/tty-keep-awake` stay TTY keep awake. Operator `/help` lists the new lane.
+
 ## [0.1.3012] - 2026-11-23
 
 ### Added

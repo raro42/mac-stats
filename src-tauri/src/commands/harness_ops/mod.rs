@@ -4324,6 +4324,97 @@ mod tests {
         }
     }
 
+    #[test]
+    fn systemsleep_slash_and_view_open_do_not_steal_displaysleep_or_bare() {
+        // Slash + view/open NL → System Sleep (`/displaysleep` · `/disksleep` parity).
+        // Bare `systemsleep` / `system sleep` / `computer sleep` / `sleep` stay with the agent;
+        // `/displaysleep` stays Display Sleep; `/disksleep` stays Disk Sleep;
+        // `/screensaver` stays Screensaver; `/ttyskeepawake` stays TTY keep awake.
+        assert!(looks_like_systemsleep_request("/systemsleep"));
+        assert!(looks_like_systemsleep_request("/system-sleep"));
+        assert!(looks_like_systemsleep_request("/systemsleep-status"));
+        assert!(looks_like_systemsleep_request("/computer-sleep"));
+        assert!(looks_like_systemsleep_request("/mac-systemsleep"));
+        assert!(looks_like_systemsleep_request("/mac-system-sleep"));
+        assert!(looks_like_systemsleep_request("/sleep"));
+        assert!(looks_like_systemsleep_request("view system sleep"));
+        assert!(looks_like_systemsleep_request("open systemsleep"));
+        assert!(looks_like_systemsleep_request("list computer sleep"));
+        assert!(looks_like_systemsleep_request("system sleep status"));
+        assert!(looks_like_systemsleep_request("is system sleep on"));
+        assert!(looks_like_systemsleep_request("is systemsleep enabled"));
+        assert!(looks_like_systemsleep_request("what's my system sleep"));
+        assert!(looks_like_systemsleep_request("view system-sleep"));
+        assert!(!looks_like_systemsleep_request("systemsleep"));
+        assert!(!looks_like_systemsleep_request("system sleep"));
+        assert!(!looks_like_systemsleep_request("computer sleep"));
+        assert!(!looks_like_systemsleep_request("sleep"));
+        assert!(!looks_like_systemsleep_request("/displaysleep"));
+        assert!(!looks_like_systemsleep_request("view display sleep"));
+        assert!(!looks_like_systemsleep_request("/screen-sleep"));
+        assert!(!looks_like_systemsleep_request("/disksleep"));
+        assert!(!looks_like_systemsleep_request("view disk sleep"));
+        assert!(!looks_like_systemsleep_request("/screensaver"));
+        assert!(!looks_like_systemsleep_request("/ttyskeepawake"));
+        assert!(!looks_like_systemsleep_request("/powernap"));
+        assert!(!looks_like_systemsleep_request("/womp"));
+        assert!(!looks_like_systemsleep_request("/power"));
+        assert!(!looks_like_systemsleep_request("/tasks"));
+        assert!(!looks_like_systemsleep_request("enable system sleep"));
+        assert!(!looks_like_displaysleep_request("/systemsleep"));
+        assert!(!looks_like_displaysleep_request("view system sleep"));
+        assert!(!looks_like_disksleep_request("/systemsleep"));
+        assert!(!looks_like_disksleep_request("view system sleep"));
+        assert!(!looks_like_ttyskeepawake_request("/systemsleep"));
+        assert!(!looks_like_ttyskeepawake_request("view system sleep"));
+        let s = try_operator_instant_reply("/systemsleep").unwrap();
+        assert!(
+            s.contains("**System Sleep**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view system sleep").unwrap();
+        assert!(
+            viewed.contains("**System Sleep**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open systemsleep").unwrap();
+        assert!(
+            open.contains("**System Sleep**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        let sleep_slash = try_operator_instant_reply("/sleep").unwrap();
+        assert!(
+            sleep_slash.contains("**System Sleep**")
+                && !sleep_slash.to_lowercase().contains("execution"),
+            "got: {sleep_slash}"
+        );
+        assert!(try_operator_instant_reply("systemsleep").is_none());
+        assert!(try_operator_instant_reply("system sleep").is_none());
+        assert!(try_operator_instant_reply("computer sleep").is_none());
+        assert!(try_operator_instant_reply("sleep").is_none());
+        let ds = try_operator_instant_reply("/displaysleep");
+        if let Some(reply) = ds {
+            assert!(
+                !reply.contains("**System Sleep**"),
+                "/displaysleep must stay Display Sleep, not System Sleep: {reply}"
+            );
+        }
+        let disk = try_operator_instant_reply("/disksleep");
+        if let Some(reply) = disk {
+            assert!(
+                !reply.contains("**System Sleep**"),
+                "/disksleep must stay Disk Sleep, not System Sleep: {reply}"
+            );
+        }
+        let tty = try_operator_instant_reply("/ttyskeepawake");
+        if let Some(reply) = tty {
+            assert!(
+                !reply.contains("**System Sleep**"),
+                "/ttyskeepawake must stay TTY keep awake, not System Sleep: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

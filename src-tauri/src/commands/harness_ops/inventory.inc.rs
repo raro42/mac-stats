@@ -18070,6 +18070,10 @@ pub fn looks_like_displaysleep_request(content: &str) -> bool {
         || n.contains("disksleep")
         || n.contains("system sleep")
         || n.contains("system-sleep")
+        || n.contains("systemsleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("computersleep")
         || n.contains("low power")
         || n.contains("low-power")
         || n.contains("lowpower")
@@ -18114,6 +18118,11 @@ pub fn looks_like_displaysleep_request(content: &str) -> bool {
         || n == "/wake-for-network"
         || n == "/wake-on-lan"
         || n == "/wol"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/computer-sleep"
+        || n == "/computersleep"
+        || n == "/sleep"
         || n == "/screensaver"
         || n == "/screen-saver"
         || n == "/idle-time"
@@ -18358,8 +18367,10 @@ pub fn looks_like_disksleep_request(content: &str) -> bool {
         || n.contains("screensleep")
         || n.contains("system sleep")
         || n.contains("system-sleep")
+        || n.contains("systemsleep")
         || n.contains("computer sleep")
         || n.contains("computer-sleep")
+        || n.contains("computersleep")
         || n.contains("proximity")
         || n.contains("low power")
         || n.contains("low-power")
@@ -18409,6 +18420,11 @@ pub fn looks_like_disksleep_request(content: &str) -> bool {
         || n == "/wake-for-network"
         || n == "/wake-on-lan"
         || n == "/wol"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/computer-sleep"
+        || n == "/computersleep"
+        || n == "/sleep"
         || n == "/displaysleep"
         || n == "/display-sleep"
         || n == "/screen-sleep"
@@ -18704,8 +18720,10 @@ pub fn looks_like_proximitywake_request(content: &str) -> bool {
         || n.contains("hdd sleep")
         || n.contains("system sleep")
         || n.contains("system-sleep")
+        || n.contains("systemsleep")
         || n.contains("computer sleep")
         || n.contains("computer-sleep")
+        || n.contains("computersleep")
         || n.contains("ttyskeepawake")
         || n.contains("ttys keep awake")
         || n.contains("networkoversleep")
@@ -18738,6 +18756,11 @@ pub fn looks_like_proximitywake_request(content: &str) -> bool {
         || n == "/adapter"
         || n == "/powernap"
         || n == "/power-nap"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/computer-sleep"
+        || n == "/computersleep"
+        || n == "/sleep"
         || n == "/womp"
         || n == "/wake-for-network"
         || n == "/wake-on-lan"
@@ -18954,8 +18977,10 @@ pub fn looks_like_ttyskeepawake_request(content: &str) -> bool {
         || n.contains("hdd sleep")
         || n.contains("system sleep")
         || n.contains("system-sleep")
+        || n.contains("systemsleep")
         || n.contains("computer sleep")
         || n.contains("computer-sleep")
+        || n.contains("computersleep")
         || n.contains("networkoversleep")
         || n.contains("tcpkeepalive")
         || n.contains("screensaver")
@@ -18999,6 +19024,11 @@ pub fn looks_like_ttyskeepawake_request(content: &str) -> bool {
         || n == "/disk-sleep"
         || n == "/hard-disk-sleep"
         || n == "/hdd-sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/computer-sleep"
+        || n == "/computersleep"
+        || n == "/sleep"
         || n == "/screensaver"
         || n == "/screen-saver"
         || n == "/idle-time"
@@ -19191,6 +19221,333 @@ pub fn format_ttyskeepawake_report() -> String {
             .to_string();
     }
     format!("**TTY keep awake** · `{v}`")
+}
+
+/// System Sleep — `pmset` Battery/AC `sleep` minutes (+ active fallback; 0 = Never).
+/// Slash + view/open NL (`/systemsleep` · `/system-sleep` · `/computer-sleep` · `view system sleep`).
+/// Bare `systemsleep` / `system sleep` / `computer sleep` / `sleep` stay with the agent;
+/// `/displaysleep` stays Display Sleep; `/disksleep` stays Disk Sleep;
+/// `/screensaver` stays Screensaver; `/ttyskeepawake` stays TTY keep awake.
+pub fn looks_like_systemsleep_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("wake on network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("hard disk sleep")
+        || n.contains("hdd sleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("ttys keep awake")
+        || n.contains("tty-keep-awake")
+        || n.contains("ttys-keep-awake")
+        || n.contains("networkoversleep")
+        || n.contains("tcpkeepalive")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/proximitywake"
+        || n == "/proximity-wake"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
+        || n == "/disksleep"
+        || n == "/disk-sleep"
+        || n == "/hard-disk-sleep"
+        || n == "/hdd-sleep"
+        || n == "/ttyskeepawake"
+        || n == "/tty-keep-awake"
+        || n == "/ttys-keep-awake"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent (incl. bare `sleep` — too ambiguous).
+        || n == "systemsleep"
+        || n == "the systemsleep"
+        || n == "system sleep"
+        || n == "the system sleep"
+        || n == "system-sleep"
+        || n == "the system-sleep"
+        || n == "computersleep"
+        || n == "the computersleep"
+        || n == "computer sleep"
+        || n == "the computer sleep"
+        || n == "computer-sleep"
+        || n == "the computer-sleep"
+        || n == "sleep"
+        || n == "the sleep"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/systemsleep"
+            | "/system-sleep"
+            | "/systemsleep-status"
+            | "/system-sleep-status"
+            | "/systemsleep-state"
+            | "/system-sleep-state"
+            | "/systemsleep-timer"
+            | "/system-sleep-timer"
+            | "/computer-sleep"
+            | "/computersleep"
+            | "/computer-sleep-status"
+            | "/computer-sleep-timer"
+            | "/mac-systemsleep"
+            | "/mac-system-sleep"
+            | "/mac-systemsleep-status"
+            | "/mac-system-sleep-status"
+            | "/mac-computer-sleep"
+            | "/mac-computersleep"
+            | "/sleep"
+            | "/sleep-status"
+            | "/sleep-state"
+            | "/sleep-timer"
+            | "systemsleep status"
+            | "the systemsleep status"
+            | "system sleep status"
+            | "the system sleep status"
+            | "system-sleep status"
+            | "the system-sleep status"
+            | "systemsleep state"
+            | "the systemsleep state"
+            | "system sleep state"
+            | "the system sleep state"
+            | "systemsleep timer"
+            | "the systemsleep timer"
+            | "system sleep timer"
+            | "the system sleep timer"
+            | "my systemsleep"
+            | "my systemsleep status"
+            | "my system sleep"
+            | "my system sleep status"
+            | "is systemsleep on"
+            | "is systemsleep off"
+            | "is systemsleep enabled"
+            | "is systemsleep disabled"
+            | "is system sleep on"
+            | "is system sleep off"
+            | "is system sleep enabled"
+            | "is system sleep disabled"
+            | "is system-sleep on"
+            | "is system-sleep enabled"
+            | "what's my systemsleep"
+            | "whats my systemsleep"
+            | "what is my systemsleep"
+            | "what's my systemsleep status"
+            | "whats my systemsleep status"
+            | "what is my systemsleep status"
+            | "what's my system sleep"
+            | "whats my system sleep"
+            | "what is my system sleep"
+            | "what's my system sleep status"
+            | "whats my system sleep status"
+            | "what is my system sleep status"
+            | "what's the systemsleep"
+            | "whats the systemsleep"
+            | "what is the systemsleep"
+            | "what's the systemsleep status"
+            | "whats the systemsleep status"
+            | "what is the systemsleep status"
+            | "what's the system sleep"
+            | "whats the system sleep"
+            | "what is the system sleep"
+            | "what's the system sleep status"
+            | "whats the system sleep status"
+            | "what is the system sleep status"
+            | "how's systemsleep"
+            | "hows systemsleep"
+            | "how's the systemsleep"
+            | "hows the systemsleep"
+            | "how's system sleep"
+            | "hows system sleep"
+            | "how's the system sleep"
+            | "hows the system sleep"
+            | "view systemsleep"
+            | "view the systemsleep"
+            | "view systemsleep status"
+            | "view the systemsleep status"
+            | "view system sleep"
+            | "view the system sleep"
+            | "view system sleep status"
+            | "view the system sleep status"
+            | "view system-sleep"
+            | "view the system-sleep"
+            | "see systemsleep"
+            | "see the systemsleep"
+            | "see systemsleep status"
+            | "see the systemsleep status"
+            | "see system sleep"
+            | "see the system sleep"
+            | "see system sleep status"
+            | "see the system sleep status"
+            | "open systemsleep"
+            | "open the systemsleep"
+            | "open systemsleep status"
+            | "open the systemsleep status"
+            | "open system sleep"
+            | "open the system sleep"
+            | "open system sleep status"
+            | "open the system sleep status"
+            | "open system-sleep"
+            | "open the system-sleep"
+            | "list systemsleep"
+            | "list the systemsleep"
+            | "list systemsleep status"
+            | "list the systemsleep status"
+            | "list system sleep"
+            | "list the system sleep"
+            | "list system sleep status"
+            | "list the system sleep status"
+            | "list system-sleep"
+            | "list the system-sleep"
+            | "computer sleep status"
+            | "the computer sleep status"
+            | "computer-sleep status"
+            | "the computer-sleep status"
+            | "computersleep status"
+            | "the computersleep status"
+            | "my computer sleep"
+            | "my computer sleep status"
+            | "is computer sleep on"
+            | "is computer sleep off"
+            | "is computer sleep enabled"
+            | "is computer-sleep on"
+            | "is computer-sleep enabled"
+            | "is computersleep on"
+            | "is computersleep enabled"
+            | "what's my computer sleep"
+            | "whats my computer sleep"
+            | "what is my computer sleep"
+            | "what's the computer sleep"
+            | "whats the computer sleep"
+            | "what is the computer sleep"
+            | "what's the computer sleep status"
+            | "whats the computer sleep status"
+            | "what is the computer sleep status"
+            | "view computer sleep"
+            | "view the computer sleep"
+            | "view computer sleep status"
+            | "view the computer sleep status"
+            | "view computer-sleep"
+            | "view the computer-sleep"
+            | "view computersleep"
+            | "view the computersleep"
+            | "see computer sleep"
+            | "see the computer sleep"
+            | "see computer sleep status"
+            | "see the computer sleep status"
+            | "open computer sleep"
+            | "open the computer sleep"
+            | "open computer sleep status"
+            | "open the computer sleep status"
+            | "open computer-sleep"
+            | "open the computer-sleep"
+            | "open computersleep"
+            | "open the computersleep"
+            | "list computer sleep"
+            | "list the computer sleep"
+            | "list computer sleep status"
+            | "list the computer sleep status"
+            | "list computer-sleep"
+            | "list the computer-sleep"
+            | "list computersleep"
+            | "list the computersleep"
+    )
+}
+
+/// Zero-LLM System Sleep status from pmset Battery/AC `sleep` (macOS-only; empty elsewhere).
+pub fn format_systemsleep_report() -> String {
+    let v = crate::metrics::get_systemsleep_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**System Sleep** — _no System Sleep reading on this Mac right now._".to_string();
+    }
+    format!("**System Sleep** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
