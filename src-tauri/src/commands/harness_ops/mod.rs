@@ -4415,6 +4415,80 @@ mod tests {
         }
     }
 
+    #[test]
+    fn tcpkeepalive_slash_and_view_open_do_not_steal_ttyskeepawake_or_bare() {
+        // Slash + view/open NL → TCP Keep Alive (`/ttyskeepawake` · `/womp` parity).
+        // Bare `tcpkeepalive` / `tcp keep alive` stay with the agent;
+        // `/ttyskeepawake` stays TTY keep awake; `/womp` stays Wake for network;
+        // `/systemsleep` stays System Sleep; networkoversleep stays out.
+        assert!(looks_like_tcpkeepalive_request("/tcpkeepalive"));
+        assert!(looks_like_tcpkeepalive_request("/tcp-keep-alive"));
+        assert!(looks_like_tcpkeepalive_request("/tcpkeepalive-status"));
+        assert!(looks_like_tcpkeepalive_request("/tcp-keepalive"));
+        assert!(looks_like_tcpkeepalive_request("/mac-tcpkeepalive"));
+        assert!(looks_like_tcpkeepalive_request("/mac-tcp-keep-alive"));
+        assert!(looks_like_tcpkeepalive_request("view tcp keep alive"));
+        assert!(looks_like_tcpkeepalive_request("open tcpkeepalive"));
+        assert!(looks_like_tcpkeepalive_request("list tcp-keep-alive"));
+        assert!(looks_like_tcpkeepalive_request("tcp keep alive status"));
+        assert!(looks_like_tcpkeepalive_request("is tcp keep alive on"));
+        assert!(looks_like_tcpkeepalive_request("is tcpkeepalive enabled"));
+        assert!(looks_like_tcpkeepalive_request("what's my tcp keep alive"));
+        assert!(looks_like_tcpkeepalive_request("view tcp-keep-alive"));
+        assert!(!looks_like_tcpkeepalive_request("tcpkeepalive"));
+        assert!(!looks_like_tcpkeepalive_request("tcp keep alive"));
+        assert!(!looks_like_tcpkeepalive_request("/ttyskeepawake"));
+        assert!(!looks_like_tcpkeepalive_request("view tty keep awake"));
+        assert!(!looks_like_tcpkeepalive_request("/womp"));
+        assert!(!looks_like_tcpkeepalive_request("/systemsleep"));
+        assert!(!looks_like_tcpkeepalive_request("/powernap"));
+        assert!(!looks_like_tcpkeepalive_request("/power"));
+        assert!(!looks_like_tcpkeepalive_request("/tasks"));
+        assert!(!looks_like_tcpkeepalive_request("enable tcp keep alive"));
+        assert!(!looks_like_ttyskeepawake_request("/tcpkeepalive"));
+        assert!(!looks_like_ttyskeepawake_request("view tcp keep alive"));
+        assert!(!looks_like_systemsleep_request("/tcpkeepalive"));
+        assert!(!looks_like_systemsleep_request("view tcp keep alive"));
+        let s = try_operator_instant_reply("/tcpkeepalive").unwrap();
+        assert!(
+            s.contains("**TCP Keep Alive**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view tcp keep alive").unwrap();
+        assert!(
+            viewed.contains("**TCP Keep Alive**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open tcpkeepalive").unwrap();
+        assert!(
+            open.contains("**TCP Keep Alive**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("tcpkeepalive").is_none());
+        assert!(try_operator_instant_reply("tcp keep alive").is_none());
+        let tty = try_operator_instant_reply("/ttyskeepawake");
+        if let Some(reply) = tty {
+            assert!(
+                !reply.contains("**TCP Keep Alive**"),
+                "/ttyskeepawake must stay TTY keep awake, not TCP Keep Alive: {reply}"
+            );
+        }
+        let sleep = try_operator_instant_reply("/systemsleep");
+        if let Some(reply) = sleep {
+            assert!(
+                !reply.contains("**TCP Keep Alive**"),
+                "/systemsleep must stay System Sleep, not TCP Keep Alive: {reply}"
+            );
+        }
+        let womp = try_operator_instant_reply("/womp");
+        if let Some(reply) = womp {
+            assert!(
+                !reply.contains("**TCP Keep Alive**"),
+                "/womp must stay Wake for network, not TCP Keep Alive: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

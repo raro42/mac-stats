@@ -19223,6 +19223,279 @@ pub fn format_ttyskeepawake_report() -> String {
     format!("**TTY keep awake** · `{v}`")
 }
 
+/// TCP Keep Alive — `pmset` Battery/AC `tcpkeepalive` (+ active fallback).
+/// Slash + view/open NL (`/tcpkeepalive` · `/tcp-keep-alive` · `view tcp keep alive`).
+/// Bare `tcpkeepalive` / `tcp keep alive` stay with the agent;
+/// `/ttyskeepawake` stays TTY keep awake; `/womp` stays Wake for network;
+/// `/systemsleep` stays System Sleep; networkoversleep stays out.
+pub fn looks_like_tcpkeepalive_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("wake on network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("hard disk sleep")
+        || n.contains("hdd sleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("systemsleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("computersleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("ttys keep awake")
+        || n.contains("tty-keep-awake")
+        || n.contains("ttys-keep-awake")
+        || n.contains("ttykeepawake")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("network-over-sleep")
+        || n.contains("hibernate")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/proximitywake"
+        || n == "/proximity-wake"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
+        || n == "/disksleep"
+        || n == "/disk-sleep"
+        || n == "/hard-disk-sleep"
+        || n == "/hdd-sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/computer-sleep"
+        || n == "/computersleep"
+        || n == "/sleep"
+        || n == "/ttyskeepawake"
+        || n == "/tty-keep-awake"
+        || n == "/ttys-keep-awake"
+        || n == "/ttykeepawake"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "tcpkeepalive"
+        || n == "the tcpkeepalive"
+        || n == "tcp keep alive"
+        || n == "the tcp keep alive"
+        || n == "tcp-keep-alive"
+        || n == "the tcp-keep-alive"
+        || n == "tcp keepalive"
+        || n == "the tcp keepalive"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/tcpkeepalive"
+            | "/tcp-keep-alive"
+            | "/tcpkeepalive-status"
+            | "/tcp-keep-alive-status"
+            | "/tcpkeepalive-state"
+            | "/tcp-keep-alive-state"
+            | "/tcp-keepalive"
+            | "/tcp-keepalive-status"
+            | "/mac-tcpkeepalive"
+            | "/mac-tcp-keep-alive"
+            | "/mac-tcpkeepalive-status"
+            | "/mac-tcp-keep-alive-status"
+            | "tcpkeepalive status"
+            | "the tcpkeepalive status"
+            | "tcp keep alive status"
+            | "the tcp keep alive status"
+            | "tcp-keep-alive status"
+            | "the tcp-keep-alive status"
+            | "tcp keepalive status"
+            | "the tcp keepalive status"
+            | "tcpkeepalive state"
+            | "the tcpkeepalive state"
+            | "tcp keep alive state"
+            | "the tcp keep alive state"
+            | "my tcpkeepalive"
+            | "my tcpkeepalive status"
+            | "my tcp keep alive"
+            | "my tcp keep alive status"
+            | "is tcpkeepalive on"
+            | "is tcpkeepalive off"
+            | "is tcpkeepalive enabled"
+            | "is tcpkeepalive disabled"
+            | "is tcp keep alive on"
+            | "is tcp keep alive off"
+            | "is tcp keep alive enabled"
+            | "is tcp keep alive disabled"
+            | "is tcp-keep-alive on"
+            | "is tcp-keep-alive enabled"
+            | "what's my tcpkeepalive"
+            | "whats my tcpkeepalive"
+            | "what is my tcpkeepalive"
+            | "what's my tcpkeepalive status"
+            | "whats my tcpkeepalive status"
+            | "what is my tcpkeepalive status"
+            | "what's my tcp keep alive"
+            | "whats my tcp keep alive"
+            | "what is my tcp keep alive"
+            | "what's my tcp keep alive status"
+            | "whats my tcp keep alive status"
+            | "what is my tcp keep alive status"
+            | "what's the tcpkeepalive"
+            | "whats the tcpkeepalive"
+            | "what is the tcpkeepalive"
+            | "what's the tcpkeepalive status"
+            | "whats the tcpkeepalive status"
+            | "what is the tcpkeepalive status"
+            | "what's the tcp keep alive"
+            | "whats the tcp keep alive"
+            | "what is the tcp keep alive"
+            | "what's the tcp keep alive status"
+            | "whats the tcp keep alive status"
+            | "what is the tcp keep alive status"
+            | "how's tcpkeepalive"
+            | "hows tcpkeepalive"
+            | "how's the tcpkeepalive"
+            | "hows the tcpkeepalive"
+            | "how's tcp keep alive"
+            | "hows tcp keep alive"
+            | "how's the tcp keep alive"
+            | "hows the tcp keep alive"
+            | "view tcpkeepalive"
+            | "view the tcpkeepalive"
+            | "view tcpkeepalive status"
+            | "view the tcpkeepalive status"
+            | "view tcp keep alive"
+            | "view the tcp keep alive"
+            | "view tcp keep alive status"
+            | "view the tcp keep alive status"
+            | "view tcp-keep-alive"
+            | "view the tcp-keep-alive"
+            | "see tcpkeepalive"
+            | "see the tcpkeepalive"
+            | "see tcpkeepalive status"
+            | "see the tcpkeepalive status"
+            | "see tcp keep alive"
+            | "see the tcp keep alive"
+            | "see tcp keep alive status"
+            | "see the tcp keep alive status"
+            | "open tcpkeepalive"
+            | "open the tcpkeepalive"
+            | "open tcpkeepalive status"
+            | "open the tcpkeepalive status"
+            | "open tcp keep alive"
+            | "open the tcp keep alive"
+            | "open tcp keep alive status"
+            | "open the tcp keep alive status"
+            | "open tcp-keep-alive"
+            | "open the tcp-keep-alive"
+            | "list tcpkeepalive"
+            | "list the tcpkeepalive"
+            | "list tcpkeepalive status"
+            | "list the tcpkeepalive status"
+            | "list tcp keep alive"
+            | "list the tcp keep alive"
+            | "list tcp keep alive status"
+            | "list the tcp keep alive status"
+            | "list tcp-keep-alive"
+            | "list the tcp-keep-alive"
+    )
+}
+
+/// Zero-LLM TCP Keep Alive status from pmset Battery/AC `tcpkeepalive` (macOS-only; empty elsewhere).
+pub fn format_tcpkeepalive_report() -> String {
+    let v = crate::metrics::get_tcpkeepalive_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**TCP Keep Alive** — _no TCP Keep Alive reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**TCP Keep Alive** · `{v}`")
+}
+
 /// System Sleep — `pmset` Battery/AC `sleep` minutes (+ active fallback; 0 = Never).
 /// Slash + view/open NL (`/systemsleep` · `/system-sleep` · `/computer-sleep` · `view system sleep`).
 /// Bare `systemsleep` / `system sleep` / `computer sleep` / `sleep` stay with the agent;

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3014] - 2026-11-24
+
+### Added
+- Instant TCP Keep Alive accepts `/tcpkeepalive` · `/tcp-keep-alive` · `/tcpkeepalive-status` · `/tcp-keep-alive-status` · `/tcpkeepalive-state` · `/tcp-keep-alive-state` · `/tcp-keepalive` · `/tcp-keepalive-status` · `/mac-tcpkeepalive` · `/mac-tcp-keep-alive` · `/mac-tcpkeepalive-status` · `/mac-tcp-keep-alive-status` and view/see/open/list NL (`view tcp keep alive`, `open tcpkeepalive`, `list tcp-keep-alive`, …), matching “tcp keep alive status” / “is tcp keep alive on” / “is tcpkeepalive enabled” / “what's my tcp keep alive” / “what's the tcpkeepalive status”. Bare `tcpkeepalive` / `tcp keep alive` stay with the agent; `/ttyskeepawake` · `/tty-keep-awake` stay TTY keep awake; `/womp` · `/wake-for-network` stay Wake for network; `/systemsleep` · `/system-sleep` stay System Sleep; networkoversleep stays out. Operator `/help` lists the new lane.
+
 ## [0.1.3013] - 2026-11-23
 
 ### Added

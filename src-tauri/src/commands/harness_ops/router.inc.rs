@@ -1226,6 +1226,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_systemsleep_request(content) {
         return Some(format_systemsleep_report());
     }
+    // TCP Keep Alive (bare `tcpkeepalive` / `tcp keep alive` stay with the agent;
+    // `/ttyskeepawake` stays TTY keep awake; `/womp` stays Wake for network;
+    // `/systemsleep` stays System Sleep; networkoversleep stays out).
+    if looks_like_tcpkeepalive_request(content) {
+        return Some(format_tcpkeepalive_report());
+    }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
     if looks_like_boot_time_request(content) {
