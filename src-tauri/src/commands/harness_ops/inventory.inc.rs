@@ -10320,10 +10320,10 @@ pub fn format_gatekeeper_report() -> String {
     format!("**Gatekeeper** · `{v}`")
 }
 
-/// Application Firewall global state — not Gatekeeper, not SIP, not FileVault, not stealth.
+/// Application Firewall global state — not Gatekeeper, not SIP, not FileVault, not stealth, not logging.
 /// Slash + view/open NL (`/firewall` · `/afw` · `view firewall`) match `/gatekeeper` · `/sip` shape;
 /// bare `firewall` / `afw` stay with the agent; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP;
-/// `/stealth` · `/firewall-stealth` stay stealth.
+/// `/stealth` · `/firewall-stealth` stay stealth; `/firewall-logging` · `/fw-logging` stay logging.
 pub fn looks_like_firewall_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -10358,7 +10358,8 @@ pub fn looks_like_firewall_request(content: &str) -> bool {
         || n.contains("sip")
         || n.contains("csrutil")
         || n.contains("stealth")
-        // Gatekeeper / SIP / FileVault / stealth / boot volume / Disk Cleanup stay elsewhere.
+        || n.contains("logging")
+        // Gatekeeper / SIP / FileVault / stealth / logging / boot volume / Disk Cleanup stay elsewhere.
         || n == "/gatekeeper"
         || n == "/gk"
         || n == "/spctl"
@@ -10369,6 +10370,9 @@ pub fn looks_like_firewall_request(content: &str) -> bool {
         || n == "/fde"
         || n == "/stealth"
         || n == "/firewall-stealth"
+        || n == "/firewall-logging"
+        || n == "/fw-logging"
+        || n == "/afw-logging"
         || n == "/boot-volume"
         || n == "/startup-disk"
         || n == "/remote-login"
@@ -10509,9 +10513,9 @@ pub fn format_firewall_report() -> String {
     format!("**Firewall** · `{v}`")
 }
 
-/// Application Firewall stealth mode — not global Firewall `/firewall`, not Gatekeeper, not SIP.
+/// Application Firewall stealth mode — not global Firewall `/firewall`, not logging, not Gatekeeper, not SIP.
 /// Slash + view/open NL (`/stealth` · `/firewall-stealth` · `view stealth`) match `/firewall` shape;
-/// bare `stealth` stays with the agent; `/firewall` stays global state.
+/// bare `stealth` stays with the agent; `/firewall` stays global state; `/firewall-logging` stays logging.
 pub fn looks_like_firewall_stealth_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -10544,7 +10548,8 @@ pub fn looks_like_firewall_stealth_request(content: &str) -> bool {
         || n.contains("system integrity")
         || n.contains("sip")
         || n.contains("csrutil")
-        // Global Firewall / Gatekeeper / SIP / FileVault stay elsewhere.
+        || n.contains("logging")
+        // Global Firewall / logging / Gatekeeper / SIP / FileVault stay elsewhere.
         || n == "/firewall"
         || n == "/firewall-status"
         || n == "/fw"
@@ -10554,6 +10559,9 @@ pub fn looks_like_firewall_stealth_request(content: &str) -> bool {
         || n == "/app-firewall"
         || n == "/application-firewall"
         || n == "/socketfilterfw"
+        || n == "/firewall-logging"
+        || n == "/fw-logging"
+        || n == "/afw-logging"
         || n == "/gatekeeper"
         || n == "/gk"
         || n == "/spctl"
@@ -10697,6 +10705,224 @@ pub fn format_firewall_stealth_report() -> String {
         return "**Stealth** — _no Firewall stealth reading on this Mac right now._".to_string();
     }
     format!("**Stealth** · `{v}`")
+}
+
+/// Application Firewall logging — not global Firewall `/firewall`, not stealth `/stealth`.
+/// Slash + view/open NL (`/firewall-logging` · `/fw-logging` · `view firewall logging`) match
+/// `/stealth` · `/firewall` shape; bare `logging` / `firewall logging` stay with the agent;
+/// `/firewall` stays global; `/stealth` stays stealth; `/logs` stays debug log.
+pub fn looks_like_firewall_logging_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("allow ")
+        || n.contains("block ")
+        || n.contains("password")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("gatekeeper")
+        || n.contains("spctl")
+        || n.contains("system integrity")
+        || n.contains("sip")
+        || n.contains("csrutil")
+        || n.contains("stealth")
+        || n.contains("debug")
+        // Global Firewall / stealth / Gatekeeper / SIP / FileVault / debug `/logs` stay elsewhere.
+        || n == "/firewall"
+        || n == "/firewall-status"
+        || n == "/fw"
+        || n == "/fw-status"
+        || n == "/afw"
+        || n == "/afw-status"
+        || n == "/app-firewall"
+        || n == "/application-firewall"
+        || n == "/socketfilterfw"
+        || n == "/stealth"
+        || n == "/stealth-mode"
+        || n == "/firewall-stealth"
+        || n == "/fw-stealth"
+        || n == "/afw-stealth"
+        || n == "/gatekeeper"
+        || n == "/gk"
+        || n == "/spctl"
+        || n == "/sip"
+        || n == "/csrutil"
+        || n == "/filevault"
+        || n == "/fv"
+        || n == "/fde"
+        || n == "/logs"
+        || n == "/log"
+        || n == "/debug-log"
+        || n == "/remote-login"
+        || n == "/ssh"
+        || n == "/sshd"
+        // Bare short / ambiguous stay with the agent.
+        || n == "logging"
+        || n == "the logging"
+        || n == "firewall logging"
+        || n == "the firewall logging"
+        || n == "logging mode"
+        || n == "the logging mode"
+        || n == "log"
+        || n == "the log"
+        || n == "logs"
+        || n == "the logs"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/firewall-logging"
+            | "/firewalllogging"
+            | "/firewall-logging-status"
+            | "/firewall-log"
+            | "/firewalllog"
+            | "/fw-logging"
+            | "/fwlogging"
+            | "/fw-logging-status"
+            | "/fw-log"
+            | "/fwlog"
+            | "/afw-logging"
+            | "/afwlogging"
+            | "/afw-logging-status"
+            | "/afw-log"
+            | "/afwlog"
+            | "/app-firewall-logging"
+            | "/application-firewall-logging"
+            | "/socketfilterfw-logging"
+            | "/logging-mode"
+            | "/loggingmode"
+            | "/logging-opt"
+            | "/loggingopt"
+            | "/firewall-logging-mode"
+            | "/firewall-logging-opt"
+            | "/mac-firewall-logging"
+            | "/mac-fw-logging"
+            | "firewall logging status"
+            | "the firewall logging status"
+            | "firewall logging mode"
+            | "the firewall logging mode"
+            | "fw logging status"
+            | "the fw logging status"
+            | "afw logging status"
+            | "the afw logging status"
+            | "logging mode status"
+            | "the logging mode status"
+            | "my firewall logging"
+            | "my firewall logging status"
+            | "my fw logging"
+            | "my logging mode"
+            | "is firewall logging on"
+            | "is firewall logging off"
+            | "is firewall logging enabled"
+            | "is firewall logging disabled"
+            | "is the firewall logging on"
+            | "is the firewall logging enabled"
+            | "is fw logging on"
+            | "is fw logging enabled"
+            | "is afw logging on"
+            | "is afw logging enabled"
+            | "is logging mode on"
+            | "is logging mode enabled"
+            | "what's my firewall logging"
+            | "whats my firewall logging"
+            | "what is my firewall logging"
+            | "what's my firewall logging status"
+            | "whats my firewall logging status"
+            | "what is my firewall logging status"
+            | "what's my logging mode"
+            | "whats my logging mode"
+            | "what is my logging mode"
+            | "what's the firewall logging"
+            | "whats the firewall logging"
+            | "what is the firewall logging"
+            | "what's the firewall logging status"
+            | "whats the firewall logging status"
+            | "what is the firewall logging status"
+            | "what's the logging mode"
+            | "whats the logging mode"
+            | "what is the logging mode"
+            | "how's firewall logging"
+            | "hows firewall logging"
+            | "how's the firewall logging"
+            | "hows the firewall logging"
+            // View/see/show me/open/list.
+            | "view firewall logging"
+            | "view the firewall logging"
+            | "view firewall logging status"
+            | "view the firewall logging status"
+            | "view fw logging"
+            | "view the fw logging"
+            | "view afw logging"
+            | "view the afw logging"
+            | "view logging mode"
+            | "view the logging mode"
+            | "see firewall logging"
+            | "see the firewall logging"
+            | "see firewall logging status"
+            | "see the firewall logging status"
+            | "see fw logging"
+            | "see the fw logging"
+            | "see logging mode"
+            | "see the logging mode"
+            | "open firewall logging"
+            | "open the firewall logging"
+            | "open firewall logging status"
+            | "open the firewall logging status"
+            | "open fw logging"
+            | "open the fw logging"
+            | "open logging mode"
+            | "open the logging mode"
+            | "list firewall logging"
+            | "list the firewall logging"
+            | "list firewall logging status"
+            | "list the firewall logging status"
+            | "list fw logging"
+            | "list the fw logging"
+            | "list logging mode"
+            | "list the logging mode"
+            | "show firewall logging"
+            | "show the firewall logging"
+            | "show me firewall logging"
+            | "show me the firewall logging"
+            | "show firewall logging status"
+            | "show the firewall logging status"
+            | "show me firewall logging status"
+            | "show me the firewall logging status"
+            | "show logging mode"
+            | "show the logging mode"
+            | "show me logging mode"
+            | "show me the logging mode"
+    )
+}
+
+/// Zero-LLM Firewall logging status from `socketfilterfw --getloggingmode` (+ `--getloggingopt`).
+pub fn format_firewall_logging_report() -> String {
+    let v = crate::metrics::get_firewall_logging_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Firewall logging** — _no Firewall logging reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**Firewall logging** · `{v}`")
 }
 
 /// Time Machine session + destination — not Disk Cleanup, not SSD % / free, not boot volume.

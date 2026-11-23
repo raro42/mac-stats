@@ -1032,12 +1032,18 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_gatekeeper_request(content) {
         return Some(format_gatekeeper_report());
     }
-    // Firewall stealth (bare `stealth` stays with the agent; `/firewall` stays global state; `/gatekeeper` stays Gatekeeper).
+    // Firewall logging (bare `logging` / `firewall logging` stay with the agent; `/firewall` stays global;
+    // `/stealth` stays stealth; `/logs` stays debug log).
+    if looks_like_firewall_logging_request(content) {
+        return Some(format_firewall_logging_report());
+    }
+    // Firewall stealth (bare `stealth` stays with the agent; `/firewall` stays global state; `/gatekeeper` stays Gatekeeper;
+    // `/firewall-logging` · `/fw-logging` stay logging).
     if looks_like_firewall_stealth_request(content) {
         return Some(format_firewall_stealth_report());
     }
     // Application Firewall (bare `firewall` / `afw` stay with the agent; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP;
-    // `/stealth` · `/firewall-stealth` stay stealth).
+    // `/stealth` · `/firewall-stealth` stay stealth; `/firewall-logging` · `/fw-logging` stay logging).
     if looks_like_firewall_request(content) {
         return Some(format_firewall_report());
     }

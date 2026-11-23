@@ -794,6 +794,116 @@ pub fn get_firewall_stealth_status() -> String {
     info
 }
 
+/// Parse `socketfilterfw --getloggingmode` (On / Off).
+pub(crate) fn parse_firewall_logging_mode(raw: &str) -> Option<&'static str> {
+    let lower = raw.to_ascii_lowercase();
+    if lower.trim().is_empty() {
+        return None;
+    }
+    if lower.contains("disabled") || lower.contains("is off") || lower.contains("logging off") {
+        return Some("Off");
+    }
+    if lower.contains("enabled") || lower.contains("is on") || lower.contains("logging on") {
+        return Some("On");
+    }
+    if lower.contains(" off") || lower.ends_with("off") {
+        return Some("Off");
+    }
+    if lower.contains(" on") || lower.ends_with("on") {
+        return Some("On");
+    }
+    None
+}
+
+/// Parse `socketfilterfw --getloggingopt` (throttled / detail / brief).
+pub(crate) fn parse_firewall_logging_opt(raw: &str) -> Option<&'static str> {
+    let lower = raw.to_ascii_lowercase();
+    if lower.trim().is_empty() {
+        return None;
+    }
+    if lower.contains("throttl") {
+        return Some("throttled");
+    }
+    if lower.contains("detail") {
+        return Some("detail");
+    }
+    if lower.contains("brief") {
+        return Some("brief");
+    }
+    None
+}
+
+/// Combine logging mode + optional logging option into a short status line.
+pub(crate) fn format_firewall_logging_parts(
+    mode: Option<&str>,
+    opt: Option<&str>,
+) -> String {
+    match (mode, opt) {
+        (Some("Off"), _) => "Off".to_string(),
+        (Some("On"), Some(o)) => format!("On · {o}"),
+        (Some("On"), None) => "On".to_string(),
+        (None, Some(o)) => o.to_string(),
+        (None, None) => String::new(),
+        (Some(other), Some(o)) => format!("{other} · {o}"),
+        (Some(other), None) => other.to_string(),
+    }
+}
+
+/// macOS Application Firewall logging from `socketfilterfw --getloggingmode` (+ `--getloggingopt`).
+/// Distinct from Firewall global `/firewall`, stealth `/stealth`, Gatekeeper `/gatekeeper`, SIP `/sip`.
+/// Used by Discord/operator instant `/firewall-logging` · `/fw-logging` lane.
+pub fn get_firewall_logging_status() -> String {
+    let mode_raw = {
+        let output = Command::new("/usr/libexec/ApplicationFirewall/socketfilterfw")
+            .arg("--getloggingmode")
+            .stderr(std::process::Stdio::null())
+            .output();
+        match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => String::new(),
+            Err(_) => {
+                debug3!("firewall-logging: socketfilterfw --getloggingmode spawn failed");
+                String::new()
+            }
+        }
+    };
+    let opt_raw = {
+        let output = Command::new("/usr/libexec/ApplicationFirewall/socketfilterfw")
+            .arg("--getloggingopt")
+            .stderr(std::process::Stdio::null())
+            .output();
+        match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => String::new(),
+            Err(_) => {
+                debug3!("firewall-logging: socketfilterfw --getloggingopt spawn failed");
+                String::new()
+            }
+        }
+    };
+    let mode = parse_firewall_logging_mode(&mode_raw);
+    let opt = parse_firewall_logging_opt(&opt_raw);
+    let info = format_firewall_logging_parts(mode, opt);
+    if info.is_empty() {
+        // Fall back to first line of mode raw when parsers miss.
+        let t = mode_raw.lines().next().unwrap_or("").trim();
+        if t.is_empty() {
+            debug3!("firewall-logging: empty status");
+            String::new()
+        } else {
+            debug3!("firewall-logging status (raw): '{}'", t);
+            t.to_string()
+        }
+    } else {
+        debug3!("firewall-logging status: '{}'", info);
+        info
+    }
+}
+
 
 /// Time Machine session + destination from `tmutil status` / `destinationinfo` (live; not OnceLock).
 /// Distinct from Disk Cleanup `view disk` / `tmutil-thin`, SSD `/ssd` · `/free`, and boot volume.
@@ -4641,6 +4751,51 @@ mod airplay_receiver_parse_tests {
             "On"
         );
         assert_eq!(format_airplay_receiver_parts(None, None, false), "");
+    }
+}
+
+#[cfg(test)]
+mod firewall_logging_parse_tests {
+    use super::{
+        format_firewall_logging_parts, parse_firewall_logging_mode, parse_firewall_logging_opt,
+    };
+
+    #[test]
+    fn parses_logging_mode() {
+        assert_eq!(
+            parse_firewall_logging_mode("Firewall logging is currently enabled\n"),
+            Some("On")
+        );
+        assert_eq!(
+            parse_firewall_logging_mode("Firewall logging is currently disabled"),
+            Some("Off")
+        );
+        assert_eq!(parse_firewall_logging_mode("logging is on"), Some("On"));
+        assert_eq!(parse_firewall_logging_mode("logging is off"), Some("Off"));
+        assert_eq!(parse_firewall_logging_mode("nope"), None);
+    }
+
+    #[test]
+    fn parses_logging_opt() {
+        assert_eq!(
+            parse_firewall_logging_opt("Firewall logging option is currently throttled\n"),
+            Some("throttled")
+        );
+        assert_eq!(parse_firewall_logging_opt("detail"), Some("detail"));
+        assert_eq!(parse_firewall_logging_opt("brief"), Some("brief"));
+        assert_eq!(parse_firewall_logging_opt("nope"), None);
+    }
+
+    #[test]
+    fn formats_off_on_and_opt() {
+        assert_eq!(format_firewall_logging_parts(Some("Off"), Some("detail")), "Off");
+        assert_eq!(
+            format_firewall_logging_parts(Some("On"), Some("throttled")),
+            "On · throttled"
+        );
+        assert_eq!(format_firewall_logging_parts(Some("On"), None), "On");
+        assert_eq!(format_firewall_logging_parts(None, Some("brief")), "brief");
+        assert_eq!(format_firewall_logging_parts(None, None), "");
     }
 }
 

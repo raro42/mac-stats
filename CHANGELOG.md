@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2987] - 2026-11-23
+
+### Added
+- Instant Application Firewall logging accepts `/firewall-logging` · `/firewalllogging` · `/firewall-logging-status` · `/firewall-log` · `/fw-logging` · `/fw-log` · `/afw-logging` · `/afw-log` · `/app-firewall-logging` · `/application-firewall-logging` · `/socketfilterfw-logging` · `/logging-mode` · `/logging-opt` · `/mac-firewall-logging` · `/mac-fw-logging` and view/see/open/list NL (`view firewall logging`, `open logging mode`, `list fw logging`, …), matching “firewall logging status” / “is firewall logging on” / “is firewall logging enabled” / “what's my firewall logging” / “what's the logging mode”. Bare `logging` / `firewall logging` stay with the agent; `/firewall` stays global Firewall; `/stealth` stays stealth; `/logs` stays debug log; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP; `/filevault` stays FileVault.
+
 ## [0.1.2986] - 2026-11-23
 
 ### Changed

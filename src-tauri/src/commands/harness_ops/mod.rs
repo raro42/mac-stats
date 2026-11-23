@@ -2093,6 +2093,8 @@ mod tests {
         assert!(!looks_like_firewall_stealth_request("/gatekeeper"));
         assert!(!looks_like_firewall_stealth_request("/sip"));
         assert!(!looks_like_firewall_stealth_request("/filevault"));
+        assert!(!looks_like_firewall_stealth_request("/firewall-logging"));
+        assert!(!looks_like_firewall_stealth_request("view firewall logging"));
         assert!(!looks_like_firewall_stealth_request("enable stealth"));
         assert!(!looks_like_firewall_stealth_request("disable stealth"));
         assert!(!looks_like_firewall_request("/stealth"));
@@ -2122,6 +2124,81 @@ mod tests {
             assert!(
                 !reply.contains("**Stealth**"),
                 "/gatekeeper must stay Gatekeeper, not Stealth: {reply}"
+            );
+        }
+    }
+
+    #[test]
+    fn firewall_logging_slash_and_view_open_do_not_steal_firewall_stealth_or_bare_logging() {
+        // Slash + view/open NL → Firewall logging (`/firewall` · `/stealth` parity).
+        // Bare `logging` / `firewall logging` stay with the agent; `/firewall` stays global;
+        // `/stealth` stays stealth; `/logs` stays debug log.
+        assert!(looks_like_firewall_logging_request("/firewall-logging"));
+        assert!(looks_like_firewall_logging_request("/firewall-log"));
+        assert!(looks_like_firewall_logging_request("/fw-logging"));
+        assert!(looks_like_firewall_logging_request("/fw-log"));
+        assert!(looks_like_firewall_logging_request("/afw-logging"));
+        assert!(looks_like_firewall_logging_request("/afw-log"));
+        assert!(looks_like_firewall_logging_request("/logging-mode"));
+        assert!(looks_like_firewall_logging_request("/logging-opt"));
+        assert!(looks_like_firewall_logging_request("/mac-firewall-logging"));
+        assert!(looks_like_firewall_logging_request("view firewall logging"));
+        assert!(looks_like_firewall_logging_request("open logging mode"));
+        assert!(looks_like_firewall_logging_request("list fw logging"));
+        assert!(looks_like_firewall_logging_request("firewall logging status"));
+        assert!(looks_like_firewall_logging_request("is firewall logging on"));
+        assert!(looks_like_firewall_logging_request("is firewall logging enabled"));
+        assert!(looks_like_firewall_logging_request("what's my firewall logging"));
+        assert!(looks_like_firewall_logging_request("what's the logging mode"));
+        assert!(!looks_like_firewall_logging_request("logging"));
+        assert!(!looks_like_firewall_logging_request("firewall logging"));
+        assert!(!looks_like_firewall_logging_request("logging mode"));
+        assert!(!looks_like_firewall_logging_request("/firewall"));
+        assert!(!looks_like_firewall_logging_request("view firewall"));
+        assert!(!looks_like_firewall_logging_request("/stealth"));
+        assert!(!looks_like_firewall_logging_request("view stealth"));
+        assert!(!looks_like_firewall_logging_request("/logs"));
+        assert!(!looks_like_firewall_logging_request("/gatekeeper"));
+        assert!(!looks_like_firewall_logging_request("/sip"));
+        assert!(!looks_like_firewall_logging_request("/filevault"));
+        assert!(!looks_like_firewall_logging_request("enable firewall logging"));
+        assert!(!looks_like_firewall_logging_request("disable firewall logging"));
+        assert!(!looks_like_firewall_request("/firewall-logging"));
+        assert!(!looks_like_firewall_request("view firewall logging"));
+        assert!(!looks_like_firewall_request("/fw-logging"));
+        assert!(!looks_like_firewall_stealth_request("/firewall-logging"));
+        assert!(!looks_like_firewall_stealth_request("view firewall logging"));
+        let logging = try_operator_instant_reply("/firewall-logging").unwrap();
+        assert!(
+            logging.contains("**Firewall logging**")
+                && !logging.to_lowercase().contains("execution"),
+            "got: {logging}"
+        );
+        let viewed = try_operator_instant_reply("view firewall logging").unwrap();
+        assert!(
+            viewed.contains("**Firewall logging**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let mode = try_operator_instant_reply("/logging-mode").unwrap();
+        assert!(
+            mode.contains("**Firewall logging**") && !mode.to_lowercase().contains("execution"),
+            "got: {mode}"
+        );
+        assert!(try_operator_instant_reply("logging").is_none());
+        assert!(try_operator_instant_reply("firewall logging").is_none());
+        let fw = try_operator_instant_reply("/firewall");
+        if let Some(reply) = fw {
+            assert!(
+                !reply.contains("**Firewall logging**"),
+                "/firewall must stay Firewall, not Firewall logging: {reply}"
+            );
+        }
+        let stealth = try_operator_instant_reply("/stealth");
+        if let Some(reply) = stealth {
+            assert!(
+                !reply.contains("**Firewall logging**"),
+                "/stealth must stay Stealth, not Firewall logging: {reply}"
             );
         }
     }
