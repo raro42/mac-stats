@@ -17256,6 +17256,19 @@ pub fn looks_like_screensaver_idle_request(content: &str) -> bool {
         || n == "/screens"
         || n == "/display"
         || n == "/displays"
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/womp"
         // Bare phrases stay with the agent.
         || n == "screensaver"
         || n == "the screensaver"
@@ -17482,6 +17495,13 @@ pub fn looks_like_power_nap_request(content: &str) -> bool {
         || n.contains("wake on")
         || n.contains("wake-on")
         || n.contains("womp")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
         || n.contains("screensaver")
         || n.contains("screen saver")
         || n.contains("screen-saver")
@@ -17508,6 +17528,9 @@ pub fn looks_like_power_nap_request(content: &str) -> bool {
         || n == "/cycles"
         || n == "/charger"
         || n == "/adapter"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
         || n == "/screensaver"
         || n == "/screen-saver"
         || n == "/idle-time"
@@ -17684,6 +17707,13 @@ pub fn looks_like_wake_for_network_request(content: &str) -> bool {
         || n.contains("powernap")
         || n.contains("power nap")
         || n.contains("power-nap")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
         || n.contains("screensaver")
         || n.contains("screen saver")
         || n.contains("screen-saver")
@@ -17715,6 +17745,9 @@ pub fn looks_like_wake_for_network_request(content: &str) -> bool {
         || n == "/adapter"
         || n == "/powernap"
         || n == "/power-nap"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
         || n == "/screensaver"
         || n == "/screen-saver"
         || n == "/idle-time"
@@ -17990,6 +18023,290 @@ pub fn format_wake_for_network_report() -> String {
             .to_string();
     }
     format!("**Wake for network** · `{v}`")
+}
+
+/// Display Sleep — `pmset` Battery/AC `displaysleep` minutes (+ active fallback; 0 = Never).
+/// Slash + view/open NL (`/displaysleep` · `/display-sleep` · `view display sleep`).
+/// Bare `displaysleep` / `display sleep` / `screen sleep` stay with the agent;
+/// `/screensaver` · `/idle-time` stay Screensaver idle; `/display` · `/screen` stay resolution;
+/// `/powernap` stays Power Nap; `/womp` stays Wake for network; disksleep stays out.
+pub fn looks_like_displaysleep_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("disksleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("wake for")
+        || n.contains("wake-for")
+        || n.contains("wake on")
+        || n.contains("wake-on")
+        || n.contains("womp")
+        || n.contains("proximity")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/display"
+        || n == "/displays"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/resolution"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "displaysleep"
+        || n == "the displaysleep"
+        || n == "display sleep"
+        || n == "the display sleep"
+        || n == "display-sleep"
+        || n == "the display-sleep"
+        || n == "screen sleep"
+        || n == "the screen sleep"
+        || n == "screen-sleep"
+        || n == "the screen-sleep"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/displaysleep"
+            | "/display-sleep"
+            | "/displaysleep-status"
+            | "/display-sleep-status"
+            | "/displaysleep-state"
+            | "/display-sleep-state"
+            | "/displaysleep-timer"
+            | "/display-sleep-timer"
+            | "/screen-sleep"
+            | "/screensleep"
+            | "/screen-sleep-status"
+            | "/screen-sleep-timer"
+            | "/mac-displaysleep"
+            | "/mac-display-sleep"
+            | "/mac-displaysleep-status"
+            | "/mac-display-sleep-status"
+            | "/mac-screen-sleep"
+            | "displaysleep status"
+            | "the displaysleep status"
+            | "display sleep status"
+            | "the display sleep status"
+            | "display-sleep status"
+            | "the display-sleep status"
+            | "displaysleep state"
+            | "the displaysleep state"
+            | "display sleep state"
+            | "the display sleep state"
+            | "displaysleep timer"
+            | "the displaysleep timer"
+            | "display sleep timer"
+            | "the display sleep timer"
+            | "my displaysleep"
+            | "my displaysleep status"
+            | "my display sleep"
+            | "my display sleep status"
+            | "is displaysleep on"
+            | "is displaysleep off"
+            | "is displaysleep enabled"
+            | "is displaysleep disabled"
+            | "is display sleep on"
+            | "is display sleep off"
+            | "is display sleep enabled"
+            | "is display sleep disabled"
+            | "is display-sleep on"
+            | "is display-sleep enabled"
+            | "what's my displaysleep"
+            | "whats my displaysleep"
+            | "what is my displaysleep"
+            | "what's my displaysleep status"
+            | "whats my displaysleep status"
+            | "what is my displaysleep status"
+            | "what's my display sleep"
+            | "whats my display sleep"
+            | "what is my display sleep"
+            | "what's my display sleep status"
+            | "whats my display sleep status"
+            | "what is my display sleep status"
+            | "what's the displaysleep"
+            | "whats the displaysleep"
+            | "what is the displaysleep"
+            | "what's the displaysleep status"
+            | "whats the displaysleep status"
+            | "what is the displaysleep status"
+            | "what's the display sleep"
+            | "whats the display sleep"
+            | "what is the display sleep"
+            | "what's the display sleep status"
+            | "whats the display sleep status"
+            | "what is the display sleep status"
+            | "how's displaysleep"
+            | "hows displaysleep"
+            | "how's the displaysleep"
+            | "hows the displaysleep"
+            | "how's display sleep"
+            | "hows display sleep"
+            | "how's the display sleep"
+            | "hows the display sleep"
+            | "view displaysleep"
+            | "view the displaysleep"
+            | "view displaysleep status"
+            | "view the displaysleep status"
+            | "view display sleep"
+            | "view the display sleep"
+            | "view display sleep status"
+            | "view the display sleep status"
+            | "view display-sleep"
+            | "view the display-sleep"
+            | "see displaysleep"
+            | "see the displaysleep"
+            | "see displaysleep status"
+            | "see the displaysleep status"
+            | "see display sleep"
+            | "see the display sleep"
+            | "see display sleep status"
+            | "see the display sleep status"
+            | "open displaysleep"
+            | "open the displaysleep"
+            | "open displaysleep status"
+            | "open the displaysleep status"
+            | "open display sleep"
+            | "open the display sleep"
+            | "open display sleep status"
+            | "open the display sleep status"
+            | "open display-sleep"
+            | "open the display-sleep"
+            | "list displaysleep"
+            | "list the displaysleep"
+            | "list displaysleep status"
+            | "list the displaysleep status"
+            | "list display sleep"
+            | "list the display sleep"
+            | "list display sleep status"
+            | "list the display sleep status"
+            | "screen sleep status"
+            | "the screen sleep status"
+            | "screen-sleep status"
+            | "the screen-sleep status"
+            | "my screen sleep"
+            | "my screen sleep status"
+            | "is screen sleep on"
+            | "is screen sleep off"
+            | "is screen sleep enabled"
+            | "is screen-sleep on"
+            | "is screen-sleep enabled"
+            | "what's my screen sleep"
+            | "whats my screen sleep"
+            | "what is my screen sleep"
+            | "what's the screen sleep"
+            | "whats the screen sleep"
+            | "what is the screen sleep"
+            | "what's the screen sleep status"
+            | "whats the screen sleep status"
+            | "what is the screen sleep status"
+            | "view screen sleep"
+            | "view the screen sleep"
+            | "view screen sleep status"
+            | "view the screen sleep status"
+            | "view screen-sleep"
+            | "view the screen-sleep"
+            | "see screen sleep"
+            | "see the screen sleep"
+            | "see screen sleep status"
+            | "see the screen sleep status"
+            | "open screen sleep"
+            | "open the screen sleep"
+            | "open screen sleep status"
+            | "open the screen sleep status"
+            | "open screen-sleep"
+            | "open the screen-sleep"
+            | "list screen sleep"
+            | "list the screen sleep"
+            | "list screen sleep status"
+            | "list the screen sleep status"
+            | "list screen-sleep"
+            | "list the screen-sleep"
+    )
+}
+
+/// Zero-LLM Display Sleep status from pmset Battery/AC `displaysleep` (macOS-only; empty elsewhere).
+pub fn format_displaysleep_report() -> String {
+    let v = crate::metrics::get_displaysleep_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Display Sleep** — _no Display Sleep reading on this Mac right now._".to_string();
+    }
+    format!("**Display Sleep** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.

@@ -1196,6 +1196,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_wake_for_network_request(content) {
         return Some(format_wake_for_network_report());
     }
+    // Display Sleep (bare `displaysleep` / `display sleep` / `screen sleep` stay with the agent;
+    // `/screensaver` · `/idle-time` stay Screensaver; `/display` · `/screen` stay resolution;
+    // `/powernap` stays Power Nap; `/womp` stays Wake for network).
+    if looks_like_displaysleep_request(content) {
+        return Some(format_displaysleep_report());
+    }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
     if looks_like_boot_time_request(content) {

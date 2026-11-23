@@ -3162,6 +3162,150 @@ pub fn get_wake_for_network_status() -> String {
     }
 }
 
+/// Parse `pmset -g custom` Battery/AC `displaysleep` minutes → (battery, ac).
+pub(crate) fn parse_pmset_custom_displaysleep(raw: &str) -> (Option<u32>, Option<u32>) {
+    let mut section: Option<&str> = None;
+    let mut battery = None;
+    let mut ac = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.eq_ignore_ascii_case("Battery Power:") {
+            section = Some("battery");
+            continue;
+        }
+        if t.eq_ignore_ascii_case("AC Power:") {
+            section = Some("ac");
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("displaysleep") {
+            continue;
+        }
+        let mins = match parts.next().and_then(|v| v.parse::<u32>().ok()) {
+            Some(v) => Some(v),
+            None => continue,
+        };
+        match section {
+            Some("battery") => battery = mins.or(battery),
+            Some("ac") => ac = mins.or(ac),
+            _ => {}
+        }
+    }
+    (battery, ac)
+}
+
+/// Parse active `pmset -g` `displaysleep` minutes (Currently in use).
+pub(crate) fn parse_pmset_active_displaysleep(raw: &str) -> Option<u32> {
+    for line in raw.lines() {
+        let mut parts = line.trim().split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("displaysleep") {
+            continue;
+        }
+        return parts.next().and_then(|v| v.parse::<u32>().ok());
+    }
+    None
+}
+
+/// Human Display Sleep minutes (0 → Never; else Nm / Nh).
+pub(crate) fn format_displaysleep_mins(mins: u32) -> String {
+    if mins == 0 {
+        return "Never".to_string();
+    }
+    if mins >= 60 && mins % 60 == 0 {
+        return format!("{}h", mins / 60);
+    }
+    format!("{mins}m")
+}
+
+/// Prefer Battery+AC custom when both set; else active `pmset -g`.
+pub(crate) fn format_displaysleep_parts(
+    battery: Option<u32>,
+    ac: Option<u32>,
+    active: Option<u32>,
+) -> String {
+    match (battery, ac) {
+        (Some(b), Some(a)) if b == a => format_displaysleep_mins(b),
+        (Some(b), Some(a)) => {
+            format!(
+                "AC {} · Battery {}",
+                format_displaysleep_mins(a),
+                format_displaysleep_mins(b)
+            )
+        }
+        (Some(b), None) => format!("{} (Battery)", format_displaysleep_mins(b)),
+        (None, Some(a)) => format!("{} (AC)", format_displaysleep_mins(a)),
+        (None, None) => match active {
+            Some(m) => format_displaysleep_mins(m),
+            None => String::new(),
+        },
+    }
+}
+
+/// macOS Display Sleep from `pmset -g custom` Battery/AC `displaysleep` minutes
+/// (fallback: active `pmset -g`). Distinct from Screensaver `/screensaver`, display resolution
+/// `/display` · `/screen`, Power Nap `/powernap`, and Wake for network `/womp`.
+/// Used by Discord/operator instant `/displaysleep` · `/display-sleep` lane.
+pub fn get_displaysleep_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let (battery, ac) = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g", "custom"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_custom_displaysleep(&stdout)
+                }
+                Ok(_) => (None, None),
+                Err(_) => {
+                    debug3!("displaysleep: pmset -g custom spawn failed");
+                    (None, None)
+                }
+            }
+        };
+
+        let active = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_active_displaysleep(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("displaysleep: pmset -g spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_displaysleep_parts(battery, ac, active);
+        if info.is_empty() {
+            debug3!("displaysleep: empty status");
+        } else {
+            debug3!("displaysleep status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
@@ -6342,6 +6486,72 @@ AC Power:
             "On"
         );
         assert_eq!(format_wake_for_network_parts(None, None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod displaysleep_parse_tests {
+    use super::{
+        format_displaysleep_mins, format_displaysleep_parts, parse_pmset_active_displaysleep,
+        parse_pmset_custom_displaysleep,
+    };
+
+    #[test]
+    fn parses_custom_battery_and_ac() {
+        let sample = r#"
+Battery Power:
+ Sleep On Power Button 1
+ displaysleep         2
+ disksleep            10
+AC Power:
+ displaysleep         10
+ disksleep            10
+"#;
+        assert_eq!(
+            parse_pmset_custom_displaysleep(sample),
+            (Some(2), Some(10))
+        );
+        assert_eq!(parse_pmset_custom_displaysleep("nope"), (None, None));
+    }
+
+    #[test]
+    fn parses_active_displaysleep() {
+        assert_eq!(
+            parse_pmset_active_displaysleep("Currently in use:\n displaysleep         10\n"),
+            Some(10)
+        );
+        assert_eq!(
+            parse_pmset_active_displaysleep(" displaysleep         0\n"),
+            Some(0)
+        );
+        assert_eq!(parse_pmset_active_displaysleep("disksleep 10\n"), None);
+    }
+
+    #[test]
+    fn formats_matched_split_and_active() {
+        assert_eq!(format_displaysleep_mins(0), "Never");
+        assert_eq!(format_displaysleep_mins(10), "10m");
+        assert_eq!(format_displaysleep_mins(60), "1h");
+        assert_eq!(format_displaysleep_mins(120), "2h");
+        assert_eq!(
+            format_displaysleep_parts(Some(10), Some(10), Some(2)),
+            "10m"
+        );
+        assert_eq!(
+            format_displaysleep_parts(Some(0), Some(0), Some(10)),
+            "Never"
+        );
+        assert_eq!(
+            format_displaysleep_parts(Some(2), Some(10), None),
+            "AC 10m · Battery 2m"
+        );
+        assert_eq!(
+            format_displaysleep_parts(Some(2), None, None),
+            "2m (Battery)"
+        );
+        assert_eq!(format_displaysleep_parts(None, Some(10), None), "10m (AC)");
+        assert_eq!(format_displaysleep_parts(None, None, Some(0)), "Never");
+        assert_eq!(format_displaysleep_parts(None, None, None), "");
     }
 }
 

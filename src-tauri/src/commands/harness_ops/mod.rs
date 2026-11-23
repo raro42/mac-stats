@@ -3995,6 +3995,94 @@ mod tests {
         }
     }
 
+    #[test]
+    fn displaysleep_slash_and_view_open_do_not_steal_screensaver_display_or_bare() {
+        // Slash + view/open NL → Display Sleep (`/screensaver` · `/display` parity).
+        // Bare `displaysleep` / `display sleep` / `screen sleep` stay with the agent;
+        // `/screensaver` stays Screensaver idle; `/display` · `/screen` stay resolution;
+        // `/powernap` stays Power Nap; `/womp` stays Wake for network.
+        assert!(looks_like_displaysleep_request("/displaysleep"));
+        assert!(looks_like_displaysleep_request("/display-sleep"));
+        assert!(looks_like_displaysleep_request("/displaysleep-status"));
+        assert!(looks_like_displaysleep_request("/screen-sleep"));
+        assert!(looks_like_displaysleep_request("/mac-displaysleep"));
+        assert!(looks_like_displaysleep_request("/mac-display-sleep"));
+        assert!(looks_like_displaysleep_request("view display sleep"));
+        assert!(looks_like_displaysleep_request("open displaysleep"));
+        assert!(looks_like_displaysleep_request("list screen sleep"));
+        assert!(looks_like_displaysleep_request("display sleep status"));
+        assert!(looks_like_displaysleep_request("is display sleep on"));
+        assert!(looks_like_displaysleep_request("is displaysleep enabled"));
+        assert!(looks_like_displaysleep_request("what's my display sleep"));
+        assert!(looks_like_displaysleep_request("view screen-sleep"));
+        assert!(!looks_like_displaysleep_request("displaysleep"));
+        assert!(!looks_like_displaysleep_request("display sleep"));
+        assert!(!looks_like_displaysleep_request("screen sleep"));
+        assert!(!looks_like_displaysleep_request("/screensaver"));
+        assert!(!looks_like_displaysleep_request("view screensaver"));
+        assert!(!looks_like_displaysleep_request("/idle-time"));
+        assert!(!looks_like_displaysleep_request("/display"));
+        assert!(!looks_like_displaysleep_request("/screen"));
+        assert!(!looks_like_displaysleep_request("view display"));
+        assert!(!looks_like_displaysleep_request("/powernap"));
+        assert!(!looks_like_displaysleep_request("/womp"));
+        assert!(!looks_like_displaysleep_request("/power"));
+        assert!(!looks_like_displaysleep_request("/tasks"));
+        assert!(!looks_like_displaysleep_request("enable display sleep"));
+        assert!(!looks_like_displaysleep_request("disk sleep"));
+        assert!(!looks_like_displaysleep_request("/disksleep"));
+        assert!(!looks_like_screensaver_idle_request("/displaysleep"));
+        assert!(!looks_like_screensaver_idle_request("view display sleep"));
+        assert!(!looks_like_power_nap_request("/displaysleep"));
+        assert!(!looks_like_wake_for_network_request("/displaysleep"));
+        let s = try_operator_instant_reply("/displaysleep").unwrap();
+        assert!(
+            s.contains("**Display Sleep**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view display sleep").unwrap();
+        assert!(
+            viewed.contains("**Display Sleep**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open displaysleep").unwrap();
+        assert!(
+            open.contains("**Display Sleep**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("displaysleep").is_none());
+        assert!(try_operator_instant_reply("display sleep").is_none());
+        assert!(try_operator_instant_reply("screen sleep").is_none());
+        let ss = try_operator_instant_reply("/screensaver");
+        if let Some(reply) = ss {
+            assert!(
+                !reply.contains("**Display Sleep**"),
+                "/screensaver must stay Screensaver, not Display Sleep: {reply}"
+            );
+        }
+        let disp = try_operator_instant_reply("/display");
+        if let Some(reply) = disp {
+            assert!(
+                !reply.contains("**Display Sleep**"),
+                "/display must stay resolution, not Display Sleep: {reply}"
+            );
+        }
+        let nap = try_operator_instant_reply("/powernap");
+        if let Some(reply) = nap {
+            assert!(
+                !reply.contains("**Display Sleep**"),
+                "/powernap must stay Power Nap, not Display Sleep: {reply}"
+            );
+        }
+        let womp = try_operator_instant_reply("/womp");
+        if let Some(reply) = womp {
+            assert!(
+                !reply.contains("**Display Sleep**"),
+                "/womp must stay Wake for network, not Display Sleep: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3009] - 2026-11-23
+
+### Added
+- Instant Display Sleep accepts `/displaysleep` · `/display-sleep` · `/displaysleep-status` · `/display-sleep-status` · `/displaysleep-state` · `/display-sleep-state` · `/displaysleep-timer` · `/display-sleep-timer` · `/screen-sleep` · `/screensleep` · `/screen-sleep-status` · `/screen-sleep-timer` · `/mac-displaysleep` · `/mac-display-sleep` · `/mac-displaysleep-status` · `/mac-display-sleep-status` · `/mac-screen-sleep` and view/see/open/list NL (`view display sleep`, `open displaysleep`, `list screen sleep`, …), matching “display sleep status” / “is display sleep on” / “is displaysleep enabled” / “what's my display sleep” / “what's the displaysleep status”. Bare `displaysleep` / `display sleep` / `screen sleep` stay with the agent; `/screensaver` · `/idle-time` stay Screensaver idle; `/display` · `/screen` stay resolution; `/powernap` · `/power-nap` stay Power Nap; `/womp` · `/wake-for-network` stay Wake for network; disksleep stays out. Operator `/help` lists the new lane.
+
 ## [0.1.3008] - 2026-11-23
 
 ### Added
