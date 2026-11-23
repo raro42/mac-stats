@@ -14166,6 +14166,12 @@ pub fn looks_like_airplay_receiver_request(content: &str) -> bool {
         || n == "/cd-sharing"
         || n == "/ods"
         || n == "/odsagent"
+        || n == "/airdrop"
+        || n == "/air-drop"
+        || n == "/mac-airdrop"
+        || n.contains("airdrop")
+        || n.contains("air drop")
+        || n.contains("air-drop")
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
@@ -14468,6 +14474,12 @@ pub fn looks_like_dvd_cd_sharing_request(content: &str) -> bool {
         || n == "/apple-events"
         || n == "/airplay"
         || n == "/airplay-receiver"
+        || n == "/airdrop"
+        || n == "/air-drop"
+        || n == "/mac-airdrop"
+        || n.contains("airdrop")
+        || n.contains("air drop")
+        || n.contains("air-drop")
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
@@ -14732,6 +14744,283 @@ pub fn format_dvd_cd_sharing_report() -> String {
         return "**DVD or CD Sharing** — _no DVD/CD Sharing reading on this Mac right now._".to_string();
     }
     format!("**DVD or CD Sharing** · `{v}`")
+}
+
+/// AirDrop — sharingd DiscoverableMode (Off / Contacts Only / Everyone).
+/// Slash + view/open NL (`/airdrop` · `/air-drop` · `view airdrop`).
+/// Bare `airdrop` / `air drop` stay with the agent; `/airplay` stays AirPlay Receiver;
+/// `/bluetooth-sharing` · `/bts` stay Bluetooth Sharing; `/media-sharing` stays Media Sharing;
+/// `/file-sharing` · `/smb` stay File Sharing.
+pub fn looks_like_airdrop_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen share")
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n.contains("file share")
+        || n.contains("printer sharing")
+        || n.contains("printersharing")
+        || n.contains("printer-sharing")
+        || n.contains("share printers")
+        || n.contains("cups share")
+        || n.contains("cups sharing")
+        || n.contains("remote management")
+        || n.contains("remotemanagement")
+        || n.contains("remote-management")
+        || n.contains("remote desktop")
+        || n.contains("apple remote desktop")
+        || n.contains("remote apple events")
+        || n.contains("remote-apple-events")
+        || n.contains("remoteappleevents")
+        || n.contains("apple events")
+        || n.contains("apple-events")
+        || n.contains("content caching")
+        || n.contains("contentcaching")
+        || n.contains("content-caching")
+        || n.contains("content cache")
+        || n.contains("asset cache")
+        || n.contains("assetcache")
+        || n.contains("asset-cache")
+        || n.contains("internet sharing")
+        || n.contains("internetsharing")
+        || n.contains("internet-sharing")
+        || n.contains("bluetooth sharing")
+        || n.contains("bluetoothsharing")
+        || n.contains("bluetooth-sharing")
+        || n.contains("media sharing")
+        || n.contains("mediasharing")
+        || n.contains("media-sharing")
+        || n.contains("home sharing")
+        || n.contains("homesharing")
+        || n.contains("home-sharing")
+        || n.contains("airplay")
+        || n.contains("air play")
+        || n.contains("airplay-receiver")
+        || n.contains("dvd sharing")
+        || n.contains("dvd-sharing")
+        || n.contains("cd sharing")
+        || n.contains("cd-sharing")
+        || n.contains("optical sharing")
+        || n.contains("wifi")
+        || n.contains("wi-fi")
+        || n.contains("ssid")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/remotelogin"
+        || n == "/ssh"
+        || n == "/sshd"
+        || n == "/screen-sharing"
+        || n == "/screensharing"
+        || n == "/vnc"
+        || n == "/file-sharing"
+        || n == "/filesharing"
+        || n == "/smb"
+        || n == "/smb-status"
+        || n == "/smbd"
+        || n == "/printer-sharing"
+        || n == "/cups-share"
+        || n == "/remote-management"
+        || n == "/ard"
+        || n == "/content-caching"
+        || n == "/asset-cache"
+        || n == "/internet-sharing"
+        || n == "/ics"
+        || n == "/bluetooth-sharing"
+        || n == "/bts"
+        || n == "/obex"
+        || n == "/media-sharing"
+        || n == "/home-sharing"
+        || n == "/remote-apple-events"
+        || n == "/rae"
+        || n == "/eppc"
+        || n == "/apple-events"
+        || n == "/airplay"
+        || n == "/airplay-receiver"
+        || n == "/dvd-sharing"
+        || n == "/cd-sharing"
+        || n == "/ods"
+        || n == "/odsagent"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        // Bare phrases stay with the agent.
+        || n == "airdrop"
+        || n == "the airdrop"
+        || n == "air drop"
+        || n == "the air drop"
+        || n == "air-drop"
+        || n == "the air-drop"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/airdrop"
+            | "/air-drop"
+            | "/airdrop-status"
+            | "/air-drop-status"
+            | "/airdrop-state"
+            | "/air-drop-state"
+            | "/airdrop-mode"
+            | "/air-drop-mode"
+            | "/mac-airdrop"
+            | "/mac-air-drop"
+            | "airdrop status"
+            | "the airdrop status"
+            | "air-drop status"
+            | "the air-drop status"
+            | "air drop status"
+            | "the air drop status"
+            | "airdrop state"
+            | "the airdrop state"
+            | "airdrop mode"
+            | "the airdrop mode"
+            | "air drop mode"
+            | "the air drop mode"
+            | "my airdrop"
+            | "my airdrop status"
+            | "my air drop"
+            | "my air drop status"
+            | "is airdrop on"
+            | "is airdrop off"
+            | "is airdrop enabled"
+            | "is airdrop disabled"
+            | "is air drop on"
+            | "is air drop off"
+            | "is air drop enabled"
+            | "is air drop disabled"
+            | "is air-drop on"
+            | "is air-drop enabled"
+            | "what's my airdrop"
+            | "whats my airdrop"
+            | "what is my airdrop"
+            | "what's my airdrop status"
+            | "whats my airdrop status"
+            | "what is my airdrop status"
+            | "what's my air drop"
+            | "whats my air drop"
+            | "what is my air drop"
+            | "what's my air drop status"
+            | "whats my air drop status"
+            | "what is my air drop status"
+            | "what's the airdrop"
+            | "whats the airdrop"
+            | "what is the airdrop"
+            | "what's the airdrop status"
+            | "whats the airdrop status"
+            | "what is the airdrop status"
+            | "what's the air drop"
+            | "whats the air drop"
+            | "what is the air drop"
+            | "what's the air drop status"
+            | "whats the air drop status"
+            | "what is the air drop status"
+            | "how's airdrop"
+            | "hows airdrop"
+            | "how's the airdrop"
+            | "hows the airdrop"
+            | "how's air drop"
+            | "hows air drop"
+            | "view airdrop"
+            | "view the airdrop"
+            | "view airdrop status"
+            | "view the airdrop status"
+            | "view air-drop"
+            | "view the air-drop"
+            | "view air drop"
+            | "view the air drop"
+            | "view air drop status"
+            | "view the air drop status"
+            | "see airdrop"
+            | "see the airdrop"
+            | "see airdrop status"
+            | "see the airdrop status"
+            | "see air drop"
+            | "see the air drop"
+            | "see air drop status"
+            | "see the air drop status"
+            | "open airdrop"
+            | "open the airdrop"
+            | "open airdrop status"
+            | "open the airdrop status"
+            | "open air drop"
+            | "open the air drop"
+            | "open air drop status"
+            | "open the air drop status"
+            | "list airdrop"
+            | "list the airdrop"
+            | "list airdrop status"
+            | "list the airdrop status"
+            | "list air drop"
+            | "list the air drop"
+            | "list air drop status"
+            | "list the air drop status"
+    )
+}
+
+/// Zero-LLM AirDrop status from sharingd DiscoverableMode (macOS-only; empty elsewhere).
+pub fn format_airdrop_report() -> String {
+    let v = crate::metrics::get_airdrop_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**AirDrop** — _no AirDrop reading on this Mac right now._".to_string();
+    }
+    format!("**AirDrop** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.

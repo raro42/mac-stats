@@ -1897,6 +1897,117 @@ pub fn get_dvd_cd_sharing_status() -> String {
     info
 }
 
+/// Parse `defaults read com.apple.sharingd DiscoverableMode` (Off / Contacts Only / Everyone).
+pub(crate) fn parse_airdrop_discoverable_mode(raw: &str) -> Option<&'static str> {
+    let t = raw
+        .trim()
+        .trim_matches('"')
+        .trim()
+        .to_ascii_lowercase()
+        .replace('_', " ")
+        .replace('-', " ");
+    let t = t.split_whitespace().collect::<Vec<_>>().join(" ");
+    if t.is_empty() {
+        return None;
+    }
+    if matches!(
+        t.as_str(),
+        "off" | "0" | "disabled" | "no" | "false" | "none"
+    ) {
+        return Some("Off");
+    }
+    if matches!(
+        t.as_str(),
+        "1" | "contacts" | "contacts only" | "contacts only mode" | "contactsonly"
+    ) || t.contains("contact")
+    {
+        return Some("Contacts Only");
+    }
+    if matches!(t.as_str(), "2" | "everyone" | "all" | "everybody")
+        || t.contains("everyone")
+        || t.contains("everybody")
+    {
+        return Some("Everyone");
+    }
+    None
+}
+
+/// Parse NetworkBrowser `DisableAirDrop` (1/true → forced Off).
+pub(crate) fn parse_airdrop_disabled_flag(raw: &str) -> Option<bool> {
+    let t = raw.trim().trim_matches('"').trim().to_ascii_lowercase();
+    if t.is_empty() {
+        return None;
+    }
+    if matches!(t.as_str(), "1" | "true" | "yes" | "on") {
+        return Some(true);
+    }
+    if matches!(t.as_str(), "0" | "false" | "no" | "off") {
+        return Some(false);
+    }
+    None
+}
+
+/// Combine DiscoverableMode + optional DisableAirDrop into a short status line.
+pub(crate) fn format_airdrop_parts(
+    mode: Option<&str>,
+    disabled: Option<bool>,
+) -> String {
+    if disabled == Some(true) {
+        return "Off".to_string();
+    }
+    mode.unwrap_or("").to_string()
+}
+
+/// macOS AirDrop discoverability from `com.apple.sharingd` DiscoverableMode (+ NetworkBrowser
+/// DisableAirDrop). Distinct from AirPlay `/airplay`, Bluetooth Sharing `/bluetooth-sharing` · `/bts`,
+/// Media Sharing `/media-sharing`, and File Sharing `/smb`.
+/// Used by Discord/operator instant `/airdrop` · `/air-drop` lane.
+pub fn get_airdrop_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let read_defaults = |domain: &str, key: &str| -> Option<String> {
+            let output = Command::new("/usr/bin/defaults")
+                .args(["read", domain, key])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout).trim().to_string();
+                    if stdout.is_empty() {
+                        None
+                    } else {
+                        Some(stdout)
+                    }
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("airdrop: defaults read spawn failed ({domain} {key})");
+                    None
+                }
+            }
+        };
+
+        let mode = read_defaults("com.apple.sharingd", "DiscoverableMode")
+            .as_deref()
+            .and_then(parse_airdrop_discoverable_mode);
+        let disabled = read_defaults("com.apple.NetworkBrowser", "DisableAirDrop")
+            .as_deref()
+            .and_then(parse_airdrop_disabled_flag);
+
+        let info = format_airdrop_parts(mode, disabled);
+        if info.is_empty() {
+            debug3!("airdrop: empty status");
+        } else {
+            debug3!("airdrop status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
@@ -4530,6 +4641,46 @@ mod airplay_receiver_parse_tests {
             "On"
         );
         assert_eq!(format_airplay_receiver_parts(None, None, false), "");
+    }
+}
+
+#[cfg(test)]
+mod airdrop_parse_tests {
+    use super::{
+        format_airdrop_parts, parse_airdrop_disabled_flag, parse_airdrop_discoverable_mode,
+    };
+
+    #[test]
+    fn parses_discoverable_modes() {
+        assert_eq!(parse_airdrop_discoverable_mode("Off\n"), Some("Off"));
+        assert_eq!(parse_airdrop_discoverable_mode("0"), Some("Off"));
+        assert_eq!(parse_airdrop_discoverable_mode("Contacts Only"), Some("Contacts Only"));
+        assert_eq!(parse_airdrop_discoverable_mode("1"), Some("Contacts Only"));
+        assert_eq!(parse_airdrop_discoverable_mode("Everyone"), Some("Everyone"));
+        assert_eq!(parse_airdrop_discoverable_mode("2"), Some("Everyone"));
+        assert_eq!(parse_airdrop_discoverable_mode("nope"), None);
+    }
+
+    #[test]
+    fn parses_disabled_flag() {
+        assert_eq!(parse_airdrop_disabled_flag("1\n"), Some(true));
+        assert_eq!(parse_airdrop_disabled_flag("0"), Some(false));
+        assert_eq!(parse_airdrop_disabled_flag("true"), Some(true));
+        assert_eq!(parse_airdrop_disabled_flag("x"), None);
+    }
+
+    #[test]
+    fn formats_off_contacts_everyone() {
+        assert_eq!(format_airdrop_parts(Some("Off"), None), "Off");
+        assert_eq!(
+            format_airdrop_parts(Some("Contacts Only"), None),
+            "Contacts Only"
+        );
+        assert_eq!(format_airdrop_parts(Some("Everyone"), None), "Everyone");
+        assert_eq!(format_airdrop_parts(Some("Everyone"), Some(true)), "Off");
+        assert_eq!(format_airdrop_parts(None, Some(true)), "Off");
+        assert_eq!(format_airdrop_parts(None, None), "");
+        assert_eq!(format_airdrop_parts(None, Some(false)), "");
     }
 }
 

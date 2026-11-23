@@ -3071,6 +3071,82 @@ mod tests {
                 "/media-sharing must stay Media Sharing, not DVD/CD Sharing: {reply}"
             );
         }
+        assert!(!looks_like_dvd_cd_sharing_request("/airdrop"));
+        assert!(!looks_like_dvd_cd_sharing_request("view airdrop"));
+    }
+
+    #[test]
+    fn airdrop_slash_and_view_open_do_not_steal_airplay_bts_or_bare_airdrop() {
+        // Slash + view/open NL → AirDrop (`/airplay` · `/bluetooth-sharing` parity).
+        // Bare `airdrop` / `air drop` stay with the agent; `/airplay` stays AirPlay Receiver;
+        // `/bluetooth-sharing` · `/bts` stay Bluetooth Sharing; `/media-sharing` stays Media Sharing;
+        // `/smb` stays File Sharing; `/dvd-sharing` · `/ods` stay DVD/CD Sharing.
+        assert!(looks_like_airdrop_request("/airdrop"));
+        assert!(looks_like_airdrop_request("/air-drop"));
+        assert!(looks_like_airdrop_request("/airdrop-status"));
+        assert!(looks_like_airdrop_request("/air-drop-status"));
+        assert!(looks_like_airdrop_request("/airdrop-state"));
+        assert!(looks_like_airdrop_request("/airdrop-mode"));
+        assert!(looks_like_airdrop_request("/mac-airdrop"));
+        assert!(looks_like_airdrop_request("/mac-air-drop"));
+        assert!(looks_like_airdrop_request("view airdrop"));
+        assert!(looks_like_airdrop_request("open air drop status"));
+        assert!(looks_like_airdrop_request("list airdrop"));
+        assert!(looks_like_airdrop_request("airdrop status"));
+        assert!(looks_like_airdrop_request("is airdrop on"));
+        assert!(looks_like_airdrop_request("is air drop enabled"));
+        assert!(looks_like_airdrop_request("what's my airdrop"));
+        assert!(looks_like_airdrop_request("view air-drop"));
+        assert!(!looks_like_airdrop_request("airdrop"));
+        assert!(!looks_like_airdrop_request("air drop"));
+        assert!(!looks_like_airdrop_request("/airplay"));
+        assert!(!looks_like_airdrop_request("/airplay-receiver"));
+        assert!(!looks_like_airdrop_request("/bluetooth-sharing"));
+        assert!(!looks_like_airdrop_request("/bts"));
+        assert!(!looks_like_airdrop_request("/media-sharing"));
+        assert!(!looks_like_airdrop_request("/file-sharing"));
+        assert!(!looks_like_airdrop_request("/smb"));
+        assert!(!looks_like_airdrop_request("/dvd-sharing"));
+        assert!(!looks_like_airdrop_request("/ods"));
+        assert!(!looks_like_airdrop_request("/tasks"));
+        assert!(!looks_like_airdrop_request("enable airdrop"));
+        assert!(!looks_like_airplay_receiver_request("/airdrop"));
+        assert!(!looks_like_airplay_receiver_request("view airdrop"));
+        assert!(!looks_like_bluetooth_sharing_request("/airdrop"));
+        assert!(!looks_like_bluetooth_sharing_request("view airdrop"));
+        assert!(!looks_like_dvd_cd_sharing_request("/airdrop"));
+        assert!(!looks_like_dvd_cd_sharing_request("view airdrop"));
+        let ad = try_operator_instant_reply("/airdrop").unwrap();
+        assert!(
+            ad.contains("**AirDrop**") && !ad.to_lowercase().contains("execution"),
+            "got: {ad}"
+        );
+        let viewed = try_operator_instant_reply("view airdrop").unwrap();
+        assert!(
+            viewed.contains("**AirDrop**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let spaced = try_operator_instant_reply("view air drop").unwrap();
+        assert!(
+            spaced.contains("**AirDrop**") && !spaced.to_lowercase().contains("execution"),
+            "got: {spaced}"
+        );
+        assert!(try_operator_instant_reply("airdrop").is_none());
+        assert!(try_operator_instant_reply("air drop").is_none());
+        let ap = try_operator_instant_reply("/airplay");
+        if let Some(reply) = ap {
+            assert!(
+                !reply.contains("**AirDrop**"),
+                "/airplay must stay AirPlay Receiver, not AirDrop: {reply}"
+            );
+        }
+        let bts = try_operator_instant_reply("/bts");
+        if let Some(reply) = bts {
+            assert!(
+                !reply.contains("**AirDrop**"),
+                "/bts must stay Bluetooth Sharing, not AirDrop: {reply}"
+            );
+        }
     }
 
 #[test]

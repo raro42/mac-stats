@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2985] - 2026-11-23
+
+### Added
+- Instant AirDrop status accepts `/airdrop` · `/air-drop` · `/airdrop-status` · `/air-drop-status` · `/airdrop-state` · `/air-drop-state` · `/airdrop-mode` · `/air-drop-mode` · `/mac-airdrop` · `/mac-air-drop` and view/see/open/list NL (`view airdrop`, `open air drop status`, `list airdrop`, …), matching “airdrop status” / “is airdrop on” / “is air drop enabled” / “what's my airdrop” / “what's the air drop status”. Bare `airdrop` / `air drop` stay with the agent; `/airplay` · `/airplay-receiver` stay AirPlay Receiver; `/bluetooth-sharing` · `/bts` stay Bluetooth Sharing; `/media-sharing` · `/home-sharing` stay Media Sharing; `/file-sharing` · `/smb` stay File Sharing; `/dvd-sharing` · `/ods` stay DVD/CD Sharing.
+
 ## [0.1.2984] - 2026-11-23
 
 ### Fixed

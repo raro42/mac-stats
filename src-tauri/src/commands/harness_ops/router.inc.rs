@@ -1118,9 +1118,16 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     // DVD or CD Sharing / ODSAgent (bare `dvd` / `cd` / `dvd sharing` / `cd sharing` / `ods` stay with the
     // agent; `/media-sharing` · `/home-sharing` stay Media Sharing; `/airplay` stays AirPlay Receiver;
-    // `/file-sharing` · `/smb` stay File Sharing; `/screen-sharing` · `/vnc` stay Screen Sharing).
+    // `/file-sharing` · `/smb` stay File Sharing; `/screen-sharing` · `/vnc` stay Screen Sharing;
+    // AirDrop stays `/airdrop` · `/air-drop`).
     if looks_like_dvd_cd_sharing_request(content) {
         return Some(format_dvd_cd_sharing_report());
+    }
+    // AirDrop (bare `airdrop` / `air drop` stay with the agent; `/airplay` stays AirPlay Receiver;
+    // `/bluetooth-sharing` · `/bts` stay Bluetooth Sharing; `/media-sharing` stays Media Sharing;
+    // `/file-sharing` · `/smb` stay File Sharing; `/dvd-sharing` · `/ods` stay DVD/CD Sharing).
+    if looks_like_airdrop_request(content) {
+        return Some(format_airdrop_report());
     }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
