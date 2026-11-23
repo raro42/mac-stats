@@ -1,3 +1,16 @@
+## Overnight note 2026-11-23 ~22:20
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Fuel: product after Screensaver idle v0.1.3006 — Power Nap slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.3007** — `/powernap` · `/power-nap` · `/mac-powernap` + view/open NL; bare powernap/power nap stay with agent; `/lpm` stays Low Power Mode; `/power` stays strip; `/watts` stays draw; `/screensaver` · `/idle-time` stay Screensaver; `/help` lists lane.
+- Ratchet keep after verify; install/kickstart (Rust).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (Wake for network / womp) — Power Nap slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3007
+
+- Product fuel after Screensaver idle v0.1.3006: Power Nap already readable via `pmset -g custom` Battery/AC `powernap` (+ active `pmset -g`) but lacked `/powernap` · `/power-nap` · `/mac-powernap` and view/see/open/list phrases while Low Power Mode `/lpm`, power strip `/power`, watts `/watts`, and Screensaver `/screensaver` already had slash+NL. Bare `powernap` / `power nap` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (Wake for network / womp) — Power Nap slash NL closed; not another keep-pNN clone.
+
 ## 2026-11-23 ~22:11 overnight tick
 - Digester open: empty (0 turns / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
