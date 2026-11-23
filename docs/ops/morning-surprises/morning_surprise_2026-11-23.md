@@ -6,6 +6,9 @@ Overnight autoresearch (Track B) while digester stayed empty.
 
 | Version | What |
 | --- | --- |
+| **v0.1.2988** | Agent Ops kb-hints (tips · tab bar · overview · health · refresh · filter chips) shorter warmer KISS (design-review `feature-agent-ops`) |
+| **v0.1.2987** | Firewall logging `/firewall-logging` · `/fw-logging` · `/logging-mode` + view/open NL |
+| **v0.1.2986** | CPU metrics kb-hints (rings · sparklines · Bat/LPM/Power) shorter warmer (design-review `feature-cpu-metrics`) |
 | **v0.1.2985** | AirDrop `/airdrop` · `/air-drop` · `/mac-airdrop` + view/open NL |
 | **v0.1.2984** | Swiss Top Processes glances focus → ink `#121216` |
 | **v0.1.2983** | DVD/CD Sharing `/dvd-sharing` · `/cd-sharing` · `/ods` + view/open NL |
@@ -19,6 +22,7 @@ Overnight autoresearch (Track B) while digester stayed empty.
 
 ## Notes
 
-- Digester: empty (0 turns / 7d). Design-review grace (Mac TCC). Layout-daily Neon marked today; Futuristic next calendar day.
+- Digester: empty (0 turns / 7d). Design-review polish-without-capture grace (Mac TCC) on Agent Ops + metrics + processes.
+- Layout-daily Neon marked today; Futuristic next calendar day.
 - Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional (not a bug).
-- Next: Futuristic layout-daily · cream/Swiss Send fill intentional · soft-state sibling/product fuel — not keep-pNN.
+- Next: feature-ai-chat design-review · Futuristic layout-daily · cream/Swiss Send fill intentional · soft-state sibling/product fuel — not keep-pNN.

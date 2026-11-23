@@ -1,3 +1,15 @@
+## Overnight note 2026-11-23 ~04:10
+- Digester open: design-review `feature-agent-ops` (68d stale).
+- Design review due=true → polish Agent Ops kb-hints; Mac TCC — polish-without-capture grace marked.
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Fuel: design-review Agent Ops kb-hint copy (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.2988** — shorter warmer tips · tab bar · overview · health · refresh · filter chips.
+- Ratchet keep after verify; sync-dist (UI JS).
+- Next fuel: feature-ai-chat design-review · cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — not another keep-pNN clone.
+
+## Overnight merge — v0.1.2988
+
+- Design-review fuel after Firewall logging `/firewall-logging` NL v0.1.2987: Agent Ops tip row · tab bar · overview · health · refresh · filter chips still used long cold “Tab or click … / Tips: 0 overview · digits …” copy while metrics rings/sparklines/power strip already shipped shorter warmer KISS lines (v0.1.2986). Shortened Agent Ops hints to match. Digester empty; layout-daily Neon marked today (Futuristic due next calendar quota). Recapture deferred (Mac TCC); polish grace marked. Next: feature-ai-chat design-review · cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — Agent Ops kb-hint copy closed; not another keep-pNN clone.
 ## Overnight note 2026-11-23 ~02:50
 - Digester open: design-review `feature-cpu-metrics` (77d stale).
 - Design review due=true → polish rings/sparkline/power-strip kb-hints; Mac TCC — polish-without-capture grace marked.
