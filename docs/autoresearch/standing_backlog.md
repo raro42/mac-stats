@@ -1,3 +1,21 @@
+## 2026-11-23 ~20:10 overnight tick
+- Digester open: empty (0 turns / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Sibling: OpenClaw/Hermes missing on rack.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: Settings Credentials kb-hints (section · Discord · Perplexity · Brave…Slack) after Monitors v0.1.2996 (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.2998** — shorter warmer Credentials tips; remote raced **v0.1.2997** Firewall `/listapps` · `/fw-apps` (backfilled keep).
+- Ratchet keep @ 82f69c4 for 2998; backfill keep for 2997; sync-dist (UI JS + theme seeds).
+- Morning surprise: refresh 2026-11-23 + archive.
+- Linux rack: sync-dist only (no /Applications install/kickstart).
+- X: ensure-loops pids live; draft-only, no send.
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · Settings Appearance/Changelog kb-hints or soft-state sibling/product fuel — Credentials kb-hint copy closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.2998
+
+- Product fuel after Monitors kb-hints v0.1.2996 (+ remote Firewall listapps v0.1.2997): Settings Credentials section tip · Discord · Perplexity · Brave · Redmine · Mastodon · MCP · Browser · Cursor Agent · Telegram · Slack toolbars still used long cold “crosses to …” copy while Ollama / Monitors / Disk Cleanup already shipped shorter warmer KISS lines. Shortened Credentials hints to match. Digester empty; design-review due=false; layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · Appearance/Changelog kb-hints or soft-state sibling/product fuel — Credentials kb-hint copy closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~20:05
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
