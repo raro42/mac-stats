@@ -1,3 +1,21 @@
+## 2026-11-23 ~21:42 overnight tick
+- Digester open: empty (0 turns / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Sibling: OpenClaw/Hermes missing on rack.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: Screen Lock slash+NL after Automatic Login v0.1.3003 (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.3004** — `/screen-lock` · `/lock-screen` · `/screenlock` · `/mac-screen-lock` + view/open NL; bare screen lock/lock screen/lock stay with agent; `/screen-sharing` · `/vnc` · `/screen` · `/display` · `/autologin` intact; `/help` lists lane.
+- Ratchet keep @ 1b5c6b9 for 3004; backfill keep for 3003.
+- Morning surprise: refresh 2026-11-23 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- X: ensure-loops pids live; draft-only, no send.
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (SMB guest) — Screen Lock slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3004
+
+- Product fuel after Automatic Login v0.1.3003: Screen Lock already readable via `com.apple.screensaver` askForPassword / askForPasswordDelay but lacked `/screen-lock` · `/lock-screen` · `/screenlock` · `/mac-screen-lock` and view/see/open/list phrases while Screen Sharing `/screen-sharing`, display `/screen` · `/display`, and Automatic Login `/autologin` already had slash+NL. Bare `screen lock` / `lock screen` / `lock` stay with the agent. Digester empty; design-review due=false; layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (SMB guest) — Screen Lock slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~21:27
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
