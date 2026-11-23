@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3005] - 2026-11-23
+
+### Added
+- Instant SMB Guest Access accepts `/smb-guest` · `/smbguest` · `/smb-guest-access` · `/smbguestaccess` · `/smb-guest-status` · `/smb-guest-state` · `/guest-access` · `/guestaccess` · `/guest-access-status` · `/mac-smb-guest` · `/mac-guest-access` · `/mac-smb-guest-access` and view/see/open/list NL (`view smb guest`, `open guest access`, `list smb guest`, …), matching “smb guest status” / “is smb guest on” / “is guest access enabled” / “what's my smb guest” / “what's the guest access status”. Bare `smb guest` / `guest access` / `smb guest access` stay with the agent; `/smb` · `/file-sharing` stay File Sharing; `/guest` · `/guest-account` stay Guest Account; `/screen-lock` · `/lock-screen` stay Screen Lock. Operator `/help` lists the new lane.
+
 ## [0.1.3004] - 2026-11-23
 
 ### Added

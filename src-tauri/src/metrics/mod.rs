@@ -2693,6 +2693,114 @@ pub fn get_screen_lock_status() -> String {
     }
 }
 
+/// Parse `sysadminctl -smbGuestAccess status` (“SMB guest access enabled/disabled”).
+pub(crate) fn parse_smb_guest_sysadminctl(raw: &str) -> Option<&'static str> {
+    let lower = raw.to_ascii_lowercase();
+    if lower.contains("smb guest access enabled")
+        || lower.contains("smb guest access is enabled")
+        || lower.contains("smb guest access on")
+        || (lower.contains("smb")
+            && lower.contains("guest")
+            && lower.contains("enabled")
+            && !lower.contains("disabled"))
+    {
+        return Some("On");
+    }
+    if lower.contains("smb guest access disabled")
+        || lower.contains("smb guest access is disabled")
+        || lower.contains("smb guest access off")
+        || (lower.contains("smb")
+            && lower.contains("guest")
+            && lower.contains("disabled"))
+    {
+        return Some("Off");
+    }
+    None
+}
+
+/// Parse `defaults … AllowGuestAccess` (0/1 / true/false) on the SMB server prefs.
+pub(crate) fn parse_smb_guest_defaults(raw: &str) -> Option<bool> {
+    parse_nat_enabled_plistbuddy(raw)
+}
+
+/// Prefer defaults AllowGuestAccess when set; else sysadminctl On/Off.
+pub(crate) fn format_smb_guest_parts(
+    enabled: Option<bool>,
+    sysadmin: Option<&str>,
+) -> String {
+    if let Some(on) = enabled {
+        return if on {
+            "On".to_string()
+        } else {
+            "Off".to_string()
+        };
+    }
+    sysadmin.unwrap_or("").to_string()
+}
+
+/// macOS SMB Guest Access from `com.apple.smb.server` AllowGuestAccess
+/// (fallback: `sysadminctl -smbGuestAccess status`). Distinct from Guest Account `/guest`,
+/// File Sharing `/file-sharing` · `/smb`, and Screen Lock `/screen-lock`.
+/// Used by Discord/operator instant `/smb-guest` · `/guest-access` lane.
+pub fn get_smb_guest_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let enabled = {
+            let output = Command::new("/usr/bin/defaults")
+                .args([
+                    "read",
+                    "/Library/Preferences/SystemConfiguration/com.apple.smb.server",
+                    "AllowGuestAccess",
+                ])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_smb_guest_defaults(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("smb-guest: defaults read spawn failed");
+                    None
+                }
+            }
+        };
+
+        let sysadmin = {
+            let output = Command::new("/usr/sbin/sysadminctl")
+                .args(["-smbGuestAccess", "status"])
+                .output();
+            match output {
+                Ok(output) => {
+                    let mut buf = String::from_utf8_lossy(&output.stdout).into_owned();
+                    if !buf.is_empty() && !output.stderr.is_empty() {
+                        buf.push('\n');
+                    }
+                    buf.push_str(&String::from_utf8_lossy(&output.stderr));
+                    parse_smb_guest_sysadminctl(&buf)
+                }
+                Err(_) => {
+                    debug3!("smb-guest: sysadminctl spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_smb_guest_parts(enabled, sysadmin);
+        if info.is_empty() {
+            debug3!("smb-guest: empty status");
+        } else {
+            debug3!("smb-guest status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
@@ -5674,6 +5782,46 @@ mod screen_lock_parse_tests {
         assert_eq!(format_screen_lock_parts(Some(true), None), "On");
         assert_eq!(format_screen_lock_parts(None, Some(0.0)), "");
         assert_eq!(format_screen_lock_parts(None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod smb_guest_parse_tests {
+    use super::{
+        format_smb_guest_parts, parse_smb_guest_defaults, parse_smb_guest_sysadminctl,
+    };
+
+    #[test]
+    fn parses_allow_guest_defaults() {
+        assert_eq!(parse_smb_guest_defaults("0\n"), Some(false));
+        assert_eq!(parse_smb_guest_defaults("1"), Some(true));
+        assert_eq!(parse_smb_guest_defaults("true"), Some(true));
+        assert_eq!(parse_smb_guest_defaults("nope"), None);
+    }
+
+    #[test]
+    fn parses_sysadminctl_smb_guest_status() {
+        assert_eq!(
+            parse_smb_guest_sysadminctl("SMB guest access disabled.\n"),
+            Some("Off")
+        );
+        assert_eq!(
+            parse_smb_guest_sysadminctl("SMB guest access enabled.\n"),
+            Some("On")
+        );
+        assert_eq!(parse_smb_guest_sysadminctl("nope"), None);
+        assert_eq!(
+            parse_smb_guest_sysadminctl("Guest account disabled.\n"),
+            None
+        );
+    }
+
+    #[test]
+    fn formats_defaults_over_sysadmin() {
+        assert_eq!(format_smb_guest_parts(Some(true), Some("Off")), "On");
+        assert_eq!(format_smb_guest_parts(Some(false), Some("On")), "Off");
+        assert_eq!(format_smb_guest_parts(None, Some("On")), "On");
+        assert_eq!(format_smb_guest_parts(None, None), "");
     }
 }
 

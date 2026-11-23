@@ -12477,6 +12477,11 @@ pub fn looks_like_file_sharing_request(content: &str) -> bool {
         || n.contains("remote-management")
         || n.contains("remote desktop")
         || n.contains("apple remote desktop")
+        || n.contains("smb guest")
+        || n.contains("smb-guest")
+        || n.contains("smbguest")
+        || n.contains("guest access")
+        || n.contains("guest-access")
         || n == "/remote-management"
         || n == "/remotemanagement"
         || n == "/remote-mgmt"
@@ -12486,6 +12491,12 @@ pub fn looks_like_file_sharing_request(content: &str) -> bool {
         || n == "/ard-agent"
         || n == "/apple-remote-desktop"
         || n == "/mac-ard"
+        || n == "/smb-guest"
+        || n == "/smbguest"
+        || n == "/smb-guest-access"
+        || n == "/guest-access"
+        || n == "/guestaccess"
+        || n == "/mac-smb-guest"
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
@@ -16098,6 +16109,11 @@ pub fn looks_like_guest_account_request(content: &str) -> bool {
         || n.contains("file sharing")
         || n.contains("filesharing")
         || n.contains("file-sharing")
+        || n.contains("smb guest")
+        || n.contains("smb-guest")
+        || n.contains("smbguest")
+        || n.contains("guest access")
+        || n.contains("guest-access")
         || n.contains("airdrop")
         || n.contains("air drop")
         || n.contains("air-drop")
@@ -16123,6 +16139,10 @@ pub fn looks_like_guest_account_request(content: &str) -> bool {
         || n == "/vnc"
         || n == "/file-sharing"
         || n == "/smb"
+        || n == "/smb-guest"
+        || n == "/smbguest"
+        || n == "/guest-access"
+        || n == "/guestaccess"
         || n == "/airdrop"
         || n == "/air-drop"
         || n == "/airplay"
@@ -16623,6 +16643,11 @@ pub fn looks_like_screen_lock_request(content: &str) -> bool {
         || n.contains("airplay")
         || n.contains("guest account")
         || n.contains("guest user")
+        || n.contains("smb guest")
+        || n.contains("smb-guest")
+        || n.contains("smbguest")
+        || n.contains("guest access")
+        || n.contains("guest-access")
         || n.contains("automatic login")
         || n.contains("auto login")
         || n.contains("autologin")
@@ -16647,6 +16672,10 @@ pub fn looks_like_screen_lock_request(content: &str) -> bool {
         || n == "/vnc"
         || n == "/file-sharing"
         || n == "/smb"
+        || n == "/smb-guest"
+        || n == "/smbguest"
+        || n == "/guest-access"
+        || n == "/guestaccess"
         || n == "/airdrop"
         || n == "/air-drop"
         || n == "/airplay"
@@ -16813,6 +16842,294 @@ pub fn format_screen_lock_report() -> String {
         return "**Screen Lock** — _no Screen Lock reading on this Mac right now._".to_string();
     }
     format!("**Screen Lock** · `{v}`")
+}
+
+/// SMB Guest Access — `sysadminctl -smbGuestAccess` (+ smb.server AllowGuestAccess).
+/// Slash + view/open NL (`/smb-guest` · `/guest-access` · `view smb guest`).
+/// Bare `smb guest` / `guest access` stay with the agent; `/smb` · `/file-sharing` stay File Sharing;
+/// `/guest` · `/guest-account` stay Guest Account; `/screen-lock` stays Screen Lock.
+pub fn looks_like_smb_guest_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("screenlock")
+        || n.contains("lock screen")
+        || n.contains("airdrop")
+        || n.contains("air drop")
+        || n.contains("air-drop")
+        || n.contains("airplay")
+        || n.contains("automatic login")
+        || n.contains("auto login")
+        || n.contains("autologin")
+        || n.contains("auto-login")
+        || n.contains("username")
+        || n.contains("whoami")
+        || n.contains("afp guest")
+        || n.contains("afp-guest")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/ssh"
+        || n == "/screen-sharing"
+        || n == "/vnc"
+        || n == "/file-sharing"
+        || n == "/filesharing"
+        || n == "/smb"
+        || n == "/smb-status"
+        || n == "/smbd"
+        || n == "/airdrop"
+        || n == "/air-drop"
+        || n == "/airplay"
+        || n == "/guest"
+        || n == "/guest-account"
+        || n == "/guest-user"
+        || n == "/guest-login"
+        || n == "/mac-guest"
+        || n == "/autologin"
+        || n == "/auto-login"
+        || n == "/automatic-login"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/username"
+        || n == "/whoami"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        // Bare phrases stay with the agent.
+        || n == "smb guest"
+        || n == "the smb guest"
+        || n == "smb-guest"
+        || n == "the smb-guest"
+        || n == "smbguest"
+        || n == "the smbguest"
+        || n == "guest access"
+        || n == "the guest access"
+        || n == "smb guest access"
+        || n == "the smb guest access"
+        || n == "guest-access"
+        || n == "the guest-access"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/smb-guest"
+            | "/smbguest"
+            | "/smb-guest-access"
+            | "/smbguestaccess"
+            | "/smb-guest-status"
+            | "/smbguest-status"
+            | "/smb-guest-state"
+            | "/smbguest-state"
+            | "/guest-access"
+            | "/guestaccess"
+            | "/guest-access-status"
+            | "/guestaccess-status"
+            | "/smb-guest-access-status"
+            | "/mac-smb-guest"
+            | "/mac-smbguest"
+            | "/mac-guest-access"
+            | "/mac-smb-guest-access"
+            | "smb guest status"
+            | "the smb guest status"
+            | "smb-guest status"
+            | "the smb-guest status"
+            | "smbguest status"
+            | "the smbguest status"
+            | "smb guest access status"
+            | "the smb guest access status"
+            | "smb-guest-access status"
+            | "the smb-guest-access status"
+            | "guest access status"
+            | "the guest access status"
+            | "guest-access status"
+            | "the guest-access status"
+            | "smb guest state"
+            | "the smb guest state"
+            | "guest access state"
+            | "the guest access state"
+            | "my smb guest"
+            | "my smb guest status"
+            | "my smb guest access"
+            | "my smb guest access status"
+            | "my guest access"
+            | "my guest access status"
+            | "is smb guest on"
+            | "is smb guest off"
+            | "is smb guest enabled"
+            | "is smb guest disabled"
+            | "is smb guest access on"
+            | "is smb guest access off"
+            | "is smb guest access enabled"
+            | "is smb guest access disabled"
+            | "is guest access on"
+            | "is guest access off"
+            | "is guest access enabled"
+            | "is guest access disabled"
+            | "is smb-guest on"
+            | "is smb-guest enabled"
+            | "is guest-access on"
+            | "is guest-access enabled"
+            | "what's my smb guest"
+            | "whats my smb guest"
+            | "what is my smb guest"
+            | "what's my smb guest status"
+            | "whats my smb guest status"
+            | "what is my smb guest status"
+            | "what's my smb guest access"
+            | "whats my smb guest access"
+            | "what is my smb guest access"
+            | "what's my smb guest access status"
+            | "whats my smb guest access status"
+            | "what is my smb guest access status"
+            | "what's my guest access"
+            | "whats my guest access"
+            | "what is my guest access"
+            | "what's my guest access status"
+            | "whats my guest access status"
+            | "what is my guest access status"
+            | "what's the smb guest"
+            | "whats the smb guest"
+            | "what is the smb guest"
+            | "what's the smb guest status"
+            | "whats the smb guest status"
+            | "what is the smb guest status"
+            | "what's the smb guest access"
+            | "whats the smb guest access"
+            | "what is the smb guest access"
+            | "what's the smb guest access status"
+            | "whats the smb guest access status"
+            | "what is the smb guest access status"
+            | "what's the guest access"
+            | "whats the guest access"
+            | "what is the guest access"
+            | "what's the guest access status"
+            | "whats the guest access status"
+            | "what is the guest access status"
+            | "how's smb guest"
+            | "hows smb guest"
+            | "how's the smb guest"
+            | "hows the smb guest"
+            | "how's smb guest access"
+            | "hows smb guest access"
+            | "how's guest access"
+            | "hows guest access"
+            | "view smb guest"
+            | "view the smb guest"
+            | "view smb guest status"
+            | "view the smb guest status"
+            | "view smb guest access"
+            | "view the smb guest access"
+            | "view smb guest access status"
+            | "view the smb guest access status"
+            | "view smb-guest"
+            | "view the smb-guest"
+            | "view guest access"
+            | "view the guest access"
+            | "view guest access status"
+            | "view the guest access status"
+            | "view guest-access"
+            | "view the guest-access"
+            | "see smb guest"
+            | "see the smb guest"
+            | "see smb guest status"
+            | "see the smb guest status"
+            | "see smb guest access"
+            | "see the smb guest access"
+            | "see guest access"
+            | "see the guest access"
+            | "see guest access status"
+            | "see the guest access status"
+            | "open smb guest"
+            | "open the smb guest"
+            | "open smb guest status"
+            | "open the smb guest status"
+            | "open smb guest access"
+            | "open the smb guest access"
+            | "open smb-guest"
+            | "open the smb-guest"
+            | "open guest access"
+            | "open the guest access"
+            | "open guest access status"
+            | "open the guest access status"
+            | "list smb guest"
+            | "list the smb guest"
+            | "list smb guest status"
+            | "list the smb guest status"
+            | "list smb guest access"
+            | "list the smb guest access"
+            | "list guest access"
+            | "list the guest access"
+            | "list guest access status"
+            | "list the guest access status"
+    )
+}
+
+/// Zero-LLM SMB Guest Access status from sysadminctl / smb.server prefs (macOS-only; empty elsewhere).
+pub fn format_smb_guest_report() -> String {
+    let v = crate::metrics::get_smb_guest_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**SMB Guest** — _no SMB guest access reading on this Mac right now._".to_string();
+    }
+    format!("**SMB Guest** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.

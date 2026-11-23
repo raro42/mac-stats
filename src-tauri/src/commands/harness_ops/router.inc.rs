@@ -1174,6 +1174,11 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_screen_lock_request(content) {
         return Some(format_screen_lock_report());
     }
+    // SMB Guest Access (bare `smb guest` / `guest access` stay with the agent; `/smb` · `/file-sharing`
+    // stay File Sharing; `/guest` · `/guest-account` stay Guest Account; `/screen-lock` stays Screen Lock).
+    if looks_like_smb_guest_request(content) {
+        return Some(format_smb_guest_report());
+    }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
     if looks_like_boot_time_request(content) {

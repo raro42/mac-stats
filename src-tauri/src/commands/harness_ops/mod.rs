@@ -3673,6 +3673,87 @@ mod tests {
         }
     }
 
+    #[test]
+    fn smb_guest_slash_and_view_open_do_not_steal_smb_guest_or_bare_access() {
+        // Slash + view/open NL → SMB Guest Access (`/smb` · `/guest` parity).
+        // Bare `smb guest` / `guest access` stay with the agent; `/smb` · `/file-sharing` stay File
+        // Sharing; `/guest` · `/guest-account` stay Guest Account; `/screen-lock` stays Screen Lock.
+        assert!(looks_like_smb_guest_request("/smb-guest"));
+        assert!(looks_like_smb_guest_request("/smbguest"));
+        assert!(looks_like_smb_guest_request("/smb-guest-access"));
+        assert!(looks_like_smb_guest_request("/guest-access"));
+        assert!(looks_like_smb_guest_request("/guestaccess"));
+        assert!(looks_like_smb_guest_request("/smb-guest-status"));
+        assert!(looks_like_smb_guest_request("/mac-smb-guest"));
+        assert!(looks_like_smb_guest_request("/mac-guest-access"));
+        assert!(looks_like_smb_guest_request("view smb guest"));
+        assert!(looks_like_smb_guest_request("open guest access"));
+        assert!(looks_like_smb_guest_request("list smb guest"));
+        assert!(looks_like_smb_guest_request("smb guest status"));
+        assert!(looks_like_smb_guest_request("is smb guest on"));
+        assert!(looks_like_smb_guest_request("is guest access enabled"));
+        assert!(looks_like_smb_guest_request("what's my smb guest"));
+        assert!(looks_like_smb_guest_request("view guest-access"));
+        assert!(!looks_like_smb_guest_request("smb guest"));
+        assert!(!looks_like_smb_guest_request("guest access"));
+        assert!(!looks_like_smb_guest_request("smb guest access"));
+        assert!(!looks_like_smb_guest_request("/smb"));
+        assert!(!looks_like_smb_guest_request("/file-sharing"));
+        assert!(!looks_like_smb_guest_request("view smb"));
+        assert!(!looks_like_smb_guest_request("/guest"));
+        assert!(!looks_like_smb_guest_request("/guest-account"));
+        assert!(!looks_like_smb_guest_request("view guest account"));
+        assert!(!looks_like_smb_guest_request("/screen-lock"));
+        assert!(!looks_like_smb_guest_request("/tasks"));
+        assert!(!looks_like_smb_guest_request("enable smb guest"));
+        assert!(!looks_like_file_sharing_request("/smb-guest"));
+        assert!(!looks_like_file_sharing_request("view smb guest"));
+        assert!(!looks_like_guest_account_request("/smb-guest"));
+        assert!(!looks_like_guest_account_request("view smb guest"));
+        assert!(!looks_like_guest_account_request("/guest-access"));
+        assert!(!looks_like_guest_account_request("view guest access"));
+        assert!(!looks_like_screen_lock_request("/smb-guest"));
+        assert!(!looks_like_screen_lock_request("view smb guest"));
+        let s = try_operator_instant_reply("/smb-guest").unwrap();
+        assert!(
+            s.contains("**SMB Guest**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view smb guest").unwrap();
+        assert!(
+            viewed.contains("**SMB Guest**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open guest access").unwrap();
+        assert!(
+            open.contains("**SMB Guest**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("smb guest").is_none());
+        assert!(try_operator_instant_reply("guest access").is_none());
+        let smb = try_operator_instant_reply("/smb");
+        if let Some(reply) = smb {
+            assert!(
+                !reply.contains("**SMB Guest**"),
+                "/smb must stay File Sharing, not SMB Guest: {reply}"
+            );
+        }
+        let g = try_operator_instant_reply("/guest");
+        if let Some(reply) = g {
+            assert!(
+                !reply.contains("**SMB Guest**"),
+                "/guest must stay Guest Account, not SMB Guest: {reply}"
+            );
+        }
+        let sl = try_operator_instant_reply("/screen-lock");
+        if let Some(reply) = sl {
+            assert!(
+                !reply.contains("**SMB Guest**"),
+                "/screen-lock must stay Screen Lock, not SMB Guest: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).
