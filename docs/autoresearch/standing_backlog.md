@@ -1,3 +1,20 @@
+## Overnight note 2026-11-24 ~00:02
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Sibling: OpenClaw/Hermes missing on rack.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after TTY keep awake v0.1.3012 — System Sleep / sleep slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.3013** — `/systemsleep` · `/system-sleep` · `/computer-sleep` · `/sleep` + view/open NL; bare systemsleep/system sleep/computer sleep/sleep stay with agent; `/displaysleep` · `/disksleep` · `/screensaver` · `/ttyskeepawake` intact; `/help` lists lane.
+- Ratchet keep @ ac1446b for 3013; backfill keep for 3012 + 3010; CI workflow_dispatch at 3013.
+- Morning surprise: refresh 2026-11-23 + 2026-11-24 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (tcpkeepalive / networkoversleep / hibernatemode) — System Sleep slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3013
+
+- Product fuel after TTY keep awake v0.1.3012: System Sleep already readable via `pmset -g custom` Battery/AC `sleep` minutes (+ active `pmset -g`; 0 = Never) but lacked `/systemsleep` · `/system-sleep` · `/computer-sleep` · `/sleep` and view/see/open/list phrases while Display Sleep `/displaysleep`, Disk Sleep `/disksleep`, Screensaver `/screensaver`, and TTY keep awake `/ttyskeepawake` already had slash+NL. Bare `systemsleep` / `system sleep` / `computer sleep` / `sleep` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked 2026-11-23 (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (tcpkeepalive / networkoversleep / hibernatemode) — System Sleep slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~23:33
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
