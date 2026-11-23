@@ -10321,11 +10321,11 @@ pub fn format_gatekeeper_report() -> String {
 }
 
 /// Application Firewall global state — not Gatekeeper, not SIP, not FileVault, not stealth, not logging,
-/// not allow-signed.
+/// not allow-signed, not block-all.
 /// Slash + view/open NL (`/firewall` · `/afw` · `view firewall`) match `/gatekeeper` · `/sip` shape;
 /// bare `firewall` / `afw` stay with the agent; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP;
 /// `/stealth` · `/firewall-stealth` stay stealth; `/firewall-logging` · `/fw-logging` stay logging;
-/// `/allow-signed` · `/fw-allow-signed` stay allow-signed.
+/// `/allow-signed` · `/fw-allow-signed` stay allow-signed; `/block-all` · `/fw-block-all` stay block-all.
 pub fn looks_like_firewall_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -10380,6 +10380,12 @@ pub fn looks_like_firewall_request(content: &str) -> bool {
         || n == "/fw-allow-signed"
         || n == "/afw-allow-signed"
         || n == "/firewall-allow-signed"
+        || n == "/block-all"
+        || n == "/blockall"
+        || n == "/fw-block-all"
+        || n == "/afw-block-all"
+        || n == "/firewall-block-all"
+        || n == "/getblockall"
         || n == "/boot-volume"
         || n == "/startup-disk"
         || n == "/remote-login"
@@ -10576,6 +10582,12 @@ pub fn looks_like_firewall_stealth_request(content: &str) -> bool {
         || n == "/fw-allow-signed"
         || n == "/afw-allow-signed"
         || n == "/firewall-allow-signed"
+        || n == "/block-all"
+        || n == "/blockall"
+        || n == "/fw-block-all"
+        || n == "/afw-block-all"
+        || n == "/firewall-block-all"
+        || n == "/getblockall"
         || n == "/gatekeeper"
         || n == "/gk"
         || n == "/spctl"
@@ -10792,6 +10804,12 @@ pub fn looks_like_firewall_logging_request(content: &str) -> bool {
         || n == "/fw-allow-signed"
         || n == "/afw-allow-signed"
         || n == "/firewall-allow-signed"
+        || n == "/block-all"
+        || n == "/blockall"
+        || n == "/fw-block-all"
+        || n == "/afw-block-all"
+        || n == "/firewall-block-all"
+        || n == "/getblockall"
         || n == "/remote-login"
         || n == "/ssh"
         || n == "/sshd"
@@ -10947,10 +10965,11 @@ pub fn format_firewall_logging_report() -> String {
 }
 
 /// Application Firewall allow-signed — not global Firewall `/firewall`, not stealth `/stealth`,
-/// not logging `/firewall-logging`.
+/// not logging `/firewall-logging`, not block-all `/block-all`.
 /// Slash + view/open NL (`/allow-signed` · `/fw-allow-signed` · `view allow signed`) match
 /// `/firewall-logging` · `/stealth` shape; bare `allow signed` / `signed software` stay with the agent;
-/// `/firewall` stays global; `/stealth` stays stealth; `/firewall-logging` stays logging.
+/// `/firewall` stays global; `/stealth` stays stealth; `/firewall-logging` stays logging;
+/// `/block-all` stays block-all.
 pub fn looks_like_firewall_allow_signed_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -11004,6 +11023,12 @@ pub fn looks_like_firewall_allow_signed_request(content: &str) -> bool {
         || n == "/afw-logging"
         || n == "/logging-mode"
         || n == "/logging-opt"
+        || n == "/block-all"
+        || n == "/blockall"
+        || n == "/fw-block-all"
+        || n == "/afw-block-all"
+        || n == "/firewall-block-all"
+        || n == "/getblockall"
         || n == "/gatekeeper"
         || n == "/gk"
         || n == "/spctl"
@@ -11167,6 +11192,224 @@ pub fn format_firewall_allow_signed_report() -> String {
             .to_string();
     }
     format!("**Allow signed** · `{v}`")
+}
+
+/// Application Firewall block-all — not global Firewall `/firewall`, not stealth `/stealth`,
+/// not logging `/firewall-logging`, not allow-signed `/allow-signed`.
+/// Slash + view/open NL (`/block-all` · `/fw-block-all` · `view block all`) match
+/// `/allow-signed` · `/stealth` shape; bare `block all` / `blockall` stay with the agent;
+/// `/firewall` stays global; `/stealth` stays stealth; `/firewall-logging` stays logging;
+/// `/allow-signed` stays allow-signed.
+pub fn looks_like_firewall_block_all_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("allow ")
+        || n.contains("password")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("gatekeeper")
+        || n.contains("spctl")
+        || n.contains("system integrity")
+        || n.contains("sip")
+        || n.contains("csrutil")
+        || n.contains("stealth")
+        || n.contains("logging")
+        || n.contains("allow signed")
+        || n.contains("signed software")
+        || n.contains("signed apps")
+        // Global Firewall / stealth / logging / allow-signed / Gatekeeper / SIP / FileVault stay elsewhere.
+        || n == "/firewall"
+        || n == "/firewall-status"
+        || n == "/fw"
+        || n == "/fw-status"
+        || n == "/afw"
+        || n == "/afw-status"
+        || n == "/app-firewall"
+        || n == "/application-firewall"
+        || n == "/socketfilterfw"
+        || n == "/stealth"
+        || n == "/stealth-mode"
+        || n == "/firewall-stealth"
+        || n == "/fw-stealth"
+        || n == "/afw-stealth"
+        || n == "/firewall-logging"
+        || n == "/fw-logging"
+        || n == "/afw-logging"
+        || n == "/logging-mode"
+        || n == "/logging-opt"
+        || n == "/allow-signed"
+        || n == "/allowsigned"
+        || n == "/fw-allow-signed"
+        || n == "/afw-allow-signed"
+        || n == "/firewall-allow-signed"
+        || n == "/getallowsigned"
+        || n == "/gatekeeper"
+        || n == "/gk"
+        || n == "/spctl"
+        || n == "/sip"
+        || n == "/csrutil"
+        || n == "/filevault"
+        || n == "/fv"
+        || n == "/fde"
+        || n == "/logs"
+        || n == "/log"
+        || n == "/debug-log"
+        || n == "/remote-login"
+        || n == "/ssh"
+        || n == "/sshd"
+        // Bare short / ambiguous stay with the agent.
+        || n == "block all"
+        || n == "the block all"
+        || n == "blockall"
+        || n == "the blockall"
+        || n == "block all incoming"
+        || n == "the block all incoming"
+        || n == "block all connections"
+        || n == "the block all connections"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/block-all"
+            | "/blockall"
+            | "/block-all-status"
+            | "/blockallstatus"
+            | "/block-all-state"
+            | "/blockallstate"
+            | "/block-all-incoming"
+            | "/blockallincoming"
+            | "/firewall-block-all"
+            | "/firewallblockall"
+            | "/firewall-block-all-status"
+            | "/fw-block-all"
+            | "/fwblockall"
+            | "/fw-block-all-status"
+            | "/afw-block-all"
+            | "/afwblockall"
+            | "/afw-block-all-status"
+            | "/app-firewall-block-all"
+            | "/application-firewall-block-all"
+            | "/socketfilterfw-block-all"
+            | "/getblockall"
+            | "/mac-block-all"
+            | "/mac-fw-block-all"
+            | "block all status"
+            | "the block all status"
+            | "block all state"
+            | "the block all state"
+            | "block all incoming status"
+            | "the block all incoming status"
+            | "fw block all status"
+            | "the fw block all status"
+            | "afw block all status"
+            | "the afw block all status"
+            | "firewall block all status"
+            | "the firewall block all status"
+            | "my block all"
+            | "my block all status"
+            | "my fw block all"
+            | "is block all on"
+            | "is block all off"
+            | "is block all enabled"
+            | "is block all disabled"
+            | "is the block all on"
+            | "is the block all enabled"
+            | "is fw block all on"
+            | "is fw block all enabled"
+            | "is afw block all on"
+            | "is afw block all enabled"
+            | "is block all incoming on"
+            | "is block all incoming enabled"
+            | "what's my block all"
+            | "whats my block all"
+            | "what is my block all"
+            | "what's my block all status"
+            | "whats my block all status"
+            | "what is my block all status"
+            | "what's the block all"
+            | "whats the block all"
+            | "what is the block all"
+            | "what's the block all status"
+            | "whats the block all status"
+            | "what is the block all status"
+            | "how's block all"
+            | "hows block all"
+            | "how's the block all"
+            | "hows the block all"
+            // View/see/show me/open/list.
+            | "view block all"
+            | "view the block all"
+            | "view block all status"
+            | "view the block all status"
+            | "view block all incoming"
+            | "view the block all incoming"
+            | "view fw block all"
+            | "view the fw block all"
+            | "view afw block all"
+            | "view the afw block all"
+            | "view firewall block all"
+            | "view the firewall block all"
+            | "see block all"
+            | "see the block all"
+            | "see block all status"
+            | "see the block all status"
+            | "see fw block all"
+            | "see the fw block all"
+            | "open block all"
+            | "open the block all"
+            | "open block all status"
+            | "open the block all status"
+            | "open fw block all"
+            | "open the fw block all"
+            | "list block all"
+            | "list the block all"
+            | "list block all status"
+            | "list the block all status"
+            | "list fw block all"
+            | "list the fw block all"
+            | "show block all"
+            | "show the block all"
+            | "show me block all"
+            | "show me the block all"
+            | "show block all status"
+            | "show the block all status"
+            | "show me block all status"
+            | "show me the block all status"
+            | "show fw block all"
+            | "show the fw block all"
+            | "show me fw block all"
+            | "show me the fw block all"
+    )
+}
+
+/// Zero-LLM Firewall block-all status from `socketfilterfw --getblockall`.
+pub fn format_firewall_block_all_report() -> String {
+    let v = crate::metrics::get_firewall_block_all_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Block all** — _no Firewall block-all reading on this Mac right now._".to_string();
+    }
+    format!("**Block all** · `{v}`")
 }
 
 /// Time Machine session + destination — not Disk Cleanup, not SSD % / free, not boot volume.

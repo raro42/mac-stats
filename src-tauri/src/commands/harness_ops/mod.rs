@@ -2204,10 +2204,53 @@ mod tests {
     }
 
     #[test]
+    fn firewall_block_all_slash_and_view_open_do_not_steal_firewall_or_bare() {
+        // Slash + view/open NL → Block all (`/allow-signed` · `/stealth` parity).
+        // Bare `block all` / `blockall` stay with the agent; `/firewall` stays global;
+        // `/stealth` stays stealth; `/firewall-logging` stays logging; `/allow-signed` stays allow-signed.
+        assert!(looks_like_firewall_block_all_request("/block-all"));
+        assert!(looks_like_firewall_block_all_request("/blockall"));
+        assert!(looks_like_firewall_block_all_request("/fw-block-all"));
+        assert!(looks_like_firewall_block_all_request("/afw-block-all"));
+        assert!(looks_like_firewall_block_all_request("/firewall-block-all"));
+        assert!(looks_like_firewall_block_all_request("/getblockall"));
+        assert!(looks_like_firewall_block_all_request("/mac-block-all"));
+        assert!(looks_like_firewall_block_all_request("view block all"));
+        assert!(looks_like_firewall_block_all_request("open fw block all"));
+        assert!(looks_like_firewall_block_all_request("list block all"));
+        assert!(looks_like_firewall_block_all_request("block all status"));
+        assert!(looks_like_firewall_block_all_request("is block all on"));
+        assert!(looks_like_firewall_block_all_request("is block all enabled"));
+        assert!(looks_like_firewall_block_all_request("what's my block all"));
+        assert!(looks_like_firewall_block_all_request("what's the block all status"));
+        assert!(!looks_like_firewall_block_all_request("block all"));
+        assert!(!looks_like_firewall_block_all_request("blockall"));
+        assert!(!looks_like_firewall_block_all_request("/firewall"));
+        assert!(!looks_like_firewall_block_all_request("view firewall"));
+        assert!(!looks_like_firewall_block_all_request("/stealth"));
+        assert!(!looks_like_firewall_block_all_request("/firewall-logging"));
+        assert!(!looks_like_firewall_block_all_request("/allow-signed"));
+        assert!(!looks_like_firewall_block_all_request("view allow signed"));
+        assert!(!looks_like_firewall_block_all_request("/logs"));
+        assert!(!looks_like_firewall_block_all_request("/gatekeeper"));
+        assert!(!looks_like_firewall_block_all_request("enable block all"));
+        assert!(!looks_like_firewall_block_all_request("disable block all"));
+        assert!(!looks_like_firewall_request("/block-all"));
+        assert!(!looks_like_firewall_request("view block all"));
+        assert!(!looks_like_firewall_request("/fw-block-all"));
+        assert!(!looks_like_firewall_stealth_request("/block-all"));
+        assert!(!looks_like_firewall_stealth_request("view block all"));
+        assert!(!looks_like_firewall_allow_signed_request("/block-all"));
+        assert!(!looks_like_firewall_allow_signed_request("view block all"));
+        assert!(!looks_like_firewall_logging_request("/block-all"));
+        assert!(!looks_like_firewall_logging_request("view block all"));
+    }
+
+    #[test]
     fn firewall_allow_signed_slash_and_view_open_do_not_steal_firewall_logging_or_bare() {
         // Slash + view/open NL → Allow signed (`/firewall-logging` · `/stealth` parity).
         // Bare `allow signed` / `signed software` stay with the agent; `/firewall` stays global;
-        // `/stealth` stays stealth; `/firewall-logging` stays logging.
+        // `/stealth` stays stealth; `/firewall-logging` stays logging; `/block-all` stays block-all.
         assert!(looks_like_firewall_allow_signed_request("/allow-signed"));
         assert!(looks_like_firewall_allow_signed_request("/allowsigned"));
         assert!(looks_like_firewall_allow_signed_request("/fw-allow-signed"));
@@ -2232,6 +2275,8 @@ mod tests {
         assert!(!looks_like_firewall_allow_signed_request("/stealth"));
         assert!(!looks_like_firewall_allow_signed_request("/firewall-logging"));
         assert!(!looks_like_firewall_allow_signed_request("view firewall logging"));
+        assert!(!looks_like_firewall_allow_signed_request("/block-all"));
+        assert!(!looks_like_firewall_allow_signed_request("view block all"));
         assert!(!looks_like_firewall_allow_signed_request("/logs"));
         assert!(!looks_like_firewall_allow_signed_request("/gatekeeper"));
         assert!(!looks_like_firewall_allow_signed_request("enable allow signed"));

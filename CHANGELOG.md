@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2993] - 2026-11-23
+
+### Added
+- Instant Application Firewall block-all accepts `/block-all` · `/blockall` · `/block-all-status` · `/block-all-state` · `/block-all-incoming` · `/fw-block-all` · `/afw-block-all` · `/firewall-block-all` · `/app-firewall-block-all` · `/application-firewall-block-all` · `/socketfilterfw-block-all` · `/getblockall` · `/mac-block-all` · `/mac-fw-block-all` and view/see/open/list NL (`view block all`, `open fw block all`, `list block all`, …), matching “block all status” / “is block all on” / “is block all enabled” / “what's my block all” / “what's the block all status”. Bare `block all` / `blockall` stay with the agent; `/firewall` stays global Firewall; `/stealth` stays stealth; `/firewall-logging` stays logging; `/allow-signed` stays allow-signed; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP; `/filevault` stays FileVault.
+
 ## [0.1.2992] - 2026-11-23
 
 ### Changed

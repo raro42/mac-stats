@@ -955,7 +955,8 @@ pub(crate) fn format_firewall_allow_signed_parts(
 }
 
 /// macOS Application Firewall allow-signed from `socketfilterfw --getallowsigned`.
-/// Distinct from Firewall global `/firewall`, stealth `/stealth`, logging `/firewall-logging`.
+/// Distinct from Firewall global `/firewall`, stealth `/stealth`, logging `/firewall-logging`,
+/// block-all `/block-all`.
 /// Used by Discord/operator instant `/allow-signed` · `/fw-allow-signed` lane.
 pub fn get_firewall_allow_signed_status() -> String {
     let output = Command::new("/usr/libexec/ApplicationFirewall/socketfilterfw")
@@ -981,6 +982,55 @@ pub fn get_firewall_allow_signed_status() -> String {
     } else {
         debug3!("firewall-allow-signed status: '{}'", info);
         info
+    }
+}
+
+/// Parse `socketfilterfw --getblockall` (Enabled / Disabled).
+pub(crate) fn parse_firewall_block_all(raw: &str) -> Option<&'static str> {
+    let lower = raw.to_ascii_lowercase();
+    if lower.trim().is_empty() {
+        return None;
+    }
+    if lower.contains("disabled") || lower.contains("is off") {
+        return Some("Disabled");
+    }
+    if lower.contains("enabled") || lower.contains("is on") {
+        return Some("Enabled");
+    }
+    if lower.contains(" off") || lower.ends_with("off") {
+        return Some("Disabled");
+    }
+    if lower.contains(" on") || lower.ends_with("on") {
+        return Some("Enabled");
+    }
+    None
+}
+
+/// macOS Application Firewall block-all from `socketfilterfw --getblockall`.
+/// Distinct from Firewall global `/firewall`, stealth `/stealth`, logging `/firewall-logging`,
+/// allow-signed `/allow-signed`.
+/// Used by Discord/operator instant `/block-all` · `/fw-block-all` lane.
+pub fn get_firewall_block_all_status() -> String {
+    let output = Command::new("/usr/libexec/ApplicationFirewall/socketfilterfw")
+        .arg("--getblockall")
+        .stderr(std::process::Stdio::null())
+        .output();
+    let Ok(output) = output else {
+        debug3!("firewall-block-all: socketfilterfw spawn failed");
+        return String::new();
+    };
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    if let Some(info) = parse_firewall_block_all(&stdout) {
+        debug3!("firewall-block-all status: '{}'", info);
+        return info.to_string();
+    }
+    let t = stdout.lines().next().unwrap_or("").trim();
+    if t.is_empty() {
+        debug3!("firewall-block-all: empty status (exit={})", output.status);
+        String::new()
+    } else {
+        debug3!("firewall-block-all status (raw): '{}'", t);
+        t.to_string()
     }
 }
 
@@ -4831,6 +4881,24 @@ mod airplay_receiver_parse_tests {
             "On"
         );
         assert_eq!(format_airplay_receiver_parts(None, None, false), "");
+    }
+}
+
+#[cfg(test)]
+mod firewall_block_all_parse_tests {
+    use super::parse_firewall_block_all;
+
+    #[test]
+    fn parses_block_all_status() {
+        assert_eq!(
+            parse_firewall_block_all("Firewall has block all state set to disabled.\n"),
+            Some("Disabled")
+        );
+        assert_eq!(
+            parse_firewall_block_all("Firewall has block all state set to enabled."),
+            Some("Enabled")
+        );
+        assert_eq!(parse_firewall_block_all("nope"), None);
     }
 }
 
