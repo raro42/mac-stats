@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2986] - 2026-11-23
+
+### Changed
+- CPU metrics keyboard hints (rings · history sparklines · Bat/LPM/Power strip): shorter, warmer copy so the metrics surface stays KISS when Tab focus shows the hint row (design-review `feature-cpu-metrics`; Mac capture still TCC-blocked — polish-without-capture grace).
+
 ## [0.1.2985] - 2026-11-23
 
 ### Added

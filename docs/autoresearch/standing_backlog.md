@@ -1,3 +1,16 @@
+## Overnight note 2026-11-23 ~02:50
+- Digester open: design-review `feature-cpu-metrics` (77d stale).
+- Design review due=true → polish rings/sparkline/power-strip kb-hints; Mac TCC — polish-without-capture grace marked.
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Fuel: design-review metrics kb-hint copy (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.2986** — shorter warmer Tab hints on rings · history charts · Bat/LPM/Power strip.
+- Ratchet keep after verify; sync-dist + install/kickstart (UI JS).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — not another keep-pNN clone.
+
+## Overnight merge — v0.1.2986
+
+- Design-review fuel after AirDrop `/airdrop` NL v0.1.2985: CPU metrics keyboard hint rows under rings · sparklines · Bat/LPM/Power still used long cold “Tab or click … crosses …” copy while the surface already relied on `.is-hot` washes (no Hot · … bars). Shortened to warmer KISS lines. Digester open design-review; layout-daily Neon marked today (Futuristic due next calendar quota). Recapture deferred (Mac TCC); polish grace marked. Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — metrics kb-hint copy closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~02:20
 - Digester open: empty (0 turns / 7d).
 - Design review due=false (Agent Ops etc. in grace; Mac TCC — polish-without-capture).

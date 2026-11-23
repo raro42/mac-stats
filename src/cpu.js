@@ -4297,8 +4297,9 @@ function ensurePowerStripKbHint() {
   if (hint.parentElement !== strip) {
     strip.appendChild(hint);
   }
+  /* Design-review feature-cpu-metrics: shorter, warmer strip hint (KISS). */
   hint.textContent =
-    'Tab or click Bat · LPM · Power · ← → / h l · Home/End · at start crosses to last history chart · at end ↓ crosses to Details glance (when collapsed) or section icons · LPM toggles (password may be required)';
+    'Tab Bat · LPM · Power · ← → / h l · Home/End · edges jump to charts or Details · LPM may ask for a password';
 }
 
 /**
@@ -4771,8 +4772,9 @@ function ensureRingGaugeKbHint() {
   if (hint.parentElement !== section) {
     section.appendChild(hint);
   }
+  /* Design-review feature-cpu-metrics: shorter, warmer ring hint (KISS). */
   hint.textContent =
-    'Tab or click a ring · ← → / h l · Home/End move · at start ← crosses to Settings · ↑ crosses to Details · at end → crosses to history charts · ↓ crosses to Top Processes filters (or Details) · Enter / Space activates';
+    'Tab a ring · ← → / h l · Home/End · Enter copies · edges jump to Settings, Details, charts, or processes';
 }
 
 /**
@@ -4934,8 +4936,9 @@ function ensureHistorySparklineKbHint() {
   if (hint.parentElement !== section) {
     section.appendChild(hint);
   }
+  /* Design-review feature-cpu-metrics: shorter, warmer sparkline hint (KISS). */
   hint.textContent =
-    'Tab or click a chart · ← → / h l · Home/End move · at start crosses to RAM ring · at end ↓ crosses to Top Processes filters · → crosses to battery strip · Enter / Space jumps to ring';
+    'Tab a chart · ← → / h l · Home/End · Enter opens the ring · edges jump to RAM, processes, or the battery strip';
 }
 
 /**
