@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3010] - 2026-11-23
+
+### Added
+- Instant Disk Sleep accepts `/disksleep` · `/disk-sleep` · `/disksleep-status` · `/disk-sleep-status` · `/disksleep-state` · `/disk-sleep-state` · `/disksleep-timer` · `/disk-sleep-timer` · `/hard-disk-sleep` · `/harddisksleep` · `/hard-disk-sleep-status` · `/hdd-sleep` · `/hddsleep` · `/hdd-sleep-status` · `/mac-disksleep` · `/mac-disk-sleep` · `/mac-disksleep-status` · `/mac-disk-sleep-status` · `/mac-hard-disk-sleep` · `/mac-hdd-sleep` and view/see/open/list NL (`view disk sleep`, `open disksleep`, `list hard disk sleep`, …), matching “disk sleep status” / “is disk sleep on” / “is disksleep enabled” / “what's my disk sleep” / “what's the disksleep status”. Bare `disksleep` / `disk sleep` / `hard disk sleep` / `hdd sleep` stay with the agent; `/displaysleep` · `/display-sleep` · `/screen-sleep` stay Display Sleep; `/screensaver` · `/idle-time` stay Screensaver idle; Disk Cleanup / `/ssd` / `/free` stay put; system sleep stays out. Operator `/help` lists the new lane.
+
 ## [0.1.3009] - 2026-11-23
 
 ### Added

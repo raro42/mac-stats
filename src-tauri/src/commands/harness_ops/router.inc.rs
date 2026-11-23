@@ -1202,6 +1202,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_displaysleep_request(content) {
         return Some(format_displaysleep_report());
     }
+    // Disk Sleep (bare `disksleep` / `disk sleep` / `hard disk sleep` stay with the agent;
+    // `/displaysleep` stays Display Sleep; `/screensaver` stays Screensaver; Disk Cleanup /
+    // `/ssd` / `/free` stay put; system sleep stays out).
+    if looks_like_disksleep_request(content) {
+        return Some(format_disksleep_report());
+    }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
     if looks_like_boot_time_request(content) {

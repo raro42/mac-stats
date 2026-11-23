@@ -18309,6 +18309,337 @@ pub fn format_displaysleep_report() -> String {
     format!("**Display Sleep** · `{v}`")
 }
 
+/// Disk Sleep — `pmset` Battery/AC `disksleep` minutes (+ active fallback; 0 = Never).
+/// Slash + view/open NL (`/disksleep` · `/disk-sleep` · `view disk sleep`).
+/// Bare `disksleep` / `disk sleep` / `hard disk sleep` stay with the agent;
+/// `/displaysleep` · `/display-sleep` stay Display Sleep; `/screensaver` stays Screensaver;
+/// Disk Cleanup / `/ssd` / `/free` stay put; system `sleep` stays out.
+pub fn looks_like_disksleep_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.contains("quarantine")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("displaysleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("screensleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("proximity")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("wake for")
+        || n.contains("wake-for")
+        || n.contains("wake on")
+        || n.contains("wake-on")
+        || n.contains("womp")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n.contains("percent")
+        || n.contains('%')
+        || n.contains("free")
+        || n.contains("used")
+        || n.contains("capacity")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/display"
+        || n == "/displays"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/resolution"
+        || n == "/ssd"
+        || n == "/disk"
+        || n == "/free"
+        || n == "/ssd-size"
+        || n == "/disk-size"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "disksleep"
+        || n == "the disksleep"
+        || n == "disk sleep"
+        || n == "the disk sleep"
+        || n == "disk-sleep"
+        || n == "the disk-sleep"
+        || n == "hard disk sleep"
+        || n == "the hard disk sleep"
+        || n == "hard-disk-sleep"
+        || n == "the hard-disk-sleep"
+        || n == "hdd sleep"
+        || n == "the hdd sleep"
+        || n == "hdd-sleep"
+        || n == "the hdd-sleep"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/disksleep"
+            | "/disk-sleep"
+            | "/disksleep-status"
+            | "/disk-sleep-status"
+            | "/disksleep-state"
+            | "/disk-sleep-state"
+            | "/disksleep-timer"
+            | "/disk-sleep-timer"
+            | "/hard-disk-sleep"
+            | "/harddisksleep"
+            | "/hard-disk-sleep-status"
+            | "/hdd-sleep"
+            | "/hddsleep"
+            | "/hdd-sleep-status"
+            | "/mac-disksleep"
+            | "/mac-disk-sleep"
+            | "/mac-disksleep-status"
+            | "/mac-disk-sleep-status"
+            | "/mac-hard-disk-sleep"
+            | "/mac-hdd-sleep"
+            | "disksleep status"
+            | "the disksleep status"
+            | "disk sleep status"
+            | "the disk sleep status"
+            | "disk-sleep status"
+            | "the disk-sleep status"
+            | "disksleep state"
+            | "the disksleep state"
+            | "disk sleep state"
+            | "the disk sleep state"
+            | "disksleep timer"
+            | "the disksleep timer"
+            | "disk sleep timer"
+            | "the disk sleep timer"
+            | "my disksleep"
+            | "my disksleep status"
+            | "my disk sleep"
+            | "my disk sleep status"
+            | "is disksleep on"
+            | "is disksleep off"
+            | "is disksleep enabled"
+            | "is disksleep disabled"
+            | "is disk sleep on"
+            | "is disk sleep off"
+            | "is disk sleep enabled"
+            | "is disk sleep disabled"
+            | "is disk-sleep on"
+            | "is disk-sleep enabled"
+            | "what's my disksleep"
+            | "whats my disksleep"
+            | "what is my disksleep"
+            | "what's my disksleep status"
+            | "whats my disksleep status"
+            | "what is my disksleep status"
+            | "what's my disk sleep"
+            | "whats my disk sleep"
+            | "what is my disk sleep"
+            | "what's my disk sleep status"
+            | "whats my disk sleep status"
+            | "what is my disk sleep status"
+            | "what's the disksleep"
+            | "whats the disksleep"
+            | "what is the disksleep"
+            | "what's the disksleep status"
+            | "whats the disksleep status"
+            | "what is the disksleep status"
+            | "what's the disk sleep"
+            | "whats the disk sleep"
+            | "what is the disk sleep"
+            | "what's the disk sleep status"
+            | "whats the disk sleep status"
+            | "what is the disk sleep status"
+            | "how's disksleep"
+            | "hows disksleep"
+            | "how's the disksleep"
+            | "hows the disksleep"
+            | "how's disk sleep"
+            | "hows disk sleep"
+            | "how's the disk sleep"
+            | "hows the disk sleep"
+            | "view disksleep"
+            | "view the disksleep"
+            | "view disksleep status"
+            | "view the disksleep status"
+            | "view disk sleep"
+            | "view the disk sleep"
+            | "view disk sleep status"
+            | "view the disk sleep status"
+            | "view disk-sleep"
+            | "view the disk-sleep"
+            | "see disksleep"
+            | "see the disksleep"
+            | "see disksleep status"
+            | "see the disksleep status"
+            | "see disk sleep"
+            | "see the disk sleep"
+            | "see disk sleep status"
+            | "see the disk sleep status"
+            | "open disksleep"
+            | "open the disksleep"
+            | "open disksleep status"
+            | "open the disksleep status"
+            | "open disk sleep"
+            | "open the disk sleep"
+            | "open disk sleep status"
+            | "open the disk sleep status"
+            | "open disk-sleep"
+            | "open the disk-sleep"
+            | "list disksleep"
+            | "list the disksleep"
+            | "list disksleep status"
+            | "list the disksleep status"
+            | "list disk sleep"
+            | "list the disk sleep"
+            | "list disk sleep status"
+            | "list the disk sleep status"
+            | "hard disk sleep status"
+            | "the hard disk sleep status"
+            | "hard-disk-sleep status"
+            | "the hard-disk-sleep status"
+            | "my hard disk sleep"
+            | "my hard disk sleep status"
+            | "is hard disk sleep on"
+            | "is hard disk sleep off"
+            | "is hard disk sleep enabled"
+            | "is hard-disk-sleep on"
+            | "is hard-disk-sleep enabled"
+            | "what's my hard disk sleep"
+            | "whats my hard disk sleep"
+            | "what is my hard disk sleep"
+            | "what's the hard disk sleep"
+            | "whats the hard disk sleep"
+            | "what is the hard disk sleep"
+            | "what's the hard disk sleep status"
+            | "whats the hard disk sleep status"
+            | "what is the hard disk sleep status"
+            | "view hard disk sleep"
+            | "view the hard disk sleep"
+            | "view hard disk sleep status"
+            | "view the hard disk sleep status"
+            | "view hard-disk-sleep"
+            | "view the hard-disk-sleep"
+            | "see hard disk sleep"
+            | "see the hard disk sleep"
+            | "open hard disk sleep"
+            | "open the hard disk sleep"
+            | "open hard-disk-sleep"
+            | "open the hard-disk-sleep"
+            | "list hard disk sleep"
+            | "list the hard disk sleep"
+            | "list hard-disk-sleep"
+            | "list the hard-disk-sleep"
+            | "hdd sleep status"
+            | "the hdd sleep status"
+            | "hdd-sleep status"
+            | "the hdd-sleep status"
+            | "my hdd sleep"
+            | "is hdd sleep on"
+            | "is hdd sleep enabled"
+            | "is hdd-sleep on"
+            | "is hdd-sleep enabled"
+            | "what's my hdd sleep"
+            | "whats my hdd sleep"
+            | "what's the hdd sleep"
+            | "whats the hdd sleep"
+            | "view hdd sleep"
+            | "view the hdd sleep"
+            | "view hdd-sleep"
+            | "view the hdd-sleep"
+            | "see hdd sleep"
+            | "see the hdd sleep"
+            | "open hdd sleep"
+            | "open the hdd sleep"
+            | "open hdd-sleep"
+            | "open the hdd-sleep"
+            | "list hdd sleep"
+            | "list the hdd sleep"
+            | "list hdd-sleep"
+            | "list the hdd-sleep"
+    )
+}
+
+/// Zero-LLM Disk Sleep status from pmset Battery/AC `disksleep` (macOS-only; empty elsewhere).
+pub fn format_disksleep_report() -> String {
+    let v = crate::metrics::get_disksleep_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Disk Sleep** — _no Disk Sleep reading on this Mac right now._".to_string();
+    }
+    format!("**Disk Sleep** · `{v}`")
+}
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

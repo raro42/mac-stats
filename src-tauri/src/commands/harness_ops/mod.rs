@@ -4083,6 +4083,96 @@ mod tests {
         }
     }
 
+    #[test]
+    fn disksleep_slash_and_view_open_do_not_steal_displaysleep_cleanup_or_bare() {
+        // Slash + view/open NL → Disk Sleep (`/displaysleep` · Disk Cleanup parity).
+        // Bare `disksleep` / `disk sleep` / `hard disk sleep` stay with the agent;
+        // `/displaysleep` stays Display Sleep; `/screensaver` stays Screensaver;
+        // `/ssd` / `/free` / Disk Cleanup stay put.
+        assert!(looks_like_disksleep_request("/disksleep"));
+        assert!(looks_like_disksleep_request("/disk-sleep"));
+        assert!(looks_like_disksleep_request("/disksleep-status"));
+        assert!(looks_like_disksleep_request("/hard-disk-sleep"));
+        assert!(looks_like_disksleep_request("/hdd-sleep"));
+        assert!(looks_like_disksleep_request("/mac-disksleep"));
+        assert!(looks_like_disksleep_request("/mac-disk-sleep"));
+        assert!(looks_like_disksleep_request("view disk sleep"));
+        assert!(looks_like_disksleep_request("open disksleep"));
+        assert!(looks_like_disksleep_request("list hard disk sleep"));
+        assert!(looks_like_disksleep_request("disk sleep status"));
+        assert!(looks_like_disksleep_request("is disk sleep on"));
+        assert!(looks_like_disksleep_request("is disksleep enabled"));
+        assert!(looks_like_disksleep_request("what's my disk sleep"));
+        assert!(looks_like_disksleep_request("view hdd-sleep"));
+        assert!(!looks_like_disksleep_request("disksleep"));
+        assert!(!looks_like_disksleep_request("disk sleep"));
+        assert!(!looks_like_disksleep_request("hard disk sleep"));
+        assert!(!looks_like_disksleep_request("hdd sleep"));
+        assert!(!looks_like_disksleep_request("/displaysleep"));
+        assert!(!looks_like_disksleep_request("view display sleep"));
+        assert!(!looks_like_disksleep_request("/screen-sleep"));
+        assert!(!looks_like_disksleep_request("/screensaver"));
+        assert!(!looks_like_disksleep_request("/display"));
+        assert!(!looks_like_disksleep_request("/ssd"));
+        assert!(!looks_like_disksleep_request("/free"));
+        assert!(!looks_like_disksleep_request("/powernap"));
+        assert!(!looks_like_disksleep_request("/womp"));
+        assert!(!looks_like_disksleep_request("/power"));
+        assert!(!looks_like_disksleep_request("/tasks"));
+        assert!(!looks_like_disksleep_request("enable disk sleep"));
+        assert!(!looks_like_disksleep_request("view disk"));
+        assert!(!looks_like_displaysleep_request("/disksleep"));
+        assert!(!looks_like_displaysleep_request("view disk sleep"));
+        assert!(!looks_like_power_nap_request("/disksleep"));
+        assert!(!looks_like_wake_for_network_request("/disksleep"));
+        let s = try_operator_instant_reply("/disksleep").unwrap();
+        assert!(
+            s.contains("**Disk Sleep**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view disk sleep").unwrap();
+        assert!(
+            viewed.contains("**Disk Sleep**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open disksleep").unwrap();
+        assert!(
+            open.contains("**Disk Sleep**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("disksleep").is_none());
+        assert!(try_operator_instant_reply("disk sleep").is_none());
+        assert!(try_operator_instant_reply("hard disk sleep").is_none());
+        let ds = try_operator_instant_reply("/displaysleep");
+        if let Some(reply) = ds {
+            assert!(
+                !reply.contains("**Disk Sleep**"),
+                "/displaysleep must stay Display Sleep, not Disk Sleep: {reply}"
+            );
+        }
+        let ss = try_operator_instant_reply("/screensaver");
+        if let Some(reply) = ss {
+            assert!(
+                !reply.contains("**Disk Sleep**"),
+                "/screensaver must stay Screensaver, not Disk Sleep: {reply}"
+            );
+        }
+        let nap = try_operator_instant_reply("/powernap");
+        if let Some(reply) = nap {
+            assert!(
+                !reply.contains("**Disk Sleep**"),
+                "/powernap must stay Power Nap, not Disk Sleep: {reply}"
+            );
+        }
+        let womp = try_operator_instant_reply("/womp");
+        if let Some(reply) = womp {
+            assert!(
+                !reply.contains("**Disk Sleep**"),
+                "/womp must stay Wake for network, not Disk Sleep: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).
