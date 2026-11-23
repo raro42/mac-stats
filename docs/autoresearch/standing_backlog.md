@@ -1,3 +1,20 @@
+## Overnight note 2026-11-24 ~00:56
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing on rack.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Data Poster v0.1.3016 — Hibernate mode / hibernatemode slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.3017** — `/hibernatemode` · `/hibernate-mode` · `/hibernate` · `/mac-hibernatemode` + view/open NL; bare hibernatemode/hibernate/hibernate mode stay with agent; `/systemsleep` · `/networkoversleep` · `/tcpkeepalive` · `/womp` intact; `/help` lists lane.
+- Ratchet keep @ 1bf93d365 for 3017.
+- Morning surprise: refresh 2026-11-24 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (standbydelay / autopoweroff) — Hibernate mode slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3017
+
+- Product fuel after Data Poster layout-daily v0.1.3016 (+ Network over sleep v0.1.3015): Hibernate mode already readable via `pmset -g custom` Battery/AC `hibernatemode` (+ active `pmset -g`) but lacked `/hibernatemode` · `/hibernate-mode` · `/hibernate` · `/mac-hibernatemode` and view/see/open/list phrases while System Sleep `/systemsleep`, Network over sleep `/networkoversleep`, TCP Keep Alive `/tcpkeepalive`, and Wake for network `/womp` already had slash+NL. Bare `hibernatemode` / `hibernate` / `hibernate mode` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (standbydelay / autopoweroff) — Hibernate mode slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~00:32
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
