@@ -1,3 +1,16 @@
+## Overnight note 2026-11-23 ~21:27
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Fuel: product after Guest Account help v0.1.3002 — Automatic Login slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.3003** — `/autologin` · `/auto-login` · `/automatic-login` · `/mac-autologin` + view/open NL; bare autologin/automatic login stay with agent; `/guest` · `/guest-login` stay Guest Account; `/username` · `/whoami` · `/remote-login` · `/ssh` · `/filevault` intact; `/help` lists lane.
+- Ratchet keep after verify; install/kickstart (Rust).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (Screen Lock / SMB guest) — not another keep-pNN clone.
+
+## Overnight merge — v0.1.3003
+
+- Product fuel after Guest Account help v0.1.3002: Automatic Login already readable via loginwindow `autoLoginUser` / `sysadminctl -autologin status` but lacked `/autologin` · `/auto-login` · `/automatic-login` · `/autologin-status` · `/mac-autologin` and view/see/open/list phrases while Guest Account `/guest`, username `/username`, Remote Login `/remote-login`, and FileVault `/filevault` already had slash+NL. Bare `autologin` / `automatic login` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (Screen Lock / SMB guest) — Automatic Login slash NL closed; not another keep-pNN clone.
+
 ## 2026-11-23 ~21:05 overnight tick
 - Digester open: empty (0 turns / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
