@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3012] - 2026-11-23
+
+### Added
+- Instant TTY keep awake accepts `/ttyskeepawake` · `/ttys-keep-awake` · `/tty-keep-awake` · `/ttykeepawake` · `/ttyskeepawake-status` · `/ttys-keep-awake-status` · `/tty-keep-awake-status` · `/ttyskeepawake-state` · `/ttys-keep-awake-state` · `/tty-keep-awake-state` · `/mac-ttyskeepawake` · `/mac-ttys-keep-awake` · `/mac-tty-keep-awake` · `/mac-ttyskeepawake-status` · `/mac-tty-keep-awake-status` and view/see/open/list NL (`view tty keep awake`, `open ttyskeepawake`, `list ttys keep awake`, …), matching “tty keep awake status” / “is tty keep awake on” / “is ttyskeepawake enabled” / “what's my tty keep awake” / “what's the ttyskeepawake status”. Bare `ttyskeepawake` / `tty keep awake` / `ttys keep awake` stay with the agent; `/proximitywake` · `/proximity-wake` stay Proximity Wake; `/womp` · `/wake-for-network` stay Wake for network; `/powernap` · `/power-nap` stay Power Nap; `/displaysleep` · `/disksleep` stay sleep timers; system sleep stays out. Operator `/help` lists the new lane.
+
 ## [0.1.3011] - 2026-11-23
 
 ### Added

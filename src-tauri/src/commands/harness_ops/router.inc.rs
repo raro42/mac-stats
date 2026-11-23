@@ -1214,6 +1214,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_proximitywake_request(content) {
         return Some(format_proximitywake_report());
     }
+    // TTY keep awake (bare `ttyskeepawake` / `tty keep awake` stay with the agent;
+    // `/proximitywake` stays Proximity Wake; `/womp` stays Wake for network;
+    // `/powernap` stays Power Nap; system sleep stays out).
+    if looks_like_ttyskeepawake_request(content) {
+        return Some(format_ttyskeepawake_report());
+    }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
     if looks_like_boot_time_request(content) {

@@ -3552,6 +3552,129 @@ pub fn get_proximitywake_status() -> String {
     }
 }
 
+/// Parse `pmset -g custom` Battery/AC `ttyskeepawake` flag → (battery, ac).
+pub(crate) fn parse_pmset_custom_ttyskeepawake(raw: &str) -> (Option<bool>, Option<bool>) {
+    let mut section: Option<&str> = None;
+    let mut battery = None;
+    let mut ac = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.eq_ignore_ascii_case("Battery Power:") {
+            section = Some("battery");
+            continue;
+        }
+        if t.eq_ignore_ascii_case("AC Power:") {
+            section = Some("ac");
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("ttyskeepawake") {
+            continue;
+        }
+        let on = match parts.next() {
+            Some("1") | Some("true") | Some("yes") => Some(true),
+            Some("0") | Some("false") | Some("no") => Some(false),
+            _ => None,
+        };
+        match section {
+            Some("battery") => battery = on.or(battery),
+            Some("ac") => ac = on.or(ac),
+            _ => {}
+        }
+    }
+    (battery, ac)
+}
+
+/// Parse active `pmset -g` `ttyskeepawake` flag (Currently in use).
+pub(crate) fn parse_pmset_active_ttyskeepawake(raw: &str) -> Option<bool> {
+    for line in raw.lines() {
+        let mut parts = line.trim().split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("ttyskeepawake") {
+            continue;
+        }
+        return match parts.next() {
+            Some("1") | Some("true") | Some("yes") => Some(true),
+            Some("0") | Some("false") | Some("no") => Some(false),
+            _ => None,
+        };
+    }
+    None
+}
+
+/// Prefer Battery+AC custom when both set; else active `pmset -g`.
+pub(crate) fn format_ttyskeepawake_parts(
+    battery: Option<bool>,
+    ac: Option<bool>,
+    active: Option<bool>,
+) -> String {
+    format_wake_for_network_parts(battery, ac, active)
+}
+
+/// macOS TTY keep awake from `pmset -g custom` Battery/AC `ttyskeepawake`
+/// (fallback: active `pmset -g`). Distinct from Proximity Wake `/proximitywake`,
+/// Wake for network `/womp`, Power Nap `/powernap`, and system `sleep`.
+/// Used by Discord/operator instant `/ttyskeepawake` · `/tty-keep-awake` lane.
+pub fn get_ttyskeepawake_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let (battery, ac) = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g", "custom"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_custom_ttyskeepawake(&stdout)
+                }
+                Ok(_) => (None, None),
+                Err(_) => {
+                    debug3!("ttyskeepawake: pmset -g custom spawn failed");
+                    (None, None)
+                }
+            }
+        };
+
+        let active = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_active_ttyskeepawake(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("ttyskeepawake: pmset -g spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_ttyskeepawake_parts(battery, ac, active);
+        if info.is_empty() {
+            debug3!("ttyskeepawake: empty status");
+        } else {
+            debug3!("ttyskeepawake status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
@@ -6802,6 +6925,74 @@ AC Power:
             "On"
         );
         assert_eq!(format_proximitywake_parts(None, None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod ttyskeepawake_parse_tests {
+    use super::{
+        format_ttyskeepawake_parts, parse_pmset_active_ttyskeepawake,
+        parse_pmset_custom_ttyskeepawake,
+    };
+
+    #[test]
+    fn parses_custom_battery_and_ac() {
+        let sample = r#"
+Battery Power:
+ Sleep On Power Button 1
+ ttyskeepawake        1
+AC Power:
+ ttyskeepawake        0
+"#;
+        assert_eq!(
+            parse_pmset_custom_ttyskeepawake(sample),
+            (Some(true), Some(false))
+        );
+        assert_eq!(parse_pmset_custom_ttyskeepawake("nope"), (None, None));
+    }
+
+    #[test]
+    fn parses_active_ttyskeepawake() {
+        assert_eq!(
+            parse_pmset_active_ttyskeepawake(
+                "Currently in use:\n ttyskeepawake        1\n"
+            ),
+            Some(true)
+        );
+        assert_eq!(
+            parse_pmset_active_ttyskeepawake(" ttyskeepawake        0\n"),
+            Some(false)
+        );
+        assert_eq!(parse_pmset_active_ttyskeepawake("womp 1\n"), None);
+    }
+
+    #[test]
+    fn formats_matched_split_and_active() {
+        assert_eq!(
+            format_ttyskeepawake_parts(Some(true), Some(true), Some(false)),
+            "On"
+        );
+        assert_eq!(
+            format_ttyskeepawake_parts(Some(false), Some(false), Some(true)),
+            "Off"
+        );
+        assert_eq!(
+            format_ttyskeepawake_parts(Some(true), Some(false), None),
+            "AC Off · Battery On"
+        );
+        assert_eq!(
+            format_ttyskeepawake_parts(Some(false), None, None),
+            "Off (Battery)"
+        );
+        assert_eq!(
+            format_ttyskeepawake_parts(None, Some(true), None),
+            "On (AC)"
+        );
+        assert_eq!(
+            format_ttyskeepawake_parts(None, None, Some(true)),
+            "On"
+        );
+        assert_eq!(format_ttyskeepawake_parts(None, None, None), "");
     }
 }
 

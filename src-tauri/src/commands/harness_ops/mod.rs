@@ -4247,6 +4247,83 @@ mod tests {
         }
     }
 
+    #[test]
+    fn ttyskeepawake_slash_and_view_open_do_not_steal_proximitywake_or_bare() {
+        // Slash + view/open NL → TTY keep awake (`/proximitywake` · `/womp` parity).
+        // Bare `ttyskeepawake` / `tty keep awake` stay with the agent;
+        // `/proximitywake` stays Proximity Wake; `/womp` stays Wake for network;
+        // `/powernap` stays Power Nap; system sleep stays out.
+        assert!(looks_like_ttyskeepawake_request("/ttyskeepawake"));
+        assert!(looks_like_ttyskeepawake_request("/ttys-keep-awake"));
+        assert!(looks_like_ttyskeepawake_request("/tty-keep-awake"));
+        assert!(looks_like_ttyskeepawake_request("/ttyskeepawake-status"));
+        assert!(looks_like_ttyskeepawake_request("/mac-ttyskeepawake"));
+        assert!(looks_like_ttyskeepawake_request("/mac-tty-keep-awake"));
+        assert!(looks_like_ttyskeepawake_request("view tty keep awake"));
+        assert!(looks_like_ttyskeepawake_request("open ttyskeepawake"));
+        assert!(looks_like_ttyskeepawake_request("list ttys keep awake"));
+        assert!(looks_like_ttyskeepawake_request("tty keep awake status"));
+        assert!(looks_like_ttyskeepawake_request("is tty keep awake on"));
+        assert!(looks_like_ttyskeepawake_request("is ttyskeepawake enabled"));
+        assert!(looks_like_ttyskeepawake_request("what's my tty keep awake"));
+        assert!(looks_like_ttyskeepawake_request("view tty-keep-awake"));
+        assert!(!looks_like_ttyskeepawake_request("ttyskeepawake"));
+        assert!(!looks_like_ttyskeepawake_request("tty keep awake"));
+        assert!(!looks_like_ttyskeepawake_request("ttys keep awake"));
+        assert!(!looks_like_ttyskeepawake_request("/proximitywake"));
+        assert!(!looks_like_ttyskeepawake_request("view proximity wake"));
+        assert!(!looks_like_ttyskeepawake_request("/womp"));
+        assert!(!looks_like_ttyskeepawake_request("/powernap"));
+        assert!(!looks_like_ttyskeepawake_request("/displaysleep"));
+        assert!(!looks_like_ttyskeepawake_request("/disksleep"));
+        assert!(!looks_like_ttyskeepawake_request("/power"));
+        assert!(!looks_like_ttyskeepawake_request("/tasks"));
+        assert!(!looks_like_ttyskeepawake_request("enable tty keep awake"));
+        assert!(!looks_like_proximitywake_request("/ttyskeepawake"));
+        assert!(!looks_like_proximitywake_request("view tty keep awake"));
+        assert!(!looks_like_wake_for_network_request("/ttyskeepawake"));
+        assert!(!looks_like_power_nap_request("/ttyskeepawake"));
+        let s = try_operator_instant_reply("/ttyskeepawake").unwrap();
+        assert!(
+            s.contains("**TTY keep awake**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view tty keep awake").unwrap();
+        assert!(
+            viewed.contains("**TTY keep awake**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open ttyskeepawake").unwrap();
+        assert!(
+            open.contains("**TTY keep awake**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("ttyskeepawake").is_none());
+        assert!(try_operator_instant_reply("tty keep awake").is_none());
+        assert!(try_operator_instant_reply("ttys keep awake").is_none());
+        let prox = try_operator_instant_reply("/proximitywake");
+        if let Some(reply) = prox {
+            assert!(
+                !reply.contains("**TTY keep awake**"),
+                "/proximitywake must stay Proximity Wake, not TTY keep awake: {reply}"
+            );
+        }
+        let womp = try_operator_instant_reply("/womp");
+        if let Some(reply) = womp {
+            assert!(
+                !reply.contains("**TTY keep awake**"),
+                "/womp must stay Wake for network, not TTY keep awake: {reply}"
+            );
+        }
+        let nap = try_operator_instant_reply("/powernap");
+        if let Some(reply) = nap {
+            assert!(
+                !reply.contains("**TTY keep awake**"),
+                "/powernap must stay Power Nap, not TTY keep awake: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

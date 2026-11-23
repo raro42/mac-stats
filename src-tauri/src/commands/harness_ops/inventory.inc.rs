@@ -18892,6 +18892,307 @@ pub fn format_proximitywake_report() -> String {
     format!("**Proximity Wake** · `{v}`")
 }
 
+/// TTY keep awake — `pmset` Battery/AC `ttyskeepawake` (+ active fallback).
+/// Slash + view/open NL (`/ttyskeepawake` · `/tty-keep-awake` · `view tty keep awake`).
+/// Bare `ttyskeepawake` / `tty keep awake` / `ttys keep awake` stay with the agent;
+/// `/proximitywake` stays Proximity Wake; `/womp` stays Wake for network;
+/// `/powernap` stays Power Nap; system sleep stays out.
+pub fn looks_like_ttyskeepawake_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("wake on network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("hard disk sleep")
+        || n.contains("hdd sleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("networkoversleep")
+        || n.contains("tcpkeepalive")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/proximitywake"
+        || n == "/proximity-wake"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
+        || n == "/disksleep"
+        || n == "/disk-sleep"
+        || n == "/hard-disk-sleep"
+        || n == "/hdd-sleep"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "ttyskeepawake"
+        || n == "the ttyskeepawake"
+        || n == "tty keep awake"
+        || n == "the tty keep awake"
+        || n == "tty-keep-awake"
+        || n == "the tty-keep-awake"
+        || n == "ttys keep awake"
+        || n == "the ttys keep awake"
+        || n == "ttys-keep-awake"
+        || n == "the ttys-keep-awake"
+        || n == "ttykeepawake"
+        || n == "the ttykeepawake"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/ttyskeepawake"
+            | "/ttys-keep-awake"
+            | "/tty-keep-awake"
+            | "/ttykeepawake"
+            | "/ttyskeepawake-status"
+            | "/ttys-keep-awake-status"
+            | "/tty-keep-awake-status"
+            | "/ttyskeepawake-state"
+            | "/ttys-keep-awake-state"
+            | "/tty-keep-awake-state"
+            | "/mac-ttyskeepawake"
+            | "/mac-ttys-keep-awake"
+            | "/mac-tty-keep-awake"
+            | "/mac-ttyskeepawake-status"
+            | "/mac-tty-keep-awake-status"
+            | "ttyskeepawake status"
+            | "the ttyskeepawake status"
+            | "tty keep awake status"
+            | "the tty keep awake status"
+            | "tty-keep-awake status"
+            | "the tty-keep-awake status"
+            | "ttys keep awake status"
+            | "the ttys keep awake status"
+            | "ttys-keep-awake status"
+            | "the ttys-keep-awake status"
+            | "ttyskeepawake state"
+            | "the ttyskeepawake state"
+            | "tty keep awake state"
+            | "the tty keep awake state"
+            | "my ttyskeepawake"
+            | "my ttyskeepawake status"
+            | "my tty keep awake"
+            | "my tty keep awake status"
+            | "my ttys keep awake"
+            | "my ttys keep awake status"
+            | "is ttyskeepawake on"
+            | "is ttyskeepawake off"
+            | "is ttyskeepawake enabled"
+            | "is ttyskeepawake disabled"
+            | "is tty keep awake on"
+            | "is tty keep awake off"
+            | "is tty keep awake enabled"
+            | "is tty keep awake disabled"
+            | "is ttys keep awake on"
+            | "is ttys keep awake off"
+            | "is ttys keep awake enabled"
+            | "is ttys keep awake disabled"
+            | "is tty-keep-awake on"
+            | "is tty-keep-awake enabled"
+            | "is ttys-keep-awake on"
+            | "is ttys-keep-awake enabled"
+            | "what's my ttyskeepawake"
+            | "whats my ttyskeepawake"
+            | "what is my ttyskeepawake"
+            | "what's my ttyskeepawake status"
+            | "whats my ttyskeepawake status"
+            | "what is my ttyskeepawake status"
+            | "what's my tty keep awake"
+            | "whats my tty keep awake"
+            | "what is my tty keep awake"
+            | "what's my tty keep awake status"
+            | "whats my tty keep awake status"
+            | "what is my tty keep awake status"
+            | "what's my ttys keep awake"
+            | "whats my ttys keep awake"
+            | "what is my ttys keep awake"
+            | "what's my ttys keep awake status"
+            | "whats my ttys keep awake status"
+            | "what is my ttys keep awake status"
+            | "what's the ttyskeepawake"
+            | "whats the ttyskeepawake"
+            | "what is the ttyskeepawake"
+            | "what's the ttyskeepawake status"
+            | "whats the ttyskeepawake status"
+            | "what is the ttyskeepawake status"
+            | "what's the tty keep awake"
+            | "whats the tty keep awake"
+            | "what is the tty keep awake"
+            | "what's the tty keep awake status"
+            | "whats the tty keep awake status"
+            | "what is the tty keep awake status"
+            | "what's the ttys keep awake"
+            | "whats the ttys keep awake"
+            | "what is the ttys keep awake"
+            | "what's the ttys keep awake status"
+            | "whats the ttys keep awake status"
+            | "what is the ttys keep awake status"
+            | "how's ttyskeepawake"
+            | "hows ttyskeepawake"
+            | "how's the ttyskeepawake"
+            | "hows the ttyskeepawake"
+            | "how's tty keep awake"
+            | "hows tty keep awake"
+            | "how's the tty keep awake"
+            | "hows the tty keep awake"
+            | "how's ttys keep awake"
+            | "hows ttys keep awake"
+            | "how's the ttys keep awake"
+            | "hows the ttys keep awake"
+            | "view ttyskeepawake"
+            | "view the ttyskeepawake"
+            | "view ttyskeepawake status"
+            | "view the ttyskeepawake status"
+            | "view tty keep awake"
+            | "view the tty keep awake"
+            | "view tty keep awake status"
+            | "view the tty keep awake status"
+            | "view tty-keep-awake"
+            | "view the tty-keep-awake"
+            | "view ttys keep awake"
+            | "view the ttys keep awake"
+            | "view ttys-keep-awake"
+            | "view the ttys-keep-awake"
+            | "see ttyskeepawake"
+            | "see the ttyskeepawake"
+            | "see ttyskeepawake status"
+            | "see the ttyskeepawake status"
+            | "see tty keep awake"
+            | "see the tty keep awake"
+            | "see tty keep awake status"
+            | "see the tty keep awake status"
+            | "see ttys keep awake"
+            | "see the ttys keep awake"
+            | "open ttyskeepawake"
+            | "open the ttyskeepawake"
+            | "open ttyskeepawake status"
+            | "open the ttyskeepawake status"
+            | "open tty keep awake"
+            | "open the tty keep awake"
+            | "open tty keep awake status"
+            | "open the tty keep awake status"
+            | "open tty-keep-awake"
+            | "open the tty-keep-awake"
+            | "open ttys keep awake"
+            | "open the ttys keep awake"
+            | "open ttys-keep-awake"
+            | "open the ttys-keep-awake"
+            | "list ttyskeepawake"
+            | "list the ttyskeepawake"
+            | "list ttyskeepawake status"
+            | "list the ttyskeepawake status"
+            | "list tty keep awake"
+            | "list the tty keep awake"
+            | "list tty keep awake status"
+            | "list the tty keep awake status"
+            | "list tty-keep-awake"
+            | "list the tty-keep-awake"
+            | "list ttys keep awake"
+            | "list the ttys keep awake"
+            | "list ttys-keep-awake"
+            | "list the ttys-keep-awake"
+    )
+}
+
+/// Zero-LLM TTY keep awake status from pmset Battery/AC `ttyskeepawake` (macOS-only; empty elsewhere).
+pub fn format_ttyskeepawake_report() -> String {
+    let v = crate::metrics::get_ttyskeepawake_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**TTY keep awake** — _no TTY keep awake reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**TTY keep awake** · `{v}`")
+}
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·
