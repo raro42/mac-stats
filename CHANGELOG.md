@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2999] - 2026-11-23
+
+### Changed
+- Perplexity and Debug Log filter-chip keyboard hints (All · Top · Snippet · Error · Warn): shorter, warmer copy so search and log filters stay KISS when Tab focus shows the hint (product polish after Credentials kb-hints; cream/Swiss Send fill white-on-blue stays intentional).
+
 ## [0.1.2998] - 2026-11-23
 
 ### Changed

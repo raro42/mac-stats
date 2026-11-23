@@ -5855,9 +5855,11 @@ function wireFilterChipToolbarKeyboard(wrap) {
           /* Design-review feature-monitors: shorter, warmer chip hint (KISS; Agent Ops / Disk Cleanup parity). */
           ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Monitors icon or the monitor list'
           : wrap.id === 'perplexity-filter-chips'
-            ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Perplexity icon · at end → result list · Enter / Space selects'
+            /* Soft-state after Credentials kb-hints: shorter, warmer chip hint (KISS; Monitors / AI Chat parity). */
+            ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Perplexity icon or the result list'
             : wrap.id === 'logs-filter-chips'
-              ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Debug Log icon · at end → log viewer · Enter / Space selects'
+              /* Soft-state after Credentials kb-hints: shorter, warmer chip hint (KISS; Monitors / AI Chat parity). */
+              ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Debug Log icon or the log viewer'
               : wrap.id === 'disk-cleanup-scope-filter-chips'
                 /* Design-review feature-disk-cleanup: shorter, warmer chip hint (KISS; Agent Ops / AI Chat parity). */
                 ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Disk Cleanup icon or the scope list'
