@@ -1,3 +1,21 @@
+## Overnight note 2026-11-23 ~02:20
+- Digester open: empty (0 turns / 7d).
+- Design review due=false (Agent Ops etc. in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already shipped earlier tonight as v0.1.2976; marked neon checked for 2026-11-23 (Futuristic next calendar quota).
+- Sibling: OpenClaw/Hermes missing on rack.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Swiss Top Processes glances v0.1.2984 — AirDrop slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional); also backfilled missing 2984 keep row.
+- Shipped **v0.1.2985** — `/airdrop` · `/air-drop` · `/airdrop-status` · `/air-drop-status` · `/airdrop-state` · `/air-drop-state` · `/airdrop-mode` · `/air-drop-mode` · `/mac-airdrop` · `/mac-air-drop` + view/open NL (`view airdrop`, `what's my airdrop`, `is air drop enabled`); bare `airdrop` / `air drop` stay with agent; `/airplay` · `/airplay-receiver` stay AirPlay Receiver; `/bluetooth-sharing` · `/bts` stay Bluetooth Sharing; `/media-sharing` · `/home-sharing` stay Media Sharing; `/file-sharing` · `/smb` stay File Sharing; `/dvd-sharing` · `/ods` stay DVD/CD Sharing.
+- Ratchet keep for 2985; backfill keep for 2984.
+- Morning surprise: refresh 2026-11-23 + archive.
+- Linux rack: Rust-only (no sync-dist /Applications install/kickstart).
+- X: ensure-loops if enabled; draft-only, no send.
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — not another keep-pNN clone.
+
+## Overnight merge — v0.1.2985
+
+- Product fuel after Swiss Top Processes glances focus v0.1.2984: AirDrop already readable via `com.apple.sharingd` DiscoverableMode (+ NetworkBrowser `DisableAirDrop`) but lacked `/airdrop` · `/air-drop` · `/airdrop-status` · `/air-drop-status` · `/airdrop-state` · `/air-drop-state` · `/airdrop-mode` · `/air-drop-mode` · `/mac-airdrop` · `/mac-air-drop` and view/see/open/list phrases while AirPlay `/airplay` · `/airplay-receiver`, Bluetooth Sharing `/bluetooth-sharing` · `/bts`, Media Sharing `/media-sharing` · `/home-sharing`, File Sharing `/file-sharing` · `/smb`, and DVD/CD Sharing `/dvd-sharing` · `/ods` already had slash+NL. Bare `airdrop` / `air drop` stay with the agent; `/airplay` · `/airplay-receiver` stay AirPlay Receiver; `/bluetooth-sharing` · `/bts` stay Bluetooth Sharing; `/media-sharing` · `/home-sharing` stay Media Sharing; `/file-sharing` · `/smb` stay File Sharing; `/dvd-sharing` · `/ods` stay DVD/CD Sharing. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — AirDrop slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~02:00
 - Shipped v0.1.2984 Swiss Top Processes glances focus → ink `#121216` (design-review feature-processes polish-without-capture); bare Send fill intentional; Futuristic layout-daily next calendar quota.
 - Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Futuristic layout-daily next calendar quota.
