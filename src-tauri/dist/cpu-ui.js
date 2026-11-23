@@ -470,7 +470,7 @@
       ariaLabel: "Settings header",
       wireKey: "settingsHeaderToolbarKbWired",
       hintText:
-        "← → / h l · Home/End move · Enter / Space on Close closes · at start crosses to Credentials · at end crosses to Appearance",
+        "← → / h l · Home/End · Enter / Space Close · ← Credentials · → Appearance",
       chainForwardFromEnd: () => tryChainSettingsHeaderToAppearance(),
       chainBackFromStart: () => tryChainSettingsHeaderToCredentials(),
     });
@@ -989,9 +989,10 @@
     document.head.appendChild(style);
   }
 
+  /* Settings Appearance: shorter, warmer tip (KISS; Credentials parity). */
   /** How to move across Appearance controls when Settings is open. */
   const APPEARANCE_SETTING_KB_HINT =
-    "← → / h l · Home/End move · Enter / Space applies theme or toggles frame · at start crosses to header Settings (or modal header) · at end crosses to Product";
+    "← → / h l · Home/End · Enter / Space theme or frame · ↑ header · → Product";
 
   /**
    * Theme HTML ships the hint at the end of the Appearance section.
@@ -1247,11 +1248,12 @@
     document.head.appendChild(style);
   }
 
+  /* Settings Product: shorter, warmer tip (KISS; Appearance / Credentials parity). */
   /** How to move across Product controls when Settings is open. */
   const PRODUCT_SETTING_KB_HINT =
-    "← → / h l · Home/End move · Space toggles · Enter / Space on Help / Reset · at ends crosses Appearance / Credentials";
+    "← → / h l · Home/End · Space toggles · Enter Help / Reset · ← Appearance · → Credentials";
   const PRODUCT_SETTING_KB_HINT_SHEET =
-    "← → / h l · Home/End move · Space toggles · Enter / c copies cheat sheet · Esc closes sheet · at ends crosses Appearance / Credentials";
+    "← → / h l · Home/End · Space toggles · Enter / c copies sheet · Esc closes · ← Appearance · → Credentials";
 
   /**
    * Theme HTML ships the hint at the end of the Product setting.
@@ -5150,9 +5152,10 @@
     }
   }
 
+  /* Changelog body: shorter, warmer tip (KISS; Settings Appearance parity). */
   /** How to move across changelog version headings when two or more are on screen. */
   const CHANGELOG_BODY_TOOLBAR_KB_HINT =
-    "← → / h l · Home/End move between versions · at start crosses to footer version (or header Close) · at end crosses to header Close";
+    "← → / h l · Home/End versions · ↑ footer version or Close · → Close";
 
   /** Focus styles for older shells that lack agent-ops.css rules. */
   function ensureChangelogBodyKbStyles() {
@@ -5384,7 +5387,7 @@
       ariaLabel: "Changelog header",
       wireKey: "changelogHeaderToolbarKbWired",
       hintText:
-        "← → / h l · Home/End move · Enter / Space on Close closes · at end crosses to changelog body · at start crosses to last version",
+        "← → / h l · Home/End · Enter / Space Close · → versions · ← last version",
       chainForwardFromEnd: () => tryChainChangelogHeaderToBody(),
       chainBackFromStart: () => tryChainChangelogHeaderToBodyLast(),
     });

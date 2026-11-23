@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3000] - 2026-11-23
+
+### Changed
+- Settings Appearance / Product / Changelog keyboard hints (Settings header · Appearance themes/frame · Product toggles · Changelog header · version list): shorter, warmer copy so the Settings and What's new chrome stays KISS when Tab focus shows the hint (product polish after Perplexity · Logs filter-chip kb-hints; cream/Swiss Send fill white-on-blue stays intentional).
+
 ## [0.1.2999] - 2026-11-23
 
 ### Changed
