@@ -1,3 +1,11 @@
+## Overnight note 2026-11-23 ~01:52
+- Shipped v0.1.2983 DVD/CD Sharing `/dvd-sharing` · `/cd-sharing` · `/ods` + view/open NL; bare dvd/cd/ods stay with agent; `/media-sharing` · `/airplay` · `/smb` · `/vnc` intact.
+- Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Futuristic layout-daily next calendar quota.
+
+## Overnight merge — v0.1.2983
+
+- Product fuel after AirPlay Receiver `/airplay` NL v0.1.2982: DVD or CD Sharing already readable via `com.apple.ODSAgent` launchd but lacked `/dvd-sharing` · `/cd-sharing` · `/ods` + view/open NL while AirPlay `/airplay`, Media Sharing `/media-sharing`, File Sharing `/smb`, and Screen Sharing `/vnc` already had slash+NL. Bare `dvd` / `cd` / `ods` stay with the agent. Digester empty; design-review due=false; layout-daily Neon marked today (Futuristic next). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — DVD/CD Sharing slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~01:30
 - Shipped v0.1.2982 AirPlay Receiver `/airplay` · `/airplay-receiver` · `/mac-airplay` + view/open NL; bare airplay/airplay receiver stay with agent; `/media-sharing` · `/rae` · `/eppc` · `/vnc` · `/display` intact.
 - Soft-state P2 #14 cream/Swiss Send fill white-on-blue intentional; Futuristic layout-daily next calendar quota.
