@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~00:07
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: soul/idle clusters only (not product ERROR/panic).
+- Fuel attempt: System Sleep after TTY keep awake v0.1.3012 — **remote raced v0.1.3013**; local duplicate discarded.
+- Then shipped **v0.1.3014** — `/tcpkeepalive` · `/tcp-keep-alive` · `/tcp-keepalive` · `/mac-tcpkeepalive` + view/open NL; bare tcpkeepalive/tcp keep alive stay with agent; `/ttyskeepawake` · `/womp` · `/systemsleep` intact; `/help` lists lane.
+- Ratchet: discard@27f6b2f (dup 3013) + keep backfill remote 3013; keep @ e19f290 for 3014; install/kickstart (Rust).
+- Morning surprise: refresh 2026-11-24 + archive.
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (networkoversleep / hibernatemode) — TCP Keep Alive slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3014
+
+- Product fuel after System Sleep v0.1.3013: TCP Keep Alive already readable via `pmset -g custom` Battery/AC `tcpkeepalive` (+ active `pmset -g`) but lacked `/tcpkeepalive` · `/tcp-keep-alive` · `/tcp-keepalive` · `/mac-tcpkeepalive` and view/see/open/list phrases while TTY keep awake `/ttyskeepawake`, Wake for network `/womp`, and System Sleep `/systemsleep` already had slash+NL. Bare `tcpkeepalive` / `tcp keep alive` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked 2026-11-23 (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (networkoversleep / hibernatemode) — TCP Keep Alive slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~00:02
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
