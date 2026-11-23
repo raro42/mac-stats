@@ -1,3 +1,20 @@
+## Overnight note 2026-11-23 ~23:25
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Sibling: OpenClaw/Hermes missing on rack.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Disk Sleep v0.1.3010 — Proximity Wake / proximitywake slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.3011** — `/proximitywake` · `/proximity-wake` · `/mac-proximitywake` + view/open NL; bare proximitywake/proximity wake stay with agent; `/womp` · `/powernap` · `/displaysleep` · `/disksleep` intact; `/help` lists lane.
+- Ratchet keep @ d80648f for 3011; install/kickstart (Rust).
+- Morning surprise: refresh 2026-11-23 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (system sleep / ttyskeepawake) — Proximity Wake slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3011
+
+- Product fuel after Disk Sleep v0.1.3010: Proximity Wake already readable via `pmset -g custom` Battery/AC `proximitywake` (+ active `pmset -g`) but lacked `/proximitywake` · `/proximity-wake` · `/mac-proximitywake` and view/see/open/list phrases while Wake for network `/womp`, Power Nap `/powernap`, Display Sleep `/displaysleep`, and Disk Sleep `/disksleep` already had slash+NL. Bare `proximitywake` / `proximity wake` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (system sleep / ttyskeepawake) — Proximity Wake slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~23:12
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
