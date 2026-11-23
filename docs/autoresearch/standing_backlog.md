@@ -1,3 +1,16 @@
+## Overnight note 2026-11-23 ~05:50
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=true → feature-disk-cleanup grace-backfill + **feature-monitors** kb-hints.
+- Layout daily: Neon marked 2026-11-23 (Futuristic next calendar quota).
+- Fuel: design-review Monitors kb-hint copy (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.2996** — shorter warmer All · Up · Down · Slow chips · list · Add form · Check now/Remove tips.
+- Ratchet keep after verify; sync-dist; backfill 2995 keep; polish grace marked feature-monitors + feature-disk-cleanup.
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — feature-monitors kb-hint copy closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.2996
+
+- Design-review fuel after Disk Cleanup kb-hints v0.1.2995: External / Monitors filter chips · list · Add form · Check now/Remove still used long cold Tab tips while Disk Cleanup · Top Processes already shipped shorter warmer KISS lines. Shortened Monitors hints to match. Digester empty; layout-daily Neon marked today (Futuristic due next calendar quota). Recapture deferred (Mac TCC); polish grace marked. Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — Monitors kb-hint copy closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~05:34
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=true → polish Disk Cleanup kb-hints; Mac TCC — polish-without-capture grace marked.
