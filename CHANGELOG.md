@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2988] - 2026-11-23
+
+### Changed
+- Agent Ops keyboard hints (tips row · tab bar · overview · health · refresh · On/Off · Live/Files · Jobs/Deliveries · Discord/Core · Instant/Lite/Direct/Slow/Fail chips): shorter, warmer copy so the Command Center stays KISS when Tab focus shows the hint (design-review `feature-agent-ops`; Mac capture still TCC-blocked — polish-without-capture grace).
+
 ## [0.1.2987] - 2026-11-23
 
 ### Added

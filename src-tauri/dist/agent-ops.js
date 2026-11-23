@@ -770,8 +770,9 @@ function ensureOpsTabBarKbHint() {
     if (hint.previousElementSibling !== tabs) {
         tabs.insertAdjacentElement('afterend', hint);
     }
+    /* Design-review feature-agent-ops: shorter, warmer tab-bar hint (KISS). */
     hint.textContent =
-        '← → / h l · Home/End move · Enter / Space opens tab or overview';
+        'Tab a tab · ← → / h l · Home/End · Enter opens overview or the list';
 }
 
 function getOpsFileTabButtons() {
@@ -1315,8 +1316,9 @@ function paintOpsOverviewHeadCount(cardId, text, opts) {
     el.classList.toggle('is-zero', zero);
 }
 
+/* Design-review feature-agent-ops: shorter, warmer tips (KISS; metrics kb-hint parity). */
 const OPS_KEYBOARD_HINT =
-    'Tips: 0 overview · digits + counts on tabs · overview head counts · Sessions All/Live/Files · filter N/M + Clear · ←/→ · ↑/↓ j/k (no selection → first/last) · PgUp/PgDn Home/End · Space/Enter · c copy id (Copied) · / Esc · r refresh · R digest · ?';
+    'Tabs · filters · lists · ← → / h l · j k · Home/End · Enter · c copies · / Esc · r refresh · R digest · ?';
 
 /** Theme HTML ships the row-selection tips under the tab-bar hint. Create it only on older shells. */
 function ensureOpsKeyboardHint() {
@@ -6006,8 +6008,9 @@ function ensureOpsOverviewKbHint() {
     if (hint.parentElement !== grid) {
         grid.appendChild(hint);
     }
+    /* Design-review feature-agent-ops: shorter, warmer overview hint (KISS). */
     hint.textContent =
-        '← → / h l · Home/End move · Enter / Space opens linked tab';
+        'Tab a card · ← → / h l · Home/End · Enter opens the linked tab';
 }
 
 /**
@@ -6176,8 +6179,9 @@ function ensureOpsHealthKbHint() {
     if (hint.parentElement !== row) {
         row.appendChild(hint);
     }
+    /* Design-review feature-agent-ops: shorter, warmer health hint (KISS). */
     hint.textContent =
-        '← → / h l · Home/End move · Enter / Space opens linked tab or preview';
+        'Tab a card · ← → / h l · Home/End · Enter opens the tab or preview';
 }
 
 /**
@@ -7505,8 +7509,9 @@ function ensureOpsRefreshRowKbHint() {
     if (hint.parentElement !== row) {
         row.appendChild(hint);
     }
+    /* Design-review feature-agent-ops: shorter, warmer refresh-row hint (KISS). */
     hint.textContent =
-        '← → / h l · Home/End move · Enter / Space refreshes or runs digest';
+        'Tab Refresh · digest · Updated · ← → / h l · Home/End · Enter runs it';
 }
 
 /**
