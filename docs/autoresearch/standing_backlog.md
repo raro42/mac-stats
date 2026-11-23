@@ -1,3 +1,16 @@
+## Overnight note 2026-11-23 ~05:34
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=true → polish Disk Cleanup kb-hints; Mac TCC — polish-without-capture grace marked.
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Fuel: design-review Disk Cleanup kb-hint copy (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.2995** — shorter warmer meta · toolbar · chips · add-scope · scope/category lists.
+- Ratchet keep after verify; sync-dist + install/kickstart (UI JS + theme seeds).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — feature-disk-cleanup kb-hint copy closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.2995
+
+- Design-review fuel after CPU chrome kb-hints v0.1.2994: Disk Cleanup meta cards · Clean now/Refresh/Save · All/On/Off · All/Reclaim/Big/Clean chips · add-scope · scope list · category list still used long cold “Tab or click … / crosses …” copy while Agent Ops · AI Chat · processes · metrics already shipped shorter warmer KISS lines. Shortened Disk Cleanup hints to match. Digester empty; layout-daily Neon marked today (Futuristic due next calendar quota). Recapture deferred (Mac TCC); polish grace marked. Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — Disk Cleanup kb-hint copy closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~05:25
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=true → recommended **feature-cpu-metrics** (77d stale; prior rings/sparklines/power grace expired).
