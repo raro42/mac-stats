@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3001] - 2026-11-23
+
+### Added
+- Instant Guest Account accepts `/guest` · `/guest-account` · `/guestaccount` · `/guest-status` · `/guest-account-status` · `/guest-user` · `/guest-login` · `/mac-guest` · `/mac-guest-account` · `/mac-guest-user` and view/see/open/list NL (`view guest account`, `open guest status`, `list guest account`, …), matching “guest account status” / “is guest account on” / “is guest enabled” / “what's my guest account” / “what's the guest account status”. Bare `guest` / `guest account` / `guest user` stay with the agent; `/username` · `/whoami` stay login name; `/airdrop` stays AirDrop; `/filevault` stays FileVault; `/sip` stays SIP.
+
 ## [0.1.3000] - 2026-11-23
 
 ### Changed

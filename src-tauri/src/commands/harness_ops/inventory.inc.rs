@@ -16025,6 +16025,246 @@ pub fn format_airdrop_report() -> String {
     format!("**AirDrop** · `{v}`")
 }
 
+/// Guest Account — loginwindow GuestEnabled (System Settings → Users & Groups).
+/// Slash + view/open NL (`/guest` · `/guest-account` · `view guest account`).
+/// Bare `guest` / `guest account` stay with the agent; `/username` · `/whoami` stay login name;
+/// `/filevault` stays FileVault; `/sip` stays SIP; `/airdrop` stays AirDrop.
+pub fn looks_like_guest_account_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n.contains("airdrop")
+        || n.contains("air drop")
+        || n.contains("air-drop")
+        || n.contains("airplay")
+        || n.contains("username")
+        || n.contains("user name")
+        || n.contains("whoami")
+        || n.contains("who am i")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/ssh"
+        || n == "/screen-sharing"
+        || n == "/vnc"
+        || n == "/file-sharing"
+        || n == "/smb"
+        || n == "/airdrop"
+        || n == "/air-drop"
+        || n == "/airplay"
+        || n == "/username"
+        || n == "/whoami"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        // Bare phrases stay with the agent.
+        || n == "guest"
+        || n == "the guest"
+        || n == "guest account"
+        || n == "the guest account"
+        || n == "guest user"
+        || n == "the guest user"
+        || n == "guest login"
+        || n == "the guest login"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/guest"
+            | "/guest-account"
+            | "/guestaccount"
+            | "/guest-status"
+            | "/guest-account-status"
+            | "/guestaccountstatus"
+            | "/guest-state"
+            | "/guest-account-state"
+            | "/guest-user"
+            | "/guestuser"
+            | "/guest-login"
+            | "/guestlogin"
+            | "/mac-guest"
+            | "/mac-guest-account"
+            | "/mac-guest-user"
+            | "guest status"
+            | "the guest status"
+            | "guest account status"
+            | "the guest account status"
+            | "guest user status"
+            | "the guest user status"
+            | "guest login status"
+            | "the guest login status"
+            | "guest state"
+            | "the guest state"
+            | "guest account state"
+            | "the guest account state"
+            | "my guest"
+            | "my guest status"
+            | "my guest account"
+            | "my guest account status"
+            | "my guest user"
+            | "my guest user status"
+            | "is guest on"
+            | "is guest off"
+            | "is guest enabled"
+            | "is guest disabled"
+            | "is guest account on"
+            | "is guest account off"
+            | "is guest account enabled"
+            | "is guest account disabled"
+            | "is guest user on"
+            | "is guest user off"
+            | "is guest user enabled"
+            | "is guest user disabled"
+            | "is guest login on"
+            | "is guest login enabled"
+            | "what's my guest"
+            | "whats my guest"
+            | "what is my guest"
+            | "what's my guest status"
+            | "whats my guest status"
+            | "what is my guest status"
+            | "what's my guest account"
+            | "whats my guest account"
+            | "what is my guest account"
+            | "what's my guest account status"
+            | "whats my guest account status"
+            | "what is my guest account status"
+            | "what's the guest"
+            | "whats the guest"
+            | "what is the guest"
+            | "what's the guest status"
+            | "whats the guest status"
+            | "what is the guest status"
+            | "what's the guest account"
+            | "whats the guest account"
+            | "what is the guest account"
+            | "what's the guest account status"
+            | "whats the guest account status"
+            | "what is the guest account status"
+            | "how's guest"
+            | "hows guest"
+            | "how's the guest"
+            | "hows the guest"
+            | "how's guest account"
+            | "hows guest account"
+            | "how's the guest account"
+            | "hows the guest account"
+            | "view guest"
+            | "view the guest"
+            | "view guest status"
+            | "view the guest status"
+            | "view guest account"
+            | "view the guest account"
+            | "view guest account status"
+            | "view the guest account status"
+            | "view guest user"
+            | "view the guest user"
+            | "view guest user status"
+            | "view the guest user status"
+            | "view guest login"
+            | "view the guest login"
+            | "see guest"
+            | "see the guest"
+            | "see guest status"
+            | "see the guest status"
+            | "see guest account"
+            | "see the guest account"
+            | "see guest account status"
+            | "see the guest account status"
+            | "see guest user"
+            | "see the guest user"
+            | "open guest"
+            | "open the guest"
+            | "open guest status"
+            | "open the guest status"
+            | "open guest account"
+            | "open the guest account"
+            | "open guest account status"
+            | "open the guest account status"
+            | "open guest user"
+            | "open the guest user"
+            | "list guest"
+            | "list the guest"
+            | "list guest status"
+            | "list the guest status"
+            | "list guest account"
+            | "list the guest account"
+            | "list guest account status"
+            | "list the guest account status"
+            | "list guest user"
+            | "list the guest user"
+    )
+}
+
+/// Zero-LLM Guest Account status from loginwindow GuestEnabled (macOS-only; empty elsewhere).
+pub fn format_guest_account_report() -> String {
+    let v = crate::metrics::get_guest_account_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Guest Account** — _no Guest Account reading on this Mac right now._".to_string();
+    }
+    format!("**Guest Account** · `{v}`")
+}
+
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
 /// "Why" stays with the agent. "How much disk is used" / bare `/ssd` stay the percent chip.
 /// Slash + view/open NL (`/ssd-size` · `/disk-size` · `view ssd size`) match RAM `/ram-size` ·

@@ -3437,6 +3437,77 @@ mod tests {
         }
     }
 
+    #[test]
+    fn guest_account_slash_and_view_open_do_not_steal_username_airdrop_or_bare_guest() {
+        // Slash + view/open NL → Guest Account (`/airdrop` · `/username` parity).
+        // Bare `guest` / `guest account` stay with the agent; `/username` · `/whoami` stay login name;
+        // `/airdrop` stays AirDrop; `/filevault` stays FileVault; `/sip` stays SIP.
+        assert!(looks_like_guest_account_request("/guest"));
+        assert!(looks_like_guest_account_request("/guest-account"));
+        assert!(looks_like_guest_account_request("/guestaccount"));
+        assert!(looks_like_guest_account_request("/guest-status"));
+        assert!(looks_like_guest_account_request("/guest-account-status"));
+        assert!(looks_like_guest_account_request("/guest-user"));
+        assert!(looks_like_guest_account_request("/guest-login"));
+        assert!(looks_like_guest_account_request("/mac-guest"));
+        assert!(looks_like_guest_account_request("/mac-guest-account"));
+        assert!(looks_like_guest_account_request("view guest account"));
+        assert!(looks_like_guest_account_request("open guest status"));
+        assert!(looks_like_guest_account_request("list guest account"));
+        assert!(looks_like_guest_account_request("guest account status"));
+        assert!(looks_like_guest_account_request("is guest account on"));
+        assert!(looks_like_guest_account_request("is guest enabled"));
+        assert!(looks_like_guest_account_request("what's my guest account"));
+        assert!(looks_like_guest_account_request("view guest user"));
+        assert!(!looks_like_guest_account_request("guest"));
+        assert!(!looks_like_guest_account_request("guest account"));
+        assert!(!looks_like_guest_account_request("guest user"));
+        assert!(!looks_like_guest_account_request("/username"));
+        assert!(!looks_like_guest_account_request("/whoami"));
+        assert!(!looks_like_guest_account_request("view username"));
+        assert!(!looks_like_guest_account_request("/airdrop"));
+        assert!(!looks_like_guest_account_request("view airdrop"));
+        assert!(!looks_like_guest_account_request("/filevault"));
+        assert!(!looks_like_guest_account_request("/sip"));
+        assert!(!looks_like_guest_account_request("/tasks"));
+        assert!(!looks_like_guest_account_request("enable guest account"));
+        assert!(!looks_like_username_request("/guest"));
+        assert!(!looks_like_username_request("view guest account"));
+        assert!(!looks_like_airdrop_request("/guest"));
+        assert!(!looks_like_airdrop_request("view guest account"));
+        let g = try_operator_instant_reply("/guest").unwrap();
+        assert!(
+            g.contains("**Guest Account**") && !g.to_lowercase().contains("execution"),
+            "got: {g}"
+        );
+        let viewed = try_operator_instant_reply("view guest account").unwrap();
+        assert!(
+            viewed.contains("**Guest Account**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let user = try_operator_instant_reply("view guest user").unwrap();
+        assert!(
+            user.contains("**Guest Account**") && !user.to_lowercase().contains("execution"),
+            "got: {user}"
+        );
+        assert!(try_operator_instant_reply("guest").is_none());
+        assert!(try_operator_instant_reply("guest account").is_none());
+        let un = try_operator_instant_reply("/username");
+        if let Some(reply) = un {
+            assert!(
+                !reply.contains("**Guest Account**"),
+                "/username must stay User, not Guest Account: {reply}"
+            );
+        }
+        let ad = try_operator_instant_reply("/airdrop");
+        if let Some(reply) = ad {
+            assert!(
+                !reply.contains("**Guest Account**"),
+                "/airdrop must stay AirDrop, not Guest Account: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

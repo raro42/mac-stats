@@ -2368,6 +2368,107 @@ pub fn get_airdrop_status() -> String {
     }
 }
 
+/// Parse `defaults read … GuestEnabled` (0/1 / true/false).
+pub(crate) fn parse_guest_enabled_defaults(raw: &str) -> Option<bool> {
+    parse_nat_enabled_plistbuddy(raw)
+}
+
+/// Parse `sysadminctl -guestAccount status` stdout/stderr (“Guest account enabled/disabled”).
+pub(crate) fn parse_guest_account_sysadminctl(raw: &str) -> Option<&'static str> {
+    let lower = raw.to_ascii_lowercase();
+    if lower.contains("guest account enabled")
+        || lower.contains("guest user enabled")
+        || (lower.contains("enabled") && lower.contains("guest") && !lower.contains("disabled"))
+    {
+        return Some("On");
+    }
+    if lower.contains("guest account disabled")
+        || lower.contains("guest user disabled")
+        || (lower.contains("disabled") && lower.contains("guest"))
+    {
+        return Some("Off");
+    }
+    None
+}
+
+/// Combine loginwindow GuestEnabled + optional sysadminctl into a short On/Off line.
+pub(crate) fn format_guest_account_parts(
+    enabled: Option<bool>,
+    sysadmin: Option<&str>,
+) -> String {
+    if let Some(on) = enabled {
+        return if on {
+            "On".to_string()
+        } else {
+            "Off".to_string()
+        };
+    }
+    sysadmin.unwrap_or("").to_string()
+}
+
+/// macOS Guest Account from `/Library/Preferences/com.apple.loginwindow` GuestEnabled
+/// (fallback: `sysadminctl -guestAccount status`). Distinct from login username `/username` ·
+/// `/whoami`, FileVault `/filevault`, and SIP `/sip`.
+/// Used by Discord/operator instant `/guest` · `/guest-account` lane.
+pub fn get_guest_account_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let enabled = {
+            let output = Command::new("/usr/bin/defaults")
+                .args([
+                    "read",
+                    "/Library/Preferences/com.apple.loginwindow",
+                    "GuestEnabled",
+                ])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_guest_enabled_defaults(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("guest-account: defaults read spawn failed");
+                    None
+                }
+            }
+        };
+
+        let sysadmin = {
+            let output = Command::new("/usr/sbin/sysadminctl")
+                .args(["-guestAccount", "status"])
+                .output();
+            match output {
+                Ok(output) => {
+                    let mut buf = String::from_utf8_lossy(&output.stdout).into_owned();
+                    if !buf.is_empty() && !output.stderr.is_empty() {
+                        buf.push('\n');
+                    }
+                    buf.push_str(&String::from_utf8_lossy(&output.stderr));
+                    parse_guest_account_sysadminctl(&buf)
+                }
+                Err(_) => {
+                    debug3!("guest-account: sysadminctl spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_guest_account_parts(enabled, sysadmin);
+        if info.is_empty() {
+            debug3!("guest-account: empty status");
+        } else {
+            debug3!("guest-account status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
@@ -5206,6 +5307,42 @@ mod airdrop_parse_tests {
         assert_eq!(format_airdrop_parts(None, Some(true)), "Off");
         assert_eq!(format_airdrop_parts(None, None), "");
         assert_eq!(format_airdrop_parts(None, Some(false)), "");
+    }
+}
+
+#[cfg(test)]
+mod guest_account_parse_tests {
+    use super::{
+        format_guest_account_parts, parse_guest_account_sysadminctl, parse_guest_enabled_defaults,
+    };
+
+    #[test]
+    fn parses_guest_enabled_defaults() {
+        assert_eq!(parse_guest_enabled_defaults("0\n"), Some(false));
+        assert_eq!(parse_guest_enabled_defaults("1"), Some(true));
+        assert_eq!(parse_guest_enabled_defaults("true"), Some(true));
+        assert_eq!(parse_guest_enabled_defaults("nope"), None);
+    }
+
+    #[test]
+    fn parses_sysadminctl_status() {
+        assert_eq!(
+            parse_guest_account_sysadminctl("Guest account disabled.\n"),
+            Some("Off")
+        );
+        assert_eq!(
+            parse_guest_account_sysadminctl("Guest account enabled.\n"),
+            Some("On")
+        );
+        assert_eq!(parse_guest_account_sysadminctl("nope"), None);
+    }
+
+    #[test]
+    fn formats_defaults_over_sysadmin() {
+        assert_eq!(format_guest_account_parts(Some(true), Some("Off")), "On");
+        assert_eq!(format_guest_account_parts(Some(false), Some("On")), "Off");
+        assert_eq!(format_guest_account_parts(None, Some("On")), "On");
+        assert_eq!(format_guest_account_parts(None, None), "");
     }
 }
 
