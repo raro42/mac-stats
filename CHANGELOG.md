@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3006] - 2026-11-23
+
+### Added
+- Instant Screensaver idle accepts `/screensaver` · `/screen-saver` · `/screensaver-idle` · `/screensaveridle` · `/screen-saver-idle` · `/screensaver-idle-status` · `/screensaver-status` · `/screensaver-state` · `/idle-time` · `/idletime` · `/idle-time-status` · `/screensaver-time` · `/mac-screensaver` · `/mac-screen-saver` · `/mac-screensaver-idle` · `/mac-idle-time` and view/see/open/list NL (`view screensaver`, `open screen saver`, `list idle time`, …), matching “screensaver status” / “is screensaver on” / “is screen saver enabled” / “what's my screensaver” / “what's the idle time status”. Bare `screensaver` / `screen saver` / `idle time` / `idle` stay with the agent; `/screen-lock` · `/lock-screen` stay Screen Lock; `/screen-sharing` · `/vnc` stay Screen Sharing; `/screen` · `/display` stay display resolution; `/smb-guest` · `/guest-access` stay SMB Guest. Operator `/help` lists the new lane.
+
 ## [0.1.3005] - 2026-11-23
 
 ### Added

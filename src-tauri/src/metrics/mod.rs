@@ -2801,6 +2801,74 @@ pub fn get_smb_guest_status() -> String {
     }
 }
 
+/// Parse `defaults … idleTime` (seconds; 0 = Never).
+pub(crate) fn parse_screensaver_idle_defaults(raw: &str) -> Option<f64> {
+    parse_screen_lock_delay_defaults(raw)
+}
+
+/// Human idle for Screensaver (0 → Never; else Ns / Nm / Nh).
+pub(crate) fn format_screensaver_idle_secs(secs: f64) -> String {
+    if secs <= 0.0 {
+        return "Never".to_string();
+    }
+    format_screen_lock_delay(secs)
+}
+
+/// Format optional idleTime into a short status line.
+pub(crate) fn format_screensaver_idle_parts(idle: Option<f64>) -> String {
+    match idle {
+        Some(secs) => format_screensaver_idle_secs(secs),
+        None => String::new(),
+    }
+}
+
+/// macOS Screensaver idle from `com.apple.screensaver` `idleTime` (seconds; 0 = Never).
+/// Prefer `-currentHost`, fall back to user domain. Distinct from Screen Lock `/screen-lock`
+/// (askForPassword), Screen Sharing `/screen-sharing` · `/vnc`, and display `/screen` · `/display`.
+/// Used by Discord/operator instant `/screensaver` · `/screensaver-idle` · `/idle-time` lane.
+pub fn get_screensaver_idle_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let read_key = |current_host: bool| -> Option<String> {
+            let mut cmd = Command::new("/usr/bin/defaults");
+            if current_host {
+                cmd.arg("-currentHost");
+            }
+            cmd.args(["read", "com.apple.screensaver", "idleTime"]);
+            cmd.stderr(std::process::Stdio::null());
+            match cmd.output() {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
+                    if stdout.trim().is_empty() {
+                        None
+                    } else {
+                        Some(stdout)
+                    }
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("screensaver-idle: defaults read spawn failed");
+                    None
+                }
+            }
+        };
+
+        let raw = read_key(true).or_else(|| read_key(false));
+        let idle = raw.as_deref().and_then(parse_screensaver_idle_defaults);
+        let info = format_screensaver_idle_parts(idle);
+        if info.is_empty() {
+            debug3!("screensaver-idle: empty status");
+        } else {
+            debug3!("screensaver-idle status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
@@ -5822,6 +5890,37 @@ mod smb_guest_parse_tests {
         assert_eq!(format_smb_guest_parts(Some(false), Some("On")), "Off");
         assert_eq!(format_smb_guest_parts(None, Some("On")), "On");
         assert_eq!(format_smb_guest_parts(None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod screensaver_idle_parse_tests {
+    use super::{
+        format_screensaver_idle_parts, format_screensaver_idle_secs, parse_screensaver_idle_defaults,
+    };
+
+    #[test]
+    fn parses_idle_time_defaults() {
+        assert_eq!(parse_screensaver_idle_defaults("0\n"), Some(0.0));
+        assert_eq!(parse_screensaver_idle_defaults("120"), Some(120.0));
+        assert_eq!(parse_screensaver_idle_defaults("nope"), None);
+        assert_eq!(
+            parse_screensaver_idle_defaults(
+                "The domain/default pair of (com.apple.screensaver, idleTime) does not exist\n"
+            ),
+            None
+        );
+    }
+
+    #[test]
+    fn formats_never_and_durations() {
+        assert_eq!(format_screensaver_idle_secs(0.0), "Never");
+        assert_eq!(format_screensaver_idle_secs(30.0), "30s");
+        assert_eq!(format_screensaver_idle_secs(120.0), "2m");
+        assert_eq!(format_screensaver_idle_secs(7200.0), "2h");
+        assert_eq!(format_screensaver_idle_parts(Some(0.0)), "Never");
+        assert_eq!(format_screensaver_idle_parts(Some(300.0)), "5m");
+        assert_eq!(format_screensaver_idle_parts(None), "");
     }
 }
 

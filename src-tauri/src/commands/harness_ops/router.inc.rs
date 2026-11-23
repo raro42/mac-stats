@@ -1179,6 +1179,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_smb_guest_request(content) {
         return Some(format_smb_guest_report());
     }
+    // Screensaver idle (bare `screensaver` / `screen saver` / `idle time` stay with the agent;
+    // `/screen-lock` stays Screen Lock; `/screen-sharing` · `/vnc` stay Screen Sharing; `/screen` ·
+    // `/display` stay display resolution).
+    if looks_like_screensaver_idle_request(content) {
+        return Some(format_screensaver_idle_report());
+    }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
     if looks_like_boot_time_request(content) {

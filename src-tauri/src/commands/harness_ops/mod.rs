@@ -3752,6 +3752,92 @@ mod tests {
                 "/screen-lock must stay Screen Lock, not SMB Guest: {reply}"
             );
         }
+        assert!(!looks_like_smb_guest_request("/screensaver"));
+        assert!(!looks_like_smb_guest_request("view screensaver"));
+        assert!(!looks_like_smb_guest_request("/idle-time"));
+    }
+
+    #[test]
+    fn screensaver_idle_slash_and_view_open_do_not_steal_screen_lock_or_bare_saver() {
+        // Slash + view/open NL → Screensaver idle (`/screen-lock` · `/screen` parity).
+        // Bare `screensaver` / `screen saver` / `idle time` stay with the agent; `/screen-lock` ·
+        // `/lock-screen` stay Screen Lock; `/screen-sharing` · `/vnc` stay Screen Sharing; `/screen` ·
+        // `/display` stay display resolution; `/smb-guest` stays SMB Guest.
+        assert!(looks_like_screensaver_idle_request("/screensaver"));
+        assert!(looks_like_screensaver_idle_request("/screen-saver"));
+        assert!(looks_like_screensaver_idle_request("/screensaver-idle"));
+        assert!(looks_like_screensaver_idle_request("/idle-time"));
+        assert!(looks_like_screensaver_idle_request("/idletime"));
+        assert!(looks_like_screensaver_idle_request("/screensaver-status"));
+        assert!(looks_like_screensaver_idle_request("/mac-screensaver"));
+        assert!(looks_like_screensaver_idle_request("/mac-idle-time"));
+        assert!(looks_like_screensaver_idle_request("view screensaver"));
+        assert!(looks_like_screensaver_idle_request("open screen saver"));
+        assert!(looks_like_screensaver_idle_request("list idle time"));
+        assert!(looks_like_screensaver_idle_request("screensaver status"));
+        assert!(looks_like_screensaver_idle_request("is screensaver on"));
+        assert!(looks_like_screensaver_idle_request("is screen saver enabled"));
+        assert!(looks_like_screensaver_idle_request("what's my screensaver"));
+        assert!(looks_like_screensaver_idle_request("what's my idle time"));
+        assert!(looks_like_screensaver_idle_request("view screensaver idle"));
+        assert!(!looks_like_screensaver_idle_request("screensaver"));
+        assert!(!looks_like_screensaver_idle_request("screen saver"));
+        assert!(!looks_like_screensaver_idle_request("idle time"));
+        assert!(!looks_like_screensaver_idle_request("idle"));
+        assert!(!looks_like_screensaver_idle_request("/screen-lock"));
+        assert!(!looks_like_screensaver_idle_request("/lock-screen"));
+        assert!(!looks_like_screensaver_idle_request("view screen lock"));
+        assert!(!looks_like_screensaver_idle_request("/screen-sharing"));
+        assert!(!looks_like_screensaver_idle_request("/vnc"));
+        assert!(!looks_like_screensaver_idle_request("/screen"));
+        assert!(!looks_like_screensaver_idle_request("/display"));
+        assert!(!looks_like_screensaver_idle_request("/smb-guest"));
+        assert!(!looks_like_screensaver_idle_request("/tasks"));
+        assert!(!looks_like_screensaver_idle_request("enable screensaver"));
+        assert!(!looks_like_screen_lock_request("/screensaver"));
+        assert!(!looks_like_screen_lock_request("view screensaver"));
+        assert!(!looks_like_screen_lock_request("/idle-time"));
+        assert!(!looks_like_smb_guest_request("/screensaver"));
+        assert!(!looks_like_smb_guest_request("view screensaver"));
+        let s = try_operator_instant_reply("/screensaver").unwrap();
+        assert!(
+            s.contains("**Screensaver**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view screensaver").unwrap();
+        assert!(
+            viewed.contains("**Screensaver**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open idle time").unwrap();
+        assert!(
+            open.contains("**Screensaver**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("screensaver").is_none());
+        assert!(try_operator_instant_reply("screen saver").is_none());
+        assert!(try_operator_instant_reply("idle time").is_none());
+        let sl = try_operator_instant_reply("/screen-lock");
+        if let Some(reply) = sl {
+            assert!(
+                !reply.contains("**Screensaver**"),
+                "/screen-lock must stay Screen Lock, not Screensaver: {reply}"
+            );
+        }
+        let screen = try_operator_instant_reply("/screen");
+        if let Some(reply) = screen {
+            assert!(
+                !reply.contains("**Screensaver**"),
+                "/screen must stay display, not Screensaver: {reply}"
+            );
+        }
+        let smb = try_operator_instant_reply("/smb-guest");
+        if let Some(reply) = smb {
+            assert!(
+                !reply.contains("**Screensaver**"),
+                "/smb-guest must stay SMB Guest, not Screensaver: {reply}"
+            );
+        }
     }
 
 #[test]

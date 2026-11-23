@@ -16684,6 +16684,13 @@ pub fn looks_like_screen_lock_request(content: &str) -> bool {
         || n == "/autologin"
         || n == "/auto-login"
         || n == "/automatic-login"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/screensaver-idle"
+        || n == "/idle-time"
+        || n == "/idletime"
+        || n == "/mac-screensaver"
+        || n == "/mac-idle-time"
         || n == "/username"
         || n == "/whoami"
         || n == "/ip"
@@ -16712,6 +16719,8 @@ pub fn looks_like_screen_lock_request(content: &str) -> bool {
         || n == "the screensaver"
         || n == "screen saver"
         || n == "the screen saver"
+        || n == "idle time"
+        || n == "the idle time"
     {
         return false;
     }
@@ -16943,6 +16952,13 @@ pub fn looks_like_smb_guest_request(content: &str) -> bool {
         || n == "/automatic-login"
         || n == "/screen-lock"
         || n == "/lock-screen"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/screensaver-idle"
+        || n == "/idle-time"
+        || n == "/idletime"
+        || n == "/mac-screensaver"
+        || n == "/mac-idle-time"
         || n == "/username"
         || n == "/whoami"
         || n == "/ip"
@@ -17130,6 +17146,297 @@ pub fn format_smb_guest_report() -> String {
         return "**SMB Guest** — _no SMB guest access reading on this Mac right now._".to_string();
     }
     format!("**SMB Guest** · `{v}`")
+}
+
+/// Screensaver idle — `com.apple.screensaver` `idleTime` (seconds; 0 = Never).
+/// Slash + view/open NL (`/screensaver` · `/screensaver-idle` · `/idle-time` · `view screensaver`).
+/// Bare `screensaver` / `screen saver` / `idle time` stay with the agent; `/screen-lock` · `/lock-screen`
+/// stay Screen Lock; `/screen-sharing` · `/vnc` stay Screen Sharing; `/screen` · `/display` stay display.
+pub fn looks_like_screensaver_idle_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("ask for password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("screenlock")
+        || n.contains("lock screen")
+        || n.contains("lock-screen")
+        || n.contains("lockscreen")
+        || n.contains("airdrop")
+        || n.contains("air drop")
+        || n.contains("air-drop")
+        || n.contains("airplay")
+        || n.contains("automatic login")
+        || n.contains("auto login")
+        || n.contains("autologin")
+        || n.contains("auto-login")
+        || n.contains("smb guest")
+        || n.contains("guest access")
+        || n.contains("guest account")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/ssh"
+        || n == "/screen-sharing"
+        || n == "/vnc"
+        || n == "/file-sharing"
+        || n == "/smb"
+        || n == "/smb-guest"
+        || n == "/guest-access"
+        || n == "/guest"
+        || n == "/guest-account"
+        || n == "/airdrop"
+        || n == "/air-drop"
+        || n == "/airplay"
+        || n == "/autologin"
+        || n == "/auto-login"
+        || n == "/automatic-login"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/screenlock"
+        || n == "/lockscreen"
+        || n == "/mac-screen-lock"
+        || n == "/mac-lock-screen"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        // Bare phrases stay with the agent.
+        || n == "screensaver"
+        || n == "the screensaver"
+        || n == "screen saver"
+        || n == "the screen saver"
+        || n == "screensaver idle"
+        || n == "the screensaver idle"
+        || n == "screen saver idle"
+        || n == "the screen saver idle"
+        || n == "idle time"
+        || n == "the idle time"
+        || n == "idle"
+        || n == "the idle"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/screensaver"
+            | "/screen-saver"
+            | "/screensaver-idle"
+            | "/screensaveridle"
+            | "/screen-saver-idle"
+            | "/screensaver-idle-status"
+            | "/screensaver-idle-state"
+            | "/screensaver-status"
+            | "/screensaver-state"
+            | "/screen-saver-status"
+            | "/idle-time"
+            | "/idletime"
+            | "/idle-time-status"
+            | "/screensaver-time"
+            | "/screen-saver-time"
+            | "/mac-screensaver"
+            | "/mac-screen-saver"
+            | "/mac-screensaver-idle"
+            | "/mac-idle-time"
+            | "screensaver status"
+            | "the screensaver status"
+            | "screen saver status"
+            | "the screen saver status"
+            | "screensaver idle status"
+            | "the screensaver idle status"
+            | "screen saver idle status"
+            | "the screen saver idle status"
+            | "idle time status"
+            | "the idle time status"
+            | "screensaver state"
+            | "the screensaver state"
+            | "idle time state"
+            | "the idle time state"
+            | "my screensaver"
+            | "my screensaver status"
+            | "my screensaver idle"
+            | "my screensaver idle status"
+            | "my screen saver"
+            | "my screen saver status"
+            | "my idle time"
+            | "my idle time status"
+            | "is screensaver on"
+            | "is screensaver off"
+            | "is screensaver enabled"
+            | "is screensaver disabled"
+            | "is screen saver on"
+            | "is screen saver off"
+            | "is screen saver enabled"
+            | "is screen saver disabled"
+            | "is screensaver idle on"
+            | "is screensaver idle enabled"
+            | "what's my screensaver"
+            | "whats my screensaver"
+            | "what is my screensaver"
+            | "what's my screensaver status"
+            | "whats my screensaver status"
+            | "what is my screensaver status"
+            | "what's my screensaver idle"
+            | "whats my screensaver idle"
+            | "what is my screensaver idle"
+            | "what's my screensaver idle status"
+            | "whats my screensaver idle status"
+            | "what is my screensaver idle status"
+            | "what's my screen saver"
+            | "whats my screen saver"
+            | "what is my screen saver"
+            | "what's my screen saver status"
+            | "whats my screen saver status"
+            | "what is my screen saver status"
+            | "what's my idle time"
+            | "whats my idle time"
+            | "what is my idle time"
+            | "what's my idle time status"
+            | "whats my idle time status"
+            | "what is my idle time status"
+            | "what's the screensaver"
+            | "whats the screensaver"
+            | "what is the screensaver"
+            | "what's the screensaver status"
+            | "whats the screensaver status"
+            | "what is the screensaver status"
+            | "what's the screensaver idle"
+            | "whats the screensaver idle"
+            | "what is the screensaver idle"
+            | "what's the screensaver idle status"
+            | "whats the screensaver idle status"
+            | "what is the screensaver idle status"
+            | "what's the screen saver"
+            | "whats the screen saver"
+            | "what is the screen saver"
+            | "what's the screen saver status"
+            | "whats the screen saver status"
+            | "what is the screen saver status"
+            | "what's the idle time"
+            | "whats the idle time"
+            | "what is the idle time"
+            | "what's the idle time status"
+            | "whats the idle time status"
+            | "what is the idle time status"
+            | "view screensaver"
+            | "view the screensaver"
+            | "view screensaver status"
+            | "view the screensaver status"
+            | "view screensaver idle"
+            | "view the screensaver idle"
+            | "view screensaver idle status"
+            | "view the screensaver idle status"
+            | "view screen saver"
+            | "view the screen saver"
+            | "view screen saver status"
+            | "view the screen saver status"
+            | "view idle time"
+            | "view the idle time"
+            | "view idle time status"
+            | "view the idle time status"
+            | "see screensaver"
+            | "see the screensaver"
+            | "see screensaver status"
+            | "see the screensaver status"
+            | "see screensaver idle"
+            | "see screen saver"
+            | "see idle time"
+            | "show me the screensaver"
+            | "show me the screensaver status"
+            | "show me the screensaver idle"
+            | "show me the screensaver idle status"
+            | "show me the screen saver"
+            | "show me the screen saver status"
+            | "show me the idle time"
+            | "show me the idle time status"
+            | "open screensaver"
+            | "open the screensaver"
+            | "open screensaver status"
+            | "open the screensaver status"
+            | "open screensaver idle"
+            | "open the screensaver idle"
+            | "open screen saver"
+            | "open the screen saver"
+            | "open idle time"
+            | "open the idle time"
+            | "list screensaver"
+            | "list the screensaver"
+            | "list screensaver status"
+            | "list the screensaver status"
+            | "list screensaver idle"
+            | "list the screensaver idle"
+            | "list screen saver"
+            | "list the screen saver"
+            | "list idle time"
+            | "list the idle time"
+            | "list idle time status"
+            | "list the idle time status"
+    )
+}
+
+/// Zero-LLM Screensaver idle status from screensaver idleTime (macOS-only; empty elsewhere).
+pub fn format_screensaver_idle_report() -> String {
+    let v = crate::metrics::get_screensaver_idle_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Screensaver** — _no Screensaver idle reading on this Mac right now._".to_string();
+    }
+    format!("**Screensaver** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
