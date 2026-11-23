@@ -5852,7 +5852,8 @@ function wireFilterChipToolbarKeyboard(wrap) {
       : wrap.id === 'rings-filter-chips'
         ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Details or Settings · at end → ring gauges · Enter / Space selects'
         : wrap.id === 'monitors-filter-chips'
-          ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Monitors icon · at end → monitor list · Enter / Space selects'
+          /* Design-review feature-monitors: shorter, warmer chip hint (KISS; Agent Ops / Disk Cleanup parity). */
+          ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Monitors icon or the monitor list'
           : wrap.id === 'perplexity-filter-chips'
             ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Perplexity icon · at end → result list · Enter / Space selects'
             : wrap.id === 'logs-filter-chips'
@@ -9975,8 +9976,9 @@ function refreshMonitorAddFormToolbarRovingTabindex(wrap, preferred) {
 }
 
 /** How to move across URL, Cancel, and Add Monitor. */
+/* Design-review feature-monitors: shorter, warmer add-form tip (KISS). */
 const MONITOR_ADD_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End move · add-btn ↓ → list · list ↓ → URL · URL ← list · Add Monitor → footer · Enter adds from URL';
+  '← → / h l · Home/End · Enter adds · edges jump to list or footer';
 
 /** Theme HTML ships the hint inside the add form. It stays hidden until the form is open. Create it only on older shells. */
 function ensureMonitorAddFormToolbarKbHint(wrap) {
@@ -10500,8 +10502,9 @@ function refreshMonitorDetailActionsRovingTabindex(row, preferred) {
 }
 
 /** How to move across Check now · Remove. */
+/* Design-review feature-monitors: shorter, warmer detail-toolbar tip (KISS). */
 const MONITOR_DETAIL_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End move · Check now ← monitor row · Remove → footer · Enter / Space on buttons';
+  '← → / h l · Home/End · Enter activates Check now or Remove · edges jump to row or footer';
 
 /** Detail HTML ships the hint under Check now and Remove. Create it only on older shells. */
 function ensureMonitorDetailActionsKbHint(row) {
@@ -11246,8 +11249,9 @@ function ensureProcessesListKbHint(processList, show) {
 }
 
 /** How to move across monitor rows when the list has rows. */
+/* Design-review feature-monitors: shorter, warmer list tip (KISS; Top Processes parity). */
 const MONITORS_LIST_KB_HINT =
-  'All · Up · Down · Slow filters · click row for details · ↑↓ / j k · open detail ↓ → Check now · detail ← row · Remove → footer · Enter check now · c copy URL · d details · Delete removes · Esc closes/clears';
+  'All · Up · Down · Slow · ↑↓ / j k · Enter / d opens · c copies · Delete removes · Esc clears';
 
 /** Theme HTML ships the hint above the monitor list. It stays hidden until rows exist. Create it only on older shells. */
 function ensureMonitorsListKbHint(monitorsList, show) {

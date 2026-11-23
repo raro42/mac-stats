@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2996] - 2026-11-23
+
+### Changed
+- Monitors keyboard hints (All/Up/Down/Slow chips · monitor list · Add form · Check now/Remove): shorter, warmer copy so the External / Monitors surface stays KISS when Tab focus shows the hint (design-review `feature-monitors`; Mac capture still TCC-blocked — polish-without-capture grace).
+
 ## [0.1.2995] - 2026-11-23
 
 ### Changed
