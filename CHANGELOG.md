@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3002] - 2026-11-23
+
+### Changed
+- Operator instant help lists Guest Account (`/guest` · `/guest-account` · `/guest-user` · `/mac-guest` + view/open NL) beside AirDrop / username, so `/help` matches the lane shipped in v0.1.3001 (username · AirDrop cross-links note Guest Account stays put).
+
 ## [0.1.3001] - 2026-11-23
 
 ### Added
