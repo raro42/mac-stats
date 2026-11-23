@@ -4487,6 +4487,84 @@ mod tests {
                 "/womp must stay Wake for network, not TCP Keep Alive: {reply}"
             );
         }
+        assert!(!looks_like_tcpkeepalive_request("/networkoversleep"));
+        assert!(!looks_like_tcpkeepalive_request("view network over sleep"));
+    }
+
+    #[test]
+    fn networkoversleep_slash_and_view_open_do_not_steal_tcpkeepalive_or_bare() {
+        // Slash + view/open NL → Network over sleep (`/tcpkeepalive` · `/womp` parity).
+        // Bare `networkoversleep` / `network over sleep` stay with the agent;
+        // `/tcpkeepalive` stays TCP Keep Alive; `/womp` stays Wake for network;
+        // `/systemsleep` stays System Sleep; hibernatemode stays out.
+        assert!(looks_like_networkoversleep_request("/networkoversleep"));
+        assert!(looks_like_networkoversleep_request("/network-over-sleep"));
+        assert!(looks_like_networkoversleep_request("/networkoversleep-status"));
+        assert!(looks_like_networkoversleep_request("/network-oversleep"));
+        assert!(looks_like_networkoversleep_request("/mac-networkoversleep"));
+        assert!(looks_like_networkoversleep_request("/mac-network-over-sleep"));
+        assert!(looks_like_networkoversleep_request("view network over sleep"));
+        assert!(looks_like_networkoversleep_request("open networkoversleep"));
+        assert!(looks_like_networkoversleep_request("list network-over-sleep"));
+        assert!(looks_like_networkoversleep_request("network over sleep status"));
+        assert!(looks_like_networkoversleep_request("is network over sleep on"));
+        assert!(looks_like_networkoversleep_request("is networkoversleep enabled"));
+        assert!(looks_like_networkoversleep_request("what's my network over sleep"));
+        assert!(looks_like_networkoversleep_request("view network-over-sleep"));
+        assert!(!looks_like_networkoversleep_request("networkoversleep"));
+        assert!(!looks_like_networkoversleep_request("network over sleep"));
+        assert!(!looks_like_networkoversleep_request("/tcpkeepalive"));
+        assert!(!looks_like_networkoversleep_request("view tcp keep alive"));
+        assert!(!looks_like_networkoversleep_request("/womp"));
+        assert!(!looks_like_networkoversleep_request("/systemsleep"));
+        assert!(!looks_like_networkoversleep_request("/powernap"));
+        assert!(!looks_like_networkoversleep_request("/power"));
+        assert!(!looks_like_networkoversleep_request("/tasks"));
+        assert!(!looks_like_networkoversleep_request("enable network over sleep"));
+        assert!(!looks_like_networkoversleep_request("/hibernate"));
+        assert!(!looks_like_tcpkeepalive_request("/networkoversleep"));
+        assert!(!looks_like_tcpkeepalive_request("view network over sleep"));
+        assert!(!looks_like_systemsleep_request("/networkoversleep"));
+        assert!(!looks_like_systemsleep_request("view network over sleep"));
+        let s = try_operator_instant_reply("/networkoversleep").unwrap();
+        assert!(
+            s.contains("**Network over sleep**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view network over sleep").unwrap();
+        assert!(
+            viewed.contains("**Network over sleep**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open networkoversleep").unwrap();
+        assert!(
+            open.contains("**Network over sleep**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("networkoversleep").is_none());
+        assert!(try_operator_instant_reply("network over sleep").is_none());
+        let tcp = try_operator_instant_reply("/tcpkeepalive");
+        if let Some(reply) = tcp {
+            assert!(
+                !reply.contains("**Network over sleep**"),
+                "/tcpkeepalive must stay TCP Keep Alive, not Network over sleep: {reply}"
+            );
+        }
+        let sleep = try_operator_instant_reply("/systemsleep");
+        if let Some(reply) = sleep {
+            assert!(
+                !reply.contains("**Network over sleep**"),
+                "/systemsleep must stay System Sleep, not Network over sleep: {reply}"
+            );
+        }
+        let womp = try_operator_instant_reply("/womp");
+        if let Some(reply) = womp {
+            assert!(
+                !reply.contains("**Network over sleep**"),
+                "/womp must stay Wake for network, not Network over sleep: {reply}"
+            );
+        }
     }
 
 #[test]

@@ -1228,9 +1228,15 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     // TCP Keep Alive (bare `tcpkeepalive` / `tcp keep alive` stay with the agent;
     // `/ttyskeepawake` stays TTY keep awake; `/womp` stays Wake for network;
-    // `/systemsleep` stays System Sleep; networkoversleep stays out).
+    // `/systemsleep` stays System Sleep; `/networkoversleep` stays Network over sleep).
     if looks_like_tcpkeepalive_request(content) {
         return Some(format_tcpkeepalive_report());
+    }
+    // Network over sleep (bare `networkoversleep` / `network over sleep` stay with the agent;
+    // `/tcpkeepalive` stays TCP Keep Alive; `/womp` stays Wake for network;
+    // `/systemsleep` stays System Sleep; hibernatemode stays out).
+    if looks_like_networkoversleep_request(content) {
+        return Some(format_networkoversleep_report());
     }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).

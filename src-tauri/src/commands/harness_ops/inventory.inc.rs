@@ -18727,7 +18727,11 @@ pub fn looks_like_proximitywake_request(content: &str) -> bool {
         || n.contains("ttyskeepawake")
         || n.contains("ttys keep awake")
         || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("network-over-sleep")
         || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("tcp-keep-alive")
         || n.contains("screensaver")
         || n.contains("screen saver")
         || n.contains("screen-saver")
@@ -18982,7 +18986,11 @@ pub fn looks_like_ttyskeepawake_request(content: &str) -> bool {
         || n.contains("computer-sleep")
         || n.contains("computersleep")
         || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("network-over-sleep")
         || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("tcp-keep-alive")
         || n.contains("screensaver")
         || n.contains("screen saver")
         || n.contains("screen-saver")
@@ -19496,6 +19504,284 @@ pub fn format_tcpkeepalive_report() -> String {
     format!("**TCP Keep Alive** · `{v}`")
 }
 
+/// Network over sleep — `pmset` Battery/AC `networkoversleep` (+ active fallback).
+/// Slash + view/open NL (`/networkoversleep` · `/network-over-sleep` · `view network over sleep`).
+/// Bare `networkoversleep` / `network over sleep` stay with the agent;
+/// `/tcpkeepalive` stays TCP Keep Alive; `/womp` stays Wake for network;
+/// `/systemsleep` stays System Sleep; hibernatemode stays out.
+pub fn looks_like_networkoversleep_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("wake on network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("hard disk sleep")
+        || n.contains("hdd sleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("systemsleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("computersleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("ttys keep awake")
+        || n.contains("tty-keep-awake")
+        || n.contains("ttys-keep-awake")
+        || n.contains("ttykeepawake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("tcp-keep-alive")
+        || n.contains("tcp keepalive")
+        || n.contains("hibernate")
+        || n.contains("hibernatemode")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/proximitywake"
+        || n == "/proximity-wake"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
+        || n == "/disksleep"
+        || n == "/disk-sleep"
+        || n == "/hard-disk-sleep"
+        || n == "/hdd-sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/computer-sleep"
+        || n == "/computersleep"
+        || n == "/sleep"
+        || n == "/ttyskeepawake"
+        || n == "/tty-keep-awake"
+        || n == "/ttys-keep-awake"
+        || n == "/ttykeepawake"
+        || n == "/tcpkeepalive"
+        || n == "/tcp-keep-alive"
+        || n == "/tcp-keepalive"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "networkoversleep"
+        || n == "the networkoversleep"
+        || n == "network over sleep"
+        || n == "the network over sleep"
+        || n == "network-over-sleep"
+        || n == "the network-over-sleep"
+        || n == "network oversleep"
+        || n == "the network oversleep"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/networkoversleep"
+            | "/network-over-sleep"
+            | "/networkoversleep-status"
+            | "/network-over-sleep-status"
+            | "/networkoversleep-state"
+            | "/network-over-sleep-state"
+            | "/network-oversleep"
+            | "/network-oversleep-status"
+            | "/mac-networkoversleep"
+            | "/mac-network-over-sleep"
+            | "/mac-networkoversleep-status"
+            | "/mac-network-over-sleep-status"
+            | "networkoversleep status"
+            | "the networkoversleep status"
+            | "network over sleep status"
+            | "the network over sleep status"
+            | "network-over-sleep status"
+            | "the network-over-sleep status"
+            | "network oversleep status"
+            | "the network oversleep status"
+            | "networkoversleep state"
+            | "the networkoversleep state"
+            | "network over sleep state"
+            | "the network over sleep state"
+            | "my networkoversleep"
+            | "my networkoversleep status"
+            | "my network over sleep"
+            | "my network over sleep status"
+            | "is networkoversleep on"
+            | "is networkoversleep off"
+            | "is networkoversleep enabled"
+            | "is networkoversleep disabled"
+            | "is network over sleep on"
+            | "is network over sleep off"
+            | "is network over sleep enabled"
+            | "is network over sleep disabled"
+            | "is network-over-sleep on"
+            | "is network-over-sleep enabled"
+            | "what's my networkoversleep"
+            | "whats my networkoversleep"
+            | "what is my networkoversleep"
+            | "what's my networkoversleep status"
+            | "whats my networkoversleep status"
+            | "what is my networkoversleep status"
+            | "what's my network over sleep"
+            | "whats my network over sleep"
+            | "what is my network over sleep"
+            | "what's my network over sleep status"
+            | "whats my network over sleep status"
+            | "what is my network over sleep status"
+            | "what's the networkoversleep"
+            | "whats the networkoversleep"
+            | "what is the networkoversleep"
+            | "what's the networkoversleep status"
+            | "whats the networkoversleep status"
+            | "what is the networkoversleep status"
+            | "what's the network over sleep"
+            | "whats the network over sleep"
+            | "what is the network over sleep"
+            | "what's the network over sleep status"
+            | "whats the network over sleep status"
+            | "what is the network over sleep status"
+            | "how's networkoversleep"
+            | "hows networkoversleep"
+            | "how's the networkoversleep"
+            | "hows the networkoversleep"
+            | "how's network over sleep"
+            | "hows network over sleep"
+            | "how's the network over sleep"
+            | "hows the network over sleep"
+            | "view networkoversleep"
+            | "view the networkoversleep"
+            | "view networkoversleep status"
+            | "view the networkoversleep status"
+            | "view network over sleep"
+            | "view the network over sleep"
+            | "view network over sleep status"
+            | "view the network over sleep status"
+            | "view network-over-sleep"
+            | "view the network-over-sleep"
+            | "see networkoversleep"
+            | "see the networkoversleep"
+            | "see networkoversleep status"
+            | "see the networkoversleep status"
+            | "see network over sleep"
+            | "see the network over sleep"
+            | "see network over sleep status"
+            | "see the network over sleep status"
+            | "open networkoversleep"
+            | "open the networkoversleep"
+            | "open networkoversleep status"
+            | "open the networkoversleep status"
+            | "open network over sleep"
+            | "open the network over sleep"
+            | "open network over sleep status"
+            | "open the network over sleep status"
+            | "open network-over-sleep"
+            | "open the network-over-sleep"
+            | "list networkoversleep"
+            | "list the networkoversleep"
+            | "list networkoversleep status"
+            | "list the networkoversleep status"
+            | "list network over sleep"
+            | "list the network over sleep"
+            | "list network over sleep status"
+            | "list the network over sleep status"
+            | "list network-over-sleep"
+            | "list the network-over-sleep"
+    )
+}
+
+/// Zero-LLM Network over sleep status from pmset Battery/AC `networkoversleep` (macOS-only; empty elsewhere).
+pub fn format_networkoversleep_report() -> String {
+    let v = crate::metrics::get_networkoversleep_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Network over sleep** — _no Network over sleep reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**Network over sleep** · `{v}`")
+}
+
 /// System Sleep — `pmset` Battery/AC `sleep` minutes (+ active fallback; 0 = Never).
 /// Slash + view/open NL (`/systemsleep` · `/system-sleep` · `/computer-sleep` · `view system sleep`).
 /// Bare `systemsleep` / `system sleep` / `computer sleep` / `sleep` stay with the agent;
@@ -19562,7 +19848,11 @@ pub fn looks_like_systemsleep_request(content: &str) -> bool {
         || n.contains("tty-keep-awake")
         || n.contains("ttys-keep-awake")
         || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("network-over-sleep")
         || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("tcp-keep-alive")
         || n.contains("screensaver")
         || n.contains("screen saver")
         || n.contains("screen-saver")

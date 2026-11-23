@@ -3743,7 +3743,7 @@ pub(crate) fn format_tcpkeepalive_parts(
 
 /// macOS TCP Keep Alive from `pmset -g custom` Battery/AC `tcpkeepalive`
 /// (fallback: active `pmset -g`). Distinct from TTY keep awake `/ttyskeepawake`,
-/// Wake for network `/womp`, and networkoversleep.
+/// Wake for network `/womp`, and Network over sleep `/networkoversleep`.
 /// Used by Discord/operator instant `/tcpkeepalive` · `/tcp-keep-alive` lane.
 pub fn get_tcpkeepalive_status() -> String {
     #[cfg(not(target_os = "macos"))]
@@ -3793,6 +3793,130 @@ pub fn get_tcpkeepalive_status() -> String {
             debug3!("tcpkeepalive: empty status");
         } else {
             debug3!("tcpkeepalive status: '{}'", info);
+        }
+        info
+    }
+}
+
+
+/// Parse `pmset -g custom` Battery/AC `networkoversleep` flag → (battery, ac).
+pub(crate) fn parse_pmset_custom_networkoversleep(raw: &str) -> (Option<bool>, Option<bool>) {
+    let mut section: Option<&str> = None;
+    let mut battery = None;
+    let mut ac = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.eq_ignore_ascii_case("Battery Power:") {
+            section = Some("battery");
+            continue;
+        }
+        if t.eq_ignore_ascii_case("AC Power:") {
+            section = Some("ac");
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("networkoversleep") {
+            continue;
+        }
+        let on = match parts.next() {
+            Some("1") | Some("true") | Some("yes") => Some(true),
+            Some("0") | Some("false") | Some("no") => Some(false),
+            _ => None,
+        };
+        match section {
+            Some("battery") => battery = on.or(battery),
+            Some("ac") => ac = on.or(ac),
+            _ => {}
+        }
+    }
+    (battery, ac)
+}
+
+/// Parse active `pmset -g` `networkoversleep` flag (Currently in use).
+pub(crate) fn parse_pmset_active_networkoversleep(raw: &str) -> Option<bool> {
+    for line in raw.lines() {
+        let mut parts = line.trim().split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("networkoversleep") {
+            continue;
+        }
+        return match parts.next() {
+            Some("1") | Some("true") | Some("yes") => Some(true),
+            Some("0") | Some("false") | Some("no") => Some(false),
+            _ => None,
+        };
+    }
+    None
+}
+
+/// Prefer Battery+AC custom when both set; else active `pmset -g`.
+pub(crate) fn format_networkoversleep_parts(
+    battery: Option<bool>,
+    ac: Option<bool>,
+    active: Option<bool>,
+) -> String {
+    format_wake_for_network_parts(battery, ac, active)
+}
+
+/// macOS Network over sleep from `pmset -g custom` Battery/AC `networkoversleep`
+/// (fallback: active `pmset -g`). Distinct from TCP Keep Alive `/tcpkeepalive`,
+/// Wake for network `/womp`, System Sleep `/systemsleep`, and hibernatemode.
+/// Used by Discord/operator instant `/networkoversleep` · `/network-over-sleep` lane.
+pub fn get_networkoversleep_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let (battery, ac) = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g", "custom"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_custom_networkoversleep(&stdout)
+                }
+                Ok(_) => (None, None),
+                Err(_) => {
+                    debug3!("networkoversleep: pmset -g custom spawn failed");
+                    (None, None)
+                }
+            }
+        };
+
+        let active = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_active_networkoversleep(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("networkoversleep: pmset -g spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_networkoversleep_parts(battery, ac, active);
+        if info.is_empty() {
+            debug3!("networkoversleep: empty status");
+        } else {
+            debug3!("networkoversleep status: '{}'", info);
         }
         info
     }
@@ -7309,6 +7433,76 @@ AC Power:
             "On"
         );
         assert_eq!(format_tcpkeepalive_parts(None, None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod networkoversleep_parse_tests {
+    use super::{
+        format_networkoversleep_parts, parse_pmset_active_networkoversleep,
+        parse_pmset_custom_networkoversleep,
+    };
+
+    #[test]
+    fn parses_custom_battery_and_ac() {
+        let sample = r#"
+Battery Power:
+ Sleep On Power Button 1
+ networkoversleep         1
+AC Power:
+ networkoversleep         0
+"#;
+        assert_eq!(
+            parse_pmset_custom_networkoversleep(sample),
+            (Some(true), Some(false))
+        );
+        assert_eq!(parse_pmset_custom_networkoversleep("nope"), (None, None));
+    }
+
+    #[test]
+    fn parses_active_networkoversleep() {
+        assert_eq!(
+            parse_pmset_active_networkoversleep(
+                "Currently in use:\n networkoversleep         1\n"
+            ),
+            Some(true)
+        );
+        assert_eq!(
+            parse_pmset_active_networkoversleep(" networkoversleep         0\n"),
+            Some(false)
+        );
+        assert_eq!(parse_pmset_active_networkoversleep("tcpkeepalive 1\n"), None);
+        assert_eq!(parse_pmset_active_networkoversleep("womp 1\n"), None);
+        assert_eq!(parse_pmset_active_networkoversleep("sleep 10\n"), None);
+    }
+
+    #[test]
+    fn formats_matched_split_and_active() {
+        assert_eq!(
+            format_networkoversleep_parts(Some(true), Some(true), Some(false)),
+            "On"
+        );
+        assert_eq!(
+            format_networkoversleep_parts(Some(false), Some(false), Some(true)),
+            "Off"
+        );
+        assert_eq!(
+            format_networkoversleep_parts(Some(true), Some(false), None),
+            "AC Off · Battery On"
+        );
+        assert_eq!(
+            format_networkoversleep_parts(Some(false), None, None),
+            "Off (Battery)"
+        );
+        assert_eq!(
+            format_networkoversleep_parts(None, Some(true), None),
+            "On (AC)"
+        );
+        assert_eq!(
+            format_networkoversleep_parts(None, None, Some(true)),
+            "On"
+        );
+        assert_eq!(format_networkoversleep_parts(None, None, None), "");
     }
 }
 

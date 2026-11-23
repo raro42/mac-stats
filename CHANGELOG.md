@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3015] - 2026-11-24
+
+### Added
+- Instant Network over sleep accepts `/networkoversleep` · `/network-over-sleep` · `/networkoversleep-status` · `/network-over-sleep-status` · `/networkoversleep-state` · `/network-over-sleep-state` · `/network-oversleep` · `/network-oversleep-status` · `/mac-networkoversleep` · `/mac-network-over-sleep` · `/mac-networkoversleep-status` · `/mac-network-over-sleep-status` and view/see/open/list NL (`view network over sleep`, `open networkoversleep`, `list network-over-sleep`, …), matching “network over sleep status” / “is network over sleep on” / “is networkoversleep enabled” / “what's my network over sleep” / “what's the networkoversleep status”. Bare `networkoversleep` / `network over sleep` stay with the agent; `/tcpkeepalive` · `/tcp-keep-alive` stay TCP Keep Alive; `/womp` · `/wake-for-network` stay Wake for network; `/systemsleep` · `/system-sleep` stay System Sleep; hibernatemode stays out. Operator `/help` lists the new lane.
+
 ## [0.1.3014] - 2026-11-24
 
 ### Added
