@@ -2828,6 +2828,93 @@ mod tests {
                 "/smb must stay File Sharing, not Media Sharing: {reply}"
             );
         }
+        assert!(!looks_like_media_sharing_request("/remote-apple-events"));
+        assert!(!looks_like_media_sharing_request("/rae"));
+        assert!(!looks_like_media_sharing_request("view remote apple events"));
+    }
+
+    #[test]
+    fn remote_apple_events_slash_and_view_open_do_not_steal_ssh_ard_or_bare_rae() {
+        // Slash + view/open NL → Remote Apple Events (`/remote-login` · `/remote-management` parity).
+        // Bare `apple events` / `remote apple events` / `eppc` / `rae` stay with the agent;
+        // `/ssh` stays Remote Login; `/ard` stays Remote Management; `/vnc` stays Screen Sharing;
+        // `/media-sharing` stays Media Sharing.
+        assert!(looks_like_remote_apple_events_request("/remote-apple-events"));
+        assert!(looks_like_remote_apple_events_request("/remoteappleevents"));
+        assert!(looks_like_remote_apple_events_request("/remote-apple-event"));
+        assert!(looks_like_remote_apple_events_request("/apple-events"));
+        assert!(looks_like_remote_apple_events_request("/appleevents"));
+        assert!(looks_like_remote_apple_events_request("/rae"));
+        assert!(looks_like_remote_apple_events_request("/rae-status"));
+        assert!(looks_like_remote_apple_events_request("/eppc"));
+        assert!(looks_like_remote_apple_events_request("/eppc-status"));
+        assert!(looks_like_remote_apple_events_request("/aeserver"));
+        assert!(looks_like_remote_apple_events_request("/mac-rae"));
+        assert!(looks_like_remote_apple_events_request("/mac-remote-apple-events"));
+        assert!(looks_like_remote_apple_events_request("view remote apple events"));
+        assert!(looks_like_remote_apple_events_request("open rae status"));
+        assert!(looks_like_remote_apple_events_request("list remote apple events"));
+        assert!(looks_like_remote_apple_events_request("remote apple events status"));
+        assert!(looks_like_remote_apple_events_request("is remote apple events on"));
+        assert!(looks_like_remote_apple_events_request("is rae enabled"));
+        assert!(looks_like_remote_apple_events_request("what's my remote apple events"));
+        assert!(looks_like_remote_apple_events_request("view eppc"));
+        assert!(!looks_like_remote_apple_events_request("rae"));
+        assert!(!looks_like_remote_apple_events_request("eppc"));
+        assert!(!looks_like_remote_apple_events_request("apple events"));
+        assert!(!looks_like_remote_apple_events_request("remote apple events"));
+        assert!(!looks_like_remote_apple_events_request("/remote-login"));
+        assert!(!looks_like_remote_apple_events_request("/ssh"));
+        assert!(!looks_like_remote_apple_events_request("/remote-management"));
+        assert!(!looks_like_remote_apple_events_request("/ard"));
+        assert!(!looks_like_remote_apple_events_request("/screen-sharing"));
+        assert!(!looks_like_remote_apple_events_request("/vnc"));
+        assert!(!looks_like_remote_apple_events_request("/media-sharing"));
+        assert!(!looks_like_remote_apple_events_request("/home-sharing"));
+        assert!(!looks_like_remote_apple_events_request("/tasks"));
+        assert!(!looks_like_remote_apple_events_request("enable remote apple events"));
+        assert!(!looks_like_remote_login_request("/remote-apple-events"));
+        assert!(!looks_like_remote_login_request("/rae"));
+        assert!(!looks_like_remote_login_request("view remote apple events"));
+        assert!(!looks_like_remote_management_request("/remote-apple-events"));
+        assert!(!looks_like_remote_management_request("/rae"));
+        assert!(!looks_like_remote_management_request("view remote apple events"));
+        assert!(!looks_like_media_sharing_request("/remote-apple-events"));
+        let rae = try_operator_instant_reply("/remote-apple-events").unwrap();
+        assert!(
+            rae.contains("**Remote Apple Events**") && !rae.to_lowercase().contains("execution"),
+            "got: {rae}"
+        );
+        let viewed = try_operator_instant_reply("view rae").unwrap();
+        assert!(
+            viewed.contains("**Remote Apple Events**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("rae").is_none());
+        assert!(try_operator_instant_reply("apple events").is_none());
+        assert!(try_operator_instant_reply("remote apple events").is_none());
+        let ssh = try_operator_instant_reply("/ssh");
+        if let Some(reply) = ssh {
+            assert!(
+                !reply.contains("**Remote Apple Events**"),
+                "/ssh must stay Remote Login, not Remote Apple Events: {reply}"
+            );
+        }
+        let ard = try_operator_instant_reply("/ard");
+        if let Some(reply) = ard {
+            assert!(
+                !reply.contains("**Remote Apple Events**"),
+                "/ard must stay Remote Management, not Remote Apple Events: {reply}"
+            );
+        }
+        let ms = try_operator_instant_reply("/media-sharing");
+        if let Some(reply) = ms {
+            assert!(
+                !reply.contains("**Remote Apple Events**"),
+                "/media-sharing must stay Media Sharing, not Remote Apple Events: {reply}"
+            );
+        }
     }
 
 #[test]

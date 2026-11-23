@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2981] - 2026-11-23
+
+### Added
+- Instant Remote Apple Events status accepts `/remote-apple-events` · `/remoteappleevents` · `/remote-apple-events-status` · `/remote-apple-event` · `/apple-events` · `/appleevents` · `/apple-events-status` · `/rae` · `/rae-status` · `/rae-state` · `/eppc` · `/eppc-status` · `/aeserver` · `/ae-server` · `/mac-rae` · `/mac-eppc` · `/mac-remote-apple-events` · `/mac-apple-events` and view/see/open/list NL (`view remote apple events`, `open rae status`, `list remote apple events`, …), matching “remote apple events status” / “is remote apple events on” / “is rae enabled” / “what's my remote apple events” / “what's the rae status”. Bare `apple events` / `remote apple events` / `eppc` / `rae` stay with the agent; `/remote-login` · `/ssh` stay Remote Login; `/remote-management` · `/ard` stay Remote Management; `/screen-sharing` · `/vnc` stay Screen Sharing; `/media-sharing` · `/home-sharing` stay Media Sharing.
+
 ## [0.1.2980] - 2026-11-23
 
 ### Added

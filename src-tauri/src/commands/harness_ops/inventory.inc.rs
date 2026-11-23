@@ -10920,6 +10920,12 @@ pub fn looks_like_remote_login_request(content: &str) -> bool {
         || n.contains("ard")
         || n.contains("remote management")
         || n.contains("remote desktop")
+        || n.contains("remote apple events")
+        || n.contains("remote-apple-events")
+        || n.contains("remoteappleevents")
+        || n.contains("apple events")
+        || n.contains("apple-events")
+        || n.contains("eppc")
         || n.contains("file sharing")
         || n.contains("filesharing")
         || n.contains("file-sharing")
@@ -10958,6 +10964,12 @@ pub fn looks_like_remote_login_request(content: &str) -> bool {
         || n == "/filesharing"
         || n == "/smb"
         || n == "/smbd"
+        || n == "/remote-apple-events"
+        || n == "/remoteappleevents"
+        || n == "/apple-events"
+        || n == "/rae"
+        || n == "/eppc"
+        || n == "/aeserver"
         || n == "/screen"
         || n == "/screens"
         // Bare short / ambiguous stay with the agent.
@@ -11979,6 +11991,12 @@ pub fn looks_like_remote_management_request(content: &str) -> bool {
         || n.contains("asset cache")
         || n.contains("asset-cache")
         || n.contains("assetcache")
+        || n.contains("remote apple events")
+        || n.contains("remote-apple-events")
+        || n.contains("remoteappleevents")
+        || n.contains("apple events")
+        || n.contains("apple-events")
+        || n.contains("eppc")
         || n == "/firewall"
         || n == "/fw"
         || n == "/afw"
@@ -12023,6 +12041,12 @@ pub fn looks_like_remote_management_request(content: &str) -> bool {
         || n == "/assetcache"
         || n == "/asset-caching"
         || n == "/mac-content-caching"
+        || n == "/remote-apple-events"
+        || n == "/remoteappleevents"
+        || n == "/apple-events"
+        || n == "/rae"
+        || n == "/eppc"
+        || n == "/aeserver"
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
@@ -13361,6 +13385,12 @@ pub fn looks_like_media_sharing_request(content: &str) -> bool {
         || n.contains("bluetooth share")
         || n.contains("file exchange")
         || n.contains("obex")
+        || n.contains("remote apple events")
+        || n.contains("remote-apple-events")
+        || n.contains("remoteappleevents")
+        || n.contains("apple events")
+        || n.contains("apple-events")
+        || n.contains("eppc")
         || n.contains("wifi")
         || n.contains("wi-fi")
         || n.contains("ssid")
@@ -13402,6 +13432,12 @@ pub fn looks_like_media_sharing_request(content: &str) -> bool {
         || n == "/bts"
         || n == "/obex"
         || n == "/file-exchange"
+        || n == "/remote-apple-events"
+        || n == "/remoteappleevents"
+        || n == "/apple-events"
+        || n == "/rae"
+        || n == "/eppc"
+        || n == "/aeserver"
         || n == "/ip"
         || n == "/wifi"
         || n == "/gateway"
@@ -13587,6 +13623,391 @@ pub fn format_media_sharing_report() -> String {
         return "**Media Sharing** — _no Media Sharing reading on this Mac right now._".to_string();
     }
     format!("**Media Sharing** · `{v}`")
+}
+
+/// Remote Apple Events — `systemsetup -getremoteappleevents`.
+/// "Why" / enable/disable stay with the agent. Slash + view/open NL (`/remote-apple-events` · `/rae` · `/eppc`).
+/// Bare `apple events` / `remote apple events` / `eppc` / `rae` stay with the agent; `/remote-login` · `/ssh`
+/// stay Remote Login; `/remote-management` · `/ard` stay Remote Management; `/screen-sharing` · `/vnc`
+/// stay Screen Sharing; `/media-sharing` · `/home-sharing` stay Media Sharing.
+pub fn looks_like_remote_apple_events_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("display")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen share")
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n.contains("file share")
+        || n.contains("printer sharing")
+        || n.contains("printersharing")
+        || n.contains("printer-sharing")
+        || n.contains("share printers")
+        || n.contains("cups share")
+        || n.contains("cups sharing")
+        || n.contains("remote management")
+        || n.contains("remotemanagement")
+        || n.contains("remote-management")
+        || n.contains("remote desktop")
+        || n.contains("apple remote desktop")
+        || n.contains("content caching")
+        || n.contains("contentcaching")
+        || n.contains("content-caching")
+        || n.contains("content cache")
+        || n.contains("asset cache")
+        || n.contains("assetcache")
+        || n.contains("asset-cache")
+        || n.contains("internet sharing")
+        || n.contains("internetsharing")
+        || n.contains("internet-sharing")
+        || n.contains("bluetooth sharing")
+        || n.contains("bluetoothsharing")
+        || n.contains("bluetooth-sharing")
+        || n.contains("media sharing")
+        || n.contains("mediasharing")
+        || n.contains("media-sharing")
+        || n.contains("home sharing")
+        || n.contains("homesharing")
+        || n.contains("home-sharing")
+        || n.contains("wifi")
+        || n.contains("wi-fi")
+        || n.contains("ssid")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/remotelogin"
+        || n == "/ssh"
+        || n == "/sshd"
+        || n == "/screen-sharing"
+        || n == "/screensharing"
+        || n == "/vnc"
+        || n == "/file-sharing"
+        || n == "/filesharing"
+        || n == "/smb"
+        || n == "/smb-status"
+        || n == "/smbd"
+        || n == "/printer-sharing"
+        || n == "/cups-share"
+        || n == "/remote-management"
+        || n == "/ard"
+        || n == "/content-caching"
+        || n == "/asset-cache"
+        || n == "/internet-sharing"
+        || n == "/ics"
+        || n == "/bluetooth-sharing"
+        || n == "/bts"
+        || n == "/obex"
+        || n == "/media-sharing"
+        || n == "/home-sharing"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        // Bare short / ambiguous stay with the agent.
+        || n == "rae"
+        || n == "the rae"
+        || n == "eppc"
+        || n == "the eppc"
+        || n == "apple events"
+        || n == "the apple events"
+        || n == "apple event"
+        || n == "the apple event"
+        || n == "remote apple events"
+        || n == "the remote apple events"
+        || n == "remote-apple-events"
+        || n == "the remote-apple-events"
+        || n == "remoteappleevents"
+        || n == "the remoteappleevents"
+        || n == "aeserver"
+        || n == "the aeserver"
+        || n == "ae server"
+        || n == "the ae server"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/remote-apple-events"
+            | "/remoteappleevents"
+            | "/remote-apple-events-status"
+            | "/remoteappleevents-status"
+            | "/remote-apple-event"
+            | "/remoteappleevent"
+            | "/apple-events"
+            | "/appleevents"
+            | "/apple-events-status"
+            | "/appleevents-status"
+            | "/apple-event"
+            | "/appleevent"
+            | "/rae"
+            | "/rae-status"
+            | "/rae-state"
+            | "/eppc"
+            | "/eppc-status"
+            | "/eppc-state"
+            | "/aeserver"
+            | "/ae-server"
+            | "/mac-rae"
+            | "/mac-eppc"
+            | "/mac-remote-apple-events"
+            | "/mac-apple-events"
+            | "remote apple events status"
+            | "the remote apple events status"
+            | "remote-apple-events status"
+            | "the remote-apple-events status"
+            | "remoteappleevents status"
+            | "the remoteappleevents status"
+            | "apple events status"
+            | "the apple events status"
+            | "apple-events status"
+            | "the apple-events status"
+            | "rae status"
+            | "the rae status"
+            | "rae state"
+            | "the rae state"
+            | "eppc status"
+            | "the eppc status"
+            | "eppc state"
+            | "the eppc state"
+            | "my remote apple events"
+            | "my remote apple events status"
+            | "my apple events"
+            | "my apple events status"
+            | "my rae"
+            | "my rae status"
+            | "my eppc"
+            | "my eppc status"
+            | "is remote apple events on"
+            | "is remote apple events off"
+            | "is remote apple events enabled"
+            | "is remote apple events disabled"
+            | "is remote-apple-events on"
+            | "is remote-apple-events enabled"
+            | "is remoteappleevents on"
+            | "is remoteappleevents enabled"
+            | "is apple events on"
+            | "is apple events off"
+            | "is apple events enabled"
+            | "is apple events disabled"
+            | "is apple-events on"
+            | "is apple-events enabled"
+            | "is rae on"
+            | "is rae off"
+            | "is rae enabled"
+            | "is rae disabled"
+            | "is eppc on"
+            | "is eppc off"
+            | "is eppc enabled"
+            | "is eppc disabled"
+            | "what's my remote apple events"
+            | "whats my remote apple events"
+            | "what is my remote apple events"
+            | "what's my remote apple events status"
+            | "whats my remote apple events status"
+            | "what is my remote apple events status"
+            | "what's the remote apple events"
+            | "whats the remote apple events"
+            | "what is the remote apple events"
+            | "what's the remote apple events status"
+            | "whats the remote apple events status"
+            | "what is the remote apple events status"
+            | "what's my apple events"
+            | "whats my apple events"
+            | "what is my apple events"
+            | "what's my apple events status"
+            | "whats my apple events status"
+            | "what is my apple events status"
+            | "what's the apple events status"
+            | "whats the apple events status"
+            | "what is the apple events status"
+            | "what's my rae"
+            | "whats my rae"
+            | "what is my rae"
+            | "what's my rae status"
+            | "whats my rae status"
+            | "what is my rae status"
+            | "what's the rae status"
+            | "whats the rae status"
+            | "what is the rae status"
+            | "what's my eppc"
+            | "whats my eppc"
+            | "what is my eppc"
+            | "what's my eppc status"
+            | "whats my eppc status"
+            | "what is my eppc status"
+            | "how's remote apple events"
+            | "hows remote apple events"
+            | "how's the remote apple events"
+            | "hows the remote apple events"
+            | "how's apple events"
+            | "hows apple events"
+            // View/see/show me/open/list.
+            | "view remote apple events"
+            | "view the remote apple events"
+            | "view remote apple events status"
+            | "view the remote apple events status"
+            | "view remote-apple-events"
+            | "view the remote-apple-events"
+            | "view remoteappleevents"
+            | "view the remoteappleevents"
+            | "view apple events"
+            | "view the apple events"
+            | "view apple events status"
+            | "view the apple events status"
+            | "view apple-events"
+            | "view the apple-events"
+            | "view rae"
+            | "view the rae"
+            | "view rae status"
+            | "view the rae status"
+            | "view eppc"
+            | "view the eppc"
+            | "view eppc status"
+            | "view the eppc status"
+            | "see remote apple events"
+            | "see the remote apple events"
+            | "see remote apple events status"
+            | "see the remote apple events status"
+            | "see apple events"
+            | "see the apple events"
+            | "see apple events status"
+            | "see the apple events status"
+            | "see rae"
+            | "see the rae"
+            | "see rae status"
+            | "see the rae status"
+            | "see eppc"
+            | "see the eppc"
+            | "see eppc status"
+            | "see the eppc status"
+            | "open remote apple events"
+            | "open the remote apple events"
+            | "open remote apple events status"
+            | "open the remote apple events status"
+            | "open apple events"
+            | "open the apple events"
+            | "open apple events status"
+            | "open the apple events status"
+            | "open rae"
+            | "open the rae"
+            | "open rae status"
+            | "open the rae status"
+            | "open eppc"
+            | "open the eppc"
+            | "open eppc status"
+            | "open the eppc status"
+            | "list remote apple events"
+            | "list the remote apple events"
+            | "list remote apple events status"
+            | "list the remote apple events status"
+            | "list apple events"
+            | "list the apple events"
+            | "list apple events status"
+            | "list the apple events status"
+            | "list rae"
+            | "list the rae"
+            | "list rae status"
+            | "list the rae status"
+            | "list eppc"
+            | "list the eppc"
+            | "list eppc status"
+            | "list the eppc status"
+            | "show remote apple events"
+            | "show the remote apple events"
+            | "show me remote apple events"
+            | "show me the remote apple events"
+            | "show remote apple events status"
+            | "show the remote apple events status"
+            | "show me remote apple events status"
+            | "show me the remote apple events status"
+            | "show apple events"
+            | "show the apple events"
+            | "show me apple events"
+            | "show me the apple events"
+            | "show apple events status"
+            | "show the apple events status"
+            | "show me apple events status"
+            | "show me the apple events status"
+            | "show rae"
+            | "show the rae"
+            | "show me rae"
+            | "show me the rae"
+            | "show rae status"
+            | "show the rae status"
+            | "show me rae status"
+            | "show me the rae status"
+            | "show eppc"
+            | "show the eppc"
+            | "show me eppc"
+            | "show me the eppc"
+            | "show eppc status"
+            | "show the eppc status"
+            | "show me eppc status"
+            | "show me the eppc status"
+    )
+}
+
+/// Zero-LLM Remote Apple Events status from `systemsetup -getremoteappleevents` (macOS-only; empty elsewhere).
+pub fn format_remote_apple_events_report() -> String {
+    let v = crate::metrics::get_remote_apple_events_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Remote Apple Events** — _no Remote Apple Events reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**Remote Apple Events** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.

@@ -1097,9 +1097,16 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     // Media Sharing / Home Sharing (bare `media` / `media sharing` / `home sharing` stay with the agent;
     // `/bluetooth-sharing` · `/bts` stay Bluetooth Sharing; `/file-sharing` · `/smb` stay File Sharing;
-    // `/internet-sharing` · `/ics` stay Internet Sharing; `/wifi` stays SSID).
+    // `/internet-sharing` · `/ics` stay Internet Sharing; `/wifi` stays SSID;
+    // Remote Apple Events stays `/remote-apple-events` · `/rae` · `/eppc`).
     if looks_like_media_sharing_request(content) {
         return Some(format_media_sharing_report());
+    }
+    // Remote Apple Events (bare `apple events` / `remote apple events` / `eppc` / `rae` stay with the agent;
+    // `/remote-login` · `/ssh` stay Remote Login; `/remote-management` · `/ard` stay Remote Management;
+    // `/screen-sharing` · `/vnc` stay Screen Sharing; `/media-sharing` · `/home-sharing` stay Media Sharing).
+    if looks_like_remote_apple_events_request(content) {
+        return Some(format_remote_apple_events_report());
     }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).

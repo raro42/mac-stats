@@ -1654,6 +1654,60 @@ pub fn get_media_sharing_status() -> String {
     }
 }
 
+/// macOS Remote Apple Events from `systemsetup -getremoteappleevents` (live; not OnceLock).
+/// Distinct from Remote Login `/remote-login` · `/ssh`, Remote Management `/remote-management` · `/ard`,
+/// Screen Sharing `/screen-sharing` · `/vnc`, and Media Sharing `/media-sharing` · `/home-sharing`.
+/// Used by Discord/operator instant `/remote-apple-events` · `/rae` · `/eppc` lane.
+pub fn get_remote_apple_events_status() -> String {
+    let output = Command::new("/usr/sbin/systemsetup")
+        .arg("-getremoteappleevents")
+        .stderr(std::process::Stdio::null())
+        .output();
+    let Ok(output) = output else {
+        debug3!("remote-apple-events: systemsetup spawn failed");
+        return String::new();
+    };
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let lower = stdout.to_ascii_lowercase();
+    let info = if lower.contains("remote apple events: on")
+        || lower.contains("remote apple events:on")
+        || (lower.contains("on")
+            && !lower.contains("off")
+            && lower.contains("apple")
+            && lower.contains("event"))
+    {
+        "On".to_string()
+    } else if lower.contains("remote apple events: off")
+        || lower.contains("remote apple events:off")
+        || (lower.contains("off") && lower.contains("apple") && lower.contains("event"))
+    {
+        "Off".to_string()
+    } else if lower.contains("enabled") && !lower.contains("disabled") {
+        "On".to_string()
+    } else if lower.contains("disabled") {
+        "Off".to_string()
+    } else {
+        let t = stdout.lines().next().unwrap_or("").trim();
+        if t.is_empty() {
+            String::new()
+        } else {
+            t.trim_start_matches("Remote Apple Events:")
+                .trim_start_matches("remote apple events:")
+                .trim()
+                .to_string()
+        }
+    };
+    if info.is_empty() {
+        debug3!(
+            "remote-apple-events: empty status (exit={})",
+            output.status
+        );
+    } else {
+        debug3!("remote-apple-events status: '{}'", info);
+    }
+    info
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
