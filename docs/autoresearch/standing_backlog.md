@@ -1,3 +1,21 @@
+## Overnight note 2026-11-23 ~23:05
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Sibling: OpenClaw/Hermes missing on rack.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Wake for network v0.1.3008 — Display Sleep / displaysleep slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.3009** — `/displaysleep` · `/display-sleep` · `/screen-sleep` · `/mac-displaysleep` + view/open NL; bare displaysleep/display sleep/screen sleep stay with agent; `/screensaver` · `/display` · `/powernap` · `/womp` intact; `/help` lists lane.
+- Ratchet keep @ 75f82ef for 3009.
+- Morning surprise: refresh 2026-11-23 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- X: ensure-loops pids live; draft-only, no send.
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (proximitywake / disksleep) — Display Sleep slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3009
+
+- Product fuel after Wake for network v0.1.3008: Display Sleep already readable via `pmset -g custom` Battery/AC `displaysleep` minutes (+ active `pmset -g`; 0 = Never) but lacked `/displaysleep` · `/display-sleep` · `/screen-sleep` · `/mac-displaysleep` and view/see/open/list phrases while Screensaver `/screensaver`, display resolution `/display` · `/screen`, Power Nap `/powernap`, and Wake for network `/womp` already had slash+NL. Bare `displaysleep` / `display sleep` / `screen sleep` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel (proximitywake / disksleep) — Display Sleep slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~22:38
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
