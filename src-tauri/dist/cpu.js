@@ -12796,9 +12796,10 @@ function refreshOllamaSettingsToolbarRovingTabindex(wrap, preferred) {
   }
 }
 
+/* Design-review feature-ai-chat: shorter, warmer Ollama settings tip (KISS). */
 /** How to move across the system prompt, Reset, and Save. */
 const OLLAMA_SETTINGS_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End move · arrows at prompt start/end · prompt first ↑ → AI Chat icon · at start crosses to footer version · at end crosses to footer version';
+  'Tab prompt · Reset · Save · ← → / h l · Home/End · arrows at prompt edges · ↑ to AI Chat icon · edges jump to footer version';
 
 /**
  * Theme HTML ships the hint under the system prompt, Reset, and Save.
@@ -12953,8 +12954,9 @@ function wireOllamaSettingsHeaderToolbarKeyboard(header) {
     closeId: 'ollama-settings-close',
     ariaLabel: 'Ollama settings header',
     wireKey: 'ollamaSettingsHeaderToolbarKbWired',
+    /* Design-review feature-ai-chat: shorter, warmer Ollama header tip (KISS). */
     hintText:
-      '← → / h l · Home/End move · Enter / Space on Close closes · at end crosses to system prompt · at start crosses to Save',
+      'Tab title · Close · ← → / h l · Home/End · Enter closes · end jumps to prompt · start to Save',
     chainForwardFromEnd: () => tryChainOllamaSettingsHeaderToBody(),
     chainBackFromStart: () => tryChainOllamaSettingsHeaderToBodyLast(),
   });

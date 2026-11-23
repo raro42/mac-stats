@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2990] - 2026-11-23
+
+### Changed
+- AI Chat keyboard hints (message filters · starter chips · composer · Ollama settings header/toolbar): shorter, warmer copy so the chat surface stays KISS when Tab focus shows the hint (design-review `feature-ai-chat`; Mac capture still TCC-blocked — polish-without-capture grace).
+
 ## [0.1.2989] - 2026-11-23
 
 ### Added

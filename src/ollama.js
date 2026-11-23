@@ -1671,9 +1671,10 @@ function focusChatMessagesLast(container) {
 }
 window.focusChatMessagesLast = focusChatMessagesLast;
 
+/* Design-review feature-ai-chat: shorter, warmer message-list tip (KISS; metrics kb-hint parity). */
 /** How to move across chat messages when the list has turns. */
 const CHAT_MESSAGES_KB_HINT =
-  'All · You · Assistant filters · focus list then ↑↓ / j k / Home / End · last ↓ → composer · click / Enter / Space / c copies · PgUp/PgDn · Esc clears';
+  'Filter All · You · Assistant · ↑↓ / j k · Home/End · Enter / c copies · ↓ to composer · Esc clears';
 
 /** Theme HTML ships the hint above the message list. It stays hidden until turns exist. Create it only on older shells. */
 function ensureChatMessagesKbHint(container, show) {
@@ -2568,8 +2569,9 @@ function ensureChatEmptySuggestionKbHint(row) {
   }
   const chips = getChatEmptySuggestionChips();
   hint.hidden = chips.length < 2;
+  /* Design-review feature-ai-chat: shorter, warmer starter-chip tip (KISS). */
   hint.textContent =
-    '← → / h l · Home/End move · Enter / Space puts prompt in composer · at end crosses to composer';
+    'Tab a starter · ← → / h l · Home/End · Enter fills the composer · last chip jumps to the input';
 }
 
 /**
@@ -3776,15 +3778,16 @@ function ensureChatComposerKbHint(container) {
   hint.hidden = items.length < 2;
   const hasStarters = getChatEmptySuggestionChips().length > 0;
   const hasMessages = visibleChatMessages(document.getElementById('chat-messages')).length > 0;
+  /* Design-review feature-ai-chat: shorter, warmer composer tip (KISS). */
   if (hasStarters) {
     hint.textContent =
-      '← → / h l · Home/End move · Enter sends · at start crosses to starter chips · last → footer · Clear / Send on button';
+      'Tab input · Clear · Send · ← → / h l · Home/End · Enter sends · start jumps to starters · end to footer';
   } else if (hasMessages) {
     hint.textContent =
-      '← → / h l · Home/End move · Enter sends · at start crosses to last message · last → footer · Clear / Send on button';
+      'Tab input · Clear · Send · ← → / h l · Home/End · Enter sends · start jumps to last message · end to footer';
   } else {
     hint.textContent =
-      '← → / h l · Home/End move · Enter sends from input · Clear / Send on button';
+      'Tab input · Clear · Send · ← → / h l · Home/End · Enter sends';
   }
 }
 
