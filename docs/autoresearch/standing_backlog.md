@@ -1,3 +1,21 @@
+## 2026-11-23 ~20:40 overnight tick
+- Digester open: empty (0 turns / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Sibling: OpenClaw/Hermes missing on rack.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: Settings Appearance/Changelog kb-hints (header · Appearance · Product · Changelog header/body) after Credentials v0.1.2998 / remote Perplexity·Logs chips v0.1.2999 (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.3000** — shorter warmer Settings header · Appearance · Product · Changelog tips; remote raced **v0.1.2999** Perplexity · Logs filter chips (backfilled keep).
+- Ratchet keep @ 7fdb0f6 for 3000; backfill keep for 2999; sync-dist (UI JS + theme seeds).
+- Morning surprise: refresh 2026-11-23 + archive.
+- Linux rack: sync-dist only (no /Applications install/kickstart).
+- X: ensure-loops pids live; draft-only, no send.
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — Appearance/Changelog kb-hint copy closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3000
+
+- Product fuel after Credentials kb-hints v0.1.2998 (+ remote Perplexity · Logs filter-chip kb-hints v0.1.2999): Settings header · Appearance themes/frame · Product toggles · Changelog header · version list still used long cold “crosses to …” copy while Credentials · Ollama / Monitors already shipped shorter warmer KISS lines. Shortened Appearance/Product/Changelog hints to match. Digester empty; design-review due=false; layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — Appearance/Changelog kb-hint copy closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~20:34
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).

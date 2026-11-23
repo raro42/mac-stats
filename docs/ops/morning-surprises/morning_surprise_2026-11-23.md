@@ -4,6 +4,7 @@ Overnight Track B shipped user-facing product work (not digester-empty).
 
 ## Shipped
 
+- **v0.1.3000** — Settings Appearance / Product / Changelog keyboard hints warmer/shorter (Settings header · Appearance themes/frame · Product toggles · Changelog header · version list).
 - **v0.1.2999** — Perplexity · Debug Log filter-chip keyboard hints warmer/shorter (All · Top · Snippet · Error · Warn; Monitors / AI Chat KISS parity after Credentials).
 - **v0.1.2998** — Settings Credentials keyboard hints warmer/shorter (Discord · Perplexity · Brave · Redmine · Mastodon · MCP · Browser · Cursor · Telegram · Slack).
 - **v0.1.2997** — Instant Application Firewall listed apps: `/listapps` · `/firewall-apps` · `/fw-apps` · `/afw-apps` + view/open NL (`socketfilterfw --listapps`). Bare `list apps` / `firewall apps` stay with the agent; `/firewall` · `/stealth` · `/firewall-logging` · `/allow-signed` · `/block-all` stay put.
@@ -24,6 +25,7 @@ Overnight Track B shipped user-facing product work (not digester-empty).
 - 20:00 CET tick: digester empty → soft-state product Firewall listapps (v0.1.2997).
 - 20:10 CET tick: Credentials kb-hints (v0.1.2998).
 - 20:34 CET tick: digester empty → soft-state Perplexity · Logs chip tips (v0.1.2999).
+- 20:40 CET tick: Appearance/Changelog kb-hints raced remote 2999 → shipped as **v0.1.3000**.
 
 ## Next fuel
 
