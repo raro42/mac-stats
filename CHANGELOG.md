@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2995] - 2026-11-23
+
+### Changed
+- Disk Cleanup keyboard hints (meta cards · Clean now/Refresh/Save · All/On/Off · All/Reclaim/Big/Clean chips · add-scope row · scope list · category list): shorter, warmer copy so the cleanup surface stays KISS when Tab focus shows the hint (design-review `feature-disk-cleanup`; Mac capture still TCC-blocked — polish-without-capture grace).
+
 ## [0.1.2994] - 2026-11-23
 
 ### Changed

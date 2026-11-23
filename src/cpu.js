@@ -5858,9 +5858,11 @@ function wireFilterChipToolbarKeyboard(wrap) {
             : wrap.id === 'logs-filter-chips'
               ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Debug Log icon · at end → log viewer · Enter / Space selects'
               : wrap.id === 'disk-cleanup-scope-filter-chips'
-                ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Disk Cleanup icon · at end → scope list · Enter / Space selects'
+                /* Design-review feature-disk-cleanup: shorter, warmer chip hint (KISS; Agent Ops / AI Chat parity). */
+                ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Disk Cleanup icon or the scope list'
                 : wrap.id === 'disk-cleanup-filter-chips'
-                  ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Disk Cleanup icon · at end → category list · Enter / Space selects'
+                  /* Design-review feature-disk-cleanup: shorter, warmer chip hint (KISS; Agent Ops / AI Chat parity). */
+                  ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Disk Cleanup icon or the category list'
                   : wrap.id === 'chat-filter-chips'
                     /* Design-review feature-ai-chat: shorter, warmer chip hint (KISS; Agent Ops parity). */
                     ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to AI Chat icon or the message list'
@@ -21735,8 +21737,9 @@ function ensureDiskCleanupMetaKbStyles() {
 }
 
 /** How to move across Reclaim · Next · Runs when · Enabled scopes. */
+/* Design-review feature-disk-cleanup: shorter, warmer meta tip (KISS). */
 const DISK_CLEANUP_META_KB_HINT =
-  '← → / h l · Home/End move · Enter / Space opens reclaim / next / runs / scopes';
+  '← → / h l · Home/End · Enter opens reclaim · next · runs · or scopes';
 
 /** Theme HTML ships the hint under the meta cards. Create it only on older shells. */
 function ensureDiskCleanupMetaKbHint() {
@@ -21855,8 +21858,9 @@ function refreshDiskCleanupToolbarRovingTabindex(row, preferred) {
 }
 
 /** How to move across Clean now · Refresh · Save scopes. */
+/* Design-review feature-disk-cleanup: shorter, warmer toolbar tip (KISS). */
 const DISK_CLEANUP_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End move · Enter / Space on buttons';
+  '← → / h l · Home/End · Enter activates Clean now · Refresh · or Save';
 
 /** Theme HTML ships the hint under the action buttons. Create it only on older shells. */
 function ensureDiskCleanupToolbarKbHint(row) {
@@ -21924,8 +21928,9 @@ function refreshDiskCleanupAddScopeToolbarRovingTabindex(wrap, preferred) {
 }
 
 /** How to move across label · path · days · Recursive · Add scope. */
+/* Design-review feature-disk-cleanup: shorter, warmer add-scope tip (KISS). */
 const DISK_CLEANUP_ADD_SCOPE_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End move · ↑ scopes last · ↓ categories first · Enter adds from fields';
+  '← → / h l · Home/End · Enter adds · edges jump to scopes or categories';
 
 /** Theme HTML ships the hint under the add-scope fields. Create it only on older shells. */
 function ensureDiskCleanupAddScopeToolbarKbHint(wrap) {
@@ -22253,8 +22258,9 @@ function renderDiskCleanupScopesEmpty(scopesEl) {
 }
 
 /** How to move across Disk Cleanup scope rows when the list has rows. */
+/* Design-review feature-disk-cleanup: shorter, warmer scope-list tip (KISS). */
 const DISK_CLEANUP_SCOPE_KB_HINT =
-  'Scopes: All · On · Off filters · ↑↓ / j k · PgUp/PgDn select · click path / c copies · Esc clears · Space toggle enable · R toggle recurse · T toggle Trash soft-delete · Delete removes custom · Enter in Add form adds · ⌘S saves';
+  'Scopes · ↑↓ / j k · Space enable · R recurse · T Trash · Delete removes · c copies · Esc · ⌘S saves';
 
 /** Theme HTML ships the hint above the scope list. It stays hidden until rows exist. Create it only on older shells. */
 function ensureDiskCleanupScopeKbHint(scopesEl, show) {
@@ -22285,8 +22291,9 @@ function ensureDiskCleanupScopeKbHint(scopesEl, show) {
 }
 
 /** How to move across Disk Cleanup category rows when the list has rows. */
+/* Design-review feature-disk-cleanup: shorter, warmer category-list tip (KISS). */
 const DISK_CLEANUP_LIST_KB_HINT =
-  `Categories: All · Reclaim · Big (≥${formatDiskBytes(DISK_CLEANUP_BIG_BYTES)}) · Clean filters · ↑↓ / j k · PgUp/PgDn · Home / End select · click path / c copies · Esc clears · Enter runs Clean now when reclaimable`;
+  'Categories · ↑↓ / j k · Home/End · Enter cleans when reclaimable · c copies · Esc clears';
 
 /** Theme HTML ships the hint above the category list. It stays hidden until rows exist. Create it only on older shells. */
 function ensureDiskCleanupListKbHint(list, show) {
