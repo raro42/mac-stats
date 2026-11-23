@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2989] - 2026-11-23
+
+### Added
+- Instant Application Firewall allow-signed accepts `/allow-signed` · `/allowsigned` · `/allow-signed-status` · `/allow-signed-apps` · `/allow-signed-software` · `/fw-allow-signed` · `/afw-allow-signed` · `/firewall-allow-signed` · `/app-firewall-allow-signed` · `/application-firewall-allow-signed` · `/socketfilterfw-allow-signed` · `/getallowsigned` · `/mac-allow-signed` · `/mac-fw-allow-signed` and view/see/open/list NL (`view allow signed`, `open fw allow signed`, `list allow signed apps`, …), matching “allow signed status” / “is allow signed on” / “is allow signed enabled” / “what's my allow signed” / “what's the allow signed status”. Bare `allow signed` / `signed` / `signed software` / `signed apps` stay with the agent; `/firewall` stays global Firewall; `/stealth` stays stealth; `/firewall-logging` stays logging; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP; `/filevault` stays FileVault.
+
 ## [0.1.2988] - 2026-11-23
 
 ### Changed

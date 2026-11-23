@@ -2204,6 +2204,80 @@ mod tests {
     }
 
     #[test]
+    fn firewall_allow_signed_slash_and_view_open_do_not_steal_firewall_logging_or_bare() {
+        // Slash + view/open NL → Allow signed (`/firewall-logging` · `/stealth` parity).
+        // Bare `allow signed` / `signed software` stay with the agent; `/firewall` stays global;
+        // `/stealth` stays stealth; `/firewall-logging` stays logging.
+        assert!(looks_like_firewall_allow_signed_request("/allow-signed"));
+        assert!(looks_like_firewall_allow_signed_request("/allowsigned"));
+        assert!(looks_like_firewall_allow_signed_request("/fw-allow-signed"));
+        assert!(looks_like_firewall_allow_signed_request("/afw-allow-signed"));
+        assert!(looks_like_firewall_allow_signed_request("/firewall-allow-signed"));
+        assert!(looks_like_firewall_allow_signed_request("/getallowsigned"));
+        assert!(looks_like_firewall_allow_signed_request("/mac-allow-signed"));
+        assert!(looks_like_firewall_allow_signed_request("view allow signed"));
+        assert!(looks_like_firewall_allow_signed_request("open fw allow signed"));
+        assert!(looks_like_firewall_allow_signed_request("list allow signed apps"));
+        assert!(looks_like_firewall_allow_signed_request("allow signed status"));
+        assert!(looks_like_firewall_allow_signed_request("is allow signed on"));
+        assert!(looks_like_firewall_allow_signed_request("is allow signed enabled"));
+        assert!(looks_like_firewall_allow_signed_request("what's my allow signed"));
+        assert!(looks_like_firewall_allow_signed_request("what's the allow signed status"));
+        assert!(!looks_like_firewall_allow_signed_request("allow signed"));
+        assert!(!looks_like_firewall_allow_signed_request("signed"));
+        assert!(!looks_like_firewall_allow_signed_request("signed software"));
+        assert!(!looks_like_firewall_allow_signed_request("signed apps"));
+        assert!(!looks_like_firewall_allow_signed_request("/firewall"));
+        assert!(!looks_like_firewall_allow_signed_request("view firewall"));
+        assert!(!looks_like_firewall_allow_signed_request("/stealth"));
+        assert!(!looks_like_firewall_allow_signed_request("/firewall-logging"));
+        assert!(!looks_like_firewall_allow_signed_request("view firewall logging"));
+        assert!(!looks_like_firewall_allow_signed_request("/logs"));
+        assert!(!looks_like_firewall_allow_signed_request("/gatekeeper"));
+        assert!(!looks_like_firewall_allow_signed_request("enable allow signed"));
+        assert!(!looks_like_firewall_allow_signed_request("disable allow signed"));
+        assert!(!looks_like_firewall_request("/allow-signed"));
+        assert!(!looks_like_firewall_request("view allow signed"));
+        assert!(!looks_like_firewall_request("/fw-allow-signed"));
+        assert!(!looks_like_firewall_stealth_request("/allow-signed"));
+        assert!(!looks_like_firewall_stealth_request("view allow signed"));
+        assert!(!looks_like_firewall_logging_request("/allow-signed"));
+        assert!(!looks_like_firewall_logging_request("view allow signed"));
+        let allow = try_operator_instant_reply("/allow-signed").unwrap();
+        assert!(
+            allow.contains("**Allow signed**") && !allow.to_lowercase().contains("execution"),
+            "got: {allow}"
+        );
+        let viewed = try_operator_instant_reply("view allow signed").unwrap();
+        assert!(
+            viewed.contains("**Allow signed**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let fw_alias = try_operator_instant_reply("/fw-allow-signed").unwrap();
+        assert!(
+            fw_alias.contains("**Allow signed**")
+                && !fw_alias.to_lowercase().contains("execution"),
+            "got: {fw_alias}"
+        );
+        assert!(try_operator_instant_reply("allow signed").is_none());
+        assert!(try_operator_instant_reply("signed software").is_none());
+        let fw = try_operator_instant_reply("/firewall");
+        if let Some(reply) = fw {
+            assert!(
+                !reply.contains("**Allow signed**"),
+                "/firewall must stay Firewall, not Allow signed: {reply}"
+            );
+        }
+        let logging = try_operator_instant_reply("/firewall-logging");
+        if let Some(reply) = logging {
+            assert!(
+                !reply.contains("**Allow signed**"),
+                "/firewall-logging must stay Firewall logging, not Allow signed: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn time_machine_slash_and_view_open_do_not_steal_disk_cleanup_or_bare_backup() {
         // Slash + view/open NL → Time Machine (`/firewall` · `/sip` parity).
         // Bare `backup` / `tm` / `time machine` stay with the agent; `view disk` stays Disk Cleanup.

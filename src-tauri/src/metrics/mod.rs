@@ -904,6 +904,86 @@ pub fn get_firewall_logging_status() -> String {
     }
 }
 
+/// Parse `socketfilterfw --getallowsigned` (built-in + downloaded lines → On / Off).
+pub(crate) fn parse_firewall_allow_signed_line(line: &str) -> Option<&'static str> {
+    let lower = line.to_ascii_lowercase();
+    if lower.trim().is_empty() {
+        return None;
+    }
+    if lower.contains("disabled") || lower.contains("is off") {
+        return Some("Off");
+    }
+    if lower.contains("enabled") || lower.contains("is on") {
+        return Some("On");
+    }
+    if lower.contains(" off") || lower.ends_with("off") {
+        return Some("Off");
+    }
+    if lower.contains(" on") || lower.ends_with("on") {
+        return Some("On");
+    }
+    None
+}
+
+/// Split `--getallowsigned` stdout into built-in + downloaded On/Off.
+pub(crate) fn parse_firewall_allow_signed(raw: &str) -> (Option<&'static str>, Option<&'static str>) {
+    let mut built_in = None;
+    let mut downloaded = None;
+    for line in raw.lines() {
+        let lower = line.to_ascii_lowercase();
+        let state = parse_firewall_allow_signed_line(line);
+        if lower.contains("built-in") || lower.contains("built in") {
+            built_in = state;
+        } else if lower.contains("downloaded") {
+            downloaded = state;
+        }
+    }
+    (built_in, downloaded)
+}
+
+/// Combine built-in + downloaded allow-signed into a short status line.
+pub(crate) fn format_firewall_allow_signed_parts(
+    built_in: Option<&str>,
+    downloaded: Option<&str>,
+) -> String {
+    match (built_in, downloaded) {
+        (Some(b), Some(d)) => format!("Built-in {b} · Downloaded {d}"),
+        (Some(b), None) => format!("Built-in {b}"),
+        (None, Some(d)) => format!("Downloaded {d}"),
+        (None, None) => String::new(),
+    }
+}
+
+/// macOS Application Firewall allow-signed from `socketfilterfw --getallowsigned`.
+/// Distinct from Firewall global `/firewall`, stealth `/stealth`, logging `/firewall-logging`.
+/// Used by Discord/operator instant `/allow-signed` · `/fw-allow-signed` lane.
+pub fn get_firewall_allow_signed_status() -> String {
+    let output = Command::new("/usr/libexec/ApplicationFirewall/socketfilterfw")
+        .arg("--getallowsigned")
+        .stderr(std::process::Stdio::null())
+        .output();
+    let Ok(output) = output else {
+        debug3!("firewall-allow-signed: socketfilterfw spawn failed");
+        return String::new();
+    };
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let (built_in, downloaded) = parse_firewall_allow_signed(&stdout);
+    let info = format_firewall_allow_signed_parts(built_in, downloaded);
+    if info.is_empty() {
+        let t = stdout.lines().next().unwrap_or("").trim();
+        if t.is_empty() {
+            debug3!("firewall-allow-signed: empty status (exit={})", output.status);
+            String::new()
+        } else {
+            debug3!("firewall-allow-signed status (raw): '{}'", t);
+            t.to_string()
+        }
+    } else {
+        debug3!("firewall-allow-signed status: '{}'", info);
+        info
+    }
+}
+
 
 /// Time Machine session + destination from `tmutil status` / `destinationinfo` (live; not OnceLock).
 /// Distinct from Disk Cleanup `view disk` / `tmutil-thin`, SSD `/ssd` · `/free`, and boot volume.
@@ -4751,6 +4831,63 @@ mod airplay_receiver_parse_tests {
             "On"
         );
         assert_eq!(format_airplay_receiver_parts(None, None, false), "");
+    }
+}
+
+#[cfg(test)]
+mod firewall_allow_signed_parse_tests {
+    use super::{
+        format_firewall_allow_signed_parts, parse_firewall_allow_signed,
+        parse_firewall_allow_signed_line,
+    };
+
+    #[test]
+    fn parses_allow_signed_line() {
+        assert_eq!(
+            parse_firewall_allow_signed_line(
+                "Automatically allow built-in signed software ENABLED.\n"
+            ),
+            Some("On")
+        );
+        assert_eq!(
+            parse_firewall_allow_signed_line(
+                "Automatically allow downloaded signed software DISABLED"
+            ),
+            Some("Off")
+        );
+        assert_eq!(parse_firewall_allow_signed_line("nope"), None);
+    }
+
+    #[test]
+    fn parses_built_in_and_downloaded() {
+        let raw = "Automatically allow built-in signed software ENABLED.\n\
+Automatically allow downloaded signed software ENABLED.\n";
+        assert_eq!(parse_firewall_allow_signed(raw), (Some("On"), Some("On")));
+        let mixed = "Automatically allow built-in signed software DISABLED.\n\
+Automatically allow downloaded signed software ENABLED.\n";
+        assert_eq!(parse_firewall_allow_signed(mixed), (Some("Off"), Some("On")));
+        assert_eq!(parse_firewall_allow_signed("nope"), (None, None));
+    }
+
+    #[test]
+    fn formats_allow_signed_parts() {
+        assert_eq!(
+            format_firewall_allow_signed_parts(Some("On"), Some("On")),
+            "Built-in On · Downloaded On"
+        );
+        assert_eq!(
+            format_firewall_allow_signed_parts(Some("Off"), Some("On")),
+            "Built-in Off · Downloaded On"
+        );
+        assert_eq!(
+            format_firewall_allow_signed_parts(Some("On"), None),
+            "Built-in On"
+        );
+        assert_eq!(
+            format_firewall_allow_signed_parts(None, Some("Off")),
+            "Downloaded Off"
+        );
+        assert_eq!(format_firewall_allow_signed_parts(None, None), "");
     }
 }
 

@@ -10320,10 +10320,12 @@ pub fn format_gatekeeper_report() -> String {
     format!("**Gatekeeper** · `{v}`")
 }
 
-/// Application Firewall global state — not Gatekeeper, not SIP, not FileVault, not stealth, not logging.
+/// Application Firewall global state — not Gatekeeper, not SIP, not FileVault, not stealth, not logging,
+/// not allow-signed.
 /// Slash + view/open NL (`/firewall` · `/afw` · `view firewall`) match `/gatekeeper` · `/sip` shape;
 /// bare `firewall` / `afw` stay with the agent; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP;
-/// `/stealth` · `/firewall-stealth` stay stealth; `/firewall-logging` · `/fw-logging` stay logging.
+/// `/stealth` · `/firewall-stealth` stay stealth; `/firewall-logging` · `/fw-logging` stay logging;
+/// `/allow-signed` · `/fw-allow-signed` stay allow-signed.
 pub fn looks_like_firewall_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -10373,6 +10375,11 @@ pub fn looks_like_firewall_request(content: &str) -> bool {
         || n == "/firewall-logging"
         || n == "/fw-logging"
         || n == "/afw-logging"
+        || n == "/allow-signed"
+        || n == "/allowsigned"
+        || n == "/fw-allow-signed"
+        || n == "/afw-allow-signed"
+        || n == "/firewall-allow-signed"
         || n == "/boot-volume"
         || n == "/startup-disk"
         || n == "/remote-login"
@@ -10513,9 +10520,11 @@ pub fn format_firewall_report() -> String {
     format!("**Firewall** · `{v}`")
 }
 
-/// Application Firewall stealth mode — not global Firewall `/firewall`, not logging, not Gatekeeper, not SIP.
+/// Application Firewall stealth mode — not global Firewall `/firewall`, not logging, not allow-signed,
+/// not Gatekeeper, not SIP.
 /// Slash + view/open NL (`/stealth` · `/firewall-stealth` · `view stealth`) match `/firewall` shape;
-/// bare `stealth` stays with the agent; `/firewall` stays global state; `/firewall-logging` stays logging.
+/// bare `stealth` stays with the agent; `/firewall` stays global state; `/firewall-logging` stays logging;
+/// `/allow-signed` stays allow-signed.
 pub fn looks_like_firewall_stealth_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -10562,6 +10571,11 @@ pub fn looks_like_firewall_stealth_request(content: &str) -> bool {
         || n == "/firewall-logging"
         || n == "/fw-logging"
         || n == "/afw-logging"
+        || n == "/allow-signed"
+        || n == "/allowsigned"
+        || n == "/fw-allow-signed"
+        || n == "/afw-allow-signed"
+        || n == "/firewall-allow-signed"
         || n == "/gatekeeper"
         || n == "/gk"
         || n == "/spctl"
@@ -10707,10 +10721,12 @@ pub fn format_firewall_stealth_report() -> String {
     format!("**Stealth** · `{v}`")
 }
 
-/// Application Firewall logging — not global Firewall `/firewall`, not stealth `/stealth`.
+/// Application Firewall logging — not global Firewall `/firewall`, not stealth `/stealth`,
+/// not allow-signed `/allow-signed`.
 /// Slash + view/open NL (`/firewall-logging` · `/fw-logging` · `view firewall logging`) match
 /// `/stealth` · `/firewall` shape; bare `logging` / `firewall logging` stay with the agent;
-/// `/firewall` stays global; `/stealth` stays stealth; `/logs` stays debug log.
+/// `/firewall` stays global; `/stealth` stays stealth; `/allow-signed` stays allow-signed;
+/// `/logs` stays debug log.
 pub fn looks_like_firewall_logging_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -10771,6 +10787,11 @@ pub fn looks_like_firewall_logging_request(content: &str) -> bool {
         || n == "/logs"
         || n == "/log"
         || n == "/debug-log"
+        || n == "/allow-signed"
+        || n == "/allowsigned"
+        || n == "/fw-allow-signed"
+        || n == "/afw-allow-signed"
+        || n == "/firewall-allow-signed"
         || n == "/remote-login"
         || n == "/ssh"
         || n == "/sshd"
@@ -10923,6 +10944,229 @@ pub fn format_firewall_logging_report() -> String {
             .to_string();
     }
     format!("**Firewall logging** · `{v}`")
+}
+
+/// Application Firewall allow-signed — not global Firewall `/firewall`, not stealth `/stealth`,
+/// not logging `/firewall-logging`.
+/// Slash + view/open NL (`/allow-signed` · `/fw-allow-signed` · `view allow signed`) match
+/// `/firewall-logging` · `/stealth` shape; bare `allow signed` / `signed software` stay with the agent;
+/// `/firewall` stays global; `/stealth` stays stealth; `/firewall-logging` stays logging.
+pub fn looks_like_firewall_allow_signed_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("block ")
+        || n.contains("password")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("gatekeeper")
+        || n.contains("spctl")
+        || n.contains("system integrity")
+        || n.contains("sip")
+        || n.contains("csrutil")
+        || n.contains("stealth")
+        || n.contains("logging")
+        // Global Firewall / stealth / logging / Gatekeeper / SIP / FileVault stay elsewhere.
+        || n == "/firewall"
+        || n == "/firewall-status"
+        || n == "/fw"
+        || n == "/fw-status"
+        || n == "/afw"
+        || n == "/afw-status"
+        || n == "/app-firewall"
+        || n == "/application-firewall"
+        || n == "/socketfilterfw"
+        || n == "/stealth"
+        || n == "/stealth-mode"
+        || n == "/firewall-stealth"
+        || n == "/fw-stealth"
+        || n == "/afw-stealth"
+        || n == "/firewall-logging"
+        || n == "/fw-logging"
+        || n == "/afw-logging"
+        || n == "/logging-mode"
+        || n == "/logging-opt"
+        || n == "/gatekeeper"
+        || n == "/gk"
+        || n == "/spctl"
+        || n == "/sip"
+        || n == "/csrutil"
+        || n == "/filevault"
+        || n == "/fv"
+        || n == "/fde"
+        || n == "/logs"
+        || n == "/log"
+        || n == "/debug-log"
+        || n == "/remote-login"
+        || n == "/ssh"
+        || n == "/sshd"
+        // Bare short / ambiguous stay with the agent.
+        || n == "allow signed"
+        || n == "the allow signed"
+        || n == "signed"
+        || n == "the signed"
+        || n == "signed software"
+        || n == "the signed software"
+        || n == "signed apps"
+        || n == "the signed apps"
+        || n == "allow signed software"
+        || n == "the allow signed software"
+        || n == "allow signed apps"
+        || n == "the allow signed apps"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/allow-signed"
+            | "/allowsigned"
+            | "/allow-signed-status"
+            | "/allowsignedstatus"
+            | "/allow-signed-apps"
+            | "/allowsignedapps"
+            | "/allow-signed-software"
+            | "/allowsignedsoftware"
+            | "/allow-signed-built-in"
+            | "/allow-signed-downloaded"
+            | "/fw-allow-signed"
+            | "/fwallowsigned"
+            | "/fw-allow-signed-status"
+            | "/afw-allow-signed"
+            | "/afwallowsigned"
+            | "/afw-allow-signed-status"
+            | "/firewall-allow-signed"
+            | "/firewallallowsigned"
+            | "/firewall-allow-signed-status"
+            | "/app-firewall-allow-signed"
+            | "/application-firewall-allow-signed"
+            | "/socketfilterfw-allow-signed"
+            | "/getallowsigned"
+            | "/mac-allow-signed"
+            | "/mac-fw-allow-signed"
+            | "allow signed status"
+            | "the allow signed status"
+            | "allow signed apps status"
+            | "the allow signed apps status"
+            | "allow signed software status"
+            | "the allow signed software status"
+            | "fw allow signed status"
+            | "the fw allow signed status"
+            | "afw allow signed status"
+            | "the afw allow signed status"
+            | "firewall allow signed status"
+            | "the firewall allow signed status"
+            | "my allow signed"
+            | "my allow signed status"
+            | "my fw allow signed"
+            | "is allow signed on"
+            | "is allow signed off"
+            | "is allow signed enabled"
+            | "is allow signed disabled"
+            | "is the allow signed on"
+            | "is the allow signed enabled"
+            | "is fw allow signed on"
+            | "is fw allow signed enabled"
+            | "is afw allow signed on"
+            | "is afw allow signed enabled"
+            | "is signed software allowed"
+            | "is signed apps allowed"
+            | "what's my allow signed"
+            | "whats my allow signed"
+            | "what is my allow signed"
+            | "what's my allow signed status"
+            | "whats my allow signed status"
+            | "what is my allow signed status"
+            | "what's the allow signed"
+            | "whats the allow signed"
+            | "what is the allow signed"
+            | "what's the allow signed status"
+            | "whats the allow signed status"
+            | "what is the allow signed status"
+            | "how's allow signed"
+            | "hows allow signed"
+            | "how's the allow signed"
+            | "hows the allow signed"
+            // View/see/show me/open/list.
+            | "view allow signed"
+            | "view the allow signed"
+            | "view allow signed status"
+            | "view the allow signed status"
+            | "view allow signed apps"
+            | "view the allow signed apps"
+            | "view allow signed software"
+            | "view the allow signed software"
+            | "view fw allow signed"
+            | "view the fw allow signed"
+            | "view afw allow signed"
+            | "view the afw allow signed"
+            | "view firewall allow signed"
+            | "view the firewall allow signed"
+            | "see allow signed"
+            | "see the allow signed"
+            | "see allow signed status"
+            | "see the allow signed status"
+            | "see allow signed apps"
+            | "see the allow signed apps"
+            | "see fw allow signed"
+            | "see the fw allow signed"
+            | "open allow signed"
+            | "open the allow signed"
+            | "open allow signed status"
+            | "open the allow signed status"
+            | "open allow signed apps"
+            | "open the allow signed apps"
+            | "open fw allow signed"
+            | "open the fw allow signed"
+            | "list allow signed"
+            | "list the allow signed"
+            | "list allow signed status"
+            | "list the allow signed status"
+            | "list allow signed apps"
+            | "list the allow signed apps"
+            | "list fw allow signed"
+            | "list the fw allow signed"
+            | "show allow signed"
+            | "show the allow signed"
+            | "show me allow signed"
+            | "show me the allow signed"
+            | "show allow signed status"
+            | "show the allow signed status"
+            | "show me allow signed status"
+            | "show me the allow signed status"
+            | "show allow signed apps"
+            | "show the allow signed apps"
+            | "show me allow signed apps"
+            | "show me the allow signed apps"
+    )
+}
+
+/// Zero-LLM Firewall allow-signed status from `socketfilterfw --getallowsigned`.
+pub fn format_firewall_allow_signed_report() -> String {
+    let v = crate::metrics::get_firewall_allow_signed_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Allow signed** — _no Firewall allow-signed reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**Allow signed** · `{v}`")
 }
 
 /// Time Machine session + destination — not Disk Cleanup, not SSD % / free, not boot volume.
