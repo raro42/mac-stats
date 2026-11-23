@@ -13562,8 +13562,9 @@ function replaceThinkingWithResponse(thinkingId, content, durationMs) {
 // Universal implementation that works across all themes using IDs
 
 /** How to move across Details values when the grid has values. */
+/* Design-review feature-cpu-metrics: shorter, warmer Details tip (KISS; rings parity). */
 const DETAILS_KB_HINT =
-  '↑↓ / j k · Home/End select · first value ↑ → temperature ring · last value ↓ → processes / footer · processes first ↑ → last value · Enter / c copies · Esc clears';
+  '↑↓ / j k · Home/End · Enter / c copies · Esc clears · edges jump to Temp, processes, or footer';
 
 /** Theme HTML ships the hint above the Details grid. Hide it when the grid has no values. Create it only on older shells. */
 function ensureDetailsKbHint(grid, show) {
@@ -25052,8 +25053,9 @@ function ensureCpuHeaderToolbarKbStyles() {
 }
 
 /** How to move across Refresh and Settings. Settings-open still says Credentials. */
+/* Design-review feature-cpu-metrics: shorter, warmer header tip (KISS; rings parity). */
 const HEADER_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End move · at end crosses to CPU ring (or Credentials when settings open) · at start crosses to Top Processes filters or footer';
+  '← → / h l · Home/End · edges jump to CPU ring (or Credentials) · or Top Processes / footer';
 
 /** Theme HTML ships the hint under Refresh and Settings. Create it only on older shells. */
 function ensureCpuHeaderToolbarKbHint() {
@@ -25439,8 +25441,9 @@ function ensureFooterToolbarKbStyles() {
 }
 
 /** Closed window: version opens the changelog. Open panels replace this line. */
+/* Design-review feature-cpu-metrics: shorter, warmer footer tip (KISS; rings parity). */
 const FOOTER_TOOLBAR_KB_HINT_CLOSED =
-  '← → / h l · Home/End move · version opens changelog · at end crosses to section icons · at start crosses to section list (or filter chips)';
+  '← → / h l · Home/End · version opens changelog · edges jump to section icons or list';
 
 /** Theme HTML ships the hint under the version chip and GitHub link. Create it only on older shells. */
 function ensureFooterToolbarKbHint() {
@@ -25474,13 +25477,13 @@ function ensureFooterToolbarKbHint() {
     window.isSettingsModalOpen();
   const processDetailsOpen = isProcessDetailsModalOpen();
   hint.textContent = changelogOpen
-    ? '← → / h l · Home/End move · version ← crosses to changelog · at end crosses to section icons'
+    ? '← → / h l · Home/End · version ← → changelog · edges jump to section icons'
     : ollamaSettingsOpen
-      ? '← → / h l · Home/End move · version ← crosses to Ollama Save · at end crosses to section icons'
+      ? '← → / h l · Home/End · version ← → Ollama Save · edges jump to section icons'
       : settingsOpen
-        ? '← → / h l · Home/End move · version ← crosses to Perplexity Clear (or Discord View logs) · at end crosses to section icons'
+        ? '← → / h l · Home/End · version ← → Perplexity Clear (or Discord logs) · edges jump to section icons'
         : processDetailsOpen
-          ? '← → / h l · Home/End move · version ← crosses to Force Quit · at end crosses to section icons'
+          ? '← → / h l · Home/End · version ← → Force Quit · edges jump to section icons'
           : FOOTER_TOOLBAR_KB_HINT_CLOSED;
 }
 
@@ -25797,8 +25800,9 @@ function ensureIconLineKbHint() {
   if (hint.parentElement !== line) {
     line.appendChild(hint);
   }
+  /* Design-review feature-cpu-metrics: shorter, warmer icon-line tip (KISS; rings parity). */
   hint.textContent =
-    'Tab or click an icon · ← → / h l · Home/End move · ↓ on Perplexity (setup or Settings key)/Logs/Monitors/Discord (Settings) crosses into section · at start crosses to power strip · at end crosses to filter chips · Enter / Space opens section';
+    'Tab an icon · ← → / h l · Home/End · Enter opens · ↓ into the section · edges jump to power strip or filter chips';
 }
 
 /**

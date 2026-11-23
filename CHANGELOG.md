@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2994] - 2026-11-23
+
+### Changed
+- CPU window chrome keyboard hints (Details grid · icon line · header Refresh/Settings · footer version): shorter, warmer copy so the metrics surface stays KISS when Tab focus shows the hint (design-review `feature-cpu-metrics`; Mac capture still TCC-blocked — polish-without-capture grace).
+
 ## [0.1.2993] - 2026-11-23
 
 ### Added
