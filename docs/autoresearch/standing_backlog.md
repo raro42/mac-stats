@@ -1,3 +1,16 @@
+## Overnight note 2026-11-23 ~05:10
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Fuel: product after Top Processes kb-hints v0.1.2992 — Firewall block-all slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.2993** — `/block-all` · `/blockall` · `/fw-block-all` · `/afw-block-all` · `/firewall-block-all` · `/getblockall` · `/mac-block-all` + view/open NL; bare block all/blockall stay with agent; `/firewall` · `/stealth` · `/firewall-logging` · `/allow-signed` intact.
+- Ratchet keep after verify; install/kickstart (Rust).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — not another keep-pNN clone.
+
+## Overnight merge — v0.1.2993
+
+- Product fuel after Top Processes kb-hints v0.1.2992: Application Firewall block-all already readable via `socketfilterfw --getblockall` but lacked `/block-all` · `/blockall` · `/block-all-status` · `/block-all-state` · `/block-all-incoming` · `/fw-block-all` · `/afw-block-all` · `/firewall-block-all` · `/app-firewall-block-all` · `/application-firewall-block-all` · `/socketfilterfw-block-all` · `/getblockall` · `/mac-block-all` · `/mac-fw-block-all` and view/see/open/list phrases while Firewall `/firewall`, stealth `/stealth`, logging `/firewall-logging`, and allow-signed `/allow-signed` already had slash+NL. Bare `block all` / `blockall` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — block-all slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~04:55
 - Digester open: empty (0 turns / 7d); design-review recommended **feature-processes** (101d stale).
 - Design review due=true → polish Top Processes kb-hints; Mac TCC — polish-without-capture grace marked.
