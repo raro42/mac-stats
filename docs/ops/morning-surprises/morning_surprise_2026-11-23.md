@@ -1,10 +1,19 @@
 # Morning surprise — 2026-11-23
 
+## Overnight tick ~20:57 CET — keep v0.1.3001
+
+- Digester empty; design-review due=false (grace); layout-daily Neon marked (Futuristic next calendar).
+- Shipped **Guest Account** instant: `/guest` · `/guest-account` · `/guest-user` · `/mac-guest` + view/open NL (loginwindow GuestEnabled / sysadminctl).
+- Bare `guest` / `guest account` stay with the agent; `/username` · `/airdrop` · `/filevault` · `/sip` intact.
+- Next: cream/Swiss Send fill intentional · Futuristic layout-daily next day · soft-state sibling/product — not keep-pNN.
+
+
 Overnight Track B shipped user-facing product work (not digester-empty).
 
 ## Shipped
 
-- **v0.1.3000** — Settings Appearance / Product / Changelog keyboard hints warmer/shorter (Settings header · Appearance themes/frame · Product toggles · Changelog header · version list).
+- **v0.1.3001** — Instant Guest Account: `/guest` · `/guest-account` · `/guest-user` · `/mac-guest` + view/open NL (loginwindow GuestEnabled / sysadminctl). Bare `guest` / `guest account` stay with the agent; `/username` · `/airdrop` · `/filevault` · `/sip` stay put.
+- **v0.1.3000** — Settings Appearance / Product / Changelog keyboard hints warmer/shorter.
 - **v0.1.2999** — Perplexity · Debug Log filter-chip keyboard hints warmer/shorter (All · Top · Snippet · Error · Warn; Monitors / AI Chat KISS parity after Credentials).
 - **v0.1.2998** — Settings Credentials keyboard hints warmer/shorter (Discord · Perplexity · Brave · Redmine · Mastodon · MCP · Browser · Cursor · Telegram · Slack).
 - **v0.1.2997** — Instant Application Firewall listed apps: `/listapps` · `/firewall-apps` · `/fw-apps` · `/afw-apps` + view/open NL (`socketfilterfw --listapps`). Bare `list apps` / `firewall apps` stay with the agent; `/firewall` · `/stealth` · `/firewall-logging` · `/allow-signed` · `/block-all` stay put.
@@ -25,11 +34,12 @@ Overnight Track B shipped user-facing product work (not digester-empty).
 - 20:00 CET tick: digester empty → soft-state product Firewall listapps (v0.1.2997).
 - 20:10 CET tick: Credentials kb-hints (v0.1.2998).
 - 20:34 CET tick: digester empty → soft-state Perplexity · Logs chip tips (v0.1.2999).
-- 20:40 CET tick: Appearance/Changelog kb-hints raced remote 2999 → shipped as **v0.1.3000**.
+- 20:40 CET tick: Appearance / Changelog kb-hints (v0.1.3000).
+- 20:57 CET tick: Guest Account slash+NL (v0.1.3001).
 
 ## Next fuel
 
 - Futuristic layout-daily next calendar day
 - cream/Swiss Send fill intentional (do not “fix” blue fill)
-- Guest Account slash+NL or soft-state sibling/product — not keep-pNN clones
+- soft-state sibling/product fuel — not keep-pNN clones
 - Recapture stale feature PNGs when Mac TCC allows

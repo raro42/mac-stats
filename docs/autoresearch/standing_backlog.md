@@ -1,3 +1,16 @@
+## Overnight note 2026-11-23 ~20:57
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Fuel: product after Appearance/Changelog kb-hints v0.1.3000 — Guest Account slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.3001** — `/guest` · `/guest-account` · `/guest-user` · `/mac-guest` + view/open NL; bare guest/guest account stay with agent; `/username` · `/whoami` · `/airdrop` · `/filevault` · `/sip` intact.
+- Ratchet keep after verify; install/kickstart (Rust).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — not another keep-pNN clone.
+
+## Overnight merge — v0.1.3001
+
+- Product fuel after Appearance/Changelog kb-hints v0.1.3000: Guest Account already readable via loginwindow GuestEnabled / sysadminctl but lacked `/guest` · `/guest-account` · `/guestaccount` · `/guest-status` · `/guest-account-status` · `/guest-user` · `/guest-login` · `/mac-guest` · `/mac-guest-account` · `/mac-guest-user` and view/see/open/list phrases while AirDrop `/airdrop`, username `/username`, FileVault `/filevault`, and SIP `/sip` already had slash+NL. Bare `guest` / `guest account` / `guest user` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — Guest Account slash NL closed; not another keep-pNN clone.
+
 ## 2026-11-23 ~20:40 overnight tick
 - Digester open: empty (0 turns / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
