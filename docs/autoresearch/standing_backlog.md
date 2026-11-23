@@ -1,3 +1,20 @@
+## Overnight note 2026-11-24 ~00:29
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily due=true recommended data-poster (remaps_missing=none) — product fuel this tick; Futuristic still next calendar quota.
+- Sibling: OpenClaw/Hermes missing on rack.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after TCP Keep Alive v0.1.3014 — Network over sleep / networkoversleep slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.3015** — `/networkoversleep` · `/network-over-sleep` · `/network-oversleep` · `/mac-networkoversleep` + view/open NL; bare networkoversleep/network over sleep stay with agent; `/tcpkeepalive` · `/womp` · `/systemsleep` intact; hibernatemode stays out; `/help` lists lane.
+- Ratchet keep @ bf30ce6 for 3015.
+- Morning surprise: refresh 2026-11-24 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Data Poster/Futuristic layout-daily next calendar quota · soft-state sibling/product fuel (hibernatemode) — Network over sleep slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3015
+
+- Product fuel after TCP Keep Alive v0.1.3014: Network over sleep already readable via `pmset -g custom` Battery/AC `networkoversleep` (+ active `pmset -g`) but lacked `/networkoversleep` · `/network-over-sleep` · `/network-oversleep` · `/mac-networkoversleep` and view/see/open/list phrases while TCP Keep Alive `/tcpkeepalive`, Wake for network `/womp`, and System Sleep `/systemsleep` already had slash+NL. Bare `networkoversleep` / `network over sleep` stay with the agent; hibernatemode stays out. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily due (data-poster remaps clean) — product fuel this tick. Next: cream/Swiss Send fill white-on-blue intentional · Data Poster/Futuristic layout-daily · soft-state sibling/product fuel (hibernatemode) — Network over sleep slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~00:07
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
