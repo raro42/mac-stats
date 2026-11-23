@@ -2594,6 +2594,105 @@ pub fn get_autologin_status() -> String {
     }
 }
 
+/// Parse `defaults … askForPassword` (0/1 / true/false).
+pub(crate) fn parse_screen_lock_ask_defaults(raw: &str) -> Option<bool> {
+    parse_nat_enabled_plistbuddy(raw)
+}
+
+/// Parse `defaults … askForPasswordDelay` (seconds as int/float).
+pub(crate) fn parse_screen_lock_delay_defaults(raw: &str) -> Option<f64> {
+    let t = raw.trim();
+    if t.is_empty() || t.to_ascii_lowercase().contains("does not exist") {
+        return None;
+    }
+    t.parse::<f64>().ok().filter(|v| v.is_finite() && *v >= 0.0)
+}
+
+/// Human delay for Screen Lock (0 → immediate; else Ns / Nm / Nh).
+pub(crate) fn format_screen_lock_delay(secs: f64) -> String {
+    if secs <= 0.0 {
+        return "immediate".to_string();
+    }
+    if secs < 60.0 {
+        return format!("{}s", secs.round() as i64);
+    }
+    if secs < 3600.0 {
+        let m = (secs / 60.0).round() as i64;
+        return format!("{m}m");
+    }
+    let h = (secs / 3600.0).round() as i64;
+    format!("{h}h")
+}
+
+/// Combine askForPassword + optional delay into a short On/Off line.
+pub(crate) fn format_screen_lock_parts(ask: Option<bool>, delay: Option<f64>) -> String {
+    match ask {
+        Some(false) => "Off".to_string(),
+        Some(true) => match delay {
+            Some(d) => format!("On · {}", format_screen_lock_delay(d)),
+            None => "On".to_string(),
+        },
+        None => match delay {
+            // Delay alone is a weak signal; prefer empty over guessing On.
+            Some(_) | None => String::new(),
+        },
+    }
+}
+
+/// macOS Screen Lock from `com.apple.screensaver` askForPassword (+ askForPasswordDelay).
+/// Prefer `-currentHost`, fall back to user domain. Distinct from Screen Sharing `/screen-sharing` ·
+/// `/vnc`, display `/screen` · `/display`, and Automatic Login `/autologin`.
+/// Used by Discord/operator instant `/screen-lock` · `/lock-screen` lane.
+pub fn get_screen_lock_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let read_key = |current_host: bool, key: &str| -> Option<String> {
+            let mut cmd = Command::new("/usr/bin/defaults");
+            if current_host {
+                cmd.arg("-currentHost");
+            }
+            cmd.args(["read", "com.apple.screensaver", key]);
+            cmd.stderr(std::process::Stdio::null());
+            match cmd.output() {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
+                    if stdout.trim().is_empty() {
+                        None
+                    } else {
+                        Some(stdout)
+                    }
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("screen-lock: defaults read spawn failed ({key})");
+                    None
+                }
+            }
+        };
+
+        let ask_raw = read_key(true, "askForPassword").or_else(|| read_key(false, "askForPassword"));
+        let delay_raw =
+            read_key(true, "askForPasswordDelay").or_else(|| read_key(false, "askForPasswordDelay"));
+
+        let ask = ask_raw.as_deref().and_then(parse_screen_lock_ask_defaults);
+        let delay = delay_raw
+            .as_deref()
+            .and_then(parse_screen_lock_delay_defaults);
+
+        let info = format_screen_lock_parts(ask, delay);
+        if info.is_empty() {
+            debug3!("screen-lock: empty status");
+        } else {
+            debug3!("screen-lock status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
@@ -5530,6 +5629,51 @@ mod autologin_parse_tests {
             "Off · FileVault"
         );
         assert_eq!(format_autologin_parts(None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod screen_lock_parse_tests {
+    use super::{
+        format_screen_lock_delay, format_screen_lock_parts, parse_screen_lock_ask_defaults,
+        parse_screen_lock_delay_defaults,
+    };
+
+    #[test]
+    fn parses_ask_and_delay() {
+        assert_eq!(parse_screen_lock_ask_defaults("1\n"), Some(true));
+        assert_eq!(parse_screen_lock_ask_defaults("0"), Some(false));
+        assert_eq!(parse_screen_lock_ask_defaults("nope"), None);
+        assert_eq!(parse_screen_lock_delay_defaults("0\n"), Some(0.0));
+        assert_eq!(parse_screen_lock_delay_defaults("300"), Some(300.0));
+        assert_eq!(parse_screen_lock_delay_defaults("5.0"), Some(5.0));
+        assert_eq!(parse_screen_lock_delay_defaults(""), None);
+        assert_eq!(
+            parse_screen_lock_delay_defaults(
+                "The domain/default pair of (com.apple.screensaver, askForPasswordDelay) does not exist\n"
+            ),
+            None
+        );
+    }
+
+    #[test]
+    fn formats_delay_and_parts() {
+        assert_eq!(format_screen_lock_delay(0.0), "immediate");
+        assert_eq!(format_screen_lock_delay(5.0), "5s");
+        assert_eq!(format_screen_lock_delay(300.0), "5m");
+        assert_eq!(format_screen_lock_delay(3600.0), "1h");
+        assert_eq!(format_screen_lock_parts(Some(false), Some(0.0)), "Off");
+        assert_eq!(
+            format_screen_lock_parts(Some(true), Some(0.0)),
+            "On · immediate"
+        );
+        assert_eq!(
+            format_screen_lock_parts(Some(true), Some(300.0)),
+            "On · 5m"
+        );
+        assert_eq!(format_screen_lock_parts(Some(true), None), "On");
+        assert_eq!(format_screen_lock_parts(None, Some(0.0)), "");
+        assert_eq!(format_screen_lock_parts(None, None), "");
     }
 }
 

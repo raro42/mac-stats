@@ -3589,6 +3589,90 @@ mod tests {
         }
     }
 
+    #[test]
+    fn screen_lock_slash_and_view_open_do_not_steal_screen_sharing_display_or_bare_lock() {
+        // Slash + view/open NL → Screen Lock (`/autologin` · `/screen-sharing` parity).
+        // Bare `screen lock` / `lock screen` / `lock` stay with the agent; `/screen-sharing` · `/vnc`
+        // stay Screen Sharing; `/screen` · `/display` stay display resolution; `/autologin` stays
+        // Automatic Login.
+        assert!(looks_like_screen_lock_request("/screen-lock"));
+        assert!(looks_like_screen_lock_request("/screenlock"));
+        assert!(looks_like_screen_lock_request("/lock-screen"));
+        assert!(looks_like_screen_lock_request("/lockscreen"));
+        assert!(looks_like_screen_lock_request("/screen-lock-status"));
+        assert!(looks_like_screen_lock_request("/lock-screen-status"));
+        assert!(looks_like_screen_lock_request("/mac-screen-lock"));
+        assert!(looks_like_screen_lock_request("/mac-lock-screen"));
+        assert!(looks_like_screen_lock_request("view screen lock"));
+        assert!(looks_like_screen_lock_request("open lock screen"));
+        assert!(looks_like_screen_lock_request("list screen lock"));
+        assert!(looks_like_screen_lock_request("screen lock status"));
+        assert!(looks_like_screen_lock_request("is screen lock on"));
+        assert!(looks_like_screen_lock_request("is lock screen enabled"));
+        assert!(looks_like_screen_lock_request("what's my screen lock"));
+        assert!(looks_like_screen_lock_request("view lock-screen"));
+        assert!(!looks_like_screen_lock_request("screen lock"));
+        assert!(!looks_like_screen_lock_request("lock screen"));
+        assert!(!looks_like_screen_lock_request("lock"));
+        assert!(!looks_like_screen_lock_request("screensaver"));
+        assert!(!looks_like_screen_lock_request("/screen-sharing"));
+        assert!(!looks_like_screen_lock_request("/vnc"));
+        assert!(!looks_like_screen_lock_request("view screen sharing"));
+        assert!(!looks_like_screen_lock_request("/screen"));
+        assert!(!looks_like_screen_lock_request("/screens"));
+        assert!(!looks_like_screen_lock_request("/display"));
+        assert!(!looks_like_screen_lock_request("/autologin"));
+        assert!(!looks_like_screen_lock_request("view automatic login"));
+        assert!(!looks_like_screen_lock_request("/filevault"));
+        assert!(!looks_like_screen_lock_request("/tasks"));
+        assert!(!looks_like_screen_lock_request("enable screen lock"));
+        assert!(!looks_like_screen_sharing_request("/screen-lock"));
+        assert!(!looks_like_screen_sharing_request("view screen lock"));
+        assert!(!looks_like_display_resolution_request("/screen-lock"));
+        assert!(!looks_like_display_resolution_request("view screen lock"));
+        assert!(!looks_like_autologin_request("/screen-lock"));
+        assert!(!looks_like_autologin_request("view screen lock"));
+        let s = try_operator_instant_reply("/screen-lock").unwrap();
+        assert!(
+            s.contains("**Screen Lock**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view screen lock").unwrap();
+        assert!(
+            viewed.contains("**Screen Lock**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open lock screen").unwrap();
+        assert!(
+            open.contains("**Screen Lock**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("screen lock").is_none());
+        assert!(try_operator_instant_reply("lock screen").is_none());
+        assert!(try_operator_instant_reply("lock").is_none());
+        let ss = try_operator_instant_reply("/screen-sharing");
+        if let Some(reply) = ss {
+            assert!(
+                !reply.contains("**Screen Lock**"),
+                "/screen-sharing must stay Screen Sharing, not Screen Lock: {reply}"
+            );
+        }
+        let disp = try_operator_instant_reply("/display");
+        if let Some(reply) = disp {
+            assert!(
+                !reply.contains("**Screen Lock**"),
+                "/display must stay Display, not Screen Lock: {reply}"
+            );
+        }
+        let al = try_operator_instant_reply("/autologin");
+        if let Some(reply) = al {
+            assert!(
+                !reply.contains("**Screen Lock**"),
+                "/autologin must stay Automatic Login, not Screen Lock: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3004] - 2026-11-23
+
+### Added
+- Instant Screen Lock accepts `/screen-lock` · `/screenlock` · `/lock-screen` · `/lockscreen` · `/screen-lock-status` · `/lock-screen-status` · `/screen-lock-state` · `/lock-screen-state` · `/mac-screen-lock` · `/mac-lock-screen` and view/see/open/list NL (`view screen lock`, `open lock screen`, `list screen lock`, …), matching “screen lock status” / “is screen lock on” / “is lock screen enabled” / “what's my screen lock” / “what's the lock screen status”. Bare `screen lock` / `lock screen` / `lock` / `screensaver` stay with the agent; `/screen-sharing` · `/vnc` stay Screen Sharing; `/screen` · `/screens` · `/display` stay display resolution; `/autologin` · `/auto-login` stay Automatic Login; `/filevault` stays FileVault. Operator `/help` lists the new lane.
+
 ## [0.1.3003] - 2026-11-23
 
 ### Added

@@ -8945,17 +8945,27 @@ pub fn looks_like_display_resolution_request(content: &str) -> bool {
         || n.contains("change")
         || n.contains("set ")
         || n.contains("reset")
-        // Screen Sharing / VNC / Remote Login stay elsewhere (not display resolution).
+        // Screen Sharing / VNC / Remote Login / Screen Lock stay elsewhere (not display resolution).
         || n.contains("screen sharing")
         || n.contains("screensharing")
         || n.contains("screen-sharing")
         || n.contains("screen share")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("screenlock")
+        || n.contains("lock screen")
+        || n.contains("lock-screen")
+        || n.contains("lockscreen")
         || n.contains("vnc")
         || n.contains("remote login")
         || n.contains("remotelogin")
         || n == "/ssh"
         || n == "/sshd"
         || n == "/remote-login"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/screenlock"
+        || n == "/lockscreen"
         // Website monitors / GPU ring / screenshots stay elsewhere.
         || n.contains("monitor")
         || n == "/gpu"
@@ -12206,6 +12216,16 @@ pub fn looks_like_screen_sharing_request(content: &str) -> bool {
         || n == "/screens"
         || n == "/display"
         || n == "/displays"
+        || n == "/screen-lock"
+        || n == "/screenlock"
+        || n == "/lock-screen"
+        || n == "/lockscreen"
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("screenlock")
+        || n.contains("lock screen")
+        || n.contains("lock-screen")
+        || n.contains("lockscreen")
         || n.contains("file sharing")
         || n.contains("filesharing")
         || n.contains("file-sharing")
@@ -16331,6 +16351,12 @@ pub fn looks_like_autologin_request(content: &str) -> bool {
         || n.contains("guestlogin")
         || n.contains("automatic time")
         || n.contains("automatic-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("screenlock")
+        || n.contains("lock screen")
+        || n.contains("lock-screen")
+        || n.contains("lockscreen")
         || n.contains("username")
         || n.contains("user name")
         || n.contains("whoami")
@@ -16362,6 +16388,10 @@ pub fn looks_like_autologin_request(content: &str) -> bool {
         || n == "/guestlogin"
         || n == "/guest-user"
         || n == "/mac-guest"
+        || n == "/screen-lock"
+        || n == "/screenlock"
+        || n == "/lock-screen"
+        || n == "/lockscreen"
         || n == "/username"
         || n == "/whoami"
         || n == "/ip"
@@ -16532,6 +16562,257 @@ pub fn format_autologin_report() -> String {
         return "**Automatic Login** — _no Automatic Login reading on this Mac right now._".to_string();
     }
     format!("**Automatic Login** · `{v}`")
+}
+
+/// Screen Lock — screensaver askForPassword (+ delay) (System Settings → Lock Screen).
+/// Slash + view/open NL (`/screen-lock` · `/lock-screen` · `view screen lock`).
+/// Bare `screen lock` / `lock screen` / `lock` stay with the agent; `/screen-sharing` · `/vnc` stay
+/// Screen Sharing; `/screen` · `/display` stay display resolution; `/autologin` stays Automatic Login.
+pub fn looks_like_screen_lock_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen share")
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n.contains("airdrop")
+        || n.contains("air drop")
+        || n.contains("air-drop")
+        || n.contains("airplay")
+        || n.contains("guest account")
+        || n.contains("guest user")
+        || n.contains("automatic login")
+        || n.contains("auto login")
+        || n.contains("autologin")
+        || n.contains("auto-login")
+        || n.contains("username")
+        || n.contains("whoami")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/ssh"
+        || n == "/screen-sharing"
+        || n == "/screensharing"
+        || n == "/vnc"
+        || n == "/file-sharing"
+        || n == "/smb"
+        || n == "/airdrop"
+        || n == "/air-drop"
+        || n == "/airplay"
+        || n == "/guest"
+        || n == "/guest-account"
+        || n == "/autologin"
+        || n == "/auto-login"
+        || n == "/automatic-login"
+        || n == "/username"
+        || n == "/whoami"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        // Bare phrases stay with the agent.
+        || n == "screen lock"
+        || n == "the screen lock"
+        || n == "screen-lock"
+        || n == "the screen-lock"
+        || n == "screenlock"
+        || n == "the screenlock"
+        || n == "lock screen"
+        || n == "the lock screen"
+        || n == "lock-screen"
+        || n == "the lock-screen"
+        || n == "lockscreen"
+        || n == "the lockscreen"
+        || n == "lock"
+        || n == "the lock"
+        || n == "screensaver"
+        || n == "the screensaver"
+        || n == "screen saver"
+        || n == "the screen saver"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/screen-lock"
+            | "/screenlock"
+            | "/lock-screen"
+            | "/lockscreen"
+            | "/screen-lock-status"
+            | "/screenlock-status"
+            | "/lock-screen-status"
+            | "/lockscreen-status"
+            | "/screen-lock-state"
+            | "/lock-screen-state"
+            | "/mac-screen-lock"
+            | "/mac-lock-screen"
+            | "/mac-screenlock"
+            | "/mac-lockscreen"
+            | "screen lock status"
+            | "the screen lock status"
+            | "screen-lock status"
+            | "the screen-lock status"
+            | "screenlock status"
+            | "the screenlock status"
+            | "lock screen status"
+            | "the lock screen status"
+            | "lock-screen status"
+            | "the lock-screen status"
+            | "lockscreen status"
+            | "the lockscreen status"
+            | "screen lock state"
+            | "the screen lock state"
+            | "lock screen state"
+            | "the lock screen state"
+            | "my screen lock"
+            | "my screen lock status"
+            | "my lock screen"
+            | "my lock screen status"
+            | "is screen lock on"
+            | "is screen lock off"
+            | "is screen lock enabled"
+            | "is screen lock disabled"
+            | "is lock screen on"
+            | "is lock screen off"
+            | "is lock screen enabled"
+            | "is lock screen disabled"
+            | "is screen-lock on"
+            | "is screen-lock enabled"
+            | "is lock-screen on"
+            | "is lock-screen enabled"
+            | "what's my screen lock"
+            | "whats my screen lock"
+            | "what is my screen lock"
+            | "what's my screen lock status"
+            | "whats my screen lock status"
+            | "what is my screen lock status"
+            | "what's my lock screen"
+            | "whats my lock screen"
+            | "what is my lock screen"
+            | "what's my lock screen status"
+            | "whats my lock screen status"
+            | "what is my lock screen status"
+            | "what's the screen lock"
+            | "whats the screen lock"
+            | "what is the screen lock"
+            | "what's the screen lock status"
+            | "whats the screen lock status"
+            | "what is the screen lock status"
+            | "what's the lock screen"
+            | "whats the lock screen"
+            | "what is the lock screen"
+            | "what's the lock screen status"
+            | "whats the lock screen status"
+            | "what is the lock screen status"
+            | "how's screen lock"
+            | "hows screen lock"
+            | "how's the screen lock"
+            | "hows the screen lock"
+            | "how's lock screen"
+            | "hows lock screen"
+            | "how's the lock screen"
+            | "hows the lock screen"
+            | "view screen lock"
+            | "view the screen lock"
+            | "view screen lock status"
+            | "view the screen lock status"
+            | "view screen-lock"
+            | "view the screen-lock"
+            | "view lock screen"
+            | "view the lock screen"
+            | "view lock screen status"
+            | "view the lock screen status"
+            | "view lock-screen"
+            | "view the lock-screen"
+            | "see screen lock"
+            | "see the screen lock"
+            | "see screen lock status"
+            | "see the screen lock status"
+            | "see lock screen"
+            | "see the lock screen"
+            | "see lock screen status"
+            | "see the lock screen status"
+            | "open screen lock"
+            | "open the screen lock"
+            | "open screen lock status"
+            | "open the screen lock status"
+            | "open lock screen"
+            | "open the lock screen"
+            | "open lock screen status"
+            | "open the lock screen status"
+            | "list screen lock"
+            | "list the screen lock"
+            | "list screen lock status"
+            | "list the screen lock status"
+            | "list lock screen"
+            | "list the lock screen"
+            | "list lock screen status"
+            | "list the lock screen status"
+    )
+}
+
+/// Zero-LLM Screen Lock status from screensaver askForPassword (macOS-only; empty elsewhere).
+pub fn format_screen_lock_report() -> String {
+    let v = crate::metrics::get_screen_lock_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Screen Lock** — _no Screen Lock reading on this Mac right now._".to_string();
+    }
+    format!("**Screen Lock** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.
