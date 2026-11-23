@@ -1,3 +1,21 @@
+## 2026-11-23 ~21:05 overnight tick
+- Digester open: empty (0 turns / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Sibling: OpenClaw/Hermes missing on rack.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: Guest Account slash+NL after Appearance/Changelog v0.1.3000 — remote raced **v0.1.3001** (local duplicate discarded); follow-up **v0.1.3002** operator `/help` lists Guest Account (status_chips gap after 3001).
+- Shipped **v0.1.3002** — `/help` · `/ops` menu includes `/guest` · `/guest-account` · `/guest-user` · `/mac-guest` + username/AirDrop cross-links.
+- Ratchet discard (race) then keep @ 610f9eb for 3002; backfill keep for remote 3001.
+- Morning surprise: refresh 2026-11-23 + archive.
+- Linux rack: no /Applications install/kickstart (Rust help text only; Mac install next Mac tick).
+- X: ensure-loops if armed; draft-only, no send.
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — Guest Account help closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3002
+
+- Product fuel after remote Guest Account slash+NL v0.1.3001: operator `/help` · `/ops` menu still omitted Guest Account while AirDrop `/airdrop`, username `/username`, and the live `/guest` lane already existed. Added the help row (+ username/AirDrop cross-links). Digester empty; design-review due=false; layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — Guest Account help closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~20:57
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
