@@ -4565,6 +4565,80 @@ mod tests {
                 "/womp must stay Wake for network, not Network over sleep: {reply}"
             );
         }
+        assert!(!looks_like_networkoversleep_request("/hibernatemode"));
+        assert!(!looks_like_networkoversleep_request("view hibernate mode"));
+    }
+
+    #[test]
+    fn hibernatemode_slash_and_view_open_do_not_steal_systemsleep_or_bare() {
+        // Slash + view/open NL → Hibernate mode (`/networkoversleep` · `/systemsleep` parity).
+        // Bare `hibernatemode` / `hibernate` / `hibernate mode` stay with the agent;
+        // `/systemsleep` stays System Sleep; `/networkoversleep` stays Network over sleep;
+        // `/tcpkeepalive` stays TCP Keep Alive; `/womp` stays Wake for network.
+        assert!(looks_like_hibernatemode_request("/hibernatemode"));
+        assert!(looks_like_hibernatemode_request("/hibernate-mode"));
+        assert!(looks_like_hibernatemode_request("/hibernatemode-status"));
+        assert!(looks_like_hibernatemode_request("/hibernate"));
+        assert!(looks_like_hibernatemode_request("/mac-hibernatemode"));
+        assert!(looks_like_hibernatemode_request("/mac-hibernate"));
+        assert!(looks_like_hibernatemode_request("view hibernate mode"));
+        assert!(looks_like_hibernatemode_request("open hibernatemode"));
+        assert!(looks_like_hibernatemode_request("list hibernate"));
+        assert!(looks_like_hibernatemode_request("hibernate mode status"));
+        assert!(looks_like_hibernatemode_request("is hibernate mode on"));
+        assert!(looks_like_hibernatemode_request("is hibernatemode enabled"));
+        assert!(looks_like_hibernatemode_request("what's my hibernate mode"));
+        assert!(looks_like_hibernatemode_request("view hibernate"));
+        assert!(!looks_like_hibernatemode_request("hibernatemode"));
+        assert!(!looks_like_hibernatemode_request("hibernate"));
+        assert!(!looks_like_hibernatemode_request("hibernate mode"));
+        assert!(!looks_like_hibernatemode_request("/systemsleep"));
+        assert!(!looks_like_hibernatemode_request("view system sleep"));
+        assert!(!looks_like_hibernatemode_request("/networkoversleep"));
+        assert!(!looks_like_hibernatemode_request("/tcpkeepalive"));
+        assert!(!looks_like_hibernatemode_request("/womp"));
+        assert!(!looks_like_hibernatemode_request("/sleep"));
+        assert!(!looks_like_hibernatemode_request("/powernap"));
+        assert!(!looks_like_hibernatemode_request("/power"));
+        assert!(!looks_like_hibernatemode_request("/tasks"));
+        assert!(!looks_like_hibernatemode_request("enable hibernate mode"));
+        assert!(!looks_like_networkoversleep_request("/hibernatemode"));
+        assert!(!looks_like_networkoversleep_request("view hibernate mode"));
+        assert!(!looks_like_systemsleep_request("/hibernatemode"));
+        assert!(!looks_like_systemsleep_request("view hibernate mode"));
+        let s = try_operator_instant_reply("/hibernatemode").unwrap();
+        assert!(
+            s.contains("**Hibernate mode**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view hibernate mode").unwrap();
+        assert!(
+            viewed.contains("**Hibernate mode**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open hibernate").unwrap();
+        assert!(
+            open.contains("**Hibernate mode**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("hibernatemode").is_none());
+        assert!(try_operator_instant_reply("hibernate").is_none());
+        assert!(try_operator_instant_reply("hibernate mode").is_none());
+        let sleep = try_operator_instant_reply("/systemsleep");
+        if let Some(reply) = sleep {
+            assert!(
+                !reply.contains("**Hibernate mode**"),
+                "/systemsleep must stay System Sleep, not Hibernate mode: {reply}"
+            );
+        }
+        let nos = try_operator_instant_reply("/networkoversleep");
+        if let Some(reply) = nos {
+            assert!(
+                !reply.contains("**Hibernate mode**"),
+                "/networkoversleep must stay Network over sleep, not Hibernate mode: {reply}"
+            );
+        }
     }
 
 #[test]

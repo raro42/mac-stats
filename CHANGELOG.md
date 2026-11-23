@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3017] - 2026-11-24
+
+### Added
+- Instant Hibernate mode accepts `/hibernatemode` · `/hibernate-mode` · `/hibernatemode-status` · `/hibernate-mode-status` · `/hibernatemode-state` · `/hibernate-mode-state` · `/hibernate` · `/hibernate-status` · `/hibernate-state` · `/mac-hibernatemode` · `/mac-hibernate-mode` · `/mac-hibernatemode-status` · `/mac-hibernate-mode-status` · `/mac-hibernate` · `/mac-hibernate-status` and view/see/open/list NL (`view hibernate mode`, `open hibernate`, `list hibernatemode`, …), matching “hibernate mode status” / “is hibernate mode on” / “is hibernatemode enabled” / “what's my hibernate mode” / “what's the hibernatemode status”. Bare `hibernatemode` / `hibernate` / `hibernate mode` stay with the agent; `/systemsleep` · `/system-sleep` stay System Sleep; `/networkoversleep` · `/network-over-sleep` stay Network over sleep; `/tcpkeepalive` · `/tcp-keep-alive` stay TCP Keep Alive; `/womp` · `/wake-for-network` stay Wake for network. Operator `/help` lists the new lane.
+
 ## [0.1.3016] - 2026-11-24
 
 ### Fixed

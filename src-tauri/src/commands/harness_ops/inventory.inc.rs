@@ -19508,7 +19508,7 @@ pub fn format_tcpkeepalive_report() -> String {
 /// Slash + view/open NL (`/networkoversleep` · `/network-over-sleep` · `view network over sleep`).
 /// Bare `networkoversleep` / `network over sleep` stay with the agent;
 /// `/tcpkeepalive` stays TCP Keep Alive; `/womp` stays Wake for network;
-/// `/systemsleep` stays System Sleep; hibernatemode stays out.
+/// `/systemsleep` stays System Sleep; `/hibernatemode` stays Hibernate mode.
 pub fn looks_like_networkoversleep_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -19780,6 +19780,320 @@ pub fn format_networkoversleep_report() -> String {
             .to_string();
     }
     format!("**Network over sleep** · `{v}`")
+}
+
+/// Hibernate mode — `pmset` Battery/AC `hibernatemode` (+ active fallback).
+/// Slash + view/open NL (`/hibernatemode` · `/hibernate` · `view hibernate mode`).
+/// Bare `hibernatemode` / `hibernate` / `hibernate mode` stay with the agent;
+/// `/systemsleep` stays System Sleep; `/networkoversleep` stays Network over sleep;
+/// `/tcpkeepalive` stays TCP Keep Alive; `/womp` stays Wake for network.
+pub fn looks_like_hibernatemode_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("wake on network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("hard disk sleep")
+        || n.contains("hdd sleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("systemsleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("computersleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("ttys keep awake")
+        || n.contains("tty-keep-awake")
+        || n.contains("ttys-keep-awake")
+        || n.contains("ttykeepawake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("tcp-keep-alive")
+        || n.contains("tcp keepalive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("network-over-sleep")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/proximitywake"
+        || n == "/proximity-wake"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
+        || n == "/disksleep"
+        || n == "/disk-sleep"
+        || n == "/hard-disk-sleep"
+        || n == "/hdd-sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/computer-sleep"
+        || n == "/computersleep"
+        || n == "/sleep"
+        || n == "/ttyskeepawake"
+        || n == "/tty-keep-awake"
+        || n == "/ttys-keep-awake"
+        || n == "/ttykeepawake"
+        || n == "/tcpkeepalive"
+        || n == "/tcp-keep-alive"
+        || n == "/tcp-keepalive"
+        || n == "/networkoversleep"
+        || n == "/network-over-sleep"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "hibernatemode"
+        || n == "the hibernatemode"
+        || n == "hibernate"
+        || n == "the hibernate"
+        || n == "hibernate mode"
+        || n == "the hibernate mode"
+        || n == "hibernate-mode"
+        || n == "the hibernate-mode"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/hibernatemode"
+            | "/hibernate-mode"
+            | "/hibernatemode-status"
+            | "/hibernate-mode-status"
+            | "/hibernatemode-state"
+            | "/hibernate-mode-state"
+            | "/hibernate"
+            | "/hibernate-status"
+            | "/hibernate-state"
+            | "/mac-hibernatemode"
+            | "/mac-hibernate-mode"
+            | "/mac-hibernatemode-status"
+            | "/mac-hibernate-mode-status"
+            | "/mac-hibernate"
+            | "/mac-hibernate-status"
+            | "hibernatemode status"
+            | "the hibernatemode status"
+            | "hibernate mode status"
+            | "the hibernate mode status"
+            | "hibernate-mode status"
+            | "the hibernate-mode status"
+            | "hibernatemode state"
+            | "the hibernatemode state"
+            | "hibernate mode state"
+            | "the hibernate mode state"
+            | "my hibernatemode"
+            | "my hibernatemode status"
+            | "my hibernate mode"
+            | "my hibernate mode status"
+            | "my hibernate"
+            | "my hibernate status"
+            | "is hibernatemode on"
+            | "is hibernatemode off"
+            | "is hibernatemode enabled"
+            | "is hibernatemode disabled"
+            | "is hibernate mode on"
+            | "is hibernate mode off"
+            | "is hibernate mode enabled"
+            | "is hibernate mode disabled"
+            | "is hibernate-mode on"
+            | "is hibernate-mode enabled"
+            | "is hibernate on"
+            | "is hibernate off"
+            | "is hibernate enabled"
+            | "is hibernate disabled"
+            | "what's my hibernatemode"
+            | "whats my hibernatemode"
+            | "what is my hibernatemode"
+            | "what's my hibernatemode status"
+            | "whats my hibernatemode status"
+            | "what is my hibernatemode status"
+            | "what's my hibernate mode"
+            | "whats my hibernate mode"
+            | "what is my hibernate mode"
+            | "what's my hibernate mode status"
+            | "whats my hibernate mode status"
+            | "what is my hibernate mode status"
+            | "what's my hibernate"
+            | "whats my hibernate"
+            | "what is my hibernate"
+            | "what's my hibernate status"
+            | "whats my hibernate status"
+            | "what is my hibernate status"
+            | "what's the hibernatemode"
+            | "whats the hibernatemode"
+            | "what is the hibernatemode"
+            | "what's the hibernatemode status"
+            | "whats the hibernatemode status"
+            | "what is the hibernatemode status"
+            | "what's the hibernate mode"
+            | "whats the hibernate mode"
+            | "what is the hibernate mode"
+            | "what's the hibernate mode status"
+            | "whats the hibernate mode status"
+            | "what is the hibernate mode status"
+            | "what's the hibernate"
+            | "whats the hibernate"
+            | "what is the hibernate"
+            | "what's the hibernate status"
+            | "whats the hibernate status"
+            | "what is the hibernate status"
+            | "how's hibernatemode"
+            | "hows hibernatemode"
+            | "how's the hibernatemode"
+            | "hows the hibernatemode"
+            | "how's hibernate mode"
+            | "hows hibernate mode"
+            | "how's the hibernate mode"
+            | "hows the hibernate mode"
+            | "how's hibernate"
+            | "hows hibernate"
+            | "how's the hibernate"
+            | "hows the hibernate"
+            | "view hibernatemode"
+            | "view the hibernatemode"
+            | "view hibernatemode status"
+            | "view the hibernatemode status"
+            | "view hibernate mode"
+            | "view the hibernate mode"
+            | "view hibernate mode status"
+            | "view the hibernate mode status"
+            | "view hibernate-mode"
+            | "view the hibernate-mode"
+            | "view hibernate"
+            | "view the hibernate"
+            | "view hibernate status"
+            | "view the hibernate status"
+            | "see hibernatemode"
+            | "see the hibernatemode"
+            | "see hibernatemode status"
+            | "see the hibernatemode status"
+            | "see hibernate mode"
+            | "see the hibernate mode"
+            | "see hibernate mode status"
+            | "see the hibernate mode status"
+            | "see hibernate"
+            | "see the hibernate"
+            | "open hibernatemode"
+            | "open the hibernatemode"
+            | "open hibernatemode status"
+            | "open the hibernatemode status"
+            | "open hibernate mode"
+            | "open the hibernate mode"
+            | "open hibernate mode status"
+            | "open the hibernate mode status"
+            | "open hibernate-mode"
+            | "open the hibernate-mode"
+            | "open hibernate"
+            | "open the hibernate"
+            | "list hibernatemode"
+            | "list the hibernatemode"
+            | "list hibernatemode status"
+            | "list the hibernatemode status"
+            | "list hibernate mode"
+            | "list the hibernate mode"
+            | "list hibernate mode status"
+            | "list the hibernate mode status"
+            | "list hibernate-mode"
+            | "list the hibernate-mode"
+            | "list hibernate"
+            | "list the hibernate"
+    )
+}
+
+/// Zero-LLM Hibernate mode status from pmset Battery/AC `hibernatemode` (macOS-only; empty elsewhere).
+pub fn format_hibernatemode_report() -> String {
+    let v = crate::metrics::get_hibernatemode_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Hibernate mode** — _no Hibernate mode reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**Hibernate mode** · `{v}`")
 }
 
 /// System Sleep — `pmset` Battery/AC `sleep` minutes (+ active fallback; 0 = Never).
