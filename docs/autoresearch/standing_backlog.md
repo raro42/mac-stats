@@ -1,3 +1,16 @@
+## Overnight note 2026-11-23 ~20:05
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Fuel: product after Monitors kb-hints v0.1.2996 — Firewall listapps slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.2997** — `/listapps` · `/list-apps` · `/firewall-apps` · `/fw-apps` · `/afw-apps` · `/firewall-listapps` · `/mac-firewall-apps` + view/open NL; bare list apps/firewall apps/apps stay with agent; `/firewall` · `/stealth` · `/firewall-logging` · `/allow-signed` · `/block-all` intact.
+- Ratchet keep after verify; install/kickstart (Rust).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — not another keep-pNN clone.
+
+## Overnight merge — v0.1.2997
+
+- Product fuel after Monitors kb-hints v0.1.2996: Application Firewall listed apps already readable via `socketfilterfw --listapps` but lacked `/listapps` · `/list-apps` · `/firewall-apps` · `/firewall-listapps` · `/fw-apps` · `/afw-apps` · `/app-firewall-apps` · `/application-firewall-apps` · `/socketfilterfw-listapps` · `/mac-firewall-apps` · `/mac-fw-apps` · `/mac-listapps` and view/see/open/list phrases while Firewall `/firewall`, stealth `/stealth`, logging `/firewall-logging`, allow-signed `/allow-signed`, and block-all `/block-all` already had slash+NL. Bare `list apps` / `firewall apps` / `apps` stay with the agent; `list allow signed apps` stays allow-signed; `list app firewall` stays global Firewall. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily Neon marked today (Futuristic due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — listapps slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~05:50
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=true → feature-disk-cleanup grace-backfill + **feature-monitors** kb-hints.
