@@ -40077,6 +40077,48 @@ body.theme-swiss-minimalistic .processes-hot-attention-glance.has-hot {
 }
 
 /*
+ * Swiss Minimalistic: Top Processes collapsed Top CPU / GPU / RAM glances still
+ * inherit shared Apple `#007aff` focus fallback while Swiss already remapped
+ * `.processes-filter-attention-glance` · `.processes-hot-attention-glance` onto
+ * ink `#121216`, and cream Light / Material / Architect remapped top glances
+ * onto cream paper. Opaque Swiss ink mixes (Hot / ok keep status amber / green).
+ * Design-review `feature-processes` (polish-without-capture — Mac TCC /
+ * window capture flaky). Standing P2 #14 after Swiss hot-attention v0.1.2862;
+ * not a keep-pNN filter-chip clone.
+ */
+/* OVERNIGHT v0.1.2984: Swiss processes-top-glance · gpu · ram remaps */
+body.theme-swiss-minimalistic .processes-top-glance,
+body.theme-swiss-minimalistic .processes-top-gpu-glance,
+body.theme-swiss-minimalistic .processes-top-ram-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
+  color: var(--text, color-mix(in srgb, #0c0c10 92%, #ffffff));
+}
+body.theme-swiss-minimalistic .processes-top-glance:hover,
+body.theme-swiss-minimalistic .processes-top-gpu-glance:hover,
+body.theme-swiss-minimalistic .processes-top-ram-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+}
+body.theme-swiss-minimalistic .processes-top-glance:focus-visible,
+body.theme-swiss-minimalistic .processes-top-gpu-glance:focus-visible,
+body.theme-swiss-minimalistic .processes-top-ram-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #121216) 45%, #ffffff);
+}
+body.theme-swiss-minimalistic .processes-top-glance.is-hot,
+body.theme-swiss-minimalistic .processes-top-gpu-glance.is-hot,
+body.theme-swiss-minimalistic .processes-top-ram-glance.is-hot {
+  border-color: color-mix(in srgb, #ff9500 26%, #ffffff);
+  background: color-mix(in srgb, #ff9500 6%, #ffffff);
+}
+body.theme-swiss-minimalistic .processes-top-glance.is-ok,
+body.theme-swiss-minimalistic .processes-top-gpu-glance.is-ok,
+body.theme-swiss-minimalistic .processes-top-ram-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
+}
+
+/*
  * Swiss Minimalistic: Top Processes filter chips + filter-miss still mix shared
  * Apple `#ffffff` / `#0a84ff` / `#007aff` washes on Swiss paper while cream
  * Light / Material / Architect remapped chips in v0.1.2643 and filter-miss on

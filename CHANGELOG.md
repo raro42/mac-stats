@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2984] - 2026-11-23
+
+### Fixed
+- Swiss Minimalistic Top Processes collapsed Top CPU / GPU / RAM glances: shared Apple `#007aff` focus fallback → theme `--accent` ink `#121216` (parity with Swiss filter-attention / hot-attention glances; cream Light / Material / Architect already remapped).
+
 ## [0.1.2983] - 2026-11-23
 
 ### Added
