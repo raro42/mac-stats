@@ -1,3 +1,16 @@
+## Overnight note 2026-11-23 ~05:25
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=true → recommended **feature-cpu-metrics** (77d stale; prior rings/sparklines/power grace expired).
+- Layout daily: Neon already marked for 2026-11-23 (Futuristic next calendar quota).
+- Fuel: design-review CPU chrome kb-hints (not keep-pNN; cream/Swiss Send fill white-on-blue intentional).
+- Shipped **v0.1.2994** — shorter warmer Details · icon line · header Refresh/Settings · footer version tips.
+- Ratchet keep after verify; sync-dist (UI JS); backfill 2993 keep; polish grace marked feature-cpu-metrics.
+- Next fuel: **feature-disk-cleanup** design-review · cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — feature-cpu-metrics chrome kb-hint copy closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.2994
+
+- Design-review fuel after Firewall block-all `/block-all` NL v0.1.2993: CPU window Details grid · icon line · header Refresh/Settings · footer version still used long cold “crosses to …” / “Tab or click an icon …” copy while rings · sparklines · Bat/LPM/Power already shipped shorter warmer KISS lines (v0.1.2986). Shortened chrome hints to match. Digester empty; layout-daily Neon marked today (Futuristic due next calendar quota). Recapture deferred (Mac TCC); polish grace marked. Next: feature-disk-cleanup design-review · cream/Swiss Send fill white-on-blue intentional · Futuristic layout-daily next calendar day · soft-state sibling/product fuel — CPU chrome kb-hint copy closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-23 ~05:10
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
