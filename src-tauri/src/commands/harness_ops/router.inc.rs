@@ -1104,9 +1104,16 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     // Remote Apple Events (bare `apple events` / `remote apple events` / `eppc` / `rae` stay with the agent;
     // `/remote-login` · `/ssh` stay Remote Login; `/remote-management` · `/ard` stay Remote Management;
-    // `/screen-sharing` · `/vnc` stay Screen Sharing; `/media-sharing` · `/home-sharing` stay Media Sharing).
+    // `/screen-sharing` · `/vnc` stay Screen Sharing; `/media-sharing` · `/home-sharing` stay Media Sharing;
+    // AirPlay Receiver stays `/airplay` · `/airplay-receiver`).
     if looks_like_remote_apple_events_request(content) {
         return Some(format_remote_apple_events_report());
+    }
+    // AirPlay Receiver (bare `airplay` / `airplay receiver` stay with the agent; `/media-sharing` ·
+    // `/home-sharing` stay Media Sharing; `/remote-apple-events` · `/rae` · `/eppc` stay Remote Apple Events;
+    // `/screen-sharing` · `/vnc` stay Screen Sharing; `/display` stays connected displays).
+    if looks_like_airplay_receiver_request(content) {
+        return Some(format_airplay_receiver_report());
     }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).

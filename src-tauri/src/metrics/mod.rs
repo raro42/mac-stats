@@ -1708,6 +1708,114 @@ pub fn get_remote_apple_events_status() -> String {
     info
 }
 
+/// Combine AirPlay Receiver pref + advertising + listen ports into a short status line.
+pub(crate) fn format_airplay_receiver_parts(
+    enabled: Option<bool>,
+    advertising: Option<i64>,
+    listening: bool,
+) -> String {
+    match (enabled, listening) {
+        (Some(false), _) => "Off".to_string(),
+        (Some(true), true) => "On · listening".to_string(),
+        (Some(true), false) => "On".to_string(),
+        (None, true) => "On · listening".to_string(),
+        (None, false) => match advertising {
+            Some(0) => "Off".to_string(),
+            Some(_) => "On".to_string(),
+            None => String::new(),
+        },
+    }
+}
+
+/// True when localhost TCP 5000 or 7000 accepts (ControlCenter AirPlay Receiver).
+pub(crate) fn airplay_receiver_ports_listening() -> bool {
+    use std::net::{SocketAddr, TcpStream};
+    use std::time::Duration;
+    let timeout = Duration::from_millis(80);
+    for port in [5000_u16, 7000] {
+        let addr = SocketAddr::from(([127, 0, 0, 1], port));
+        if TcpStream::connect_timeout(&addr, timeout).is_ok() {
+            return true;
+        }
+    }
+    false
+}
+
+/// Parse `defaults -currentHost read …` AirPlay Receiver flag (0/1 / true/false / yes/no).
+pub(crate) fn parse_airplay_receiver_enabled(raw: &str) -> Option<bool> {
+    let t = raw.trim().to_ascii_lowercase();
+    if t.is_empty() {
+        return None;
+    }
+    if matches!(t.as_str(), "0" | "false" | "no" | "off") {
+        return Some(false);
+    }
+    if matches!(t.as_str(), "1" | "true" | "yes" | "on") {
+        return Some(true);
+    }
+    None
+}
+
+/// Parse AirplayReceiverAdvertising integer from defaults stdout.
+pub(crate) fn parse_airplay_receiver_advertising(raw: &str) -> Option<i64> {
+    let t = raw.trim();
+    if t.is_empty() {
+        return None;
+    }
+    t.parse::<i64>().ok()
+}
+
+/// macOS AirPlay Receiver from Control Center host prefs + listen ports 5000/7000.
+/// Distinct from Media Sharing `/media-sharing`, Remote Apple Events `/rae` · `/eppc`,
+/// Screen Sharing `/vnc`, and display `/display`.
+/// Used by Discord/operator instant `/airplay` · `/airplay-receiver` lane.
+pub fn get_airplay_receiver_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let read_host = |key: &str| -> Option<String> {
+            let output = Command::new("/usr/bin/defaults")
+                .args(["-currentHost", "read", "com.apple.controlcenter", key])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout).trim().to_string();
+                    if stdout.is_empty() {
+                        None
+                    } else {
+                        Some(stdout)
+                    }
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("airplay-receiver: defaults -currentHost read spawn failed ({key})");
+                    None
+                }
+            }
+        };
+
+        let enabled = read_host("AirplayReceiverEnabled")
+            .as_deref()
+            .and_then(parse_airplay_receiver_enabled);
+        let advertising = read_host("AirplayReceiverAdvertising")
+            .as_deref()
+            .and_then(parse_airplay_receiver_advertising);
+        let listening = airplay_receiver_ports_listening();
+
+        let info = format_airplay_receiver_parts(enabled, advertising, listening);
+        if info.is_empty() {
+            debug3!("airplay-receiver: empty status");
+        } else {
+            debug3!("airplay-receiver status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Local timezone — IANA when `/etc/localtime` points at zoneinfo, else abbr · offset.
 /// Live (not OnceLock): DST abbr/offset change while the process stays up.
 /// Used by the Discord/operator instant `/timezone` · `/tz` lane.
@@ -4288,6 +4396,59 @@ mod media_sharing_parse_tests {
             format_media_sharing_parts(Some(true), Some(true), true),
             "On · home · photos · active"
         );
+    }
+}
+
+#[cfg(test)]
+mod airplay_receiver_parse_tests {
+    use super::{
+        format_airplay_receiver_parts, parse_airplay_receiver_advertising,
+        parse_airplay_receiver_enabled,
+    };
+
+    #[test]
+    fn parses_enabled_flags() {
+        assert_eq!(parse_airplay_receiver_enabled("0\n"), Some(false));
+        assert_eq!(parse_airplay_receiver_enabled("1"), Some(true));
+        assert_eq!(parse_airplay_receiver_enabled("true"), Some(true));
+        assert_eq!(parse_airplay_receiver_enabled("false"), Some(false));
+        assert_eq!(parse_airplay_receiver_enabled("nope"), None);
+    }
+
+    #[test]
+    fn parses_advertising_ints() {
+        assert_eq!(parse_airplay_receiver_advertising("2\n"), Some(2));
+        assert_eq!(parse_airplay_receiver_advertising("0"), Some(0));
+        assert_eq!(parse_airplay_receiver_advertising("x"), None);
+    }
+
+    #[test]
+    fn formats_off_on_and_listening() {
+        assert_eq!(
+            format_airplay_receiver_parts(Some(false), Some(2), true),
+            "Off"
+        );
+        assert_eq!(
+            format_airplay_receiver_parts(Some(true), Some(2), false),
+            "On"
+        );
+        assert_eq!(
+            format_airplay_receiver_parts(Some(true), Some(3), true),
+            "On · listening"
+        );
+        assert_eq!(
+            format_airplay_receiver_parts(None, Some(2), true),
+            "On · listening"
+        );
+        assert_eq!(
+            format_airplay_receiver_parts(None, Some(0), false),
+            "Off"
+        );
+        assert_eq!(
+            format_airplay_receiver_parts(None, Some(2), false),
+            "On"
+        );
+        assert_eq!(format_airplay_receiver_parts(None, None, false), "");
     }
 }
 

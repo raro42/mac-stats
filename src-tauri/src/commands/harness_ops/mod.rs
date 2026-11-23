@@ -2915,6 +2915,76 @@ mod tests {
                 "/media-sharing must stay Media Sharing, not Remote Apple Events: {reply}"
             );
         }
+        assert!(!looks_like_remote_apple_events_request("/airplay"));
+        assert!(!looks_like_remote_apple_events_request("/airplay-receiver"));
+        assert!(!looks_like_remote_apple_events_request("view airplay"));
+    }
+
+    #[test]
+    fn airplay_receiver_slash_and_view_open_do_not_steal_media_rae_or_bare_airplay() {
+        // Slash + view/open NL → AirPlay Receiver (`/media-sharing` · `/rae` parity).
+        // Bare `airplay` / `airplay receiver` stay with the agent; `/media-sharing` stays Media Sharing;
+        // `/rae` · `/eppc` stay Remote Apple Events; `/vnc` stays Screen Sharing; `/display` stays displays.
+        assert!(looks_like_airplay_receiver_request("/airplay"));
+        assert!(looks_like_airplay_receiver_request("/airplay-status"));
+        assert!(looks_like_airplay_receiver_request("/airplay-receiver"));
+        assert!(looks_like_airplay_receiver_request("/airplayreceiver"));
+        assert!(looks_like_airplay_receiver_request("/airplay-recv"));
+        assert!(looks_like_airplay_receiver_request("/airplay-rx"));
+        assert!(looks_like_airplay_receiver_request("/ap-receiver"));
+        assert!(looks_like_airplay_receiver_request("/mac-airplay"));
+        assert!(looks_like_airplay_receiver_request("/mac-airplay-receiver"));
+        assert!(looks_like_airplay_receiver_request("view airplay"));
+        assert!(looks_like_airplay_receiver_request("open airplay receiver status"));
+        assert!(looks_like_airplay_receiver_request("list airplay"));
+        assert!(looks_like_airplay_receiver_request("airplay status"));
+        assert!(looks_like_airplay_receiver_request("is airplay on"));
+        assert!(looks_like_airplay_receiver_request("is airplay receiver enabled"));
+        assert!(looks_like_airplay_receiver_request("what's my airplay"));
+        assert!(looks_like_airplay_receiver_request("view airplay receiver"));
+        assert!(!looks_like_airplay_receiver_request("airplay"));
+        assert!(!looks_like_airplay_receiver_request("airplay receiver"));
+        assert!(!looks_like_airplay_receiver_request("/media-sharing"));
+        assert!(!looks_like_airplay_receiver_request("/home-sharing"));
+        assert!(!looks_like_airplay_receiver_request("/remote-apple-events"));
+        assert!(!looks_like_airplay_receiver_request("/rae"));
+        assert!(!looks_like_airplay_receiver_request("/eppc"));
+        assert!(!looks_like_airplay_receiver_request("/screen-sharing"));
+        assert!(!looks_like_airplay_receiver_request("/vnc"));
+        assert!(!looks_like_airplay_receiver_request("/display"));
+        assert!(!looks_like_airplay_receiver_request("/tasks"));
+        assert!(!looks_like_airplay_receiver_request("enable airplay"));
+        assert!(!looks_like_media_sharing_request("/airplay"));
+        assert!(!looks_like_media_sharing_request("view airplay"));
+        assert!(!looks_like_remote_apple_events_request("/airplay"));
+        assert!(!looks_like_remote_apple_events_request("view airplay receiver"));
+        let ap = try_operator_instant_reply("/airplay").unwrap();
+        assert!(
+            ap.contains("**AirPlay Receiver**") && !ap.to_lowercase().contains("execution"),
+            "got: {ap}"
+        );
+        let viewed = try_operator_instant_reply("view airplay receiver").unwrap();
+        assert!(
+            viewed.contains("**AirPlay Receiver**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        assert!(try_operator_instant_reply("airplay").is_none());
+        assert!(try_operator_instant_reply("airplay receiver").is_none());
+        let ms = try_operator_instant_reply("/media-sharing");
+        if let Some(reply) = ms {
+            assert!(
+                !reply.contains("**AirPlay Receiver**"),
+                "/media-sharing must stay Media Sharing, not AirPlay Receiver: {reply}"
+            );
+        }
+        let rae = try_operator_instant_reply("/rae");
+        if let Some(reply) = rae {
+            assert!(
+                !reply.contains("**AirPlay Receiver**"),
+                "/rae must stay Remote Apple Events, not AirPlay Receiver: {reply}"
+            );
+        }
     }
 
 #[test]

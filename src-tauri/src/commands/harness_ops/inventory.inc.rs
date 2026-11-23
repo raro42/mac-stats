@@ -13391,6 +13391,9 @@ pub fn looks_like_media_sharing_request(content: &str) -> bool {
         || n.contains("apple events")
         || n.contains("apple-events")
         || n.contains("eppc")
+        || n.contains("airplay")
+        || n.contains("air play")
+        || n.contains("airplay-receiver")
         || n.contains("wifi")
         || n.contains("wi-fi")
         || n.contains("ssid")
@@ -13709,6 +13712,10 @@ pub fn looks_like_remote_apple_events_request(content: &str) -> bool {
         || n.contains("home sharing")
         || n.contains("homesharing")
         || n.contains("home-sharing")
+        || n.contains("airplay")
+        || n.contains("air play")
+        || n.contains("airplay-receiver")
+        || n.contains("airplayreceiver")
         || n.contains("wifi")
         || n.contains("wi-fi")
         || n.contains("ssid")
@@ -13748,6 +13755,9 @@ pub fn looks_like_remote_apple_events_request(content: &str) -> bool {
         || n == "/obex"
         || n == "/media-sharing"
         || n == "/home-sharing"
+        || n == "/airplay"
+        || n == "/airplay-receiver"
+        || n == "/airplayreceiver"
         || n == "/ip"
         || n == "/wifi"
         || n == "/tasks"
@@ -14008,6 +14018,295 @@ pub fn format_remote_apple_events_report() -> String {
             .to_string();
     }
     format!("**Remote Apple Events** · `{v}`")
+}
+
+/// AirPlay Receiver — Control Center host prefs + ports 5000/7000.
+/// "Why" / enable/disable stay with the agent. Slash + view/open NL (`/airplay` · `/airplay-receiver`).
+/// Bare `airplay` / `airplay receiver` stay with the agent; `/media-sharing` · `/home-sharing` stay Media
+/// Sharing; `/remote-apple-events` · `/rae` · `/eppc` stay Remote Apple Events; `/screen-sharing` · `/vnc`
+/// stay Screen Sharing; `/display` stays connected displays.
+pub fn looks_like_airplay_receiver_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("firewall")
+        || n.contains("stealth")
+        || n.contains("gatekeeper")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("system integrity")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("vpn")
+        || n.contains("remote login")
+        || n.contains("remotelogin")
+        || n.contains("remote-login")
+        || n.contains("screen sharing")
+        || n.contains("screensharing")
+        || n.contains("screen-sharing")
+        || n.contains("screen share")
+        || n.contains("file sharing")
+        || n.contains("filesharing")
+        || n.contains("file-sharing")
+        || n.contains("file share")
+        || n.contains("printer sharing")
+        || n.contains("printersharing")
+        || n.contains("printer-sharing")
+        || n.contains("share printers")
+        || n.contains("cups share")
+        || n.contains("cups sharing")
+        || n.contains("remote management")
+        || n.contains("remotemanagement")
+        || n.contains("remote-management")
+        || n.contains("remote desktop")
+        || n.contains("apple remote desktop")
+        || n.contains("remote apple events")
+        || n.contains("remote-apple-events")
+        || n.contains("remoteappleevents")
+        || n.contains("apple events")
+        || n.contains("apple-events")
+        || n.contains("content caching")
+        || n.contains("contentcaching")
+        || n.contains("content-caching")
+        || n.contains("content cache")
+        || n.contains("asset cache")
+        || n.contains("assetcache")
+        || n.contains("asset-cache")
+        || n.contains("internet sharing")
+        || n.contains("internetsharing")
+        || n.contains("internet-sharing")
+        || n.contains("bluetooth sharing")
+        || n.contains("bluetoothsharing")
+        || n.contains("bluetooth-sharing")
+        || n.contains("media sharing")
+        || n.contains("mediasharing")
+        || n.contains("media-sharing")
+        || n.contains("home sharing")
+        || n.contains("homesharing")
+        || n.contains("home-sharing")
+        || n.contains("wifi")
+        || n.contains("wi-fi")
+        || n.contains("ssid")
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/stealth"
+        || n == "/gatekeeper"
+        || n == "/sip"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/timemachine"
+        || n == "/tm"
+        || n == "/vpn"
+        || n == "/remote-login"
+        || n == "/remotelogin"
+        || n == "/ssh"
+        || n == "/sshd"
+        || n == "/screen-sharing"
+        || n == "/screensharing"
+        || n == "/vnc"
+        || n == "/file-sharing"
+        || n == "/filesharing"
+        || n == "/smb"
+        || n == "/smb-status"
+        || n == "/smbd"
+        || n == "/printer-sharing"
+        || n == "/cups-share"
+        || n == "/remote-management"
+        || n == "/ard"
+        || n == "/content-caching"
+        || n == "/asset-cache"
+        || n == "/internet-sharing"
+        || n == "/ics"
+        || n == "/bluetooth-sharing"
+        || n == "/bts"
+        || n == "/obex"
+        || n == "/media-sharing"
+        || n == "/home-sharing"
+        || n == "/remote-apple-events"
+        || n == "/rae"
+        || n == "/eppc"
+        || n == "/apple-events"
+        || n == "/ip"
+        || n == "/wifi"
+        || n == "/tasks"
+        || n == "/screen"
+        || n == "/screens"
+        || n == "/display"
+        || n == "/displays"
+        || n == "airplay"
+        || n == "the airplay"
+        || n == "air play"
+        || n == "the air play"
+        || n == "airplay receiver"
+        || n == "the airplay receiver"
+        || n == "air play receiver"
+        || n == "the air play receiver"
+        || n == "airplay-receiver"
+        || n == "the airplay-receiver"
+        || n == "receiver"
+        || n == "the receiver"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/airplay"
+            | "/airplay-status"
+            | "/airplay-state"
+            | "/airplay-receiver"
+            | "/airplayreceiver"
+            | "/airplay-receiver-status"
+            | "/airplayreceiver-status"
+            | "/airplay-recv"
+            | "/airplay-rx"
+            | "/ap-receiver"
+            | "/mac-airplay"
+            | "/mac-airplay-receiver"
+            | "/airplay-receiver-mode"
+            | "airplay status"
+            | "the airplay status"
+            | "airplay state"
+            | "the airplay state"
+            | "airplay receiver status"
+            | "the airplay receiver status"
+            | "airplay-receiver status"
+            | "the airplay-receiver status"
+            | "airplayreceiver status"
+            | "the airplayreceiver status"
+            | "my airplay"
+            | "my airplay status"
+            | "my airplay receiver"
+            | "my airplay receiver status"
+            | "is airplay on"
+            | "is airplay off"
+            | "is airplay enabled"
+            | "is airplay disabled"
+            | "is airplay receiver on"
+            | "is airplay receiver off"
+            | "is airplay receiver enabled"
+            | "is airplay receiver disabled"
+            | "is airplay-receiver on"
+            | "is airplay-receiver enabled"
+            | "is airplayreceiver on"
+            | "is airplayreceiver enabled"
+            | "what's my airplay"
+            | "whats my airplay"
+            | "what is my airplay"
+            | "what's my airplay status"
+            | "whats my airplay status"
+            | "what is my airplay status"
+            | "what's my airplay receiver"
+            | "whats my airplay receiver"
+            | "what is my airplay receiver"
+            | "what's my airplay receiver status"
+            | "whats my airplay receiver status"
+            | "what is my airplay receiver status"
+            | "what's the airplay"
+            | "whats the airplay"
+            | "what is the airplay"
+            | "what's the airplay status"
+            | "whats the airplay status"
+            | "what is the airplay status"
+            | "what's the airplay receiver"
+            | "whats the airplay receiver"
+            | "what is the airplay receiver"
+            | "what's the airplay receiver status"
+            | "whats the airplay receiver status"
+            | "what is the airplay receiver status"
+            | "how's airplay"
+            | "hows airplay"
+            | "how's the airplay"
+            | "hows the airplay"
+            | "how's airplay receiver"
+            | "hows airplay receiver"
+            | "view airplay"
+            | "view the airplay"
+            | "view airplay status"
+            | "view the airplay status"
+            | "view airplay receiver"
+            | "view the airplay receiver"
+            | "view airplay receiver status"
+            | "view the airplay receiver status"
+            | "view airplay-receiver"
+            | "view the airplay-receiver"
+            | "view airplayreceiver"
+            | "view the airplayreceiver"
+            | "see airplay"
+            | "see the airplay"
+            | "see airplay status"
+            | "see the airplay status"
+            | "see airplay receiver"
+            | "see the airplay receiver"
+            | "see airplay receiver status"
+            | "see the airplay receiver status"
+            | "open airplay"
+            | "open the airplay"
+            | "open airplay status"
+            | "open the airplay status"
+            | "open airplay receiver"
+            | "open the airplay receiver"
+            | "open airplay receiver status"
+            | "open the airplay receiver status"
+            | "list airplay"
+            | "list the airplay"
+            | "list airplay status"
+            | "list the airplay status"
+            | "list airplay receiver"
+            | "list the airplay receiver"
+            | "list airplay receiver status"
+            | "list the airplay receiver status"
+            | "show airplay"
+            | "show the airplay"
+            | "show me airplay"
+            | "show me the airplay"
+            | "show airplay status"
+            | "show the airplay status"
+            | "show me airplay status"
+            | "show me the airplay status"
+            | "show airplay receiver"
+            | "show the airplay receiver"
+            | "show me airplay receiver"
+            | "show me the airplay receiver"
+            | "show airplay receiver status"
+            | "show the airplay receiver status"
+            | "show me airplay receiver status"
+            | "show me the airplay receiver status"
+    )
+}
+
+/// Zero-LLM AirPlay Receiver status from Control Center prefs + listen ports (macOS-only; empty elsewhere).
+pub fn format_airplay_receiver_report() -> String {
+    let v = crate::metrics::get_airplay_receiver_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**AirPlay Receiver** — _no AirPlay Receiver reading on this Mac right now._".to_string();
+    }
+    format!("**AirPlay Receiver** · `{v}`")
 }
 
 /// SSD / disk total capacity — not the used-% chip, not free-bytes, not Disk Cleanup.

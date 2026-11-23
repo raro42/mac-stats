@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2982] - 2026-11-23
+
+### Added
+- Instant AirPlay Receiver status accepts `/airplay` · `/airplay-status` · `/airplay-state` · `/airplay-receiver` · `/airplayreceiver` · `/airplay-receiver-status` · `/airplay-recv` · `/airplay-rx` · `/ap-receiver` · `/mac-airplay` · `/mac-airplay-receiver` and view/see/open/list NL (`view airplay`, `open airplay receiver status`, `list airplay`, …), matching “airplay status” / “is airplay on” / “is airplay receiver enabled” / “what's my airplay” / “what's the airplay receiver status”. Bare `airplay` / `airplay receiver` stay with the agent; `/media-sharing` · `/home-sharing` stay Media Sharing; `/remote-apple-events` · `/rae` · `/eppc` stay Remote Apple Events; `/screen-sharing` · `/vnc` stay Screen Sharing; `/display` stays connected displays.
+
 ## [0.1.2981] - 2026-11-23
 
 ### Added
