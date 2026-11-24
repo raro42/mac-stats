@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~03:25 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel attempt: Standby delay high after Autopower Off delay v0.1.3026 — **remote raced v0.1.3027**; local duplicate discarded + remote keep backfill.
+- Then shipped **v0.1.3028** — `/standbydelaylow` · `/standby-delay-low` · `/mac-standbydelaylow` + view/open NL; bare standbydelaylow/standby delay low stay with agent; `/standbydelay` · `/standbydelayhigh` · `/standby` · `/autopoweroffdelay` intact; `/help` lists lane.
+- Ratchet: discard@44af071 (dup 3027) + keep backfill remote 3027; keep @ d2432bddb for 3028; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-24 + archive.
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day — Standby delay high/low slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3028
+
+- Product fuel after Standby delay high v0.1.3027 (local high race discarded): Standby delay low already readable via `pmset -g custom` Battery/AC `standbydelaylow` (+ active `pmset -g`; seconds; often absent on Apple Silicon) but lacked `/standbydelaylow` · `/standby-delay-low` · `/mac-standbydelaylow` and view/see/open/list phrases while Standby delay `/standbydelay` and Standby delay high `/standbydelayhigh` already had slash+NL. Bare `standbydelaylow` / `standby delay low` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day — Standby delay high/low slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~03:16 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
