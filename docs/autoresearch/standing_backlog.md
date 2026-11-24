@@ -1,3 +1,20 @@
+## Overnight note 2026-11-24 ~21:20 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota; already_checked_today).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: standing backlog soft-state after Wake on Modem Ring v0.1.3044 — Sleep Disabled / SleepDisabled (not keep-pNN; Dark layout-daily next calendar day).
+- Shipped **v0.1.3045** — `/sleepdisabled` · `/sleep-disabled` · `/disable-sleep` · `/mac-sleepdisabled` + view/open NL; bare sleepdisabled/sleep disabled/disable sleep stay with agent; `/systemsleep` · `/sleep` · `/ring` · `/displaysleep` · `/disksleep` · `/norestoresleep` intact; `/help` lists lane.
+- Ratchet keep @ 3f56aa4a3 for 3045.
+- Morning surprise: refresh 2026-11-25 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SleepDisabled — not another keep-pNN clone.
+
+## Overnight merge — v0.1.3045
+
+- Product fuel after Wake on Modem Ring v0.1.3044: Sleep Disabled already readable via `pmset -g custom` Battery/AC `SleepDisabled` (+ active `pmset -g`; often absent on Apple Silicon) but lacked `/sleepdisabled` · `/sleep-disabled` · `/disable-sleep` · `/mac-sleepdisabled` and view/see/open/list phrases while System Sleep `/systemsleep`, Wake on Modem Ring `/ring`, Display Sleep `/displaysleep`, Disk Sleep `/disksleep`, and No Restore Sleep `/norestoresleep` already had slash+NL. Bare `sleepdisabled` / `sleep disabled` / `disable sleep` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SleepDisabled soft-state closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~21:02 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
