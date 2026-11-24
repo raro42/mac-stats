@@ -5109,6 +5109,131 @@ pub fn get_autopoweroff_status() -> String {
     }
 }
 
+/// Parse `pmset -g custom` Battery/AC `autopoweroffdelay` seconds → (battery, ac).
+/// Exact key `autopoweroffdelay` only (not `autopoweroff`).
+pub(crate) fn parse_pmset_custom_autopoweroffdelay(raw: &str) -> (Option<u32>, Option<u32>) {
+    let mut section: Option<&str> = None;
+    let mut battery = None;
+    let mut ac = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.eq_ignore_ascii_case("Battery Power:") {
+            section = Some("battery");
+            continue;
+        }
+        if t.eq_ignore_ascii_case("AC Power:") {
+            section = Some("ac");
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("autopoweroffdelay") {
+            continue;
+        }
+        let secs = match parts.next().and_then(|v| v.parse::<u32>().ok()) {
+            Some(v) => Some(v),
+            None => continue,
+        };
+        match section {
+            Some("battery") => battery = secs.or(battery),
+            Some("ac") => ac = secs.or(ac),
+            _ => {}
+        }
+    }
+    (battery, ac)
+}
+
+/// Parse active `pmset -g` `autopoweroffdelay` seconds (Currently in use).
+pub(crate) fn parse_pmset_active_autopoweroffdelay(raw: &str) -> Option<u32> {
+    for line in raw.lines() {
+        let mut parts = line.trim().split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("autopoweroffdelay") {
+            continue;
+        }
+        return parts.next().and_then(|v| v.parse::<u32>().ok());
+    }
+    None
+}
+
+/// Human Autopower Off delay seconds (reuses Standby delay formatting).
+pub(crate) fn format_autopoweroffdelay_secs(secs: u32) -> String {
+    format_standbydelay_secs(secs)
+}
+
+/// Prefer Battery+AC custom when both set; else active `pmset -g`.
+pub(crate) fn format_autopoweroffdelay_parts(
+    battery: Option<u32>,
+    ac: Option<u32>,
+    active: Option<u32>,
+) -> String {
+    format_standbydelay_parts(battery, ac, active)
+}
+
+/// macOS Autopower Off delay from `pmset -g custom` Battery/AC `autopoweroffdelay`
+/// (fallback: active `pmset -g`; often absent on Apple Silicon). Distinct from
+/// Auto Power Off `/autopoweroff`, Standby delay `/standbydelay`, and
+/// standbydelayhigh / standbydelaylow.
+/// Used by Discord/operator instant `/autopoweroffdelay` · `/auto-power-off-delay` lane.
+pub fn get_autopoweroffdelay_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let (battery, ac) = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g", "custom"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_custom_autopoweroffdelay(&stdout)
+                }
+                Ok(_) => (None, None),
+                Err(_) => {
+                    debug3!("autopoweroffdelay: pmset -g custom spawn failed");
+                    (None, None)
+                }
+            }
+        };
+
+        let active = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_active_autopoweroffdelay(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("autopoweroffdelay: pmset -g spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_autopoweroffdelay_parts(battery, ac, active);
+        if info.is_empty() {
+            debug3!("autopoweroffdelay: empty status");
+        } else {
+            debug3!("autopoweroffdelay status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -9407,6 +9532,78 @@ AC Power:
         );
         assert_eq!(format_autopoweroff_parts(None, None, Some(true)), "On");
         assert_eq!(format_autopoweroff_parts(None, None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod autopoweroffdelay_parse_tests {
+    use super::{
+        format_autopoweroffdelay_parts, parse_pmset_active_autopoweroffdelay,
+        parse_pmset_custom_autopoweroffdelay,
+    };
+
+    #[test]
+    fn parses_custom_battery_and_ac() {
+        let sample = r#"
+Battery Power:
+ autopoweroffdelay    10800
+ autopoweroff         1
+AC Power:
+ autopoweroffdelay    86400
+ standbydelay         10800
+"#;
+        assert_eq!(
+            parse_pmset_custom_autopoweroffdelay(sample),
+            (Some(10800), Some(86400))
+        );
+        assert_eq!(parse_pmset_custom_autopoweroffdelay("nope"), (None, None));
+        let other = r#"
+Battery Power:
+ autopoweroff         1
+AC Power:
+ standbydelay         10800
+"#;
+        assert_eq!(parse_pmset_custom_autopoweroffdelay(other), (None, None));
+    }
+
+    #[test]
+    fn parses_active_autopoweroffdelay() {
+        assert_eq!(
+            parse_pmset_active_autopoweroffdelay(
+                "Currently in use:\n autopoweroffdelay    10800\n"
+            ),
+            Some(10800)
+        );
+        assert_eq!(
+            parse_pmset_active_autopoweroffdelay(" autopoweroff         1\n"),
+            None
+        );
+        assert_eq!(
+            parse_pmset_active_autopoweroffdelay(" standbydelay         10800\n"),
+            None
+        );
+    }
+
+    #[test]
+    fn formats_parts() {
+        assert_eq!(
+            format_autopoweroffdelay_parts(Some(10800), Some(10800), Some(0)),
+            "3h"
+        );
+        assert_eq!(
+            format_autopoweroffdelay_parts(Some(10800), Some(86400), None),
+            "AC 24h · Battery 3h"
+        );
+        assert_eq!(
+            format_autopoweroffdelay_parts(Some(10800), None, None),
+            "3h (Battery)"
+        );
+        assert_eq!(
+            format_autopoweroffdelay_parts(None, Some(0), None),
+            "Never (AC)"
+        );
+        assert_eq!(format_autopoweroffdelay_parts(None, None, Some(120)), "2m");
+        assert_eq!(format_autopoweroffdelay_parts(None, None, None), "");
     }
 }
 

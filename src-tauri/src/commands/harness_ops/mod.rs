@@ -5194,6 +5194,62 @@ mod tests {
     }
 
     #[test]
+    fn autopoweroffdelay_slash_and_view_open_do_not_steal_apo_or_bare() {
+        // Slash + view/open NL → Autopower Off delay (`/autopoweroff` · `/standbydelay` parity).
+        // Bare `autopoweroffdelay` / `auto power off delay` stay with the agent;
+        // `/autopoweroff` stays Auto Power Off; `/standbydelay` stays Standby delay;
+        // standbydelayhigh stay out.
+        assert!(looks_like_autopoweroffdelay_request("/autopoweroffdelay"));
+        assert!(looks_like_autopoweroffdelay_request("/autopoweroffdelay-status"));
+        assert!(looks_like_autopoweroffdelay_request("/auto-power-off-delay"));
+        assert!(looks_like_autopoweroffdelay_request("/mac-autopoweroffdelay"));
+        assert!(looks_like_autopoweroffdelay_request("/mac-auto-power-off-delay"));
+        assert!(looks_like_autopoweroffdelay_request("view autopoweroffdelay"));
+        assert!(looks_like_autopoweroffdelay_request("open auto-power-off-delay"));
+        assert!(looks_like_autopoweroffdelay_request("list auto power off delay"));
+        assert!(looks_like_autopoweroffdelay_request("autopoweroffdelay status"));
+        assert!(looks_like_autopoweroffdelay_request("what's my autopoweroffdelay"));
+        assert!(looks_like_autopoweroffdelay_request("view auto power off delay"));
+        assert!(!looks_like_autopoweroffdelay_request("autopoweroffdelay"));
+        assert!(!looks_like_autopoweroffdelay_request("auto power off delay"));
+        assert!(!looks_like_autopoweroffdelay_request("/autopoweroff"));
+        assert!(!looks_like_autopoweroffdelay_request("view autopoweroff"));
+        assert!(!looks_like_autopoweroffdelay_request("/standbydelay"));
+        assert!(!looks_like_autopoweroffdelay_request("/standby"));
+        assert!(!looks_like_autopoweroffdelay_request("/tasks"));
+        assert!(!looks_like_autopoweroffdelay_request("enable autopoweroffdelay"));
+        assert!(!looks_like_autopoweroffdelay_request("standbydelayhigh"));
+        assert!(!looks_like_autopoweroff_request("/autopoweroffdelay"));
+        assert!(!looks_like_autopoweroff_request("view autopoweroffdelay"));
+        assert!(!looks_like_standbydelay_request("/autopoweroffdelay"));
+        let s = try_operator_instant_reply("/autopoweroffdelay").unwrap();
+        assert!(
+            s.contains("**Autopower Off delay**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view autopoweroffdelay").unwrap();
+        assert!(
+            viewed.contains("**Autopower Off delay**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open auto-power-off-delay").unwrap();
+        assert!(
+            open.contains("**Autopower Off delay**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("autopoweroffdelay").is_none());
+        assert!(try_operator_instant_reply("auto power off delay").is_none());
+        let apo = try_operator_instant_reply("/autopoweroff");
+        if let Some(reply) = apo {
+            assert!(
+                !reply.contains("**Autopower Off delay**"),
+                "/autopoweroff must stay Auto Power Off, not delay: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).
         // Bare `charger` / `adapter` stay with the agent; `/watts` stays CPU+GPU; `/battery` · is it charging stay Bat %.

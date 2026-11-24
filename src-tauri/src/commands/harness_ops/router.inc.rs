@@ -1263,9 +1263,15 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_standbydelay_request(content) {
         return Some(format_standbydelay_report());
     }
+    // Autopower Off delay (bare `autopoweroffdelay` / `auto power off delay` stay with the agent;
+    // `/autopoweroff` stays Auto Power Off; `/standbydelay` stays Standby delay;
+    // standbydelayhigh / standbydelaylow stay out).
+    if looks_like_autopoweroffdelay_request(content) {
+        return Some(format_autopoweroffdelay_report());
+    }
     // Auto Power Off (bare `autopoweroff` / `auto power off` stay with the agent;
     // `/standby` stays Standby; `/standbydelay` stays Standby delay;
-    // autopoweroffdelay stays out).
+    // `/autopoweroffdelay` stays Autopower Off delay).
     if looks_like_autopoweroff_request(content) {
         return Some(format_autopoweroff_report());
     }

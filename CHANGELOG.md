@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3026] - 2026-11-24
+
+### Added
+- Instant Autopower Off delay accepts `/autopoweroffdelay` · `/autopoweroffdelay-status` · `/autopoweroffdelay-state` · `/auto-power-off-delay` · `/auto-power-off-delay-status` · `/auto-power-off-delay-state` · `/autopower-off-delay` · `/auto-poweroff-delay` · `/mac-autopoweroffdelay` · `/mac-auto-power-off-delay` · `/mac-autopoweroffdelay-status` · `/mac-auto-power-off-delay-status` and view/see/open/list NL (`view autopoweroffdelay`, `open auto-power-off-delay`, `list auto power off delay`, …), matching “autopoweroffdelay status” / “what's my autopoweroffdelay” / “what's the auto power off delay”. Bare `autopoweroffdelay` / `auto power off delay` stay with the agent; `/autopoweroff` · `/auto-power-off` stay Auto Power Off; `/standbydelay` · `/standby-delay` stay Standby delay; standbydelayhigh / standbydelaylow stay out. Operator `/help` lists the new lane.
+
 ## [0.1.3025] - 2026-11-24
 
 ### Added
