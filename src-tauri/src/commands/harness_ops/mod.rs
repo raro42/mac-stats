@@ -5981,6 +5981,71 @@ mod tests {
     }
 
     #[test]
+    fn sms_slash_and_view_open_do_not_steal_systemsleep_or_bare() {
+        // Slash + view/open NL → Sudden Motion Sensor (`/systemsleep` · `/reducebrightness` parity).
+        // Bare `sms` / `sudden motion` stay with the agent;
+        // `/systemsleep` stays System Sleep; `/reducebrightness` stays Reduce Brightness.
+        assert!(looks_like_sms_request("/sms"));
+        assert!(looks_like_sms_request("/sms-status"));
+        assert!(looks_like_sms_request("/sudden-motion"));
+        assert!(looks_like_sms_request("/sudden-motion-sensor"));
+        assert!(looks_like_sms_request("/mac-sms"));
+        assert!(looks_like_sms_request("/mac-sudden-motion"));
+        assert!(looks_like_sms_request("view sms"));
+        assert!(looks_like_sms_request("open sudden-motion"));
+        assert!(looks_like_sms_request("list sudden motion sensor"));
+        assert!(looks_like_sms_request("sms status"));
+        assert!(looks_like_sms_request("is sudden motion on"));
+        assert!(looks_like_sms_request("what's my sms"));
+        assert!(looks_like_sms_request("view sudden motion"));
+        assert!(!looks_like_sms_request("sms"));
+        assert!(!looks_like_sms_request("sudden motion"));
+        assert!(!looks_like_sms_request("sudden motion sensor"));
+        assert!(!looks_like_sms_request("/systemsleep"));
+        assert!(!looks_like_sms_request("view system sleep"));
+        assert!(!looks_like_sms_request("/reducebrightness"));
+        assert!(!looks_like_sms_request("/halfdim"));
+        assert!(!looks_like_sms_request("/lessbright"));
+        assert!(!looks_like_sms_request("/tasks"));
+        assert!(!looks_like_sms_request("enable sms"));
+        assert!(!looks_like_systemsleep_request("/sms"));
+        assert!(!looks_like_systemsleep_request("view sms"));
+        assert!(!looks_like_reducebrightness_request("/sms"));
+        let s = try_operator_instant_reply("/sms").unwrap();
+        assert!(
+            s.contains("**Sudden Motion Sensor**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view sms").unwrap();
+        assert!(
+            viewed.contains("**Sudden Motion Sensor**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open sudden-motion").unwrap();
+        assert!(
+            open.contains("**Sudden Motion Sensor**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("sms").is_none());
+        assert!(try_operator_instant_reply("sudden motion").is_none());
+        let ss = try_operator_instant_reply("/systemsleep");
+        if let Some(reply) = ss {
+            assert!(
+                !reply.contains("**Sudden Motion Sensor**"),
+                "/systemsleep must stay System Sleep, not SMS: {reply}"
+            );
+        }
+        let rb = try_operator_instant_reply("/reducebrightness");
+        if let Some(reply) = rb {
+            assert!(
+                !reply.contains("**Sudden Motion Sensor**"),
+                "/reducebrightness must stay Reduce Brightness, not SMS: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn norestoresleep_slash_and_view_open_do_not_steal_systemsleep_or_bare() {
         // Slash + view/open NL → No Restore Sleep (`/systemsleep` · `/ttysclobber` parity).
         // Bare `norestoresleep` / `no restore sleep` stay with the agent;

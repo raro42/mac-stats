@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3043] - 2026-11-24
+
+### Added
+- Instant Sudden Motion Sensor accepts `/sms` · `/sms-status` · `/sms-state` · `/sudden-motion` · `/sudden-motion-status` · `/sudden-motion-state` · `/suddenmotion` · `/suddenmotion-status` · `/suddenmotion-state` · `/sudden-motion-sensor` · `/sudden-motion-sensor-status` · `/mac-sms` · `/mac-sudden-motion` · `/mac-suddenmotion` · `/mac-sudden-motion-sensor` · `/mac-sms-status` · `/mac-sudden-motion-status` and view/see/open/list NL (`view sms`, `open sudden-motion`, `list sudden motion sensor`, …), matching “sms status” / “is sudden motion on” / “is sms enabled” / “what's my sms” / “what's the sudden motion”. Bare `sms` / `sudden motion` / `sudden motion sensor` stay with the agent; `/systemsleep` · `/system-sleep` · `/sleep` stay System Sleep; `/reducebrightness` · `/reduce-brightness` stay Reduce Brightness; `/halfdim` · `/half-dim` stay Half Dim; `/lessbright` · `/less-bright` stay Less Bright. Operator `/help` lists the new lane.
+
 ## [0.1.3042] - 2026-11-24
 
 ### Added

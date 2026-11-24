@@ -1332,6 +1332,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_reducebrightness_request(content) {
         return Some(format_reducebrightness_report());
     }
+    // Sudden Motion Sensor (bare `sms` / `sudden motion` stay with the agent;
+    // `/systemsleep` stays System Sleep; `/reducebrightness` stays Reduce Brightness;
+    // `/halfdim` stays Half Dim; `/lessbright` stays Less Bright).
+    if looks_like_sms_request(content) {
+        return Some(format_sms_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

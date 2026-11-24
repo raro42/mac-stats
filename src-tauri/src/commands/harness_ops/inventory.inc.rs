@@ -25887,6 +25887,239 @@ pub fn format_reducebrightness_report() -> String {
     format!("**Reduce Brightness** · `{v}`")
 }
 
+/// Sudden Motion Sensor — `pmset` Battery/AC `sms` (+ active fallback; often absent on Apple Silicon / SSDs).
+/// Slash + view/open NL (`/sms` · `/sudden-motion` · `view sms`).
+/// Bare `sms` / `sudden motion` / `sudden motion sensor` stay with the agent;
+/// `/systemsleep` stays System Sleep; `/reducebrightness` stays Reduce Brightness;
+/// `/halfdim` stays Half Dim; `/lessbright` stays Less Bright.
+pub fn looks_like_sms_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("reducebrightness")
+        || n.contains("reduce brightness")
+        || n.contains("reduce-brightness")
+        || n.contains("lessbright")
+        || n.contains("less bright")
+        || n.contains("less-bright")
+        || n.contains("halfdim")
+        || n.contains("half dim")
+        || n.contains("half-dim")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("system sleep")
+        || n.contains("systemsleep")
+        || n.contains("system-sleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("norestoresleep")
+        || n.contains("no restore sleep")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("screensaver")
+        || n.contains("filevault")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n.contains("ring")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/lessbright"
+        || n == "/less-bright"
+        || n == "/halfdim"
+        || n == "/half-dim"
+        || n == "/reducebrightness"
+        || n == "/reduce-brightness"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/display"
+        || n == "/screen"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/sleep"
+        || n == "/powermode"
+        || n == "/power-mode"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        // Bare phrases stay with the agent.
+        || n == "sms"
+        || n == "the sms"
+        || n == "sudden motion"
+        || n == "the sudden motion"
+        || n == "sudden-motion"
+        || n == "the sudden-motion"
+        || n == "sudden motion sensor"
+        || n == "the sudden motion sensor"
+        || n == "sudden-motion-sensor"
+        || n == "the sudden-motion-sensor"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/sms"
+            | "/sms-status"
+            | "/sms-state"
+            | "/sudden-motion"
+            | "/sudden-motion-status"
+            | "/sudden-motion-state"
+            | "/suddenmotion"
+            | "/suddenmotion-status"
+            | "/suddenmotion-state"
+            | "/sudden-motion-sensor"
+            | "/sudden-motion-sensor-status"
+            | "/mac-sms"
+            | "/mac-sudden-motion"
+            | "/mac-suddenmotion"
+            | "/mac-sudden-motion-sensor"
+            | "/mac-sms-status"
+            | "/mac-sudden-motion-status"
+            | "sms status"
+            | "the sms status"
+            | "sms state"
+            | "the sms state"
+            | "sudden motion status"
+            | "the sudden motion status"
+            | "sudden-motion status"
+            | "the sudden-motion status"
+            | "suddenmotion status"
+            | "the suddenmotion status"
+            | "sudden motion sensor status"
+            | "the sudden motion sensor status"
+            | "sudden-motion-sensor status"
+            | "my sms"
+            | "my sms status"
+            | "my sudden motion"
+            | "my sudden motion status"
+            | "my sudden-motion"
+            | "my sudden motion sensor"
+            | "is sms on"
+            | "is sms off"
+            | "is sms enabled"
+            | "is sms disabled"
+            | "is sudden motion on"
+            | "is sudden motion off"
+            | "is sudden motion enabled"
+            | "is sudden motion disabled"
+            | "is sudden-motion on"
+            | "is sudden-motion enabled"
+            | "is sudden motion sensor on"
+            | "is sudden motion sensor enabled"
+            | "what's my sms"
+            | "whats my sms"
+            | "what is my sms"
+            | "what's my sms status"
+            | "whats my sms status"
+            | "what is my sms status"
+            | "what's my sudden motion"
+            | "whats my sudden motion"
+            | "what is my sudden motion"
+            | "what's my sudden motion status"
+            | "whats my sudden motion status"
+            | "what is my sudden motion status"
+            | "what's the sms"
+            | "whats the sms"
+            | "what is the sms"
+            | "what's the sms status"
+            | "whats the sms status"
+            | "what is the sms status"
+            | "what's the sudden motion"
+            | "whats the sudden motion"
+            | "what is the sudden motion"
+            | "what's the sudden motion status"
+            | "whats the sudden motion status"
+            | "what is the sudden motion status"
+            | "how's sms"
+            | "hows sms"
+            | "how's the sms"
+            | "hows the sms"
+            | "how's sudden motion"
+            | "hows sudden motion"
+            | "view sms"
+            | "view the sms"
+            | "view sms status"
+            | "view the sms status"
+            | "view sudden motion"
+            | "view the sudden motion"
+            | "view sudden motion status"
+            | "view the sudden motion status"
+            | "view sudden-motion"
+            | "view the sudden-motion"
+            | "view sudden motion sensor"
+            | "view the sudden motion sensor"
+            | "view sudden-motion-sensor"
+            | "see sms"
+            | "see the sms"
+            | "see sms status"
+            | "see the sms status"
+            | "see sudden motion"
+            | "see the sudden motion"
+            | "open sms"
+            | "open the sms"
+            | "open sms status"
+            | "open the sms status"
+            | "open sudden motion"
+            | "open the sudden motion"
+            | "open sudden-motion"
+            | "open the sudden-motion"
+            | "open sudden motion sensor"
+            | "list sms"
+            | "list the sms"
+            | "list sms status"
+            | "list the sms status"
+            | "list sudden motion"
+            | "list the sudden motion"
+            | "list sudden-motion"
+            | "list the sudden-motion"
+            | "list sudden motion sensor"
+            | "list the sudden motion sensor"
+    )
+}
+
+/// Zero-LLM Sudden Motion Sensor from pmset (macOS-only; empty elsewhere).
+pub fn format_sms_report() -> String {
+    let v = crate::metrics::get_sms_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Sudden Motion Sensor** — _no Sudden Motion Sensor reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**Sudden Motion Sensor** · `{v}`")
+}
+
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).
 /// Bare `autopoweroff` / `auto power off` stay with the agent;
