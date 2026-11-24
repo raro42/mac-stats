@@ -1,23 +1,20 @@
 # Morning surprise — 2026-11-25
 
-Overnight 2026-11-24/25 shipped more pmset instant-status lanes.
+Overnight 2026-11-24/25 shipped more pmset instant-status lanes, then Power everything.
 
 ## Shipped
-- **v0.1.3058** Power live — `/pmlive` · `/power-live` · `/currently-in-use` (+ aliases) show Currently-in-use settings from `pmset -g live` (sleep preventer notes kept).
-- **v0.1.3057** Power adapters — `/pmadapters` · `/power-adapters` (remote tick; this Mac raced live-on-3057 and discarded).
-- **v0.1.3056** Power custom profiles — `/pmcustom` · `/power-profiles` Battery vs AC diffs.
-- Earlier tonight: Power source `/pmps` (3055), User activity `/useractivity` (3054), Power capabilities `/pmcap` (3053), and the SoftDisabled → assertions → powersched → sysload → ups → pmlog → therm → pmstats chain.
-
-## Layout
-- Data Poster layout-daily: remaps audited OK (no missing WASH selectors / no live `#0e0e14`); marked checked 2026-11-25. Dark is next calendar quota.
+- **v0.1.3059** Power everything — `/pmeverything` · `/power-everything` · `/all-power-settings` (+ aliases) summarize section labels (Battery · AC · UPS · Sched · Assertions) plus a Currently-in-use snapshot from `pmset -g everything`. Distinct from Power live `/pmlive` and from health `is everything ok`.
+- **v0.1.3058** Power live — `/pmlive` · `/power-live` · `/currently-in-use` (+ aliases) from `pmset -g live`.
+- Earlier tonight: Power adapters `/pmadapters` (3057), Power custom `/pmcustom` (3056), Power source `/pmps` (3055), User activity `/useractivity` (3054), and the SoftDisabled → assertions → powersched → sysload → ups → pmlog → therm → pmstats → pmcap chain.
 
 ## Tried / context
 - Digester open stayed empty.
 - Design review due=false (grace; Mac TCC — polish-without-capture).
-- Local Power live targeted 3057 while remote shipped adapters 3057 — discarded + rebased to 3058.
+- Layout daily: data-poster audited 2026-11-25 (missing_remaps=none; Dark due next).
+- Sibling OpenClaw/Hermes missing on rack; no port.
 
 ## Next
-- Dark layout-daily next calendar day.
-- Optional `pmset -g everything` summary if still useful; avoid keep-pNN soft-state clones.
+- Dark layout-daily next calendar quota.
+- Optional `pmset -g history` if non-blocking; avoid keep-pNN soft-state clones.
 
-Generated: 2026-11-25T00:36:26+01:00
+Generated: 2026-11-25T00:53:53+01:00

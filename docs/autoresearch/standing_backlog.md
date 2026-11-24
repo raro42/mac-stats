@@ -1,3 +1,21 @@
+## Overnight note 2026-11-25 ~00:53 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Power live v0.1.3058 — Power everything from `pmset -g everything` (not SoftDisabled/boolean soft-state clone; not `/pmlive` live-only; Dark layout-daily next).
+- Backfill: missing keep row for v0.1.3058.
+- Shipped **v0.1.3059** — `/pmeverything` · `/pm-everything` · `/pmset-everything` · `/power-everything` · `/all-power-settings` · `/power-all-settings` · `/mac-pmeverything` + view/open NL; bare pmeverything/power everything stay with agent; `/pmlive` · `/pmcustom` · `/pmadapters` · `/pmps` intact; health `is everything ok` stays put; `/help` lists lane.
+- Ratchet keep @ 211957def for 3059; backfill keep for 3058; push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats/pmcap/useractivity/pmps/pmcustom/pmadapters/pmlive/pmeverything — try `pmset -g history` only if non-blocking; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3059
+
+- Product fuel after Power live v0.1.3058: full power dump already readable via `pmset -g everything` but lacked `/pmeverything` · `/pm-everything` · `/pmset-everything` · `/power-everything` · `/all-power-settings` · `/power-all-settings` · `/mac-pmeverything` and view/see/open/list phrases while Power live `/pmlive`, Power custom `/pmcustom`, and Power adapters `/pmadapters` already had slash+NL. Bare `pmeverything` / `power everything` stay with the agent; health `is everything ok` stays put. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-25 (Dark due next). Next: Dark layout-daily next calendar day — SoftDisabled…pmlive/pmeverything soft-state closed; try history only if non-blocking; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~00:40 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
