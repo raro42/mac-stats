@@ -24504,6 +24504,8 @@ pub fn looks_like_gpuswitch_request(content: &str) -> bool {
         || n == "/lpm"
         || n == "/power"
         || n == "/watts"
+        || n == "/darkwakes"
+        || n == "/dark-wakes"
         || n == "/tasks"
         || n == "/uptime"
         // Bare phrases stay with the agent.
@@ -24670,6 +24672,273 @@ pub fn format_gpuswitch_report() -> String {
         return "**GPU Switch** — _no GPU Switch reading on this Mac right now._".to_string();
     }
     format!("**GPU Switch** · `{v}`")
+}
+
+/// Dark Wakes — `pmset` Battery/AC `darkwakes` (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/darkwakes` · `/dark-wakes` · `view darkwakes`).
+/// Bare `darkwakes` / `dark wakes` stay with the agent;
+/// `/gpuswitch` stays GPU Switch; `/autorestart` stays Auto Restart; `/standby` stays Standby;
+/// `/lidwake` · `/acwake` stay their lanes.
+pub fn looks_like_darkwakes_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("gpuswitch")
+        || n.contains("gpu switch")
+        || n.contains("gpu-switch")
+        || n.contains("graphics switching")
+        || n.contains("graphics-switching")
+        || n.contains("autorestart")
+        || n.contains("auto restart")
+        || n.contains("auto-restart")
+        || n.contains("restart on power loss")
+        || n.contains("restart-on-power-loss")
+        || n.contains("autopoweroffdelay")
+        || n.contains("auto power off delay")
+        || n.contains("autopoweroff")
+        || n.contains("auto power off")
+        || n.contains("auto-power-off")
+        || n.contains("lidwake")
+        || n.contains("lid wake")
+        || n.contains("lid-wake")
+        || n.contains("acwake")
+        || n.contains("ac wake")
+        || n.contains("ac-wake")
+        || n.contains("wake on lid")
+        || n.contains("wake on ac")
+        || n.contains("destroyfvkey")
+        || n.contains("destroy-fv-key")
+        || n.contains("destroy fv key")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("hibernatemode")
+        || n.contains("hibernate")
+        || n.contains("standbydelay")
+        || n.contains("standby delay")
+        || n.contains("standby")
+        || n.contains("stand by")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("system sleep")
+        || n.contains("systemsleep")
+        || n.contains("sleep on power")
+        || n.contains("power button")
+        || n.contains("sopb")
+        || n.contains("lessbright")
+        || n.contains("halfdim")
+        || n.contains("filevault")
+        || n.contains("screensaver")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/gpu"
+        || n == "/gpu-name"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/autopoweroff"
+        || n == "/auto-power-off"
+        || n == "/autopoweroffdelay"
+        || n == "/proximitywake"
+        || n == "/standby"
+        || n == "/stand-by"
+        || n == "/lidwake"
+        || n == "/lid-wake"
+        || n == "/acwake"
+        || n == "/ac-wake"
+        || n == "/autorestart"
+        || n == "/auto-restart"
+        || n == "/restart-on-power-loss"
+        || n == "/gpuswitch"
+        || n == "/gpu-switch"
+        || n == "/graphics-switching"
+        || n == "/destroyfvkeyonstandby"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        // Bare phrases stay with the agent.
+        || n == "darkwakes"
+        || n == "the darkwakes"
+        || n == "dark wakes"
+        || n == "the dark wakes"
+        || n == "dark-wakes"
+        || n == "the dark-wakes"
+        || n == "dark wake"
+        || n == "the dark wake"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/darkwakes"
+            | "/darkwakes-status"
+            | "/darkwakes-state"
+            | "/dark-wakes"
+            | "/dark-wakes-status"
+            | "/dark-wakes-state"
+            | "/darkwake"
+            | "/darkwake-status"
+            | "/darkwake-state"
+            | "/dark-wake"
+            | "/dark-wake-status"
+            | "/dark-wake-state"
+            | "/mac-darkwakes"
+            | "/mac-dark-wakes"
+            | "/mac-darkwake"
+            | "/mac-dark-wake"
+            | "/mac-darkwakes-status"
+            | "/mac-dark-wakes-status"
+            | "darkwakes status"
+            | "the darkwakes status"
+            | "dark wakes status"
+            | "the dark wakes status"
+            | "dark-wakes status"
+            | "the dark-wakes status"
+            | "dark wake status"
+            | "the dark wake status"
+            | "darkwakes state"
+            | "the darkwakes state"
+            | "dark wakes state"
+            | "my darkwakes"
+            | "my darkwakes status"
+            | "my dark wakes"
+            | "my dark wakes status"
+            | "is darkwakes on"
+            | "is darkwakes off"
+            | "is darkwakes enabled"
+            | "is darkwakes disabled"
+            | "is dark wakes on"
+            | "is dark wakes off"
+            | "is dark wakes enabled"
+            | "is dark wakes disabled"
+            | "is dark-wakes on"
+            | "is dark-wakes enabled"
+            | "is dark wake on"
+            | "is dark wake enabled"
+            | "what's my darkwakes"
+            | "whats my darkwakes"
+            | "what is my darkwakes"
+            | "what's my darkwakes status"
+            | "whats my darkwakes status"
+            | "what is my darkwakes status"
+            | "what's my dark wakes"
+            | "whats my dark wakes"
+            | "what is my dark wakes"
+            | "what's my dark wakes status"
+            | "whats my dark wakes status"
+            | "what is my dark wakes status"
+            | "what's the darkwakes"
+            | "whats the darkwakes"
+            | "what is the darkwakes"
+            | "what's the darkwakes status"
+            | "whats the darkwakes status"
+            | "what is the darkwakes status"
+            | "what's the dark wakes"
+            | "whats the dark wakes"
+            | "what is the dark wakes"
+            | "what's the dark wakes status"
+            | "whats the dark wakes status"
+            | "what is the dark wakes status"
+            | "how's darkwakes"
+            | "hows darkwakes"
+            | "how's the darkwakes"
+            | "hows the darkwakes"
+            | "how's dark wakes"
+            | "hows dark wakes"
+            | "view darkwakes"
+            | "view the darkwakes"
+            | "view darkwakes status"
+            | "view the darkwakes status"
+            | "view dark wakes"
+            | "view the dark wakes"
+            | "view dark wakes status"
+            | "view the dark wakes status"
+            | "view dark-wakes"
+            | "view the dark-wakes"
+            | "view dark wake"
+            | "view the dark wake"
+            | "see darkwakes"
+            | "see the darkwakes"
+            | "see darkwakes status"
+            | "see the darkwakes status"
+            | "see dark wakes"
+            | "see the dark wakes"
+            | "open darkwakes"
+            | "open the darkwakes"
+            | "open darkwakes status"
+            | "open the darkwakes status"
+            | "open dark wakes"
+            | "open the dark wakes"
+            | "open dark-wakes"
+            | "open the dark-wakes"
+            | "open dark wake"
+            | "open the dark wake"
+            | "list darkwakes"
+            | "list the darkwakes"
+            | "list darkwakes status"
+            | "list the darkwakes status"
+            | "list dark wakes"
+            | "list the dark wakes"
+            | "list dark-wakes"
+            | "list the dark-wakes"
+            | "list dark wake"
+            | "list the dark wake"
+    )
+}
+
+/// Zero-LLM Dark Wakes from pmset (macOS-only; empty elsewhere).
+pub fn format_darkwakes_report() -> String {
+    let v = crate::metrics::get_darkwakes_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Dark Wakes** — _no Dark Wakes reading on this Mac right now._".to_string();
+    }
+    format!("**Dark Wakes** · `{v}`")
 }
 
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).

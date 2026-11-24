@@ -1301,6 +1301,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_gpuswitch_request(content) {
         return Some(format_gpuswitch_report());
     }
+    // Dark Wakes (bare `darkwakes` / `dark wakes` stay with the agent;
+    // `/gpuswitch` stays GPU Switch; `/autorestart` stays Auto Restart;
+    // `/lidwake` · `/acwake` · `/standby` stay their lanes).
+    if looks_like_darkwakes_request(content) {
+        return Some(format_darkwakes_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

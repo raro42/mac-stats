@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3038] - 2026-11-24
+
+### Added
+- Instant Dark Wakes accepts `/darkwakes` · `/darkwakes-status` · `/darkwakes-state` · `/dark-wakes` · `/dark-wakes-status` · `/dark-wakes-state` · `/darkwake` · `/darkwake-status` · `/darkwake-state` · `/dark-wake` · `/dark-wake-status` · `/dark-wake-state` · `/mac-darkwakes` · `/mac-dark-wakes` · `/mac-darkwake` · `/mac-dark-wake` · `/mac-darkwakes-status` · `/mac-dark-wakes-status` and view/see/open/list NL (`view darkwakes`, `open dark-wakes`, `list dark wake`, …), matching “darkwakes status” / “is dark wakes on” / “is darkwakes enabled” / “what's my darkwakes” / “what's the dark wakes”. Bare `darkwakes` / `dark wakes` stay with the agent; `/gpuswitch` · `/gpu-switch` stay GPU Switch; `/autorestart` · `/auto-restart` stay Auto Restart; `/lidwake` · `/lid-wake` stay Lid Wake; `/acwake` · `/ac-wake` stay AC Wake; `/standby` · `/stand-by` stay Standby. Operator `/help` lists the new lane.
+
 ## [0.1.3037] - 2026-11-24
 
 ### Added

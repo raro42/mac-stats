@@ -5714,6 +5714,71 @@ mod tests {
     }
 
     #[test]
+    fn darkwakes_slash_and_view_open_do_not_steal_gpuswitch_or_bare() {
+        // Slash + view/open NL → Dark Wakes (`/gpuswitch` · `/autorestart` parity).
+        // Bare `darkwakes` / `dark wakes` stay with the agent;
+        // `/gpuswitch` stays GPU Switch; `/autorestart` stays Auto Restart.
+        assert!(looks_like_darkwakes_request("/darkwakes"));
+        assert!(looks_like_darkwakes_request("/darkwakes-status"));
+        assert!(looks_like_darkwakes_request("/dark-wakes"));
+        assert!(looks_like_darkwakes_request("/darkwake"));
+        assert!(looks_like_darkwakes_request("/mac-darkwakes"));
+        assert!(looks_like_darkwakes_request("/mac-dark-wakes"));
+        assert!(looks_like_darkwakes_request("view darkwakes"));
+        assert!(looks_like_darkwakes_request("open dark-wakes"));
+        assert!(looks_like_darkwakes_request("list dark wake"));
+        assert!(looks_like_darkwakes_request("darkwakes status"));
+        assert!(looks_like_darkwakes_request("is dark wakes on"));
+        assert!(looks_like_darkwakes_request("what's my darkwakes"));
+        assert!(looks_like_darkwakes_request("view dark wakes"));
+        assert!(!looks_like_darkwakes_request("darkwakes"));
+        assert!(!looks_like_darkwakes_request("dark wakes"));
+        assert!(!looks_like_darkwakes_request("/gpuswitch"));
+        assert!(!looks_like_darkwakes_request("view gpuswitch"));
+        assert!(!looks_like_darkwakes_request("/autorestart"));
+        assert!(!looks_like_darkwakes_request("/lidwake"));
+        assert!(!looks_like_darkwakes_request("/acwake"));
+        assert!(!looks_like_darkwakes_request("/standby"));
+        assert!(!looks_like_darkwakes_request("/tasks"));
+        assert!(!looks_like_darkwakes_request("enable darkwakes"));
+        assert!(!looks_like_darkwakes_request("/gpu"));
+        assert!(!looks_like_gpuswitch_request("/darkwakes"));
+        assert!(!looks_like_gpuswitch_request("view darkwakes"));
+        assert!(!looks_like_autorestart_request("/darkwakes"));
+        let s = try_operator_instant_reply("/darkwakes").unwrap();
+        assert!(
+            s.contains("**Dark Wakes**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view darkwakes").unwrap();
+        assert!(
+            viewed.contains("**Dark Wakes**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open dark-wakes").unwrap();
+        assert!(
+            open.contains("**Dark Wakes**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("darkwakes").is_none());
+        assert!(try_operator_instant_reply("dark wakes").is_none());
+        let gs = try_operator_instant_reply("/gpuswitch");
+        if let Some(reply) = gs {
+            assert!(
+                !reply.contains("**Dark Wakes**"),
+                "/gpuswitch must stay GPU Switch, not Dark Wakes: {reply}"
+            );
+        }
+        let ar = try_operator_instant_reply("/autorestart");
+        if let Some(reply) = ar {
+            assert!(
+                !reply.contains("**Dark Wakes**"),
+                "/autorestart must stay Auto Restart, not Dark Wakes: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn autorestart_slash_and_view_open_do_not_steal_autopoweroff_or_bare() {
         // Slash + view/open NL → Auto Restart (`/lidwake` · `/autopoweroff` parity).
         // Bare `autorestart` / `auto restart` stay with the agent;
