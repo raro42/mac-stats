@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~05:40 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel attempt: Dark Wakes after Auto Restart v0.1.3036 — **remote raced GPU Switch v0.1.3037**; local darkwakes-on-3036 WIP discarded + remote keep backfill.
+- Then shipped **v0.1.3038** — `/darkwakes` · `/dark-wakes` · `/darkwake` · `/mac-darkwakes` + view/open NL; bare darkwakes/dark wakes stay with agent; `/gpuswitch` · `/autorestart` · `/lidwake` · `/acwake` · `/standby` intact; `/help` lists lane.
+- Ratchet: discard@760dcc8 (dup 3037) + keep backfill remote 3037; keep @ 663f178 for 3038; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-24 + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for gpuswitch/darkwakes — not another keep-pNN clone.
+
+## Overnight merge — v0.1.3038
+
+- Product fuel after GPU Switch v0.1.3037 (local gpuswitch race discarded): Dark Wakes already readable via `pmset -g custom` Battery/AC `darkwakes` (+ active `pmset -g`; legacy dark wake; often absent on Apple Silicon) but lacked `/darkwakes` · `/dark-wakes` · `/darkwake` · `/mac-darkwakes` and view/see/open/list phrases while GPU Switch `/gpuswitch` and Auto Restart `/autorestart` already had slash+NL. Bare `darkwakes` / `dark wakes` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — gpuswitch/darkwakes soft-state closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~05:35 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
