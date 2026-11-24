@@ -37373,7 +37373,7 @@ body.theme-architect #chat-clear-btn:focus-visible {
   outline-offset: 2px;
 }
 body.theme-architect #chat-send-btn:focus-visible {
-  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon Send focus (#14 / P2; design-review AI Chat; fill stays white-on-blue). */
+  /* Opaque Architect accent — bare Apple #0a84ff lagged --accent / Neon Send focus (#14 / P2; design-review AI Chat). */
   outline: 2px solid color-mix(in srgb, var(--accent, #232d41) 55%, #f1f1f1);
   outline-offset: 2px;
 }

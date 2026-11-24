@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3035] - 2026-11-24
+
+### Changed
+- Architect theme AI Chat Send leaves bare Apple `#007aff` white-on-blue. Send fill now uses Architect slate ink (`#232d41`) with white type, matching Dark / Neon / Material / Swiss / Light / Data Poster / Futuristic. Focus ring already used `--accent`; Apple theme keeps system blue.
+
 ## [0.1.3034] - 2026-11-24
 
 ### Changed
