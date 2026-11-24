@@ -1393,6 +1393,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_pmstats_request(content) {
         return Some(format_pmstats_report());
     }
+    // Power capabilities from `pmset -g cap` (bare `pmcap` / `power cap` / `power capabilities` stay with the agent;
+    // `/pmstats` stays Power stats; `/therm` stays Therm; `/pmlog` stays Power log;
+    // `/adapter` · `/charger` stay AC charger; `/ram-capacity` · `/disk-capacity` stay size lanes).
+    if looks_like_pmcap_request(content) {
+        return Some(format_pmcap_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

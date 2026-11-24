@@ -6620,6 +6620,81 @@ mod tests {
     }
 
     #[test]
+    fn pmcap_slash_and_view_open_do_not_steal_pmstats_adapter_or_bare() {
+        // Slash + view/open NL -> Power capabilities (/pmstats · /adapter parity).
+        assert!(looks_like_pmcap_request("/pmcap"));
+        assert!(looks_like_pmcap_request("/pmcap-status"));
+        assert!(looks_like_pmcap_request("/pm-cap"));
+        assert!(looks_like_pmcap_request("/pmset-cap"));
+        assert!(looks_like_pmcap_request("/power-cap"));
+        assert!(looks_like_pmcap_request("/power-capabilities"));
+        assert!(looks_like_pmcap_request("/pm-capabilities"));
+        assert!(looks_like_pmcap_request("/mac-pmcap"));
+        assert!(looks_like_pmcap_request("/mac-power-cap"));
+        assert!(looks_like_pmcap_request("view pmcap"));
+        assert!(looks_like_pmcap_request("open power-cap"));
+        assert!(looks_like_pmcap_request("list power capabilities"));
+        assert!(looks_like_pmcap_request("pmcap status"));
+        assert!(looks_like_pmcap_request("is pmcap ok"));
+        assert!(looks_like_pmcap_request("what's my pmcap"));
+        assert!(looks_like_pmcap_request("view power capabilities"));
+        assert!(!looks_like_pmcap_request("pmcap"));
+        assert!(!looks_like_pmcap_request("power cap"));
+        assert!(!looks_like_pmcap_request("power capabilities"));
+        assert!(!looks_like_pmcap_request("pmset cap"));
+        assert!(!looks_like_pmcap_request("capabilities"));
+        assert!(!looks_like_pmcap_request("/pmstats"));
+        assert!(!looks_like_pmcap_request("view pmstats"));
+        assert!(!looks_like_pmcap_request("/therm"));
+        assert!(!looks_like_pmcap_request("view therm"));
+        assert!(!looks_like_pmcap_request("/pmlog"));
+        assert!(!looks_like_pmcap_request("/adapter"));
+        assert!(!looks_like_pmcap_request("/charger"));
+        assert!(!looks_like_pmcap_request("/ram-capacity"));
+        assert!(!looks_like_pmcap_request("/disk-capacity"));
+        assert!(!looks_like_pmcap_request("/thermal"));
+        assert!(!looks_like_pmcap_request("/tasks"));
+        assert!(!looks_like_pmcap_request("enable pmcap"));
+        assert!(!looks_like_pmstats_request("/pmcap"));
+        assert!(!looks_like_pmstats_request("view pmcap"));
+        assert!(!looks_like_therm_request("/pmcap"));
+        assert!(!looks_like_therm_request("view pmcap"));
+        assert!(!looks_like_ac_charger_request("/pmcap"));
+        let s = try_operator_instant_reply("/pmcap").unwrap();
+        assert!(
+            s.contains("**Power capabilities**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view pmcap").unwrap();
+        assert!(
+            viewed.contains("**Power capabilities**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open power-cap").unwrap();
+        assert!(
+            open.contains("**Power capabilities**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("pmcap").is_none());
+        assert!(try_operator_instant_reply("power capabilities").is_none());
+        let pmstats = try_operator_instant_reply("/pmstats");
+        if let Some(reply) = pmstats {
+            assert!(
+                !reply.contains("**Power capabilities**"),
+                "/pmstats must stay Power stats, not Power capabilities: {reply}"
+            );
+        }
+        let adapter = try_operator_instant_reply("/adapter");
+        if let Some(reply) = adapter {
+            assert!(
+                !reply.contains("**Power capabilities**"),
+                "/adapter must stay AC charger, not Power capabilities: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn sysload_slash_and_view_open_do_not_steal_load_heat_or_bare() {
         // Slash + view/open NL → System load (`/load` · `/thermal` parity).
         // Bare `sysload` / `load level` stay with the agent;

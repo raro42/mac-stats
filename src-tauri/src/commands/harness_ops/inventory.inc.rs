@@ -27979,6 +27979,12 @@ pub fn looks_like_therm_request(content: &str) -> bool {
         || n == "/pmstats"
         || n == "/power-stats"
         || n == "view pmstats"
+        || n.contains("pmcap")
+        || n.contains("power cap")
+        || n.contains("power capabilities")
+        || n == "/pmcap"
+        || n == "/power-cap"
+        || n == "view pmcap"
         // Bare phrases stay with the agent.
         || n == "therm"
         || n == "the therm"
@@ -28286,6 +28292,15 @@ pub fn looks_like_pmstats_request(content: &str) -> bool {
         || n == "/restart"
         || n == "restart"
         || n == "/stats"
+        || n.contains("pmcap")
+        || n.contains("power cap")
+        || n.contains("power capabilities")
+        || n.contains("pmset cap")
+        || n == "/pmcap"
+        || n == "/power-cap"
+        || n == "/power-capabilities"
+        || n == "view pmcap"
+        || n == "open power-cap"
         // Bare phrases stay with the agent.
         || n == "pmstats"
         || n == "the pmstats"
@@ -28529,6 +28544,301 @@ pub fn format_pmstats_report() -> String {
         return "**Power stats** — _no Sleep / Wake counts on this Mac right now._".to_string();
     }
     format!("**Power stats** · `{v}`")
+}
+
+/// Power capabilities — supported settings list from `pmset -g cap`.
+/// Slash + view/open NL (`/pmcap` · `/power-cap` · `view pmcap`).
+/// Bare `pmcap` / `power cap` / `power capabilities` / `pmset cap` stay with the agent;
+/// `/pmstats` stays Power stats; `/therm` stays Therm; `/pmlog` stays Power log;
+/// `/adapter` · `/charger` stay AC charger; `/ram-capacity` · `/disk-capacity` stay size lanes.
+pub fn looks_like_pmcap_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("pmstats")
+        || n.contains("power stats")
+        || n.contains("sleep stats")
+        || n.contains("wake stats")
+        || n == "/pmstats"
+        || n == "/power-stats"
+        || n == "view pmstats"
+        || n == "open pmstats"
+        || n.contains("pmlog")
+        || n.contains("powerlog")
+        || n.contains("power log")
+        || n.contains("power management log")
+        || n == "/logs"
+        || n == "view logs"
+        || n.contains("assertions")
+        || n.contains("preventer")
+        || n.contains("who keeps awake")
+        || n.contains("sysload")
+        || n.contains("sys load")
+        || n.contains("load level")
+        || n.contains("powersched")
+        || n.contains("power schedule")
+        || n.contains("scheduled power")
+        || n == "/ups"
+        || n == "/ups-settings"
+        || n == "view ups"
+        || n == "/therm"
+        || n == "/pmset-therm"
+        || n == "/cpu-speed-limit"
+        || n == "/speed-limit"
+        || n == "/thermal-limits"
+        || n == "view therm"
+        || n == "open therm"
+        || n.contains("cpu speed limit")
+        || n.contains("thermal limits")
+        || n.contains("speed limit")
+        || n == "/thermal"
+        || n == "/heat"
+        || n == "view heat"
+        || n == "open thermal"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        || n == "/stats"
+        || n == "/adapter"
+        || n == "/charger"
+        || n == "/ac-charger"
+        || n == "view adapter"
+        || n == "view charger"
+        || n == "open adapter"
+        || n == "open charger"
+        || n.contains("ram capacity")
+        || n.contains("ram-capacity")
+        || n.contains("disk capacity")
+        || n.contains("disk-capacity")
+        || n.contains("ssd capacity")
+        || n.contains("memory capacity")
+        || n == "/ram-capacity"
+        || n == "/disk-capacity"
+        || n == "/ssd-capacity"
+        || n == "/ram-size"
+        || n == "/disk-size"
+        // Bare phrases stay with the agent.
+        || n == "pmcap"
+        || n == "the pmcap"
+        || n == "pm-cap"
+        || n == "the pm-cap"
+        || n == "pm cap"
+        || n == "the pm cap"
+        || n == "pmsetcap"
+        || n == "the pmsetcap"
+        || n == "pmset-cap"
+        || n == "the pmset-cap"
+        || n == "pmset cap"
+        || n == "the pmset cap"
+        || n == "powercap"
+        || n == "the powercap"
+        || n == "power-cap"
+        || n == "the power-cap"
+        || n == "power cap"
+        || n == "the power cap"
+        || n == "powercapabilities"
+        || n == "the powercapabilities"
+        || n == "power-capabilities"
+        || n == "the power-capabilities"
+        || n == "power capabilities"
+        || n == "the power capabilities"
+        || n == "pm capabilities"
+        || n == "the pm capabilities"
+        || n == "pm-capabilities"
+        || n == "the pm-capabilities"
+        || n == "capabilities"
+        || n == "the capabilities"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/pmcap"
+            | "/pmcap-status"
+            | "/pmcap-state"
+            | "/pm-cap"
+            | "/pm-cap-status"
+            | "/pm-cap-state"
+            | "/pmset-cap"
+            | "/pmset-cap-status"
+            | "/pmset-cap-state"
+            | "/pmsetcap"
+            | "/pmsetcap-status"
+            | "/power-cap"
+            | "/power-cap-status"
+            | "/power-cap-state"
+            | "/powercap"
+            | "/powercap-status"
+            | "/power-capabilities"
+            | "/power-capabilities-status"
+            | "/powercapabilities"
+            | "/powercapabilities-status"
+            | "/pm-capabilities"
+            | "/pm-capabilities-status"
+            | "/mac-pmcap"
+            | "/mac-pm-cap"
+            | "/mac-pmset-cap"
+            | "/mac-power-cap"
+            | "/mac-power-capabilities"
+            | "/mac-pmcap-status"
+            | "/mac-power-cap-status"
+            | "pmcap status"
+            | "the pmcap status"
+            | "pmcap state"
+            | "the pmcap state"
+            | "pm-cap status"
+            | "the pm-cap status"
+            | "pm cap status"
+            | "the pm cap status"
+            | "pmset-cap status"
+            | "the pmset-cap status"
+            | "pmset cap status"
+            | "the pmset cap status"
+            | "power-cap status"
+            | "the power-cap status"
+            | "power cap status"
+            | "the power cap status"
+            | "power-capabilities status"
+            | "the power-capabilities status"
+            | "power capabilities status"
+            | "the power capabilities status"
+            | "pm-capabilities status"
+            | "the pm-capabilities status"
+            | "my pmcap"
+            | "my pmcap status"
+            | "my power cap"
+            | "my power capabilities"
+            | "is pmcap ok"
+            | "is the pmcap ok"
+            | "how's pmcap"
+            | "hows pmcap"
+            | "how's the pmcap"
+            | "hows the pmcap"
+            | "how's power capabilities"
+            | "hows power capabilities"
+            | "what's my pmcap"
+            | "whats my pmcap"
+            | "what is my pmcap"
+            | "what's my pmcap status"
+            | "whats my pmcap status"
+            | "what is my pmcap status"
+            | "what's my power cap"
+            | "whats my power cap"
+            | "what is my power cap"
+            | "what's my power capabilities"
+            | "whats my power capabilities"
+            | "what is my power capabilities"
+            | "what's the pmcap"
+            | "whats the pmcap"
+            | "what is the pmcap"
+            | "what's the pmcap status"
+            | "whats the pmcap status"
+            | "what is the pmcap status"
+            | "what's the power cap"
+            | "whats the power cap"
+            | "what is the power cap"
+            | "what's the power capabilities"
+            | "whats the power capabilities"
+            | "what is the power capabilities"
+            | "view pmcap"
+            | "view the pmcap"
+            | "view pmcap status"
+            | "view the pmcap status"
+            | "view pm-cap"
+            | "view the pm-cap"
+            | "view pm cap"
+            | "view the pm cap"
+            | "view pmset-cap"
+            | "view the pmset-cap"
+            | "view pmset cap"
+            | "view the pmset cap"
+            | "view power-cap"
+            | "view the power-cap"
+            | "view power cap"
+            | "view the power cap"
+            | "view power-capabilities"
+            | "view the power-capabilities"
+            | "view power capabilities"
+            | "view the power capabilities"
+            | "view pm-capabilities"
+            | "view the pm-capabilities"
+            | "see pmcap"
+            | "see the pmcap"
+            | "see power cap"
+            | "see the power cap"
+            | "see power capabilities"
+            | "see the power capabilities"
+            | "open pmcap"
+            | "open the pmcap"
+            | "open pmcap status"
+            | "open the pmcap status"
+            | "open pm-cap"
+            | "open pmset-cap"
+            | "open power-cap"
+            | "open power cap"
+            | "open power-capabilities"
+            | "open power capabilities"
+            | "open pm-capabilities"
+            | "list pmcap"
+            | "list the pmcap"
+            | "list pmcap status"
+            | "list the pmcap status"
+            | "list power-cap"
+            | "list the power-cap"
+            | "list power cap"
+            | "list the power cap"
+            | "list power capabilities"
+            | "list the power capabilities"
+            | "list pm-capabilities"
+    )
+}
+
+/// Zero-LLM power capabilities from `pmset -g cap` (macOS-only; empty elsewhere).
+pub fn format_pmcap_report() -> String {
+    let v = crate::metrics::get_pmcap_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Power capabilities** — _no supported caps listed on this Mac right now._".to_string();
+    }
+    format!("**Power capabilities** · `{v}`")
 }
 
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).

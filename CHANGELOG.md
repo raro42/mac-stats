@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3053] - 2026-11-24
+
+### Added
+- Instant Power capabilities accepts `/pmcap` · `/pmcap-status` · `/pmcap-state` · `/pm-cap` · `/pm-cap-status` · `/pm-cap-state` · `/pmset-cap` · `/pmset-cap-status` · `/pmset-cap-state` · `/pmsetcap` · `/pmsetcap-status` · `/power-cap` · `/power-cap-status` · `/power-cap-state` · `/powercap` · `/powercap-status` · `/power-capabilities` · `/power-capabilities-status` · `/powercapabilities` · `/powercapabilities-status` · `/pm-capabilities` · `/pm-capabilities-status` · `/mac-pmcap` · `/mac-pm-cap` · `/mac-pmset-cap` · `/mac-power-cap` · `/mac-power-capabilities` · `/mac-pmcap-status` · `/mac-power-cap-status` and view/see/open/list NL (`view pmcap`, `open power-cap`, `list power capabilities`, …), matching “pmcap status” / “is pmcap ok” / “what's my pmcap” / “what's the power capabilities”. Bare `pmcap` / `power cap` / `power capabilities` / `pmset cap` stay with the agent; `/pmstats` · `/power-stats` stay Power stats; `/therm` · `/cpu-speed-limit` stay Therm; `/pmlog` · `/powerlog` stay Power log; `/adapter` · `/charger` stay AC charger; `/ram-capacity` · `/disk-capacity` stay size lanes; `/thermal` · `/heat` stay Heat. Operator `/help` lists the new lane.
+
 ## [0.1.3052] - 2026-11-24
 
 ### Added

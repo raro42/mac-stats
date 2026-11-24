@@ -7981,6 +7981,101 @@ pub fn get_pmstats_status() -> String {
     }
 }
 
+/// Parse `pmset -g cap` → supported capability tokens (sleep, displaysleep, …).
+/// Skips header / prose lines; keeps single alphanumeric identifiers.
+pub(crate) fn parse_pmset_cap_list(raw: &str) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let lower = t.to_ascii_lowercase();
+        if lower.contains("capabilities")
+            || lower.contains("depending")
+            || lower.contains("currently")
+            || lower.contains("may change")
+            || lower.contains("hardware")
+        {
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let Some(tok) = parts.next() else {
+            continue;
+        };
+        if parts.next().is_some() {
+            continue;
+        }
+        if !tok
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-')
+        {
+            continue;
+        }
+        let key = tok.to_ascii_lowercase();
+        if !out.iter().any(|e| e == &key) {
+            out.push(key);
+        }
+    }
+    out
+}
+
+/// Compact power capabilities: `15 · sleep · displaysleep · …` (cap list at 12 + remainder).
+pub(crate) fn format_pmcap_parts(caps: &[String]) -> String {
+    if caps.is_empty() {
+        return String::new();
+    }
+    let n = caps.len();
+    const SHOW: usize = 12;
+    if n <= SHOW {
+        format!("{n} · {}", caps.join(" · "))
+    } else {
+        format!(
+            "{n} · {} · +{} more",
+            caps[..SHOW].join(" · "),
+            n - SHOW
+        )
+    }
+}
+
+/// macOS power capabilities from `pmset -g cap` (supported settings list).
+/// Distinct from Power stats `/pmstats` (counts), Therm `/therm`, AC charger `/adapter`.
+/// Used by Discord/operator instant `/pmcap` · `/power-cap` lane.
+pub fn get_pmcap_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "cap"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("pmcap: pmset -g cap non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("pmcap: pmset -g cap spawn failed");
+                return String::new();
+            }
+        };
+        let caps = parse_pmset_cap_list(&stdout);
+        let info = format_pmcap_parts(&caps);
+        if info.is_empty() {
+            debug3!("pmcap: empty status");
+        } else {
+            debug3!("pmcap status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -13801,6 +13896,50 @@ User Wake Count:6
         assert_eq!(
             format_pmstats_parts(Some(1), None, Some(2)),
             "sleep 1 · user wake 2"
+        );
+    }
+}
+
+#[cfg(test)]
+mod pmcap_parse_tests {
+    use super::{format_pmcap_parts, parse_pmset_cap_list};
+
+    const SAMPLE: &str = "\
+Capabilities may change depending on hardware configuration:
+ sleep
+ displaysleep
+ disksleep
+ powernap
+ standby
+ hibernatemode
+ lowpowermode
+";
+
+    #[test]
+    fn parses_cap_list_and_formats() {
+        let caps = parse_pmset_cap_list(SAMPLE);
+        assert_eq!(
+            caps,
+            vec![
+                "sleep".to_string(),
+                "displaysleep".to_string(),
+                "disksleep".to_string(),
+                "powernap".to_string(),
+                "standby".to_string(),
+                "hibernatemode".to_string(),
+                "lowpowermode".to_string(),
+            ]
+        );
+        assert_eq!(
+            format_pmcap_parts(&caps),
+            "7 · sleep · displaysleep · disksleep · powernap · standby · hibernatemode · lowpowermode"
+        );
+        assert!(parse_pmset_cap_list("").is_empty());
+        assert_eq!(format_pmcap_parts(&[]), "");
+        let many: Vec<String> = (0..14).map(|i| format!("c{i}")).collect();
+        assert_eq!(
+            format_pmcap_parts(&many),
+            "14 · c0 · c1 · c2 · c3 · c4 · c5 · c6 · c7 · c8 · c9 · c10 · c11 · +2 more"
         );
     }
 }
