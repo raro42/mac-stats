@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~01:30
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel attempt: Sleep On Power Button after Standby v0.1.3018 — **remote raced v0.1.3019**; local duplicate discarded.
+- Then shipped **v0.1.3020** — `/lessbright` · `/less-bright` · `/slightly-dim` · `/dim-display` · `/mac-lessbright` + view/open NL; bare lessbright/less bright/slightly dim/dim display stay with agent; `/displaysleep` · `/display` · `/lpm` · `/sopb` intact; `/help` lists lane.
+- Ratchet: discard@acfae9f (dup 3019) + keep backfill remote 3019; keep @ 81f25d49e for 3020; install/kickstart (Rust).
+- Morning surprise: refresh 2026-11-24 + archive.
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (powermode) — Less Bright slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3020
+
+- Product fuel after Sleep On Power Button v0.1.3019 (local sopb race discarded): Less Bright already readable via `pmset -g custom` Battery/AC `lessbright` (+ active `pmset -g`; often Battery-only) but lacked `/lessbright` · `/less-bright` · `/slightly-dim` · `/dim-display` · `/mac-lessbright` and view/see/open/list phrases while Sleep On Power Button `/sopb`, Display Sleep `/displaysleep`, and Low Power Mode `/lpm` already had slash+NL. Bare `lessbright` / `less bright` / `slightly dim` / `dim display` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (powermode) — Less Bright slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~01:20
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
