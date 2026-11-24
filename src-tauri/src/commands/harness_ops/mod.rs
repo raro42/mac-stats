@@ -6257,6 +6257,77 @@ mod tests {
         }
     }
 
+
+    #[test]
+    fn powersched_slash_and_view_open_do_not_steal_schedules_assertions_or_bare() {
+        // Slash + view/open NL → Power schedule (`/schedules` · `/assertions` parity).
+        // Bare `powersched` / `power schedule` / `scheduled power` stay with the agent;
+        // `/schedules` · `/cron` stay Agent Ops; `/assertions` stays Sleep assertions.
+        assert!(looks_like_powersched_request("/powersched"));
+        assert!(looks_like_powersched_request("/powersched-status"));
+        assert!(looks_like_powersched_request("/power-schedule"));
+        assert!(looks_like_powersched_request("/pmset-sched"));
+        assert!(looks_like_powersched_request("/scheduled-power"));
+        assert!(looks_like_powersched_request("/mac-powersched"));
+        assert!(looks_like_powersched_request("/mac-power-schedule"));
+        assert!(looks_like_powersched_request("view powersched"));
+        assert!(looks_like_powersched_request("open power-schedule"));
+        assert!(looks_like_powersched_request("list scheduled power"));
+        assert!(looks_like_powersched_request("powersched status"));
+        assert!(looks_like_powersched_request("any power schedule"));
+        assert!(looks_like_powersched_request("what's my power schedule"));
+        assert!(looks_like_powersched_request("view power schedule"));
+        assert!(!looks_like_powersched_request("powersched"));
+        assert!(!looks_like_powersched_request("power schedule"));
+        assert!(!looks_like_powersched_request("scheduled power"));
+        assert!(!looks_like_powersched_request("/schedules"));
+        assert!(!looks_like_powersched_request("/cron"));
+        assert!(!looks_like_powersched_request("view schedules"));
+        assert!(!looks_like_powersched_request("/assertions"));
+        assert!(!looks_like_powersched_request("/systemsleep"));
+        assert!(!looks_like_powersched_request("/sleep"));
+        assert!(!looks_like_powersched_request("/sleepdisabled"));
+        assert!(!looks_like_powersched_request("/tasks"));
+        assert!(!looks_like_powersched_request("enable powersched"));
+        assert!(!looks_like_schedules_request("/powersched"));
+        assert!(!looks_like_schedules_request("view power schedule"));
+        assert!(!looks_like_assertions_request("/powersched"));
+        assert!(!looks_like_assertions_request("view power schedule"));
+        let s = try_operator_instant_reply("/powersched").unwrap();
+        assert!(
+            s.contains("**Power schedule**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view power schedule").unwrap();
+        assert!(
+            viewed.contains("**Power schedule**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open power-schedule").unwrap();
+        assert!(
+            open.contains("**Power schedule**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("powersched").is_none());
+        assert!(try_operator_instant_reply("power schedule").is_none());
+        assert!(try_operator_instant_reply("scheduled power").is_none());
+        let sched = try_operator_instant_reply("/schedules");
+        if let Some(reply) = sched {
+            assert!(
+                !reply.contains("**Power schedule**"),
+                "/schedules must stay Agent Ops, not Power schedule: {reply}"
+            );
+        }
+        let assertions = try_operator_instant_reply("/assertions");
+        if let Some(reply) = assertions {
+            assert!(
+                !reply.contains("**Power schedule**"),
+                "/assertions must stay Sleep assertions, not Power schedule: {reply}"
+            );
+        }
+    }
+
     #[test]
     fn norestoresleep_slash_and_view_open_do_not_steal_systemsleep_or_bare() {
         // Slash + view/open NL → No Restore Sleep (`/systemsleep` · `/ttysclobber` parity).

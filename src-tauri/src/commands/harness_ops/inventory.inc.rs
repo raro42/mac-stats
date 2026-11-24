@@ -26905,6 +26905,265 @@ pub fn format_assertions_report() -> String {
     format!("**Sleep assertions** · `{v}`")
 }
 
+/// Power schedule — `pmset -g sched` (one-shot + repeating wake/sleep).
+/// Slash + view/open NL (`/powersched` · `/power-schedule` · `view power schedule`).
+/// Bare `powersched` / `power schedule` / `scheduled power` stay with the agent;
+/// `/schedules` · `/cron` stay Agent Ops jobs; `/assertions` stays Sleep assertions;
+/// `/systemsleep` · `/sleep` stay System Sleep; `/sleepdisabled` stays Sleep Disabled.
+pub fn looks_like_powersched_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("schedules")
+        || n.contains("schedule a")
+        || n.contains("cron")
+        || n.contains("deliver")
+        || n.contains("jobs")
+        || n.contains("redmine")
+        || n.contains("ticket")
+        || n.contains("systemsleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("sleepdisabled")
+        || n.contains("sleep disabled")
+        || n.contains("sleep-disabled")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("norestoresleep")
+        || n.contains("no restore sleep")
+        || n.contains("no-restore-sleep")
+        || n.contains("assertions")
+        || n.contains("preventer")
+        || n.contains("who keeps awake")
+        || n.contains("screensaver")
+        || n.contains("filevault")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/schedules"
+        || n == "/cron"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/sleep"
+        || n == "/sleep-status"
+        || n == "/sleep-state"
+        || n == "/sleep-timer"
+        || n == "/sleepdisabled"
+        || n == "/sleep-disabled"
+        || n == "/assertions"
+        || n == "/sleep-preventers"
+        || n == "/preventers"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        // Bare phrases stay with the agent.
+        || n == "powersched"
+        || n == "the powersched"
+        || n == "power-sched"
+        || n == "the power-sched"
+        || n == "power schedule"
+        || n == "the power schedule"
+        || n == "power-schedule"
+        || n == "the power-schedule"
+        || n == "pmset sched"
+        || n == "the pmset sched"
+        || n == "pmset-sched"
+        || n == "the pmset-sched"
+        || n == "scheduled power"
+        || n == "the scheduled power"
+        || n == "scheduled-power"
+        || n == "the scheduled-power"
+        || n == "power events"
+        || n == "the power events"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/powersched"
+            | "/powersched-status"
+            | "/powersched-state"
+            | "/power-sched"
+            | "/power-sched-status"
+            | "/power-sched-state"
+            | "/power-schedule"
+            | "/power-schedule-status"
+            | "/power-schedule-state"
+            | "/powerschedule"
+            | "/powerschedule-status"
+            | "/powerschedule-state"
+            | "/pmset-sched"
+            | "/pmset-sched-status"
+            | "/pmset-schedule"
+            | "/pmset-schedule-status"
+            | "/scheduled-power"
+            | "/scheduled-power-status"
+            | "/scheduledpower"
+            | "/scheduledpower-status"
+            | "/mac-powersched"
+            | "/mac-power-sched"
+            | "/mac-power-schedule"
+            | "/mac-powerschedule"
+            | "/mac-pmset-sched"
+            | "/mac-scheduled-power"
+            | "/mac-powersched-status"
+            | "/mac-power-schedule-status"
+            | "powersched status"
+            | "the powersched status"
+            | "powersched state"
+            | "the powersched state"
+            | "power-sched status"
+            | "the power-sched status"
+            | "power schedule status"
+            | "the power schedule status"
+            | "power-schedule status"
+            | "the power-schedule status"
+            | "powerschedule status"
+            | "the powerschedule status"
+            | "pmset sched status"
+            | "the pmset sched status"
+            | "pmset-sched status"
+            | "the pmset-sched status"
+            | "scheduled power status"
+            | "the scheduled power status"
+            | "my powersched"
+            | "my powersched status"
+            | "my power schedule"
+            | "my power schedule status"
+            | "my power-schedule"
+            | "my scheduled power"
+            | "is powersched on"
+            | "is power schedule on"
+            | "is power-schedule on"
+            | "is scheduled power on"
+            | "any power schedule"
+            | "any scheduled power"
+            | "what's my powersched"
+            | "whats my powersched"
+            | "what is my powersched"
+            | "what's my powersched status"
+            | "whats my powersched status"
+            | "what is my powersched status"
+            | "what's my power schedule"
+            | "whats my power schedule"
+            | "what is my power schedule"
+            | "what's my power schedule status"
+            | "whats my power schedule status"
+            | "what is my power schedule status"
+            | "what's the powersched"
+            | "whats the powersched"
+            | "what is the powersched"
+            | "what's the powersched status"
+            | "whats the powersched status"
+            | "what is the powersched status"
+            | "what's the power schedule"
+            | "whats the power schedule"
+            | "what is the power schedule"
+            | "what's the power schedule status"
+            | "whats the power schedule status"
+            | "what is the power schedule status"
+            | "how's powersched"
+            | "hows powersched"
+            | "how's the powersched"
+            | "hows the powersched"
+            | "how's power schedule"
+            | "hows power schedule"
+            | "view powersched"
+            | "view the powersched"
+            | "view powersched status"
+            | "view the powersched status"
+            | "view power-sched"
+            | "view the power-sched"
+            | "view power schedule"
+            | "view the power schedule"
+            | "view power schedule status"
+            | "view the power schedule status"
+            | "view power-schedule"
+            | "view the power-schedule"
+            | "view powerschedule"
+            | "view pmset-sched"
+            | "view the pmset-sched"
+            | "view pmset schedule"
+            | "view scheduled power"
+            | "view the scheduled power"
+            | "see powersched"
+            | "see the powersched"
+            | "see power schedule"
+            | "see the power schedule"
+            | "see scheduled power"
+            | "see the scheduled power"
+            | "open powersched"
+            | "open the powersched"
+            | "open powersched status"
+            | "open the powersched status"
+            | "open power-sched"
+            | "open power schedule"
+            | "open the power schedule"
+            | "open power-schedule"
+            | "open powerschedule"
+            | "open pmset-sched"
+            | "open scheduled power"
+            | "list powersched"
+            | "list the powersched"
+            | "list powersched status"
+            | "list the powersched status"
+            | "list power-sched"
+            | "list power schedule"
+            | "list the power schedule"
+            | "list power-schedule"
+            | "list powerschedule"
+            | "list pmset-sched"
+            | "list scheduled power"
+            | "list the scheduled power"
+            | "list power events"
+            | "list the power events"
+    )
+}
+
+/// Zero-LLM power schedule from pmset (macOS-only; empty elsewhere).
+pub fn format_powersched_report() -> String {
+    let v = crate::metrics::get_powersched_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Power schedule** — _no scheduled power events on this Mac right now._"
+            .to_string();
+    }
+    format!("**Power schedule** · `{v}`")
+}
+
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).
 /// Bare `autopoweroff` / `auto power off` stay with the agent;

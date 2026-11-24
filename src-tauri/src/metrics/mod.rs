@@ -7344,6 +7344,126 @@ pub fn get_assertions_status() -> String {
     }
 }
 
+/// Compact one-shot `pmset -g sched` line body (`wake at DATE TIME by …` → `wake DATE HH:MM`).
+pub(crate) fn compact_pmset_sched_oneshot(rest: &str) -> Option<String> {
+    let parts: Vec<&str> = rest.split_whitespace().collect();
+    if parts.len() >= 4 && parts[1].eq_ignore_ascii_case("at") {
+        let kind = parts[0].to_ascii_lowercase();
+        let date = parts[2];
+        let time = parts[3];
+        let time_short = {
+            let segs: Vec<&str> = time.split(':').collect();
+            if segs.len() >= 2 {
+                format!("{}:{}", segs[0], segs[1])
+            } else {
+                time.to_string()
+            }
+        };
+        return Some(format!("{kind} {date} {time_short}"));
+    }
+    let t = rest.trim();
+    if t.is_empty() {
+        None
+    } else {
+        Some(t.to_string())
+    }
+}
+
+/// Parse scheduled + repeating power events from `pmset -g sched` stdout.
+pub(crate) fn parse_pmset_sched_events(raw: &str) -> Vec<String> {
+    let mut events = Vec::new();
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let tl = t.to_ascii_lowercase();
+        if tl.starts_with("scheduled power")
+            || tl.starts_with("repeating")
+            || tl.starts_with("no scheduled")
+            || tl.starts_with("no repeating")
+            || tl.contains("scheduled events:")
+        {
+            continue;
+        }
+        if let Some(close) = t.find(']') {
+            if t.starts_with('[') {
+                let rest = t[close + 1..].trim();
+                if let Some(compact) = compact_pmset_sched_oneshot(rest) {
+                    events.push(compact);
+                }
+                continue;
+            }
+        }
+        // Repeating / free-form rows (wake every Monday…, wakemondays …).
+        let interesting = tl.contains("wake")
+            || tl.contains("sleep")
+            || tl.contains("shutdown")
+            || tl.contains("restart")
+            || tl.contains("poweron")
+            || tl.contains("poweroff")
+            || tl.contains("power on")
+            || tl.contains("power off");
+        if !interesting {
+            continue;
+        }
+        let compact = t.split_whitespace().collect::<Vec<_>>().join(" ");
+        if compact.len() > 2 && compact.len() < 96 {
+            events.push(compact);
+        }
+    }
+    events
+}
+
+/// Compact status: up to 5 events (+N overflow).
+pub(crate) fn format_powersched_parts(events: &[String]) -> String {
+    const MAX: usize = 5;
+    let show = events.len().min(MAX);
+    let mut bits: Vec<String> = events.iter().take(show).cloned().collect();
+    if events.len() > MAX {
+        bits.push(format!("(+{})", events.len() - MAX));
+    }
+    bits.join(" · ")
+}
+
+/// macOS power schedule from `pmset -g sched` (one-shot + repeating wake/sleep).
+/// Distinct from Agent Ops `/schedules` and Sleep assertions `/assertions`.
+/// Used by Discord/operator instant `/powersched` · `/power-schedule` lane.
+pub fn get_powersched_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "sched"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("powersched: pmset -g sched non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("powersched: pmset -g sched spawn failed");
+                return String::new();
+            }
+        };
+        let events = parse_pmset_sched_events(&stdout);
+        let info = format_powersched_parts(&events);
+        if info.is_empty() {
+            debug3!("powersched: empty status");
+        } else {
+            debug3!("powersched status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -12939,6 +13059,52 @@ Kernel Assertions: 0x124=USB,THNDR,MAGICWAKE
             format_assertions_parts(&["Media"], &["powerd".into()]),
             "Media · powerd"
         );
+    }
+}
+
+#[cfg(test)]
+mod powersched_parse_tests {
+    use super::{
+        compact_pmset_sched_oneshot, format_powersched_parts, parse_pmset_sched_events,
+    };
+
+    const SAMPLE: &str = r#"
+Scheduled power events:
+ [0]  wake at 11/25/26 07:00:00 by 'com.apple.alarm.user.wake'
+ [1]  sleep at 11/25/26 23:30:00
+Repeating power events:
+  wake every Monday at 8:00AM
+"#;
+
+    #[test]
+    fn parses_oneshot_and_repeating() {
+        assert_eq!(
+            parse_pmset_sched_events(SAMPLE),
+            vec![
+                "wake 11/25/26 07:00".to_string(),
+                "sleep 11/25/26 23:30".to_string(),
+                "wake every Monday at 8:00AM".to_string(),
+            ]
+        );
+        assert_eq!(parse_pmset_sched_events("No scheduled events."), Vec::<String>::new());
+        assert_eq!(parse_pmset_sched_events("nope"), Vec::<String>::new());
+    }
+
+    #[test]
+    fn compacts_oneshot_and_overflow() {
+        assert_eq!(
+            compact_pmset_sched_oneshot("wake at 07/04/25 06:00:00 by 'root'").as_deref(),
+            Some("wake 07/04/25 06:00")
+        );
+        let events: Vec<String> = ["a", "b", "c", "d", "e", "f", "g"]
+            .into_iter()
+            .map(str::to_string)
+            .collect();
+        assert_eq!(
+            format_powersched_parts(&events),
+            "a · b · c · d · e · (+2)"
+        );
+        assert_eq!(format_powersched_parts(&[]), "");
     }
 }
 

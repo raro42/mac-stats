@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.3047] - 2026-11-24
+
+### Added
+- Instant Power schedule accepts `/powersched` · `/powersched-status` · `/powersched-state` · `/power-sched` · `/power-sched-status` · `/power-sched-state` · `/power-schedule` · `/power-schedule-status` · `/power-schedule-state` · `/powerschedule` · `/powerschedule-status` · `/powerschedule-state` · `/pmset-sched` · `/pmset-sched-status` · `/pmset-schedule` · `/pmset-schedule-status` · `/scheduled-power` · `/scheduled-power-status` · `/scheduledpower` · `/scheduledpower-status` · `/mac-powersched` · `/mac-power-sched` · `/mac-power-schedule` · `/mac-powerschedule` · `/mac-pmset-sched` · `/mac-scheduled-power` · `/mac-powersched-status` · `/mac-power-schedule-status` and view/see/open/list NL (`view powersched`, `open power-schedule`, `list scheduled power`, …), matching “powersched status” / “any power schedule” / “what's my power schedule” / “what's the powersched”. Bare `powersched` / `power schedule` / `scheduled power` stay with the agent; `/schedules` · `/cron` stay Agent Ops jobs; `/assertions` · `/sleep-preventers` stay Sleep assertions; `/systemsleep` · `/system-sleep` · `/sleep` stay System Sleep; `/sleepdisabled` · `/sleep-disabled` stay Sleep Disabled. Operator `/help` lists the new lane.
+
+
 ## [0.1.3046] - 2026-11-24
 
 ### Added

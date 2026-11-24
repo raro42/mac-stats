@@ -1358,6 +1358,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_assertions_request(content) {
         return Some(format_assertions_report());
     }
+    // Power schedule (bare `powersched` / `power schedule` stay with the agent;
+    // `/schedules` · `/cron` stay Agent Ops; `/assertions` stays Sleep assertions;
+    // `/systemsleep` · `/sleep` stay System Sleep; `/sleepdisabled` stays Sleep Disabled).
+    if looks_like_powersched_request(content) {
+        return Some(format_powersched_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;
