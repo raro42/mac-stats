@@ -6393,6 +6393,81 @@ mod tests {
     }
 
     #[test]
+    fn pmlog_slash_and_view_open_do_not_steal_logs_assertions_or_bare() {
+        // Slash + view/open NL → Power management log (`/assertions` · `/logs` parity).
+        // Bare `pmlog` / `power log` stay with the agent;
+        // `/logs` stays Debug Log; `/assertions` stays Sleep assertions;
+        // `/sysload` stays System load; `/powersched` stays Power schedule; `/ups` stays UPS.
+        assert!(looks_like_pmlog_request("/pmlog"));
+        assert!(looks_like_pmlog_request("/pmlog-status"));
+        assert!(looks_like_pmlog_request("/pm-log"));
+        assert!(looks_like_pmlog_request("/powerlog"));
+        assert!(looks_like_pmlog_request("/power-log"));
+        assert!(looks_like_pmlog_request("/powermanagement-log"));
+        assert!(looks_like_pmlog_request("/pmset-log"));
+        assert!(looks_like_pmlog_request("/sleep-wake-log"));
+        assert!(looks_like_pmlog_request("/mac-pmlog"));
+        assert!(looks_like_pmlog_request("/mac-powerlog"));
+        assert!(looks_like_pmlog_request("view pmlog"));
+        assert!(looks_like_pmlog_request("open powerlog"));
+        assert!(looks_like_pmlog_request("list power management log"));
+        assert!(looks_like_pmlog_request("pmlog status"));
+        assert!(looks_like_pmlog_request("is pmlog ok"));
+        assert!(looks_like_pmlog_request("what's my pmlog"));
+        assert!(looks_like_pmlog_request("view power log"));
+        assert!(!looks_like_pmlog_request("pmlog"));
+        assert!(!looks_like_pmlog_request("power log"));
+        assert!(!looks_like_pmlog_request("power management log"));
+        assert!(!looks_like_pmlog_request("/logs"));
+        assert!(!looks_like_pmlog_request("view logs"));
+        assert!(!looks_like_pmlog_request("/assertions"));
+        assert!(!looks_like_pmlog_request("view assertions"));
+        assert!(!looks_like_pmlog_request("/sysload"));
+        assert!(!looks_like_pmlog_request("/powersched"));
+        assert!(!looks_like_pmlog_request("/ups"));
+        assert!(!looks_like_pmlog_request("/thermal"));
+        assert!(!looks_like_pmlog_request("/tasks"));
+        assert!(!looks_like_pmlog_request("enable pmlog"));
+        assert!(!looks_like_sysload_request("/pmlog"));
+        assert!(!looks_like_sysload_request("view pmlog"));
+        assert!(!looks_like_assertions_request("/pmlog"));
+        assert!(!looks_like_assertions_request("view pmlog"));
+        assert!(!looks_like_ups_request("/pmlog"));
+        assert!(!looks_like_ups_request("view pmlog"));
+        let s = try_operator_instant_reply("/pmlog").unwrap();
+        assert!(
+            s.contains("**Power log**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view pmlog").unwrap();
+        assert!(
+            viewed.contains("**Power log**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open powerlog").unwrap();
+        assert!(
+            open.contains("**Power log**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("pmlog").is_none());
+        assert!(try_operator_instant_reply("power log").is_none());
+        let assertions = try_operator_instant_reply("/assertions");
+        if let Some(reply) = assertions {
+            assert!(
+                !reply.contains("**Power log**"),
+                "/assertions must stay Sleep assertions, not Power log: {reply}"
+            );
+        }
+        let ups = try_operator_instant_reply("/ups");
+        if let Some(reply) = ups {
+            assert!(
+                !reply.contains("**Power log**"),
+                "/ups must stay UPS, not Power log: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn sysload_slash_and_view_open_do_not_steal_load_heat_or_bare() {
         // Slash + view/open NL → System load (`/load` · `/thermal` parity).
         // Bare `sysload` / `load level` stay with the agent;

@@ -7676,6 +7676,123 @@ pub fn get_ups_status() -> String {
     }
 }
 
+/// Compact one Sleep / Wake / DarkWake / Notification row from `pmset -g log`.
+/// Line shape: `YYYY-MM-DD HH:MM:SS ±ZZZZ Domain\trest…`
+pub(crate) fn compact_pmset_pmlog_line(line: &str) -> Option<String> {
+    let t = line.trim();
+    if t.len() < 28 {
+        return None;
+    }
+    let mut parts = t.split_whitespace();
+    let date = parts.next()?;
+    let time = parts.next()?;
+    let tz = parts.next()?;
+    if date.len() < 10 || !date.as_bytes().get(4).copied().is_some_and(|b| b == b'-') {
+        return None;
+    }
+    if time.len() < 5 || !time.as_bytes().get(2).copied().is_some_and(|b| b == b':') {
+        return None;
+    }
+    if !(tz.starts_with('+') || tz.starts_with('-')) || tz.len() < 5 {
+        return None;
+    }
+    let after_tz = {
+        let idx = t.find(tz)?;
+        t[idx + tz.len()..].trim_start()
+    };
+    let (domain, rest_owned) = match after_tz.find('\t') {
+        Some(i) => (
+            after_tz[..i].trim().to_string(),
+            after_tz[i + 1..].trim().to_string(),
+        ),
+        None => {
+            let mut it = after_tz.split_whitespace();
+            let d = it.next()?.trim().to_string();
+            (d, it.collect::<Vec<_>>().join(" "))
+        }
+    };
+    match domain.as_str() {
+        "Sleep" | "Wake" | "DarkWake" | "Notification" => {}
+        _ => return None,
+    }
+    let md = if date.len() >= 10 { &date[5..] } else { date };
+    let hhmm = &time[..5];
+    let reason_tokens: Vec<&str> = rest_owned.split_whitespace().take(5).collect();
+    let mut reason = reason_tokens.join(" ");
+    if reason.len() > 42 {
+        reason.truncate(39);
+        reason.push('…');
+    }
+    if reason.is_empty() {
+        Some(format!("{md} {hhmm} {domain}"))
+    } else {
+        Some(format!("{md} {hhmm} {domain} {reason}"))
+    }
+}
+
+/// Collect Sleep / Wake / DarkWake / Notification events from `pmset -g log` stdout (chronological).
+pub(crate) fn parse_pmset_pmlog_events(raw: &str) -> Vec<String> {
+    let mut events = Vec::new();
+    for line in raw.lines() {
+        if let Some(compact) = compact_pmset_pmlog_line(line) {
+            events.push(compact);
+        }
+    }
+    events
+}
+
+/// Compact status: last up to 5 events (+N older overflow).
+pub(crate) fn format_pmlog_parts(events: &[String]) -> String {
+    const MAX: usize = 5;
+    if events.is_empty() {
+        return String::new();
+    }
+    let start = events.len().saturating_sub(MAX);
+    let mut bits: Vec<String> = events[start..].to_vec();
+    if events.len() > MAX {
+        bits.insert(0, format!("(+{} older)", events.len() - MAX));
+    }
+    bits.join(" · ")
+}
+
+/// macOS power-management log from `pmset -g log` (recent Sleep / Wake / DarkWake / Notification).
+/// Distinct from Sleep assertions `/assertions` (current holders), debug `/logs`, and UPS `/ups`.
+/// Used by Discord/operator instant `/pmlog` · `/powerlog` lane.
+pub fn get_pmlog_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "log"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("pmlog: pmset -g log non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("pmlog: pmset -g log spawn failed");
+                return String::new();
+            }
+        };
+        let events = parse_pmset_pmlog_events(&stdout);
+        let info = format_pmlog_parts(&events);
+        if info.is_empty() {
+            debug3!("pmlog: empty status");
+        } else {
+            debug3!("pmlog status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -13382,6 +13499,43 @@ UPS settings:
             format_ups_parts(Some(20), Some(120), None),
             "halt 20% · after 2h"
         );
+    }
+}
+
+#[cfg(test)]
+mod pmlog_parse_tests {
+    use super::{compact_pmset_pmlog_line, format_pmlog_parts, parse_pmset_pmlog_events};
+
+    const SAMPLE: &str = "\
+2026-11-21 11:26:12 +0100 Sleep              \tEntering Sleep state due to 'Maintenance Sleep'\n\
+2026-11-21 11:27:01 +0100 DarkWake           \tDarkWake from Deep Idle [CDNP] : using BATT\n\
+2026-11-21 11:27:02 +0100 Notification       \tDisplay is turned on\n\
+2026-11-21 11:27:05 +0100 Wake               \tDarkWake to FullWake from Deep Idle [CDNP]\n\
+2026-11-21 11:27:10 +0100 Assertions         \tPID 1(launchd) Summary PreventUserIdleSystemSleep \"x\"\n\
+2026-11-21 11:28:00 +0100 Sleep              \tEntering Sleep state due to 'Idle Sleep'\n\
+";
+
+    #[test]
+    fn parses_sleep_wake_domains_skips_assertions_and_formats_tail() {
+        assert!(compact_pmset_pmlog_line(
+            "2026-11-21 11:27:10 +0100 Assertions         \tPID 1(launchd) Summary"
+        )
+        .is_none());
+        let events = parse_pmset_pmlog_events(SAMPLE);
+        assert_eq!(events.len(), 5);
+        assert!(events[0].starts_with("11-21 11:26 Sleep"));
+        assert!(events[1].starts_with("11-21 11:27 DarkWake"));
+        assert!(events[2].starts_with("11-21 11:27 Notification"));
+        assert!(events[3].starts_with("11-21 11:27 Wake"));
+        assert!(events[4].starts_with("11-21 11:28 Sleep"));
+        let formatted = format_pmlog_parts(&events);
+        assert!(formatted.contains("11-21 11:28 Sleep"));
+        assert!(!formatted.contains("(+"));
+        let many: Vec<String> = (0..7).map(|i| format!("e{i}")).collect();
+        let with_overflow = format_pmlog_parts(&many);
+        assert!(with_overflow.starts_with("(+2 older)"));
+        assert!(with_overflow.contains("e6"));
+        assert_eq!(format_pmlog_parts(&[]), "");
     }
 }
 

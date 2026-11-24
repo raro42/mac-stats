@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3050] - 2026-11-24
+
+### Added
+- Instant Power log accepts `/pmlog` · `/pmlog-status` · `/pmlog-state` · `/pm-log` · `/pm-log-status` · `/pm-log-state` · `/powerlog` · `/powerlog-status` · `/powerlog-state` · `/power-log` · `/power-log-status` · `/power-log-state` · `/powermanagement-log` · `/powermanagement-log-status` · `/powermanagementlog` · `/powermanagementlog-status` · `/pmset-log` · `/pmset-log-status` · `/pmsetlog` · `/pmsetlog-status` · `/sleep-wake-log` · `/sleep-wake-log-status` · `/sleepwakelog` · `/sleepwakelog-status` · `/mac-pmlog` · `/mac-pm-log` · `/mac-powerlog` · `/mac-power-log` · `/mac-powermanagement-log` · `/mac-pmset-log` · `/mac-sleep-wake-log` · `/mac-pmlog-status` · `/mac-powerlog-status` and view/see/open/list NL (`view pmlog`, `open powerlog`, `list power management log`, …), matching “pmlog status” / “is pmlog ok” / “what's my pmlog” / “what's the power log”. Bare `pmlog` / `power log` / `power management log` stay with the agent; `/logs` stays Debug Log; `/assertions` · `/sleep-preventers` stay Sleep assertions; `/sysload` · `/load-level` stay System load; `/powersched` · `/power-schedule` stay Power schedule; `/ups` · `/ups-settings` stay UPS; `/thermal` · `/heat` stay Heat. Operator `/help` lists the new lane.
+
 ## [0.1.3049] - 2026-11-24
 
 ### Added

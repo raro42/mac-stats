@@ -27600,6 +27600,279 @@ pub fn format_ups_report() -> String {
     format!("**UPS** · `{v}`")
 }
 
+/// Power management log — recent Sleep / Wake / DarkWake / Notification from `pmset -g log`.
+/// Slash + view/open NL (`/pmlog` · `/powerlog` · `view pmlog`).
+/// Bare `pmlog` / `power log` / `power management log` stay with the agent;
+/// `/logs` stays Debug Log; `/assertions` stays Sleep assertions;
+/// `/sysload` stays System load; `/powersched` stays Power schedule;
+/// `/ups` stays UPS; `/thermal` · `/heat` stay Heat.
+pub fn looks_like_pmlog_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n == "/logs"
+        || n == "view logs"
+        || n == "open logs"
+        || n == "see logs"
+        || n == "check logs"
+        || n == "review logs"
+        || n.contains("assertions")
+        || n.contains("preventer")
+        || n.contains("who keeps awake")
+        || n.contains("sysload")
+        || n.contains("sys load")
+        || n.contains("load level")
+        || n.contains("powersched")
+        || n.contains("power schedule")
+        || n.contains("pmset sched")
+        || n.contains("scheduled power")
+        || n.contains("uninterruptible")
+        || n == "/ups"
+        || n == "/ups-settings"
+        || n == "/pmset-ups"
+        || n == "view ups"
+        || n == "open ups"
+        || n == "/thermal"
+        || n == "/heat"
+        || n == "view heat"
+        || n == "open thermal"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        // Bare phrases stay with the agent.
+        || n == "pmlog"
+        || n == "the pmlog"
+        || n == "pm-log"
+        || n == "the pm-log"
+        || n == "pm log"
+        || n == "the pm log"
+        || n == "powerlog"
+        || n == "the powerlog"
+        || n == "power-log"
+        || n == "the power-log"
+        || n == "power log"
+        || n == "the power log"
+        || n == "power management log"
+        || n == "the power management log"
+        || n == "powermanagement log"
+        || n == "the powermanagement log"
+        || n == "powermanagement-log"
+        || n == "the powermanagement-log"
+        || n == "pmset log"
+        || n == "the pmset log"
+        || n == "pmset-log"
+        || n == "the pmset-log"
+        || n == "sleep wake log"
+        || n == "the sleep wake log"
+        || n == "sleep-wake-log"
+        || n == "the sleep-wake-log"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/pmlog"
+            | "/pmlog-status"
+            | "/pmlog-state"
+            | "/pm-log"
+            | "/pm-log-status"
+            | "/pm-log-state"
+            | "/powerlog"
+            | "/powerlog-status"
+            | "/powerlog-state"
+            | "/power-log"
+            | "/power-log-status"
+            | "/power-log-state"
+            | "/powermanagement-log"
+            | "/powermanagement-log-status"
+            | "/powermanagementlog"
+            | "/powermanagementlog-status"
+            | "/pmset-log"
+            | "/pmset-log-status"
+            | "/pmsetlog"
+            | "/pmsetlog-status"
+            | "/sleep-wake-log"
+            | "/sleep-wake-log-status"
+            | "/sleepwakelog"
+            | "/sleepwakelog-status"
+            | "/mac-pmlog"
+            | "/mac-pm-log"
+            | "/mac-powerlog"
+            | "/mac-power-log"
+            | "/mac-powermanagement-log"
+            | "/mac-pmset-log"
+            | "/mac-sleep-wake-log"
+            | "/mac-pmlog-status"
+            | "/mac-powerlog-status"
+            | "pmlog status"
+            | "the pmlog status"
+            | "pmlog state"
+            | "the pmlog state"
+            | "pm-log status"
+            | "the pm-log status"
+            | "pm log status"
+            | "the pm log status"
+            | "powerlog status"
+            | "the powerlog status"
+            | "power-log status"
+            | "the power-log status"
+            | "power log status"
+            | "the power log status"
+            | "power management log status"
+            | "the power management log status"
+            | "pmset log status"
+            | "the pmset log status"
+            | "pmset-log status"
+            | "the pmset-log status"
+            | "sleep wake log status"
+            | "the sleep wake log status"
+            | "my pmlog"
+            | "my pmlog status"
+            | "my powerlog"
+            | "my power log"
+            | "my power management log"
+            | "is pmlog ok"
+            | "is the pmlog ok"
+            | "how's pmlog"
+            | "hows pmlog"
+            | "how's the pmlog"
+            | "hows the pmlog"
+            | "how's powerlog"
+            | "hows powerlog"
+            | "what's my pmlog"
+            | "whats my pmlog"
+            | "what is my pmlog"
+            | "what's my pmlog status"
+            | "whats my pmlog status"
+            | "what is my pmlog status"
+            | "what's my powerlog"
+            | "whats my powerlog"
+            | "what is my powerlog"
+            | "what's my power log"
+            | "whats my power log"
+            | "what is my power log"
+            | "what's the pmlog"
+            | "whats the pmlog"
+            | "what is the pmlog"
+            | "what's the pmlog status"
+            | "whats the pmlog status"
+            | "what is the pmlog status"
+            | "what's the powerlog"
+            | "whats the powerlog"
+            | "what is the powerlog"
+            | "what's the power log"
+            | "whats the power log"
+            | "what is the power log"
+            | "what's the power management log"
+            | "whats the power management log"
+            | "what is the power management log"
+            | "view pmlog"
+            | "view the pmlog"
+            | "view pmlog status"
+            | "view the pmlog status"
+            | "view pm-log"
+            | "view the pm-log"
+            | "view pm log"
+            | "view the pm log"
+            | "view powerlog"
+            | "view the powerlog"
+            | "view power-log"
+            | "view the power-log"
+            | "view power log"
+            | "view the power log"
+            | "view power management log"
+            | "view the power management log"
+            | "view pmset-log"
+            | "view the pmset-log"
+            | "view pmset log"
+            | "view the pmset log"
+            | "view sleep-wake-log"
+            | "view the sleep-wake-log"
+            | "view sleep wake log"
+            | "view the sleep wake log"
+            | "see pmlog"
+            | "see the pmlog"
+            | "see powerlog"
+            | "see the powerlog"
+            | "see power log"
+            | "see the power log"
+            | "see power management log"
+            | "see the power management log"
+            | "open pmlog"
+            | "open the pmlog"
+            | "open pmlog status"
+            | "open the pmlog status"
+            | "open pm-log"
+            | "open powerlog"
+            | "open the powerlog"
+            | "open power-log"
+            | "open power log"
+            | "open power management log"
+            | "open pmset-log"
+            | "open sleep-wake-log"
+            | "list pmlog"
+            | "list the pmlog"
+            | "list pmlog status"
+            | "list the pmlog status"
+            | "list powerlog"
+            | "list the powerlog"
+            | "list power log"
+            | "list the power log"
+            | "list power management log"
+            | "list pmset-log"
+            | "list sleep-wake-log"
+    )
+}
+
+/// Zero-LLM power-management log from `pmset -g log` (macOS-only; empty elsewhere).
+pub fn format_pmlog_report() -> String {
+    let v = crate::metrics::get_pmlog_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Power log** — _no recent Sleep / Wake events on this Mac right now._"
+            .to_string();
+    }
+    format!("**Power log** · `{v}`")
+}
+
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).
 /// Bare `autopoweroff` / `auto power off` stay with the agent;
