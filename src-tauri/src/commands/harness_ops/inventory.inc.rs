@@ -25428,6 +25428,229 @@ pub fn format_ttysclobber_report() -> String {
     format!("**TTY Clobber** · `{v}`")
 }
 
+/// No Restore Sleep — `pmset` Battery/AC `norestoresleep` (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/norestoresleep` · `/no-restore-sleep` · `view norestoresleep`).
+/// Bare `norestoresleep` / `no restore sleep` stay with the agent;
+/// `/systemsleep` stays System Sleep; `/ttysclobber` stays TTY Clobber; `/standby` stays Standby;
+/// `/tcpkeepalive` stays TCP Keep Alive.
+pub fn looks_like_norestoresleep_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("ttysclobber")
+        || n.contains("ttys clobber")
+        || n.contains("tty clobber")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("darkwakes")
+        || n.contains("dark wakes")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("hibernatemode")
+        || n.contains("hibernate")
+        || n.contains("standbydelay")
+        || n.contains("standby delay")
+        || n.contains("standby")
+        || n.contains("stand by")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("system sleep")
+        || n.contains("systemsleep")
+        || n.contains("system-sleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("sleep on power")
+        || n.contains("power button")
+        || n.contains("sopb")
+        || n.contains("lessbright")
+        || n.contains("halfdim")
+        || n.contains("reducebrightness")
+        || n.contains("reduce brightness")
+        || n.contains("filevault")
+        || n.contains("screensaver")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/sleep"
+        || n == "/computer-sleep"
+        || n == "/ttysclobber"
+        || n == "/ttys-clobber"
+        || n == "/darkwakes"
+        || n == "/ttyskeepawake"
+        || n == "/tcpkeepalive"
+        || n == "/standby"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        // Bare phrases stay with the agent.
+        || n == "norestoresleep"
+        || n == "the norestoresleep"
+        || n == "no restore sleep"
+        || n == "the no restore sleep"
+        || n == "no-restore-sleep"
+        || n == "the no-restore-sleep"
+        || n == "norestore-sleep"
+        || n == "the norestore-sleep"
+        || n == "no restoresleep"
+        || n == "the no restoresleep"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/norestoresleep"
+            | "/norestoresleep-status"
+            | "/norestoresleep-state"
+            | "/no-restore-sleep"
+            | "/no-restore-sleep-status"
+            | "/no-restore-sleep-state"
+            | "/norestore-sleep"
+            | "/norestore-sleep-status"
+            | "/norestore-sleep-state"
+            | "/no-restoresleep"
+            | "/no-restoresleep-status"
+            | "/mac-norestoresleep"
+            | "/mac-no-restore-sleep"
+            | "/mac-norestore-sleep"
+            | "/mac-norestoresleep-status"
+            | "/mac-no-restore-sleep-status"
+            | "norestoresleep status"
+            | "the norestoresleep status"
+            | "no restore sleep status"
+            | "the no restore sleep status"
+            | "no-restore-sleep status"
+            | "the no-restore-sleep status"
+            | "norestoresleep state"
+            | "the norestoresleep state"
+            | "no restore sleep state"
+            | "my norestoresleep"
+            | "my norestoresleep status"
+            | "my no restore sleep"
+            | "my no restore sleep status"
+            | "is norestoresleep on"
+            | "is norestoresleep off"
+            | "is norestoresleep enabled"
+            | "is norestoresleep disabled"
+            | "is no restore sleep on"
+            | "is no restore sleep off"
+            | "is no restore sleep enabled"
+            | "is no restore sleep disabled"
+            | "is no-restore-sleep on"
+            | "is no-restore-sleep enabled"
+            | "what's my norestoresleep"
+            | "whats my norestoresleep"
+            | "what is my norestoresleep"
+            | "what's my norestoresleep status"
+            | "whats my norestoresleep status"
+            | "what is my norestoresleep status"
+            | "what's my no restore sleep"
+            | "whats my no restore sleep"
+            | "what is my no restore sleep"
+            | "what's my no restore sleep status"
+            | "whats my no restore sleep status"
+            | "what is my no restore sleep status"
+            | "what's the norestoresleep"
+            | "whats the norestoresleep"
+            | "what is the norestoresleep"
+            | "what's the norestoresleep status"
+            | "whats the norestoresleep status"
+            | "what is the norestoresleep status"
+            | "what's the no restore sleep"
+            | "whats the no restore sleep"
+            | "what is the no restore sleep"
+            | "what's the no restore sleep status"
+            | "whats the no restore sleep status"
+            | "what is the no restore sleep status"
+            | "how's norestoresleep"
+            | "hows norestoresleep"
+            | "how's the norestoresleep"
+            | "hows the norestoresleep"
+            | "how's no restore sleep"
+            | "hows no restore sleep"
+            | "view norestoresleep"
+            | "view the norestoresleep"
+            | "view norestoresleep status"
+            | "view the norestoresleep status"
+            | "view no restore sleep"
+            | "view the no restore sleep"
+            | "view no restore sleep status"
+            | "view the no restore sleep status"
+            | "view no-restore-sleep"
+            | "view the no-restore-sleep"
+            | "see norestoresleep"
+            | "see the norestoresleep"
+            | "see norestoresleep status"
+            | "see the norestoresleep status"
+            | "see no restore sleep"
+            | "see the no restore sleep"
+            | "open norestoresleep"
+            | "open the norestoresleep"
+            | "open norestoresleep status"
+            | "open the norestoresleep status"
+            | "open no restore sleep"
+            | "open the no restore sleep"
+            | "open no-restore-sleep"
+            | "open the no-restore-sleep"
+            | "list norestoresleep"
+            | "list the norestoresleep"
+            | "list norestoresleep status"
+            | "list the norestoresleep status"
+            | "list no restore sleep"
+            | "list the no restore sleep"
+            | "list no-restore-sleep"
+            | "list the no-restore-sleep"
+    )
+}
+
+/// Zero-LLM No Restore Sleep from pmset (macOS-only; empty elsewhere).
+pub fn format_norestoresleep_report() -> String {
+    let v = crate::metrics::get_norestoresleep_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**No Restore Sleep** — _no No Restore Sleep reading on this Mac right now._".to_string();
+    }
+    format!("**No Restore Sleep** · `{v}`")
+}
+
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).
 /// Bare `autopoweroff` / `auto power off` stay with the agent;
@@ -26120,6 +26343,9 @@ pub fn looks_like_systemsleep_request(content: &str) -> bool {
         || n.contains("networkoversleep")
         || n.contains("network over sleep")
         || n.contains("network-over-sleep")
+        || n.contains("norestoresleep")
+        || n.contains("no restore sleep")
+        || n.contains("no-restore-sleep")
         || n.contains("tcpkeepalive")
         || n.contains("tcp keep alive")
         || n.contains("tcp-keep-alive")
@@ -26171,6 +26397,8 @@ pub fn looks_like_systemsleep_request(content: &str) -> bool {
         || n == "/ttyskeepawake"
         || n == "/tty-keep-awake"
         || n == "/ttys-keep-awake"
+        || n == "/norestoresleep"
+        || n == "/no-restore-sleep"
         || n == "/screensaver"
         || n == "/screen-saver"
         || n == "/idle-time"

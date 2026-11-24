@@ -6568,6 +6568,130 @@ pub fn get_ttysclobber_status() -> String {
     }
 }
 
+/// Parse `pmset -g custom` Battery/AC `norestoresleep` flag → (battery, ac).
+/// Exact key `norestoresleep` only (do not restore sleep settings after wake; often absent on Apple Silicon).
+pub(crate) fn parse_pmset_custom_norestoresleep(raw: &str) -> (Option<bool>, Option<bool>) {
+    let mut section: Option<&str> = None;
+    let mut battery = None;
+    let mut ac = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.eq_ignore_ascii_case("Battery Power:") {
+            section = Some("battery");
+            continue;
+        }
+        if t.eq_ignore_ascii_case("AC Power:") {
+            section = Some("ac");
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("norestoresleep") {
+            continue;
+        }
+        let on = match parts.next() {
+            Some("1") | Some("true") | Some("yes") => Some(true),
+            Some("0") | Some("false") | Some("no") => Some(false),
+            _ => None,
+        };
+        match section {
+            Some("battery") => battery = on.or(battery),
+            Some("ac") => ac = on.or(ac),
+            _ => {}
+        }
+    }
+    (battery, ac)
+}
+
+/// Parse active `pmset -g` `norestoresleep` flag (Currently in use).
+pub(crate) fn parse_pmset_active_norestoresleep(raw: &str) -> Option<bool> {
+    for line in raw.lines() {
+        let mut parts = line.trim().split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("norestoresleep") {
+            continue;
+        }
+        return match parts.next() {
+            Some("1") | Some("true") | Some("yes") => Some(true),
+            Some("0") | Some("false") | Some("no") => Some(false),
+            _ => None,
+        };
+    }
+    None
+}
+
+/// Prefer Battery+AC custom when both set; else active `pmset -g`.
+pub(crate) fn format_norestoresleep_parts(
+    battery: Option<bool>,
+    ac: Option<bool>,
+    active: Option<bool>,
+) -> String {
+    format_wake_for_network_parts(battery, ac, active)
+}
+
+/// macOS No Restore Sleep from `pmset -g custom` Battery/AC `norestoresleep`
+/// (fallback: active `pmset -g`). Distinct from System Sleep `/systemsleep`
+/// and TTY Clobber `/ttysclobber`.
+/// Used by Discord/operator instant `/norestoresleep` · `/no-restore-sleep` lane.
+pub fn get_norestoresleep_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let (battery, ac) = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g", "custom"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_custom_norestoresleep(&stdout)
+                }
+                Ok(_) => (None, None),
+                Err(_) => {
+                    debug3!("norestoresleep: pmset -g custom spawn failed");
+                    (None, None)
+                }
+            }
+        };
+
+        let active = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_active_norestoresleep(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("norestoresleep: pmset -g spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_norestoresleep_parts(battery, ac, active);
+        if info.is_empty() {
+            debug3!("norestoresleep: empty status");
+        } else {
+            debug3!("norestoresleep status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -11717,6 +11841,77 @@ mod spotlight_parse_tests {
     fn empty_on_noise() {
         assert_eq!(parse_mdutil_spotlight_status("nope"), None);
         assert_eq!(parse_mdutil_spotlight_status("/:\n"), None);
+    }
+}
+
+#[cfg(test)]
+mod norestoresleep_parse_tests {
+    use super::{
+        format_norestoresleep_parts, parse_pmset_active_norestoresleep, parse_pmset_custom_norestoresleep,
+    };
+
+    #[test]
+    fn parses_custom_battery_and_ac() {
+        let sample = r#"
+Battery Power:
+ norestoresleep            1
+ standby              1
+AC Power:
+ norestoresleep            0
+ womp                 1
+"#;
+        assert_eq!(
+            parse_pmset_custom_norestoresleep(sample),
+            (Some(true), Some(false))
+        );
+        assert_eq!(parse_pmset_custom_norestoresleep("nope"), (None, None));
+        let other = r#"
+Battery Power:
+ standby              1
+AC Power:
+ ttysclobber            1
+"#;
+        assert_eq!(parse_pmset_custom_norestoresleep(other), (None, None));
+    }
+
+    #[test]
+    fn parses_active_norestoresleep() {
+        assert_eq!(
+            parse_pmset_active_norestoresleep("Currently in use:\n norestoresleep            1\n"),
+            Some(true)
+        );
+        assert_eq!(
+            parse_pmset_active_norestoresleep(" norestoresleep            0\n"),
+            Some(false)
+        );
+        assert_eq!(parse_pmset_active_norestoresleep(" womp                 1\n"), None);
+        assert_eq!(parse_pmset_active_norestoresleep(" ttysclobber            1\n"), None);
+    }
+
+    #[test]
+    fn formats_matched_split_and_active() {
+        assert_eq!(
+            format_norestoresleep_parts(Some(true), Some(true), Some(false)),
+            "On"
+        );
+        assert_eq!(
+            format_norestoresleep_parts(Some(false), Some(false), Some(true)),
+            "Off"
+        );
+        assert_eq!(
+            format_norestoresleep_parts(Some(true), Some(false), None),
+            "AC Off · Battery On"
+        );
+        assert_eq!(
+            format_norestoresleep_parts(Some(true), None, None),
+            "On (Battery)"
+        );
+        assert_eq!(
+            format_norestoresleep_parts(None, Some(false), None),
+            "Off (AC)"
+        );
+        assert_eq!(format_norestoresleep_parts(None, None, Some(true)), "On");
+        assert_eq!(format_norestoresleep_parts(None, None, None), "");
     }
 }
 

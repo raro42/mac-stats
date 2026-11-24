@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3041] - 2026-11-24
+
+### Added
+- Instant No Restore Sleep accepts `/norestoresleep` · `/norestoresleep-status` · `/norestoresleep-state` · `/no-restore-sleep` · `/no-restore-sleep-status` · `/no-restore-sleep-state` · `/norestore-sleep` · `/norestore-sleep-status` · `/norestore-sleep-state` · `/no-restoresleep` · `/no-restoresleep-status` · `/mac-norestoresleep` · `/mac-no-restore-sleep` · `/mac-norestore-sleep` · `/mac-norestoresleep-status` · `/mac-no-restore-sleep-status` and view/see/open/list NL (`view norestoresleep`, `open no-restore-sleep`, `list no restore sleep`, …), matching “norestoresleep status” / “is no restore sleep on” / “is norestoresleep enabled” / “what's my norestoresleep” / “what's the no restore sleep”. Bare `norestoresleep` / `no restore sleep` stay with the agent; `/systemsleep` · `/system-sleep` · `/sleep` stay System Sleep; `/ttysclobber` · `/ttys-clobber` stay TTY Clobber; `/ttyskeepawake` · `/tty-keep-awake` stay TTY keep awake; `/tcpkeepalive` · `/tcp-keep-alive` stay TCP Keep Alive; reducebrightness stays out. Operator `/help` lists the new lane.
+
 ## [0.1.3040] - 2026-11-24
 
 ### Added

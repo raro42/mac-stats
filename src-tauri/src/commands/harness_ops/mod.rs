@@ -5914,6 +5914,69 @@ mod tests {
     }
 
     #[test]
+    fn norestoresleep_slash_and_view_open_do_not_steal_systemsleep_or_bare() {
+        // Slash + view/open NL → No Restore Sleep (`/systemsleep` · `/ttysclobber` parity).
+        // Bare `norestoresleep` / `no restore sleep` stay with the agent;
+        // `/systemsleep` stays System Sleep; `/ttysclobber` stays TTY Clobber.
+        assert!(looks_like_norestoresleep_request("/norestoresleep"));
+        assert!(looks_like_norestoresleep_request("/norestoresleep-status"));
+        assert!(looks_like_norestoresleep_request("/no-restore-sleep"));
+        assert!(looks_like_norestoresleep_request("/norestore-sleep"));
+        assert!(looks_like_norestoresleep_request("/mac-norestoresleep"));
+        assert!(looks_like_norestoresleep_request("/mac-no-restore-sleep"));
+        assert!(looks_like_norestoresleep_request("view norestoresleep"));
+        assert!(looks_like_norestoresleep_request("open no-restore-sleep"));
+        assert!(looks_like_norestoresleep_request("list no restore sleep"));
+        assert!(looks_like_norestoresleep_request("norestoresleep status"));
+        assert!(looks_like_norestoresleep_request("is no restore sleep on"));
+        assert!(looks_like_norestoresleep_request("what's my norestoresleep"));
+        assert!(looks_like_norestoresleep_request("view no restore sleep"));
+        assert!(!looks_like_norestoresleep_request("norestoresleep"));
+        assert!(!looks_like_norestoresleep_request("no restore sleep"));
+        assert!(!looks_like_norestoresleep_request("/systemsleep"));
+        assert!(!looks_like_norestoresleep_request("view system sleep"));
+        assert!(!looks_like_norestoresleep_request("/ttysclobber"));
+        assert!(!looks_like_norestoresleep_request("/tcpkeepalive"));
+        assert!(!looks_like_norestoresleep_request("/standby"));
+        assert!(!looks_like_norestoresleep_request("/tasks"));
+        assert!(!looks_like_norestoresleep_request("enable norestoresleep"));
+        assert!(!looks_like_systemsleep_request("/norestoresleep"));
+        assert!(!looks_like_systemsleep_request("view norestoresleep"));
+        assert!(!looks_like_ttysclobber_request("/norestoresleep"));
+        let s = try_operator_instant_reply("/norestoresleep").unwrap();
+        assert!(
+            s.contains("**No Restore Sleep**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view norestoresleep").unwrap();
+        assert!(
+            viewed.contains("**No Restore Sleep**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open no-restore-sleep").unwrap();
+        assert!(
+            open.contains("**No Restore Sleep**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("norestoresleep").is_none());
+        assert!(try_operator_instant_reply("no restore sleep").is_none());
+        let ss = try_operator_instant_reply("/systemsleep");
+        if let Some(reply) = ss {
+            assert!(
+                !reply.contains("**No Restore Sleep**"),
+                "/systemsleep must stay System Sleep, not No Restore Sleep: {reply}"
+            );
+        }
+        let tc = try_operator_instant_reply("/ttysclobber");
+        if let Some(reply) = tc {
+            assert!(
+                !reply.contains("**No Restore Sleep**"),
+                "/ttysclobber must stay TTY Clobber, not No Restore Sleep: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn autorestart_slash_and_view_open_do_not_steal_autopoweroff_or_bare() {
         // Slash + view/open NL → Auto Restart (`/lidwake` · `/autopoweroff` parity).
         // Bare `autorestart` / `auto restart` stay with the agent;

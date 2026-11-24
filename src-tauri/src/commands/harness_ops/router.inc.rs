@@ -1319,6 +1319,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_ttysclobber_request(content) {
         return Some(format_ttysclobber_report());
     }
+    // No Restore Sleep (bare `norestoresleep` / `no restore sleep` stay with the agent;
+    // `/systemsleep` stays System Sleep; `/ttysclobber` stays TTY Clobber;
+    // `/tcpkeepalive` stays TCP Keep Alive; reducebrightness stays out).
+    if looks_like_norestoresleep_request(content) {
+        return Some(format_norestoresleep_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;
