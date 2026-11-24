@@ -7188,6 +7188,162 @@ pub fn get_sleepdisabled_status() -> String {
     }
 }
 
+/// Sleep-relevant assertion type from a `pmset -g assertions` owning-process line.
+pub(crate) fn assertion_line_prevent_kind(line: &str) -> Option<&'static str> {
+    let l = line.to_ascii_lowercase();
+    if l.contains("preventuseridlesystemsleep") {
+        Some("System")
+    } else if l.contains("preventuseridledisplaysleep") {
+        Some("Display")
+    } else if l.contains("preventsystemsleep") {
+        Some("NoSleep")
+    } else if l.contains("externalmedia") {
+        Some("Media")
+    } else {
+        None
+    }
+}
+
+/// Extract `Name` from `pid 123(Name): …` (owning-process assertion line).
+pub(crate) fn assertion_line_process_name(line: &str) -> Option<String> {
+    let t = line.trim();
+    let after_pid = t.strip_prefix("pid ")?;
+    let open = after_pid.find('(')?;
+    let close = after_pid[open + 1..].find(')')?;
+    let name = after_pid[open + 1..open + 1 + close].trim();
+    if name.is_empty() {
+        None
+    } else {
+        Some(name.to_string())
+    }
+}
+
+/// Parse system-wide prevent flags that are on (`1` / true / yes).
+pub(crate) fn parse_pmset_assertions_flags(raw: &str) -> Vec<&'static str> {
+    let mut flags = Vec::new();
+    let mut in_listed = false;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.starts_with("Listed by owning process") {
+            in_listed = true;
+            continue;
+        }
+        if t.starts_with("Kernel Assertions") {
+            break;
+        }
+        if in_listed {
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        let on = match parts.next() {
+            Some("1") | Some("true") | Some("yes") => true,
+            _ => false,
+        };
+        if !on {
+            continue;
+        }
+        let kind = match key {
+            k if k.eq_ignore_ascii_case("PreventUserIdleSystemSleep") => Some("System"),
+            k if k.eq_ignore_ascii_case("PreventUserIdleDisplaySleep") => Some("Display"),
+            k if k.eq_ignore_ascii_case("PreventSystemSleep") => Some("NoSleep"),
+            k if k.eq_ignore_ascii_case("ExternalMedia") => Some("Media"),
+            _ => None,
+        };
+        if let Some(k) = kind {
+            if !flags.contains(&k) {
+                flags.push(k);
+            }
+        }
+    }
+    flags
+}
+
+/// Parse owning-process holders that keep the Mac awake (deduped, order preserved).
+pub(crate) fn parse_pmset_assertions_holders(raw: &str) -> Vec<String> {
+    let mut holders = Vec::new();
+    let mut in_listed = false;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.starts_with("Listed by owning process") {
+            in_listed = true;
+            continue;
+        }
+        if t.starts_with("Kernel Assertions") {
+            break;
+        }
+        if !in_listed {
+            continue;
+        }
+        if assertion_line_prevent_kind(t).is_none() {
+            continue;
+        }
+        if let Some(name) = assertion_line_process_name(t) {
+            if !holders
+                .iter()
+                .any(|h: &String| h.eq_ignore_ascii_case(&name))
+            {
+                holders.push(name);
+            }
+        }
+    }
+    holders
+}
+
+/// Compact status: flags + up to 5 holder names (+N overflow).
+pub(crate) fn format_assertions_parts(flags: &[&str], holders: &[String]) -> String {
+    let mut bits: Vec<String> = flags.iter().map(|s| (*s).to_string()).collect();
+    const MAX_HOLDERS: usize = 5;
+    let show = holders.len().min(MAX_HOLDERS);
+    for name in holders.iter().take(show) {
+        bits.push(name.clone());
+    }
+    if holders.len() > MAX_HOLDERS {
+        bits.push(format!("(+{})", holders.len() - MAX_HOLDERS));
+    }
+    bits.join(" · ")
+}
+
+/// macOS sleep assertions from `pmset -g assertions` (who keeps the Mac awake).
+/// Distinct from System Sleep `/systemsleep` and Sleep Disabled `/sleepdisabled`.
+/// Used by Discord/operator instant `/assertions` · `/sleep-preventers` lane.
+pub fn get_assertions_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "assertions"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => String::from_utf8_lossy(&output.stdout).into_owned(),
+            Ok(_) => {
+                debug3!("assertions: pmset -g assertions non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("assertions: pmset -g assertions spawn failed");
+                return String::new();
+            }
+        };
+        let flags = parse_pmset_assertions_flags(&stdout);
+        let holders = parse_pmset_assertions_holders(&stdout);
+        let info = format_assertions_parts(&flags, &holders);
+        if info.is_empty() {
+            debug3!("assertions: empty status");
+        } else {
+            debug3!("assertions status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -12703,6 +12859,86 @@ AC Power:
         );
         assert_eq!(format_sleepdisabled_parts(None, None, Some(true)), "On");
         assert_eq!(format_sleepdisabled_parts(None, None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod assertions_parse_tests {
+    use super::{
+        assertion_line_prevent_kind, assertion_line_process_name, format_assertions_parts,
+        parse_pmset_assertions_flags, parse_pmset_assertions_holders,
+    };
+
+    const SAMPLE: &str = r#"
+Assertion status system-wide:
+   UserIsActive                   1
+   PreventUserIdleDisplaySleep    1
+   PreventSystemSleep             0
+   ExternalMedia                  1
+   PreventUserIdleSystemSleep     1
+   NetworkClientActive            0
+Listed by owning process:
+   pid 689(sharingd): [0x1] 00:01:04 PreventUserIdleSystemSleep named: "Handoff"
+   pid 360(mds): [0x2] 170:18:33 BackgroundTask named: "com.apple.metadata.mds.power"
+   pid 1492(AnyDesk): [0x3] 169:50:33 PreventUserIdleSystemSleep named: "AnyDesk frontend"
+   pid 345(powerd): [0x4] 81:57:36 PreventUserIdleSystemSleep named: "Powerd - Prevent sleep"
+   pid 345(powerd): [0x5] 81:57:33 ExternalMedia named: "externalmediamounted"
+   pid 92966(WhatsApp): [0x6] 138:00:17 PreventUserIdleSystemSleep named: "camera"
+   pid 21267(Jami): [0x7] 127:08:23 PreventUserIdleDisplaySleep named: "Active Call"
+   pid 406(WindowServer): [0x8] 00:00:00 UserIsActive named: "tickle"
+Kernel Assertions: 0x124=USB,THNDR,MAGICWAKE
+   id=576  level=255 0x20=THNDR
+"#;
+
+    #[test]
+    fn parses_flags_and_holders() {
+        assert_eq!(
+            parse_pmset_assertions_flags(SAMPLE),
+            vec!["Display", "Media", "System"]
+        );
+        assert_eq!(
+            parse_pmset_assertions_holders(SAMPLE),
+            vec![
+                "sharingd".to_string(),
+                "AnyDesk".to_string(),
+                "powerd".to_string(),
+                "WhatsApp".to_string(),
+                "Jami".to_string(),
+            ]
+        );
+        assert_eq!(parse_pmset_assertions_flags("nope"), Vec::<&str>::new());
+        assert_eq!(parse_pmset_assertions_holders("nope"), Vec::<String>::new());
+    }
+
+    #[test]
+    fn parses_process_line_helpers() {
+        let line =
+            r#"pid 1492(AnyDesk): [0x3] 169:50:33 PreventUserIdleSystemSleep named: "AnyDesk""#;
+        assert_eq!(assertion_line_process_name(line).as_deref(), Some("AnyDesk"));
+        assert_eq!(assertion_line_prevent_kind(line), Some("System"));
+        assert_eq!(
+            assertion_line_prevent_kind(
+                r#"pid 360(mds): [0x2] BackgroundTask named: "mds""#
+            ),
+            None
+        );
+    }
+
+    #[test]
+    fn formats_flags_holders_and_overflow() {
+        let holders: Vec<String> = ["a", "b", "c", "d", "e", "f", "g"]
+            .into_iter()
+            .map(str::to_string)
+            .collect();
+        assert_eq!(
+            format_assertions_parts(&["System", "Display"], &holders),
+            "System · Display · a · b · c · d · e · (+2)"
+        );
+        assert_eq!(format_assertions_parts(&[], &[]), "");
+        assert_eq!(
+            format_assertions_parts(&["Media"], &["powerd".into()]),
+            "Media · powerd"
+        );
     }
 }
 

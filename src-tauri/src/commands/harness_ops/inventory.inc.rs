@@ -26644,6 +26644,267 @@ pub fn format_sleepdisabled_report() -> String {
     format!("**Sleep Disabled** · `{v}`")
 }
 
+/// Sleep assertions / preventers — `pmset -g assertions` (who keeps the Mac awake).
+/// Slash + view/open NL (`/assertions` · `/sleep-preventers` · `view assertions`).
+/// Bare `assertions` / `sleep preventers` / `preventers` stay with the agent;
+/// `/systemsleep` · `/sleep` stay System Sleep; `/sleepdisabled` stays Sleep Disabled;
+/// `/displaysleep` stays Display Sleep; `/disksleep` stays Disk Sleep;
+/// `/norestoresleep` stays No Restore Sleep.
+pub fn looks_like_assertions_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("systemsleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("sleepdisabled")
+        || n.contains("sleep disabled")
+        || n.contains("sleep-disabled")
+        || n.contains("disablesleep")
+        || n.contains("disable-sleep")
+        || n.contains("disable sleep")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("norestoresleep")
+        || n.contains("no restore sleep")
+        || n.contains("no-restore-sleep")
+        || n.contains("sleep on power button")
+        || n.contains("sleep-on-power-button")
+        || n.contains("hibernatefile")
+        || n.contains("hibernate file")
+        || n.contains("sleepimage")
+        || n.contains("sleep image")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("screensaver")
+        || n.contains("filevault")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/sleep"
+        || n == "/sleep-status"
+        || n == "/sleep-state"
+        || n == "/sleep-timer"
+        || n == "/sleepdisabled"
+        || n == "/sleep-disabled"
+        || n == "/disablesleep"
+        || n == "/disable-sleep"
+        || n == "/displaysleep"
+        || n == "/disksleep"
+        || n == "/norestoresleep"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        // Bare phrases stay with the agent.
+        || n == "assertions"
+        || n == "the assertions"
+        || n == "assertion"
+        || n == "the assertion"
+        || n == "sleep assertions"
+        || n == "the sleep assertions"
+        || n == "sleep-assertions"
+        || n == "the sleep-assertions"
+        || n == "sleep preventers"
+        || n == "the sleep preventers"
+        || n == "sleep-preventers"
+        || n == "the sleep-preventers"
+        || n == "preventers"
+        || n == "the preventers"
+        || n == "preventer"
+        || n == "the preventer"
+        || n == "who keeps awake"
+        || n == "who keeps me awake"
+        || n == "keeps awake"
+        || n == "keeping awake"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/assertions"
+            | "/assertions-status"
+            | "/assertions-state"
+            | "/assertion"
+            | "/assertion-status"
+            | "/assertion-state"
+            | "/sleep-assertions"
+            | "/sleep-assertions-status"
+            | "/sleep-assertions-state"
+            | "/sleepassertions"
+            | "/sleepassertions-status"
+            | "/sleep-preventers"
+            | "/sleep-preventers-status"
+            | "/sleep-preventers-state"
+            | "/sleeppreventers"
+            | "/sleeppreventers-status"
+            | "/preventers"
+            | "/preventers-status"
+            | "/preventers-state"
+            | "/preventer"
+            | "/preventer-status"
+            | "/who-keeps-awake"
+            | "/who-keeps-awake-status"
+            | "/keeps-awake"
+            | "/keeps-awake-status"
+            | "/mac-assertions"
+            | "/mac-assertion"
+            | "/mac-sleep-assertions"
+            | "/mac-sleep-preventers"
+            | "/mac-preventers"
+            | "/mac-who-keeps-awake"
+            | "/mac-assertions-status"
+            | "/mac-sleep-preventers-status"
+            | "assertions status"
+            | "the assertions status"
+            | "assertions state"
+            | "the assertions state"
+            | "assertion status"
+            | "the assertion status"
+            | "sleep assertions status"
+            | "the sleep assertions status"
+            | "sleep-assertions status"
+            | "the sleep-assertions status"
+            | "sleep preventers status"
+            | "the sleep preventers status"
+            | "sleep-preventers status"
+            | "the sleep-preventers status"
+            | "preventers status"
+            | "the preventers status"
+            | "who keeps awake status"
+            | "the who keeps awake status"
+            | "my assertions"
+            | "my assertions status"
+            | "my sleep assertions"
+            | "my sleep preventers"
+            | "my preventers"
+            | "is sleep prevented"
+            | "is sleep prevented on"
+            | "are assertions on"
+            | "are preventers on"
+            | "what's my assertions"
+            | "whats my assertions"
+            | "what is my assertions"
+            | "what's my assertions status"
+            | "whats my assertions status"
+            | "what is my assertions status"
+            | "what's my sleep preventers"
+            | "whats my sleep preventers"
+            | "what is my sleep preventers"
+            | "what's the assertions"
+            | "whats the assertions"
+            | "what is the assertions"
+            | "what's the assertions status"
+            | "whats the assertions status"
+            | "what is the assertions status"
+            | "what's the sleep preventers"
+            | "whats the sleep preventers"
+            | "what is the sleep preventers"
+            | "what's keeping awake"
+            | "whats keeping awake"
+            | "what is keeping awake"
+            | "who's keeping awake"
+            | "whos keeping awake"
+            | "who is keeping awake"
+            | "how's assertions"
+            | "hows assertions"
+            | "how's the assertions"
+            | "hows the assertions"
+            | "view assertions"
+            | "view the assertions"
+            | "view assertions status"
+            | "view the assertions status"
+            | "view assertion"
+            | "view the assertion"
+            | "view sleep assertions"
+            | "view the sleep assertions"
+            | "view sleep-assertions"
+            | "view sleep preventers"
+            | "view the sleep preventers"
+            | "view sleep-preventers"
+            | "view preventers"
+            | "view the preventers"
+            | "view who keeps awake"
+            | "see assertions"
+            | "see the assertions"
+            | "see assertions status"
+            | "see the assertions status"
+            | "see sleep preventers"
+            | "see the sleep preventers"
+            | "see preventers"
+            | "see who keeps awake"
+            | "open assertions"
+            | "open the assertions"
+            | "open assertions status"
+            | "open the assertions status"
+            | "open sleep assertions"
+            | "open sleep-assertions"
+            | "open sleep preventers"
+            | "open sleep-preventers"
+            | "open preventers"
+            | "open who keeps awake"
+            | "list assertions"
+            | "list the assertions"
+            | "list assertions status"
+            | "list the assertions status"
+            | "list sleep assertions"
+            | "list the sleep assertions"
+            | "list sleep-assertions"
+            | "list sleep preventers"
+            | "list the sleep preventers"
+            | "list sleep-preventers"
+            | "list preventers"
+            | "list the preventers"
+            | "list who keeps awake"
+            | "list the who keeps awake"
+    )
+}
+
+/// Zero-LLM sleep assertions from pmset (macOS-only; empty elsewhere).
+pub fn format_assertions_report() -> String {
+    let v = crate::metrics::get_assertions_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Sleep assertions** — _nothing holding sleep awake on this Mac right now._"
+            .to_string();
+    }
+    format!("**Sleep assertions** · `{v}`")
+}
+
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).
 /// Bare `autopoweroff` / `auto power off` stay with the agent;

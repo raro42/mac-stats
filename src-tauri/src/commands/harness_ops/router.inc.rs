@@ -1351,6 +1351,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_sleepdisabled_request(content) {
         return Some(format_sleepdisabled_report());
     }
+    // Sleep assertions / preventers (bare `assertions` / `sleep preventers` stay with the agent;
+    // `/systemsleep` · `/sleep` stay System Sleep; `/sleepdisabled` stays Sleep Disabled;
+    // `/displaysleep` stays Display Sleep; `/disksleep` stays Disk Sleep;
+    // `/norestoresleep` stays No Restore Sleep).
+    if looks_like_assertions_request(content) {
+        return Some(format_assertions_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

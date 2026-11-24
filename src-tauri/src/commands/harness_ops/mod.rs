@@ -6186,6 +6186,78 @@ mod tests {
     }
 
     #[test]
+    fn assertions_slash_and_view_open_do_not_steal_systemsleep_sleepdisabled_or_bare() {
+        // Slash + view/open NL → Sleep assertions (`/systemsleep` · `/sleepdisabled` parity).
+        // Bare `assertions` / `sleep preventers` / `preventers` stay with the agent;
+        // `/systemsleep` · `/sleep` stay System Sleep; `/sleepdisabled` stays Sleep Disabled.
+        assert!(looks_like_assertions_request("/assertions"));
+        assert!(looks_like_assertions_request("/assertions-status"));
+        assert!(looks_like_assertions_request("/sleep-assertions"));
+        assert!(looks_like_assertions_request("/sleep-preventers"));
+        assert!(looks_like_assertions_request("/preventers"));
+        assert!(looks_like_assertions_request("/who-keeps-awake"));
+        assert!(looks_like_assertions_request("/mac-assertions"));
+        assert!(looks_like_assertions_request("/mac-sleep-preventers"));
+        assert!(looks_like_assertions_request("view assertions"));
+        assert!(looks_like_assertions_request("open sleep-preventers"));
+        assert!(looks_like_assertions_request("list preventers"));
+        assert!(looks_like_assertions_request("assertions status"));
+        assert!(looks_like_assertions_request("is sleep prevented"));
+        assert!(looks_like_assertions_request("what's my assertions"));
+        assert!(looks_like_assertions_request("view sleep preventers"));
+        assert!(!looks_like_assertions_request("assertions"));
+        assert!(!looks_like_assertions_request("sleep preventers"));
+        assert!(!looks_like_assertions_request("preventers"));
+        assert!(!looks_like_assertions_request("who keeps awake"));
+        assert!(!looks_like_assertions_request("/systemsleep"));
+        assert!(!looks_like_assertions_request("/sleep"));
+        assert!(!looks_like_assertions_request("view system sleep"));
+        assert!(!looks_like_assertions_request("/sleepdisabled"));
+        assert!(!looks_like_assertions_request("/displaysleep"));
+        assert!(!looks_like_assertions_request("/disksleep"));
+        assert!(!looks_like_assertions_request("/norestoresleep"));
+        assert!(!looks_like_assertions_request("/tasks"));
+        assert!(!looks_like_assertions_request("enable assertions"));
+        assert!(!looks_like_systemsleep_request("/assertions"));
+        assert!(!looks_like_systemsleep_request("view sleep preventers"));
+        assert!(!looks_like_sleepdisabled_request("/assertions"));
+        assert!(!looks_like_sleepdisabled_request("view preventers"));
+        let s = try_operator_instant_reply("/assertions").unwrap();
+        assert!(
+            s.contains("**Sleep assertions**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view assertions").unwrap();
+        assert!(
+            viewed.contains("**Sleep assertions**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open sleep-preventers").unwrap();
+        assert!(
+            open.contains("**Sleep assertions**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("assertions").is_none());
+        assert!(try_operator_instant_reply("sleep preventers").is_none());
+        assert!(try_operator_instant_reply("preventers").is_none());
+        let sys = try_operator_instant_reply("/systemsleep");
+        if let Some(reply) = sys {
+            assert!(
+                !reply.contains("**Sleep assertions**"),
+                "/systemsleep must stay System Sleep, not assertions: {reply}"
+            );
+        }
+        let sd = try_operator_instant_reply("/sleepdisabled");
+        if let Some(reply) = sd {
+            assert!(
+                !reply.contains("**Sleep assertions**"),
+                "/sleepdisabled must stay Sleep Disabled, not assertions: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn norestoresleep_slash_and_view_open_do_not_steal_systemsleep_or_bare() {
         // Slash + view/open NL → No Restore Sleep (`/systemsleep` · `/ttysclobber` parity).
         // Bare `norestoresleep` / `no restore sleep` stay with the agent;

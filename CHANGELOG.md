@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3046] - 2026-11-24
+
+### Added
+- Instant Sleep assertions accepts `/assertions` · `/assertions-status` · `/assertions-state` · `/assertion` · `/assertion-status` · `/assertion-state` · `/sleep-assertions` · `/sleep-assertions-status` · `/sleep-assertions-state` · `/sleepassertions` · `/sleepassertions-status` · `/sleep-preventers` · `/sleep-preventers-status` · `/sleep-preventers-state` · `/sleeppreventers` · `/sleeppreventers-status` · `/preventers` · `/preventers-status` · `/preventers-state` · `/preventer` · `/preventer-status` · `/who-keeps-awake` · `/who-keeps-awake-status` · `/keeps-awake` · `/keeps-awake-status` · `/mac-assertions` · `/mac-assertion` · `/mac-sleep-assertions` · `/mac-sleep-preventers` · `/mac-preventers` · `/mac-who-keeps-awake` · `/mac-assertions-status` · `/mac-sleep-preventers-status` and view/see/open/list NL (`view assertions`, `open sleep-preventers`, `list preventers`, …), matching “assertions status” / “is sleep prevented” / “what's my assertions” / “what's the sleep preventers”. Bare `assertions` / `sleep preventers` / `preventers` / `who keeps awake` stay with the agent; `/systemsleep` · `/system-sleep` · `/sleep` stay System Sleep; `/sleepdisabled` · `/sleep-disabled` stay Sleep Disabled; `/displaysleep` · `/display-sleep` stay Display Sleep; `/disksleep` · `/disk-sleep` stay Disk Sleep; `/norestoresleep` · `/no-restore-sleep` stay No Restore Sleep. Operator `/help` lists the new lane.
+
 ## [0.1.3045] - 2026-11-24
 
 ### Added
