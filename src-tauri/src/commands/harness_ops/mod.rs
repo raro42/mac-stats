@@ -4641,6 +4641,73 @@ mod tests {
         }
     }
 
+    #[test]
+    fn standby_slash_and_view_open_do_not_steal_hibernatemode_or_bare() {
+        // Slash + view/open NL → Standby (`/hibernatemode` · `/powernap` parity).
+        // Bare `standby` / `stand by` stay with the agent;
+        // `/hibernatemode` stays Hibernate mode; `/systemsleep` stays System Sleep;
+        // `/powernap` stays Power Nap; `/networkoversleep` stays Network over sleep.
+        assert!(looks_like_standby_request("/standby"));
+        assert!(looks_like_standby_request("/standby-status"));
+        assert!(looks_like_standby_request("/stand-by"));
+        assert!(looks_like_standby_request("/mac-standby"));
+        assert!(looks_like_standby_request("/mac-stand-by"));
+        assert!(looks_like_standby_request("view standby"));
+        assert!(looks_like_standby_request("open standby"));
+        assert!(looks_like_standby_request("list stand-by"));
+        assert!(looks_like_standby_request("standby status"));
+        assert!(looks_like_standby_request("is standby on"));
+        assert!(looks_like_standby_request("is stand by enabled"));
+        assert!(looks_like_standby_request("what's my standby"));
+        assert!(looks_like_standby_request("view stand by"));
+        assert!(!looks_like_standby_request("standby"));
+        assert!(!looks_like_standby_request("stand by"));
+        assert!(!looks_like_standby_request("/hibernatemode"));
+        assert!(!looks_like_standby_request("view hibernate mode"));
+        assert!(!looks_like_standby_request("/systemsleep"));
+        assert!(!looks_like_standby_request("/powernap"));
+        assert!(!looks_like_standby_request("/networkoversleep"));
+        assert!(!looks_like_standby_request("/womp"));
+        assert!(!looks_like_standby_request("/power"));
+        assert!(!looks_like_standby_request("/tasks"));
+        assert!(!looks_like_standby_request("enable standby"));
+        assert!(!looks_like_standby_request("standbydelay"));
+        assert!(!looks_like_hibernatemode_request("/standby"));
+        assert!(!looks_like_hibernatemode_request("view standby"));
+        assert!(!looks_like_systemsleep_request("/standby"));
+        let s = try_operator_instant_reply("/standby").unwrap();
+        assert!(
+            s.contains("**Standby**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view standby").unwrap();
+        assert!(
+            viewed.contains("**Standby**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open standby").unwrap();
+        assert!(
+            open.contains("**Standby**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("standby").is_none());
+        assert!(try_operator_instant_reply("stand by").is_none());
+        let hib = try_operator_instant_reply("/hibernatemode");
+        if let Some(reply) = hib {
+            assert!(
+                !reply.contains("**Standby**"),
+                "/hibernatemode must stay Hibernate mode, not Standby: {reply}"
+            );
+        }
+        let nap = try_operator_instant_reply("/powernap");
+        if let Some(reply) = nap {
+            assert!(
+                !reply.contains("**Standby**"),
+                "/powernap must stay Power Nap, not Standby: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

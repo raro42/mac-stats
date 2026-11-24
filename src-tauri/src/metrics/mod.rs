@@ -4065,6 +4065,130 @@ pub fn get_hibernatemode_status() -> String {
     }
 }
 
+/// Parse `pmset -g custom` Battery/AC `standby` flag → (battery, ac).
+/// Exact key `standby` only (not `standbydelay` / `standbydelayhigh` / `standbydelaylow`).
+pub(crate) fn parse_pmset_custom_standby(raw: &str) -> (Option<bool>, Option<bool>) {
+    let mut section: Option<&str> = None;
+    let mut battery = None;
+    let mut ac = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.eq_ignore_ascii_case("Battery Power:") {
+            section = Some("battery");
+            continue;
+        }
+        if t.eq_ignore_ascii_case("AC Power:") {
+            section = Some("ac");
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("standby") {
+            continue;
+        }
+        let on = match parts.next() {
+            Some("1") | Some("true") | Some("yes") => Some(true),
+            Some("0") | Some("false") | Some("no") => Some(false),
+            _ => None,
+        };
+        match section {
+            Some("battery") => battery = on.or(battery),
+            Some("ac") => ac = on.or(ac),
+            _ => {}
+        }
+    }
+    (battery, ac)
+}
+
+/// Parse active `pmset -g` `standby` flag (Currently in use).
+pub(crate) fn parse_pmset_active_standby(raw: &str) -> Option<bool> {
+    for line in raw.lines() {
+        let mut parts = line.trim().split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("standby") {
+            continue;
+        }
+        return match parts.next() {
+            Some("1") | Some("true") | Some("yes") => Some(true),
+            Some("0") | Some("false") | Some("no") => Some(false),
+            _ => None,
+        };
+    }
+    None
+}
+
+/// Prefer Battery+AC custom when both set; else active `pmset -g`.
+pub(crate) fn format_standby_parts(
+    battery: Option<bool>,
+    ac: Option<bool>,
+    active: Option<bool>,
+) -> String {
+    format_wake_for_network_parts(battery, ac, active)
+}
+
+/// macOS Standby from `pmset -g custom` Battery/AC `standby`
+/// (fallback: active `pmset -g`). Distinct from Hibernate mode `/hibernatemode`,
+/// System Sleep `/systemsleep`, Network over sleep `/networkoversleep`, and
+/// Power Nap `/powernap`. Used by Discord/operator instant `/standby` lane.
+pub fn get_standby_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let (battery, ac) = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g", "custom"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_custom_standby(&stdout)
+                }
+                Ok(_) => (None, None),
+                Err(_) => {
+                    debug3!("standby: pmset -g custom spawn failed");
+                    (None, None)
+                }
+            }
+        };
+
+        let active = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_active_standby(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("standby: pmset -g spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_standby_parts(battery, ac, active);
+        if info.is_empty() {
+            debug3!("standby: empty status");
+        } else {
+            debug3!("standby status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -7725,6 +7849,60 @@ AC Power:
             "25 (Hibernate only)"
         );
         assert_eq!(format_hibernatemode_parts(None, None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod standby_parse_tests {
+    use super::{
+        format_standby_parts, parse_pmset_active_standby, parse_pmset_custom_standby,
+    };
+
+    #[test]
+    fn parses_custom_battery_and_ac() {
+        let sample = r#"
+Battery Power:
+ Sleep On Power Button 1
+ standby              1
+AC Power:
+ standby              0
+"#;
+        assert_eq!(parse_pmset_custom_standby(sample), (Some(true), Some(false)));
+        assert_eq!(parse_pmset_custom_standby("nope"), (None, None));
+        // Exact key only — delay variants must not match.
+        let delay = r#"
+Battery Power:
+ standbydelay         10800
+AC Power:
+ standbydelayhigh     86400
+"#;
+        assert_eq!(parse_pmset_custom_standby(delay), (None, None));
+    }
+
+    #[test]
+    fn parses_active_standby() {
+        assert_eq!(
+            parse_pmset_active_standby("Currently in use:\n standby              1\n"),
+            Some(true)
+        );
+        assert_eq!(parse_pmset_active_standby(" standby              0\n"), Some(false));
+        assert_eq!(parse_pmset_active_standby("standbydelay 10800\n"), None);
+        assert_eq!(parse_pmset_active_standby("hibernatemode 3\n"), None);
+        assert_eq!(parse_pmset_active_standby("powernap 1\n"), None);
+    }
+
+    #[test]
+    fn formats_matched_split_and_active() {
+        assert_eq!(format_standby_parts(Some(true), Some(true), Some(false)), "On");
+        assert_eq!(format_standby_parts(Some(false), Some(false), Some(true)), "Off");
+        assert_eq!(
+            format_standby_parts(Some(true), Some(false), None),
+            "AC Off · Battery On"
+        );
+        assert_eq!(format_standby_parts(Some(false), None, None), "Off (Battery)");
+        assert_eq!(format_standby_parts(None, Some(true), None), "On (AC)");
+        assert_eq!(format_standby_parts(None, None, Some(true)), "On");
+        assert_eq!(format_standby_parts(None, None, None), "");
     }
 }
 

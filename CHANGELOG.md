@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3018] - 2026-11-24
+
+### Added
+- Instant Standby accepts `/standby` · `/standby-status` · `/standby-state` · `/stand-by` · `/stand-by-status` · `/stand-by-state` · `/mac-standby` · `/mac-stand-by` · `/mac-standby-status` · `/mac-stand-by-status` and view/see/open/list NL (`view standby`, `open stand by`, `list stand-by`, …), matching “standby status” / “is standby on” / “is stand by enabled” / “what's my standby” / “what's the standby status”. Bare `standby` / `stand by` stay with the agent; `/hibernatemode` · `/hibernate` stay Hibernate mode; `/systemsleep` · `/system-sleep` stay System Sleep; `/powernap` · `/power-nap` stay Power Nap; `/networkoversleep` · `/network-over-sleep` stay Network over sleep; standbydelay / autopoweroff stay out. Operator `/help` lists the new lane.
+
 ## [0.1.3017] - 2026-11-24
 
 ### Added
