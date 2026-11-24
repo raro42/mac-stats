@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~01:02
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: soul/idle clusters only (not product ERROR/panic).
+- Fuel attempt: Hibernate mode after Data Poster v0.1.3016 — **remote raced v0.1.3017**; local duplicate discarded.
+- Then shipped **v0.1.3018** — `/standby` · `/stand-by` · `/mac-standby` + view/open NL; bare standby/stand by stay with agent; `/hibernatemode` · `/systemsleep` · `/powernap` · `/networkoversleep` intact; standbydelay/autopoweroff stay out; `/help` lists lane.
+- Ratchet: discard@9847298 (dup 3017) + keep backfill remote 3017; keep @ f6b015e for 3018; install/kickstart (Rust).
+- Morning surprise: refresh 2026-11-24 + archive.
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (lessbright / Sleep On Power Button) — Standby slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3018
+
+- Product fuel after Hibernate mode v0.1.3017 (local hibernate race discarded): Standby already readable via `pmset -g custom` Battery/AC `standby` (+ active `pmset -g`) but lacked `/standby` · `/stand-by` · `/mac-standby` and view/see/open/list phrases while Hibernate mode `/hibernatemode`, System Sleep `/systemsleep`, Power Nap `/powernap`, and Network over sleep `/networkoversleep` already had slash+NL. Bare `standby` / `stand by` stay with the agent; standbydelay / autopoweroff stay out (not present on this Mac). Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (lessbright / Sleep On Power Button) — Standby slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~00:56
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
