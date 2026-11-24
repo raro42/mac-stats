@@ -1344,6 +1344,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_modem_ring_request(content) {
         return Some(format_modem_ring_report());
     }
+    // Sleep Disabled (bare `sleepdisabled` / `sleep disabled` stay with the agent;
+    // `/systemsleep` · `/sleep` stay System Sleep; `/ring` stays Wake on Modem Ring;
+    // `/displaysleep` stays Display Sleep; `/disksleep` stays Disk Sleep;
+    // `/norestoresleep` stays No Restore Sleep).
+    if looks_like_sleepdisabled_request(content) {
+        return Some(format_sleepdisabled_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

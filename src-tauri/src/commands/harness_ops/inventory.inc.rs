@@ -26375,6 +26375,275 @@ pub fn format_modem_ring_report() -> String {
     format!("**Wake on Modem Ring** · `{v}`")
 }
 
+/// Sleep Disabled — `pmset` Battery/AC `SleepDisabled` (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/sleepdisabled` · `/sleep-disabled` · `/disable-sleep` · `view sleep disabled`).
+/// Bare `sleepdisabled` / `sleep disabled` / `disable sleep` stay with the agent;
+/// `/systemsleep` · `/sleep` stay System Sleep; `/ring` stays Wake on Modem Ring;
+/// `/displaysleep` stays Display Sleep; `/disksleep` stays Disk Sleep;
+/// `/norestoresleep` stays No Restore Sleep.
+pub fn looks_like_sleepdisabled_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("systemsleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("computersleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("network-over-sleep")
+        || n.contains("norestoresleep")
+        || n.contains("no restore sleep")
+        || n.contains("no-restore-sleep")
+        || n.contains("sleep on power button")
+        || n.contains("sleep-on-power-button")
+        || n.contains("power button sleep")
+        || n.contains("power-button-sleep")
+        || n.contains("hibernatefile")
+        || n.contains("hibernate file")
+        || n.contains("sleepimage")
+        || n.contains("sleep image")
+        || n.contains("sleep-image")
+        || n.contains("modem ring")
+        || n.contains("modem-ring")
+        || n.contains("wake on ring")
+        || n.contains("wake-on-ring")
+        || n.contains("sudden motion")
+        || n.contains("sudden-motion")
+        || n.contains("womp")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("screensaver")
+        || n.contains("filevault")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/sleep"
+        || n == "/sleep-status"
+        || n == "/sleep-state"
+        || n == "/sleep-timer"
+        || n == "/displaysleep"
+        || n == "/disksleep"
+        || n == "/ring"
+        || n == "/modem-ring"
+        || n == "/sms"
+        || n == "/womp"
+        || n == "/norestoresleep"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        // Bare phrases stay with the agent.
+        || n == "sleepdisabled"
+        || n == "the sleepdisabled"
+        || n == "sleep disabled"
+        || n == "the sleep disabled"
+        || n == "sleep-disabled"
+        || n == "the sleep-disabled"
+        || n == "sleepdisable"
+        || n == "the sleepdisable"
+        || n == "disablesleep"
+        || n == "the disablesleep"
+        || n == "disable-sleep"
+        || n == "the disable-sleep"
+        || n == "disable sleep"
+        || n == "the disable sleep"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/sleepdisabled"
+            | "/sleepdisabled-status"
+            | "/sleepdisabled-state"
+            | "/sleep-disabled"
+            | "/sleep-disabled-status"
+            | "/sleep-disabled-state"
+            | "/sleepdisable"
+            | "/sleepdisable-status"
+            | "/sleepdisable-state"
+            | "/disablesleep"
+            | "/disablesleep-status"
+            | "/disablesleep-state"
+            | "/disable-sleep"
+            | "/disable-sleep-status"
+            | "/disable-sleep-state"
+            | "/mac-sleepdisabled"
+            | "/mac-sleep-disabled"
+            | "/mac-sleepdisable"
+            | "/mac-disablesleep"
+            | "/mac-disable-sleep"
+            | "/mac-sleepdisabled-status"
+            | "/mac-sleep-disabled-status"
+            | "sleepdisabled status"
+            | "the sleepdisabled status"
+            | "sleepdisabled state"
+            | "the sleepdisabled state"
+            | "sleep disabled status"
+            | "the sleep disabled status"
+            | "sleep-disabled status"
+            | "the sleep-disabled status"
+            | "sleepdisable status"
+            | "the sleepdisable status"
+            | "disablesleep status"
+            | "the disablesleep status"
+            | "disable-sleep status"
+            | "the disable-sleep status"
+            | "disable sleep status"
+            | "the disable sleep status"
+            | "my sleepdisabled"
+            | "my sleepdisabled status"
+            | "my sleep disabled"
+            | "my sleep disabled status"
+            | "my sleep-disabled"
+            | "my disable sleep"
+            | "is sleepdisabled"
+            | "is sleepdisabled on"
+            | "is sleepdisabled off"
+            | "is sleepdisabled enabled"
+            | "is sleepdisabled disabled"
+            | "is sleep disabled"
+            | "is sleep disabled on"
+            | "is sleep disabled off"
+            | "is sleep disabled enabled"
+            | "is sleep-disabled"
+            | "is sleep-disabled on"
+            | "is sleep-disabled enabled"
+            | "is sleepdisable on"
+            | "is sleepdisable enabled"
+            | "is disablesleep on"
+            | "is disablesleep enabled"
+            | "is disable-sleep on"
+            | "is disable-sleep enabled"
+            | "is disable sleep on"
+            | "is disable sleep enabled"
+            | "what's my sleepdisabled"
+            | "whats my sleepdisabled"
+            | "what is my sleepdisabled"
+            | "what's my sleepdisabled status"
+            | "whats my sleepdisabled status"
+            | "what is my sleepdisabled status"
+            | "what's my sleep disabled"
+            | "whats my sleep disabled"
+            | "what is my sleep disabled"
+            | "what's my sleep disabled status"
+            | "whats my sleep disabled status"
+            | "what is my sleep disabled status"
+            | "what's the sleepdisabled"
+            | "whats the sleepdisabled"
+            | "what is the sleepdisabled"
+            | "what's the sleepdisabled status"
+            | "whats the sleepdisabled status"
+            | "what is the sleepdisabled status"
+            | "what's the sleep disabled"
+            | "whats the sleep disabled"
+            | "what is the sleep disabled"
+            | "what's the sleep disabled status"
+            | "whats the sleep disabled status"
+            | "what is the sleep disabled status"
+            | "how's sleepdisabled"
+            | "hows sleepdisabled"
+            | "how's the sleepdisabled"
+            | "hows the sleepdisabled"
+            | "how's sleep disabled"
+            | "hows sleep disabled"
+            | "view sleepdisabled"
+            | "view the sleepdisabled"
+            | "view sleepdisabled status"
+            | "view the sleepdisabled status"
+            | "view sleep disabled"
+            | "view the sleep disabled"
+            | "view sleep disabled status"
+            | "view the sleep disabled status"
+            | "view sleep-disabled"
+            | "view the sleep-disabled"
+            | "view disable sleep"
+            | "view the disable sleep"
+            | "view disable-sleep"
+            | "view disablesleep"
+            | "see sleepdisabled"
+            | "see the sleepdisabled"
+            | "see sleepdisabled status"
+            | "see the sleepdisabled status"
+            | "see sleep disabled"
+            | "see the sleep disabled"
+            | "open sleepdisabled"
+            | "open the sleepdisabled"
+            | "open sleepdisabled status"
+            | "open the sleepdisabled status"
+            | "open sleep disabled"
+            | "open the sleep disabled"
+            | "open sleep-disabled"
+            | "open the sleep-disabled"
+            | "open disable sleep"
+            | "open disable-sleep"
+            | "open disablesleep"
+            | "list sleepdisabled"
+            | "list the sleepdisabled"
+            | "list sleepdisabled status"
+            | "list the sleepdisabled status"
+            | "list sleep disabled"
+            | "list the sleep disabled"
+            | "list sleep-disabled"
+            | "list the sleep-disabled"
+            | "list disable sleep"
+            | "list the disable sleep"
+            | "list disable-sleep"
+            | "list disablesleep"
+    )
+}
+
+/// Zero-LLM Sleep Disabled from pmset (macOS-only; empty elsewhere).
+pub fn format_sleepdisabled_report() -> String {
+    let v = crate::metrics::get_sleepdisabled_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Sleep Disabled** — _no Sleep Disabled reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**Sleep Disabled** · `{v}`")
+}
+
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).
 /// Bare `autopoweroff` / `auto power off` stay with the agent;
@@ -27070,6 +27339,12 @@ pub fn looks_like_systemsleep_request(content: &str) -> bool {
         || n.contains("norestoresleep")
         || n.contains("no restore sleep")
         || n.contains("no-restore-sleep")
+        || n.contains("sleepdisabled")
+        || n.contains("sleep disabled")
+        || n.contains("sleep-disabled")
+        || n.contains("disablesleep")
+        || n.contains("disable-sleep")
+        || n.contains("disable sleep")
         || n.contains("tcpkeepalive")
         || n.contains("tcp keep alive")
         || n.contains("tcp-keep-alive")
@@ -27123,6 +27398,10 @@ pub fn looks_like_systemsleep_request(content: &str) -> bool {
         || n == "/ttys-keep-awake"
         || n == "/norestoresleep"
         || n == "/no-restore-sleep"
+        || n == "/sleepdisabled"
+        || n == "/sleep-disabled"
+        || n == "/disablesleep"
+        || n == "/disable-sleep"
         || n == "/screensaver"
         || n == "/screen-saver"
         || n == "/idle-time"

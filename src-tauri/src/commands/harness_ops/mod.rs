@@ -6116,6 +6116,76 @@ mod tests {
     }
 
     #[test]
+    fn sleepdisabled_slash_and_view_open_do_not_steal_systemsleep_ring_or_bare() {
+        // Slash + view/open NL → Sleep Disabled (`/systemsleep` · `/ring` parity).
+        // Bare `sleepdisabled` / `sleep disabled` / `disable sleep` stay with the agent;
+        // `/systemsleep` · `/sleep` stay System Sleep; `/ring` stays Wake on Modem Ring.
+        assert!(looks_like_sleepdisabled_request("/sleepdisabled"));
+        assert!(looks_like_sleepdisabled_request("/sleepdisabled-status"));
+        assert!(looks_like_sleepdisabled_request("/sleep-disabled"));
+        assert!(looks_like_sleepdisabled_request("/disable-sleep"));
+        assert!(looks_like_sleepdisabled_request("/disablesleep"));
+        assert!(looks_like_sleepdisabled_request("/mac-sleepdisabled"));
+        assert!(looks_like_sleepdisabled_request("/mac-sleep-disabled"));
+        assert!(looks_like_sleepdisabled_request("view sleepdisabled"));
+        assert!(looks_like_sleepdisabled_request("open sleep-disabled"));
+        assert!(looks_like_sleepdisabled_request("list disable sleep"));
+        assert!(looks_like_sleepdisabled_request("sleepdisabled status"));
+        assert!(looks_like_sleepdisabled_request("is sleep disabled"));
+        assert!(looks_like_sleepdisabled_request("is sleepdisabled enabled"));
+        assert!(looks_like_sleepdisabled_request("what's my sleepdisabled"));
+        assert!(looks_like_sleepdisabled_request("view sleep disabled"));
+        assert!(!looks_like_sleepdisabled_request("sleepdisabled"));
+        assert!(!looks_like_sleepdisabled_request("sleep disabled"));
+        assert!(!looks_like_sleepdisabled_request("disable sleep"));
+        assert!(!looks_like_sleepdisabled_request("/systemsleep"));
+        assert!(!looks_like_sleepdisabled_request("/sleep"));
+        assert!(!looks_like_sleepdisabled_request("view system sleep"));
+        assert!(!looks_like_sleepdisabled_request("/ring"));
+        assert!(!looks_like_sleepdisabled_request("/displaysleep"));
+        assert!(!looks_like_sleepdisabled_request("/disksleep"));
+        assert!(!looks_like_sleepdisabled_request("/norestoresleep"));
+        assert!(!looks_like_sleepdisabled_request("/tasks"));
+        assert!(!looks_like_sleepdisabled_request("enable sleepdisabled"));
+        assert!(!looks_like_systemsleep_request("/sleepdisabled"));
+        assert!(!looks_like_systemsleep_request("view sleep disabled"));
+        assert!(!looks_like_modem_ring_request("/sleepdisabled"));
+        let s = try_operator_instant_reply("/sleepdisabled").unwrap();
+        assert!(
+            s.contains("**Sleep Disabled**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view sleep disabled").unwrap();
+        assert!(
+            viewed.contains("**Sleep Disabled**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open sleep-disabled").unwrap();
+        assert!(
+            open.contains("**Sleep Disabled**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("sleepdisabled").is_none());
+        assert!(try_operator_instant_reply("sleep disabled").is_none());
+        assert!(try_operator_instant_reply("disable sleep").is_none());
+        let sys = try_operator_instant_reply("/systemsleep");
+        if let Some(reply) = sys {
+            assert!(
+                !reply.contains("**Sleep Disabled**"),
+                "/systemsleep must stay System Sleep, not Sleep Disabled: {reply}"
+            );
+        }
+        let ring = try_operator_instant_reply("/ring");
+        if let Some(reply) = ring {
+            assert!(
+                !reply.contains("**Sleep Disabled**"),
+                "/ring must stay Wake on Modem Ring, not Sleep Disabled: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn norestoresleep_slash_and_view_open_do_not_steal_systemsleep_or_bare() {
         // Slash + view/open NL → No Restore Sleep (`/systemsleep` · `/ttysclobber` parity).
         // Bare `norestoresleep` / `no restore sleep` stay with the agent;

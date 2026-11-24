@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3045] - 2026-11-24
+
+### Added
+- Instant Sleep Disabled accepts `/sleepdisabled` · `/sleepdisabled-status` · `/sleepdisabled-state` · `/sleep-disabled` · `/sleep-disabled-status` · `/sleep-disabled-state` · `/sleepdisable` · `/sleepdisable-status` · `/sleepdisable-state` · `/disablesleep` · `/disablesleep-status` · `/disablesleep-state` · `/disable-sleep` · `/disable-sleep-status` · `/disable-sleep-state` · `/mac-sleepdisabled` · `/mac-sleep-disabled` · `/mac-sleepdisable` · `/mac-disablesleep` · `/mac-disable-sleep` · `/mac-sleepdisabled-status` · `/mac-sleep-disabled-status` and view/see/open/list NL (`view sleepdisabled`, `open sleep-disabled`, `list disable sleep`, …), matching “sleepdisabled status” / “is sleep disabled” / “is sleepdisabled enabled” / “what's my sleepdisabled” / “what's the sleep disabled”. Bare `sleepdisabled` / `sleep disabled` / `disable sleep` stay with the agent; `/systemsleep` · `/system-sleep` · `/sleep` stay System Sleep; `/ring` · `/modem-ring` stay Wake on Modem Ring; `/displaysleep` · `/display-sleep` stay Display Sleep; `/disksleep` · `/disk-sleep` stay Disk Sleep; `/norestoresleep` · `/no-restore-sleep` stay No Restore Sleep. Operator `/help` lists the new lane.
+
 ## [0.1.3044] - 2026-11-24
 
 ### Added

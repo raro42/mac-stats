@@ -7064,6 +7064,130 @@ pub fn get_modem_ring_status() -> String {
     }
 }
 
+/// Parse `pmset -g custom` Battery/AC `SleepDisabled` flag → (battery, ac).
+/// Exact key `SleepDisabled` / `sleepdisabled` only (disable sleep; often absent on Apple Silicon).
+pub(crate) fn parse_pmset_custom_sleepdisabled(raw: &str) -> (Option<bool>, Option<bool>) {
+    let mut section: Option<&str> = None;
+    let mut battery = None;
+    let mut ac = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.eq_ignore_ascii_case("Battery Power:") {
+            section = Some("battery");
+            continue;
+        }
+        if t.eq_ignore_ascii_case("AC Power:") {
+            section = Some("ac");
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("SleepDisabled") {
+            continue;
+        }
+        let on = match parts.next() {
+            Some("1") | Some("true") | Some("yes") => Some(true),
+            Some("0") | Some("false") | Some("no") => Some(false),
+            _ => None,
+        };
+        match section {
+            Some("battery") => battery = on.or(battery),
+            Some("ac") => ac = on.or(ac),
+            _ => {}
+        }
+    }
+    (battery, ac)
+}
+
+/// Parse active `pmset -g` `SleepDisabled` flag (Currently in use).
+pub(crate) fn parse_pmset_active_sleepdisabled(raw: &str) -> Option<bool> {
+    for line in raw.lines() {
+        let mut parts = line.trim().split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("SleepDisabled") {
+            continue;
+        }
+        return match parts.next() {
+            Some("1") | Some("true") | Some("yes") => Some(true),
+            Some("0") | Some("false") | Some("no") => Some(false),
+            _ => None,
+        };
+    }
+    None
+}
+
+/// Prefer Battery+AC custom when both set; else active `pmset -g`.
+pub(crate) fn format_sleepdisabled_parts(
+    battery: Option<bool>,
+    ac: Option<bool>,
+    active: Option<bool>,
+) -> String {
+    format_wake_for_network_parts(battery, ac, active)
+}
+
+/// macOS Sleep Disabled from `pmset -g custom` Battery/AC `SleepDisabled`
+/// (fallback: active `pmset -g`). Distinct from System Sleep `/systemsleep`
+/// and Wake on Modem Ring `/ring`.
+/// Used by Discord/operator instant `/sleepdisabled` · `/sleep-disabled` lane.
+pub fn get_sleepdisabled_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let (battery, ac) = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g", "custom"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_custom_sleepdisabled(&stdout)
+                }
+                Ok(_) => (None, None),
+                Err(_) => {
+                    debug3!("sleepdisabled: pmset -g custom spawn failed");
+                    (None, None)
+                }
+            }
+        };
+
+        let active = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_active_sleepdisabled(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("sleepdisabled: pmset -g spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_sleepdisabled_parts(battery, ac, active);
+        if info.is_empty() {
+            debug3!("sleepdisabled: empty status");
+        } else {
+            debug3!("sleepdisabled status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -12498,6 +12622,87 @@ AC Power:
         );
         assert_eq!(format_modem_ring_parts(None, None, Some(true)), "On");
         assert_eq!(format_modem_ring_parts(None, None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod sleepdisabled_parse_tests {
+    use super::{
+        format_sleepdisabled_parts, parse_pmset_active_sleepdisabled, parse_pmset_custom_sleepdisabled,
+    };
+
+    #[test]
+    fn parses_custom_battery_and_ac() {
+        let sample = r#"
+Battery Power:
+ SleepDisabled            1
+ standby              1
+AC Power:
+ SleepDisabled            0
+ womp                 1
+"#;
+        assert_eq!(
+            parse_pmset_custom_sleepdisabled(sample),
+            (Some(true), Some(false))
+        );
+        assert_eq!(parse_pmset_custom_sleepdisabled("nope"), (None, None));
+        let other = r#"
+Battery Power:
+ standby              1
+AC Power:
+ ring            1
+"#;
+        assert_eq!(parse_pmset_custom_sleepdisabled(other), (None, None));
+        let lower = r#"
+Battery Power:
+ sleepdisabled            1
+AC Power:
+ sleepdisabled            1
+"#;
+        assert_eq!(
+            parse_pmset_custom_sleepdisabled(lower),
+            (Some(true), Some(true))
+        );
+    }
+
+    #[test]
+    fn parses_active_sleepdisabled() {
+        assert_eq!(
+            parse_pmset_active_sleepdisabled("Currently in use:\n SleepDisabled            1\n"),
+            Some(true)
+        );
+        assert_eq!(
+            parse_pmset_active_sleepdisabled(" sleepdisabled            0\n"),
+            Some(false)
+        );
+        assert_eq!(parse_pmset_active_sleepdisabled(" ring            1\n"), None);
+        assert_eq!(parse_pmset_active_sleepdisabled(" sleep                 10\n"), None);
+    }
+
+    #[test]
+    fn formats_matched_split_and_active() {
+        assert_eq!(
+            format_sleepdisabled_parts(Some(true), Some(true), Some(false)),
+            "On"
+        );
+        assert_eq!(
+            format_sleepdisabled_parts(Some(false), Some(false), Some(true)),
+            "Off"
+        );
+        assert_eq!(
+            format_sleepdisabled_parts(Some(true), Some(false), None),
+            "AC Off · Battery On"
+        );
+        assert_eq!(
+            format_sleepdisabled_parts(Some(true), None, None),
+            "On (Battery)"
+        );
+        assert_eq!(
+            format_sleepdisabled_parts(None, Some(false), None),
+            "Off (AC)"
+        );
+        assert_eq!(format_sleepdisabled_parts(None, None, Some(true)), "On");
+        assert_eq!(format_sleepdisabled_parts(None, None, None), "");
     }
 }
 
