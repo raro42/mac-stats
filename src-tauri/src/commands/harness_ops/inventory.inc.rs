@@ -10336,6 +10336,198 @@ pub fn format_gatekeeper_report() -> String {
     format!("**Gatekeeper** · `{v}`")
 }
 
+/// Spotlight indexing — `mdutil -s /` (Enabled / Disabled).
+/// Slash + view/open NL (`/spotlight` · `/mdutil` · `view spotlight`) match `/gatekeeper` · `/sip` shape;
+/// bare `spotlight` / `mdutil` stay with the agent; `/timemachine` stays Time Machine;
+/// `/ssd` · `/free` stay capacity · free; `view disk` stays Disk Cleanup; `/gatekeeper` stays Gatekeeper;
+/// `/sip` stays SIP; `/filevault` stays FileVault.
+pub fn looks_like_spotlight_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("rebuild")
+        || n.contains("reindex")
+        || n.contains("password")
+        || n.split_whitespace().any(|w| w == "keep" || w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("system integrity")
+        || n.contains("gatekeeper")
+        || n.contains("firewall")
+        || n.contains("time machine")
+        || n.contains("timemachine")
+        || n.contains("time-machine")
+        || n == "/sip"
+        || n == "/csrutil"
+        || n == "/filevault"
+        || n == "/fv"
+        || n == "/fde"
+        || n == "/gatekeeper"
+        || n == "/gk"
+        || n == "/spctl"
+        || n == "/firewall"
+        || n == "/fw"
+        || n == "/afw"
+        || n == "/timemachine"
+        || n == "/time-machine"
+        || n == "/tm"
+        || n == "/boot-volume"
+        || n == "/startup-disk"
+        || n == "view disk"
+        || n == "open disk"
+        || n == "/ssd"
+        || n == "/storage"
+        || n == "/free"
+        || n == "/tasks"
+        // Bare short / ambiguous stay with the agent.
+        || n == "spotlight"
+        || n == "the spotlight"
+        || n == "mdutil"
+        || n == "the mdutil"
+        || n == "indexing"
+        || n == "the indexing"
+        || n == "spotlight indexing"
+        || n == "the spotlight indexing"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/spotlight"
+            | "/spotlight-status"
+            | "/spotlight-state"
+            | "/spotlightstatus"
+            | "/mdutil"
+            | "/mdutil-status"
+            | "/mdutil-state"
+            | "/mdutilstatus"
+            | "/spotlight-index"
+            | "/spotlight-indexing"
+            | "/mac-spotlight"
+            | "/mac-mdutil"
+            | "/mac-spotlight-status"
+            | "/mac-mdutil-status"
+            | "spotlight status"
+            | "the spotlight status"
+            | "spotlight state"
+            | "the spotlight state"
+            | "mdutil status"
+            | "the mdutil status"
+            | "spotlight indexing status"
+            | "the spotlight indexing status"
+            | "indexing status"
+            | "the indexing status"
+            | "my spotlight"
+            | "my spotlight status"
+            | "my mdutil"
+            | "my mdutil status"
+            | "is spotlight on"
+            | "is spotlight off"
+            | "is spotlight enabled"
+            | "is spotlight disabled"
+            | "is spotlight indexing on"
+            | "is spotlight indexing enabled"
+            | "is mdutil on"
+            | "is mdutil enabled"
+            | "is indexing on"
+            | "is indexing enabled"
+            | "what's my spotlight"
+            | "whats my spotlight"
+            | "what is my spotlight"
+            | "what's my spotlight status"
+            | "whats my spotlight status"
+            | "what is my spotlight status"
+            | "what's the spotlight"
+            | "whats the spotlight"
+            | "what is the spotlight"
+            | "what's the spotlight status"
+            | "whats the spotlight status"
+            | "what is the spotlight status"
+            | "what's my mdutil"
+            | "whats my mdutil"
+            | "what is my mdutil"
+            | "what's the mdutil status"
+            | "whats the mdutil status"
+            | "what is the mdutil status"
+            | "how's spotlight"
+            | "hows spotlight"
+            | "how's the spotlight"
+            | "hows the spotlight"
+            | "view spotlight"
+            | "view the spotlight"
+            | "view spotlight status"
+            | "view the spotlight status"
+            | "view mdutil"
+            | "view the mdutil"
+            | "view mdutil status"
+            | "view spotlight indexing"
+            | "view the spotlight indexing"
+            | "view indexing status"
+            | "see spotlight"
+            | "see the spotlight"
+            | "see spotlight status"
+            | "see the spotlight status"
+            | "see mdutil"
+            | "see the mdutil"
+            | "open spotlight"
+            | "open the spotlight"
+            | "open spotlight status"
+            | "open the spotlight status"
+            | "open mdutil"
+            | "open the mdutil"
+            | "open spotlight indexing"
+            | "list spotlight"
+            | "list the spotlight"
+            | "list spotlight status"
+            | "list the spotlight status"
+            | "list mdutil"
+            | "list the mdutil"
+            | "list spotlight indexing"
+            | "show spotlight"
+            | "show the spotlight"
+            | "show me spotlight"
+            | "show me the spotlight"
+            | "show spotlight status"
+            | "show the spotlight status"
+            | "show me spotlight status"
+            | "show me the spotlight status"
+            | "show mdutil"
+            | "show the mdutil"
+            | "show me mdutil"
+            | "show me the mdutil"
+    )
+}
+
+/// Zero-LLM Spotlight indexing from `mdutil -s /` (macOS-only; empty elsewhere).
+pub fn format_spotlight_report() -> String {
+    let v = crate::metrics::get_spotlight_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Spotlight** — _no Spotlight indexing reading on this Mac right now._".to_string();
+    }
+    format!("**Spotlight** · `{v}`")
+}
+
 /// Application Firewall global state — not Gatekeeper, not SIP, not FileVault, not stealth, not logging,
 /// not allow-signed, not block-all.
 /// Slash + view/open NL (`/firewall` · `/afw` · `view firewall`) match `/gatekeeper` · `/sip` shape;

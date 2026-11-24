@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3040] - 2026-11-24
+
+### Added
+- Instant Spotlight accepts `/spotlight` · `/spotlight-status` · `/spotlight-state` · `/mdutil` · `/mdutil-status` · `/mdutil-state` · `/spotlight-index` · `/spotlight-indexing` · `/mac-spotlight` · `/mac-mdutil` · `/mac-spotlight-status` · `/mac-mdutil-status` and view/see/open/list NL (`view spotlight`, `open mdutil`, `list spotlight indexing`, …), matching “spotlight status” / “is spotlight on” / “is spotlight enabled” / “what's my spotlight” / “what's the spotlight status”. Bare `spotlight` / `mdutil` / `indexing` stay with the agent; `/timemachine` stays Time Machine; `/ssd` · `/free` stay capacity · free; `view disk` stays Disk Cleanup; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP; `/filevault` stays FileVault. Operator `/help` lists the new lane.
+
 ## [0.1.3039] - 2026-11-24
 
 ### Added

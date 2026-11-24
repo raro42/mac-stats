@@ -2000,6 +2000,76 @@ mod tests {
     }
 
     #[test]
+    fn spotlight_slash_and_view_open_do_not_steal_gatekeeper_or_bare() {
+        // Slash + view/open NL → Spotlight (`/gatekeeper` · `/sip` parity).
+        // Bare `spotlight` / `mdutil` stay with the agent;
+        // `/gatekeeper` stays Gatekeeper; `/timemachine` stays Time Machine;
+        // `/ssd` · `/free` stay capacity · free.
+        assert!(looks_like_spotlight_request("/spotlight"));
+        assert!(looks_like_spotlight_request("/spotlight-status"));
+        assert!(looks_like_spotlight_request("/mdutil"));
+        assert!(looks_like_spotlight_request("/mdutil-status"));
+        assert!(looks_like_spotlight_request("/spotlight-indexing"));
+        assert!(looks_like_spotlight_request("/mac-spotlight"));
+        assert!(looks_like_spotlight_request("/mac-mdutil"));
+        assert!(looks_like_spotlight_request("view spotlight"));
+        assert!(looks_like_spotlight_request("open spotlight status"));
+        assert!(looks_like_spotlight_request("list mdutil"));
+        assert!(looks_like_spotlight_request("spotlight status"));
+        assert!(looks_like_spotlight_request("is spotlight on"));
+        assert!(looks_like_spotlight_request("is spotlight enabled"));
+        assert!(looks_like_spotlight_request("what's my spotlight"));
+        assert!(looks_like_spotlight_request("view mdutil"));
+        assert!(!looks_like_spotlight_request("spotlight"));
+        assert!(!looks_like_spotlight_request("mdutil"));
+        assert!(!looks_like_spotlight_request("indexing"));
+        assert!(!looks_like_spotlight_request("/gatekeeper"));
+        assert!(!looks_like_spotlight_request("view gatekeeper"));
+        assert!(!looks_like_spotlight_request("/sip"));
+        assert!(!looks_like_spotlight_request("/filevault"));
+        assert!(!looks_like_spotlight_request("/timemachine"));
+        assert!(!looks_like_spotlight_request("/ssd"));
+        assert!(!looks_like_spotlight_request("/free"));
+        assert!(!looks_like_spotlight_request("view disk"));
+        assert!(!looks_like_spotlight_request("enable spotlight"));
+        assert!(!looks_like_spotlight_request("rebuild spotlight"));
+        assert!(!looks_like_gatekeeper_request("/spotlight"));
+        assert!(!looks_like_gatekeeper_request("view spotlight"));
+        assert!(!looks_like_gatekeeper_request("/mdutil"));
+        let s = try_operator_instant_reply("/spotlight").unwrap();
+        assert!(
+            s.contains("**Spotlight**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view spotlight").unwrap();
+        assert!(
+            viewed.contains("**Spotlight**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open mdutil").unwrap();
+        assert!(
+            open.contains("**Spotlight**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("spotlight").is_none());
+        assert!(try_operator_instant_reply("mdutil").is_none());
+        let gk = try_operator_instant_reply("/gatekeeper");
+        if let Some(reply) = gk {
+            assert!(
+                !reply.contains("**Spotlight**"),
+                "/gatekeeper must stay Gatekeeper, not Spotlight: {reply}"
+            );
+        }
+        let tm = try_operator_instant_reply("/timemachine");
+        if let Some(reply) = tm {
+            assert!(
+                !reply.contains("**Spotlight**"),
+                "/timemachine must stay Time Machine, not Spotlight: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn firewall_slash_and_view_open_do_not_steal_gatekeeper_or_bare_firewall() {
         // Slash + view/open NL → Application Firewall (`/gatekeeper` · `/sip` parity).
         // Bare `firewall` / `afw` stay with the agent; `/gatekeeper` stays Gatekeeper; `/sip` stays SIP;

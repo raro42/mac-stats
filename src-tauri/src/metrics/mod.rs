@@ -715,6 +715,73 @@ pub fn get_gatekeeper_status() -> String {
     info
 }
 
+/// Parse `mdutil -s <vol>` Spotlight indexing line(s) → Enabled / Disabled / raw.
+/// Ignores volume path headers (`/:`). Prefers Enabled before Disabled.
+pub(crate) fn parse_mdutil_spotlight_status(raw: &str) -> Option<String> {
+    let lower = raw.to_ascii_lowercase();
+    if lower.contains("indexing enabled") {
+        return Some("Enabled".to_string());
+    }
+    if lower.contains("indexing disabled")
+        || lower.contains("indexing and searching disabled")
+        || lower.contains("searching disabled")
+    {
+        return Some("Disabled".to_string());
+    }
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() || t.ends_with(':') {
+            continue;
+        }
+        let tl = t.to_ascii_lowercase();
+        if tl.starts_with("error") || tl.contains("unknown") {
+            return Some(t.trim_end_matches('.').to_string());
+        }
+        if tl.contains("index") || tl.contains("search") {
+            return Some(t.trim_end_matches('.').to_string());
+        }
+    }
+    None
+}
+
+/// macOS Spotlight indexing from `mdutil -s /` (live; not OnceLock).
+/// Distinct from Time Machine `/timemachine`, Disk Cleanup, SIP `/sip`, Gatekeeper `/gatekeeper`,
+/// and boot volume `/boot-volume`.
+/// Used by Discord/operator instant `/spotlight` · `/mdutil` lane.
+pub fn get_spotlight_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/mdutil")
+            .args(["-s", "/"])
+            .stderr(std::process::Stdio::piped())
+            .output();
+        let Ok(output) = output else {
+            debug3!("spotlight: mdutil spawn failed");
+            return String::new();
+        };
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        let combined = if stdout.trim().is_empty() {
+            stderr.to_string()
+        } else if stderr.trim().is_empty() {
+            stdout.to_string()
+        } else {
+            format!("{}\n{}", stdout, stderr)
+        };
+        let info = parse_mdutil_spotlight_status(&combined).unwrap_or_default();
+        if info.is_empty() {
+            debug3!("spotlight: empty status (exit={})", output.status);
+        } else {
+            debug3!("spotlight status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// macOS Application Firewall global state from `socketfilterfw --getglobalstate` (live; not OnceLock).
 /// Distinct from Gatekeeper `/gatekeeper`, SIP `/sip`, and FileVault `/filevault`.
 /// Used by Discord/operator instant `/firewall` · `/afw` lane.
@@ -11609,6 +11676,47 @@ AC Power:
         );
         assert_eq!(format_ttysclobber_parts(None, None, Some(true)), "On");
         assert_eq!(format_ttysclobber_parts(None, None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod spotlight_parse_tests {
+    use super::parse_mdutil_spotlight_status;
+
+    #[test]
+    fn parses_indexing_enabled() {
+        let sample = "/:\n\tIndexing enabled. \n";
+        assert_eq!(
+            parse_mdutil_spotlight_status(sample).as_deref(),
+            Some("Enabled")
+        );
+    }
+
+    #[test]
+    fn parses_indexing_disabled() {
+        assert_eq!(
+            parse_mdutil_spotlight_status("/:\n\tIndexing disabled.\n").as_deref(),
+            Some("Disabled")
+        );
+        assert_eq!(
+            parse_mdutil_spotlight_status("Indexing and searching disabled.\n").as_deref(),
+            Some("Disabled")
+        );
+    }
+
+    #[test]
+    fn prefers_enabled_when_mixed() {
+        let sample = "/:\n\tIndexing enabled.\n/System/Volumes/Data:\n\tIndexing disabled.\n";
+        assert_eq!(
+            parse_mdutil_spotlight_status(sample).as_deref(),
+            Some("Enabled")
+        );
+    }
+
+    #[test]
+    fn empty_on_noise() {
+        assert_eq!(parse_mdutil_spotlight_status("nope"), None);
+        assert_eq!(parse_mdutil_spotlight_status("/:\n"), None);
     }
 }
 

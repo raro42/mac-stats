@@ -1032,6 +1032,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_gatekeeper_request(content) {
         return Some(format_gatekeeper_report());
     }
+    // Spotlight indexing (bare `spotlight` / `mdutil` stay with the agent; `/timemachine` stays Time Machine;
+    // `/ssd` · `/free` stay capacity · free; `view disk` stays Disk Cleanup; `/gatekeeper` stays Gatekeeper;
+    // `/sip` stays SIP; `/filevault` stays FileVault).
+    if looks_like_spotlight_request(content) {
+        return Some(format_spotlight_report());
+    }
     // Firewall listapps (bare `list apps` / `firewall apps` stay with the agent; `/firewall` stays global;
     // `/stealth` stays stealth; `/firewall-logging` · `/fw-logging` stay logging; `/allow-signed` stays allow-signed;
     // `/block-all` stays block-all; `list allow signed apps` stays allow-signed; `list app firewall` stays global).
