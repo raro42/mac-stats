@@ -8630,6 +8630,17 @@ pub fn looks_like_ac_charger_request(content: &str) -> bool {
         || n == "the adapter"
         || n == "ac"
         || n == "the ac"
+        // `pmset -g adapters` lane (`/pmadapters` · `/adapters`) — not SPPower charger.
+        || n.contains("pmadapters")
+        || n.contains("pm-adapters")
+        || n.contains("pmset-adapters")
+        || n.contains("pmset adapters")
+        || n.contains("power-adapters")
+        || n.contains("power adapters")
+        || n.contains("adapters")
+        || n.contains("adapter list")
+        || n == "/adapters"
+        || n == "/adapter-list"
     {
         return false;
     }
@@ -29532,6 +29543,14 @@ pub fn looks_like_pmcustom_request(content: &str) -> bool {
         || n == "/ac-charger"
         || n == "view adapter"
         || n == "view charger"
+        || n.contains("pmadapters")
+        || n.contains("pm-adapters")
+        || n.contains("pmset-adapters")
+        || n.contains("power-adapters")
+        || n.contains("power adapters")
+        || n.contains("adapters")
+        || n == "/adapters"
+        || n == "/adapter-list"
         || n == "/battery"
         || n == "/bat"
         || n == "/lpm"
@@ -29760,6 +29779,277 @@ pub fn format_pmcustom_report() -> String {
         return "**Power custom** — _no Battery/AC profiles on this Mac right now._".to_string();
     }
     format!("**Power custom** · `{v}`")
+}
+
+/// Power adapters from `pmset -g adapters` (fallback `pmset -g adapter`).
+/// Slash + view/open NL (`/pmadapters` · `/power-adapters` · `view pmadapters`).
+/// Bare `pmadapters` / `power adapters` / `adapters` stay with the agent;
+/// `/adapter` · `/charger` stay AC charger (`system_profiler`); `/pmps` stays Power source;
+/// `/pmcustom` stays Power custom; `/ups` stays UPS; `/battery` stays Bat %.
+pub fn looks_like_pmadapters_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("pmcustom")
+        || n.contains("power custom")
+        || n.contains("power profiles")
+        || n.contains("battery-ac")
+        || n.contains("pmps")
+        || n.contains("power source")
+        || n.contains("now drawing")
+        || n == "/ps"
+        || n == "/ups"
+        || n == "/ups-settings"
+        || n == "/pmcap"
+        || n.contains("power cap")
+        || n.contains("power capabilities")
+        || n.contains("useractivity")
+        || n.contains("user activity")
+        || n.contains("pmstats")
+        || n.contains("power stats")
+        || n.contains("pmlog")
+        || n.contains("power log")
+        || n == "/therm"
+        || n.contains("sysload")
+        || n.contains("powersched")
+        || n.contains("assertions")
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/watts"
+        || n == "/power"
+        || n == "/lpm"
+        || n == "/tasks"
+        || n == "/adapter"
+        || n == "/adapter-watts"
+        || n == "/adapterwatts"
+        || n == "/adapter-wattage"
+        || n == "/charger"
+        || n == "/ac-charger"
+        || n == "/power-adapter"
+        || n == "/ac-adapter"
+        || n == "/charger-watts"
+        || n == "view adapter"
+        || n == "view the adapter"
+        || n == "view charger"
+        || n == "view the charger"
+        || n == "open adapter"
+        || n == "open charger"
+        || n == "list adapter"
+        || n == "list charger"
+        || n == "see adapter"
+        || n == "see charger"
+        || n == "adapter watts"
+        || n == "charger watts"
+        || n == "what's my adapter"
+        || n == "whats my adapter"
+        || n == "what's my charger"
+        || n == "whats my charger"
+        || n == "pmadapters"
+        || n == "the pmadapters"
+        || n == "pm-adapters"
+        || n == "the pm-adapters"
+        || n == "pm adapters"
+        || n == "the pm adapters"
+        || n == "pmsetadapters"
+        || n == "the pmsetadapters"
+        || n == "pmset-adapters"
+        || n == "the pmset-adapters"
+        || n == "pmset adapters"
+        || n == "the pmset adapters"
+        || n == "poweradapters"
+        || n == "the poweradapters"
+        || n == "power-adapters"
+        || n == "the power-adapters"
+        || n == "power adapters"
+        || n == "the power adapters"
+        || n == "adapters"
+        || n == "the adapters"
+        || n == "adapter list"
+        || n == "the adapter list"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/pmadapters"
+            | "/pmadapters-status"
+            | "/pmadapters-state"
+            | "/pm-adapters"
+            | "/pm-adapters-status"
+            | "/pm-adapters-state"
+            | "/pmset-adapters"
+            | "/pmset-adapters-status"
+            | "/pmset-adapters-state"
+            | "/pmsetadapters"
+            | "/pmsetadapters-status"
+            | "/power-adapters"
+            | "/power-adapters-status"
+            | "/power-adapters-state"
+            | "/poweradapters"
+            | "/poweradapters-status"
+            | "/adapters"
+            | "/adapters-status"
+            | "/adapters-state"
+            | "/adapter-list"
+            | "/adapter-list-status"
+            | "/mac-pmadapters"
+            | "/mac-pm-adapters"
+            | "/mac-pmset-adapters"
+            | "/mac-power-adapters"
+            | "/mac-adapters"
+            | "/mac-pmadapters-status"
+            | "/mac-power-adapters-status"
+            | "pmadapters status"
+            | "the pmadapters status"
+            | "pmadapters state"
+            | "the pmadapters state"
+            | "pm-adapters status"
+            | "the pm-adapters status"
+            | "pm adapters status"
+            | "the pm adapters status"
+            | "pmset-adapters status"
+            | "the pmset-adapters status"
+            | "pmset adapters status"
+            | "the pmset adapters status"
+            | "power-adapters status"
+            | "the power-adapters status"
+            | "power adapters status"
+            | "the power adapters status"
+            | "adapters status"
+            | "the adapters status"
+            | "adapter list status"
+            | "the adapter list status"
+            | "my pmadapters"
+            | "my pmadapters status"
+            | "my power adapters"
+            | "my adapters"
+            | "is pmadapters ok"
+            | "is the pmadapters ok"
+            | "how's pmadapters"
+            | "hows pmadapters"
+            | "how's the pmadapters"
+            | "hows the pmadapters"
+            | "how's power adapters"
+            | "hows power adapters"
+            | "how's adapters"
+            | "hows adapters"
+            | "what's my pmadapters"
+            | "whats my pmadapters"
+            | "what is my pmadapters"
+            | "what's my pmadapters status"
+            | "whats my pmadapters status"
+            | "what is my pmadapters status"
+            | "what's my power adapters"
+            | "whats my power adapters"
+            | "what is my power adapters"
+            | "what's my adapters"
+            | "whats my adapters"
+            | "what is my adapters"
+            | "what's the pmadapters"
+            | "whats the pmadapters"
+            | "what is the pmadapters"
+            | "what's the pmadapters status"
+            | "whats the pmadapters status"
+            | "what is the pmadapters status"
+            | "what's the power adapters"
+            | "whats the power adapters"
+            | "what is the power adapters"
+            | "what's the adapters"
+            | "whats the adapters"
+            | "what is the adapters"
+            | "view pmadapters"
+            | "view the pmadapters"
+            | "view pmadapters status"
+            | "view the pmadapters status"
+            | "view pm-adapters"
+            | "view the pm-adapters"
+            | "view pm adapters"
+            | "view the pm adapters"
+            | "view pmset-adapters"
+            | "view the pmset-adapters"
+            | "view pmset adapters"
+            | "view the pmset adapters"
+            | "view power-adapters"
+            | "view the power-adapters"
+            | "view power adapters"
+            | "view the power adapters"
+            | "view adapters"
+            | "view the adapters"
+            | "view adapter list"
+            | "view the adapter list"
+            | "see pmadapters"
+            | "see the pmadapters"
+            | "see power adapters"
+            | "see the power adapters"
+            | "see adapters"
+            | "see the adapters"
+            | "open pmadapters"
+            | "open the pmadapters"
+            | "open pmadapters status"
+            | "open the pmadapters status"
+            | "open pm-adapters"
+            | "open power-adapters"
+            | "open power adapters"
+            | "open adapters"
+            | "open the adapters"
+            | "open pmset-adapters"
+            | "list pmadapters"
+            | "list the pmadapters"
+            | "list pmadapters status"
+            | "list the pmadapters status"
+            | "list pm-adapters"
+            | "list the pm-adapters"
+            | "list power-adapters"
+            | "list the power-adapters"
+            | "list power adapters"
+            | "list the power adapters"
+            | "list adapters"
+            | "list the adapters"
+            | "list adapter list"
+            | "list pmset-adapters"
+    )
+}
+
+/// Zero-LLM power adapters from `pmset -g adapters` (macOS-only; empty elsewhere).
+pub fn format_pmadapters_report() -> String {
+    let v = crate::metrics::get_pmadapters_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Power adapters** — _no adapters listed on this Mac right now._".to_string();
+    }
+    format!("**Power adapters** · `{v}`")
 }
 
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).

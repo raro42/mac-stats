@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3057] - 2026-11-25
+
+### Added
+- Instant Power adapters accepts `/pmadapters` · `/pmadapters-status` · `/pmadapters-state` · `/pm-adapters` · `/pm-adapters-status` · `/pm-adapters-state` · `/pmset-adapters` · `/pmset-adapters-status` · `/pmset-adapters-state` · `/pmsetadapters` · `/pmsetadapters-status` · `/power-adapters` · `/power-adapters-status` · `/power-adapters-state` · `/poweradapters` · `/poweradapters-status` · `/adapters` · `/adapters-status` · `/adapters-state` · `/adapter-list` · `/adapter-list-status` · `/mac-pmadapters` · `/mac-pm-adapters` · `/mac-pmset-adapters` · `/mac-power-adapters` · `/mac-adapters` · `/mac-pmadapters-status` · `/mac-power-adapters-status` and view/see/open/list NL (`view pmadapters`, `open power-adapters`, `list adapters`, …), matching “pmadapters status” / “is pmadapters ok” / “what's my pmadapters” / “what's the power adapters”. Bare `pmadapters` / `power adapters` / `adapters` stay with the agent; `/adapter` · `/charger` stay AC charger (`system_profiler`); `/pmps` · `/power-source` stay Power source; `/pmcustom` · `/power-profiles` stay Power custom; `/ups` · `/ups-settings` stay UPS; `/battery` · `/bat` stay Bat %. Uses `pmset -g adapters` (wattage · description; fallback `pmset -g adapter`). Operator `/help` lists the new lane.
+
 ## [0.1.3056] - 2026-11-24
 
 ### Added

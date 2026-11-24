@@ -1417,6 +1417,11 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_pmcustom_request(content) {
         return Some(format_pmcustom_report());
     }
+    // Power adapters from `pmset -g adapters` (bare `pmadapters` / `power adapters` / `adapters` stay with the agent;
+    // `/adapter` · `/charger` stay AC charger; `/pmps` stays Power source; `/pmcustom` stays Power custom; `/ups` stays UPS).
+    if looks_like_pmadapters_request(content) {
+        return Some(format_pmadapters_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

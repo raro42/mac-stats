@@ -8526,6 +8526,149 @@ pub fn get_pmcustom_status() -> String {
     }
 }
 
+/// Parse `pmset -g adapters` / `pmset -g adapter` → (wattage, description, amt).
+/// Handles `Key: value`, `Key = value`, and `Key value` lines; "No adapters attached".
+pub(crate) fn parse_pmset_adapters(
+    raw: &str,
+) -> (Option<u32>, Option<String>, Option<u32>) {
+    let lower = raw.to_ascii_lowercase();
+    if lower.contains("no adapters") || lower.contains("no adapter attached") {
+        return (None, Some("none".to_string()), Some(0));
+    }
+    let mut wattage: Option<u32> = None;
+    let mut description: Option<String> = None;
+    let mut amt: Option<u32> = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let (key_raw, val_raw): (String, String) = if let Some((k, v)) = t.split_once(':') {
+            (k.trim().to_string(), v.trim().to_string())
+        } else if let Some((k, v)) = t.split_once('=') {
+            (k.trim().to_string(), v.trim().to_string())
+        } else {
+            let mut parts = t.split_whitespace();
+            let Some(k) = parts.next() else {
+                continue;
+            };
+            let v = parts.collect::<Vec<_>>().join(" ");
+            if v.is_empty() {
+                continue;
+            }
+            (k.to_string(), v)
+        };
+        let key = key_raw.to_ascii_lowercase().replace([' ', '_'], "");
+        let val_num = val_raw
+            .trim()
+            .trim_end_matches('W')
+            .trim()
+            .trim_end_matches('w')
+            .trim();
+        if key == "wattage" || key == "watts" {
+            if let Ok(w) = val_num.parse::<u32>() {
+                wattage = Some(w);
+            }
+        } else if key == "description" || key == "adaptername" || key == "name" {
+            let d = val_raw.trim();
+            if !d.is_empty() {
+                description = Some(d.to_string());
+            }
+        } else if key == "amt" || key == "amount" || key == "count" {
+            if let Ok(a) = val_num.parse::<u32>() {
+                amt = Some(a);
+            }
+        }
+    }
+    (wattage, description, amt)
+}
+
+/// Compact adapter chip from `pmset -g adapters`.
+/// Example: `96W · usb host` · `none` · `2 adapters`.
+pub(crate) fn format_pmadapters_parts(
+    wattage: Option<u32>,
+    description: Option<&str>,
+    amt: Option<u32>,
+) -> String {
+    if matches!(description, Some("none")) || amt == Some(0) {
+        return "none".to_string();
+    }
+    let mut bits: Vec<String> = Vec::new();
+    if let Some(w) = wattage {
+        bits.push(format!("{w}W"));
+    }
+    if let Some(d) = description {
+        let d = d.trim();
+        if !d.is_empty() && !d.eq_ignore_ascii_case("none") {
+            bits.push(d.to_string());
+        }
+    }
+    if bits.is_empty() {
+        if let Some(a) = amt {
+            if a > 1 {
+                return format!("{a} adapters");
+            }
+            if a == 1 {
+                return "1 adapter".to_string();
+            }
+        }
+        return String::new();
+    }
+    if let Some(a) = amt {
+        if a > 1 {
+            bits.push(format!("×{a}"));
+        }
+    }
+    bits.join(" · ")
+}
+
+/// macOS power adapters from `pmset -g adapters` (fallback: `pmset -g adapter`).
+/// Distinct from AC charger `/adapter` (`system_profiler SPPowerDataType`), Bat `/battery`,
+/// Power source `/pmps`, UPS `/ups`, and Power custom `/pmcustom`.
+/// Used by Discord/operator instant `/pmadapters` · `/power-adapters` lane.
+pub fn get_pmadapters_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let mut stdout = String::new();
+        for args in [["-g", "adapters"], ["-g", "adapter"]] {
+            let output = Command::new("/usr/bin/pmset")
+                .args(args)
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    stdout = String::from_utf8_lossy(&output.stdout).into_owned();
+                    if !stdout.trim().is_empty() {
+                        break;
+                    }
+                }
+                Ok(_) => {
+                    debug3!("pmadapters: pmset {:?} non-zero", args);
+                }
+                Err(_) => {
+                    debug3!("pmadapters: pmset {:?} spawn failed", args);
+                }
+            }
+        }
+        if stdout.trim().is_empty() {
+            debug3!("pmadapters: empty stdout");
+            return String::new();
+        }
+        let (wattage, description, amt) = parse_pmset_adapters(&stdout);
+        let info = format_pmadapters_parts(wattage, description.as_deref(), amt);
+        if info.is_empty() {
+            debug3!("pmadapters: empty status");
+        } else {
+            debug3!("pmadapters status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -14543,6 +14686,54 @@ AC Power:
         same_b.insert("sleep".into(), "1".into());
         let same_a = same_b.clone();
         assert_eq!(format_pmcustom_parts(&same_b, &same_a), "Battery=AC (1 keys)");
+    }
+}
+
+#[cfg(test)]
+mod pmadapters_parse_tests {
+    use super::{format_pmadapters_parts, parse_pmset_adapters};
+
+    const SAMPLE: &str = "\
+Amt: 1
+AdapterID: 0
+AdapterVoltage: 20000
+Wattage: 96
+Current: 4800
+Description: usb host
+Family Code: 0xe000400a
+";
+
+    #[test]
+    fn parses_wattage_description_and_none() {
+        let (w, d, a) = parse_pmset_adapters(SAMPLE);
+        assert_eq!(w, Some(96));
+        assert_eq!(d.as_deref(), Some("usb host"));
+        assert_eq!(a, Some(1));
+        assert_eq!(
+            format_pmadapters_parts(w, d.as_deref(), a),
+            "96W · usb host"
+        );
+        let (w2, d2, a2) = parse_pmset_adapters("No adapters attached.\n");
+        assert_eq!(w2, None);
+        assert_eq!(d2.as_deref(), Some("none"));
+        assert_eq!(a2, Some(0));
+        assert_eq!(
+            format_pmadapters_parts(w2, d2.as_deref(), a2),
+            "none"
+        );
+        assert_eq!(
+            format_pmadapters_parts(Some(67), Some("usb c"), Some(2)),
+            "67W · usb c · ×2"
+        );
+        assert_eq!(format_pmadapters_parts(None, None, None), "");
+        let (w3, d3, a3) = parse_pmset_adapters("Wattage = 30W\nDescription=MagSafe\n");
+        assert_eq!(w3, Some(30));
+        assert_eq!(d3.as_deref(), Some("MagSafe"));
+        assert_eq!(a3, None);
+        assert_eq!(
+            format_pmadapters_parts(w3, d3.as_deref(), a3),
+            "30W · MagSafe"
+        );
     }
 }
 

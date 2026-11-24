@@ -6886,6 +6886,8 @@ mod tests {
         assert!(!looks_like_pmcustom_request("view pmps"));
         assert!(!looks_like_pmcustom_request("/pmstats"));
         assert!(!looks_like_pmcustom_request("/adapter"));
+        assert!(!looks_like_pmcustom_request("/pmadapters"));
+        assert!(!looks_like_pmcustom_request("/adapters"));
         assert!(!looks_like_pmcustom_request("/tasks"));
         assert!(!looks_like_pmcustom_request("enable pmcustom"));
         assert!(!looks_like_pmcap_request("/pmcustom"));
@@ -6930,6 +6932,81 @@ mod tests {
             assert!(
                 !reply.contains("**Power custom**"),
                 "/powernap must stay Power Nap, not Power custom: {reply}"
+            );
+        }
+    }
+
+    #[test]
+    fn pmadapters_slash_and_view_open_do_not_steal_adapter_pmcustom_or_bare() {
+        // Slash + view/open NL → Power adapters (`/adapter` · `/pmcustom` parity).
+        assert!(looks_like_pmadapters_request("/pmadapters"));
+        assert!(looks_like_pmadapters_request("/pmadapters-status"));
+        assert!(looks_like_pmadapters_request("/pm-adapters"));
+        assert!(looks_like_pmadapters_request("/pmset-adapters"));
+        assert!(looks_like_pmadapters_request("/power-adapters"));
+        assert!(looks_like_pmadapters_request("/adapters"));
+        assert!(looks_like_pmadapters_request("/adapter-list"));
+        assert!(looks_like_pmadapters_request("/mac-pmadapters"));
+        assert!(looks_like_pmadapters_request("/mac-power-adapters"));
+        assert!(looks_like_pmadapters_request("view pmadapters"));
+        assert!(looks_like_pmadapters_request("open power-adapters"));
+        assert!(looks_like_pmadapters_request("list adapters"));
+        assert!(looks_like_pmadapters_request("pmadapters status"));
+        assert!(looks_like_pmadapters_request("is pmadapters ok"));
+        assert!(looks_like_pmadapters_request("what's my power adapters"));
+        assert!(looks_like_pmadapters_request("view adapters"));
+        assert!(!looks_like_pmadapters_request("pmadapters"));
+        assert!(!looks_like_pmadapters_request("power adapters"));
+        assert!(!looks_like_pmadapters_request("adapters"));
+        assert!(!looks_like_pmadapters_request("pmset adapters"));
+        assert!(!looks_like_pmadapters_request("/adapter"));
+        assert!(!looks_like_pmadapters_request("view adapter"));
+        assert!(!looks_like_pmadapters_request("/charger"));
+        assert!(!looks_like_pmadapters_request("view charger"));
+        assert!(!looks_like_pmadapters_request("/pmcustom"));
+        assert!(!looks_like_pmadapters_request("view pmcustom"));
+        assert!(!looks_like_pmadapters_request("/pmps"));
+        assert!(!looks_like_pmadapters_request("/ups"));
+        assert!(!looks_like_pmadapters_request("/battery"));
+        assert!(!looks_like_pmadapters_request("/tasks"));
+        assert!(!looks_like_pmadapters_request("enable pmadapters"));
+        assert!(!looks_like_ac_charger_request("/pmadapters"));
+        assert!(!looks_like_ac_charger_request("/adapters"));
+        assert!(!looks_like_ac_charger_request("view pmadapters"));
+        assert!(!looks_like_ac_charger_request("list adapters"));
+        assert!(!looks_like_pmcustom_request("/pmadapters"));
+        assert!(!looks_like_pmcustom_request("view pmadapters"));
+        assert!(!looks_like_pmps_request("/pmadapters"));
+        let s = try_operator_instant_reply("/pmadapters").unwrap();
+        assert!(
+            s.contains("**Power adapters**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view pmadapters").unwrap();
+        assert!(
+            viewed.contains("**Power adapters**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open power-adapters").unwrap();
+        assert!(
+            open.contains("**Power adapters**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("pmadapters").is_none());
+        assert!(try_operator_instant_reply("power adapters").is_none());
+        assert!(try_operator_instant_reply("adapters").is_none());
+        let adapter = try_operator_instant_reply("/adapter");
+        if let Some(reply) = adapter {
+            assert!(
+                !reply.contains("**Power adapters**"),
+                "/adapter must stay AC charger, not Power adapters: {reply}"
+            );
+        }
+        let pmcustom = try_operator_instant_reply("/pmcustom");
+        if let Some(reply) = pmcustom {
+            assert!(
+                !reply.contains("**Power adapters**"),
+                "/pmcustom must stay Power custom, not Power adapters: {reply}"
             );
         }
     }
