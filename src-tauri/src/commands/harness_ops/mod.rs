@@ -6468,6 +6468,79 @@ mod tests {
     }
 
     #[test]
+    fn therm_slash_and_view_open_do_not_steal_heat_pmlog_or_bare() {
+        // Slash + view/open NL → Therm / CPU speed limits (`/thermal` · `/heat` parity).
+        // Bare `therm` / `cpu speed limit` / `thermal limits` stay with the agent;
+        // `/thermal` · `/heat` stay Heat; `/pmlog` stays Power log; `/sysload` stays System load.
+        assert!(looks_like_therm_request("/therm"));
+        assert!(looks_like_therm_request("/therm-status"));
+        assert!(looks_like_therm_request("/pmset-therm"));
+        assert!(looks_like_therm_request("/cpu-speed-limit"));
+        assert!(looks_like_therm_request("/speed-limit"));
+        assert!(looks_like_therm_request("/thermal-limits"));
+        assert!(looks_like_therm_request("/thermal-limit"));
+        assert!(looks_like_therm_request("/sched-limit"));
+        assert!(looks_like_therm_request("/mac-therm"));
+        assert!(looks_like_therm_request("/mac-cpu-speed-limit"));
+        assert!(looks_like_therm_request("view therm"));
+        assert!(looks_like_therm_request("open cpu-speed-limit"));
+        assert!(looks_like_therm_request("list thermal limits"));
+        assert!(looks_like_therm_request("therm status"));
+        assert!(looks_like_therm_request("is therm ok"));
+        assert!(looks_like_therm_request("what's my therm"));
+        assert!(looks_like_therm_request("view thermal limits"));
+        assert!(!looks_like_therm_request("therm"));
+        assert!(!looks_like_therm_request("cpu speed limit"));
+        assert!(!looks_like_therm_request("thermal limits"));
+        assert!(!looks_like_therm_request("/thermal"));
+        assert!(!looks_like_therm_request("view thermal"));
+        assert!(!looks_like_therm_request("/heat"));
+        assert!(!looks_like_therm_request("view heat"));
+        assert!(!looks_like_therm_request("/pmlog"));
+        assert!(!looks_like_therm_request("/sysload"));
+        assert!(!looks_like_therm_request("/ups"));
+        assert!(!looks_like_therm_request("/tasks"));
+        assert!(!looks_like_therm_request("enable therm"));
+        assert!(!looks_like_pmlog_request("/therm"));
+        assert!(!looks_like_pmlog_request("view therm"));
+        assert!(!looks_like_sysload_request("/therm"));
+        assert!(!looks_like_sysload_request("view therm"));
+        assert!(!looks_like_ups_request("/therm"));
+        let s = try_operator_instant_reply("/therm").unwrap();
+        assert!(
+            s.contains("**Therm**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view therm").unwrap();
+        assert!(
+            viewed.contains("**Therm**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open cpu-speed-limit").unwrap();
+        assert!(
+            open.contains("**Therm**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("therm").is_none());
+        assert!(try_operator_instant_reply("cpu speed limit").is_none());
+        assert!(try_operator_instant_reply("thermal limits").is_none());
+        let heat = try_operator_instant_reply("/thermal");
+        if let Some(reply) = heat {
+            assert!(
+                !reply.contains("**Therm**"),
+                "/thermal must stay Heat, not Therm: {reply}"
+            );
+        }
+        let pmlog = try_operator_instant_reply("/pmlog");
+        if let Some(reply) = pmlog {
+            assert!(
+                !reply.contains("**Therm**"),
+                "/pmlog must stay Power log, not Therm: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn sysload_slash_and_view_open_do_not_steal_load_heat_or_bare() {
         // Slash + view/open NL → System load (`/load` · `/thermal` parity).
         // Bare `sysload` / `load level` stay with the agent;

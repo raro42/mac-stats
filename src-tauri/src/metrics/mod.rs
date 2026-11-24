@@ -7793,6 +7793,104 @@ pub fn get_pmlog_status() -> String {
     }
 }
 
+/// Parse `pmset -g therm` CPU limits → (scheduler_limit %, available_cpus, speed_limit %).
+/// Typical keys: `CPU_Scheduler_Limit` · `CPU_Available_CPUs` · `CPU_Speed_Limit`.
+pub(crate) fn parse_pmset_therm_limits(
+    raw: &str,
+) -> (Option<u32>, Option<u32>, Option<u32>) {
+    let mut sched = None;
+    let mut cpus = None;
+    let mut speed = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() || t.to_ascii_lowercase().starts_with("note:") {
+            continue;
+        }
+        let (key, val_s) = if let Some((k, v)) = t.split_once('=') {
+            (k.trim(), v.trim())
+        } else {
+            let mut parts = t.split_whitespace();
+            let k = match parts.next() {
+                Some(k) => k,
+                None => continue,
+            };
+            let v = match parts.next() {
+                Some(v) => v,
+                None => continue,
+            };
+            (k, v)
+        };
+        let val = match val_s.parse::<u32>() {
+            Ok(v) => v,
+            Err(_) => continue,
+        };
+        match key.to_ascii_lowercase().as_str() {
+            "cpu_scheduler_limit" => sched = Some(val),
+            "cpu_available_cpus" => cpus = Some(val),
+            "cpu_speed_limit" => speed = Some(val),
+            _ => {}
+        }
+    }
+    (sched, cpus, speed)
+}
+
+/// Compact therm status: `sched 100% · speed 100% · 8 cpus`.
+pub(crate) fn format_therm_parts(
+    sched: Option<u32>,
+    cpus: Option<u32>,
+    speed: Option<u32>,
+) -> String {
+    let mut bits: Vec<String> = Vec::new();
+    if let Some(v) = sched {
+        bits.push(format!("sched {v}%"));
+    }
+    if let Some(v) = speed {
+        bits.push(format!("speed {v}%"));
+    }
+    if let Some(v) = cpus {
+        bits.push(format!("{v} cpus"));
+    }
+    bits.join(" · ")
+}
+
+/// macOS thermal / CPU speed limits from `pmset -g therm` (not the live `thermlog` stream).
+/// Distinct from Heat chip `/thermal` · `/heat` and Power log `/pmlog`.
+/// Used by Discord/operator instant `/therm` · `/cpu-speed-limit` lane.
+pub fn get_therm_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "therm"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("therm: pmset -g therm non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("therm: pmset -g therm spawn failed");
+                return String::new();
+            }
+        };
+        let (sched, cpus, speed) = parse_pmset_therm_limits(&stdout);
+        let info = format_therm_parts(sched, cpus, speed);
+        if info.is_empty() {
+            debug3!("therm: empty status");
+        } else {
+            debug3!("therm status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -13536,6 +13634,55 @@ mod pmlog_parse_tests {
         assert!(with_overflow.starts_with("(+2 older)"));
         assert!(with_overflow.contains("e6"));
         assert_eq!(format_pmlog_parts(&[]), "");
+    }
+}
+
+#[cfg(test)]
+mod therm_parse_tests {
+    use super::{format_therm_parts, parse_pmset_therm_limits};
+
+    const SAMPLE: &str = r#"
+Note: No thermal warning level has been recorded
+Note: No performance warning level has been recorded
+  CPU_Scheduler_Limit         = 100
+  CPU_Available_CPUs          = 8
+  CPU_Speed_Limit             = 100
+"#;
+
+    const THROTTLED: &str = r#"
+2020-10-06 12:25:52 +0200 CPU Power notify
+    CPU_Scheduler_Limit     = 40
+    CPU_Available_CPUs     = 8
+    CPU_Speed_Limit     = 21
+"#;
+
+    #[test]
+    fn parses_limits_and_formats() {
+        let (sched, cpus, speed) = parse_pmset_therm_limits(SAMPLE);
+        assert_eq!(sched, Some(100));
+        assert_eq!(cpus, Some(8));
+        assert_eq!(speed, Some(100));
+        assert_eq!(
+            format_therm_parts(sched, cpus, speed),
+            "sched 100% · speed 100% · 8 cpus"
+        );
+        let (s2, c2, sp2) = parse_pmset_therm_limits(THROTTLED);
+        assert_eq!(s2, Some(40));
+        assert_eq!(c2, Some(8));
+        assert_eq!(sp2, Some(21));
+        assert_eq!(
+            format_therm_parts(s2, c2, sp2),
+            "sched 40% · speed 21% · 8 cpus"
+        );
+        assert_eq!(
+            parse_pmset_therm_limits("Note: No thermal warning level has been recorded"),
+            (None, None, None)
+        );
+        assert_eq!(format_therm_parts(None, None, None), "");
+        assert_eq!(
+            format_therm_parts(Some(100), None, Some(80)),
+            "sched 100% · speed 80%"
+        );
     }
 }
 

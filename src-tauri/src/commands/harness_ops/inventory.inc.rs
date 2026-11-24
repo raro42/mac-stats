@@ -27668,6 +27668,13 @@ pub fn looks_like_pmlog_request(content: &str) -> bool {
         || n == "/heat"
         || n == "view heat"
         || n == "open thermal"
+        || n == "/therm"
+        || n == "/pmset-therm"
+        || n == "/cpu-speed-limit"
+        || n == "/thermal-limits"
+        || n == "view therm"
+        || n == "open therm"
+        || n == "view thermal limits"
         || n == "/battery"
         || n == "/bat"
         || n == "/lpm"
@@ -27871,6 +27878,292 @@ pub fn format_pmlog_report() -> String {
             .to_string();
     }
     format!("**Power log** · `{v}`")
+}
+
+/// Thermal / CPU speed limits from `pmset -g therm` (not the live `thermlog` stream).
+/// Slash + view/open NL (`/therm` · `/cpu-speed-limit` · `view therm`).
+/// Bare `therm` / `cpu speed limit` / `thermal limits` stay with the agent;
+/// `/thermal` · `/heat` stay Heat; `/pmlog` stays Power log; `/sysload` stays System load.
+pub fn looks_like_therm_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("sysload")
+        || n.contains("sys load")
+        || n.contains("load level")
+        || n.contains("powersched")
+        || n.contains("power schedule")
+        || n.contains("pmlog")
+        || n.contains("power log")
+        || n.contains("power management log")
+        || n == "/thermal"
+        || n == "/heat"
+        || n == "view thermal"
+        || n == "view the thermal"
+        || n == "open thermal"
+        || n == "open the thermal"
+        || n == "see thermal"
+        || n == "see the thermal"
+        || n == "list thermal"
+        || n == "list the thermal"
+        || n == "view heat"
+        || n == "view the heat"
+        || n == "open heat"
+        || n == "open the heat"
+        || n == "see heat"
+        || n == "see the heat"
+        || n == "list heat"
+        || n == "list the heat"
+        || n == "heat"
+        || n == "the heat"
+        || n == "thermal"
+        || n == "the thermal"
+        || n == "thermal state"
+        || n == "thermal pressure"
+        || n == "is the heat high"
+        || n == "is the thermal high"
+        || n == "is it throttling"
+        || n == "/pmlog"
+        || n == "/powerlog"
+        || n == "/ups"
+        || n == "/sysload"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "therm"
+        || n == "the therm"
+        || n == "pmset therm"
+        || n == "the pmset therm"
+        || n == "pmset-therm"
+        || n == "the pmset-therm"
+        || n == "cpu speed limit"
+        || n == "the cpu speed limit"
+        || n == "cpu-speed-limit"
+        || n == "the cpu-speed-limit"
+        || n == "cpuspeedlimit"
+        || n == "the cpuspeedlimit"
+        || n == "speed limit"
+        || n == "the speed limit"
+        || n == "speed-limit"
+        || n == "the speed-limit"
+        || n == "thermal limits"
+        || n == "the thermal limits"
+        || n == "thermal-limits"
+        || n == "the thermal-limits"
+        || n == "thermal limit"
+        || n == "the thermal limit"
+        || n == "thermal-limit"
+        || n == "the thermal-limit"
+        || n == "sched limit"
+        || n == "the sched limit"
+        || n == "scheduler limit"
+        || n == "the scheduler limit"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/therm"
+            | "/therm-status"
+            | "/therm-state"
+            | "/pmset-therm"
+            | "/pmset-therm-status"
+            | "/pmset-therm-state"
+            | "/pmsettherm"
+            | "/pmsettherm-status"
+            | "/cpu-speed-limit"
+            | "/cpu-speed-limit-status"
+            | "/cpu-speed-limit-state"
+            | "/cpuspeedlimit"
+            | "/cpuspeedlimit-status"
+            | "/speed-limit"
+            | "/speed-limit-status"
+            | "/speed-limit-state"
+            | "/speedlimit"
+            | "/speedlimit-status"
+            | "/thermal-limits"
+            | "/thermal-limits-status"
+            | "/thermal-limits-state"
+            | "/thermallimits"
+            | "/thermallimits-status"
+            | "/thermal-limit"
+            | "/thermal-limit-status"
+            | "/thermallimit"
+            | "/thermallimit-status"
+            | "/sched-limit"
+            | "/sched-limit-status"
+            | "/scheduler-limit"
+            | "/scheduler-limit-status"
+            | "/mac-therm"
+            | "/mac-therm-status"
+            | "/mac-pmset-therm"
+            | "/mac-cpu-speed-limit"
+            | "/mac-speed-limit"
+            | "/mac-thermal-limits"
+            | "/mac-thermal-limit"
+            | "/mac-sched-limit"
+            | "therm status"
+            | "the therm status"
+            | "therm state"
+            | "the therm state"
+            | "pmset therm status"
+            | "the pmset therm status"
+            | "pmset-therm status"
+            | "the pmset-therm status"
+            | "cpu speed limit status"
+            | "the cpu speed limit status"
+            | "cpu-speed-limit status"
+            | "the cpu-speed-limit status"
+            | "speed limit status"
+            | "the speed limit status"
+            | "speed-limit status"
+            | "the speed-limit status"
+            | "thermal limits status"
+            | "the thermal limits status"
+            | "thermal-limits status"
+            | "the thermal-limits status"
+            | "my therm"
+            | "my therm status"
+            | "my cpu speed limit"
+            | "my speed limit"
+            | "my thermal limits"
+            | "is therm ok"
+            | "is the therm ok"
+            | "is cpu speed limit ok"
+            | "is the cpu speed limit ok"
+            | "how's therm"
+            | "hows therm"
+            | "how's the therm"
+            | "hows the therm"
+            | "what's my therm"
+            | "whats my therm"
+            | "what is my therm"
+            | "what's my therm status"
+            | "whats my therm status"
+            | "what is my therm status"
+            | "what's my cpu speed limit"
+            | "whats my cpu speed limit"
+            | "what is my cpu speed limit"
+            | "what's my speed limit"
+            | "whats my speed limit"
+            | "what is my speed limit"
+            | "what's my thermal limits"
+            | "whats my thermal limits"
+            | "what is my thermal limits"
+            | "what's the therm"
+            | "whats the therm"
+            | "what is the therm"
+            | "what's the therm status"
+            | "whats the therm status"
+            | "what is the therm status"
+            | "what's the cpu speed limit"
+            | "whats the cpu speed limit"
+            | "what is the cpu speed limit"
+            | "what's the speed limit"
+            | "whats the speed limit"
+            | "what is the speed limit"
+            | "what's the thermal limits"
+            | "whats the thermal limits"
+            | "what is the thermal limits"
+            | "view therm"
+            | "view the therm"
+            | "view therm status"
+            | "view the therm status"
+            | "view pmset-therm"
+            | "view the pmset-therm"
+            | "view pmset therm"
+            | "view the pmset therm"
+            | "view cpu-speed-limit"
+            | "view the cpu-speed-limit"
+            | "view cpu speed limit"
+            | "view the cpu speed limit"
+            | "view speed-limit"
+            | "view the speed-limit"
+            | "view speed limit"
+            | "view the speed limit"
+            | "view thermal-limits"
+            | "view the thermal-limits"
+            | "view thermal limits"
+            | "view the thermal limits"
+            | "view thermal-limit"
+            | "view the thermal-limit"
+            | "view sched-limit"
+            | "view the sched-limit"
+            | "see therm"
+            | "see the therm"
+            | "see cpu speed limit"
+            | "see the cpu speed limit"
+            | "see speed limit"
+            | "see the speed limit"
+            | "see thermal limits"
+            | "see the thermal limits"
+            | "open therm"
+            | "open the therm"
+            | "open therm status"
+            | "open the therm status"
+            | "open pmset-therm"
+            | "open cpu-speed-limit"
+            | "open cpu speed limit"
+            | "open speed-limit"
+            | "open speed limit"
+            | "open thermal-limits"
+            | "open thermal limits"
+            | "open thermal-limit"
+            | "open sched-limit"
+            | "list therm"
+            | "list the therm"
+            | "list therm status"
+            | "list the therm status"
+            | "list cpu-speed-limit"
+            | "list cpu speed limit"
+            | "list speed-limit"
+            | "list speed limit"
+            | "list thermal-limits"
+            | "list thermal limits"
+            | "list thermal-limit"
+            | "list sched-limit"
+    )
+}
+
+/// Zero-LLM thermal / CPU speed limits from `pmset -g therm` (macOS-only; empty elsewhere).
+pub fn format_therm_report() -> String {
+    let v = crate::metrics::get_therm_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Therm** — _no CPU speed limits on this Mac right now._".to_string();
+    }
+    format!("**Therm** · `{v}`")
 }
 
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).

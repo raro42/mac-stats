@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3051] - 2026-11-24
+
+### Added
+- Instant Therm / CPU speed limits accepts `/therm` · `/therm-status` · `/therm-state` · `/pmset-therm` · `/pmset-therm-status` · `/pmset-therm-state` · `/pmsettherm` · `/pmsettherm-status` · `/cpu-speed-limit` · `/cpu-speed-limit-status` · `/cpu-speed-limit-state` · `/cpuspeedlimit` · `/cpuspeedlimit-status` · `/speed-limit` · `/speed-limit-status` · `/speed-limit-state` · `/speedlimit` · `/speedlimit-status` · `/thermal-limits` · `/thermal-limits-status` · `/thermal-limits-state` · `/thermallimits` · `/thermallimits-status` · `/thermal-limit` · `/thermal-limit-status` · `/thermallimit` · `/thermallimit-status` · `/sched-limit` · `/sched-limit-status` · `/scheduler-limit` · `/scheduler-limit-status` · `/mac-therm` · `/mac-therm-status` · `/mac-pmset-therm` · `/mac-cpu-speed-limit` · `/mac-speed-limit` · `/mac-thermal-limits` · `/mac-thermal-limit` · `/mac-sched-limit` and view/see/open/list NL (`view therm`, `open cpu-speed-limit`, `list thermal limits`, …), matching “therm status” / “is therm ok” / “what's my therm” / “what's the cpu speed limit”. Bare `therm` / `cpu speed limit` / `thermal limits` stay with the agent; `/thermal` · `/heat` stay Heat; `/pmlog` · `/powerlog` stay Power log; `/sysload` · `/load-level` stay System load; `/ups` · `/ups-settings` stay UPS. Uses `pmset -g therm` (not the live `thermlog` stream). Operator `/help` lists the new lane.
+
 ## [0.1.3050] - 2026-11-24
 
 ### Added

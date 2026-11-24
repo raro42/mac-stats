@@ -1381,6 +1381,11 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_pmlog_request(content) {
         return Some(format_pmlog_report());
     }
+    // Thermal / CPU speed limits from `pmset -g therm` (bare `therm` / `cpu speed limit` stay with the agent;
+    // `/thermal` · `/heat` stay Heat; `/pmlog` stays Power log; `/sysload` stays System load).
+    if looks_like_therm_request(content) {
+        return Some(format_therm_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;
