@@ -5070,7 +5070,7 @@ mod tests {
         // Slash + view/open NL → Standby delay (`/standby` · `/hibernatefile` parity).
         // Bare `standbydelay` / `standby delay` stay with the agent;
         // `/standby` stays Standby; `/hibernatefile` stays Hibernate file;
-        // standbydelayhigh stay out; `/autopoweroff` stays Auto Power Off.
+        // `/standbydelayhigh` stays Standby delay high; `/autopoweroff` stays Auto Power Off.
         assert!(looks_like_standbydelay_request("/standbydelay"));
         assert!(looks_like_standbydelay_request("/standbydelay-status"));
         assert!(looks_like_standbydelay_request("/standby-delay"));
@@ -5198,7 +5198,7 @@ mod tests {
         // Slash + view/open NL → Autopower Off delay (`/autopoweroff` · `/standbydelay` parity).
         // Bare `autopoweroffdelay` / `auto power off delay` stay with the agent;
         // `/autopoweroff` stays Auto Power Off; `/standbydelay` stays Standby delay;
-        // standbydelayhigh stay out.
+        // `/standbydelayhigh` stays Standby delay high.
         assert!(looks_like_autopoweroffdelay_request("/autopoweroffdelay"));
         assert!(looks_like_autopoweroffdelay_request("/autopoweroffdelay-status"));
         assert!(looks_like_autopoweroffdelay_request("/auto-power-off-delay"));
@@ -5245,6 +5245,62 @@ mod tests {
             assert!(
                 !reply.contains("**Autopower Off delay**"),
                 "/autopoweroff must stay Auto Power Off, not delay: {reply}"
+            );
+        }
+    }
+
+    #[test]
+    fn standbydelayhigh_slash_and_view_open_do_not_steal_standbydelay_or_bare() {
+        // Slash + view/open NL → Standby delay high (`/standbydelay` · `/autopoweroffdelay` parity).
+        // Bare `standbydelayhigh` / `standby delay high` stay with the agent;
+        // `/standbydelay` stays Standby delay; `/standby` stays Standby;
+        // standbydelaylow stays out.
+        assert!(looks_like_standbydelayhigh_request("/standbydelayhigh"));
+        assert!(looks_like_standbydelayhigh_request("/standbydelayhigh-status"));
+        assert!(looks_like_standbydelayhigh_request("/standby-delay-high"));
+        assert!(looks_like_standbydelayhigh_request("/mac-standbydelayhigh"));
+        assert!(looks_like_standbydelayhigh_request("/mac-standby-delay-high"));
+        assert!(looks_like_standbydelayhigh_request("view standbydelayhigh"));
+        assert!(looks_like_standbydelayhigh_request("open standby-delay-high"));
+        assert!(looks_like_standbydelayhigh_request("list standby delay high"));
+        assert!(looks_like_standbydelayhigh_request("standbydelayhigh status"));
+        assert!(looks_like_standbydelayhigh_request("what's my standbydelayhigh"));
+        assert!(looks_like_standbydelayhigh_request("view standby delay high"));
+        assert!(!looks_like_standbydelayhigh_request("standbydelayhigh"));
+        assert!(!looks_like_standbydelayhigh_request("standby delay high"));
+        assert!(!looks_like_standbydelayhigh_request("/standbydelay"));
+        assert!(!looks_like_standbydelayhigh_request("view standbydelay"));
+        assert!(!looks_like_standbydelayhigh_request("/standby"));
+        assert!(!looks_like_standbydelayhigh_request("/autopoweroffdelay"));
+        assert!(!looks_like_standbydelayhigh_request("/tasks"));
+        assert!(!looks_like_standbydelayhigh_request("enable standbydelayhigh"));
+        assert!(!looks_like_standbydelayhigh_request("standbydelaylow"));
+        assert!(!looks_like_standbydelay_request("/standbydelayhigh"));
+        assert!(!looks_like_standbydelay_request("view standbydelayhigh"));
+        assert!(!looks_like_autopoweroffdelay_request("/standbydelayhigh"));
+        let s = try_operator_instant_reply("/standbydelayhigh").unwrap();
+        assert!(
+            s.contains("**Standby delay high**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view standbydelayhigh").unwrap();
+        assert!(
+            viewed.contains("**Standby delay high**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open standby-delay-high").unwrap();
+        assert!(
+            open.contains("**Standby delay high**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("standbydelayhigh").is_none());
+        assert!(try_operator_instant_reply("standby delay high").is_none());
+        let sd = try_operator_instant_reply("/standbydelay");
+        if let Some(reply) = sd {
+            assert!(
+                !reply.contains("**Standby delay high**"),
+                "/standbydelay must stay Standby delay, not high: {reply}"
             );
         }
     }

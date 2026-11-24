@@ -1257,15 +1257,22 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_hibernatefile_request(content) {
         return Some(format_hibernatefile_report());
     }
+    // Standby delay high (bare `standbydelayhigh` / `standby delay high` stay with the agent;
+    // `/standbydelay` stays Standby delay; `/standby` stays Standby;
+    // standbydelaylow stays out; `/autopoweroffdelay` stays Autopower Off delay).
+    if looks_like_standbydelayhigh_request(content) {
+        return Some(format_standbydelayhigh_report());
+    }
     // Standby delay (bare `standbydelay` / `standby delay` stay with the agent;
     // `/standby` stays Standby; `/hibernatefile` stays Hibernate file;
-    // standbydelayhigh / standbydelaylow stay out; `/autopoweroff` stays Auto Power Off).
+    // `/standbydelayhigh` stays Standby delay high; standbydelaylow stays out;
+    // `/autopoweroff` stays Auto Power Off).
     if looks_like_standbydelay_request(content) {
         return Some(format_standbydelay_report());
     }
     // Autopower Off delay (bare `autopoweroffdelay` / `auto power off delay` stay with the agent;
     // `/autopoweroff` stays Auto Power Off; `/standbydelay` stays Standby delay;
-    // standbydelayhigh / standbydelaylow stay out).
+    // `/standbydelayhigh` stays Standby delay high; standbydelaylow stays out).
     if looks_like_autopoweroffdelay_request(content) {
         return Some(format_autopoweroffdelay_report());
     }

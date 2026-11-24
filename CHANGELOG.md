@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3027] - 2026-11-24
+
+### Added
+- Instant Standby delay high accepts `/standbydelayhigh` · `/standbydelayhigh-status` · `/standbydelayhigh-state` · `/standby-delay-high` · `/standby-delay-high-status` · `/standby-delay-high-state` · `/mac-standbydelayhigh` · `/mac-standby-delay-high` · `/mac-standbydelayhigh-status` · `/mac-standby-delay-high-status` and view/see/open/list NL (`view standbydelayhigh`, `open standby-delay-high`, `list standby delay high`, …), matching “standbydelayhigh status” / “what's my standbydelayhigh” / “what's the standby delay high”. Bare `standbydelayhigh` / `standby delay high` stay with the agent; `/standbydelay` · `/standby-delay` stay Standby delay; `/standby` · `/stand-by` stay Standby; standbydelaylow stays out; `/autopoweroffdelay` · `/auto-power-off-delay` stay Autopower Off delay. Operator `/help` lists the new lane.
+
 ## [0.1.3026] - 2026-11-24
 
 ### Added
