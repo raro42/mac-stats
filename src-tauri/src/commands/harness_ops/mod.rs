@@ -7012,6 +7012,64 @@ mod tests {
     }
 
 
+
+    #[test]
+    fn pmlive_slash_and_view_open_do_not_steal_pmcustom_pmadapters_or_bare() {
+        assert!(looks_like_pmlive_request("/pmlive"));
+        assert!(looks_like_pmlive_request("/pmlive-status"));
+        assert!(looks_like_pmlive_request("/pm-live"));
+        assert!(looks_like_pmlive_request("/pmset-live"));
+        assert!(looks_like_pmlive_request("/power-live"));
+        assert!(looks_like_pmlive_request("/currently-in-use"));
+        assert!(looks_like_pmlive_request("/in-use"));
+        assert!(looks_like_pmlive_request("/live-settings"));
+        assert!(looks_like_pmlive_request("/mac-pmlive"));
+        assert!(looks_like_pmlive_request("/mac-power-live"));
+        assert!(looks_like_pmlive_request("view pmlive"));
+        assert!(looks_like_pmlive_request("open power-live"));
+        assert!(looks_like_pmlive_request("list currently in use"));
+        assert!(looks_like_pmlive_request("pmlive status"));
+        assert!(looks_like_pmlive_request("is pmlive ok"));
+        assert!(looks_like_pmlive_request("what's my currently in use"));
+        assert!(looks_like_pmlive_request("view currently in use"));
+        assert!(!looks_like_pmlive_request("pmlive"));
+        assert!(!looks_like_pmlive_request("power live"));
+        assert!(!looks_like_pmlive_request("currently in use"));
+        assert!(!looks_like_pmlive_request("pmset live"));
+        assert!(!looks_like_pmlive_request("/pmcustom"));
+        assert!(!looks_like_pmlive_request("view pmcustom"));
+        assert!(!looks_like_pmlive_request("/pmadapters"));
+        assert!(!looks_like_pmlive_request("view pmadapters"));
+        assert!(!looks_like_pmlive_request("/pmps"));
+        assert!(!looks_like_pmlive_request("/pmcap"));
+        assert!(!looks_like_pmlive_request("/powernap"));
+        assert!(!looks_like_pmlive_request("/tasks"));
+        assert!(!looks_like_pmlive_request("enable pmlive"));
+        assert!(!looks_like_pmcustom_request("/pmlive"));
+        assert!(!looks_like_pmcustom_request("view pmlive"));
+        assert!(!looks_like_pmadapters_request("/pmlive"));
+        assert!(!looks_like_pmadapters_request("view pmlive"));
+        let s = try_operator_instant_reply("/pmlive").unwrap();
+        assert!(
+            s.contains("**Power live**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view pmlive").unwrap();
+        assert!(
+            viewed.contains("**Power live**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open currently-in-use").unwrap();
+        assert!(
+            open.contains("**Power live**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("pmlive").is_none());
+        assert!(try_operator_instant_reply("power live").is_none());
+        assert!(try_operator_instant_reply("currently in use").is_none());
+    }
+
+
     #[test]
     fn sysload_slash_and_view_open_do_not_steal_load_heat_or_bare() {
         // Slash + view/open NL → System load (`/load` · `/thermal` parity).

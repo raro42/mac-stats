@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3058] - 2026-11-25
+
+### Added
+- Instant Power live accepts `/pmlive` · `/pmlive-status` · `/pmlive-state` · `/pm-live` · `/pm-live-status` · `/pm-live-state` · `/pmset-live` · `/pmset-live-status` · `/pmset-live-state` · `/pmsetlive` · `/pmsetlive-status` · `/power-live` · `/power-live-status` · `/power-live-state` · `/powerlive` · `/powerlive-status` · `/currently-in-use` · `/currently-in-use-status` · `/currently-in-use-state` · `/in-use` · `/in-use-status` · `/in-use-state` · `/live-settings` · `/live-settings-status` · `/live-power` · `/live-power-status` · `/mac-pmlive` · `/mac-pm-live` · `/mac-pmset-live` · `/mac-power-live` · `/mac-currently-in-use` · `/mac-in-use` · `/mac-pmlive-status` · `/mac-power-live-status` and view/see/open/list NL (`view pmlive`, `open currently-in-use`, `list live settings`, …), matching “pmlive status” / “is pmlive ok” / “what's my pmlive” / “what's the currently in use”. Bare `pmlive` / `power live` / `currently in use` stay with the agent; `/pmcustom` · `/power-profiles` stay Power custom; `/pmadapters` · `/power-adapters` stay Power adapters; `/pmps` · `/power-source` stay Power source; `/pmcap` · `/power-cap` stay Power capabilities; `/pmstats` · `/power-stats` stay Power stats; per-key soft-state `/powernap` · `/womp` · `/displaysleep` stay put. Uses `pmset -g live` (Currently in use; keep sleep preventer notes). Operator `/help` lists the new lane.
+
 ## [0.1.3057] - 2026-11-25
 
 ### Added

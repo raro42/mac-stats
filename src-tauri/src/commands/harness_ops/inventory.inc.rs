@@ -29534,6 +29534,14 @@ pub fn looks_like_pmcustom_request(content: &str) -> bool {
         || n.contains("power source")
         || n.contains("now drawing")
         || n == "/ps"
+        || n.contains("pmlive")
+        || n.contains("pm-live")
+        || n.contains("power live")
+        || n.contains("currently in use")
+        || n.contains("currently-in-use")
+        || n == "/in-use"
+        || n == "/live-settings"
+        || n == "/live-power"
         || n == "/idle-time"
         || n.contains("screensaver")
         || n == "/username"
@@ -29898,6 +29906,14 @@ pub fn looks_like_pmadapters_request(content: &str) -> bool {
         || n == "the adapters"
         || n == "adapter list"
         || n == "the adapter list"
+        || n.contains("pmlive")
+        || n.contains("pm-live")
+        || n.contains("power live")
+        || n.contains("currently in use")
+        || n.contains("currently-in-use")
+        || n == "/in-use"
+        || n == "/live-settings"
+        || n == "/live-power"
     {
         return false;
     }
@@ -30051,6 +30067,301 @@ pub fn format_pmadapters_report() -> String {
     }
     format!("**Power adapters** · `{v}`")
 }
+
+/// Power live — Currently in use from `pmset -g live`.
+/// Slash + view/open NL (`/pmlive` · `/power-live` · `/currently-in-use` · `view pmlive`).
+/// Bare `pmlive` / `power live` / `currently in use` stay with the agent;
+/// `/pmcustom` stays Power custom; `/pmadapters` stays Power adapters; `/pmps` stays Power source;
+/// `/pmcap` stays Power capabilities; `/pmstats` stays Power stats; per-key soft-state stays put.
+pub fn looks_like_pmlive_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("pmcustom")
+        || n.contains("power custom")
+        || n.contains("power profiles")
+        || n.contains("pmadapters")
+        || n.contains("power adapters")
+        || n.contains("power adapter")
+        || n == "/adapters"
+        || n.contains("pmps")
+        || n.contains("power source")
+        || n.contains("now drawing")
+        || n.contains("pmcap")
+        || n.contains("power cap")
+        || n.contains("power capabilities")
+        || n.contains("pmstats")
+        || n.contains("power stats")
+        || n.contains("useractivity")
+        || n.contains("user activity")
+        || n.contains("pmlog")
+        || n.contains("power log")
+        || n == "/therm"
+        || n.contains("assertions")
+        || n.contains("powersched")
+        || n.contains("power schedule")
+        || n.contains("sysload")
+        || n == "/ups"
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n == "/womp"
+        || n.contains("wake for network")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n == "/sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/adapter"
+        || n == "/charger"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/thermal"
+        || n == "/heat"
+        || n == "/ps"
+        || n == "pmlive"
+        || n == "the pmlive"
+        || n == "pm-live"
+        || n == "the pm-live"
+        || n == "pm live"
+        || n == "the pm live"
+        || n == "pmsetlive"
+        || n == "the pmsetlive"
+        || n == "pmset-live"
+        || n == "the pmset-live"
+        || n == "pmset live"
+        || n == "the pmset live"
+        || n == "powerlive"
+        || n == "the powerlive"
+        || n == "power-live"
+        || n == "the power-live"
+        || n == "power live"
+        || n == "the power live"
+        || n == "currently-in-use"
+        || n == "the currently-in-use"
+        || n == "currently in use"
+        || n == "the currently in use"
+        || n == "in-use"
+        || n == "the in-use"
+        || n == "in use"
+        || n == "the in use"
+        || n == "live settings"
+        || n == "the live settings"
+        || n == "live power"
+        || n == "the live power"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+            "/pmlive"
+            | "/pmlive-status"
+            | "/pmlive-state"
+            | "/pm-live"
+            | "/pm-live-status"
+            | "/pm-live-state"
+            | "/pmset-live"
+            | "/pmset-live-status"
+            | "/pmset-live-state"
+            | "/pmsetlive"
+            | "/pmsetlive-status"
+            | "/power-live"
+            | "/power-live-status"
+            | "/power-live-state"
+            | "/powerlive"
+            | "/powerlive-status"
+            | "/currently-in-use"
+            | "/currently-in-use-status"
+            | "/currently-in-use-state"
+            | "/in-use"
+            | "/in-use-status"
+            | "/in-use-state"
+            | "/live-settings"
+            | "/live-settings-status"
+            | "/live-power"
+            | "/live-power-status"
+            | "/mac-pmlive"
+            | "/mac-pm-live"
+            | "/mac-pmset-live"
+            | "/mac-power-live"
+            | "/mac-currently-in-use"
+            | "/mac-in-use"
+            | "/mac-pmlive-status"
+            | "/mac-power-live-status"
+            | "pmlive status"
+            | "the pmlive status"
+            | "pmlive state"
+            | "the pmlive state"
+            | "pm-live status"
+            | "the pm-live status"
+            | "pm live status"
+            | "the pm live status"
+            | "pmset-live status"
+            | "the pmset-live status"
+            | "pmset live status"
+            | "the pmset live status"
+            | "power-live status"
+            | "the power-live status"
+            | "power live status"
+            | "the power live status"
+            | "currently-in-use status"
+            | "the currently-in-use status"
+            | "currently in use status"
+            | "the currently in use status"
+            | "in-use status"
+            | "the in-use status"
+            | "in use status"
+            | "the in use status"
+            | "live settings status"
+            | "the live settings status"
+            | "my pmlive"
+            | "my pmlive status"
+            | "my power live"
+            | "my currently in use"
+            | "is pmlive ok"
+            | "is the pmlive ok"
+            | "how's pmlive"
+            | "hows pmlive"
+            | "how's the pmlive"
+            | "hows the pmlive"
+            | "how's power live"
+            | "hows power live"
+            | "what's my pmlive"
+            | "whats my pmlive"
+            | "what is my pmlive"
+            | "what's my pmlive status"
+            | "whats my pmlive status"
+            | "what is my pmlive status"
+            | "what's my power live"
+            | "whats my power live"
+            | "what is my power live"
+            | "what's my currently in use"
+            | "whats my currently in use"
+            | "what is my currently in use"
+            | "what's the pmlive"
+            | "whats the pmlive"
+            | "what is the pmlive"
+            | "what's the pmlive status"
+            | "whats the pmlive status"
+            | "what is the pmlive status"
+            | "what's the power live"
+            | "whats the power live"
+            | "what is the power live"
+            | "what's the currently in use"
+            | "whats the currently in use"
+            | "what is the currently in use"
+            | "view pmlive"
+            | "view the pmlive"
+            | "view pmlive status"
+            | "view the pmlive status"
+            | "view pm-live"
+            | "view the pm-live"
+            | "view pm live"
+            | "view the pm live"
+            | "view pmset-live"
+            | "view the pmset-live"
+            | "view pmset live"
+            | "view the pmset live"
+            | "view power-live"
+            | "view the power-live"
+            | "view power live"
+            | "view the power live"
+            | "view currently-in-use"
+            | "view the currently-in-use"
+            | "view currently in use"
+            | "view the currently in use"
+            | "view in-use"
+            | "view the in-use"
+            | "view in use"
+            | "view the in use"
+            | "view live settings"
+            | "view the live settings"
+            | "see pmlive"
+            | "see the pmlive"
+            | "see power live"
+            | "see the power live"
+            | "see currently in use"
+            | "see the currently in use"
+            | "open pmlive"
+            | "open the pmlive"
+            | "open pmlive status"
+            | "open the pmlive status"
+            | "open pm-live"
+            | "open power-live"
+            | "open power live"
+            | "open currently-in-use"
+            | "open currently in use"
+            | "open in-use"
+            | "open live settings"
+            | "open pmset-live"
+            | "list pmlive"
+            | "list the pmlive"
+            | "list pmlive status"
+            | "list the pmlive status"
+            | "list pm-live"
+            | "list the pm-live"
+            | "list power-live"
+            | "list the power-live"
+            | "list power live"
+            | "list the power live"
+            | "list currently-in-use"
+            | "list the currently-in-use"
+            | "list currently in use"
+            | "list the currently in use"
+            | "list in-use"
+            | "list live settings"
+    )
+}
+
+/// Zero-LLM live power settings from `pmset -g live` (macOS-only; empty elsewhere).
+pub fn format_pmlive_report() -> String {
+    let v = crate::metrics::get_pmlive_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Power live** — _no live power settings on this Mac right now._".to_string();
+    }
+    format!("**Power live** · `{v}`")
+}
+
+
 
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).

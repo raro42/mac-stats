@@ -8669,6 +8669,113 @@ pub fn get_pmadapters_status() -> String {
     }
 }
 
+
+/// Parse `pmset -g live` → ordered key/value pairs (Currently in use).
+/// Skips headers; keeps parenthetical preventer notes on the value.
+pub(crate) fn parse_pmset_live(raw: &str) -> Vec<(String, String)> {
+    let mut out = Vec::new();
+    let mut in_use = false;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let lower = t.to_ascii_lowercase();
+        if lower.starts_with("system-wide power settings") {
+            continue;
+        }
+        if lower.starts_with("currently in use") {
+            in_use = true;
+            continue;
+        }
+        if !in_use {
+            if t.contains(':') && !t.contains(' ') {
+                continue;
+            }
+        }
+        let parts: Vec<&str> = t.split_whitespace().collect();
+        if parts.len() < 2 {
+            continue;
+        }
+        let (key, val) = if let Some(idx) = t.find("  ") {
+            let k = t[..idx].trim();
+            let v = t[idx..].trim();
+            if k.is_empty() || v.is_empty() {
+                continue;
+            }
+            (k.to_string(), v.to_string())
+        } else {
+            let val = parts[parts.len() - 1].to_string();
+            let key = parts[..parts.len() - 1].join(" ");
+            (key, val)
+        };
+        if key.eq_ignore_ascii_case("Currently in use") {
+            continue;
+        }
+        out.push((key, val));
+        in_use = true;
+    }
+    out
+}
+
+/// Compact live settings: `key=val · key=val` (cap length for Discord).
+pub(crate) fn format_pmlive_parts(pairs: &[(String, String)]) -> String {
+    if pairs.is_empty() {
+        return String::new();
+    }
+    let mut parts = Vec::new();
+    for (k, v) in pairs {
+        let v_show = if v.starts_with('/') && v.len() > 28 {
+            format!("…{}", &v[v.len().saturating_sub(24)..])
+        } else {
+            v.clone()
+        };
+        parts.push(format!("{k}={v_show}"));
+    }
+    let mut s = parts.join(" · ");
+    if s.len() > 420 {
+        s.truncate(417);
+        s.push_str("…");
+    }
+    s
+}
+
+/// macOS live power settings from `pmset -g live` (Currently in use).
+pub fn get_pmlive_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "live"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("pmlive: pmset -g live non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("pmlive: pmset -g live spawn failed");
+                return String::new();
+            }
+        };
+        let pairs = parse_pmset_live(&stdout);
+        let info = format_pmlive_parts(&pairs);
+        if info.is_empty() {
+            debug3!("pmlive: empty status");
+        } else {
+            debug3!("pmlive status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -14736,6 +14843,47 @@ Family Code: 0xe000400a
         );
     }
 }
+
+
+#[cfg(test)]
+mod pmlive_parse_tests {
+    use super::{format_pmlive_parts, parse_pmset_live};
+
+    const SAMPLE: &str = "\
+System-wide power settings:
+Currently in use:
+ standby              1
+ Sleep On Power Button 1
+ hibernatefile        /var/vm/sleepimage
+ powernap             1
+ sleep                1 (sleep prevented by App)
+ displaysleep         5 (display sleep prevented by App)
+ womp                 1
+";
+
+    #[test]
+    fn parse_pmset_live_reads_currently_in_use_pairs() {
+        let pairs = parse_pmset_live(SAMPLE);
+        assert!(pairs.iter().any(|(k, v)| k == "standby" && v == "1"));
+        assert!(pairs.iter().any(|(k, v)| k == "Sleep On Power Button" && v == "1"));
+        assert!(pairs.iter().any(|(k, v)| k == "powernap" && v == "1"));
+        assert!(pairs.iter().any(|(k, v)| k == "womp" && v == "1"));
+        assert!(pairs.iter().any(|(k, v)| k == "sleep" && v.starts_with("1")));
+        assert!(pairs.iter().any(|(k, v)| k == "hibernatefile" && v.contains("sleepimage")));
+        let s = format_pmlive_parts(&pairs);
+        assert!(s.contains("standby=1"), "got: {s}");
+        assert!(s.contains("powernap=1"), "got: {s}");
+        assert!(s.contains("hibernatefile="), "got: {s}");
+        let long = vec![(
+            "hibernatefile".into(),
+            "/very/long/path/to/var/vm/sleepimage".into(),
+        )];
+        let shortened = format_pmlive_parts(&long);
+        assert!(shortened.contains("…"), "long path should shorten: {shortened}");
+        assert_eq!(format_pmlive_parts(&[]), "");
+    }
+}
+
 
 #[cfg(test)]
 mod displaysleep_parse_tests {
