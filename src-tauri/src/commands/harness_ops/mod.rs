@@ -6499,6 +6499,8 @@ mod tests {
         assert!(!looks_like_therm_request("/pmlog"));
         assert!(!looks_like_therm_request("/sysload"));
         assert!(!looks_like_therm_request("/ups"));
+        assert!(!looks_like_therm_request("/pmstats"));
+        assert!(!looks_like_therm_request("view pmstats"));
         assert!(!looks_like_therm_request("/tasks"));
         assert!(!looks_like_therm_request("enable therm"));
         assert!(!looks_like_pmlog_request("/therm"));
@@ -6536,6 +6538,83 @@ mod tests {
             assert!(
                 !reply.contains("**Therm**"),
                 "/pmlog must stay Power log, not Therm: {reply}"
+            );
+        }
+    }
+
+    #[test]
+    fn pmstats_slash_and_view_open_do_not_steal_pmlog_therm_or_bare() {
+        // Slash + view/open NL -> Power stats (/pmlog · /therm parity).
+        assert!(looks_like_pmstats_request("/pmstats"));
+        assert!(looks_like_pmstats_request("/pmstats-status"));
+        assert!(looks_like_pmstats_request("/pm-stats"));
+        assert!(looks_like_pmstats_request("/powerstats"));
+        assert!(looks_like_pmstats_request("/power-stats"));
+        assert!(looks_like_pmstats_request("/sleep-stats"));
+        assert!(looks_like_pmstats_request("/wake-stats"));
+        assert!(looks_like_pmstats_request("/sleep-wake-stats"));
+        assert!(looks_like_pmstats_request("/pmset-stats"));
+        assert!(looks_like_pmstats_request("/mac-pmstats"));
+        assert!(looks_like_pmstats_request("/mac-power-stats"));
+        assert!(looks_like_pmstats_request("view pmstats"));
+        assert!(looks_like_pmstats_request("open power-stats"));
+        assert!(looks_like_pmstats_request("list sleep stats"));
+        assert!(looks_like_pmstats_request("pmstats status"));
+        assert!(looks_like_pmstats_request("is pmstats ok"));
+        assert!(looks_like_pmstats_request("what's my pmstats"));
+        assert!(looks_like_pmstats_request("view power stats"));
+        assert!(!looks_like_pmstats_request("pmstats"));
+        assert!(!looks_like_pmstats_request("power stats"));
+        assert!(!looks_like_pmstats_request("sleep stats"));
+        assert!(!looks_like_pmstats_request("wake stats"));
+        assert!(!looks_like_pmstats_request("/stats"));
+        assert!(!looks_like_pmstats_request("/pmlog"));
+        assert!(!looks_like_pmstats_request("view pmlog"));
+        assert!(!looks_like_pmstats_request("/therm"));
+        assert!(!looks_like_pmstats_request("view therm"));
+        assert!(!looks_like_pmstats_request("/darkwakes"));
+        assert!(!looks_like_pmstats_request("view dark wakes"));
+        assert!(!looks_like_pmstats_request("/assertions"));
+        assert!(!looks_like_pmstats_request("/sysload"));
+        assert!(!looks_like_pmstats_request("/powersched"));
+        assert!(!looks_like_pmstats_request("/ups"));
+        assert!(!looks_like_pmstats_request("/thermal"));
+        assert!(!looks_like_pmstats_request("/tasks"));
+        assert!(!looks_like_pmstats_request("enable pmstats"));
+        assert!(!looks_like_pmlog_request("/pmstats"));
+        assert!(!looks_like_pmlog_request("view pmstats"));
+        assert!(!looks_like_therm_request("/pmstats"));
+        assert!(!looks_like_therm_request("view pmstats"));
+        assert!(!looks_like_darkwakes_request("/pmstats"));
+        let s = try_operator_instant_reply("/pmstats").unwrap();
+        assert!(
+            s.contains("**Power stats**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view pmstats").unwrap();
+        assert!(
+            viewed.contains("**Power stats**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open power-stats").unwrap();
+        assert!(
+            open.contains("**Power stats**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("pmstats").is_none());
+        assert!(try_operator_instant_reply("power stats").is_none());
+        let pmlog = try_operator_instant_reply("/pmlog");
+        if let Some(reply) = pmlog {
+            assert!(
+                !reply.contains("**Power stats**"),
+                "/pmlog must stay Power log, not Power stats: {reply}"
+            );
+        }
+        let therm = try_operator_instant_reply("/therm");
+        if let Some(reply) = therm {
+            assert!(
+                !reply.contains("**Power stats**"),
+                "/therm must stay Therm, not Power stats: {reply}"
             );
         }
     }

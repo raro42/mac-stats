@@ -1386,6 +1386,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_therm_request(content) {
         return Some(format_therm_report());
     }
+    // Power stats from `pmset -g stats` (bare `pmstats` / `power stats` stay with the agent;
+    // `/pmlog` stays Power log; `/darkwakes` stays Dark Wakes; `/therm` stays Therm;
+    // `/assertions` stays Sleep assertions; `/sysload` stays System load;
+    // `/powersched` stays Power schedule; `/ups` stays UPS).
+    if looks_like_pmstats_request(content) {
+        return Some(format_pmstats_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

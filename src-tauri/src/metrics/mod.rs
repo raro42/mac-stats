@@ -7891,6 +7891,96 @@ pub fn get_therm_status() -> String {
     }
 }
 
+/// Parse `pmset -g stats` → (sleep_count, dark_wake_count, user_wake_count).
+/// Line shape: `Sleep Count:52` / `Dark Wake Count:52` / `User Wake Count:6`.
+pub(crate) fn parse_pmset_stats_counts(
+    raw: &str,
+) -> (Option<u64>, Option<u64>, Option<u64>) {
+    let mut sleep = None;
+    let mut dark_wake = None;
+    let mut user_wake = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let lower = t.to_ascii_lowercase();
+        let Some(colon) = lower.find(':') else {
+            continue;
+        };
+        let key = lower[..colon].trim();
+        let val = t[colon + 1..].trim();
+        let Ok(n) = val.parse::<u64>() else {
+            continue;
+        };
+        match key {
+            "sleep count" => sleep = Some(n),
+            "dark wake count" => dark_wake = Some(n),
+            "user wake count" => user_wake = Some(n),
+            _ => {}
+        }
+    }
+    (sleep, dark_wake, user_wake)
+}
+
+/// Compact power stats: `sleep 52 · dark wake 52 · user wake 6`.
+pub(crate) fn format_pmstats_parts(
+    sleep: Option<u64>,
+    dark_wake: Option<u64>,
+    user_wake: Option<u64>,
+) -> String {
+    let mut bits: Vec<String> = Vec::new();
+    if let Some(v) = sleep {
+        bits.push(format!("sleep {v}"));
+    }
+    if let Some(v) = dark_wake {
+        bits.push(format!("dark wake {v}"));
+    }
+    if let Some(v) = user_wake {
+        bits.push(format!("user wake {v}"));
+    }
+    bits.join(" · ")
+}
+
+/// macOS power stats from `pmset -g stats` (Sleep / Dark Wake / User Wake counts).
+/// Distinct from Power log `/pmlog` (event lines), Dark Wakes `/darkwakes` (setting),
+/// and Therm `/therm` (CPU speed limits).
+/// Used by Discord/operator instant `/pmstats` · `/power-stats` lane.
+pub fn get_pmstats_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "stats"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("pmstats: pmset -g stats non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("pmstats: pmset -g stats spawn failed");
+                return String::new();
+            }
+        };
+        let (sleep, dark_wake, user_wake) = parse_pmset_stats_counts(&stdout);
+        let info = format_pmstats_parts(sleep, dark_wake, user_wake);
+        if info.is_empty() {
+            debug3!("pmstats: empty status");
+        } else {
+            debug3!("pmstats status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -13682,6 +13772,35 @@ Note: No performance warning level has been recorded
         assert_eq!(
             format_therm_parts(Some(100), None, Some(80)),
             "sched 100% · speed 80%"
+        );
+    }
+}
+
+#[cfg(test)]
+mod pmstats_parse_tests {
+    use super::{format_pmstats_parts, parse_pmset_stats_counts};
+
+    const SAMPLE: &str = "\
+Sleep Count:52
+Dark Wake Count:52
+User Wake Count:6
+";
+
+    #[test]
+    fn parses_counts_and_formats() {
+        let (sleep, dark, user) = parse_pmset_stats_counts(SAMPLE);
+        assert_eq!(sleep, Some(52));
+        assert_eq!(dark, Some(52));
+        assert_eq!(user, Some(6));
+        assert_eq!(
+            format_pmstats_parts(sleep, dark, user),
+            "sleep 52 · dark wake 52 · user wake 6"
+        );
+        assert_eq!(parse_pmset_stats_counts(""), (None, None, None));
+        assert_eq!(format_pmstats_parts(None, None, None), "");
+        assert_eq!(
+            format_pmstats_parts(Some(1), None, Some(2)),
+            "sleep 1 · user wake 2"
         );
     }
 }

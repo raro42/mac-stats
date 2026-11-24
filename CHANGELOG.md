@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3052] - 2026-11-24
+
+### Added
+- Instant Power stats accepts `/pmstats` · `/pmstats-status` · `/pmstats-state` · `/pm-stats` · `/pm-stats-status` · `/pm-stats-state` · `/powerstats` · `/powerstats-status` · `/powerstats-state` · `/power-stats` · `/power-stats-status` · `/power-stats-state` · `/sleepstats` · `/sleepstats-status` · `/sleepstats-state` · `/sleep-stats` · `/sleep-stats-status` · `/sleep-stats-state` · `/wakestats` · `/wakestats-status` · `/wakestats-state` · `/wake-stats` · `/wake-stats-status` · `/wake-stats-state` · `/sleep-wake-stats` · `/sleep-wake-stats-status` · `/sleepwakestats` · `/sleepwakestats-status` · `/pmset-stats` · `/pmset-stats-status` · `/pmsetstats` · `/pmsetstats-status` · `/mac-pmstats` · `/mac-pm-stats` · `/mac-powerstats` · `/mac-power-stats` · `/mac-sleep-stats` · `/mac-wake-stats` · `/mac-sleep-wake-stats` · `/mac-pmset-stats` · `/mac-pmstats-status` · `/mac-power-stats-status` and view/see/open/list NL (`view pmstats`, `open power-stats`, `list sleep stats`, ...), matching "pmstats status" / "is pmstats ok" / "what's my pmstats" / "what's the power stats". Bare `pmstats` / `power stats` / `sleep stats` / `wake stats` stay with the agent; `/pmlog` · `/powerlog` stay Power log; `/darkwakes` · `/dark-wakes` stay Dark Wakes; `/therm` · `/cpu-speed-limit` stay Therm; `/assertions` · `/sleep-preventers` stay Sleep assertions; `/sysload` · `/load-level` stay System load; `/powersched` · `/power-schedule` stay Power schedule; `/ups` · `/ups-settings` stay UPS; `/thermal` · `/heat` stay Heat. Operator `/help` lists the new lane.
+
 ## [0.1.3051] - 2026-11-24
 
 ### Added

@@ -27684,6 +27684,19 @@ pub fn looks_like_pmlog_request(content: &str) -> bool {
         || n == "/uptime"
         || n == "/restart"
         || n == "restart"
+        || n.contains("pmstats")
+        || n.contains("pm stats")
+        || n.contains("power stats")
+        || n.contains("sleep stats")
+        || n.contains("wake stats")
+        || n.contains("sleep count")
+        || n.contains("wake count")
+        || n.contains("pmset stats")
+        || n == "/pmstats"
+        || n == "/power-stats"
+        || n == "/sleep-stats"
+        || n == "view pmstats"
+        || n == "open pmstats"
         // Bare phrases stay with the agent.
         || n == "pmlog"
         || n == "the pmlog"
@@ -27960,6 +27973,12 @@ pub fn looks_like_therm_request(content: &str) -> bool {
         || n == "/watts"
         || n == "/tasks"
         || n == "/uptime"
+        || n.contains("pmstats")
+        || n.contains("power stats")
+        || n.contains("sleep stats")
+        || n == "/pmstats"
+        || n == "/power-stats"
+        || n == "view pmstats"
         // Bare phrases stay with the agent.
         || n == "therm"
         || n == "the therm"
@@ -28164,6 +28183,352 @@ pub fn format_therm_report() -> String {
         return "**Therm** — _no CPU speed limits on this Mac right now._".to_string();
     }
     format!("**Therm** · `{v}`")
+}
+
+/// Power stats — Sleep / Dark Wake / User Wake counts from `pmset -g stats`.
+/// Slash + view/open NL (`/pmstats` · `/power-stats` · `view pmstats`).
+/// Bare `pmstats` / `power stats` / `sleep stats` stay with the agent;
+/// `/pmlog` stays Power log; `/darkwakes` stays Dark Wakes setting;
+/// `/therm` stays Therm; `/assertions` stays Sleep assertions;
+/// `/sysload` stays System load; `/powersched` stays Power schedule; `/ups` stays UPS.
+pub fn looks_like_pmstats_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("pmlog")
+        || n.contains("powerlog")
+        || n.contains("power log")
+        || n.contains("power management log")
+        || n.contains("pmset log")
+        || n.contains("sleep wake log")
+        || n.contains("sleep-wake-log")
+        || n == "/logs"
+        || n == "view logs"
+        || n == "open logs"
+        || n.contains("assertions")
+        || n.contains("preventer")
+        || n.contains("who keeps awake")
+        || n.contains("sysload")
+        || n.contains("sys load")
+        || n.contains("load level")
+        || n.contains("powersched")
+        || n.contains("power schedule")
+        || n.contains("pmset sched")
+        || n.contains("scheduled power")
+        || n.contains("uninterruptible")
+        || n == "/ups"
+        || n == "/ups-settings"
+        || n == "/pmset-ups"
+        || n == "view ups"
+        || n == "open ups"
+        || n.contains("darkwakes")
+        || n == "/darkwakes"
+        || n == "/dark-wakes"
+        || n == "/darkwake"
+        || n == "view darkwakes"
+        || n == "open darkwakes"
+        || n == "view dark wakes"
+        || n == "open dark wakes"
+        || n == "/therm"
+        || n == "/pmset-therm"
+        || n == "/cpu-speed-limit"
+        || n == "/speed-limit"
+        || n == "/thermal-limits"
+        || n == "/sched-limit"
+        || n == "view therm"
+        || n == "open therm"
+        || n.contains("cpu speed limit")
+        || n.contains("thermal limits")
+        || n.contains("speed limit")
+        || n == "/thermal"
+        || n == "/heat"
+        || n == "view heat"
+        || n == "open thermal"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        || n == "/stats"
+        // Bare phrases stay with the agent.
+        || n == "pmstats"
+        || n == "the pmstats"
+        || n == "pm-stats"
+        || n == "the pm-stats"
+        || n == "pm stats"
+        || n == "the pm stats"
+        || n == "powerstats"
+        || n == "the powerstats"
+        || n == "power-stats"
+        || n == "the power-stats"
+        || n == "power stats"
+        || n == "the power stats"
+        || n == "sleepstats"
+        || n == "the sleepstats"
+        || n == "sleep-stats"
+        || n == "the sleep-stats"
+        || n == "sleep stats"
+        || n == "the sleep stats"
+        || n == "wakestats"
+        || n == "the wakestats"
+        || n == "wake-stats"
+        || n == "the wake-stats"
+        || n == "wake stats"
+        || n == "the wake stats"
+        || n == "sleep wake stats"
+        || n == "the sleep wake stats"
+        || n == "sleep-wake-stats"
+        || n == "the sleep-wake-stats"
+        || n == "pmset stats"
+        || n == "the pmset stats"
+        || n == "pmset-stats"
+        || n == "the pmset-stats"
+        || n == "sleep count"
+        || n == "the sleep count"
+        || n == "dark wake count"
+        || n == "the dark wake count"
+        || n == "user wake count"
+        || n == "the user wake count"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/pmstats"
+            | "/pmstats-status"
+            | "/pmstats-state"
+            | "/pm-stats"
+            | "/pm-stats-status"
+            | "/pm-stats-state"
+            | "/powerstats"
+            | "/powerstats-status"
+            | "/powerstats-state"
+            | "/power-stats"
+            | "/power-stats-status"
+            | "/power-stats-state"
+            | "/sleepstats"
+            | "/sleepstats-status"
+            | "/sleepstats-state"
+            | "/sleep-stats"
+            | "/sleep-stats-status"
+            | "/sleep-stats-state"
+            | "/wakestats"
+            | "/wakestats-status"
+            | "/wakestats-state"
+            | "/wake-stats"
+            | "/wake-stats-status"
+            | "/wake-stats-state"
+            | "/sleep-wake-stats"
+            | "/sleep-wake-stats-status"
+            | "/sleepwakestats"
+            | "/sleepwakestats-status"
+            | "/pmset-stats"
+            | "/pmset-stats-status"
+            | "/pmsetstats"
+            | "/pmsetstats-status"
+            | "/mac-pmstats"
+            | "/mac-pm-stats"
+            | "/mac-powerstats"
+            | "/mac-power-stats"
+            | "/mac-sleep-stats"
+            | "/mac-wake-stats"
+            | "/mac-sleep-wake-stats"
+            | "/mac-pmset-stats"
+            | "/mac-pmstats-status"
+            | "/mac-power-stats-status"
+            | "pmstats status"
+            | "the pmstats status"
+            | "pmstats state"
+            | "the pmstats state"
+            | "pm-stats status"
+            | "the pm-stats status"
+            | "pm stats status"
+            | "the pm stats status"
+            | "powerstats status"
+            | "the powerstats status"
+            | "power-stats status"
+            | "the power-stats status"
+            | "power stats status"
+            | "the power stats status"
+            | "sleepstats status"
+            | "the sleepstats status"
+            | "sleep-stats status"
+            | "the sleep-stats status"
+            | "sleep stats status"
+            | "the sleep stats status"
+            | "wakestats status"
+            | "the wakestats status"
+            | "wake-stats status"
+            | "the wake-stats status"
+            | "wake stats status"
+            | "the wake stats status"
+            | "sleep wake stats status"
+            | "the sleep wake stats status"
+            | "pmset stats status"
+            | "the pmset stats status"
+            | "pmset-stats status"
+            | "the pmset-stats status"
+            | "my pmstats"
+            | "my pmstats status"
+            | "my power stats"
+            | "my sleep stats"
+            | "my wake stats"
+            | "is pmstats ok"
+            | "is the pmstats ok"
+            | "how's pmstats"
+            | "hows pmstats"
+            | "how's the pmstats"
+            | "hows the pmstats"
+            | "how's power stats"
+            | "hows power stats"
+            | "what's my pmstats"
+            | "whats my pmstats"
+            | "what is my pmstats"
+            | "what's my pmstats status"
+            | "whats my pmstats status"
+            | "what is my pmstats status"
+            | "what's my power stats"
+            | "whats my power stats"
+            | "what is my power stats"
+            | "what's my sleep stats"
+            | "whats my sleep stats"
+            | "what is my sleep stats"
+            | "what's my wake stats"
+            | "whats my wake stats"
+            | "what is my wake stats"
+            | "what's the pmstats"
+            | "whats the pmstats"
+            | "what is the pmstats"
+            | "what's the pmstats status"
+            | "whats the pmstats status"
+            | "what is the pmstats status"
+            | "what's the power stats"
+            | "whats the power stats"
+            | "what is the power stats"
+            | "what's the sleep stats"
+            | "whats the sleep stats"
+            | "what is the sleep stats"
+            | "what's the wake stats"
+            | "whats the wake stats"
+            | "what is the wake stats"
+            | "view pmstats"
+            | "view the pmstats"
+            | "view pmstats status"
+            | "view the pmstats status"
+            | "view pm-stats"
+            | "view the pm-stats"
+            | "view pm stats"
+            | "view the pm stats"
+            | "view powerstats"
+            | "view the powerstats"
+            | "view power-stats"
+            | "view the power-stats"
+            | "view power stats"
+            | "view the power stats"
+            | "view sleepstats"
+            | "view the sleepstats"
+            | "view sleep-stats"
+            | "view the sleep-stats"
+            | "view sleep stats"
+            | "view the sleep stats"
+            | "view wakestats"
+            | "view the wakestats"
+            | "view wake-stats"
+            | "view the wake-stats"
+            | "view wake stats"
+            | "view the wake stats"
+            | "view sleep-wake-stats"
+            | "view the sleep-wake-stats"
+            | "view sleep wake stats"
+            | "view the sleep wake stats"
+            | "view pmset-stats"
+            | "view the pmset-stats"
+            | "view pmset stats"
+            | "view the pmset stats"
+            | "see pmstats"
+            | "see the pmstats"
+            | "see power stats"
+            | "see the power stats"
+            | "see sleep stats"
+            | "see the sleep stats"
+            | "see wake stats"
+            | "see the wake stats"
+            | "open pmstats"
+            | "open the pmstats"
+            | "open pmstats status"
+            | "open the pmstats status"
+            | "open pm-stats"
+            | "open powerstats"
+            | "open the powerstats"
+            | "open power-stats"
+            | "open power stats"
+            | "open sleep-stats"
+            | "open sleep stats"
+            | "open wake-stats"
+            | "open wake stats"
+            | "open sleep-wake-stats"
+            | "open pmset-stats"
+            | "list pmstats"
+            | "list the pmstats"
+            | "list pmstats status"
+            | "list the pmstats status"
+            | "list powerstats"
+            | "list the powerstats"
+            | "list power stats"
+            | "list the power stats"
+            | "list sleep stats"
+            | "list the sleep stats"
+            | "list wake stats"
+            | "list the wake stats"
+            | "list sleep-wake-stats"
+            | "list pmset-stats"
+    )
+}
+
+/// Zero-LLM power stats from `pmset -g stats` (macOS-only; empty elsewhere).
+pub fn format_pmstats_report() -> String {
+    let v = crate::metrics::get_pmstats_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Power stats** — _no Sleep / Wake counts on this Mac right now._".to_string();
+    }
+    format!("**Power stats** · `{v}`")
 }
 
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
