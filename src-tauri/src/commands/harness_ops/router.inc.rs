@@ -1277,6 +1277,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_destroyfvkeyonstandby_request(content) {
         return Some(format_destroyfvkeyonstandby_report());
     }
+    // AC Wake (bare `acwake` / `ac wake` stay with the agent;
+    // `/womp` stays Wake for network; `/proximitywake` stays Proximity Wake;
+    // `/lidwake` stays out; `/standby` stays Standby; `/destroyfvkeyonstandby` stays Destroy FV key).
+    if looks_like_acwake_request(content) {
+        return Some(format_acwake_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

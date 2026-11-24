@@ -5518,6 +5518,72 @@ mod tests {
     }
 
     #[test]
+    fn acwake_slash_and_view_open_do_not_steal_womp_or_bare() {
+        // Slash + view/open NL → AC Wake (`/womp` · `/proximitywake` parity).
+        // Bare `acwake` / `ac wake` stay with the agent;
+        // `/womp` stays Wake for network; `/proximitywake` stays Proximity Wake;
+        // `/lidwake` stays out; `/standby` stays Standby; `/destroyfvkeyonstandby` stays Destroy FV key;
+        // `/charger` stays AC charger.
+        assert!(looks_like_acwake_request("/acwake"));
+        assert!(looks_like_acwake_request("/acwake-status"));
+        assert!(looks_like_acwake_request("/ac-wake"));
+        assert!(looks_like_acwake_request("/wake-on-ac"));
+        assert!(looks_like_acwake_request("/mac-acwake"));
+        assert!(looks_like_acwake_request("/mac-ac-wake"));
+        assert!(looks_like_acwake_request("view acwake"));
+        assert!(looks_like_acwake_request("open ac-wake"));
+        assert!(looks_like_acwake_request("list wake on ac"));
+        assert!(looks_like_acwake_request("acwake status"));
+        assert!(looks_like_acwake_request("is ac wake on"));
+        assert!(looks_like_acwake_request("what's my acwake"));
+        assert!(looks_like_acwake_request("view ac wake"));
+        assert!(!looks_like_acwake_request("acwake"));
+        assert!(!looks_like_acwake_request("ac wake"));
+        assert!(!looks_like_acwake_request("/womp"));
+        assert!(!looks_like_acwake_request("view womp"));
+        assert!(!looks_like_acwake_request("/proximitywake"));
+        assert!(!looks_like_acwake_request("/standby"));
+        assert!(!looks_like_acwake_request("/destroyfvkeyonstandby"));
+        assert!(!looks_like_acwake_request("/charger"));
+        assert!(!looks_like_acwake_request("/tasks"));
+        assert!(!looks_like_acwake_request("enable acwake"));
+        assert!(!looks_like_wake_for_network_request("/acwake"));
+        assert!(!looks_like_wake_for_network_request("view acwake"));
+        assert!(!looks_like_destroyfvkeyonstandby_request("/acwake"));
+        let s = try_operator_instant_reply("/acwake").unwrap();
+        assert!(
+            s.contains("**AC Wake**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view acwake").unwrap();
+        assert!(
+            viewed.contains("**AC Wake**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open ac-wake").unwrap();
+        assert!(
+            open.contains("**AC Wake**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("acwake").is_none());
+        assert!(try_operator_instant_reply("ac wake").is_none());
+        let womp = try_operator_instant_reply("/womp");
+        if let Some(reply) = womp {
+            assert!(
+                !reply.contains("**AC Wake**"),
+                "/womp must stay Wake for network, not AC Wake: {reply}"
+            );
+        }
+        let charger = try_operator_instant_reply("/charger");
+        if let Some(reply) = charger {
+            assert!(
+                !reply.contains("**AC Wake**"),
+                "/charger must stay AC charger, not AC Wake: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).
         // Bare `charger` / `adapter` stay with the agent; `/watts` stays CPU+GPU; `/battery` · is it charging stay Bat %.

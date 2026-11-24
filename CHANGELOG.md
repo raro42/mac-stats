@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3032] - 2026-11-24
+
+### Added
+- Instant AC Wake accepts `/acwake` · `/acwake-status` · `/acwake-state` · `/ac-wake` · `/ac-wake-status` · `/ac-wake-state` · `/wake-on-ac` · `/wake-on-ac-status` · `/wake-on-ac-state` · `/wakeonac` · `/wakeonac-status` · `/mac-acwake` · `/mac-ac-wake` · `/mac-wake-on-ac` · `/mac-acwake-status` · `/mac-ac-wake-status` and view/see/open/list NL (`view acwake`, `open ac-wake`, `list wake on ac`, …), matching “acwake status” / “is ac wake on” / “is acwake enabled” / “what's my acwake” / “what's the ac wake”. Bare `acwake` / `ac wake` stay with the agent; `/womp` · `/wake-for-network` stay Wake for network; `/proximitywake` · `/proximity-wake` stay Proximity Wake; `/lidwake` · `/lid-wake` stay out; `/standby` · `/stand-by` stay Standby; `/destroyfvkeyonstandby` · `/destroyfvkey` stay Destroy FV key on standby. Operator `/help` lists the new lane.
+
 ## [0.1.3031] - 2026-11-24
 
 ### Added

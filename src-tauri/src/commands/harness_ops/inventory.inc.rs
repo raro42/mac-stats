@@ -8618,6 +8618,12 @@ pub fn looks_like_ac_charger_request(content: &str) -> bool {
         || n == "battery level"
         || n == "battery status"
         // Bare short / ambiguous stay with the agent.
+        || n.contains("acwake")
+        || n.contains("ac wake")
+        || n.contains("ac-wake")
+        || n == "/acwake"
+        || n == "/ac-wake"
+        || n == "/wake-on-ac"
         || n == "charger"
         || n == "the charger"
         || n == "adapter"
@@ -17733,6 +17739,14 @@ pub fn looks_like_wake_for_network_request(content: &str) -> bool {
         || n.contains("networkoversleep")
         || n.contains("ttyskeepawake")
         || n.contains("tcpkeepalive")
+        || n.contains("acwake")
+        || n.contains("ac wake")
+        || n.contains("ac-wake")
+        || n.contains("wake on ac")
+        || n.contains("wake-on-ac")
+        || n.contains("lidwake")
+        || n.contains("lid wake")
+        || n.contains("lid-wake")
         || n.contains("proximitywake")
         || n.contains("proximity wake")
         || n.contains("proximity-wake")
@@ -17757,6 +17771,10 @@ pub fn looks_like_wake_for_network_request(content: &str) -> bool {
         || n == "/screen-lock"
         || n == "/lock-screen"
         || n == "/filevault"
+        || n == "/acwake"
+        || n == "/ac-wake"
+        || n == "/wake-on-ac"
+        || n == "/lidwake"
         || n == "/proximitywake"
         || n == "/proximity-wake"
         || n == "/wifi"
@@ -23624,6 +23642,256 @@ pub fn format_destroyfvkeyonstandby_report() -> String {
             .to_string();
     }
     format!("**Destroy FV key on standby** · `{v}`")
+}
+
+/// AC Wake — `pmset` Battery/AC `acwake` (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/acwake` · `/ac-wake` · `view acwake`).
+/// Bare `acwake` / `ac wake` stay with the agent;
+/// `/womp` · `/wake-for-network` stay Wake for network; `/proximitywake` stays Proximity Wake;
+/// `/lidwake` · `/lid-wake` stay out; `/standby` stays Standby; `/destroyfvkeyonstandby` stays Destroy FV key.
+pub fn looks_like_acwake_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("lidwake")
+        || n.contains("lid wake")
+        || n.contains("lid-wake")
+        || n.contains("destroyfvkey")
+        || n.contains("destroy-fv-key")
+        || n.contains("destroy fv key")
+        || n.contains("fvkeyonstandby")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("wake on network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("hibernatemode")
+        || n.contains("hibernate")
+        || n.contains("standbydelay")
+        || n.contains("standby delay")
+        || n.contains("autopoweroff")
+        || n.contains("auto power off")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("system sleep")
+        || n.contains("systemsleep")
+        || n.contains("sleep on power")
+        || n.contains("power button")
+        || n.contains("sopb")
+        || n.contains("lessbright")
+        || n.contains("halfdim")
+        || n.contains("filevault")
+        || n.contains("screensaver")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/proximitywake"
+        || n == "/proximity-wake"
+        || n == "/standby"
+        || n == "/stand-by"
+        || n == "/destroyfvkeyonstandby"
+        || n == "/destroyfvkey"
+        || n == "/lidwake"
+        || n == "/lid-wake"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "acwake"
+        || n == "the acwake"
+        || n == "ac wake"
+        || n == "the ac wake"
+        || n == "ac-wake"
+        || n == "the ac-wake"
+        || n == "wake on ac"
+        || n == "the wake on ac"
+        || n == "wake-on-ac"
+        || n == "the wake-on-ac"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/acwake"
+            | "/acwake-status"
+            | "/acwake-state"
+            | "/ac-wake"
+            | "/ac-wake-status"
+            | "/ac-wake-state"
+            | "/wake-on-ac"
+            | "/wake-on-ac-status"
+            | "/wake-on-ac-state"
+            | "/wakeonac"
+            | "/wakeonac-status"
+            | "/mac-acwake"
+            | "/mac-ac-wake"
+            | "/mac-wake-on-ac"
+            | "/mac-acwake-status"
+            | "/mac-ac-wake-status"
+            | "acwake status"
+            | "the acwake status"
+            | "ac wake status"
+            | "the ac wake status"
+            | "ac-wake status"
+            | "the ac-wake status"
+            | "wake on ac status"
+            | "the wake on ac status"
+            | "wake-on-ac status"
+            | "the wake-on-ac status"
+            | "acwake state"
+            | "the acwake state"
+            | "ac wake state"
+            | "my acwake"
+            | "my acwake status"
+            | "my ac wake"
+            | "my ac wake status"
+            | "is acwake on"
+            | "is acwake off"
+            | "is acwake enabled"
+            | "is acwake disabled"
+            | "is ac wake on"
+            | "is ac wake off"
+            | "is ac wake enabled"
+            | "is ac wake disabled"
+            | "is ac-wake on"
+            | "is ac-wake enabled"
+            | "is wake on ac on"
+            | "is wake on ac enabled"
+            | "is wake-on-ac on"
+            | "is wake-on-ac enabled"
+            | "what's my acwake"
+            | "whats my acwake"
+            | "what is my acwake"
+            | "what's my acwake status"
+            | "whats my acwake status"
+            | "what is my acwake status"
+            | "what's my ac wake"
+            | "whats my ac wake"
+            | "what is my ac wake"
+            | "what's my ac wake status"
+            | "whats my ac wake status"
+            | "what is my ac wake status"
+            | "what's the acwake"
+            | "whats the acwake"
+            | "what is the acwake"
+            | "what's the acwake status"
+            | "whats the acwake status"
+            | "what is the acwake status"
+            | "what's the ac wake"
+            | "whats the ac wake"
+            | "what is the ac wake"
+            | "what's the ac wake status"
+            | "whats the ac wake status"
+            | "what is the ac wake status"
+            | "how's acwake"
+            | "hows acwake"
+            | "how's the acwake"
+            | "hows the acwake"
+            | "how's ac wake"
+            | "hows ac wake"
+            | "view acwake"
+            | "view the acwake"
+            | "view acwake status"
+            | "view the acwake status"
+            | "view ac wake"
+            | "view the ac wake"
+            | "view ac wake status"
+            | "view the ac wake status"
+            | "view ac-wake"
+            | "view the ac-wake"
+            | "view wake on ac"
+            | "view the wake on ac"
+            | "view wake-on-ac"
+            | "view the wake-on-ac"
+            | "see acwake"
+            | "see the acwake"
+            | "see acwake status"
+            | "see the acwake status"
+            | "see ac wake"
+            | "see the ac wake"
+            | "see wake on ac"
+            | "open acwake"
+            | "open the acwake"
+            | "open acwake status"
+            | "open the acwake status"
+            | "open ac wake"
+            | "open the ac wake"
+            | "open ac-wake"
+            | "open the ac-wake"
+            | "open wake on ac"
+            | "open the wake on ac"
+            | "open wake-on-ac"
+            | "open the wake-on-ac"
+            | "list acwake"
+            | "list the acwake"
+            | "list acwake status"
+            | "list the acwake status"
+            | "list ac wake"
+            | "list the ac wake"
+            | "list ac-wake"
+            | "list the ac-wake"
+            | "list wake on ac"
+            | "list the wake on ac"
+            | "list wake-on-ac"
+            | "list the wake-on-ac"
+    )
+}
+
+/// Zero-LLM AC Wake from pmset (macOS-only; empty elsewhere).
+pub fn format_acwake_report() -> String {
+    let v = crate::metrics::get_acwake_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**AC Wake** — _no AC Wake reading on this Mac right now._".to_string();
+    }
+    format!("**AC Wake** · `{v}`")
 }
 
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
