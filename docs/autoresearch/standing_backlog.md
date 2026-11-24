@@ -1,3 +1,18 @@
+## Overnight note 2026-11-24 ~22:00 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota; already_checked_today).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window (Soul content noise only).
+- Fuel attempt: Power schedule after Sleep assertions v0.1.3046 — **remote raced Power schedule v0.1.3047**; local WIP discarded + remote keep backfill.
+- Then shipped **v0.1.3048** — `/sysload` · `/sys-load` · `/pmset-sysload` · `/load-level` · `/system-load-level` · `/mac-sysload` + view/open NL; bare sysload/sys load/load level stay with agent; `/load` · `/load-1m` · `/thermal` · `/heat` · `/battery` · `/powersched` intact; `/help` lists lane.
+- Ratchet: discard@34220e9 (dup 3047) + keep backfill remote 3047; keep @ 81e0b684a for 3048; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched/sysload — not another keep-pNN clone.
+
+## Overnight merge — v0.1.3048
+
+- Product fuel after Power schedule v0.1.3047 (local powersched race discarded): system load levels already readable via `pmset -g sysload` (combined / user / battery / thermal) but lacked `/sysload` · `/sys-load` · `/pmset-sysload` · `/load-level` · `/system-load-level` · `/mac-sysload` and view/see/open/list phrases while Details `/load` · `/load-1m`, Heat `/thermal` · `/heat`, Bat `/battery`, and Power schedule `/powersched` already had slash+NL. Bare `sysload` / `sys load` / `load level` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled/assertions/powersched/sysload soft-state closed; not another keep-pNN clone.
 ## Overnight note 2026-11-24 ~21:54 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
