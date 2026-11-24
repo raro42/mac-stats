@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~01:56 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Power Mode v0.1.3021 — Half Dim / halfdim slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional; hibernatefile stays out).
+- Shipped **v0.1.3022** — `/halfdim` · `/half-dim` · `/half-brightness` · `/mac-halfdim` + view/open NL; bare halfdim/half dim/half brightness stay with agent; `/lessbright` · `/displaysleep` · `/powermode` · `/dim-display` intact; `/help` lists lane.
+- Ratchet keep @ a20230319 for 3022; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-24 + archive.
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (hibernatefile) — Half Dim slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3022
+
+- Product fuel after Power Mode v0.1.3021: Half Dim already readable via `pmset -g custom` Battery/AC `halfdim` (+ active `pmset -g`; often absent on Apple Silicon) but lacked `/halfdim` · `/half-dim` · `/half-brightness` · `/mac-halfdim` and view/see/open/list phrases while Less Bright `/lessbright`, Display Sleep `/displaysleep`, and Power Mode `/powermode` already had slash+NL. Bare `halfdim` / `half dim` / `half brightness` stay with the agent; hibernatefile stays out. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (hibernatefile) — Half Dim slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~01:51
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
