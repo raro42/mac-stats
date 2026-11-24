@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~04:45 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: standing backlog Light Send after Lid Wake v0.1.3033 (not keep-pNN; Architect Send #007aff optional).
+- Shipped **v0.1.3034** — Light `#chat-send-btn` leaves bare Apple `#007aff` white-on-blue for soft `--accent` `#6aa6df` (white type); Dark/Neon/Material/Swiss/Data Poster/Futuristic parity.
+- Ratchet: keep backfill remote 3033 @ 9d6b9d4; keep @ c128d573f for 3034; install/kickstart + push (themes embedded).
+- Morning surprise: refresh 2026-11-24 + archive.
+- Next fuel: Dark layout-daily next calendar day · Architect Send `#007aff` optional — Light Send closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3034
+
+- Product fuel after Lid Wake v0.1.3033: Light AI Chat Send still used bare Apple `#007aff` white-on-blue while Dark / Neon / Material / Swiss / Data Poster / Futuristic already remapped Send onto theme accent. Light Send now uses soft `--accent` (`#6aa6df`) with white type. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day · Architect Send optional — Light Send closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~04:40 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
