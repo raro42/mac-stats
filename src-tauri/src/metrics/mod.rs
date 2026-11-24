@@ -5162,11 +5162,6 @@ pub(crate) fn parse_pmset_active_autopoweroffdelay(raw: &str) -> Option<u32> {
     None
 }
 
-/// Human Autopower Off delay seconds (reuses Standby delay formatting).
-pub(crate) fn format_autopoweroffdelay_secs(secs: u32) -> String {
-    format_standbydelay_secs(secs)
-}
-
 /// Prefer Battery+AC custom when both set; else active `pmset -g`.
 pub(crate) fn format_autopoweroffdelay_parts(
     battery: Option<u32>,
