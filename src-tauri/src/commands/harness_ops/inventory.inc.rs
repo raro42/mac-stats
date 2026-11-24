@@ -22131,7 +22131,7 @@ pub fn format_hibernatefile_report() -> String {
 /// Slash + view/open NL (`/standbydelay` · `/standby-delay` · `view standbydelay`).
 /// Bare `standbydelay` / `standby delay` stay with the agent;
 /// `/standby` stays Standby; `/hibernatefile` stays Hibernate file;
-/// standbydelayhigh / standbydelaylow / autopoweroff stay out.
+/// standbydelayhigh / standbydelaylow stay out; `/autopoweroff` stays Auto Power Off.
 pub fn looks_like_standbydelay_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -22457,6 +22457,384 @@ pub fn format_standbydelay_report() -> String {
             .to_string();
     }
     format!("**Standby delay** · `{v}`")
+}
+/// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).
+/// Bare `autopoweroff` / `auto power off` stay with the agent;
+/// `/standby` stays Standby; `/standbydelay` stays Standby delay;
+/// autopoweroffdelay stays out.
+pub fn looks_like_autopoweroff_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("autopoweroffdelay")
+        || n.contains("auto power off delay")
+        || n.contains("auto-power-off-delay")
+        || n.contains("autopoweroff delay")
+        || n.contains("standbydelayhigh")
+        || n.contains("standby delay high")
+        || n.contains("standby-delay-high")
+        || n.contains("standbydelaylow")
+        || n.contains("standby delay low")
+        || n.contains("standby-delay-low")
+        || n.contains("standbydelay")
+        || n.contains("standby delay")
+        || n.contains("standby-delay")
+        || n.contains("standby")
+        || n.contains("stand by")
+        || n.contains("stand-by")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("power-mode")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("wake on network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("hard disk sleep")
+        || n.contains("hdd sleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("systemsleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("computersleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("ttys keep awake")
+        || n.contains("tty-keep-awake")
+        || n.contains("ttys-keep-awake")
+        || n.contains("ttykeepawake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("tcp-keep-alive")
+        || n.contains("tcp keepalive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("network-over-sleep")
+        || n.contains("hibernatemode")
+        || n.contains("hibernate mode")
+        || n.contains("hibernate-mode")
+        || n.contains("hibernatefile")
+        || n.contains("hibernate file")
+        || n.contains("hibernate-file")
+        || n.contains("sleepimage")
+        || n.contains("sleep image")
+        || n.contains("sleep-image")
+        || n.contains("sleep on power")
+        || n.contains("sleep-on-power")
+        || n.contains("power button")
+        || n.contains("power-button")
+        || n.contains("sopb")
+        || n.contains("lessbright")
+        || n.contains("less bright")
+        || n.contains("less-bright")
+        || n.contains("slightly dim")
+        || n.contains("slightly-dim")
+        || n.contains("dim display")
+        || n.contains("dim-display")
+        || n.contains("halfdim")
+        || n.contains("half dim")
+        || n.contains("half-dim")
+        || n.contains("half brightness")
+        || n.contains("half-brightness")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        // Bare standby phrases / slash stay with Standby or agent.
+        || n == "standby"
+        || n == "the standby"
+        || n == "stand by"
+        || n == "the stand by"
+        || n == "stand-by"
+        || n == "the stand-by"
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/powermode"
+        || n == "/power-mode"
+        || n == "/mac-powermode"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/proximitywake"
+        || n == "/proximity-wake"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
+        || n == "/display"
+        || n == "/screen"
+        || n == "/resolution"
+        || n == "/disksleep"
+        || n == "/disk-sleep"
+        || n == "/hard-disk-sleep"
+        || n == "/hdd-sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/computer-sleep"
+        || n == "/computersleep"
+        || n == "/sleep"
+        || n == "/ttyskeepawake"
+        || n == "/tty-keep-awake"
+        || n == "/ttys-keep-awake"
+        || n == "/ttykeepawake"
+        || n == "/tcpkeepalive"
+        || n == "/tcp-keep-alive"
+        || n == "/tcp-keepalive"
+        || n == "/networkoversleep"
+        || n == "/network-over-sleep"
+        || n == "/hibernatemode"
+        || n == "/hibernate-mode"
+        || n == "/hibernate"
+        || n == "/hibernatefile"
+        || n == "/hibernate-file"
+        || n == "/sleepimage"
+        || n == "/sleep-image"
+        || n == "/standby"
+        || n == "/stand-by"
+        || n == "/standby-status"
+        || n == "/stand-by-status"
+        || n == "/mac-standby"
+        || n == "/mac-stand-by"
+        || n == "/standbydelay"
+        || n == "/standby-delay"
+        || n == "/mac-standbydelay"
+        || n == "/mac-standby-delay"
+        || n == "/sleep-on-power-button"
+        || n == "/sleep-on-power"
+        || n == "/power-button-sleep"
+        || n == "/sopb"
+        || n == "/lessbright"
+        || n == "/less-bright"
+        || n == "/slightly-dim"
+        || n == "/dim-display"
+        || n == "/halfdim"
+        || n == "/half-dim"
+        || n == "/half-brightness"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "autopoweroff"
+        || n == "the autopoweroff"
+        || n == "auto power off"
+        || n == "the auto power off"
+        || n == "auto-power-off"
+        || n == "the auto-power-off"
+        || n == "auto-poweroff"
+        || n == "the auto-poweroff"
+        || n == "autopower-off"
+        || n == "the autopower-off"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/autopoweroff"
+            | "/autopoweroff-status"
+            | "/autopoweroff-state"
+            | "/auto-power-off"
+            | "/auto-power-off-status"
+            | "/auto-power-off-state"
+            | "/auto-poweroff"
+            | "/auto-poweroff-status"
+            | "/auto-poweroff-state"
+            | "/autopower-off"
+            | "/autopower-off-status"
+            | "/autopower-off-state"
+            | "/mac-autopoweroff"
+            | "/mac-auto-power-off"
+            | "/mac-auto-poweroff"
+            | "/mac-autopower-off"
+            | "/mac-autopoweroff-status"
+            | "/mac-auto-power-off-status"
+            | "autopoweroff status"
+            | "the autopoweroff status"
+            | "auto power off status"
+            | "the auto power off status"
+            | "auto-power-off status"
+            | "the auto-power-off status"
+            | "auto-poweroff status"
+            | "the auto-poweroff status"
+            | "autopower-off status"
+            | "the autopower-off status"
+            | "autopoweroff state"
+            | "the autopoweroff state"
+            | "auto power off state"
+            | "the auto power off state"
+            | "my autopoweroff"
+            | "my autopoweroff status"
+            | "my auto power off"
+            | "my auto power off status"
+            | "my auto-power-off"
+            | "my auto-power-off status"
+            | "is autopoweroff on"
+            | "is autopoweroff off"
+            | "is autopoweroff enabled"
+            | "is autopoweroff disabled"
+            | "is auto power off on"
+            | "is auto power off off"
+            | "is auto power off enabled"
+            | "is auto power off disabled"
+            | "is auto-power-off on"
+            | "is auto-power-off enabled"
+            | "is auto-poweroff on"
+            | "is auto-poweroff enabled"
+            | "what's my autopoweroff"
+            | "whats my autopoweroff"
+            | "what is my autopoweroff"
+            | "what's my autopoweroff status"
+            | "whats my autopoweroff status"
+            | "what is my autopoweroff status"
+            | "what's my auto power off"
+            | "whats my auto power off"
+            | "what is my auto power off"
+            | "what's my auto power off status"
+            | "whats my auto power off status"
+            | "what is my auto power off status"
+            | "what's the autopoweroff"
+            | "whats the autopoweroff"
+            | "what is the autopoweroff"
+            | "what's the autopoweroff status"
+            | "whats the autopoweroff status"
+            | "what is the autopoweroff status"
+            | "what's the auto power off"
+            | "whats the auto power off"
+            | "what is the auto power off"
+            | "what's the auto power off status"
+            | "whats the auto power off status"
+            | "what is the auto power off status"
+            | "how's autopoweroff"
+            | "hows autopoweroff"
+            | "how's the autopoweroff"
+            | "hows the autopoweroff"
+            | "how's auto power off"
+            | "hows auto power off"
+            | "view autopoweroff"
+            | "view the autopoweroff"
+            | "view autopoweroff status"
+            | "view the autopoweroff status"
+            | "view auto power off"
+            | "view the auto power off"
+            | "view auto power off status"
+            | "view the auto power off status"
+            | "view auto-power-off"
+            | "view the auto-power-off"
+            | "view auto-poweroff"
+            | "view the auto-poweroff"
+            | "see autopoweroff"
+            | "see the autopoweroff"
+            | "see autopoweroff status"
+            | "see the autopoweroff status"
+            | "see auto power off"
+            | "see the auto power off"
+            | "open autopoweroff"
+            | "open the autopoweroff"
+            | "open autopoweroff status"
+            | "open the autopoweroff status"
+            | "open auto power off"
+            | "open the auto power off"
+            | "open auto-power-off"
+            | "open the auto-power-off"
+            | "open auto-poweroff"
+            | "open the auto-poweroff"
+            | "list autopoweroff"
+            | "list the autopoweroff"
+            | "list autopoweroff status"
+            | "list the autopoweroff status"
+            | "list auto power off"
+            | "list the auto power off"
+            | "list auto-power-off"
+            | "list the auto-power-off"
+            | "list auto-poweroff"
+            | "list the auto-poweroff"
+    )
+}
+
+/// Zero-LLM Auto Power Off from pmset (macOS-only; empty elsewhere).
+pub fn format_autopoweroff_report() -> String {
+    let v = crate::metrics::get_autopoweroff_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Auto Power Off** — _no Auto Power Off reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**Auto Power Off** · `{v}`")
 }
 
 /// System Sleep — `pmset` Battery/AC `sleep` minutes (+ active fallback; 0 = Never).

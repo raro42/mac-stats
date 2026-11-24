@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.3025] - 2026-11-24
+
+### Added
+- Instant Auto Power Off accepts `/autopoweroff` · `/autopoweroff-status` · `/autopoweroff-state` · `/auto-power-off` · `/auto-power-off-status` · `/auto-power-off-state` · `/auto-poweroff` · `/auto-poweroff-status` · `/auto-poweroff-state` · `/autopower-off` · `/autopower-off-status` · `/autopower-off-state` · `/mac-autopoweroff` · `/mac-auto-power-off` · `/mac-auto-poweroff` · `/mac-autopower-off` · `/mac-autopoweroff-status` · `/mac-auto-power-off-status` and view/see/open/list NL (`view autopoweroff`, `open auto-power-off`, `list auto power off`, …), matching “autopoweroff status” / “is auto power off on” / “is autopoweroff enabled” / “what's my autopoweroff” / “what's the auto power off”. Bare `autopoweroff` / `auto power off` stay with the agent; `/standby` · `/stand-by` stay Standby; `/standbydelay` · `/standby-delay` stay Standby delay; autopoweroffdelay stays out. Operator `/help` lists the new lane.
+
+
 ## [0.1.3024] - 2026-11-24
 
 ### Added

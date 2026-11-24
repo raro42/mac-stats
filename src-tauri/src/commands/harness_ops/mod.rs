@@ -5066,13 +5066,11 @@ mod tests {
     }
 
     #[test]
-
-    #[test]
     fn standbydelay_slash_and_view_open_do_not_steal_standby_or_bare() {
         // Slash + view/open NL → Standby delay (`/standby` · `/hibernatefile` parity).
         // Bare `standbydelay` / `standby delay` stay with the agent;
         // `/standby` stays Standby; `/hibernatefile` stays Hibernate file;
-        // standbydelayhigh / autopoweroff stay out.
+        // standbydelayhigh stay out; `/autopoweroff` stays Auto Power Off.
         assert!(looks_like_standbydelay_request("/standbydelay"));
         assert!(looks_like_standbydelay_request("/standbydelay-status"));
         assert!(looks_like_standbydelay_request("/standby-delay"));
@@ -5122,8 +5120,80 @@ mod tests {
                 "/standby must stay Standby, not Standby delay: {reply}"
             );
         }
+        assert!(!looks_like_standbydelay_request("/autopoweroff"));
+        assert!(!looks_like_standbydelay_request("view autopoweroff"));
+        assert!(!looks_like_autopoweroff_request("/standbydelay"));
     }
 
+    #[test]
+    fn autopoweroff_slash_and_view_open_do_not_steal_standby_or_bare() {
+        // Slash + view/open NL → Auto Power Off (`/standby` · `/standbydelay` parity).
+        // Bare `autopoweroff` / `auto power off` stay with the agent;
+        // `/standby` stays Standby; `/standbydelay` stays Standby delay;
+        // autopoweroffdelay stays out.
+        assert!(looks_like_autopoweroff_request("/autopoweroff"));
+        assert!(looks_like_autopoweroff_request("/autopoweroff-status"));
+        assert!(looks_like_autopoweroff_request("/auto-power-off"));
+        assert!(looks_like_autopoweroff_request("/auto-poweroff"));
+        assert!(looks_like_autopoweroff_request("/mac-autopoweroff"));
+        assert!(looks_like_autopoweroff_request("/mac-auto-power-off"));
+        assert!(looks_like_autopoweroff_request("view autopoweroff"));
+        assert!(looks_like_autopoweroff_request("open auto-power-off"));
+        assert!(looks_like_autopoweroff_request("list auto power off"));
+        assert!(looks_like_autopoweroff_request("autopoweroff status"));
+        assert!(looks_like_autopoweroff_request("is auto power off on"));
+        assert!(looks_like_autopoweroff_request("is autopoweroff enabled"));
+        assert!(looks_like_autopoweroff_request("what's my autopoweroff"));
+        assert!(looks_like_autopoweroff_request("view auto power off"));
+        assert!(!looks_like_autopoweroff_request("autopoweroff"));
+        assert!(!looks_like_autopoweroff_request("auto power off"));
+        assert!(!looks_like_autopoweroff_request("/standby"));
+        assert!(!looks_like_autopoweroff_request("view standby"));
+        assert!(!looks_like_autopoweroff_request("/standbydelay"));
+        assert!(!looks_like_autopoweroff_request("view standbydelay"));
+        assert!(!looks_like_autopoweroff_request("/hibernatefile"));
+        assert!(!looks_like_autopoweroff_request("/tasks"));
+        assert!(!looks_like_autopoweroff_request("enable autopoweroff"));
+        assert!(!looks_like_autopoweroff_request("autopoweroffdelay"));
+        assert!(!looks_like_autopoweroff_request("view autopoweroffdelay"));
+        assert!(!looks_like_standby_request("/autopoweroff"));
+        assert!(!looks_like_standby_request("view autopoweroff"));
+        assert!(!looks_like_standbydelay_request("/autopoweroff"));
+        let s = try_operator_instant_reply("/autopoweroff").unwrap();
+        assert!(
+            s.contains("**Auto Power Off**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view autopoweroff").unwrap();
+        assert!(
+            viewed.contains("**Auto Power Off**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open auto-power-off").unwrap();
+        assert!(
+            open.contains("**Auto Power Off**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("autopoweroff").is_none());
+        assert!(try_operator_instant_reply("auto power off").is_none());
+        let st = try_operator_instant_reply("/standby");
+        if let Some(reply) = st {
+            assert!(
+                !reply.contains("**Auto Power Off**"),
+                "/standby must stay Standby, not Auto Power Off: {reply}"
+            );
+        }
+        let sd = try_operator_instant_reply("/standbydelay");
+        if let Some(reply) = sd {
+            assert!(
+                !reply.contains("**Auto Power Off**"),
+                "/standbydelay must stay Standby delay, not Auto Power Off: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).
         // Bare `charger` / `adapter` stay with the agent; `/watts` stays CPU+GPU; `/battery` · is it charging stay Bat %.
