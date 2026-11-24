@@ -1,27 +1,20 @@
 # Morning surprise — 2026-11-25
 
-Overnight 2026-11-24 → 25 (CET). Digester open empty; design-review due=false (grace / Mac TCC); layout-daily data-poster already marked 2026-11-24 (Dark next calendar day).
+Overnight (2026-11-24 → 25) kept shipping pmset instant lanes.
 
 ## Shipped
-
-- **v0.1.3052** — Power stats instant lane: `/pmstats` · `/pm-stats` · `/power-stats` · `/sleep-stats` · `/wake-stats` · `/sleep-wake-stats` · `/pmset-stats` · `/mac-pmstats` + view/open NL. Reads Sleep / Dark Wake / User Wake counts from `pmset -g stats`. Bare phrases stay with the agent; Power log `/pmlog`, Therm `/therm`, Dark Wakes `/darkwakes`, Sleep assertions `/assertions`, System load `/sysload`, Power schedule `/powersched`, UPS `/ups`, and Heat `/thermal` stay intact.
-- **v0.1.3051** — Therm / CPU speed limits `/therm` · `/cpu-speed-limit` from `pmset -g therm` (remote; local Power-stats WIP rebased to 3052).
-- **v0.1.3050** — Power log `/pmlog` · `/powerlog` from `pmset -g log`.
-- **v0.1.3049** — UPS `/ups` · `/ups-settings`.
-- Ratchet: keep @ b30f9cebb (3052).
+- **v0.1.3053** Power capabilities — `/pmcap` · `/power-cap` · `/power-capabilities` (+ view/open NL) from `pmset -g cap` supported settings list.
+- **v0.1.3052** Power stats — `/pmstats` · `/power-stats` from `pmset -g stats` Sleep/Dark Wake/User Wake counts.
+- Earlier same night: Therm `/therm`, Power log `/pmlog`, UPS `/ups`, System load `/sysload`, Power schedule `/powersched`, Sleep assertions `/assertions`, Sleep Disabled `/sleepdisabled`, and friends.
 
 ## Tried / context
-
-- Digester open empty; design-review grace; layout-daily already checked today — picked Power stats (counts) after Therm, not another Battery/AC soft-state 0/1 key.
-- Sibling OpenClaw/Hermes: no clear port this tick.
+- Digester empty all night (0 Slowest / 7d).
+- Design review surfaces in grace (Mac TCC — polish-without-capture).
+- Layout-daily: data-poster marked 2026-11-24; Dark/Neon/Futuristic wait for next calendar quota.
+- Sibling OpenClaw/Hermes missing on Linux rack; no clear port.
+- Debug.log quiet (no ERROR/WARN clusters).
 
 ## Next
-
 - Dark layout-daily next calendar day.
-- Soft-state leftover closed for SoftDisabled / assertions / powersched / sysload / ups / pmlog / therm / pmstats — try `pmset -g cap` / useractivity; not another keep-pNN clone.
-
-## Try
-
-- `/pmstats` or `view power stats` in Discord / AI Chat (Mac).
-- `/therm` for CPU scheduler / speed limits.
-- `/pmlog` for recent Sleep / Wake event lines.
+- Try `pmset -g useractivity` next (pmcap closed).
+- Not another keep-pNN SoftDisabled clone.
