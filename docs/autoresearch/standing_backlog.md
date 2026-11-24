@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~23:05 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota; already_checked_today).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window (Soul content noise only).
+- Fuel: product after Power source v0.1.3055 — Power custom profiles from `pmset -g custom` Battery vs AC diffs (not SoftDisabled/boolean soft-state clone; not pmps clone; Dark layout-daily next calendar day).
+- Shipped **v0.1.3056** — `/pmcustom` · `/pm-custom` · `/pmset-custom` · `/power-custom` · `/power-profiles` · `/battery-ac-profiles` · `/mac-pmcustom` + view/open NL; bare pmcustom/power custom/power profiles stay with agent; `/powernap` · `/womp` · `/displaysleep` · `/pmcap` · `/useractivity` · `/pmps` · `/pmstats` · `/adapter` intact; `/help` lists lane.
+- Ratchet keep @ 4cceb748a for 3056; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats/pmcap/useractivity/pmps/pmcustom — try other pmset adapters next (history/live/everything if useful); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3056
+
+- Product fuel after Power source v0.1.3055: Battery vs AC profile diffs already readable via `pmset -g custom` but lacked `/pmcustom` · `/pm-custom` · `/pmset-custom` · `/power-custom` · `/power-profiles` · `/battery-ac-profiles` · `/mac-pmcustom` and view/see/open/list phrases while per-key soft-state `/powernap` · `/womp` · `/displaysleep`, Power capabilities `/pmcap`, User activity `/useractivity`, and Power source `/pmps` already had slash+NL. Bare `pmcustom` / `power custom` / `power profiles` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats/pmcap/useractivity/pmps/pmcustom soft-state closed; try other pmset adapters; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~23:55 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
