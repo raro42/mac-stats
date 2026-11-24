@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3037] - 2026-11-24
+
+### Added
+- Instant GPU Switch accepts `/gpuswitch` · `/gpuswitch-status` · `/gpuswitch-state` · `/gpu-switch` · `/gpu-switch-status` · `/gpu-switch-state` · `/graphics-switching` · `/graphics-switching-status` · `/graphics-switching-state` · `/graphicswitching` · `/graphicswitching-status` · `/mac-gpuswitch` · `/mac-gpu-switch` · `/mac-graphics-switching` · `/mac-gpuswitch-status` · `/mac-gpu-switch-status` and view/see/open/list NL (`view gpuswitch`, `open gpu-switch`, `list graphics switching`, …), matching “gpuswitch status” / “is gpu switch on” / “is graphics switching enabled” / “what's my gpuswitch” / “what's the gpu switch”. Bare `gpuswitch` / `gpu switch` / `graphics switching` stay with the agent; `/gpu` stays GPU usage ring; `/gpu-name` · `/gpu-model` stay GPU identity; `/autorestart` · `/auto-restart` stay Auto Restart; `/powermode` · `/power-mode` stay Power Mode; darkwakes stays out. Operator `/help` lists the new lane.
+
 ## [0.1.3036] - 2026-11-24
 
 ### Added

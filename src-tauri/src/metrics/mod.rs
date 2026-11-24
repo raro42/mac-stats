@@ -6108,6 +6108,151 @@ pub fn get_autorestart_status() -> String {
     }
 }
 
+/// Human `gpuswitch` label (Intel dual-GPU / graphics switching pmset codes).
+/// 0 = Integrated · 1 = Discrete · 2 = Auto (often absent on Apple Silicon).
+pub(crate) fn format_gpuswitch_code(mode: u32) -> String {
+    match mode {
+        0 => "0 (Integrated)".to_string(),
+        1 => "1 (Discrete)".to_string(),
+        2 => "2 (Auto)".to_string(),
+        n => format!("{n}"),
+    }
+}
+
+/// Prefer Battery+AC custom when both set; else active `pmset -g`.
+pub(crate) fn format_gpuswitch_parts(
+    battery: Option<u32>,
+    ac: Option<u32>,
+    active: Option<u32>,
+) -> String {
+    match (battery, ac) {
+        (Some(b), Some(a)) if b == a => format_gpuswitch_code(b),
+        (Some(b), Some(a)) => {
+            format!(
+                "AC {} · Battery {}",
+                format_gpuswitch_code(a),
+                format_gpuswitch_code(b)
+            )
+        }
+        (Some(b), None) => format!("{} (Battery)", format_gpuswitch_code(b)),
+        (None, Some(a)) => format!("{} (AC)", format_gpuswitch_code(a)),
+        (None, None) => match active {
+            Some(m) => format_gpuswitch_code(m),
+            None => String::new(),
+        },
+    }
+}
+
+/// Parse `pmset -g custom` Battery/AC `gpuswitch` → (battery, ac).
+/// Exact key `gpuswitch` only (graphics switching; often absent on Apple Silicon).
+pub(crate) fn parse_pmset_custom_gpuswitch(raw: &str) -> (Option<u32>, Option<u32>) {
+    let mut section: Option<&str> = None;
+    let mut battery = None;
+    let mut ac = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.eq_ignore_ascii_case("Battery Power:") {
+            section = Some("battery");
+            continue;
+        }
+        if t.eq_ignore_ascii_case("AC Power:") {
+            section = Some("ac");
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("gpuswitch") {
+            continue;
+        }
+        let mode = match parts.next().and_then(|v| v.parse::<u32>().ok()) {
+            Some(v) => Some(v),
+            None => continue,
+        };
+        match section {
+            Some("battery") => battery = mode.or(battery),
+            Some("ac") => ac = mode.or(ac),
+            _ => {}
+        }
+    }
+    (battery, ac)
+}
+
+/// Parse active `pmset -g` `gpuswitch` (Currently in use).
+pub(crate) fn parse_pmset_active_gpuswitch(raw: &str) -> Option<u32> {
+    for line in raw.lines() {
+        let mut parts = line.trim().split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("gpuswitch") {
+            continue;
+        }
+        return parts.next().and_then(|v| v.parse::<u32>().ok());
+    }
+    None
+}
+
+/// macOS GPU Switch from `pmset -g custom` Battery/AC `gpuswitch`
+/// (fallback: active `pmset -g`). Distinct from GPU usage ring `/gpu`,
+/// GPU identity `/gpu-name`, and Auto Restart `/autorestart`.
+/// Used by Discord/operator instant `/gpuswitch` · `/gpu-switch` lane.
+pub fn get_gpuswitch_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let (battery, ac) = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g", "custom"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_custom_gpuswitch(&stdout)
+                }
+                Ok(_) => (None, None),
+                Err(_) => {
+                    debug3!("gpuswitch: pmset -g custom spawn failed");
+                    (None, None)
+                }
+            }
+        };
+
+        let active = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_active_gpuswitch(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("gpuswitch: pmset -g spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_gpuswitch_parts(battery, ac, active);
+        if info.is_empty() {
+            debug3!("gpuswitch: empty status");
+        } else {
+            debug3!("gpuswitch status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -10999,6 +11144,81 @@ AC Power:
         );
         assert_eq!(format_autorestart_parts(None, None, Some(true)), "On");
         assert_eq!(format_autorestart_parts(None, None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod gpuswitch_parse_tests {
+    use super::{
+        format_gpuswitch_code, format_gpuswitch_parts, parse_pmset_active_gpuswitch,
+        parse_pmset_custom_gpuswitch,
+    };
+
+    #[test]
+    fn parses_custom_battery_and_ac() {
+        let sample = r#"
+Battery Power:
+ gpuswitch            2
+ standby              1
+AC Power:
+ gpuswitch            0
+ womp                 1
+"#;
+        assert_eq!(
+            parse_pmset_custom_gpuswitch(sample),
+            (Some(2), Some(0))
+        );
+        assert_eq!(parse_pmset_custom_gpuswitch("nope"), (None, None));
+        let other = r#"
+Battery Power:
+ standby              1
+AC Power:
+ autorestart          1
+"#;
+        assert_eq!(parse_pmset_custom_gpuswitch(other), (None, None));
+    }
+
+    #[test]
+    fn parses_active_gpuswitch() {
+        assert_eq!(
+            parse_pmset_active_gpuswitch("Currently in use:\n gpuswitch            2\n"),
+            Some(2)
+        );
+        assert_eq!(
+            parse_pmset_active_gpuswitch(" gpuswitch            1\n"),
+            Some(1)
+        );
+        assert_eq!(parse_pmset_active_gpuswitch(" womp                 1\n"), None);
+        assert_eq!(parse_pmset_active_gpuswitch(" autorestart          1\n"), None);
+    }
+
+    #[test]
+    fn formats_codes_matched_split_and_active() {
+        assert_eq!(format_gpuswitch_code(0), "0 (Integrated)");
+        assert_eq!(format_gpuswitch_code(1), "1 (Discrete)");
+        assert_eq!(format_gpuswitch_code(2), "2 (Auto)");
+        assert_eq!(format_gpuswitch_code(9), "9");
+        assert_eq!(
+            format_gpuswitch_parts(Some(2), Some(2), Some(0)),
+            "2 (Auto)"
+        );
+        assert_eq!(
+            format_gpuswitch_parts(Some(2), Some(0), None),
+            "AC 0 (Integrated) · Battery 2 (Auto)"
+        );
+        assert_eq!(
+            format_gpuswitch_parts(Some(1), None, None),
+            "1 (Discrete) (Battery)"
+        );
+        assert_eq!(
+            format_gpuswitch_parts(None, Some(0), None),
+            "0 (Integrated) (AC)"
+        );
+        assert_eq!(
+            format_gpuswitch_parts(None, None, Some(2)),
+            "2 (Auto)"
+        );
+        assert_eq!(format_gpuswitch_parts(None, None, None), "");
     }
 }
 

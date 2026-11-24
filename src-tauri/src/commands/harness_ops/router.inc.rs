@@ -1295,6 +1295,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_autorestart_request(content) {
         return Some(format_autorestart_report());
     }
+    // GPU Switch (bare `gpuswitch` / `gpu switch` / `graphics switching` stay with the agent;
+    // `/gpu` stays GPU usage ring; `/gpu-name` stays GPU identity; `/autorestart` stays Auto Restart;
+    // `/powermode` stays Power Mode; darkwakes stays out).
+    if looks_like_gpuswitch_request(content) {
+        return Some(format_gpuswitch_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

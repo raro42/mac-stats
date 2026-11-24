@@ -5651,6 +5651,69 @@ mod tests {
     }
 
     #[test]
+    fn gpuswitch_slash_and_view_open_do_not_steal_gpu_or_bare() {
+        // Slash + view/open NL → GPU Switch (`/autorestart` · `/powermode` parity).
+        // Bare `gpuswitch` / `gpu switch` / `graphics switching` stay with the agent;
+        // `/gpu` stays GPU ring; `/gpu-name` stays GPU identity; `/autorestart` stays Auto Restart.
+        assert!(looks_like_gpuswitch_request("/gpuswitch"));
+        assert!(looks_like_gpuswitch_request("/gpuswitch-status"));
+        assert!(looks_like_gpuswitch_request("/gpu-switch"));
+        assert!(looks_like_gpuswitch_request("/graphics-switching"));
+        assert!(looks_like_gpuswitch_request("/mac-gpuswitch"));
+        assert!(looks_like_gpuswitch_request("/mac-gpu-switch"));
+        assert!(looks_like_gpuswitch_request("view gpuswitch"));
+        assert!(looks_like_gpuswitch_request("open gpu-switch"));
+        assert!(looks_like_gpuswitch_request("list graphics switching"));
+        assert!(looks_like_gpuswitch_request("gpuswitch status"));
+        assert!(looks_like_gpuswitch_request("is gpu switch on"));
+        assert!(looks_like_gpuswitch_request("what's my gpuswitch"));
+        assert!(looks_like_gpuswitch_request("view gpu switch"));
+        assert!(!looks_like_gpuswitch_request("gpuswitch"));
+        assert!(!looks_like_gpuswitch_request("gpu switch"));
+        assert!(!looks_like_gpuswitch_request("graphics switching"));
+        assert!(!looks_like_gpuswitch_request("/gpu"));
+        assert!(!looks_like_gpuswitch_request("view gpu"));
+        assert!(!looks_like_gpuswitch_request("/gpu-name"));
+        assert!(!looks_like_gpuswitch_request("/autorestart"));
+        assert!(!looks_like_gpuswitch_request("/powermode"));
+        assert!(!looks_like_gpuswitch_request("/tasks"));
+        assert!(!looks_like_gpuswitch_request("enable gpuswitch"));
+        assert!(!looks_like_autorestart_request("/gpuswitch"));
+        assert!(!looks_like_autorestart_request("view gpuswitch"));
+        let s = try_operator_instant_reply("/gpuswitch").unwrap();
+        assert!(
+            s.contains("**GPU Switch**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view gpuswitch").unwrap();
+        assert!(
+            viewed.contains("**GPU Switch**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open gpu-switch").unwrap();
+        assert!(
+            open.contains("**GPU Switch**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("gpuswitch").is_none());
+        assert!(try_operator_instant_reply("gpu switch").is_none());
+        let gpu = try_operator_instant_reply("/gpu");
+        if let Some(reply) = gpu {
+            assert!(
+                !reply.contains("**GPU Switch**"),
+                "/gpu must stay GPU ring, not GPU Switch: {reply}"
+            );
+        }
+        let ar = try_operator_instant_reply("/autorestart");
+        if let Some(reply) = ar {
+            assert!(
+                !reply.contains("**GPU Switch**"),
+                "/autorestart must stay Auto Restart, not GPU Switch: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn autorestart_slash_and_view_open_do_not_steal_autopoweroff_or_bare() {
         // Slash + view/open NL → Auto Restart (`/lidwake` · `/autopoweroff` parity).
         // Bare `autorestart` / `auto restart` stay with the agent;

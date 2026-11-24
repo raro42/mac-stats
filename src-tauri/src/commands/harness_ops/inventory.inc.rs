@@ -24419,6 +24419,259 @@ pub fn format_autorestart_report() -> String {
     format!("**Auto Restart** · `{v}`")
 }
 
+/// GPU Switch — `pmset` Battery/AC `gpuswitch` (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/gpuswitch` · `/gpu-switch` · `/graphics-switching` · `view gpuswitch`).
+/// Bare `gpuswitch` / `gpu switch` / `graphics switching` stay with the agent;
+/// `/gpu` stays GPU usage ring; `/gpu-name` · `/gpu-model` stay GPU identity;
+/// `/autorestart` stays Auto Restart; `/powermode` stays Power Mode.
+pub fn looks_like_gpuswitch_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("gpu-name")
+        || n.contains("gpu name")
+        || n.contains("gpu-model")
+        || n.contains("gpu model")
+        || n.contains("gpu-chip")
+        || n.contains("gpu chip")
+        || n.contains("gpu-chipset")
+        || n.contains("gpu chipset")
+        || n.contains("gpu-cores")
+        || n.contains("gpu cores")
+        || n.contains("chipset")
+        || n.contains("metal")
+        || n.contains("autorestart")
+        || n.contains("auto restart")
+        || n.contains("auto-restart")
+        || n.contains("restart on power loss")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("power-mode")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("darkwakes")
+        || n.contains("dark wakes")
+        || n.contains("dark-wakes")
+        || n.contains("lidwake")
+        || n.contains("lid wake")
+        || n.contains("acwake")
+        || n.contains("ac wake")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("standby")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n == "/gpu"
+        || n == "/gpu-ring"
+        || n == "/gpuring"
+        || n == "/gpu-name"
+        || n == "/gpu-model"
+        || n == "/gpu-chip"
+        || n == "/gpu-chipset"
+        || n == "/gpu-cores"
+        || n == "/chipset"
+        || n == "/metal"
+        || n == "/autorestart"
+        || n == "/auto-restart"
+        || n == "/powermode"
+        || n == "/power-mode"
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "gpuswitch"
+        || n == "the gpuswitch"
+        || n == "gpu switch"
+        || n == "the gpu switch"
+        || n == "gpu-switch"
+        || n == "the gpu-switch"
+        || n == "graphics switching"
+        || n == "the graphics switching"
+        || n == "graphics-switching"
+        || n == "the graphics-switching"
+        || n == "automatic graphics switching"
+        || n == "the automatic graphics switching"
+        // GPU ring / identity bare phrases stay out.
+        || n == "gpu"
+        || n == "the gpu"
+        || n == "view gpu"
+        || n == "open gpu"
+        || n == "see gpu"
+        || n == "list gpu"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/gpuswitch"
+            | "/gpuswitch-status"
+            | "/gpuswitch-state"
+            | "/gpu-switch"
+            | "/gpu-switch-status"
+            | "/gpu-switch-state"
+            | "/graphics-switching"
+            | "/graphics-switching-status"
+            | "/graphics-switching-state"
+            | "/graphicswitching"
+            | "/graphicswitching-status"
+            | "/mac-gpuswitch"
+            | "/mac-gpu-switch"
+            | "/mac-graphics-switching"
+            | "/mac-gpuswitch-status"
+            | "/mac-gpu-switch-status"
+            | "gpuswitch status"
+            | "the gpuswitch status"
+            | "gpu switch status"
+            | "the gpu switch status"
+            | "gpu-switch status"
+            | "the gpu-switch status"
+            | "graphics switching status"
+            | "the graphics switching status"
+            | "graphics-switching status"
+            | "the graphics-switching status"
+            | "gpuswitch state"
+            | "the gpuswitch state"
+            | "gpu switch state"
+            | "the gpu switch state"
+            | "my gpuswitch"
+            | "my gpuswitch status"
+            | "my gpu switch"
+            | "my gpu switch status"
+            | "my graphics switching"
+            | "my graphics switching status"
+            | "is gpuswitch on"
+            | "is gpuswitch off"
+            | "is gpuswitch enabled"
+            | "is gpuswitch disabled"
+            | "is gpu switch on"
+            | "is gpu switch off"
+            | "is gpu switch enabled"
+            | "is gpu switch disabled"
+            | "is graphics switching on"
+            | "is graphics switching enabled"
+            | "what's my gpuswitch"
+            | "whats my gpuswitch"
+            | "what is my gpuswitch"
+            | "what's my gpuswitch status"
+            | "whats my gpuswitch status"
+            | "what is my gpuswitch status"
+            | "what's my gpu switch"
+            | "whats my gpu switch"
+            | "what is my gpu switch"
+            | "what's my gpu switch status"
+            | "whats my gpu switch status"
+            | "what is my gpu switch status"
+            | "what's my graphics switching"
+            | "whats my graphics switching"
+            | "what is my graphics switching"
+            | "what's the gpuswitch"
+            | "whats the gpuswitch"
+            | "what is the gpuswitch"
+            | "what's the gpuswitch status"
+            | "whats the gpuswitch status"
+            | "what is the gpuswitch status"
+            | "what's the gpu switch"
+            | "whats the gpu switch"
+            | "what is the gpu switch"
+            | "what's the gpu switch status"
+            | "whats the gpu switch status"
+            | "what is the gpu switch status"
+            | "what's the graphics switching"
+            | "whats the graphics switching"
+            | "what is the graphics switching"
+            | "how's gpuswitch"
+            | "hows gpuswitch"
+            | "how's the gpuswitch"
+            | "hows the gpuswitch"
+            | "how's gpu switch"
+            | "hows gpu switch"
+            | "view gpuswitch"
+            | "view the gpuswitch"
+            | "view gpuswitch status"
+            | "view the gpuswitch status"
+            | "view gpu switch"
+            | "view the gpu switch"
+            | "view gpu switch status"
+            | "view the gpu switch status"
+            | "view gpu-switch"
+            | "view the gpu-switch"
+            | "view graphics switching"
+            | "view the graphics switching"
+            | "view graphics-switching"
+            | "view the graphics-switching"
+            | "see gpuswitch"
+            | "see the gpuswitch"
+            | "see gpuswitch status"
+            | "see the gpuswitch status"
+            | "see gpu switch"
+            | "see the gpu switch"
+            | "see graphics switching"
+            | "see the graphics switching"
+            | "open gpuswitch"
+            | "open the gpuswitch"
+            | "open gpuswitch status"
+            | "open the gpuswitch status"
+            | "open gpu switch"
+            | "open the gpu switch"
+            | "open gpu-switch"
+            | "open the gpu-switch"
+            | "open graphics switching"
+            | "open the graphics switching"
+            | "open graphics-switching"
+            | "open the graphics-switching"
+            | "list gpuswitch"
+            | "list the gpuswitch"
+            | "list gpuswitch status"
+            | "list the gpuswitch status"
+            | "list gpu switch"
+            | "list the gpu switch"
+            | "list gpu-switch"
+            | "list the gpu-switch"
+            | "list graphics switching"
+            | "list the graphics switching"
+            | "list graphics-switching"
+            | "list the graphics-switching"
+    )
+}
+
+/// Zero-LLM GPU Switch from pmset (macOS-only; empty elsewhere).
+pub fn format_gpuswitch_report() -> String {
+    let v = crate::metrics::get_gpuswitch_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**GPU Switch** — _no GPU Switch reading on this Mac right now._".to_string();
+    }
+    format!("**GPU Switch** · `{v}`")
+}
+
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).
 /// Bare `autopoweroff` / `auto power off` stay with the agent;
