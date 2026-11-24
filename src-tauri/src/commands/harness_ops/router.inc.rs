@@ -1411,6 +1411,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_pmps_request(content) {
         return Some(format_pmps_report());
     }
+    // Power custom profiles from `pmset -g custom` (bare `pmcustom` / `power custom` / `power profiles` stay with the agent;
+    // per-key soft-state stays put; `/pmcap` stays Power capabilities; `/useractivity` stays User activity;
+    // `/pmps` stays Power source; `/pmstats` stays Power stats; `/adapter` · `/charger` stay AC charger).
+    if looks_like_pmcustom_request(content) {
+        return Some(format_pmcustom_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

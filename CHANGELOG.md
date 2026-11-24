@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.3056] - 2026-11-24
+
+### Added
+- Instant Power custom profiles accepts `/pmcustom` · `/pmcustom-status` · `/pmcustom-state` · `/pm-custom` · `/pm-custom-status` · `/pm-custom-state` · `/pmset-custom` · `/pmset-custom-status` · `/pmset-custom-state` · `/pmsetcustom` · `/pmsetcustom-status` · `/power-custom` · `/power-custom-status` · `/power-custom-state` · `/powercustom` · `/powercustom-status` · `/power-profiles` · `/power-profiles-status` · `/power-profiles-state` · `/powerprofiles` · `/powerprofiles-status` · `/battery-ac` · `/battery-ac-status` · `/battery-ac-profiles` · `/battery-ac-profiles-status` · `/bat-ac-profiles` · `/bat-ac-profiles-status` · `/mac-pmcustom` · `/mac-pm-custom` · `/mac-pmset-custom` · `/mac-power-custom` · `/mac-power-profiles` · `/mac-battery-ac` · `/mac-battery-ac-profiles` · `/mac-pmcustom-status` · `/mac-power-profiles-status` and view/see/open/list NL (`view pmcustom`, `open power-profiles`, `list power profiles`, ...), matching "pmcustom status" / "is pmcustom ok" / "what's my pmcustom" / "what's the power profiles". Bare `pmcustom` / `power custom` / `power profiles` stay with the agent; per-key soft-state `/powernap` · `/womp` · `/displaysleep` stay put; `/pmcap` · `/power-cap` stay Power capabilities; `/useractivity` · `/user-activity` stay User activity; `/pmps` · `/power-source` stay Power source; `/pmstats` · `/power-stats` stay Power stats; `/adapter` · `/charger` stay AC charger. Uses `pmset -g custom` (Battery vs AC diffs; path-like values skipped). Operator `/help` lists the new lane.
+
+
 ## [0.1.3055] - 2026-11-24
 
 ### Added

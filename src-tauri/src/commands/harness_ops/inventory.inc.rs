@@ -28902,6 +28902,13 @@ pub fn looks_like_useractivity_request(content: &str) -> bool {
         || n.contains("login name")
         || n.contains("account name")
         || n == "/pmcap"
+        || n == "/pmcustom"
+        || n == "/power-custom"
+        || n == "/power-profiles"
+        || n == "view pmcustom"
+        || n.contains("power custom")
+        || n.contains("power profiles")
+        || n.contains("pmcustom")
         || n == "/power-cap"
         || n == "/power-capabilities"
         || n == "view pmcap"
@@ -29155,6 +29162,13 @@ pub fn looks_like_pmps_request(content: &str) -> bool {
         || n.contains("debug log")
         || n.contains("process")
         || n == "/processes"
+        || n == "/pmcustom"
+        || n == "/power-custom"
+        || n == "/power-profiles"
+        || n == "view pmcustom"
+        || n.contains("power custom")
+        || n.contains("power profiles")
+        || n.contains("pmcustom")
         || n == "/top"
         || n == "view processes"
         || n == "open processes"
@@ -29389,6 +29403,363 @@ pub fn format_pmps_report() -> String {
         return "**Power source** — _no power source listed on this Mac right now._".to_string();
     }
     format!("**Power source** · `{v}`")
+}
+
+/// Power custom profiles — Battery vs AC diffs from `pmset -g custom`.
+/// Slash + view/open NL (`/pmcustom` · `/power-profiles` · `view pmcustom`).
+/// Bare `pmcustom` / `power custom` / `power profiles` stay with the agent;
+/// per-key soft-state (`/powernap`, `/womp`, `/displaysleep`, …) stays put;
+/// `/pmcap` stays Power capabilities; `/useractivity` stays User activity;
+/// `/pmps` stays Power source; `/pmstats` stays Power stats; `/adapter` · `/charger` stay AC charger.
+pub fn looks_like_pmcustom_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n == "/womp"
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("hibernatemode")
+        || n.contains("hibernate mode")
+        || n == "/standby"
+        || n == "/stand-by"
+        || n.contains("standbydelay")
+        || n.contains("autopoweroff")
+        || n.contains("auto power off")
+        || n.contains("autorestart")
+        || n.contains("auto restart")
+        || n.contains("gpuswitch")
+        || n.contains("gpu switch")
+        || n.contains("darkwakes")
+        || n.contains("dark wakes")
+        || n.contains("lessbright")
+        || n.contains("less bright")
+        || n.contains("reducebrightness")
+        || n.contains("reduce brightness")
+        || n.contains("halfdim")
+        || n.contains("half dim")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n == "/sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n.contains("sleep on power button")
+        || n == "/sopb"
+        || n == "/sms"
+        || n.contains("sudden motion")
+        || n == "/ring"
+        || n.contains("modem ring")
+        || n.contains("sleepdisabled")
+        || n.contains("sleep disabled")
+        || n.contains("assertions")
+        || n.contains("preventer")
+        || n.contains("powersched")
+        || n.contains("power schedule")
+        || n.contains("sysload")
+        || n.contains("sys load")
+        || n.contains("load level")
+        || n == "/ups"
+        || n == "/ups-settings"
+        || n.contains("pmlog")
+        || n.contains("power log")
+        || n == "/therm"
+        || n.contains("cpu speed limit")
+        || n.contains("thermal limits")
+        || n.contains("pmstats")
+        || n.contains("power stats")
+        || n.contains("sleep stats")
+        || n.contains("pmcap")
+        || n.contains("power cap")
+        || n.contains("power capabilities")
+        || n.contains("useractivity")
+        || n.contains("user activity")
+        || n.contains("activity level")
+        || n.contains("pmps")
+        || n.contains("power source")
+        || n.contains("now drawing")
+        || n == "/ps"
+        || n == "/idle-time"
+        || n.contains("screensaver")
+        || n == "/username"
+        || n == "/whoami"
+        || n == "/adapter"
+        || n == "/charger"
+        || n == "/ac-charger"
+        || n == "view adapter"
+        || n == "view charger"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        || n == "/stats"
+        || n == "/thermal"
+        || n == "/heat"
+        || n == "pmcustom"
+        || n == "the pmcustom"
+        || n == "pm-custom"
+        || n == "the pm-custom"
+        || n == "pm custom"
+        || n == "the pm custom"
+        || n == "pmsetcustom"
+        || n == "the pmsetcustom"
+        || n == "pmset-custom"
+        || n == "the pmset-custom"
+        || n == "pmset custom"
+        || n == "the pmset custom"
+        || n == "powercustom"
+        || n == "the powercustom"
+        || n == "power-custom"
+        || n == "the power-custom"
+        || n == "power custom"
+        || n == "the power custom"
+        || n == "powerprofiles"
+        || n == "the powerprofiles"
+        || n == "power-profiles"
+        || n == "the power-profiles"
+        || n == "power profiles"
+        || n == "the power profiles"
+        || n == "battery-ac"
+        || n == "the battery-ac"
+        || n == "battery ac"
+        || n == "the battery ac"
+        || n == "battery-ac-profiles"
+        || n == "the battery-ac-profiles"
+        || n == "battery ac profiles"
+        || n == "the battery ac profiles"
+        || n == "custom profiles"
+        || n == "the custom profiles"
+        || n == "custom"
+        || n == "the custom"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+            "/pmcustom"
+            | "/pmcustom-status"
+            | "/pmcustom-state"
+            | "/pm-custom"
+            | "/pm-custom-status"
+            | "/pm-custom-state"
+            | "/pmset-custom"
+            | "/pmset-custom-status"
+            | "/pmset-custom-state"
+            | "/pmsetcustom"
+            | "/pmsetcustom-status"
+            | "/power-custom"
+            | "/power-custom-status"
+            | "/power-custom-state"
+            | "/powercustom"
+            | "/powercustom-status"
+            | "/power-profiles"
+            | "/power-profiles-status"
+            | "/power-profiles-state"
+            | "/powerprofiles"
+            | "/powerprofiles-status"
+            | "/battery-ac"
+            | "/battery-ac-status"
+            | "/battery-ac-profiles"
+            | "/battery-ac-profiles-status"
+            | "/bat-ac-profiles"
+            | "/bat-ac-profiles-status"
+            | "/mac-pmcustom"
+            | "/mac-pm-custom"
+            | "/mac-pmset-custom"
+            | "/mac-power-custom"
+            | "/mac-power-profiles"
+            | "/mac-battery-ac"
+            | "/mac-battery-ac-profiles"
+            | "/mac-pmcustom-status"
+            | "/mac-power-profiles-status"
+            | "pmcustom status"
+            | "the pmcustom status"
+            | "pmcustom state"
+            | "the pmcustom state"
+            | "pm-custom status"
+            | "the pm-custom status"
+            | "pm custom status"
+            | "the pm custom status"
+            | "pmset-custom status"
+            | "the pmset-custom status"
+            | "pmset custom status"
+            | "the pmset custom status"
+            | "power-custom status"
+            | "the power-custom status"
+            | "power custom status"
+            | "the power custom status"
+            | "power-profiles status"
+            | "the power-profiles status"
+            | "power profiles status"
+            | "the power profiles status"
+            | "battery-ac status"
+            | "the battery-ac status"
+            | "battery ac status"
+            | "the battery ac status"
+            | "battery-ac-profiles status"
+            | "the battery-ac-profiles status"
+            | "battery ac profiles status"
+            | "the battery ac profiles status"
+            | "my pmcustom"
+            | "my pmcustom status"
+            | "my power custom"
+            | "my power profiles"
+            | "my battery ac profiles"
+            | "is pmcustom ok"
+            | "is the pmcustom ok"
+            | "how's pmcustom"
+            | "hows pmcustom"
+            | "how's the pmcustom"
+            | "hows the pmcustom"
+            | "how's power profiles"
+            | "hows power profiles"
+            | "what's my pmcustom"
+            | "whats my pmcustom"
+            | "what is my pmcustom"
+            | "what's my pmcustom status"
+            | "whats my pmcustom status"
+            | "what is my pmcustom status"
+            | "what's my power custom"
+            | "whats my power custom"
+            | "what is my power custom"
+            | "what's my power profiles"
+            | "whats my power profiles"
+            | "what is my power profiles"
+            | "what's the pmcustom"
+            | "whats the pmcustom"
+            | "what is the pmcustom"
+            | "what's the pmcustom status"
+            | "whats the pmcustom status"
+            | "what is the pmcustom status"
+            | "what's the power custom"
+            | "whats the power custom"
+            | "what is the power custom"
+            | "what's the power profiles"
+            | "whats the power profiles"
+            | "what is the power profiles"
+            | "view pmcustom"
+            | "view the pmcustom"
+            | "view pmcustom status"
+            | "view the pmcustom status"
+            | "view pm-custom"
+            | "view the pm-custom"
+            | "view pm custom"
+            | "view the pm custom"
+            | "view pmset-custom"
+            | "view the pmset-custom"
+            | "view pmset custom"
+            | "view the pmset custom"
+            | "view power-custom"
+            | "view the power-custom"
+            | "view power custom"
+            | "view the power custom"
+            | "view power-profiles"
+            | "view the power-profiles"
+            | "view power profiles"
+            | "view the power profiles"
+            | "view battery-ac"
+            | "view the battery-ac"
+            | "view battery ac"
+            | "view the battery ac"
+            | "view battery-ac-profiles"
+            | "view the battery-ac-profiles"
+            | "view battery ac profiles"
+            | "view the battery ac profiles"
+            | "see pmcustom"
+            | "see the pmcustom"
+            | "see power custom"
+            | "see the power custom"
+            | "see power profiles"
+            | "see the power profiles"
+            | "open pmcustom"
+            | "open the pmcustom"
+            | "open pmcustom status"
+            | "open the pmcustom status"
+            | "open pm-custom"
+            | "open power-custom"
+            | "open power custom"
+            | "open power-profiles"
+            | "open power profiles"
+            | "open battery-ac"
+            | "open battery-ac-profiles"
+            | "open pmset-custom"
+            | "list pmcustom"
+            | "list the pmcustom"
+            | "list pmcustom status"
+            | "list the pmcustom status"
+            | "list pm-custom"
+            | "list the pm-custom"
+            | "list power-custom"
+            | "list the power-custom"
+            | "list power custom"
+            | "list the power custom"
+            | "list power-profiles"
+            | "list the power-profiles"
+            | "list power profiles"
+            | "list the power profiles"
+            | "list battery-ac"
+            | "list battery-ac-profiles"
+            | "list battery ac profiles"
+    )
+}
+
+/// Zero-LLM Battery/AC power profile diffs from `pmset -g custom` (macOS-only; empty elsewhere).
+pub fn format_pmcustom_report() -> String {
+    let v = crate::metrics::get_pmcustom_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Power custom** — _no Battery/AC profiles on this Mac right now._".to_string();
+    }
+    format!("**Power custom** · `{v}`")
 }
 
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).

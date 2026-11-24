@@ -8375,6 +8375,157 @@ pub fn get_pmps_status() -> String {
     }
 }
 
+/// Parse `pmset -g custom` → Battery / AC key→value maps (last token = value).
+/// Skips empty lines; section headers set the active map.
+pub(crate) fn parse_pmset_custom_profiles(
+    raw: &str,
+) -> (
+    std::collections::BTreeMap<String, String>,
+    std::collections::BTreeMap<String, String>,
+) {
+    let mut battery = std::collections::BTreeMap::new();
+    let mut ac = std::collections::BTreeMap::new();
+    let mut section: Option<&str> = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        if t.eq_ignore_ascii_case("Battery Power:") {
+            section = Some("battery");
+            continue;
+        }
+        if t.eq_ignore_ascii_case("AC Power:") {
+            section = Some("ac");
+            continue;
+        }
+        let Some(sec) = section else {
+            continue;
+        };
+        let mut parts: Vec<&str> = t.split_whitespace().collect();
+        if parts.len() < 2 {
+            continue;
+        }
+        let val = parts.pop().unwrap_or("").to_string();
+        if val.is_empty() {
+            continue;
+        }
+        // Skip path-like values (hibernatefile) — too long for status chips.
+        if val.contains('/') {
+            continue;
+        }
+        let key = parts.join(" ");
+        if key.is_empty() {
+            continue;
+        }
+        match sec {
+            "battery" => {
+                battery.insert(key, val);
+            }
+            "ac" => {
+                ac.insert(key, val);
+            }
+            _ => {}
+        }
+    }
+    (battery, ac)
+}
+
+/// Compact Battery vs AC diffs from `pmset -g custom`.
+/// Example: `displaysleep 2/5 · womp 0/1 · lessbright bat 1` or `Battery=AC (12 keys)`.
+pub(crate) fn format_pmcustom_parts(
+    battery: &std::collections::BTreeMap<String, String>,
+    ac: &std::collections::BTreeMap<String, String>,
+) -> String {
+    if battery.is_empty() && ac.is_empty() {
+        return String::new();
+    }
+    let mut keys = std::collections::BTreeSet::new();
+    keys.extend(battery.keys().cloned());
+    keys.extend(ac.keys().cloned());
+    let mut diffs: Vec<String> = Vec::new();
+    for key in keys.iter() {
+        let b = battery.get(key);
+        let a = ac.get(key);
+        match (b, a) {
+            (Some(bv), Some(av)) if bv == av => {}
+            (Some(bv), Some(av)) => {
+                let label = shorten_pmcustom_key(key);
+                diffs.push(format!("{label} {bv}/{av}"));
+            }
+            (Some(bv), None) => {
+                let label = shorten_pmcustom_key(key);
+                diffs.push(format!("{label} bat {bv}"));
+            }
+            (None, Some(av)) => {
+                let label = shorten_pmcustom_key(key);
+                diffs.push(format!("{label} ac {av}"));
+            }
+            (None, None) => {}
+        }
+    }
+    if diffs.is_empty() {
+        return format!("Battery=AC ({} keys)", keys.len());
+    }
+    const MAX: usize = 10;
+    if diffs.len() > MAX {
+        let extra = diffs.len() - MAX;
+        diffs.truncate(MAX);
+        diffs.push(format!("+{extra} more"));
+    }
+    diffs.join(" · ")
+}
+
+fn shorten_pmcustom_key(key: &str) -> String {
+    let lower = key.to_ascii_lowercase();
+    if lower == "sleep on power button" {
+        return "sopb".to_string();
+    }
+    if !key.contains(' ') {
+        return key.to_string();
+    }
+    lower.replace(' ', "-")
+}
+
+/// macOS Battery/AC power profiles from `pmset -g custom` (diff summary).
+/// Distinct from per-key soft-state (`/powernap`, `/womp`, …), Power capabilities `/pmcap`,
+/// User activity `/useractivity`, Power source `/pmps`, and AC charger `/adapter`.
+/// Used by Discord/operator instant `/pmcustom` · `/power-profiles` lane.
+pub fn get_pmcustom_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "custom"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("pmcustom: pmset -g custom non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("pmcustom: pmset -g custom spawn failed");
+                return String::new();
+            }
+        };
+        let (battery, ac) = parse_pmset_custom_profiles(&stdout);
+        let info = format_pmcustom_parts(&battery, &ac);
+        if info.is_empty() {
+            debug3!("pmcustom: empty status");
+        } else {
+            debug3!("pmcustom status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -14339,6 +14490,59 @@ Now drawing from 'Battery Power'
             format_pmps_parts(Some("AC Power"), Some("AC Power"), None, None),
             "AC Power"
         );
+    }
+}
+
+#[cfg(test)]
+mod pmcustom_parse_tests {
+    use super::{format_pmcustom_parts, parse_pmset_custom_profiles};
+
+    const SAMPLE: &str = "\
+Battery Power:
+ Sleep On Power Button 1
+ powermode            0
+ standby              1
+ displaysleep         2
+ womp                 0
+ lessbright           1
+ hibernatefile        /var/vm/sleepimage
+ sleep                1
+AC Power:
+ Sleep On Power Button 1
+ powermode            0
+ standby              1
+ displaysleep         5
+ womp                 1
+ hibernatefile        /var/vm/sleepimage
+ sleep                1
+";
+
+    #[test]
+    fn parses_battery_ac_and_formats_diffs() {
+        let (bat, ac) = parse_pmset_custom_profiles(SAMPLE);
+        assert_eq!(bat.get("displaysleep").map(String::as_str), Some("2"));
+        assert_eq!(ac.get("displaysleep").map(String::as_str), Some("5"));
+        assert_eq!(bat.get("womp").map(String::as_str), Some("0"));
+        assert_eq!(ac.get("womp").map(String::as_str), Some("1"));
+        assert!(bat.contains_key("lessbright"));
+        assert!(!ac.contains_key("lessbright"));
+        assert!(!bat.contains_key("hibernatefile"));
+        assert!(!ac.contains_key("hibernatefile"));
+        let s = format_pmcustom_parts(&bat, &ac);
+        assert!(s.contains("displaysleep 2/5"), "got: {s}");
+        assert!(s.contains("womp 0/1"), "got: {s}");
+        assert!(s.contains("lessbright bat 1"), "got: {s}");
+        assert!(!s.contains("sleep 1/1"), "identical keys must not appear: {s}");
+        assert!(!s.contains("hibernatefile"), "got: {s}");
+        let empty = format_pmcustom_parts(
+            &std::collections::BTreeMap::new(),
+            &std::collections::BTreeMap::new(),
+        );
+        assert_eq!(empty, "");
+        let mut same_b = std::collections::BTreeMap::new();
+        same_b.insert("sleep".into(), "1".into());
+        let same_a = same_b.clone();
+        assert_eq!(format_pmcustom_parts(&same_b, &same_a), "Battery=AC (1 keys)");
     }
 }
 
