@@ -1,3 +1,20 @@
+## Overnight note 2026-11-24 ~20:50 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota; already_checked_today).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: standing backlog soft-state after Reduce Brightness v0.1.3042 — Sudden Motion Sensor / sms (not keep-pNN; Dark layout-daily next calendar day; SleepDisabled/ring stay out).
+- Shipped **v0.1.3043** — `/sms` · `/sudden-motion` · `/sudden-motion-sensor` · `/mac-sms` + view/open NL; bare sms/sudden motion/sudden motion sensor stay with agent; `/systemsleep` · `/reducebrightness` · `/halfdim` · `/lessbright` intact; `/help` lists lane.
+- Ratchet keep @ eee8fbf24 for 3043.
+- Morning surprise: refresh 2026-11-25 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: Dark layout-daily next calendar day · soft-state sibling/product fuel (SleepDisabled / ring) — Sudden Motion Sensor slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3043
+
+- Product fuel after Reduce Brightness v0.1.3042: Sudden Motion Sensor already readable via `pmset -g custom` Battery/AC `sms` (+ active `pmset -g`; often absent on Apple Silicon / SSDs) but lacked `/sms` · `/sudden-motion` · `/sudden-motion-sensor` · `/mac-sms` and view/see/open/list phrases while System Sleep `/systemsleep`, Reduce Brightness `/reducebrightness`, Half Dim `/halfdim`, and Less Bright `/lessbright` already had slash+NL. Bare `sms` / `sudden motion` / `sudden motion sensor` stay with the agent; SleepDisabled / ring stay out. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day · soft-state sibling/product fuel (SleepDisabled / ring) — Sudden Motion Sensor slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~20:35 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
