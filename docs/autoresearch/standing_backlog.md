@@ -1,3 +1,20 @@
+## Overnight note 2026-11-24 ~04:40 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after AC Wake v0.1.3032 — Lid Wake / lidwake slash+NL (not keep-pNN; Light Send #007aff optional).
+- Shipped **v0.1.3033** — `/lidwake` · `/lid-wake` · `/wake-on-lid` · `/mac-lidwake` + view/open NL; bare lidwake/lid wake stay with agent; `/womp` · `/proximitywake` · `/acwake` · `/standby` · `/destroyfvkeyonstandby` intact; `/help` lists lane.
+- Ratchet keep @ 4934c7d for 3033.
+- Morning surprise: refresh 2026-11-24 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: Dark layout-daily next calendar day · Light Send `#007aff` optional · soft-state sibling/product fuel — Lid Wake slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3033
+
+- Product fuel after AC Wake v0.1.3032: Lid Wake already readable via `pmset -g custom` Battery/AC `lidwake` (+ active `pmset -g`; wake when lid opens; often absent on Apple Silicon) but lacked `/lidwake` · `/lid-wake` · `/wake-on-lid` · `/mac-lidwake` and view/see/open/list phrases while Wake for network `/womp`, Proximity Wake `/proximitywake`, AC Wake `/acwake`, Standby `/standby`, and Destroy FV key `/destroyfvkeyonstandby` already had slash+NL. Bare `lidwake` / `lid wake` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day · Light Send optional · soft-state sibling/product fuel — Lid Wake slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~04:20 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
