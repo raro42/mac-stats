@@ -1270,6 +1270,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_highstandbythreshold_request(content) {
         return Some(format_highstandbythreshold_report());
     }
+    // Destroy FileVault key on standby (bare `destroyfvkeyonstandby` / `destroy fv key on standby`
+    // stay with the agent; `/filevault` · `/fv` stay FileVault; `/standby` stays Standby;
+    // `/highstandbythreshold` stays High Standby Threshold; `/hibernatemode` stays Hibernate mode;
+    // acwake / lidwake stay out).
+    if looks_like_destroyfvkeyonstandby_request(content) {
+        return Some(format_destroyfvkeyonstandby_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

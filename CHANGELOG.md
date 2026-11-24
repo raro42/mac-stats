@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3031] - 2026-11-24
+
+### Added
+- Instant Destroy FileVault key on standby accepts `/destroyfvkeyonstandby` · `/destroyfvkeyonstandby-status` · `/destroyfvkeyonstandby-state` · `/destroy-fv-key-on-standby` · `/destroy-fv-key-on-standby-status` · `/destroy-fv-key-on-standby-state` · `/destroyfvkey` · `/destroyfvkey-status` · `/destroyfvkey-state` · `/destroy-fv-key` · `/destroy-fv-key-status` · `/destroy-fv-key-state` · `/fvkeyonstandby` · `/fvkeyonstandby-status` · `/fvkeyonstandby-state` · `/fv-key-on-standby` · `/fv-key-on-standby-status` · `/fv-key-on-standby-state` · `/mac-destroyfvkeyonstandby` · `/mac-destroy-fv-key-on-standby` · `/mac-destroyfvkey` · `/mac-destroy-fv-key` · `/mac-fvkeyonstandby` · `/mac-fv-key-on-standby` · `/mac-destroyfvkeyonstandby-status` · `/mac-destroy-fv-key-on-standby-status` and view/see/open/list NL (`view destroyfvkeyonstandby`, `open destroy-fv-key-on-standby`, `list fv key on standby`, …), matching “destroyfvkeyonstandby status” / “is destroy fv key on standby on” / “what's my destroyfvkeyonstandby” / “what's the destroy fv key on standby”. Bare `destroyfvkeyonstandby` / `destroy fv key on standby` / `destroyfvkey` / `fv key on standby` stay with the agent; `/filevault` · `/fv` stay FileVault; `/standby` · `/stand-by` stay Standby; `/highstandbythreshold` · `/high-standby-threshold` stay High Standby Threshold; `/hibernatemode` · `/hibernate` stay Hibernate mode; acwake / lidwake stay out. Operator `/help` lists the new lane.
+
 ## [0.1.3030] - 2026-11-24
 
 ### Changed

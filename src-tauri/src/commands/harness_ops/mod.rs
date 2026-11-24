@@ -5443,6 +5443,81 @@ mod tests {
     }
 
     #[test]
+    fn destroyfvkeyonstandby_slash_and_view_open_do_not_steal_filevault_or_bare() {
+        // Slash + view/open NL → Destroy FV key on standby (`/filevault` · `/standby` parity).
+        // Bare `destroyfvkeyonstandby` / `destroy fv key on standby` stay with the agent;
+        // `/filevault` · `/fv` stay FileVault; `/standby` stays Standby;
+        // `/highstandbythreshold` stays High Standby Threshold; `/hibernatemode` stays Hibernate mode.
+        assert!(looks_like_destroyfvkeyonstandby_request("/destroyfvkeyonstandby"));
+        assert!(looks_like_destroyfvkeyonstandby_request("/destroyfvkeyonstandby-status"));
+        assert!(looks_like_destroyfvkeyonstandby_request("/destroy-fv-key-on-standby"));
+        assert!(looks_like_destroyfvkeyonstandby_request("/destroyfvkey"));
+        assert!(looks_like_destroyfvkeyonstandby_request("/destroy-fv-key"));
+        assert!(looks_like_destroyfvkeyonstandby_request("/fvkeyonstandby"));
+        assert!(looks_like_destroyfvkeyonstandby_request("/fv-key-on-standby"));
+        assert!(looks_like_destroyfvkeyonstandby_request("/mac-destroyfvkeyonstandby"));
+        assert!(looks_like_destroyfvkeyonstandby_request("/mac-destroy-fv-key-on-standby"));
+        assert!(looks_like_destroyfvkeyonstandby_request("view destroyfvkeyonstandby"));
+        assert!(looks_like_destroyfvkeyonstandby_request("open destroy-fv-key-on-standby"));
+        assert!(looks_like_destroyfvkeyonstandby_request("list fv key on standby"));
+        assert!(looks_like_destroyfvkeyonstandby_request("destroyfvkeyonstandby status"));
+        assert!(looks_like_destroyfvkeyonstandby_request("is destroy fv key on standby on"));
+        assert!(looks_like_destroyfvkeyonstandby_request("what's my destroyfvkeyonstandby"));
+        assert!(looks_like_destroyfvkeyonstandby_request("view destroy fv key on standby"));
+        assert!(!looks_like_destroyfvkeyonstandby_request("destroyfvkeyonstandby"));
+        assert!(!looks_like_destroyfvkeyonstandby_request("destroy fv key on standby"));
+        assert!(!looks_like_destroyfvkeyonstandby_request("destroyfvkey"));
+        assert!(!looks_like_destroyfvkeyonstandby_request("fv key on standby"));
+        assert!(!looks_like_destroyfvkeyonstandby_request("/filevault"));
+        assert!(!looks_like_destroyfvkeyonstandby_request("view filevault"));
+        assert!(!looks_like_destroyfvkeyonstandby_request("/fv"));
+        assert!(!looks_like_destroyfvkeyonstandby_request("/standby"));
+        assert!(!looks_like_destroyfvkeyonstandby_request("view standby"));
+        assert!(!looks_like_destroyfvkeyonstandby_request("/highstandbythreshold"));
+        assert!(!looks_like_destroyfvkeyonstandby_request("/hibernatemode"));
+        assert!(!looks_like_destroyfvkeyonstandby_request("/tasks"));
+        assert!(!looks_like_destroyfvkeyonstandby_request("enable destroyfvkeyonstandby"));
+        assert!(!looks_like_filevault_request("/destroyfvkeyonstandby"));
+        assert!(!looks_like_filevault_request("view destroyfvkeyonstandby"));
+        assert!(!looks_like_standby_request("/destroyfvkeyonstandby"));
+        assert!(!looks_like_standby_request("view destroy fv key on standby"));
+        assert!(!looks_like_highstandbythreshold_request("/destroyfvkeyonstandby"));
+        let s = try_operator_instant_reply("/destroyfvkeyonstandby").unwrap();
+        assert!(
+            s.contains("**Destroy FV key on standby**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view destroyfvkeyonstandby").unwrap();
+        assert!(
+            viewed.contains("**Destroy FV key on standby**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open destroy-fv-key-on-standby").unwrap();
+        assert!(
+            open.contains("**Destroy FV key on standby**")
+                && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("destroyfvkeyonstandby").is_none());
+        assert!(try_operator_instant_reply("destroy fv key on standby").is_none());
+        let fv = try_operator_instant_reply("/filevault");
+        if let Some(reply) = fv {
+            assert!(
+                !reply.contains("**Destroy FV key on standby**"),
+                "/filevault must stay FileVault, not destroyfvkey: {reply}"
+            );
+        }
+        let standby = try_operator_instant_reply("/standby");
+        if let Some(reply) = standby {
+            assert!(
+                !reply.contains("**Destroy FV key on standby**"),
+                "/standby must stay Standby, not destroyfvkey: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).
         // Bare `charger` / `adapter` stay with the agent; `/watts` stays CPU+GPU; `/battery` · is it charging stay Bat %.

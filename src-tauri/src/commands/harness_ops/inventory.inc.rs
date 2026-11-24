@@ -23254,6 +23254,378 @@ pub fn format_highstandbythreshold_report() -> String {
     }
     format!("**High Standby Threshold** · `{v}`")
 }
+
+/// Destroy FileVault key on standby — `pmset` Battery/AC `destroyfvkeyonstandby` (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/destroyfvkeyonstandby` · `/destroy-fv-key-on-standby` · `view destroyfvkeyonstandby`).
+/// Bare `destroyfvkeyonstandby` / `destroy fv key on standby` stay with the agent;
+/// `/filevault` · `/fv` stay FileVault; `/standby` stays Standby;
+/// `/highstandbythreshold` stays High Standby Threshold; `/hibernatemode` stays Hibernate mode;
+/// acwake / lidwake stay out.
+pub fn looks_like_destroyfvkeyonstandby_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 96 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("highstandbythreshold")
+        || n.contains("high standby threshold")
+        || n.contains("high-standby-threshold")
+        || n.contains("standbythreshold")
+        || n.contains("standby threshold")
+        || n.contains("standby-threshold")
+        || n.contains("standbydelayhigh")
+        || n.contains("standby delay high")
+        || n.contains("standby-delay-high")
+        || n.contains("standbydelaylow")
+        || n.contains("standby delay low")
+        || n.contains("standby-delay-low")
+        || n.contains("standbydelay")
+        || n.contains("standby delay")
+        || n.contains("standby-delay")
+        || n.contains("autopoweroffdelay")
+        || n.contains("auto power off delay")
+        || n.contains("auto-power-off-delay")
+        || n.contains("autopoweroff")
+        || n.contains("auto power off")
+        || n.contains("auto-power-off")
+        || n.contains("hibernatemode")
+        || n.contains("hibernate mode")
+        || n.contains("hibernatefile")
+        || n.contains("hibernate file")
+        || n.contains("sleepimage")
+        || n.contains("sleep image")
+        || n.contains("acwake")
+        || n.contains("ac wake")
+        || n.contains("ac-wake")
+        || n.contains("lidwake")
+        || n.contains("lid wake")
+        || n.contains("lid-wake")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("file-vault")
+        || n.contains("disk encryption")
+        || n.contains("fde")
+        || n.contains("encryption status")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("system sleep")
+        || n.contains("systemsleep")
+        || n.contains("computer sleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("tcpkeepalive")
+        || n.contains("networkoversleep")
+        || n.contains("sleep on power")
+        || n.contains("power button")
+        || n.contains("sopb")
+        || n.contains("lessbright")
+        || n.contains("halfdim")
+        || n.contains("screensaver")
+        || n.contains("screen lock")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/filevault"
+        || n == "/file-vault"
+        || n == "/fv"
+        || n == "/fv-status"
+        || n == "/fde"
+        || n == "/disk-encryption"
+        || n == "/encryption-status"
+        || n == "/standby"
+        || n == "/stand-by"
+        || n == "/standbydelay"
+        || n == "/standby-delay"
+        || n == "/standbydelayhigh"
+        || n == "/standby-delay-high"
+        || n == "/standbydelaylow"
+        || n == "/standby-delay-low"
+        || n == "/highstandbythreshold"
+        || n == "/high-standby-threshold"
+        || n == "/standbythreshold"
+        || n == "/standby-threshold"
+        || n == "/hibernatemode"
+        || n == "/hibernate"
+        || n == "/hibernatefile"
+        || n == "/systemsleep"
+        || n == "/sleep"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "destroyfvkeyonstandby"
+        || n == "the destroyfvkeyonstandby"
+        || n == "destroy fv key on standby"
+        || n == "the destroy fv key on standby"
+        || n == "destroy-fv-key-on-standby"
+        || n == "the destroy-fv-key-on-standby"
+        || n == "destroyfvkey"
+        || n == "the destroyfvkey"
+        || n == "destroy fv key"
+        || n == "the destroy fv key"
+        || n == "destroy-fv-key"
+        || n == "the destroy-fv-key"
+        || n == "fvkeyonstandby"
+        || n == "the fvkeyonstandby"
+        || n == "fv key on standby"
+        || n == "the fv key on standby"
+        || n == "fv-key-on-standby"
+        || n == "the fv-key-on-standby"
+        // Bare Standby / FileVault stay with their lanes / agent.
+        || n == "standby"
+        || n == "the standby"
+        || n == "stand by"
+        || n == "the stand by"
+        || n == "filevault"
+        || n == "the filevault"
+        || n == "file vault"
+        || n == "the file vault"
+        || n == "fv"
+        || n == "the fv"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/destroyfvkeyonstandby"
+            | "/destroyfvkeyonstandby-status"
+            | "/destroyfvkeyonstandby-state"
+            | "/destroy-fv-key-on-standby"
+            | "/destroy-fv-key-on-standby-status"
+            | "/destroy-fv-key-on-standby-state"
+            | "/destroyfvkey"
+            | "/destroyfvkey-status"
+            | "/destroyfvkey-state"
+            | "/destroy-fv-key"
+            | "/destroy-fv-key-status"
+            | "/destroy-fv-key-state"
+            | "/fvkeyonstandby"
+            | "/fvkeyonstandby-status"
+            | "/fvkeyonstandby-state"
+            | "/fv-key-on-standby"
+            | "/fv-key-on-standby-status"
+            | "/fv-key-on-standby-state"
+            | "/mac-destroyfvkeyonstandby"
+            | "/mac-destroy-fv-key-on-standby"
+            | "/mac-destroyfvkey"
+            | "/mac-destroy-fv-key"
+            | "/mac-fvkeyonstandby"
+            | "/mac-fv-key-on-standby"
+            | "/mac-destroyfvkeyonstandby-status"
+            | "/mac-destroy-fv-key-on-standby-status"
+            | "destroyfvkeyonstandby status"
+            | "the destroyfvkeyonstandby status"
+            | "destroy fv key on standby status"
+            | "the destroy fv key on standby status"
+            | "destroy-fv-key-on-standby status"
+            | "the destroy-fv-key-on-standby status"
+            | "destroyfvkey status"
+            | "the destroyfvkey status"
+            | "destroy fv key status"
+            | "the destroy fv key status"
+            | "destroy-fv-key status"
+            | "the destroy-fv-key status"
+            | "fvkeyonstandby status"
+            | "the fvkeyonstandby status"
+            | "fv key on standby status"
+            | "the fv key on standby status"
+            | "fv-key-on-standby status"
+            | "the fv-key-on-standby status"
+            | "destroyfvkeyonstandby state"
+            | "the destroyfvkeyonstandby state"
+            | "destroy fv key on standby state"
+            | "the destroy fv key on standby state"
+            | "my destroyfvkeyonstandby"
+            | "my destroyfvkeyonstandby status"
+            | "my destroy fv key on standby"
+            | "my destroy fv key on standby status"
+            | "my destroyfvkey"
+            | "my destroy fv key"
+            | "my fvkeyonstandby"
+            | "my fv key on standby"
+            | "is destroyfvkeyonstandby on"
+            | "is destroyfvkeyonstandby off"
+            | "is destroyfvkeyonstandby enabled"
+            | "is destroyfvkeyonstandby disabled"
+            | "is destroy fv key on standby on"
+            | "is destroy fv key on standby off"
+            | "is destroy fv key on standby enabled"
+            | "is destroy fv key on standby disabled"
+            | "is destroy-fv-key-on-standby on"
+            | "is destroy-fv-key-on-standby enabled"
+            | "is destroyfvkey on"
+            | "is destroyfvkey enabled"
+            | "is destroy fv key on"
+            | "is destroy fv key enabled"
+            | "is fvkeyonstandby on"
+            | "is fvkeyonstandby enabled"
+            | "is fv key on standby on"
+            | "is fv key on standby enabled"
+            | "what's my destroyfvkeyonstandby"
+            | "whats my destroyfvkeyonstandby"
+            | "what is my destroyfvkeyonstandby"
+            | "what's my destroyfvkeyonstandby status"
+            | "whats my destroyfvkeyonstandby status"
+            | "what is my destroyfvkeyonstandby status"
+            | "what's my destroy fv key on standby"
+            | "whats my destroy fv key on standby"
+            | "what is my destroy fv key on standby"
+            | "what's my destroy fv key on standby status"
+            | "whats my destroy fv key on standby status"
+            | "what is my destroy fv key on standby status"
+            | "what's my destroyfvkey"
+            | "whats my destroyfvkey"
+            | "what is my destroyfvkey"
+            | "what's my destroy fv key"
+            | "whats my destroy fv key"
+            | "what is my destroy fv key"
+            | "what's my fvkeyonstandby"
+            | "whats my fvkeyonstandby"
+            | "what is my fvkeyonstandby"
+            | "what's my fv key on standby"
+            | "whats my fv key on standby"
+            | "what is my fv key on standby"
+            | "what's the destroyfvkeyonstandby"
+            | "whats the destroyfvkeyonstandby"
+            | "what is the destroyfvkeyonstandby"
+            | "what's the destroyfvkeyonstandby status"
+            | "whats the destroyfvkeyonstandby status"
+            | "what is the destroyfvkeyonstandby status"
+            | "what's the destroy fv key on standby"
+            | "whats the destroy fv key on standby"
+            | "what is the destroy fv key on standby"
+            | "what's the destroy fv key on standby status"
+            | "whats the destroy fv key on standby status"
+            | "what is the destroy fv key on standby status"
+            | "how's destroyfvkeyonstandby"
+            | "hows destroyfvkeyonstandby"
+            | "how's the destroyfvkeyonstandby"
+            | "hows the destroyfvkeyonstandby"
+            | "how's destroy fv key on standby"
+            | "hows destroy fv key on standby"
+            | "view destroyfvkeyonstandby"
+            | "view the destroyfvkeyonstandby"
+            | "view destroyfvkeyonstandby status"
+            | "view the destroyfvkeyonstandby status"
+            | "view destroy fv key on standby"
+            | "view the destroy fv key on standby"
+            | "view destroy fv key on standby status"
+            | "view the destroy fv key on standby status"
+            | "view destroy-fv-key-on-standby"
+            | "view the destroy-fv-key-on-standby"
+            | "view destroyfvkey"
+            | "view the destroyfvkey"
+            | "view destroy fv key"
+            | "view the destroy fv key"
+            | "view destroy-fv-key"
+            | "view the destroy-fv-key"
+            | "view fvkeyonstandby"
+            | "view the fvkeyonstandby"
+            | "view fv key on standby"
+            | "view the fv key on standby"
+            | "view fv-key-on-standby"
+            | "view the fv-key-on-standby"
+            | "see destroyfvkeyonstandby"
+            | "see the destroyfvkeyonstandby"
+            | "see destroyfvkeyonstandby status"
+            | "see the destroyfvkeyonstandby status"
+            | "see destroy fv key on standby"
+            | "see the destroy fv key on standby"
+            | "see destroyfvkey"
+            | "see the destroyfvkey"
+            | "see fv key on standby"
+            | "see the fv key on standby"
+            | "open destroyfvkeyonstandby"
+            | "open the destroyfvkeyonstandby"
+            | "open destroyfvkeyonstandby status"
+            | "open the destroyfvkeyonstandby status"
+            | "open destroy fv key on standby"
+            | "open the destroy fv key on standby"
+            | "open destroy-fv-key-on-standby"
+            | "open the destroy-fv-key-on-standby"
+            | "open destroyfvkey"
+            | "open the destroyfvkey"
+            | "open destroy fv key"
+            | "open the destroy fv key"
+            | "open destroy-fv-key"
+            | "open the destroy-fv-key"
+            | "open fvkeyonstandby"
+            | "open the fvkeyonstandby"
+            | "open fv key on standby"
+            | "open the fv key on standby"
+            | "open fv-key-on-standby"
+            | "open the fv-key-on-standby"
+            | "list destroyfvkeyonstandby"
+            | "list the destroyfvkeyonstandby"
+            | "list destroyfvkeyonstandby status"
+            | "list the destroyfvkeyonstandby status"
+            | "list destroy fv key on standby"
+            | "list the destroy fv key on standby"
+            | "list destroy-fv-key-on-standby"
+            | "list the destroy-fv-key-on-standby"
+            | "list destroyfvkey"
+            | "list the destroyfvkey"
+            | "list destroy fv key"
+            | "list the destroy fv key"
+            | "list fvkeyonstandby"
+            | "list the fvkeyonstandby"
+            | "list fv key on standby"
+            | "list the fv key on standby"
+            | "list fv-key-on-standby"
+            | "list the fv-key-on-standby"
+    )
+}
+
+/// Zero-LLM Destroy FileVault key on standby from pmset (macOS-only; empty elsewhere).
+pub fn format_destroyfvkeyonstandby_report() -> String {
+    let v = crate::metrics::get_destroyfvkeyonstandby_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Destroy FV key on standby** — _no Destroy FV key on standby reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**Destroy FV key on standby** · `{v}`")
+}
+
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).
 /// Bare `autopoweroff` / `auto power off` stay with the agent;
