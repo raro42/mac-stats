@@ -20183,6 +20183,13 @@ pub fn looks_like_standby_request(content: &str) -> bool {
         || n.contains("autopoweroff")
         || n.contains("auto power off")
         || n.contains("auto-power-off")
+        || n.contains("sleep on power button")
+        || n.contains("sleep-on-power-button")
+        || n.contains("power button sleep")
+        || n.contains("power-button-sleep")
+        || n.contains("lessbright")
+        || n.contains("less bright")
+        || n.contains("less-bright")
         || n.contains("screensaver")
         || n.contains("screen saver")
         || n.contains("screen-saver")
@@ -20241,6 +20248,10 @@ pub fn looks_like_standby_request(content: &str) -> bool {
         || n == "/hibernatemode"
         || n == "/hibernate-mode"
         || n == "/hibernate"
+        || n == "/sleep-on-power-button"
+        || n == "/sleep-on-power"
+        || n == "/power-button-sleep"
+        || n == "/sopb"
         || n == "/screensaver"
         || n == "/screen-saver"
         || n == "/idle-time"
@@ -20364,6 +20375,321 @@ pub fn format_standby_report() -> String {
     format!("**Standby** · `{v}`")
 }
 
+/// Sleep On Power Button — `pmset` Battery/AC `Sleep On Power Button` (+ active fallback).
+/// Slash + view/open NL (`/sleep-on-power-button` · `/sopb` · `/power-button-sleep` · `view sleep on power button`).
+/// Bare `sleep on power button` / `power button sleep` / `sopb` stay with the agent;
+/// `/sleep` · `/systemsleep` stay System Sleep; `/standby` stays Standby;
+/// `/hibernatemode` stays Hibernate mode; `/powernap` stays Power Nap.
+pub fn looks_like_sleep_on_power_button_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("wake on network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("hard disk sleep")
+        || n.contains("hdd sleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("systemsleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("computersleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("ttys keep awake")
+        || n.contains("tty-keep-awake")
+        || n.contains("ttys-keep-awake")
+        || n.contains("ttykeepawake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("tcp-keep-alive")
+        || n.contains("tcp keepalive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("network-over-sleep")
+        || n.contains("hibernate")
+        || n.contains("hibernatemode")
+        || n.contains("standbydelay")
+        || n.contains("standby delay")
+        || n.contains("standby-delay")
+        || n.contains("autopoweroff")
+        || n.contains("auto power off")
+        || n.contains("auto-power-off")
+        || n.contains("lessbright")
+        || n.contains("less bright")
+        || n.contains("less-bright")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/proximitywake"
+        || n == "/proximity-wake"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
+        || n == "/disksleep"
+        || n == "/disk-sleep"
+        || n == "/hard-disk-sleep"
+        || n == "/hdd-sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/computer-sleep"
+        || n == "/computersleep"
+        || n == "/sleep"
+        || n == "/sleep-status"
+        || n == "/sleep-state"
+        || n == "/sleep-timer"
+        || n == "/ttyskeepawake"
+        || n == "/tty-keep-awake"
+        || n == "/ttys-keep-awake"
+        || n == "/ttykeepawake"
+        || n == "/tcpkeepalive"
+        || n == "/tcp-keep-alive"
+        || n == "/tcp-keepalive"
+        || n == "/networkoversleep"
+        || n == "/network-over-sleep"
+        || n == "/hibernatemode"
+        || n == "/hibernate-mode"
+        || n == "/hibernate"
+        || n == "/standby"
+        || n == "/stand-by"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "sleep on power button"
+        || n == "the sleep on power button"
+        || n == "sleep-on-power-button"
+        || n == "the sleep-on-power-button"
+        || n == "power button sleep"
+        || n == "the power button sleep"
+        || n == "power-button-sleep"
+        || n == "the power-button-sleep"
+        || n == "sopb"
+        || n == "the sopb"
+        // Bare standby / sleep stay elsewhere.
+        || n == "standby"
+        || n == "stand by"
+        || n == "sleep"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/sleep-on-power-button"
+            | "/sleep-on-power-button-status"
+            | "/sleep-on-power-button-state"
+            | "/sleep-on-power"
+            | "/sleep-on-power-status"
+            | "/sleep-on-power-state"
+            | "/power-button-sleep"
+            | "/power-button-sleep-status"
+            | "/power-button-sleep-state"
+            | "/sopb"
+            | "/sopb-status"
+            | "/sopb-state"
+            | "/mac-sleep-on-power-button"
+            | "/mac-sleep-on-power"
+            | "/mac-power-button-sleep"
+            | "/mac-sopb"
+            | "/mac-sleep-on-power-button-status"
+            | "/mac-sopb-status"
+            | "sleep on power button status"
+            | "the sleep on power button status"
+            | "sleep-on-power-button status"
+            | "the sleep-on-power-button status"
+            | "sleep on power button state"
+            | "the sleep on power button state"
+            | "power button sleep status"
+            | "the power button sleep status"
+            | "power-button-sleep status"
+            | "the power-button-sleep status"
+            | "sopb status"
+            | "the sopb status"
+            | "sopb state"
+            | "the sopb state"
+            | "my sleep on power button"
+            | "my sleep on power button status"
+            | "my power button sleep"
+            | "my power button sleep status"
+            | "my sopb"
+            | "my sopb status"
+            | "is sleep on power button on"
+            | "is sleep on power button off"
+            | "is sleep on power button enabled"
+            | "is sleep on power button disabled"
+            | "is power button sleep on"
+            | "is power button sleep off"
+            | "is power button sleep enabled"
+            | "is power button sleep disabled"
+            | "is sopb on"
+            | "is sopb off"
+            | "is sopb enabled"
+            | "is sopb disabled"
+            | "what's my sleep on power button"
+            | "whats my sleep on power button"
+            | "what is my sleep on power button"
+            | "what's my sleep on power button status"
+            | "whats my sleep on power button status"
+            | "what is my sleep on power button status"
+            | "what's my power button sleep"
+            | "whats my power button sleep"
+            | "what is my power button sleep"
+            | "what's my sopb"
+            | "whats my sopb"
+            | "what is my sopb"
+            | "what's the sleep on power button"
+            | "whats the sleep on power button"
+            | "what is the sleep on power button"
+            | "what's the sleep on power button status"
+            | "whats the sleep on power button status"
+            | "what is the sleep on power button status"
+            | "how's sleep on power button"
+            | "hows sleep on power button"
+            | "how's the sleep on power button"
+            | "hows the sleep on power button"
+            | "how's sopb"
+            | "hows sopb"
+            | "view sleep on power button"
+            | "view the sleep on power button"
+            | "view sleep on power button status"
+            | "view the sleep on power button status"
+            | "view sleep-on-power-button"
+            | "view the sleep-on-power-button"
+            | "view power button sleep"
+            | "view the power button sleep"
+            | "view power-button-sleep"
+            | "view the power-button-sleep"
+            | "view sopb"
+            | "view the sopb"
+            | "see sleep on power button"
+            | "see the sleep on power button"
+            | "see sleep on power button status"
+            | "see the sleep on power button status"
+            | "see power button sleep"
+            | "see the power button sleep"
+            | "see sopb"
+            | "see the sopb"
+            | "open sleep on power button"
+            | "open the sleep on power button"
+            | "open sleep on power button status"
+            | "open the sleep on power button status"
+            | "open sleep-on-power-button"
+            | "open the sleep-on-power-button"
+            | "open power button sleep"
+            | "open the power button sleep"
+            | "open power-button-sleep"
+            | "open the power-button-sleep"
+            | "open sopb"
+            | "open the sopb"
+            | "list sleep on power button"
+            | "list the sleep on power button"
+            | "list sleep on power button status"
+            | "list the sleep on power button status"
+            | "list sleep-on-power-button"
+            | "list the sleep-on-power-button"
+            | "list power button sleep"
+            | "list the power button sleep"
+            | "list power-button-sleep"
+            | "list the power-button-sleep"
+            | "list sopb"
+            | "list the sopb"
+    )
+}
+
+/// Zero-LLM Sleep On Power Button status from pmset (macOS-only; empty elsewhere).
+pub fn format_sleep_on_power_button_report() -> String {
+    let v = crate::metrics::get_sleep_on_power_button_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Sleep On Power Button** — _no Sleep On Power Button reading on this Mac right now._".to_string();
+    }
+    format!("**Sleep On Power Button** · `{v}`")
+}
+
 /// System Sleep — `pmset` Battery/AC `sleep` minutes (+ active fallback; 0 = Never).
 /// Slash + view/open NL (`/systemsleep` · `/system-sleep` · `/computer-sleep` · `view system sleep`).
 /// Bare `systemsleep` / `system sleep` / `computer sleep` / `sleep` stay with the agent;
@@ -20424,6 +20750,10 @@ pub fn looks_like_systemsleep_request(content: &str) -> bool {
         || n.contains("disk-sleep")
         || n.contains("hard disk sleep")
         || n.contains("hdd sleep")
+        || n.contains("sleep on power button")
+        || n.contains("sleep-on-power-button")
+        || n.contains("power button sleep")
+        || n.contains("power-button-sleep")
         || n.contains("ttyskeepawake")
         || n.contains("tty keep awake")
         || n.contains("ttys keep awake")
@@ -20476,6 +20806,10 @@ pub fn looks_like_systemsleep_request(content: &str) -> bool {
         || n == "/disk-sleep"
         || n == "/hard-disk-sleep"
         || n == "/hdd-sleep"
+        || n == "/sleep-on-power-button"
+        || n == "/sleep-on-power"
+        || n == "/power-button-sleep"
+        || n == "/sopb"
         || n == "/ttyskeepawake"
         || n == "/tty-keep-awake"
         || n == "/ttys-keep-awake"

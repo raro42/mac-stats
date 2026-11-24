@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3019] - 2026-11-24
+
+### Added
+- Instant Sleep On Power Button accepts `/sleep-on-power-button` · `/sleep-on-power-button-status` · `/sleep-on-power-button-state` · `/sleep-on-power` · `/sleep-on-power-status` · `/sleep-on-power-state` · `/power-button-sleep` · `/power-button-sleep-status` · `/power-button-sleep-state` · `/sopb` · `/sopb-status` · `/sopb-state` · `/mac-sleep-on-power-button` · `/mac-sleep-on-power` · `/mac-power-button-sleep` · `/mac-sopb` · `/mac-sleep-on-power-button-status` · `/mac-sopb-status` and view/see/open/list NL (`view sleep on power button`, `open sopb`, `list power-button-sleep`, …), matching “sleep on power button status” / “is sleep on power button on” / “is power button sleep enabled” / “what's my sopb” / “what's the sleep on power button status”. Bare `sleep on power button` / `power button sleep` / `sopb` stay with the agent; `/sleep` · `/systemsleep` · `/system-sleep` stay System Sleep; `/standby` · `/stand-by` stay Standby; `/hibernatemode` · `/hibernate` stay Hibernate mode; `/powernap` · `/power-nap` stay Power Nap; lessbright stays out. Operator `/help` lists the new lane.
+
 ## [0.1.3018] - 2026-11-24
 
 ### Added

@@ -4708,6 +4708,77 @@ mod tests {
         }
     }
 
+    #[test]
+    fn sleep_on_power_button_slash_and_view_open_do_not_steal_sleep_or_bare() {
+        // Slash + view/open NL → Sleep On Power Button.
+        // Bare `sleep on power button` / `power button sleep` / `sopb` stay with the agent;
+        // `/sleep` · `/systemsleep` stay System Sleep; `/standby` stays Standby;
+        // `/hibernatemode` stays Hibernate mode; `/powernap` stays Power Nap.
+        assert!(looks_like_sleep_on_power_button_request("/sleep-on-power-button"));
+        assert!(looks_like_sleep_on_power_button_request("/sleep-on-power-button-status"));
+        assert!(looks_like_sleep_on_power_button_request("/sleep-on-power"));
+        assert!(looks_like_sleep_on_power_button_request("/power-button-sleep"));
+        assert!(looks_like_sleep_on_power_button_request("/sopb"));
+        assert!(looks_like_sleep_on_power_button_request("/mac-sopb"));
+        assert!(looks_like_sleep_on_power_button_request("view sleep on power button"));
+        assert!(looks_like_sleep_on_power_button_request("open sopb"));
+        assert!(looks_like_sleep_on_power_button_request("list power-button-sleep"));
+        assert!(looks_like_sleep_on_power_button_request("sleep on power button status"));
+        assert!(looks_like_sleep_on_power_button_request("is sleep on power button on"));
+        assert!(looks_like_sleep_on_power_button_request("is power button sleep enabled"));
+        assert!(looks_like_sleep_on_power_button_request("what's my sopb"));
+        assert!(looks_like_sleep_on_power_button_request("view power button sleep"));
+        assert!(!looks_like_sleep_on_power_button_request("sleep on power button"));
+        assert!(!looks_like_sleep_on_power_button_request("power button sleep"));
+        assert!(!looks_like_sleep_on_power_button_request("sopb"));
+        assert!(!looks_like_sleep_on_power_button_request("/sleep"));
+        assert!(!looks_like_sleep_on_power_button_request("/systemsleep"));
+        assert!(!looks_like_sleep_on_power_button_request("view system sleep"));
+        assert!(!looks_like_sleep_on_power_button_request("/standby"));
+        assert!(!looks_like_sleep_on_power_button_request("/hibernatemode"));
+        assert!(!looks_like_sleep_on_power_button_request("/powernap"));
+        assert!(!looks_like_sleep_on_power_button_request("/power"));
+        assert!(!looks_like_sleep_on_power_button_request("/tasks"));
+        assert!(!looks_like_sleep_on_power_button_request("enable sleep on power button"));
+        assert!(!looks_like_sleep_on_power_button_request("lessbright"));
+        assert!(!looks_like_systemsleep_request("/sleep-on-power-button"));
+        assert!(!looks_like_systemsleep_request("view sleep on power button"));
+        assert!(!looks_like_standby_request("/sleep-on-power-button"));
+        assert!(!looks_like_standby_request("view sleep on power button"));
+        let s = try_operator_instant_reply("/sleep-on-power-button").unwrap();
+        assert!(
+            s.contains("**Sleep On Power Button**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view sleep on power button").unwrap();
+        assert!(
+            viewed.contains("**Sleep On Power Button**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open sopb").unwrap();
+        assert!(
+            open.contains("**Sleep On Power Button**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("sleep on power button").is_none());
+        assert!(try_operator_instant_reply("sopb").is_none());
+        let sleep = try_operator_instant_reply("/sleep");
+        if let Some(reply) = sleep {
+            assert!(
+                !reply.contains("**Sleep On Power Button**"),
+                "/sleep must stay System Sleep, not Sleep On Power Button: {reply}"
+            );
+        }
+        let standby = try_operator_instant_reply("/standby");
+        if let Some(reply) = standby {
+            assert!(
+                !reply.contains("**Sleep On Power Button**"),
+                "/standby must stay Standby, not Sleep On Power Button: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

@@ -4189,6 +4189,126 @@ pub fn get_standby_status() -> String {
     }
 }
 
+/// Parse one `Sleep On Power Button <0|1>` line (multi-word pmset key).
+pub(crate) fn parse_sleep_on_power_button_flag_line(line: &str) -> Option<bool> {
+    let t = line.trim();
+    let lower = t.to_ascii_lowercase();
+    const PREFIX: &str = "sleep on power button";
+    if !lower.starts_with(PREFIX) {
+        return None;
+    }
+    let rest = t[PREFIX.len()..].trim();
+    match rest.split_whitespace().next() {
+        Some("1") | Some("true") | Some("yes") => Some(true),
+        Some("0") | Some("false") | Some("no") => Some(false),
+        _ => None,
+    }
+}
+
+/// Parse `pmset -g custom` Battery/AC `Sleep On Power Button` → (battery, ac).
+pub(crate) fn parse_pmset_custom_sleep_on_power_button(raw: &str) -> (Option<bool>, Option<bool>) {
+    let mut section: Option<&str> = None;
+    let mut battery = None;
+    let mut ac = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.eq_ignore_ascii_case("Battery Power:") {
+            section = Some("battery");
+            continue;
+        }
+        if t.eq_ignore_ascii_case("AC Power:") {
+            section = Some("ac");
+            continue;
+        }
+        let on = match parse_sleep_on_power_button_flag_line(t) {
+            Some(v) => Some(v),
+            None => continue,
+        };
+        match section {
+            Some("battery") => battery = on.or(battery),
+            Some("ac") => ac = on.or(ac),
+            _ => {}
+        }
+    }
+    (battery, ac)
+}
+
+/// Parse active `pmset -g` `Sleep On Power Button` flag (Currently in use).
+pub(crate) fn parse_pmset_active_sleep_on_power_button(raw: &str) -> Option<bool> {
+    for line in raw.lines() {
+        if let Some(v) = parse_sleep_on_power_button_flag_line(line) {
+            return Some(v);
+        }
+    }
+    None
+}
+
+/// Prefer Battery+AC custom when both set; else active `pmset -g`.
+pub(crate) fn format_sleep_on_power_button_parts(
+    battery: Option<bool>,
+    ac: Option<bool>,
+    active: Option<bool>,
+) -> String {
+    format_wake_for_network_parts(battery, ac, active)
+}
+
+/// macOS Sleep On Power Button from `pmset -g custom` Battery/AC
+/// `Sleep On Power Button` (fallback: active `pmset -g`). Distinct from System Sleep
+/// `/systemsleep` · `/sleep`, Standby `/standby`, and Hibernate mode `/hibernatemode`.
+/// Used by Discord/operator instant `/sleep-on-power-button` · `/sopb` lane.
+pub fn get_sleep_on_power_button_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let (battery, ac) = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g", "custom"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_custom_sleep_on_power_button(&stdout)
+                }
+                Ok(_) => (None, None),
+                Err(_) => {
+                    debug3!("sleep-on-power-button: pmset -g custom spawn failed");
+                    (None, None)
+                }
+            }
+        };
+
+        let active = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_active_sleep_on_power_button(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("sleep-on-power-button: pmset -g spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_sleep_on_power_button_parts(battery, ac, active);
+        if info.is_empty() {
+            debug3!("sleep-on-power-button: empty status");
+        } else {
+            debug3!("sleep-on-power-button status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -7903,6 +8023,103 @@ AC Power:
         assert_eq!(format_standby_parts(None, Some(true), None), "On (AC)");
         assert_eq!(format_standby_parts(None, None, Some(true)), "On");
         assert_eq!(format_standby_parts(None, None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod sleep_on_power_button_parse_tests {
+    use super::{
+        format_sleep_on_power_button_parts, parse_pmset_active_sleep_on_power_button,
+        parse_pmset_custom_sleep_on_power_button, parse_sleep_on_power_button_flag_line,
+    };
+
+    #[test]
+    fn parses_flag_line() {
+        assert_eq!(
+            parse_sleep_on_power_button_flag_line("Sleep On Power Button 1"),
+            Some(true)
+        );
+        assert_eq!(
+            parse_sleep_on_power_button_flag_line(" sleep on power button  0 "),
+            Some(false)
+        );
+        assert_eq!(parse_sleep_on_power_button_flag_line("standby 1"), None);
+        assert_eq!(parse_sleep_on_power_button_flag_line("sleep 10"), None);
+    }
+
+    #[test]
+    fn parses_custom_battery_and_ac() {
+        let sample = r#"
+Battery Power:
+ Sleep On Power Button 1
+ standby              1
+AC Power:
+ Sleep On Power Button 0
+ standby              0
+"#;
+        assert_eq!(
+            parse_pmset_custom_sleep_on_power_button(sample),
+            (Some(true), Some(false))
+        );
+        assert_eq!(parse_pmset_custom_sleep_on_power_button("nope"), (None, None));
+        let standby_only = r#"
+Battery Power:
+ standby              1
+AC Power:
+ standby              0
+"#;
+        assert_eq!(
+            parse_pmset_custom_sleep_on_power_button(standby_only),
+            (None, None)
+        );
+    }
+
+    #[test]
+    fn parses_active() {
+        assert_eq!(
+            parse_pmset_active_sleep_on_power_button(
+                "Currently in use:\n Sleep On Power Button 1\n"
+            ),
+            Some(true)
+        );
+        assert_eq!(
+            parse_pmset_active_sleep_on_power_button(" Sleep On Power Button 0\n"),
+            Some(false)
+        );
+        assert_eq!(parse_pmset_active_sleep_on_power_button("standby 1\n"), None);
+        assert_eq!(parse_pmset_active_sleep_on_power_button("sleep 10\n"), None);
+    }
+
+    #[test]
+    fn formats_matched_split_and_active() {
+        assert_eq!(
+            format_sleep_on_power_button_parts(Some(true), Some(true), Some(false)),
+            "On"
+        );
+        assert_eq!(
+            format_sleep_on_power_button_parts(Some(false), Some(false), Some(true)),
+            "Off"
+        );
+        assert_eq!(
+            format_sleep_on_power_button_parts(Some(true), Some(false), None),
+            "AC Off · Battery On"
+        );
+        assert_eq!(
+            format_sleep_on_power_button_parts(Some(false), None, None),
+            "Off (Battery)"
+        );
+        assert_eq!(
+            format_sleep_on_power_button_parts(None, Some(true), None),
+            "On (AC)"
+        );
+        assert_eq!(
+            format_sleep_on_power_button_parts(None, None, Some(true)),
+            "On"
+        );
+        assert_eq!(
+            format_sleep_on_power_button_parts(None, None, None),
+            ""
+        );
     }
 }
 

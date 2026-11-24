@@ -1220,6 +1220,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_ttyskeepawake_request(content) {
         return Some(format_ttyskeepawake_report());
     }
+    // Sleep On Power Button (bare `sleep on power button` / `power button sleep` / `sopb` stay
+    // with the agent; `/sleep` · `/systemsleep` stay System Sleep; `/standby` stays Standby;
+    // `/hibernatemode` stays Hibernate mode; `/powernap` stays Power Nap).
+    if looks_like_sleep_on_power_button_request(content) {
+        return Some(format_sleep_on_power_button_report());
+    }
     // System Sleep (bare `systemsleep` / `system sleep` / `computer sleep` / `sleep` stay with
     // the agent; `/displaysleep` stays Display Sleep; `/disksleep` stays Disk Sleep;
     // `/screensaver` stays Screensaver; `/ttyskeepawake` stays TTY keep awake).
