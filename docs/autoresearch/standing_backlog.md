@@ -1,3 +1,20 @@
+## Overnight note 2026-11-24 ~05:35 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: standing backlog GPU Switch after Auto Restart v0.1.3036 (not keep-pNN; darkwakes stays out).
+- Shipped **v0.1.3037** — `/gpuswitch` · `/gpu-switch` · `/graphics-switching` · `/mac-gpuswitch` + view/open NL; bare gpuswitch/gpu switch/graphics switching stay with agent; `/gpu` · `/gpu-name` · `/autorestart` · `/powermode` intact; `/help` lists lane.
+- Ratchet keep @ 9dc20dd for 3037; backfill keep for 3036.
+- Morning surprise: refresh 2026-11-24 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: Dark layout-daily next calendar day · soft-state sibling/product fuel (darkwakes) — GPU Switch slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3037
+
+- Product fuel after Auto Restart v0.1.3036: GPU Switch already readable via `pmset -g custom` Battery/AC `gpuswitch` (+ active `pmset -g`; 0 Integrated · 1 Discrete · 2 Auto; often absent on Apple Silicon) but lacked `/gpuswitch` · `/gpu-switch` · `/graphics-switching` · `/mac-gpuswitch` and view/see/open/list phrases while Auto Restart `/autorestart`, Power Mode `/powermode`, GPU ring `/gpu`, and GPU identity `/gpu-name` already had slash+NL. Bare `gpuswitch` / `gpu switch` / `graphics switching` stay with the agent; darkwakes stays out. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day · soft-state sibling/product fuel (darkwakes) — GPU Switch slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~05:12 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
