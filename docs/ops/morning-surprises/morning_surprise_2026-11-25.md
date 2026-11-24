@@ -1,20 +1,18 @@
 # Morning surprise — 2026-11-25
 
-Overnight (2026-11-24 → 25) kept shipping pmset instant lanes.
+Overnight (2026-11-24 → 2026-11-25) shipped product fuel from standing backlog (digester open empty).
 
 ## Shipped
-- **v0.1.3053** Power capabilities — `/pmcap` · `/power-cap` · `/power-capabilities` (+ view/open NL) from `pmset -g cap` supported settings list.
-- **v0.1.3052** Power stats — `/pmstats` · `/power-stats` from `pmset -g stats` Sleep/Dark Wake/User Wake counts.
-- Earlier same night: Therm `/therm`, Power log `/pmlog`, UPS `/ups`, System load `/sysload`, Power schedule `/powersched`, Sleep assertions `/assertions`, Sleep Disabled `/sleepdisabled`, and friends.
+- **v0.1.3054** — User activity instant lane: `/useractivity` · `/user-activity` · `/pmset-useractivity` · `/user-activity-level` · `/activity-level` · `/mac-useractivity` + view/open NL. Reads Level / MostSignificant / idle hint from `pmset -g useractivity`. Bare phrases stay with the agent; Screensaver idle `/idle-time`, Username `/username`, Power capabilities `/pmcap`, and Power stats `/pmstats` stay intact.
+- **v0.1.3053** — Power capabilities `/pmcap` · `/power-cap` from `pmset -g cap` (prior tick; remote).
+- **v0.1.3052** — Power stats `/pmstats` · `/power-stats` from `pmset -g stats` (prior tick).
+- **v0.1.3051** — Therm / CPU speed limits `/therm` · `/cpu-speed-limit` from `pmset -g therm` (prior tick).
 
-## Tried / context
-- Digester empty all night (0 Slowest / 7d).
-- Design review surfaces in grace (Mac TCC — polish-without-capture).
-- Layout-daily: data-poster marked 2026-11-24; Dark/Neon/Futuristic wait for next calendar quota.
-- Sibling OpenClaw/Hermes missing on Linux rack; no clear port.
-- Debug.log quiet (no ERROR/WARN clusters).
+## Context
+- Digester open empty; design-review due=false (Mac TCC — polish-without-capture).
+- Layout-daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Soft-state leftover closed for SoftDisabled / assertions / powersched / sysload / ups / pmlog / therm / pmstats / pmcap / useractivity — try other pmset adapters next; not another keep-pNN clone.
 
-## Next
-- Dark layout-daily next calendar day.
-- Try `pmset -g useractivity` next (pmcap closed).
-- Not another keep-pNN SoftDisabled clone.
+## Try
+- `/useractivity` or `view user activity` in Discord / AI Chat (Mac).
+- `/pmcap` for supported power-management caps.

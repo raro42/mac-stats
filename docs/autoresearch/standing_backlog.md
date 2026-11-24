@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~23:35 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota; already_checked_today).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window (Soul content noise only).
+- Fuel: product after Power capabilities v0.1.3053 — User activity from `pmset -g useractivity` (not SoftDisabled/boolean soft-state clone; Dark layout-daily next calendar day).
+- Shipped **v0.1.3054** — `/useractivity` · `/user-activity` · `/pmset-useractivity` · `/user-activity-level` · `/activity-level` · `/mac-useractivity` + view/open NL; bare useractivity/user activity/activity level stay with agent; `/idle-time` · `/screensaver` · `/username` · `/whoami` · `/pmcap` · `/pmstats` intact; `/help` lists lane.
+- Ratchet keep @ 4acd31852 for 3054; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats/pmcap/useractivity — try other pmset adapters next; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3054
+
+- Product fuel after Power capabilities v0.1.3053: user activity Level / MostSignificant / idle hint already readable via `pmset -g useractivity` but lacked `/useractivity` · `/user-activity` · `/pmset-useractivity` · `/user-activity-level` · `/activity-level` · `/mac-useractivity` and view/see/open/list phrases while Screensaver idle `/idle-time`, Username `/username`, Power capabilities `/pmcap`, and Power stats `/pmstats` already had slash+NL. Bare `useractivity` / `user activity` / `activity level` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats/pmcap/useractivity soft-state closed; try other pmset adapters; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~23:25 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
