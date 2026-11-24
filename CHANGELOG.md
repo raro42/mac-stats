@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3049] - 2026-11-24
+
+### Added
+- Instant UPS accepts `/ups` · `/ups-status` · `/ups-state` · `/ups-settings` · `/ups-settings-status` · `/ups-settings-state` · `/upssettings` · `/upssettings-status` · `/pmset-ups` · `/pmset-ups-status` · `/pmset-ups-state` · `/pmsetups` · `/pmsetups-status` · `/uninterruptible-power` · `/uninterruptible-power-status` · `/uninterruptible` · `/uninterruptible-status` · `/mac-ups` · `/mac-ups-status` · `/mac-ups-settings` · `/mac-pmset-ups` · `/mac-uninterruptible-power` and view/see/open/list NL (`view ups`, `open ups-settings`, `list ups`, …), matching “ups status” / “is ups attached” / “what's my ups” / “what's the ups settings”. Bare `ups` / `ups settings` stay with the agent; `/battery` · `/bat` stay Bat %; `/charger` · `/adapter` stay AC charger; `/sysload` · `/load-level` stay System load; `/powersched` · `/power-schedule` stay Power schedule. Operator `/help` lists the new lane.
+
 ## [0.1.3048] - 2026-11-24
 
 ### Added

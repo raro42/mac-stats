@@ -27247,6 +27247,9 @@ pub fn looks_like_sysload_request(content: &str) -> bool {
         || n == "/powersched"
         || n == "/power-schedule"
         || n == "/pmset-sched"
+        || n == "/ups"
+        || n == "/ups-settings"
+        || n == "/pmset-ups"
         || n == "/lpm"
         || n == "/power"
         || n == "/watts"
@@ -27407,6 +27410,194 @@ pub fn format_sysload_report() -> String {
         return "**System load** — _no sysload reading on this Mac right now._".to_string();
     }
     format!("**System load** · `{v}`")
+}
+
+/// UPS settings — `pmset -g ups` (haltlevel / haltafter / haltremain).
+/// Slash + view/open NL (`/ups` · `/ups-settings` · `view ups`).
+/// Bare `ups` / `ups settings` stay with the agent;
+/// `/battery` stays Bat %; `/charger` stays AC charger; `/sysload` stays System load.
+pub fn looks_like_ups_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("sysload")
+        || n.contains("load level")
+        || n.contains("powersched")
+        || n.contains("power schedule")
+        || n.contains("assertions")
+        || n.contains("systemsleep")
+        || n.contains("sleepdisabled")
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/sysload"
+        || n == "/load-level"
+        || n == "/powersched"
+        || n == "/power-schedule"
+        || n == "/thermal"
+        || n == "/heat"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/lpm"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "ups"
+        || n == "the ups"
+        || n == "ups settings"
+        || n == "the ups settings"
+        || n == "ups-settings"
+        || n == "the ups-settings"
+        || n == "ups setting"
+        || n == "the ups setting"
+        || n == "uninterruptible power"
+        || n == "the uninterruptible power"
+        || n == "uninterruptible-power"
+        || n == "the uninterruptible-power"
+        || n == "pmset ups"
+        || n == "the pmset ups"
+        || n == "pmset-ups"
+        || n == "the pmset-ups"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/ups"
+            | "/ups-status"
+            | "/ups-state"
+            | "/ups-settings"
+            | "/ups-settings-status"
+            | "/ups-settings-state"
+            | "/upssettings"
+            | "/upssettings-status"
+            | "/pmset-ups"
+            | "/pmset-ups-status"
+            | "/pmset-ups-state"
+            | "/pmsetups"
+            | "/pmsetups-status"
+            | "/uninterruptible-power"
+            | "/uninterruptible-power-status"
+            | "/uninterruptible"
+            | "/uninterruptible-status"
+            | "/mac-ups"
+            | "/mac-ups-status"
+            | "/mac-ups-settings"
+            | "/mac-pmset-ups"
+            | "/mac-uninterruptible-power"
+            | "ups status"
+            | "the ups status"
+            | "ups state"
+            | "the ups state"
+            | "ups settings status"
+            | "the ups settings status"
+            | "ups-settings status"
+            | "the ups-settings status"
+            | "pmset ups status"
+            | "the pmset ups status"
+            | "pmset-ups status"
+            | "the pmset-ups status"
+            | "my ups"
+            | "my ups status"
+            | "my ups settings"
+            | "is ups ok"
+            | "is the ups ok"
+            | "is ups attached"
+            | "is the ups attached"
+            | "how's ups"
+            | "hows ups"
+            | "how's the ups"
+            | "hows the ups"
+            | "what's my ups"
+            | "whats my ups"
+            | "what is my ups"
+            | "what's my ups status"
+            | "whats my ups status"
+            | "what is my ups status"
+            | "what's my ups settings"
+            | "whats my ups settings"
+            | "what is my ups settings"
+            | "what's the ups"
+            | "whats the ups"
+            | "what is the ups"
+            | "what's the ups status"
+            | "whats the ups status"
+            | "what is the ups status"
+            | "what's the ups settings"
+            | "whats the ups settings"
+            | "what is the ups settings"
+            | "view ups"
+            | "view the ups"
+            | "view ups status"
+            | "view the ups status"
+            | "view ups settings"
+            | "view the ups settings"
+            | "view ups-settings"
+            | "view the ups-settings"
+            | "view pmset-ups"
+            | "view the pmset-ups"
+            | "view uninterruptible power"
+            | "view the uninterruptible power"
+            | "see ups"
+            | "see the ups"
+            | "see ups settings"
+            | "see the ups settings"
+            | "open ups"
+            | "open the ups"
+            | "open ups status"
+            | "open the ups status"
+            | "open ups settings"
+            | "open the ups settings"
+            | "open ups-settings"
+            | "open pmset-ups"
+            | "open uninterruptible-power"
+            | "list ups"
+            | "list the ups"
+            | "list ups status"
+            | "list the ups status"
+            | "list ups settings"
+            | "list the ups settings"
+            | "list ups-settings"
+            | "list pmset-ups"
+            | "list uninterruptible power"
+    )
+}
+
+/// Zero-LLM UPS settings from `pmset -g ups` (macOS-only; empty elsewhere).
+pub fn format_ups_report() -> String {
+    let v = crate::metrics::get_ups_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**UPS** — _no UPS settings on this Mac right now._".to_string();
+    }
+    format!("**UPS** · `{v}`")
 }
 
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).

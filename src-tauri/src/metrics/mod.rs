@@ -7570,6 +7570,112 @@ pub fn get_sysload_status() -> String {
     }
 }
 
+/// Parse `pmset -g ups` settings → (haltlevel %, haltafter mins-or-neg, haltremain mins).
+/// Typical keys: `haltlevel` · `haltafter` · `haltremain` (absent when no UPS policy).
+pub(crate) fn parse_pmset_ups_settings(
+    raw: &str,
+) -> (Option<i32>, Option<i32>, Option<i32>) {
+    let mut haltlevel = None;
+    let mut haltafter = None;
+    let mut haltremain = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() || t.to_ascii_lowercase().contains("ups settings") {
+            continue;
+        }
+        if t.to_ascii_lowercase().contains("no ups") {
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        let val = match parts.next().and_then(|v| v.parse::<i32>().ok()) {
+            Some(v) => v,
+            None => continue,
+        };
+        match key.to_ascii_lowercase().as_str() {
+            "haltlevel" => haltlevel = Some(val),
+            "haltafter" => haltafter = Some(val),
+            "haltremain" => haltremain = Some(val),
+            _ => {}
+        }
+    }
+    (haltlevel, haltafter, haltremain)
+}
+
+fn format_ups_mins(mins: i32) -> String {
+    if mins < 0 {
+        "never".to_string()
+    } else if mins == 0 {
+        "0m".to_string()
+    } else if mins % 60 == 0 && mins >= 60 {
+        format!("{}h", mins / 60)
+    } else if mins >= 60 {
+        format!("{}h{}m", mins / 60, mins % 60)
+    } else {
+        format!("{mins}m")
+    }
+}
+
+/// Compact UPS status: `halt 5% · after never · remain 10m`.
+pub(crate) fn format_ups_parts(
+    haltlevel: Option<i32>,
+    haltafter: Option<i32>,
+    haltremain: Option<i32>,
+) -> String {
+    let mut bits: Vec<String> = Vec::new();
+    if let Some(v) = haltlevel {
+        bits.push(format!("halt {v}%"));
+    }
+    if let Some(v) = haltafter {
+        bits.push(format!("after {}", format_ups_mins(v)));
+    }
+    if let Some(v) = haltremain {
+        bits.push(format!("remain {}", format_ups_mins(v)));
+    }
+    bits.join(" · ")
+}
+
+/// macOS UPS settings from `pmset -g ups` (haltlevel / haltafter / haltremain).
+/// Distinct from Bat `%` `/battery`, AC charger `/charger`, and sysload `/sysload`.
+/// Used by Discord/operator instant `/ups` · `/ups-settings` lane.
+pub fn get_ups_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "ups"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("ups: pmset -g ups non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("ups: pmset -g ups spawn failed");
+                return String::new();
+            }
+        };
+        let (haltlevel, haltafter, haltremain) = parse_pmset_ups_settings(&stdout);
+        let info = format_ups_parts(haltlevel, haltafter, haltremain);
+        if info.is_empty() {
+            debug3!("ups: empty status");
+        } else {
+            debug3!("ups status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -13245,6 +13351,36 @@ mod sysload_parse_tests {
         assert_eq!(
             format_sysload_parts(Some("OK"), None, None, Some("Fair")),
             "OK · therm Fair"
+        );
+    }
+}
+
+#[cfg(test)]
+mod ups_parse_tests {
+    use super::{format_ups_parts, parse_pmset_ups_settings};
+
+    const SAMPLE: &str = r#"
+UPS settings:
+  haltlevel		5
+  haltafter		-1
+  haltremain		10
+"#;
+
+    #[test]
+    fn parses_settings_and_formats() {
+        let (level, after, remain) = parse_pmset_ups_settings(SAMPLE);
+        assert_eq!(level, Some(5));
+        assert_eq!(after, Some(-1));
+        assert_eq!(remain, Some(10));
+        assert_eq!(
+            format_ups_parts(level, after, remain),
+            "halt 5% · after never · remain 10m"
+        );
+        assert_eq!(parse_pmset_ups_settings("No UPS attached."), (None, None, None));
+        assert_eq!(format_ups_parts(None, None, None), "");
+        assert_eq!(
+            format_ups_parts(Some(20), Some(120), None),
+            "halt 20% · after 2h"
         );
     }
 }

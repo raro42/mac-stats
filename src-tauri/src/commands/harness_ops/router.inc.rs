@@ -1370,6 +1370,11 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_sysload_request(content) {
         return Some(format_sysload_report());
     }
+    // UPS settings from `pmset -g ups` (bare `ups` / `ups settings` stay with the agent;
+    // `/battery` stays Bat %; `/charger` stays AC charger; `/sysload` stays System load).
+    if looks_like_ups_request(content) {
+        return Some(format_ups_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

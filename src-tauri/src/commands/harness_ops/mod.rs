@@ -6329,6 +6329,70 @@ mod tests {
     }
 
     #[test]
+    fn ups_slash_and_view_open_do_not_steal_battery_charger_or_bare() {
+        // Slash + view/open NL → UPS (`/battery` · `/charger` parity).
+        // Bare `ups` / `ups settings` stay with the agent;
+        // `/battery` stays Bat %; `/charger` stays AC charger; `/sysload` stays System load.
+        assert!(looks_like_ups_request("/ups"));
+        assert!(looks_like_ups_request("/ups-status"));
+        assert!(looks_like_ups_request("/ups-settings"));
+        assert!(looks_like_ups_request("/pmset-ups"));
+        assert!(looks_like_ups_request("/uninterruptible-power"));
+        assert!(looks_like_ups_request("/mac-ups"));
+        assert!(looks_like_ups_request("/mac-ups-settings"));
+        assert!(looks_like_ups_request("view ups"));
+        assert!(looks_like_ups_request("open ups-settings"));
+        assert!(looks_like_ups_request("list ups"));
+        assert!(looks_like_ups_request("ups status"));
+        assert!(looks_like_ups_request("is ups attached"));
+        assert!(looks_like_ups_request("what's my ups"));
+        assert!(looks_like_ups_request("view ups settings"));
+        assert!(!looks_like_ups_request("ups"));
+        assert!(!looks_like_ups_request("ups settings"));
+        assert!(!looks_like_ups_request("/battery"));
+        assert!(!looks_like_ups_request("/bat"));
+        assert!(!looks_like_ups_request("/charger"));
+        assert!(!looks_like_ups_request("/adapter"));
+        assert!(!looks_like_ups_request("/sysload"));
+        assert!(!looks_like_ups_request("/powersched"));
+        assert!(!looks_like_ups_request("/tasks"));
+        assert!(!looks_like_ups_request("enable ups"));
+        assert!(!looks_like_sysload_request("/ups"));
+        assert!(!looks_like_sysload_request("view ups"));
+        let s = try_operator_instant_reply("/ups").unwrap();
+        assert!(
+            s.contains("**UPS**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view ups").unwrap();
+        assert!(
+            viewed.contains("**UPS**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open ups-settings").unwrap();
+        assert!(
+            open.contains("**UPS**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("ups").is_none());
+        assert!(try_operator_instant_reply("ups settings").is_none());
+        let bat = try_operator_instant_reply("/battery");
+        if let Some(reply) = bat {
+            assert!(
+                !reply.contains("**UPS**"),
+                "/battery must stay Bat %, not UPS: {reply}"
+            );
+        }
+        let charger = try_operator_instant_reply("/charger");
+        if let Some(reply) = charger {
+            assert!(
+                !reply.contains("**UPS**"),
+                "/charger must stay AC charger, not UPS: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn sysload_slash_and_view_open_do_not_steal_load_heat_or_bare() {
         // Slash + view/open NL → System load (`/load` · `/thermal` parity).
         // Bare `sysload` / `load level` stay with the agent;
