@@ -5742,6 +5742,7 @@ mod tests {
         assert!(!looks_like_darkwakes_request("/tasks"));
         assert!(!looks_like_darkwakes_request("enable darkwakes"));
         assert!(!looks_like_darkwakes_request("/gpu"));
+        assert!(!looks_like_darkwakes_request("/ttysclobber"));
         assert!(!looks_like_gpuswitch_request("/darkwakes"));
         assert!(!looks_like_gpuswitch_request("view darkwakes"));
         assert!(!looks_like_autorestart_request("/darkwakes"));
@@ -5774,6 +5775,70 @@ mod tests {
             assert!(
                 !reply.contains("**Dark Wakes**"),
                 "/autorestart must stay Auto Restart, not Dark Wakes: {reply}"
+            );
+        }
+    }
+
+    #[test]
+    fn ttysclobber_slash_and_view_open_do_not_steal_ttyskeepawake_or_bare() {
+        // Slash + view/open NL → TTY Clobber (`/ttyskeepawake` · `/darkwakes` parity).
+        // Bare `ttysclobber` / `ttys clobber` / `tty clobber` stay with the agent;
+        // `/ttyskeepawake` stays TTY keep awake; `/darkwakes` stays Dark Wakes.
+        assert!(looks_like_ttysclobber_request("/ttysclobber"));
+        assert!(looks_like_ttysclobber_request("/ttysclobber-status"));
+        assert!(looks_like_ttysclobber_request("/ttys-clobber"));
+        assert!(looks_like_ttysclobber_request("/tty-clobber"));
+        assert!(looks_like_ttysclobber_request("/mac-ttysclobber"));
+        assert!(looks_like_ttysclobber_request("/mac-ttys-clobber"));
+        assert!(looks_like_ttysclobber_request("view ttysclobber"));
+        assert!(looks_like_ttysclobber_request("open ttys-clobber"));
+        assert!(looks_like_ttysclobber_request("list tty clobber"));
+        assert!(looks_like_ttysclobber_request("ttysclobber status"));
+        assert!(looks_like_ttysclobber_request("is ttys clobber on"));
+        assert!(looks_like_ttysclobber_request("what's my ttysclobber"));
+        assert!(looks_like_ttysclobber_request("view ttys clobber"));
+        assert!(!looks_like_ttysclobber_request("ttysclobber"));
+        assert!(!looks_like_ttysclobber_request("ttys clobber"));
+        assert!(!looks_like_ttysclobber_request("tty clobber"));
+        assert!(!looks_like_ttysclobber_request("/ttyskeepawake"));
+        assert!(!looks_like_ttysclobber_request("view tty keep awake"));
+        assert!(!looks_like_ttysclobber_request("/darkwakes"));
+        assert!(!looks_like_ttysclobber_request("/tcpkeepalive"));
+        assert!(!looks_like_ttysclobber_request("/standby"));
+        assert!(!looks_like_ttysclobber_request("/tasks"));
+        assert!(!looks_like_ttysclobber_request("enable ttysclobber"));
+        assert!(!looks_like_ttyskeepawake_request("/ttysclobber"));
+        assert!(!looks_like_ttyskeepawake_request("view ttysclobber"));
+        assert!(!looks_like_darkwakes_request("/ttysclobber"));
+        let s = try_operator_instant_reply("/ttysclobber").unwrap();
+        assert!(
+            s.contains("**TTY Clobber**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view ttysclobber").unwrap();
+        assert!(
+            viewed.contains("**TTY Clobber**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open ttys-clobber").unwrap();
+        assert!(
+            open.contains("**TTY Clobber**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("ttysclobber").is_none());
+        assert!(try_operator_instant_reply("ttys clobber").is_none());
+        let tk = try_operator_instant_reply("/ttyskeepawake");
+        if let Some(reply) = tk {
+            assert!(
+                !reply.contains("**TTY Clobber**"),
+                "/ttyskeepawake must stay TTY keep awake, not TTY Clobber: {reply}"
+            );
+        }
+        let dw = try_operator_instant_reply("/darkwakes");
+        if let Some(reply) = dw {
+            assert!(
+                !reply.contains("**TTY Clobber**"),
+                "/darkwakes must stay Dark Wakes, not TTY Clobber: {reply}"
             );
         }
     }

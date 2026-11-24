@@ -1307,6 +1307,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_darkwakes_request(content) {
         return Some(format_darkwakes_report());
     }
+    // TTY Clobber (bare `ttysclobber` / `ttys clobber` / `tty clobber` stay with the agent;
+    // `/ttyskeepawake` stays TTY keep awake; `/darkwakes` stays Dark Wakes;
+    // `/tcpkeepalive` stays TCP Keep Alive).
+    if looks_like_ttysclobber_request(content) {
+        return Some(format_ttysclobber_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

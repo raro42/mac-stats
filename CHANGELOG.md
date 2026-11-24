@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.3039] - 2026-11-24
+
+### Added
+- Instant TTY Clobber accepts `/ttysclobber` · `/ttysclobber-status` · `/ttysclobber-state` · `/ttys-clobber` · `/ttys-clobber-status` · `/ttys-clobber-state` · `/tty-clobber` · `/tty-clobber-status` · `/tty-clobber-state` · `/ttyclobber` · `/ttyclobber-status` · `/mac-ttysclobber` · `/mac-ttys-clobber` · `/mac-tty-clobber` · `/mac-ttyclobber` · `/mac-ttysclobber-status` · `/mac-ttys-clobber-status` and view/see/open/list NL (`view ttysclobber`, `open ttys-clobber`, `list tty clobber`, …), matching “ttysclobber status” / “is ttys clobber on” / “is ttysclobber enabled” / “what's my ttysclobber” / “what's the ttys clobber”. Bare `ttysclobber` / `ttys clobber` / `tty clobber` stay with the agent; `/ttyskeepawake` · `/tty-keep-awake` stay TTY keep awake; `/darkwakes` · `/dark-wakes` stay Dark Wakes; `/tcpkeepalive` · `/tcp-keep-alive` stay TCP Keep Alive. Operator `/help` lists the new lane.
+
+
 ## [0.1.3038] - 2026-11-24
 
 ### Added

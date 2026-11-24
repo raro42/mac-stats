@@ -18984,6 +18984,9 @@ pub fn looks_like_ttyskeepawake_request(content: &str) -> bool {
         || n.contains("wake-on-lan")
         || n.contains("wake on network")
         || n.contains("womp")
+        || n.contains("ttysclobber")
+        || n.contains("ttys clobber")
+        || n.contains("tty clobber")
         || n.contains("proximitywake")
         || n.contains("proximity wake")
         || n.contains("proximity-wake")
@@ -19041,6 +19044,9 @@ pub fn looks_like_ttyskeepawake_request(content: &str) -> bool {
         || n == "/wake-for-network"
         || n == "/wake-on-lan"
         || n == "/wol"
+        || n == "/ttysclobber"
+        || n == "/ttys-clobber"
+        || n == "/tty-clobber"
         || n == "/proximitywake"
         || n == "/proximity-wake"
         || n == "/displaysleep"
@@ -24744,6 +24750,11 @@ pub fn looks_like_darkwakes_request(content: &str) -> bool {
         || n.contains("proximity-wake")
         || n.contains("ttyskeepawake")
         || n.contains("tty keep awake")
+        || n.contains("ttysclobber")
+        || n.contains("ttys clobber")
+        || n.contains("tty clobber")
+        || n.contains("ttys-clobber")
+        || n.contains("tty-clobber")
         || n.contains("tcpkeepalive")
         || n.contains("tcp keep alive")
         || n.contains("networkoversleep")
@@ -24796,6 +24807,9 @@ pub fn looks_like_darkwakes_request(content: &str) -> bool {
         || n == "/gpuswitch"
         || n == "/gpu-switch"
         || n == "/graphics-switching"
+        || n == "/ttysclobber"
+        || n == "/ttys-clobber"
+        || n == "/tty-clobber"
         || n == "/destroyfvkeyonstandby"
         || n == "/tasks"
         || n == "/uptime"
@@ -24939,6 +24953,287 @@ pub fn format_darkwakes_report() -> String {
         return "**Dark Wakes** — _no Dark Wakes reading on this Mac right now._".to_string();
     }
     format!("**Dark Wakes** · `{v}`")
+}
+
+/// TTY Clobber — `pmset` Battery/AC `ttysclobber` (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/ttysclobber` · `/ttys-clobber` · `view ttysclobber`).
+/// Bare `ttysclobber` / `ttys clobber` stay with the agent;
+/// `/ttyskeepawake` stays TTY keep awake; `/darkwakes` stays Dark Wakes; `/standby` stays Standby;
+/// `/tcpkeepalive` stays TCP Keep Alive.
+pub fn looks_like_ttysclobber_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("gpuswitch")
+        || n.contains("gpu switch")
+        || n.contains("gpu-switch")
+        || n.contains("graphics switching")
+        || n.contains("graphics-switching")
+        || n.contains("autorestart")
+        || n.contains("auto restart")
+        || n.contains("auto-restart")
+        || n.contains("restart on power loss")
+        || n.contains("restart-on-power-loss")
+        || n.contains("autopoweroffdelay")
+        || n.contains("auto power off delay")
+        || n.contains("autopoweroff")
+        || n.contains("auto power off")
+        || n.contains("auto-power-off")
+        || n.contains("lidwake")
+        || n.contains("lid wake")
+        || n.contains("lid-wake")
+        || n.contains("acwake")
+        || n.contains("ac wake")
+        || n.contains("ac-wake")
+        || n.contains("wake on lid")
+        || n.contains("wake on ac")
+        || n.contains("destroyfvkey")
+        || n.contains("destroy-fv-key")
+        || n.contains("destroy fv key")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("ttys-keep-awake")
+        || n.contains("tty-keep-awake")
+        || n.contains("darkwakes")
+        || n.contains("dark wakes")
+        || n.contains("dark-wakes")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("hibernatemode")
+        || n.contains("hibernate")
+        || n.contains("standbydelay")
+        || n.contains("standby delay")
+        || n.contains("standby")
+        || n.contains("stand by")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("system sleep")
+        || n.contains("systemsleep")
+        || n.contains("sleep on power")
+        || n.contains("power button")
+        || n.contains("sopb")
+        || n.contains("lessbright")
+        || n.contains("halfdim")
+        || n.contains("filevault")
+        || n.contains("screensaver")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/gpu"
+        || n == "/gpu-name"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/autopoweroff"
+        || n == "/auto-power-off"
+        || n == "/autopoweroffdelay"
+        || n == "/proximitywake"
+        || n == "/standby"
+        || n == "/stand-by"
+        || n == "/lidwake"
+        || n == "/lid-wake"
+        || n == "/acwake"
+        || n == "/ac-wake"
+        || n == "/autorestart"
+        || n == "/auto-restart"
+        || n == "/restart-on-power-loss"
+        || n == "/gpuswitch"
+        || n == "/gpu-switch"
+        || n == "/graphics-switching"
+        || n == "/darkwakes"
+        || n == "/dark-wakes"
+        || n == "/ttyskeepawake"
+        || n == "/ttys-keep-awake"
+        || n == "/tty-keep-awake"
+        || n == "/destroyfvkeyonstandby"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        // Bare phrases stay with the agent.
+        || n == "ttysclobber"
+        || n == "the ttysclobber"
+        || n == "ttys clobber"
+        || n == "the ttys clobber"
+        || n == "ttys-clobber"
+        || n == "the ttys-clobber"
+        || n == "tty clobber"
+        || n == "the tty clobber"
+        || n == "tty-clobber"
+        || n == "the tty-clobber"
+        || n == "ttyclobber"
+        || n == "the ttyclobber"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/ttysclobber"
+            | "/ttysclobber-status"
+            | "/ttysclobber-state"
+            | "/ttys-clobber"
+            | "/ttys-clobber-status"
+            | "/ttys-clobber-state"
+            | "/tty-clobber"
+            | "/tty-clobber-status"
+            | "/tty-clobber-state"
+            | "/ttyclobber"
+            | "/ttyclobber-status"
+            | "/ttyclobber-state"
+            | "/mac-ttysclobber"
+            | "/mac-ttys-clobber"
+            | "/mac-tty-clobber"
+            | "/mac-ttyclobber"
+            | "/mac-ttysclobber-status"
+            | "/mac-ttys-clobber-status"
+            | "ttysclobber status"
+            | "the ttysclobber status"
+            | "ttys clobber status"
+            | "the ttys clobber status"
+            | "ttys-clobber status"
+            | "the ttys-clobber status"
+            | "tty clobber status"
+            | "the tty clobber status"
+            | "ttysclobber state"
+            | "the ttysclobber state"
+            | "ttys clobber state"
+            | "my ttysclobber"
+            | "my ttysclobber status"
+            | "my ttys clobber"
+            | "my ttys clobber status"
+            | "is ttysclobber on"
+            | "is ttysclobber off"
+            | "is ttysclobber enabled"
+            | "is ttysclobber disabled"
+            | "is ttys clobber on"
+            | "is ttys clobber off"
+            | "is ttys clobber enabled"
+            | "is ttys clobber disabled"
+            | "is ttys-clobber on"
+            | "is ttys-clobber enabled"
+            | "is tty clobber on"
+            | "is tty clobber enabled"
+            | "what's my ttysclobber"
+            | "whats my ttysclobber"
+            | "what is my ttysclobber"
+            | "what's my ttysclobber status"
+            | "whats my ttysclobber status"
+            | "what is my ttysclobber status"
+            | "what's my ttys clobber"
+            | "whats my ttys clobber"
+            | "what is my ttys clobber"
+            | "what's my ttys clobber status"
+            | "whats my ttys clobber status"
+            | "what is my ttys clobber status"
+            | "what's the ttysclobber"
+            | "whats the ttysclobber"
+            | "what is the ttysclobber"
+            | "what's the ttysclobber status"
+            | "whats the ttysclobber status"
+            | "what is the ttysclobber status"
+            | "what's the ttys clobber"
+            | "whats the ttys clobber"
+            | "what is the ttys clobber"
+            | "what's the ttys clobber status"
+            | "whats the ttys clobber status"
+            | "what is the ttys clobber status"
+            | "how's ttysclobber"
+            | "hows ttysclobber"
+            | "how's the ttysclobber"
+            | "hows the ttysclobber"
+            | "how's ttys clobber"
+            | "hows ttys clobber"
+            | "view ttysclobber"
+            | "view the ttysclobber"
+            | "view ttysclobber status"
+            | "view the ttysclobber status"
+            | "view ttys clobber"
+            | "view the ttys clobber"
+            | "view ttys clobber status"
+            | "view the ttys clobber status"
+            | "view ttys-clobber"
+            | "view the ttys-clobber"
+            | "view tty clobber"
+            | "view the tty clobber"
+            | "see ttysclobber"
+            | "see the ttysclobber"
+            | "see ttysclobber status"
+            | "see the ttysclobber status"
+            | "see ttys clobber"
+            | "see the ttys clobber"
+            | "open ttysclobber"
+            | "open the ttysclobber"
+            | "open ttysclobber status"
+            | "open the ttysclobber status"
+            | "open ttys clobber"
+            | "open the ttys clobber"
+            | "open ttys-clobber"
+            | "open the ttys-clobber"
+            | "open tty clobber"
+            | "open the tty clobber"
+            | "list ttysclobber"
+            | "list the ttysclobber"
+            | "list ttysclobber status"
+            | "list the ttysclobber status"
+            | "list ttys clobber"
+            | "list the ttys clobber"
+            | "list ttys-clobber"
+            | "list the ttys-clobber"
+            | "list tty clobber"
+            | "list the tty clobber"
+    )
+}
+
+/// Zero-LLM TTY Clobber from pmset (macOS-only; empty elsewhere).
+pub fn format_ttysclobber_report() -> String {
+    let v = crate::metrics::get_ttysclobber_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**TTY Clobber** — _no TTY Clobber reading on this Mac right now._".to_string();
+    }
+    format!("**TTY Clobber** · `{v}`")
 }
 
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
