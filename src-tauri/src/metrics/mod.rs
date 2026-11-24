@@ -4834,6 +4834,157 @@ pub fn get_hibernatefile_status() -> String {
     }
 }
 
+/// Parse `pmset -g custom` Battery/AC `standbydelay` seconds → (battery, ac).
+/// Exact key `standbydelay` only (not `standby` / `standbydelayhigh` / `standbydelaylow`).
+pub(crate) fn parse_pmset_custom_standbydelay(raw: &str) -> (Option<u32>, Option<u32>) {
+    let mut section: Option<&str> = None;
+    let mut battery = None;
+    let mut ac = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.eq_ignore_ascii_case("Battery Power:") {
+            section = Some("battery");
+            continue;
+        }
+        if t.eq_ignore_ascii_case("AC Power:") {
+            section = Some("ac");
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("standbydelay") {
+            continue;
+        }
+        let secs = match parts.next().and_then(|v| v.parse::<u32>().ok()) {
+            Some(v) => Some(v),
+            None => continue,
+        };
+        match section {
+            Some("battery") => battery = secs.or(battery),
+            Some("ac") => ac = secs.or(ac),
+            _ => {}
+        }
+    }
+    (battery, ac)
+}
+
+/// Parse active `pmset -g` `standbydelay` seconds (Currently in use).
+pub(crate) fn parse_pmset_active_standbydelay(raw: &str) -> Option<u32> {
+    for line in raw.lines() {
+        let mut parts = line.trim().split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("standbydelay") {
+            continue;
+        }
+        return parts.next().and_then(|v| v.parse::<u32>().ok());
+    }
+    None
+}
+
+/// Human Standby delay seconds (0 → Never; else Ns / Nm / Nh).
+pub(crate) fn format_standbydelay_secs(secs: u32) -> String {
+    if secs == 0 {
+        return "Never".to_string();
+    }
+    if secs >= 3600 && secs % 3600 == 0 {
+        return format!("{}h", secs / 3600);
+    }
+    if secs >= 60 && secs % 60 == 0 {
+        return format!("{}m", secs / 60);
+    }
+    if secs >= 60 {
+        return format!("{}m{}s", secs / 60, secs % 60);
+    }
+    format!("{secs}s")
+}
+
+/// Prefer Battery+AC custom when both set; else active `pmset -g`.
+pub(crate) fn format_standbydelay_parts(
+    battery: Option<u32>,
+    ac: Option<u32>,
+    active: Option<u32>,
+) -> String {
+    match (battery, ac) {
+        (Some(b), Some(a)) if b == a => format_standbydelay_secs(b),
+        (Some(b), Some(a)) => {
+            format!(
+                "AC {} · Battery {}",
+                format_standbydelay_secs(a),
+                format_standbydelay_secs(b)
+            )
+        }
+        (Some(b), None) => format!("{} (Battery)", format_standbydelay_secs(b)),
+        (None, Some(a)) => format!("{} (AC)", format_standbydelay_secs(a)),
+        (None, None) => match active {
+            Some(s) => format_standbydelay_secs(s),
+            None => String::new(),
+        },
+    }
+}
+
+/// macOS Standby delay from `pmset -g custom` Battery/AC `standbydelay`
+/// (fallback: active `pmset -g`; often absent on Apple Silicon). Distinct from
+/// Standby `/standby`, Hibernate file `/hibernatefile`, and autopoweroff.
+/// Used by Discord/operator instant `/standbydelay` · `/standby-delay` lane.
+pub fn get_standbydelay_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let (battery, ac) = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g", "custom"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_custom_standbydelay(&stdout)
+                }
+                Ok(_) => (None, None),
+                Err(_) => {
+                    debug3!("standbydelay: pmset -g custom spawn failed");
+                    (None, None)
+                }
+            }
+        };
+
+        let active = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_active_standbydelay(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("standbydelay: pmset -g spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_standbydelay_parts(battery, ac, active);
+        if info.is_empty() {
+            debug3!("standbydelay: empty status");
+        } else {
+            debug3!("standbydelay status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -8982,6 +9133,79 @@ AC Power:
             "/c"
         );
         assert_eq!(format_hibernatefile_parts(None, None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod standbydelay_parse_tests {
+    use super::{
+        format_standbydelay_parts, format_standbydelay_secs, parse_pmset_active_standbydelay,
+        parse_pmset_custom_standbydelay,
+    };
+
+    #[test]
+    fn parses_custom_battery_and_ac() {
+        let sample = r#"
+Battery Power:
+ standbydelay         10800
+ standby              1
+AC Power:
+ standbydelay         86400
+ standbydelayhigh     86400
+"#;
+        assert_eq!(
+            parse_pmset_custom_standbydelay(sample),
+            (Some(10800), Some(86400))
+        );
+        assert_eq!(parse_pmset_custom_standbydelay("nope"), (None, None));
+        let other = r#"
+Battery Power:
+ standby              1
+AC Power:
+ standbydelayhigh     86400
+"#;
+        assert_eq!(parse_pmset_custom_standbydelay(other), (None, None));
+    }
+
+    #[test]
+    fn parses_active_standbydelay() {
+        assert_eq!(
+            parse_pmset_active_standbydelay("Currently in use:\n standbydelay         10800\n"),
+            Some(10800)
+        );
+        assert_eq!(parse_pmset_active_standbydelay(" standby              1\n"), None);
+        assert_eq!(
+            parse_pmset_active_standbydelay(" standbydelayhigh     86400\n"),
+            None
+        );
+    }
+
+    #[test]
+    fn formats_secs_and_parts() {
+        assert_eq!(format_standbydelay_secs(0), "Never");
+        assert_eq!(format_standbydelay_secs(45), "45s");
+        assert_eq!(format_standbydelay_secs(90), "1m30s");
+        assert_eq!(format_standbydelay_secs(120), "2m");
+        assert_eq!(format_standbydelay_secs(3600), "1h");
+        assert_eq!(format_standbydelay_secs(10800), "3h");
+        assert_eq!(
+            format_standbydelay_parts(Some(10800), Some(10800), Some(0)),
+            "3h"
+        );
+        assert_eq!(
+            format_standbydelay_parts(Some(10800), Some(86400), None),
+            "AC 24h · Battery 3h"
+        );
+        assert_eq!(
+            format_standbydelay_parts(Some(10800), None, None),
+            "3h (Battery)"
+        );
+        assert_eq!(
+            format_standbydelay_parts(None, Some(0), None),
+            "Never (AC)"
+        );
+        assert_eq!(format_standbydelay_parts(None, None, Some(120)), "2m");
+        assert_eq!(format_standbydelay_parts(None, None, None), "");
     }
 }
 

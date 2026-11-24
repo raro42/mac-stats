@@ -1253,13 +1253,20 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     // Hibernate file (bare `hibernatefile` / `hibernate file` / `sleepimage` stay with the agent;
     // `/hibernatemode` · `/hibernate` stay Hibernate mode; `/systemsleep` stays System Sleep;
-    // `/standby` stays Standby; `/halfdim` stays Half Dim).
+    // `/standby` stays Standby; `/halfdim` stays Half Dim; `/standbydelay` stays Standby delay).
     if looks_like_hibernatefile_request(content) {
         return Some(format_hibernatefile_report());
     }
+    // Standby delay (bare `standbydelay` / `standby delay` stay with the agent;
+    // `/standby` stays Standby; `/hibernatefile` stays Hibernate file;
+    // standbydelayhigh / standbydelaylow / autopoweroff stay out).
+    if looks_like_standbydelay_request(content) {
+        return Some(format_standbydelay_report());
+    }
     // Standby (bare `standby` / `stand by` stay with the agent;
     // `/hibernatemode` stays Hibernate mode; `/systemsleep` stays System Sleep;
-    // `/powernap` stays Power Nap; `/networkoversleep` stays Network over sleep).
+    // `/powernap` stays Power Nap; `/networkoversleep` stays Network over sleep;
+    // `/standbydelay` stays Standby delay).
     if looks_like_standby_request(content) {
         return Some(format_standby_report());
     }

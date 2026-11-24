@@ -22127,6 +22127,338 @@ pub fn format_hibernatefile_report() -> String {
     format!("**Hibernate file** · `{v}`")
 }
 
+/// Standby delay — `pmset` Battery/AC `standbydelay` seconds (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/standbydelay` · `/standby-delay` · `view standbydelay`).
+/// Bare `standbydelay` / `standby delay` stay with the agent;
+/// `/standby` stays Standby; `/hibernatefile` stays Hibernate file;
+/// standbydelayhigh / standbydelaylow / autopoweroff stay out.
+pub fn looks_like_standbydelay_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("standbydelayhigh")
+        || n.contains("standby delay high")
+        || n.contains("standby-delay-high")
+        || n.contains("standbydelaylow")
+        || n.contains("standby delay low")
+        || n.contains("standby-delay-low")
+        || n.contains("autopoweroff")
+        || n.contains("auto power off")
+        || n.contains("auto-power-off")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("power-mode")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("wake on network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("hard disk sleep")
+        || n.contains("hdd sleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("systemsleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("computersleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("ttys keep awake")
+        || n.contains("tty-keep-awake")
+        || n.contains("ttys-keep-awake")
+        || n.contains("ttykeepawake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("tcp-keep-alive")
+        || n.contains("tcp keepalive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("network-over-sleep")
+        || n.contains("hibernatemode")
+        || n.contains("hibernate mode")
+        || n.contains("hibernate-mode")
+        || n.contains("hibernatefile")
+        || n.contains("hibernate file")
+        || n.contains("hibernate-file")
+        || n.contains("sleepimage")
+        || n.contains("sleep image")
+        || n.contains("sleep-image")
+        || n.contains("sleep on power")
+        || n.contains("sleep-on-power")
+        || n.contains("power button")
+        || n.contains("power-button")
+        || n.contains("sopb")
+        || n.contains("lessbright")
+        || n.contains("less bright")
+        || n.contains("less-bright")
+        || n.contains("slightly dim")
+        || n.contains("slightly-dim")
+        || n.contains("dim display")
+        || n.contains("dim-display")
+        || n.contains("halfdim")
+        || n.contains("half dim")
+        || n.contains("half-dim")
+        || n.contains("half brightness")
+        || n.contains("half-brightness")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/powermode"
+        || n == "/power-mode"
+        || n == "/mac-powermode"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/proximitywake"
+        || n == "/proximity-wake"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
+        || n == "/display"
+        || n == "/screen"
+        || n == "/resolution"
+        || n == "/disksleep"
+        || n == "/disk-sleep"
+        || n == "/hard-disk-sleep"
+        || n == "/hdd-sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/computer-sleep"
+        || n == "/computersleep"
+        || n == "/sleep"
+        || n == "/ttyskeepawake"
+        || n == "/tty-keep-awake"
+        || n == "/ttys-keep-awake"
+        || n == "/ttykeepawake"
+        || n == "/tcpkeepalive"
+        || n == "/tcp-keep-alive"
+        || n == "/tcp-keepalive"
+        || n == "/networkoversleep"
+        || n == "/network-over-sleep"
+        || n == "/hibernatemode"
+        || n == "/hibernate-mode"
+        || n == "/hibernate"
+        || n == "/hibernatefile"
+        || n == "/hibernate-file"
+        || n == "/sleepimage"
+        || n == "/sleep-image"
+        || n == "/standby"
+        || n == "/stand-by"
+        || n == "/standby-status"
+        || n == "/stand-by-status"
+        || n == "/mac-standby"
+        || n == "/mac-stand-by"
+        || n == "/sleep-on-power-button"
+        || n == "/sleep-on-power"
+        || n == "/power-button-sleep"
+        || n == "/sopb"
+        || n == "/lessbright"
+        || n == "/less-bright"
+        || n == "/slightly-dim"
+        || n == "/dim-display"
+        || n == "/halfdim"
+        || n == "/half-dim"
+        || n == "/half-brightness"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "standbydelay"
+        || n == "the standbydelay"
+        || n == "standby delay"
+        || n == "the standby delay"
+        || n == "standby-delay"
+        || n == "the standby-delay"
+        // Bare standby stays with Standby agent lane.
+        || n == "standby"
+        || n == "the standby"
+        || n == "stand by"
+        || n == "the stand by"
+        || n == "stand-by"
+        || n == "the stand-by"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/standbydelay"
+            | "/standbydelay-status"
+            | "/standbydelay-state"
+            | "/standby-delay"
+            | "/standby-delay-status"
+            | "/standby-delay-state"
+            | "/mac-standbydelay"
+            | "/mac-standby-delay"
+            | "/mac-standbydelay-status"
+            | "/mac-standby-delay-status"
+            | "standbydelay status"
+            | "the standbydelay status"
+            | "standby delay status"
+            | "the standby delay status"
+            | "standby-delay status"
+            | "the standby-delay status"
+            | "standbydelay state"
+            | "the standbydelay state"
+            | "standby delay state"
+            | "the standby delay state"
+            | "my standbydelay"
+            | "my standbydelay status"
+            | "my standby delay"
+            | "my standby delay status"
+            | "what's my standbydelay"
+            | "whats my standbydelay"
+            | "what is my standbydelay"
+            | "what's my standbydelay status"
+            | "whats my standbydelay status"
+            | "what is my standbydelay status"
+            | "what's my standby delay"
+            | "whats my standby delay"
+            | "what is my standby delay"
+            | "what's my standby delay status"
+            | "whats my standby delay status"
+            | "what is my standby delay status"
+            | "what's the standbydelay"
+            | "whats the standbydelay"
+            | "what is the standbydelay"
+            | "what's the standbydelay status"
+            | "whats the standbydelay status"
+            | "what is the standbydelay status"
+            | "what's the standby delay"
+            | "whats the standby delay"
+            | "what is the standby delay"
+            | "what's the standby delay status"
+            | "whats the standby delay status"
+            | "what is the standby delay status"
+            | "how's standbydelay"
+            | "hows standbydelay"
+            | "how's the standbydelay"
+            | "hows the standbydelay"
+            | "how's standby delay"
+            | "hows standby delay"
+            | "view standbydelay"
+            | "view the standbydelay"
+            | "view standbydelay status"
+            | "view the standbydelay status"
+            | "view standby delay"
+            | "view the standby delay"
+            | "view standby delay status"
+            | "view the standby delay status"
+            | "view standby-delay"
+            | "view the standby-delay"
+            | "see standbydelay"
+            | "see the standbydelay"
+            | "see standbydelay status"
+            | "see the standbydelay status"
+            | "see standby delay"
+            | "see the standby delay"
+            | "open standbydelay"
+            | "open the standbydelay"
+            | "open standbydelay status"
+            | "open the standbydelay status"
+            | "open standby delay"
+            | "open the standby delay"
+            | "open standby-delay"
+            | "open the standby-delay"
+            | "list standbydelay"
+            | "list the standbydelay"
+            | "list standbydelay status"
+            | "list the standbydelay status"
+            | "list standby delay"
+            | "list the standby delay"
+            | "list standby-delay"
+            | "list the standby-delay"
+    )
+}
+
+/// Zero-LLM Standby delay from pmset (macOS-only; empty elsewhere).
+pub fn format_standbydelay_report() -> String {
+    let v = crate::metrics::get_standbydelay_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Standby delay** — _no Standby delay reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**Standby delay** · `{v}`")
+}
+
 /// System Sleep — `pmset` Battery/AC `sleep` minutes (+ active fallback; 0 = Never).
 /// Slash + view/open NL (`/systemsleep` · `/system-sleep` · `/computer-sleep` · `view system sleep`).
 /// Bare `systemsleep` / `system sleep` / `computer sleep` / `sleep` stay with the agent;

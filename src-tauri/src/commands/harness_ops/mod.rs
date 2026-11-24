@@ -5066,6 +5066,64 @@ mod tests {
     }
 
     #[test]
+
+    #[test]
+    fn standbydelay_slash_and_view_open_do_not_steal_standby_or_bare() {
+        // Slash + view/open NL → Standby delay (`/standby` · `/hibernatefile` parity).
+        // Bare `standbydelay` / `standby delay` stay with the agent;
+        // `/standby` stays Standby; `/hibernatefile` stays Hibernate file;
+        // standbydelayhigh / autopoweroff stay out.
+        assert!(looks_like_standbydelay_request("/standbydelay"));
+        assert!(looks_like_standbydelay_request("/standbydelay-status"));
+        assert!(looks_like_standbydelay_request("/standby-delay"));
+        assert!(looks_like_standbydelay_request("/mac-standbydelay"));
+        assert!(looks_like_standbydelay_request("/mac-standby-delay"));
+        assert!(looks_like_standbydelay_request("view standbydelay"));
+        assert!(looks_like_standbydelay_request("open standby-delay"));
+        assert!(looks_like_standbydelay_request("list standby delay"));
+        assert!(looks_like_standbydelay_request("standbydelay status"));
+        assert!(looks_like_standbydelay_request("what's my standby delay"));
+        assert!(looks_like_standbydelay_request("view standby delay"));
+        assert!(!looks_like_standbydelay_request("standbydelay"));
+        assert!(!looks_like_standbydelay_request("standby delay"));
+        assert!(!looks_like_standbydelay_request("/standby"));
+        assert!(!looks_like_standbydelay_request("view standby"));
+        assert!(!looks_like_standbydelay_request("/hibernatefile"));
+        assert!(!looks_like_standbydelay_request("/hibernatemode"));
+        assert!(!looks_like_standbydelay_request("/tasks"));
+        assert!(!looks_like_standbydelay_request("enable standbydelay"));
+        assert!(!looks_like_standbydelay_request("standbydelayhigh"));
+        assert!(!looks_like_standby_request("/standbydelay"));
+        assert!(!looks_like_standby_request("view standbydelay"));
+        assert!(!looks_like_standby_request("view standby delay"));
+        assert!(!looks_like_hibernatefile_request("/standbydelay"));
+        let s = try_operator_instant_reply("/standbydelay").unwrap();
+        assert!(
+            s.contains("**Standby delay**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view standbydelay").unwrap();
+        assert!(
+            viewed.contains("**Standby delay**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open standby-delay").unwrap();
+        assert!(
+            open.contains("**Standby delay**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("standbydelay").is_none());
+        assert!(try_operator_instant_reply("standby delay").is_none());
+        let st = try_operator_instant_reply("/standby");
+        if let Some(reply) = st {
+            assert!(
+                !reply.contains("**Standby delay**"),
+                "/standby must stay Standby, not Standby delay: {reply}"
+            );
+        }
+    }
+
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).
         // Bare `charger` / `adapter` stay with the agent; `/watts` stays CPU+GPU; `/battery` · is it charging stay Bat %.

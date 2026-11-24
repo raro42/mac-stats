@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3024] - 2026-11-24
+
+### Added
+- Instant Standby delay accepts `/standbydelay` · `/standbydelay-status` · `/standbydelay-state` · `/standby-delay` · `/standby-delay-status` · `/standby-delay-state` · `/mac-standbydelay` · `/mac-standby-delay` · `/mac-standbydelay-status` · `/mac-standby-delay-status` and view/see/open/list NL (`view standbydelay`, `open standby-delay`, `list standby delay`, …), matching “standbydelay status” / “what's my standby delay” / “what's the standbydelay”. Bare `standbydelay` / `standby delay` stay with the agent; `/standby` · `/stand-by` stay Standby; `/hibernatefile` · `/sleepimage` stay Hibernate file; standbydelayhigh / standbydelaylow / autopoweroff stay out. Operator `/help` lists the new lane.
+
 ## [0.1.3023] - 2026-11-24
 
 ### Added
