@@ -1,3 +1,20 @@
+## Overnight note 2026-11-24 ~02:45 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Standby delay v0.1.3024 — Auto Power Off / autopoweroff slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional; autopoweroffdelay / standbydelayhigh/low stay out).
+- Shipped **v0.1.3025** — `/autopoweroff` · `/auto-power-off` · `/mac-autopoweroff` + view/open NL; bare autopoweroff/auto power off stay with agent; `/standby` · `/standbydelay` · `/hibernatefile` intact; `/help` lists lane.
+- Ratchet keep @ 8a069df for 3025; backfill keep for 3024.
+- Morning surprise: refresh 2026-11-24 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (standbydelayhigh / standbydelaylow / autopoweroffdelay) — Auto Power Off slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3025
+
+- Product fuel after Standby delay v0.1.3024: Auto Power Off already readable via `pmset -g custom` Battery/AC `autopoweroff` (+ active `pmset -g`; often absent on Apple Silicon) but lacked `/autopoweroff` · `/auto-power-off` · `/mac-autopoweroff` and view/see/open/list phrases while Standby `/standby` and Standby delay `/standbydelay` already had slash+NL. Bare `autopoweroff` / `auto power off` stay with the agent; autopoweroffdelay stays out. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (standbydelayhigh / standbydelaylow / autopoweroffdelay) — Auto Power Off slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~02:30 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).

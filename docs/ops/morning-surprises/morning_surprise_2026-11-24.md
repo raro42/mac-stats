@@ -1,22 +1,18 @@
 # Morning surprise — 2026-11-24
 
-Overnight autoresearch kept shipping pmset slash+NL lanes while digester stayed empty.
+Overnight autoresearch kept shipping soft-state pmset instant lanes.
 
-## Shipped tonight (highlights)
-- **v0.1.3024** — Standby delay `/standbydelay` · `/standby-delay` · `/mac-standbydelay` + view/open NL (seconds; often absent on Apple Silicon → calm empty reading). Bare `standbydelay` / `standby delay` stay with the agent; `/standby` · `/hibernatefile` intact; standbydelayhigh / standbydelaylow / autopoweroff stay out.
-- **v0.1.3023** — Hibernate file `/hibernatefile` · `/hibernate-file` · `/sleepimage` · `/mac-hibernatefile` + view/open NL (path to sleepimage from `pmset`). Bare `hibernatefile` / `hibernate file` / `sleepimage` stay with the agent; `/hibernatemode` · `/hibernate` · `/halfdim` · `/standby` intact.
-- **v0.1.3022** — Half Dim `/halfdim` · `/half-dim` · `/half-brightness`
-- **v0.1.3021** — Power Mode `/powermode`
-- **v0.1.3020** — Less Bright `/lessbright`
-- Earlier: Sleep On Power Button · Standby · Hibernate · Network over sleep · TCP Keep Alive · System Sleep · Data Poster focus fill · …
+## Shipped
+- **v0.1.3025** — Auto Power Off `/autopoweroff` · `/auto-power-off` · `/mac-autopoweroff` + view/open NL (often absent on Apple Silicon → calm empty reading). Bare `autopoweroff` / `auto power off` stay with the agent; `/standby` · `/standbydelay` intact; autopoweroffdelay stays out.
+- **v0.1.3024** — Standby delay `/standbydelay` · `/standby-delay` · `/mac-standbydelay` + view/open NL.
+- Earlier tonight: Hibernate file · Half Dim · Power Mode · Less Bright · Sleep On Power Button · Standby · Hibernate mode · Data Poster layout-daily · Network over sleep · …
 
-## Tried / discarded
-- Local Hibernate file race against remote v0.1.3023 — discarded duplicate, backfilled remote keep, then shipped Standby delay.
-- Earlier local races on hibernate / systemsleep / sopb — discarded duplicates, then next open key.
+## Tried / context
+- Digester empty all night; design-review surfaces in grace (Mac TCC polish-without-capture).
+- Layout-daily: Data Poster marked; Dark next calendar quota.
+- Sibling OpenClaw/Hermes: no clear port.
 
-## Still soft / next
+## Next
 - cream/Swiss Send fill white-on-blue intentional
-- Dark layout-daily next calendar quota
-- autopoweroff (or standbydelayhigh/low) product fuel — not another keep-pNN clone
-
-Generated: 2026-11-24T02:26:27+01:00
+- Dark layout-daily next calendar day
+- soft-state sibling: standbydelayhigh / standbydelaylow / autopoweroffdelay — not another keep-pNN clone
