@@ -1,3 +1,21 @@
+## Overnight note 2026-11-24 ~01:51
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- X: ensure-loops pids live; notifications skim (no new followers); draft-only, no send.
+- Fuel: product after Less Bright v0.1.3020 — Power Mode / powermode slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional; halfdim stays out).
+- Shipped **v0.1.3021** — `/powermode` · `/power-mode` · `/mac-powermode` + view/open NL; bare powermode/power mode stay with agent; `/lpm` · `/powernap` · `/power` · `/lessbright` intact; `/help` lists lane.
+- Ratchet keep @ 3b00a4848 for 3021; backfill keep for 3020.
+- Morning surprise: refresh 2026-11-24 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (halfdim) — Power Mode slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3021
+
+- Product fuel after Less Bright v0.1.3020: Power Mode already readable via `pmset -g custom` Battery/AC `powermode` (+ active `pmset -g`; 0 Automatic · 1 Low Power · 2 High Power) but lacked `/powermode` · `/power-mode` · `/mac-powermode` and view/see/open/list phrases while Low Power Mode `/lpm`, Power Nap `/powernap`, Less Bright `/lessbright`, and the power strip `/power` already had slash+NL. Bare `powermode` / `power mode` stay with the agent; halfdim stays out. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (halfdim) — Power Mode slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~01:30
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
