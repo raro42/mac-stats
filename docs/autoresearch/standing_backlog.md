@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~20:35 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota; already_checked_today).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: standing backlog soft-state after No Restore Sleep v0.1.3041 — Reduce Brightness / reducebrightness (not keep-pNN; Dark layout-daily next calendar day).
+- Shipped **v0.1.3042** — `/reducebrightness` · `/reduce-brightness` · `/reducebright` · `/mac-reducebrightness` + view/open NL; bare reducebrightness/reduce brightness stay with agent; `/lessbright` · `/halfdim` · `/dim-display` · `/displaysleep` · `/norestoresleep` intact; `/help` lists lane.
+- Ratchet keep @ 1865113ab for 3042; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for reducebrightness — not another keep-pNN clone.
+
+## Overnight merge — v0.1.3042
+
+- Product fuel after No Restore Sleep v0.1.3041: Reduce Brightness already readable via `pmset -g custom` Battery/AC `reducebrightness` (+ active `pmset -g`; often absent on Apple Silicon) but lacked `/reducebrightness` · `/reduce-brightness` · `/reducebright` · `/mac-reducebrightness` and view/see/open/list phrases while Less Bright `/lessbright`, Half Dim `/halfdim`, and No Restore Sleep `/norestoresleep` already had slash+NL. Bare `reducebrightness` / `reduce brightness` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — reducebrightness soft-state closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~20:14 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
