@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3048] - 2026-11-24
+
+### Added
+- Instant System load accepts `/sysload` · `/sysload-status` · `/sysload-state` · `/sys-load` · `/sys-load-status` · `/sys-load-state` · `/pmset-sysload` · `/pmset-sysload-status` · `/pmset-sysload-state` · `/pmsetsysload` · `/pmsetsysload-status` · `/load-level` · `/load-level-status` · `/load-level-state` · `/loadlevel` · `/loadlevel-status` · `/system-load-level` · `/system-load-level-status` · `/systemloadlevel` · `/mac-sysload` · `/mac-sys-load` · `/mac-load-level` · `/mac-pmset-sysload` · `/mac-sysload-status` · `/mac-load-level-status` and view/see/open/list NL (`view sysload`, `open load-level`, `list system load level`, …), matching “sysload status” / “is sysload ok” / “what's my sysload” / “what's the load level”. Bare `sysload` / `sys load` / `load level` stay with the agent; `/load` · `/load-1m` · `/load-5m` · `/load-15m` stay Details load averages; `/thermal` · `/heat` stay Heat; `/battery` · `/bat` stay Bat %; `/powersched` · `/power-schedule` stay Power schedule. Operator `/help` lists the new lane.
+
 ## [0.1.3047] - 2026-11-24
 
 ### Added

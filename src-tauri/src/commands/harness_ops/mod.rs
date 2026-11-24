@@ -6329,6 +6329,77 @@ mod tests {
     }
 
     #[test]
+    fn sysload_slash_and_view_open_do_not_steal_load_heat_or_bare() {
+        // Slash + view/open NL → System load (`/load` · `/thermal` parity).
+        // Bare `sysload` / `load level` stay with the agent;
+        // `/load` stays Details; `/thermal` · `/heat` stay Heat; `/powersched` stays Power schedule.
+        assert!(looks_like_sysload_request("/sysload"));
+        assert!(looks_like_sysload_request("/sysload-status"));
+        assert!(looks_like_sysload_request("/sys-load"));
+        assert!(looks_like_sysload_request("/pmset-sysload"));
+        assert!(looks_like_sysload_request("/load-level"));
+        assert!(looks_like_sysload_request("/system-load-level"));
+        assert!(looks_like_sysload_request("/mac-sysload"));
+        assert!(looks_like_sysload_request("/mac-load-level"));
+        assert!(looks_like_sysload_request("view sysload"));
+        assert!(looks_like_sysload_request("open load-level"));
+        assert!(looks_like_sysload_request("list system load level"));
+        assert!(looks_like_sysload_request("sysload status"));
+        assert!(looks_like_sysload_request("is sysload ok"));
+        assert!(looks_like_sysload_request("what's my sysload"));
+        assert!(looks_like_sysload_request("view load level"));
+        assert!(!looks_like_sysload_request("sysload"));
+        assert!(!looks_like_sysload_request("sys load"));
+        assert!(!looks_like_sysload_request("load level"));
+        assert!(!looks_like_sysload_request("/load"));
+        assert!(!looks_like_sysload_request("view load"));
+        assert!(!looks_like_sysload_request("/load-1m"));
+        assert!(!looks_like_sysload_request("load 1"));
+        assert!(!looks_like_sysload_request("/thermal"));
+        assert!(!looks_like_sysload_request("view heat"));
+        assert!(!looks_like_sysload_request("/battery"));
+        assert!(!looks_like_sysload_request("/powersched"));
+        assert!(!looks_like_sysload_request("/tasks"));
+        assert!(!looks_like_sysload_request("enable sysload"));
+        assert!(!looks_like_details_request("/sysload"));
+        assert!(!looks_like_details_request("view sysload"));
+        assert!(!looks_like_powersched_request("/sysload"));
+        assert!(!looks_like_powersched_request("view sysload"));
+        let s = try_operator_instant_reply("/sysload").unwrap();
+        assert!(
+            s.contains("**System load**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view sysload").unwrap();
+        assert!(
+            viewed.contains("**System load**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open load-level").unwrap();
+        assert!(
+            open.contains("**System load**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("sysload").is_none());
+        assert!(try_operator_instant_reply("load level").is_none());
+        let load = try_operator_instant_reply("/load");
+        if let Some(reply) = load {
+            assert!(
+                !reply.contains("**System load**"),
+                "/load must stay Details, not sysload: {reply}"
+            );
+        }
+        let heat = try_operator_instant_reply("/thermal");
+        if let Some(reply) = heat {
+            assert!(
+                !reply.contains("**System load**"),
+                "/thermal must stay Heat, not sysload: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn norestoresleep_slash_and_view_open_do_not_steal_systemsleep_or_bare() {
         // Slash + view/open NL → No Restore Sleep (`/systemsleep` · `/ttysclobber` parity).
         // Bare `norestoresleep` / `no restore sleep` stay with the agent;

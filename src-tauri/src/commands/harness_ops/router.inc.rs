@@ -1364,6 +1364,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_powersched_request(content) {
         return Some(format_powersched_report());
     }
+    // System load levels from `pmset -g sysload` (bare `sysload` / `load level` stay with the agent;
+    // `/load` · `/load-1m` stay Details load averages; `/thermal` · `/heat` stay Heat;
+    // `/battery` stays Bat %; `/powersched` stays Power schedule).
+    if looks_like_sysload_request(content) {
+        return Some(format_sysload_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

@@ -27164,6 +27164,251 @@ pub fn format_powersched_report() -> String {
     format!("**Power schedule** · `{v}`")
 }
 
+/// System load levels — `pmset -g sysload` (combined / user / battery / thermal).
+/// Slash + view/open NL (`/sysload` · `/load-level` · `view sysload`).
+/// Bare `sysload` / `sys load` / `load level` stay with the agent;
+/// `/load` · `/load-1m` stay Details load averages; `/thermal` · `/heat` stay Heat;
+/// `/battery` stays Bat %; `/powersched` stays Power schedule.
+pub fn looks_like_sysload_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("powersched")
+        || n.contains("power schedule")
+        || n.contains("power-schedule")
+        || n.contains("pmset sched")
+        || n.contains("scheduled power")
+        || n.contains("schedules")
+        || n.contains("cron")
+        || n.contains("assertions")
+        || n.contains("systemsleep")
+        || n.contains("sleepdisabled")
+        || n.contains("1m")
+        || n.contains("5m")
+        || n.contains("15m")
+        || n.contains("1-minute")
+        || n.contains("5-minute")
+        || n.contains("15-minute")
+        || n.contains("1 minute")
+        || n.contains("5 minute")
+        || n.contains("15 minute")
+        || n.contains("throttl")
+        || n == "/load"
+        || n == "/load-1m"
+        || n == "/load-5m"
+        || n == "/load-15m"
+        || n == "/load1m"
+        || n == "/load5m"
+        || n == "/load15m"
+        || n == "view load"
+        || n == "open load"
+        || n == "what's the load"
+        || n == "whats the load"
+        || n == "what is the load"
+        || n == "how's the load"
+        || n == "hows the load"
+        || n == "is the load high"
+        || n == "/details"
+        || n == "/thermal"
+        || n == "/heat"
+        || n == "view heat"
+        || n == "open thermal"
+        || n == "is the heat high"
+        || n == "is the thermal high"
+        || n == "is it throttling"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/powersched"
+        || n == "/power-schedule"
+        || n == "/pmset-sched"
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        // Bare phrases stay with the agent.
+        || n == "sysload"
+        || n == "the sysload"
+        || n == "sys-load"
+        || n == "the sys-load"
+        || n == "sys load"
+        || n == "the sys load"
+        || n == "system load level"
+        || n == "the system load level"
+        || n == "system-load-level"
+        || n == "the system-load-level"
+        || n == "load level"
+        || n == "the load level"
+        || n == "load-level"
+        || n == "the load-level"
+        || n == "pmset sysload"
+        || n == "the pmset sysload"
+        || n == "pmset-sysload"
+        || n == "the pmset-sysload"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/sysload"
+            | "/sysload-status"
+            | "/sysload-state"
+            | "/sys-load"
+            | "/sys-load-status"
+            | "/sys-load-state"
+            | "/pmset-sysload"
+            | "/pmset-sysload-status"
+            | "/pmset-sysload-state"
+            | "/pmsetsysload"
+            | "/pmsetsysload-status"
+            | "/load-level"
+            | "/load-level-status"
+            | "/load-level-state"
+            | "/loadlevel"
+            | "/loadlevel-status"
+            | "/system-load-level"
+            | "/system-load-level-status"
+            | "/systemloadlevel"
+            | "/mac-sysload"
+            | "/mac-sys-load"
+            | "/mac-load-level"
+            | "/mac-pmset-sysload"
+            | "/mac-sysload-status"
+            | "/mac-load-level-status"
+            | "sysload status"
+            | "the sysload status"
+            | "sysload state"
+            | "the sysload state"
+            | "sys-load status"
+            | "the sys-load status"
+            | "sys load status"
+            | "the sys load status"
+            | "load level status"
+            | "the load level status"
+            | "load-level status"
+            | "the load-level status"
+            | "system load level status"
+            | "the system load level status"
+            | "pmset sysload status"
+            | "the pmset sysload status"
+            | "pmset-sysload status"
+            | "the pmset-sysload status"
+            | "my sysload"
+            | "my sysload status"
+            | "my load level"
+            | "my load-level"
+            | "my system load level"
+            | "is sysload ok"
+            | "is load level ok"
+            | "is the sysload ok"
+            | "is the load level ok"
+            | "how's sysload"
+            | "hows sysload"
+            | "how's the sysload"
+            | "hows the sysload"
+            | "how's load level"
+            | "hows load level"
+            | "what's my sysload"
+            | "whats my sysload"
+            | "what is my sysload"
+            | "what's my sysload status"
+            | "whats my sysload status"
+            | "what is my sysload status"
+            | "what's my load level"
+            | "whats my load level"
+            | "what is my load level"
+            | "what's the sysload"
+            | "whats the sysload"
+            | "what is the sysload"
+            | "what's the sysload status"
+            | "whats the sysload status"
+            | "what is the sysload status"
+            | "what's the load level"
+            | "whats the load level"
+            | "what is the load level"
+            | "view sysload"
+            | "view the sysload"
+            | "view sysload status"
+            | "view the sysload status"
+            | "view sys-load"
+            | "view the sys-load"
+            | "view sys load"
+            | "view the sys load"
+            | "view load level"
+            | "view the load level"
+            | "view load-level"
+            | "view the load-level"
+            | "view system load level"
+            | "view the system load level"
+            | "view pmset-sysload"
+            | "view the pmset-sysload"
+            | "see sysload"
+            | "see the sysload"
+            | "see load level"
+            | "see the load level"
+            | "see sys load"
+            | "see the sys load"
+            | "open sysload"
+            | "open the sysload"
+            | "open sysload status"
+            | "open the sysload status"
+            | "open sys-load"
+            | "open load level"
+            | "open the load level"
+            | "open load-level"
+            | "open system load level"
+            | "open pmset-sysload"
+            | "list sysload"
+            | "list the sysload"
+            | "list sysload status"
+            | "list the sysload status"
+            | "list sys-load"
+            | "list load level"
+            | "list the load level"
+            | "list load-level"
+            | "list system load level"
+            | "list pmset-sysload"
+    )
+}
+
+/// Zero-LLM system load levels from `pmset -g sysload` (macOS-only; empty elsewhere).
+pub fn format_sysload_report() -> String {
+    let v = crate::metrics::get_sysload_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**System load** — _no sysload reading on this Mac right now._".to_string();
+    }
+    format!("**System load** · `{v}`")
+}
+
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).
 /// Bare `autopoweroff` / `auto power off` stay with the agent;

@@ -7464,6 +7464,112 @@ pub fn get_powersched_status() -> String {
     }
 }
 
+/// Parse `pmset -g sysload` levels → (combined, user, battery, thermal).
+/// Lines look like `combined level = OK` / `- user level = OK`.
+pub(crate) fn parse_pmset_sysload_levels(
+    raw: &str,
+) -> (
+    Option<String>,
+    Option<String>,
+    Option<String>,
+    Option<String>,
+) {
+    let mut combined = None;
+    let mut user = None;
+    let mut battery = None;
+    let mut thermal = None;
+    for line in raw.lines() {
+        let t = line.trim().trim_start_matches('-').trim();
+        let lower = t.to_ascii_lowercase();
+        let Some(eq) = lower.find(" level = ") else {
+            continue;
+        };
+        let key = lower[..eq].trim();
+        // Value keeps original casing from the raw line after `=`.
+        let Some(raw_eq) = t.find('=') else {
+            continue;
+        };
+        let val = t[raw_eq + 1..].trim();
+        if val.is_empty() {
+            continue;
+        }
+        match key {
+            "combined" => combined = Some(val.to_string()),
+            "user" => user = Some(val.to_string()),
+            "battery" => battery = Some(val.to_string()),
+            "thermal" => thermal = Some(val.to_string()),
+            _ => {}
+        }
+    }
+    (combined, user, battery, thermal)
+}
+
+/// Compact sysload status: `OK · user OK · bat Great · therm Great`.
+pub(crate) fn format_sysload_parts(
+    combined: Option<&str>,
+    user: Option<&str>,
+    battery: Option<&str>,
+    thermal: Option<&str>,
+) -> String {
+    let mut bits: Vec<String> = Vec::new();
+    if let Some(v) = combined {
+        bits.push(v.to_string());
+    }
+    if let Some(v) = user {
+        bits.push(format!("user {v}"));
+    }
+    if let Some(v) = battery {
+        bits.push(format!("bat {v}"));
+    }
+    if let Some(v) = thermal {
+        bits.push(format!("therm {v}"));
+    }
+    bits.join(" · ")
+}
+
+/// macOS system load levels from `pmset -g sysload` (combined / user / battery / thermal).
+/// Distinct from Details load averages `/load` · `/load-1m` and Heat `/thermal` · `/heat`.
+/// Used by Discord/operator instant `/sysload` · `/load-level` lane.
+pub fn get_sysload_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "sysload"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("sysload: pmset -g sysload non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("sysload: pmset -g sysload spawn failed");
+                return String::new();
+            }
+        };
+        let (combined, user, battery, thermal) = parse_pmset_sysload_levels(&stdout);
+        let info = format_sysload_parts(
+            combined.as_deref(),
+            user.as_deref(),
+            battery.as_deref(),
+            thermal.as_deref(),
+        );
+        if info.is_empty() {
+            debug3!("sysload: empty status");
+        } else {
+            debug3!("sysload status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -13105,6 +13211,41 @@ Repeating power events:
             "a · b · c · d · e · (+2)"
         );
         assert_eq!(format_powersched_parts(&[]), "");
+    }
+}
+
+#[cfg(test)]
+mod sysload_parse_tests {
+    use super::{format_sysload_parts, parse_pmset_sysload_levels};
+
+    const SAMPLE: &str = r#"
+2026-11-24 21:57:18 +0100
+  combined level = OK
+  - user level = OK
+  - battery level = Great
+  - thermal level = Great
+"#;
+
+    #[test]
+    fn parses_levels_and_formats() {
+        let (c, u, b, t) = parse_pmset_sysload_levels(SAMPLE);
+        assert_eq!(c.as_deref(), Some("OK"));
+        assert_eq!(u.as_deref(), Some("OK"));
+        assert_eq!(b.as_deref(), Some("Great"));
+        assert_eq!(t.as_deref(), Some("Great"));
+        assert_eq!(
+            format_sysload_parts(c.as_deref(), u.as_deref(), b.as_deref(), t.as_deref()),
+            "OK · user OK · bat Great · therm Great"
+        );
+        assert_eq!(
+            parse_pmset_sysload_levels("nope"),
+            (None, None, None, None)
+        );
+        assert_eq!(format_sysload_parts(None, None, None, None), "");
+        assert_eq!(
+            format_sysload_parts(Some("OK"), None, None, Some("Fair")),
+            "OK · therm Fair"
+        );
     }
 }
 
