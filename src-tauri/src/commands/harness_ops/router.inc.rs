@@ -1256,6 +1256,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_standby_request(content) {
         return Some(format_standby_report());
     }
+    // Less Bright (bare `lessbright` / `less bright` / `slightly dim` stay with the agent;
+    // `/displaysleep` stays Display Sleep; `/display` · `/screen` stay resolution;
+    // `/lpm` stays Low Power Mode; `/sopb` stays Sleep On Power Button).
+    if looks_like_lessbright_request(content) {
+        return Some(format_lessbright_report());
+    }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).
     if looks_like_boot_time_request(content) {

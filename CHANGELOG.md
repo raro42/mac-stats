@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3020] - 2026-11-24
+
+### Added
+- Instant Less Bright accepts `/lessbright` · `/lessbright-status` · `/lessbright-state` · `/less-bright` · `/less-bright-status` · `/less-bright-state` · `/slightly-dim` · `/slightly-dim-status` · `/slightly-dim-state` · `/dim-display` · `/dim-display-status` · `/dim-display-state` · `/mac-lessbright` · `/mac-less-bright` · `/mac-slightly-dim` · `/mac-dim-display` · `/mac-lessbright-status` · `/mac-less-bright-status` and view/see/open/list NL (`view lessbright`, `open slightly-dim`, `list dim-display`, …), matching “lessbright status” / “is less bright on” / “is slightly dim enabled” / “what's my lessbright” / “what's the less bright status”. Bare `lessbright` / `less bright` / `slightly dim` / `dim display` stay with the agent; `/displaysleep` · `/display-sleep` stay Display Sleep; `/display` · `/screen` stay resolution; `/lpm` stays Low Power Mode; `/sopb` · `/sleep-on-power-button` stay Sleep On Power Button. Operator `/help` lists the new lane.
+
 ## [0.1.3019] - 2026-11-24
 
 ### Added

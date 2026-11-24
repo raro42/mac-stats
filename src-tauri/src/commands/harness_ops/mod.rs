@@ -4779,6 +4779,79 @@ mod tests {
         }
     }
 
+    #[test]
+    fn lessbright_slash_and_view_open_do_not_steal_displaysleep_or_bare() {
+        // Slash + view/open NL → Less Bright (`/sopb` · `/displaysleep` parity).
+        // Bare `lessbright` / `less bright` / `slightly dim` stay with the agent;
+        // `/displaysleep` stays Display Sleep; `/display` stays resolution;
+        // `/lpm` stays Low Power Mode; `/sopb` stays Sleep On Power Button.
+        assert!(looks_like_lessbright_request("/lessbright"));
+        assert!(looks_like_lessbright_request("/lessbright-status"));
+        assert!(looks_like_lessbright_request("/less-bright"));
+        assert!(looks_like_lessbright_request("/slightly-dim"));
+        assert!(looks_like_lessbright_request("/dim-display"));
+        assert!(looks_like_lessbright_request("/mac-lessbright"));
+        assert!(looks_like_lessbright_request("/mac-less-bright"));
+        assert!(looks_like_lessbright_request("view lessbright"));
+        assert!(looks_like_lessbright_request("open slightly-dim"));
+        assert!(looks_like_lessbright_request("list dim-display"));
+        assert!(looks_like_lessbright_request("lessbright status"));
+        assert!(looks_like_lessbright_request("is less bright on"));
+        assert!(looks_like_lessbright_request("is slightly dim enabled"));
+        assert!(looks_like_lessbright_request("what's my lessbright"));
+        assert!(looks_like_lessbright_request("view less bright"));
+        assert!(!looks_like_lessbright_request("lessbright"));
+        assert!(!looks_like_lessbright_request("less bright"));
+        assert!(!looks_like_lessbright_request("slightly dim"));
+        assert!(!looks_like_lessbright_request("dim display"));
+        assert!(!looks_like_lessbright_request("/displaysleep"));
+        assert!(!looks_like_lessbright_request("view display sleep"));
+        assert!(!looks_like_lessbright_request("/display"));
+        assert!(!looks_like_lessbright_request("/screen"));
+        assert!(!looks_like_lessbright_request("/lpm"));
+        assert!(!looks_like_lessbright_request("/sopb"));
+        assert!(!looks_like_lessbright_request("/sleep-on-power-button"));
+        assert!(!looks_like_lessbright_request("/power"));
+        assert!(!looks_like_lessbright_request("/tasks"));
+        assert!(!looks_like_lessbright_request("enable lessbright"));
+        assert!(!looks_like_displaysleep_request("/lessbright"));
+        assert!(!looks_like_displaysleep_request("view lessbright"));
+        assert!(!looks_like_sleep_on_power_button_request("/lessbright"));
+        assert!(!looks_like_sleep_on_power_button_request("view lessbright"));
+        let s = try_operator_instant_reply("/lessbright").unwrap();
+        assert!(
+            s.contains("**Less Bright**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view lessbright").unwrap();
+        assert!(
+            viewed.contains("**Less Bright**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open slightly-dim").unwrap();
+        assert!(
+            open.contains("**Less Bright**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("lessbright").is_none());
+        assert!(try_operator_instant_reply("less bright").is_none());
+        assert!(try_operator_instant_reply("slightly dim").is_none());
+        let disp = try_operator_instant_reply("/displaysleep");
+        if let Some(reply) = disp {
+            assert!(
+                !reply.contains("**Less Bright**"),
+                "/displaysleep must stay Display Sleep, not Less Bright: {reply}"
+            );
+        }
+        let sopb = try_operator_instant_reply("/sopb");
+        if let Some(reply) = sopb {
+            assert!(
+                !reply.contains("**Less Bright**"),
+                "/sopb must stay Sleep On Power Button, not Less Bright: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).

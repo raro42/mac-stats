@@ -20690,6 +20690,357 @@ pub fn format_sleep_on_power_button_report() -> String {
     format!("**Sleep On Power Button** · `{v}`")
 }
 
+/// Less Bright — `pmset` Battery/AC `lessbright` (+ active fallback; often Battery-only).
+/// Slash + view/open NL (`/lessbright` · `/less-bright` · `/slightly-dim` · `view lessbright`).
+/// Bare `lessbright` / `less bright` / `slightly dim` stay with the agent;
+/// `/displaysleep` stays Display Sleep; `/display` · `/screen` stay resolution;
+/// `/lpm` stays Low Power Mode; `/sopb` stays Sleep On Power Button.
+pub fn looks_like_lessbright_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("wake on network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("hard disk sleep")
+        || n.contains("hdd sleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("systemsleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("computersleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("ttys keep awake")
+        || n.contains("tty-keep-awake")
+        || n.contains("ttys-keep-awake")
+        || n.contains("ttykeepawake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("tcp-keep-alive")
+        || n.contains("tcp keepalive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("network-over-sleep")
+        || n.contains("hibernate")
+        || n.contains("hibernatemode")
+        || n.contains("standby")
+        || n.contains("stand by")
+        || n.contains("stand-by")
+        || n.contains("sleep on power")
+        || n.contains("sleep-on-power")
+        || n.contains("power button")
+        || n.contains("power-button")
+        || n.contains("sopb")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/proximitywake"
+        || n == "/proximity-wake"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
+        || n == "/display"
+        || n == "/screen"
+        || n == "/resolution"
+        || n == "/disksleep"
+        || n == "/disk-sleep"
+        || n == "/hard-disk-sleep"
+        || n == "/hdd-sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/computer-sleep"
+        || n == "/computersleep"
+        || n == "/sleep"
+        || n == "/ttyskeepawake"
+        || n == "/tty-keep-awake"
+        || n == "/ttys-keep-awake"
+        || n == "/ttykeepawake"
+        || n == "/tcpkeepalive"
+        || n == "/tcp-keep-alive"
+        || n == "/tcp-keepalive"
+        || n == "/networkoversleep"
+        || n == "/network-over-sleep"
+        || n == "/hibernatemode"
+        || n == "/hibernate-mode"
+        || n == "/hibernate"
+        || n == "/standby"
+        || n == "/stand-by"
+        || n == "/sleep-on-power-button"
+        || n == "/sleep-on-power"
+        || n == "/power-button-sleep"
+        || n == "/sopb"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "lessbright"
+        || n == "the lessbright"
+        || n == "less bright"
+        || n == "the less bright"
+        || n == "less-bright"
+        || n == "the less-bright"
+        || n == "slightly dim"
+        || n == "the slightly dim"
+        || n == "slightly-dim"
+        || n == "the slightly-dim"
+        || n == "dim display"
+        || n == "the dim display"
+        || n == "dim-display"
+        || n == "the dim-display"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/lessbright"
+            | "/lessbright-status"
+            | "/lessbright-state"
+            | "/less-bright"
+            | "/less-bright-status"
+            | "/less-bright-state"
+            | "/slightly-dim"
+            | "/slightly-dim-status"
+            | "/slightly-dim-state"
+            | "/dim-display"
+            | "/dim-display-status"
+            | "/dim-display-state"
+            | "/mac-lessbright"
+            | "/mac-less-bright"
+            | "/mac-slightly-dim"
+            | "/mac-dim-display"
+            | "/mac-lessbright-status"
+            | "/mac-less-bright-status"
+            | "lessbright status"
+            | "the lessbright status"
+            | "less bright status"
+            | "the less bright status"
+            | "less-bright status"
+            | "the less-bright status"
+            | "slightly dim status"
+            | "the slightly dim status"
+            | "slightly-dim status"
+            | "the slightly-dim status"
+            | "dim display status"
+            | "the dim display status"
+            | "dim-display status"
+            | "the dim-display status"
+            | "lessbright state"
+            | "the lessbright state"
+            | "less bright state"
+            | "the less bright state"
+            | "slightly dim state"
+            | "dim display state"
+            | "my lessbright"
+            | "my lessbright status"
+            | "my less bright"
+            | "my less bright status"
+            | "my slightly dim"
+            | "my slightly dim status"
+            | "my dim display"
+            | "my dim display status"
+            | "is lessbright on"
+            | "is lessbright off"
+            | "is lessbright enabled"
+            | "is lessbright disabled"
+            | "is less bright on"
+            | "is less bright off"
+            | "is less bright enabled"
+            | "is less bright disabled"
+            | "is less-bright on"
+            | "is less-bright enabled"
+            | "is slightly dim on"
+            | "is slightly dim enabled"
+            | "is slightly-dim on"
+            | "is slightly-dim enabled"
+            | "is dim display on"
+            | "is dim display enabled"
+            | "what's my lessbright"
+            | "whats my lessbright"
+            | "what is my lessbright"
+            | "what's my lessbright status"
+            | "whats my lessbright status"
+            | "what is my lessbright status"
+            | "what's my less bright"
+            | "whats my less bright"
+            | "what is my less bright"
+            | "what's my less bright status"
+            | "whats my less bright status"
+            | "what is my less bright status"
+            | "what's my slightly dim"
+            | "whats my slightly dim"
+            | "what is my slightly dim"
+            | "what's the lessbright"
+            | "whats the lessbright"
+            | "what is the lessbright"
+            | "what's the lessbright status"
+            | "whats the lessbright status"
+            | "what is the lessbright status"
+            | "what's the less bright"
+            | "whats the less bright"
+            | "what is the less bright"
+            | "what's the less bright status"
+            | "whats the less bright status"
+            | "what is the less bright status"
+            | "how's lessbright"
+            | "hows lessbright"
+            | "how's the lessbright"
+            | "hows the lessbright"
+            | "how's less bright"
+            | "hows less bright"
+            | "view lessbright"
+            | "view the lessbright"
+            | "view lessbright status"
+            | "view the lessbright status"
+            | "view less bright"
+            | "view the less bright"
+            | "view less bright status"
+            | "view the less bright status"
+            | "view less-bright"
+            | "view the less-bright"
+            | "view slightly dim"
+            | "view the slightly dim"
+            | "view slightly-dim"
+            | "view the slightly-dim"
+            | "view dim display"
+            | "view the dim display"
+            | "view dim-display"
+            | "view the dim-display"
+            | "see lessbright"
+            | "see the lessbright"
+            | "see lessbright status"
+            | "see the lessbright status"
+            | "see less bright"
+            | "see the less bright"
+            | "see slightly dim"
+            | "see dim display"
+            | "open lessbright"
+            | "open the lessbright"
+            | "open lessbright status"
+            | "open the lessbright status"
+            | "open less bright"
+            | "open the less bright"
+            | "open less-bright"
+            | "open the less-bright"
+            | "open slightly dim"
+            | "open the slightly dim"
+            | "open slightly-dim"
+            | "open the slightly-dim"
+            | "open dim display"
+            | "open the dim display"
+            | "open dim-display"
+            | "open the dim-display"
+            | "list lessbright"
+            | "list the lessbright"
+            | "list lessbright status"
+            | "list the lessbright status"
+            | "list less bright"
+            | "list the less bright"
+            | "list less-bright"
+            | "list the less-bright"
+            | "list slightly dim"
+            | "list the slightly dim"
+            | "list slightly-dim"
+            | "list dim display"
+            | "list the dim display"
+            | "list dim-display"
+    )
+}
+
+/// Zero-LLM Less Bright status from pmset (macOS-only; empty elsewhere).
+pub fn format_lessbright_report() -> String {
+    let v = crate::metrics::get_lessbright_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Less Bright** — _no Less Bright reading on this Mac right now._".to_string();
+    }
+    format!("**Less Bright** · `{v}`")
+}
+
 /// System Sleep — `pmset` Battery/AC `sleep` minutes (+ active fallback; 0 = Never).
 /// Slash + view/open NL (`/systemsleep` · `/system-sleep` · `/computer-sleep` · `view system sleep`).
 /// Bare `systemsleep` / `system sleep` / `computer sleep` / `sleep` stay with the agent;

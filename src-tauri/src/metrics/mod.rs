@@ -4309,6 +4309,130 @@ pub fn get_sleep_on_power_button_status() -> String {
     }
 }
 
+/// Parse `pmset -g custom` Battery/AC `lessbright` flag → (battery, ac).
+/// Exact key `lessbright` only (battery-only on many Macs; AC often absent).
+pub(crate) fn parse_pmset_custom_lessbright(raw: &str) -> (Option<bool>, Option<bool>) {
+    let mut section: Option<&str> = None;
+    let mut battery = None;
+    let mut ac = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.eq_ignore_ascii_case("Battery Power:") {
+            section = Some("battery");
+            continue;
+        }
+        if t.eq_ignore_ascii_case("AC Power:") {
+            section = Some("ac");
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("lessbright") {
+            continue;
+        }
+        let on = match parts.next() {
+            Some("1") | Some("true") | Some("yes") => Some(true),
+            Some("0") | Some("false") | Some("no") => Some(false),
+            _ => None,
+        };
+        match section {
+            Some("battery") => battery = on.or(battery),
+            Some("ac") => ac = on.or(ac),
+            _ => {}
+        }
+    }
+    (battery, ac)
+}
+
+/// Parse active `pmset -g` `lessbright` flag (Currently in use).
+pub(crate) fn parse_pmset_active_lessbright(raw: &str) -> Option<bool> {
+    for line in raw.lines() {
+        let mut parts = line.trim().split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("lessbright") {
+            continue;
+        }
+        return match parts.next() {
+            Some("1") | Some("true") | Some("yes") => Some(true),
+            Some("0") | Some("false") | Some("no") => Some(false),
+            _ => None,
+        };
+    }
+    None
+}
+
+/// Prefer Battery+AC custom when both set; else active `pmset -g`.
+pub(crate) fn format_lessbright_parts(
+    battery: Option<bool>,
+    ac: Option<bool>,
+    active: Option<bool>,
+) -> String {
+    format_wake_for_network_parts(battery, ac, active)
+}
+
+/// macOS Less Bright from `pmset -g custom` Battery/AC `lessbright`
+/// (fallback: active `pmset -g`). Distinct from Display Sleep `/displaysleep`,
+/// display resolution `/display`, Sleep On Power Button `/sopb`, and Low Power Mode
+/// `/lpm`. Used by Discord/operator instant `/lessbright` · `/less-bright` lane.
+pub fn get_lessbright_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let (battery, ac) = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g", "custom"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_custom_lessbright(&stdout)
+                }
+                Ok(_) => (None, None),
+                Err(_) => {
+                    debug3!("lessbright: pmset -g custom spawn failed");
+                    (None, None)
+                }
+            }
+        };
+
+        let active = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_active_lessbright(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("lessbright: pmset -g spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_lessbright_parts(battery, ac, active);
+        if info.is_empty() {
+            debug3!("lessbright: empty status");
+        } else {
+            debug3!("lessbright status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -8120,6 +8244,93 @@ AC Power:
             format_sleep_on_power_button_parts(None, None, None),
             ""
         );
+    }
+}
+
+#[cfg(test)]
+mod lessbright_parse_tests {
+    use super::{
+        format_lessbright_parts, parse_pmset_active_lessbright, parse_pmset_custom_lessbright,
+    };
+
+    #[test]
+    fn parses_custom_battery_and_ac() {
+        let sample = r#"
+Battery Power:
+ Sleep On Power Button 1
+ lessbright           1
+ standby              1
+AC Power:
+ standby              1
+ lessbright           0
+"#;
+        assert_eq!(
+            parse_pmset_custom_lessbright(sample),
+            (Some(true), Some(false))
+        );
+        assert_eq!(parse_pmset_custom_lessbright("nope"), (None, None));
+        // Battery-only (common on Apple Silicon).
+        let bat_only = r#"
+Battery Power:
+ lessbright           1
+AC Power:
+ standby              1
+"#;
+        assert_eq!(
+            parse_pmset_custom_lessbright(bat_only),
+            (Some(true), None)
+        );
+        let other = r#"
+Battery Power:
+ standby              1
+AC Power:
+ displaysleep         5
+"#;
+        assert_eq!(parse_pmset_custom_lessbright(other), (None, None));
+    }
+
+    #[test]
+    fn parses_active_lessbright() {
+        assert_eq!(
+            parse_pmset_active_lessbright("Currently in use:\n lessbright           1\n"),
+            Some(true)
+        );
+        assert_eq!(
+            parse_pmset_active_lessbright(" lessbright           0\n"),
+            Some(false)
+        );
+        assert_eq!(parse_pmset_active_lessbright(" standby              1\n"), None);
+        assert_eq!(
+            parse_pmset_active_lessbright(" Sleep On Power Button 1\n"),
+            None
+        );
+        assert_eq!(parse_pmset_active_lessbright(" displaysleep         5\n"), None);
+    }
+
+    #[test]
+    fn formats_matched_split_and_active() {
+        assert_eq!(
+            format_lessbright_parts(Some(true), Some(true), Some(false)),
+            "On"
+        );
+        assert_eq!(
+            format_lessbright_parts(Some(false), Some(false), Some(true)),
+            "Off"
+        );
+        assert_eq!(
+            format_lessbright_parts(Some(true), Some(false), None),
+            "AC Off · Battery On"
+        );
+        assert_eq!(
+            format_lessbright_parts(Some(true), None, None),
+            "On (Battery)"
+        );
+        assert_eq!(
+            format_lessbright_parts(None, Some(false), None),
+            "Off (AC)"
+        );
+        assert_eq!(format_lessbright_parts(None, None, Some(true)), "On");
+        assert_eq!(format_lessbright_parts(None, None, None), "");
     }
 }
 
