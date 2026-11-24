@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~06:00 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota; already_checked_today).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: standing backlog soft-state after Dark Wakes v0.1.3038 — TTY Clobber / ttysclobber (not keep-pNN; Dark layout-daily next calendar day).
+- Shipped **v0.1.3039** — `/ttysclobber` · `/ttys-clobber` · `/tty-clobber` · `/mac-ttysclobber` + view/open NL; bare ttysclobber/ttys clobber/tty clobber stay with agent; `/ttyskeepawake` · `/darkwakes` · `/tcpkeepalive` intact; `/help` lists lane.
+- Ratchet keep @ ac65b1d for 3039; backfill keep for 3038.
+- Morning surprise: refresh 2026-11-24 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: Dark layout-daily next calendar day · soft-state sibling/product fuel (norestoresleep / reducebrightness) — TTY Clobber slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3039
+
+- Product fuel after Dark Wakes v0.1.3038: TTY Clobber already readable via `pmset -g custom` Battery/AC `ttysclobber` (+ active `pmset -g`; often absent on Apple Silicon) but lacked `/ttysclobber` · `/ttys-clobber` · `/tty-clobber` · `/mac-ttysclobber` and view/see/open/list phrases while TTY keep awake `/ttyskeepawake` and Dark Wakes `/darkwakes` already had slash+NL. Bare `ttysclobber` / `ttys clobber` / `tty clobber` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day · soft-state sibling/product fuel (norestoresleep / reducebrightness) — TTY Clobber slash NL closed; not another keep-pNN clone.
 ## Overnight note 2026-11-24 ~05:40 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
