@@ -1,3 +1,20 @@
+## Overnight note 2026-11-24 ~01:20
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Standby v0.1.3018 — Sleep On Power Button slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional; lessbright stays out for next soft-state).
+- Shipped **v0.1.3019** — `/sleep-on-power-button` · `/sleep-on-power` · `/power-button-sleep` · `/sopb` · `/mac-sopb` + view/open NL; bare sleep on power button/power button sleep/sopb stay with agent; `/sleep` · `/systemsleep` · `/standby` · `/hibernatemode` · `/powernap` intact; `/help` lists lane.
+- Ratchet keep @ c3ff6ed for 3019.
+- Morning surprise: refresh 2026-11-24 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (lessbright / halfdim) — Sleep On Power Button slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3019
+
+- Product fuel after Standby v0.1.3018: Sleep On Power Button already readable via `pmset -g custom` Battery/AC multi-word `Sleep On Power Button` (+ active `pmset -g`) but lacked `/sleep-on-power-button` · `/sleep-on-power` · `/power-button-sleep` · `/sopb` · `/mac-sopb` and view/see/open/list phrases while Standby `/standby`, System Sleep `/systemsleep` · `/sleep`, Hibernate mode `/hibernatemode`, and Power Nap `/powernap` already had slash+NL. Bare `sleep on power button` / `power button sleep` / `sopb` stay with the agent; lessbright stays out. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (lessbright / halfdim) — Sleep On Power Button slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~01:02
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
