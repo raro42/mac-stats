@@ -1,3 +1,19 @@
+## Overnight note 2026-11-25 ~00:40 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster remaps audited OK (WASH selectors present; no live `#0e0e14`); marked 2026-11-25 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window (Soul content noise only).
+- Fuel attempt: Power live after Power custom v0.1.3056 — **remote raced Power adapters as v0.1.3057**; local live-on-3057 discarded + remote keep backfill.
+- Shipped **v0.1.3058** — `/pmlive` · `/pm-live` · `/pmset-live` · `/power-live` · `/currently-in-use` · `/in-use` · `/live-settings` · `/live-power` · `/mac-pmlive` + view/open NL; bare pmlive/power live/currently in use stay with agent; `/pmcustom` · `/pmadapters` · `/pmps` · `/pmcap` · `/pmstats` · `/powernap` intact; `/help` lists lane.
+- Ratchet: discard@37074b1 (dup 3057) + keep backfill remote 3057; keep @ 93ab85978 for 3058; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats/pmcap/useractivity/pmps/pmcustom/pmadapters/pmlive — try `pmset -g everything` summary if useful; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3058
+
+- Product fuel after Power adapters v0.1.3057 (local Power-live-on-3057 race discarded): Currently-in-use settings already readable via `pmset -g live` but lacked `/pmlive` · `/pm-live` · `/pmset-live` · `/power-live` · `/currently-in-use` · `/in-use` · `/live-settings` · `/live-power` · `/mac-pmlive` and view/see/open/list phrases while Power custom `/pmcustom`, Power adapters `/pmadapters`, Power source `/pmps`, and Power capabilities `/pmcap` already had slash+NL. Bare `pmlive` / `power live` / `currently in use` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats/pmcap/useractivity/pmps/pmcustom/pmadapters/pmlive soft-state closed; try everything summary; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~00:25 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
