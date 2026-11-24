@@ -1,3 +1,18 @@
+## Overnight note 2026-11-24 ~21:02 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota; already_checked_today).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: standing backlog soft-state after Sudden Motion Sensor v0.1.3043 — Wake on Modem Ring / ring (not keep-pNN; Dark layout-daily next calendar day; SleepDisabled stays out).
+- Shipped **v0.1.3044** — `/ring` · `/modem-ring` · `/wake-on-ring` · `/mac-ring` + view/open NL; bare ring/modem ring/wake on ring stay with agent; `/rings` · `/cpu-ring` · `/sms` · `/womp` · `/systemsleep` intact; `/help` lists lane.
+- Ratchet keep @ c3b4b2009 for 3044; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state sibling/product fuel (SleepDisabled) — Wake on Modem Ring slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3044
+
+- Product fuel after Sudden Motion Sensor v0.1.3043: Wake on Modem Ring already readable via `pmset -g custom` Battery/AC `ring` (+ active `pmset -g`; often absent on Apple Silicon) but lacked `/ring` · `/modem-ring` · `/wake-on-ring` · `/mac-ring` and view/see/open/list phrases while Sudden Motion Sensor `/sms`, Wake for network `/womp`, and System Sleep `/systemsleep` already had slash+NL. Bare `ring` / `modem ring` / `wake on ring` stay with the agent; CPU `/rings` · `/cpu-ring` stay rings; SleepDisabled stays out. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day · soft-state sibling/product fuel (SleepDisabled) — Wake on Modem Ring slash NL closed; not another keep-pNN clone.
 ## Overnight note 2026-11-24 ~20:50 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
