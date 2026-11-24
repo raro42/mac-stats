@@ -26120,6 +26120,261 @@ pub fn format_sms_report() -> String {
     format!("**Sudden Motion Sensor** · `{v}`")
 }
 
+/// Wake on Modem Ring — `pmset` Battery/AC `ring` (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/ring` · `/modem-ring` · `/wake-on-ring` · `view modem ring`).
+/// Bare `ring` / `modem ring` / `wake on ring` stay with the agent;
+/// `/rings` · `/cpu-ring` stay CPU rings; `/sms` stays Sudden Motion Sensor;
+/// `/womp` stays Wake for network; `/systemsleep` stays System Sleep.
+pub fn looks_like_modem_ring_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("rings")
+        || n.contains("cpu-ring")
+        || n.contains("cpu ring")
+        || n.contains("gpu-ring")
+        || n.contains("gpu ring")
+        || n.contains("ram-ring")
+        || n.contains("ram ring")
+        || n.contains("freq-ring")
+        || n.contains("freq ring")
+        || n.contains("temp-ring")
+        || n.contains("temp ring")
+        || n.contains("sms")
+        || n.contains("sudden motion")
+        || n.contains("sudden-motion")
+        || n.contains("womp")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("systemsleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("screensaver")
+        || n.contains("filevault")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/sms"
+        || n == "/sudden-motion"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/sleep"
+        || n == "/rings"
+        || n == "/cpu"
+        || n == "/gpu"
+        || n == "/freq"
+        || n == "/temp"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        // Bare phrases stay with the agent.
+        || n == "ring"
+        || n == "the ring"
+        || n == "modem ring"
+        || n == "the modem ring"
+        || n == "modem-ring"
+        || n == "the modem-ring"
+        || n == "wake on ring"
+        || n == "the wake on ring"
+        || n == "wake-on-ring"
+        || n == "the wake-on-ring"
+        || n == "wake on modem ring"
+        || n == "the wake on modem ring"
+        || n == "wake-on-modem-ring"
+        || n == "the wake-on-modem-ring"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/ring"
+            | "/ring-status"
+            | "/ring-state"
+            | "/modem-ring"
+            | "/modem-ring-status"
+            | "/modem-ring-state"
+            | "/modemring"
+            | "/modemring-status"
+            | "/modemring-state"
+            | "/wake-on-ring"
+            | "/wake-on-ring-status"
+            | "/wake-on-ring-state"
+            | "/wakeonring"
+            | "/wakeonring-status"
+            | "/wake-on-modem-ring"
+            | "/wake-on-modem-ring-status"
+            | "/mac-ring"
+            | "/mac-modem-ring"
+            | "/mac-modemring"
+            | "/mac-wake-on-ring"
+            | "/mac-wake-on-modem-ring"
+            | "/mac-ring-status"
+            | "/mac-modem-ring-status"
+            | "ring status"
+            | "the ring status"
+            | "ring state"
+            | "the ring state"
+            | "modem ring status"
+            | "the modem ring status"
+            | "modem-ring status"
+            | "the modem-ring status"
+            | "modemring status"
+            | "the modemring status"
+            | "wake on ring status"
+            | "the wake on ring status"
+            | "wake-on-ring status"
+            | "the wake-on-ring status"
+            | "wake on modem ring status"
+            | "the wake on modem ring status"
+            | "my ring"
+            | "my ring status"
+            | "my modem ring"
+            | "my modem ring status"
+            | "my modem-ring"
+            | "my wake on ring"
+            | "is ring on"
+            | "is ring off"
+            | "is ring enabled"
+            | "is ring disabled"
+            | "is modem ring on"
+            | "is modem ring off"
+            | "is modem ring enabled"
+            | "is modem ring disabled"
+            | "is modem-ring on"
+            | "is modem-ring enabled"
+            | "is wake on ring on"
+            | "is wake on ring enabled"
+            | "is wake-on-ring on"
+            | "is wake-on-ring enabled"
+            | "is wake on modem ring on"
+            | "is wake on modem ring enabled"
+            | "what's my ring"
+            | "whats my ring"
+            | "what is my ring"
+            | "what's my ring status"
+            | "whats my ring status"
+            | "what is my ring status"
+            | "what's my modem ring"
+            | "whats my modem ring"
+            | "what is my modem ring"
+            | "what's my modem ring status"
+            | "whats my modem ring status"
+            | "what is my modem ring status"
+            | "what's the ring"
+            | "whats the ring"
+            | "what is the ring"
+            | "what's the ring status"
+            | "whats the ring status"
+            | "what is the ring status"
+            | "what's the modem ring"
+            | "whats the modem ring"
+            | "what is the modem ring"
+            | "what's the modem ring status"
+            | "whats the modem ring status"
+            | "what is the modem ring status"
+            | "how's ring"
+            | "hows ring"
+            | "how's the ring"
+            | "hows the ring"
+            | "how's modem ring"
+            | "hows modem ring"
+            | "view ring"
+            | "view the ring"
+            | "view ring status"
+            | "view the ring status"
+            | "view modem ring"
+            | "view the modem ring"
+            | "view modem ring status"
+            | "view the modem ring status"
+            | "view modem-ring"
+            | "view the modem-ring"
+            | "view wake on ring"
+            | "view the wake on ring"
+            | "view wake-on-ring"
+            | "view wake on modem ring"
+            | "see ring"
+            | "see the ring"
+            | "see ring status"
+            | "see the ring status"
+            | "see modem ring"
+            | "see the modem ring"
+            | "open ring"
+            | "open the ring"
+            | "open ring status"
+            | "open the ring status"
+            | "open modem ring"
+            | "open the modem ring"
+            | "open modem-ring"
+            | "open the modem-ring"
+            | "open wake on ring"
+            | "open wake-on-ring"
+            | "open wake on modem ring"
+            | "list ring"
+            | "list the ring"
+            | "list ring status"
+            | "list the ring status"
+            | "list modem ring"
+            | "list the modem ring"
+            | "list modem-ring"
+            | "list the modem-ring"
+            | "list wake on ring"
+            | "list the wake on ring"
+            | "list wake-on-ring"
+            | "list wake on modem ring"
+            | "list the wake on modem ring"
+    )
+}
+
+/// Zero-LLM Wake on Modem Ring from pmset (macOS-only; empty elsewhere).
+pub fn format_modem_ring_report() -> String {
+    let v = crate::metrics::get_modem_ring_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Wake on Modem Ring** — _no Wake on Modem Ring reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**Wake on Modem Ring** · `{v}`")
+}
+
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).
 /// Bare `autopoweroff` / `auto power off` stay with the agent;

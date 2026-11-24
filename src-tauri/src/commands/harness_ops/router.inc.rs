@@ -1338,6 +1338,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_sms_request(content) {
         return Some(format_sms_report());
     }
+    // Wake on Modem Ring (bare `ring` / `modem ring` stay with the agent;
+    // `/rings` · `/cpu-ring` stay CPU rings; `/sms` stays Sudden Motion Sensor;
+    // `/womp` stays Wake for network; `/systemsleep` stays System Sleep).
+    if looks_like_modem_ring_request(content) {
+        return Some(format_modem_ring_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

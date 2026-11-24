@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3044] - 2026-11-24
+
+### Added
+- Instant Wake on Modem Ring accepts `/ring` · `/ring-status` · `/ring-state` · `/modem-ring` · `/modem-ring-status` · `/modem-ring-state` · `/modemring` · `/modemring-status` · `/modemring-state` · `/wake-on-ring` · `/wake-on-ring-status` · `/wake-on-ring-state` · `/wakeonring` · `/wakeonring-status` · `/wake-on-modem-ring` · `/wake-on-modem-ring-status` · `/mac-ring` · `/mac-modem-ring` · `/mac-modemring` · `/mac-wake-on-ring` · `/mac-wake-on-modem-ring` · `/mac-ring-status` · `/mac-modem-ring-status` and view/see/open/list NL (`view ring`, `open modem-ring`, `list wake on ring`, …), matching “ring status” / “is modem ring on” / “is ring enabled” / “what's my ring” / “what's the modem ring”. Bare `ring` / `modem ring` / `wake on ring` stay with the agent; `/rings` · `/cpu-ring` · `/gpu-ring` · `/ram-ring` · `/freq-ring` · `/temp-ring` stay CPU rings; `/sms` · `/sudden-motion` stay Sudden Motion Sensor; `/womp` · `/wake-for-network` stay Wake for network; `/systemsleep` · `/system-sleep` · `/sleep` stay System Sleep. Operator `/help` lists the new lane.
+
 ## [0.1.3043] - 2026-11-24
 
 ### Added

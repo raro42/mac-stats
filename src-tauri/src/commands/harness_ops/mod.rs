@@ -6006,6 +6006,7 @@ mod tests {
         assert!(!looks_like_sms_request("/reducebrightness"));
         assert!(!looks_like_sms_request("/halfdim"));
         assert!(!looks_like_sms_request("/lessbright"));
+        assert!(!looks_like_sms_request("/ring"));
         assert!(!looks_like_sms_request("/tasks"));
         assert!(!looks_like_sms_request("enable sms"));
         assert!(!looks_like_systemsleep_request("/sms"));
@@ -6041,6 +6042,75 @@ mod tests {
             assert!(
                 !reply.contains("**Sudden Motion Sensor**"),
                 "/reducebrightness must stay Reduce Brightness, not SMS: {reply}"
+            );
+        }
+    }
+
+    #[test]
+    fn modem_ring_slash_and_view_open_do_not_steal_rings_sms_or_bare() {
+        // Slash + view/open NL → Wake on Modem Ring (`/sms` · `/rings` parity).
+        // Bare `ring` / `modem ring` stay with the agent;
+        // `/rings` · `/cpu-ring` stay CPU rings; `/sms` stays Sudden Motion Sensor.
+        assert!(looks_like_modem_ring_request("/ring"));
+        assert!(looks_like_modem_ring_request("/ring-status"));
+        assert!(looks_like_modem_ring_request("/modem-ring"));
+        assert!(looks_like_modem_ring_request("/wake-on-ring"));
+        assert!(looks_like_modem_ring_request("/wake-on-modem-ring"));
+        assert!(looks_like_modem_ring_request("/mac-ring"));
+        assert!(looks_like_modem_ring_request("/mac-modem-ring"));
+        assert!(looks_like_modem_ring_request("view ring"));
+        assert!(looks_like_modem_ring_request("open modem-ring"));
+        assert!(looks_like_modem_ring_request("list wake on ring"));
+        assert!(looks_like_modem_ring_request("ring status"));
+        assert!(looks_like_modem_ring_request("is modem ring on"));
+        assert!(looks_like_modem_ring_request("what's my ring"));
+        assert!(looks_like_modem_ring_request("view modem ring"));
+        assert!(!looks_like_modem_ring_request("ring"));
+        assert!(!looks_like_modem_ring_request("modem ring"));
+        assert!(!looks_like_modem_ring_request("wake on ring"));
+        assert!(!looks_like_modem_ring_request("/rings"));
+        assert!(!looks_like_modem_ring_request("view rings"));
+        assert!(!looks_like_modem_ring_request("/cpu-ring"));
+        assert!(!looks_like_modem_ring_request("cpu ring"));
+        assert!(!looks_like_modem_ring_request("/sms"));
+        assert!(!looks_like_modem_ring_request("/womp"));
+        assert!(!looks_like_modem_ring_request("/systemsleep"));
+        assert!(!looks_like_modem_ring_request("/tasks"));
+        assert!(!looks_like_modem_ring_request("enable ring"));
+        assert!(!looks_like_sms_request("/ring"));
+        assert!(!looks_like_sms_request("view modem ring"));
+        assert!(!looks_like_rings_request("/ring"));
+        assert!(!looks_like_ring_chip_request("/ring"));
+        let s = try_operator_instant_reply("/ring").unwrap();
+        assert!(
+            s.contains("**Wake on Modem Ring**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view ring").unwrap();
+        assert!(
+            viewed.contains("**Wake on Modem Ring**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open modem-ring").unwrap();
+        assert!(
+            open.contains("**Wake on Modem Ring**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("ring").is_none());
+        assert!(try_operator_instant_reply("modem ring").is_none());
+        let sms = try_operator_instant_reply("/sms");
+        if let Some(reply) = sms {
+            assert!(
+                !reply.contains("**Wake on Modem Ring**"),
+                "/sms must stay Sudden Motion Sensor, not modem ring: {reply}"
+            );
+        }
+        let rings = try_operator_instant_reply("/rings");
+        if let Some(reply) = rings {
+            assert!(
+                !reply.contains("**Wake on Modem Ring**"),
+                "/rings must stay CPU rings, not modem ring: {reply}"
             );
         }
     }
