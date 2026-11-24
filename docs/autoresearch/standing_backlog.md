@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~03:50 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: standing backlog cream/Swiss Send fill (not keep-pNN; after High Standby Threshold v0.1.3029).
+- Shipped **v0.1.3030** — Material + Swiss Minimalistic `#chat-send-btn` leave bare Apple `#007aff` white-on-blue for theme accent / Swiss ink (Material dark type on `--accent`; Swiss white type on `#121216`); Dark/Neon/Data Poster/Futuristic parity.
+- Ratchet keep @ b795a2fbe for 3030; install/kickstart + push (themes embedded).
+- Morning surprise: refresh 2026-11-24 + archive.
+- Next fuel: Dark layout-daily next calendar day · Light Send `#007aff` optional · soft-state sibling (destroyfvkeyonstandby / acwake / lidwake) — cream/Swiss Send fill closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3030
+
+- Product fuel after High Standby Threshold v0.1.3029: cream/Swiss AI Chat Send still used bare Apple `#007aff` white-on-blue while Dark / Neon / Data Poster / Futuristic already remapped Send onto theme accent. Material Send now uses warm `--accent` with dark type; Swiss Send uses `#121216` ink with white type. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day · Light Send optional · soft-state sibling (destroyfvkeyonstandby / acwake / lidwake) — cream/Swiss Send fill closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~03:45 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
