@@ -1,3 +1,20 @@
+## Overnight note 2026-11-24 ~21:54 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota; already_checked_today).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Sleep assertions v0.1.3046 — Power schedule from `pmset -g sched` (not keep-pNN; not SoftDisabled/assertions clone; Dark layout-daily next calendar day).
+- Shipped **v0.1.3047** — `/powersched` · `/power-sched` · `/power-schedule` · `/pmset-sched` · `/scheduled-power` · `/mac-powersched` + view/open NL; bare powersched/power schedule/scheduled power stay with agent; `/schedules` · `/cron` stay Agent Ops; `/assertions` · `/systemsleep` · `/sleepdisabled` intact; `/help` lists lane.
+- Ratchet keep @ 98fc71e56 for 3047; backfill keep for 3046 + 3044; push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched — not another keep-pNN clone.
+
+## Overnight merge — v0.1.3047
+
+- Product fuel after Sleep assertions v0.1.3046: Mac power schedule already readable via `pmset -g sched` (one-shot + repeating wake/sleep) but lacked `/powersched` · `/power-sched` · `/power-schedule` · `/pmset-sched` · `/scheduled-power` · `/mac-powersched` and view/see/open/list phrases while Agent Ops `/schedules` · `/cron`, Sleep assertions `/assertions`, System Sleep `/systemsleep`, and Sleep Disabled `/sleepdisabled` already had slash+NL. Bare `powersched` / `power schedule` / `scheduled power` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled/assertions/powersched soft-state closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~21:31 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
