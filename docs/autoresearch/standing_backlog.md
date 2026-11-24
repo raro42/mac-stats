@@ -1,3 +1,20 @@
+## Overnight note 2026-11-24 ~04:10 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after cream/Swiss Send fill v0.1.3030 — Destroy FV key on standby / destroyfvkeyonstandby slash+NL (not keep-pNN; Light Send #007aff optional; acwake / lidwake stay out).
+- Shipped **v0.1.3031** — `/destroyfvkeyonstandby` · `/destroy-fv-key-on-standby` · `/destroyfvkey` · `/fvkeyonstandby` · `/mac-destroyfvkeyonstandby` + view/open NL; bare destroyfvkeyonstandby/destroy fv key on standby stay with agent; `/filevault` · `/fv` · `/standby` · `/highstandbythreshold` intact; `/help` lists lane.
+- Ratchet keep @ 45b6087 for 3031; backfill keep for 3030.
+- Morning surprise: refresh 2026-11-24 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: Dark layout-daily next calendar day · Light Send `#007aff` optional · soft-state sibling/product fuel (acwake / lidwake) — Destroy FV key on standby slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3031
+
+- Product fuel after cream/Swiss Send fill v0.1.3030: Destroy FileVault key on standby already readable via `pmset -g custom` Battery/AC `destroyfvkeyonstandby` (+ active `pmset -g`; often absent on Apple Silicon) but lacked `/destroyfvkeyonstandby` · `/destroy-fv-key-on-standby` · `/destroyfvkey` · `/fvkeyonstandby` · `/mac-destroyfvkeyonstandby` and view/see/open/list phrases while FileVault `/filevault` · `/fv`, Standby `/standby`, High Standby Threshold `/highstandbythreshold`, and Hibernate mode `/hibernatemode` already had slash+NL. Bare `destroyfvkeyonstandby` / `destroy fv key on standby` stay with the agent; acwake / lidwake stay out. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day · Light Send optional · soft-state sibling/product fuel (acwake / lidwake) — Destroy FV key on standby slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~03:50 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
