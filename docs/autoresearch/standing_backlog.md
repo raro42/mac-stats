@@ -1,3 +1,18 @@
+## Overnight note 2026-11-24 ~23:05 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota; already_checked_today).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window (Soul content noise only).
+- Fuel attempt: Power stats after Therm v0.1.3051 — **remote raced Therm as v0.1.3051** while local WIP targeted 3051; rebased onto origin then shipped **v0.1.3052**.
+- Shipped **v0.1.3052** — `/pmstats` · `/pm-stats` · `/power-stats` · `/sleep-stats` · `/wake-stats` · `/sleep-wake-stats` · `/pmset-stats` · `/mac-pmstats` + view/open NL; bare pmstats/power stats/sleep stats/wake stats stay with agent; `/pmlog` · `/therm` · `/darkwakes` · `/assertions` · `/sysload` · `/powersched` · `/ups` · `/thermal` intact; `/help` lists lane.
+- Ratchet keep @ b30f9cebb for 3052; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats — try `pmset -g cap` / useractivity next; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3052
+
+- Product fuel after Therm v0.1.3051 (local Power-stats-on-3051 race rebased): Sleep / Dark Wake / User Wake counts already readable via `pmset -g stats` but lacked `/pmstats` · `/pm-stats` · `/power-stats` · `/sleep-stats` · `/wake-stats` · `/sleep-wake-stats` · `/pmset-stats` · `/mac-pmstats` and view/see/open/list phrases while Power log `/pmlog`, Therm `/therm`, Dark Wakes `/darkwakes`, Sleep assertions `/assertions`, System load `/sysload`, Power schedule `/powersched`, and UPS `/ups` already had slash+NL. Bare `pmstats` / `power stats` / `sleep stats` / `wake stats` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats soft-state closed; try cap/useractivity; not another keep-pNN clone.
 ## Overnight note 2026-11-24 ~22:55 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
