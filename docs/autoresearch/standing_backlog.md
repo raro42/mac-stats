@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~20:10 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after TTY Clobber v0.1.3039 — Spotlight indexing slash+NL (not keep-pNN; not another pmset clone).
+- Shipped **v0.1.3040** — `/spotlight` · `/mdutil` · `/spotlight-indexing` · `/mac-spotlight` + view/open NL; bare spotlight/mdutil/indexing stay with agent; `/gatekeeper` · `/sip` · `/filevault` · `/timemachine` · `/ssd` · `/free` intact; `/help` lists lane.
+- Ratchet keep @ 825c9aa for 3040; install/kickstart + push (Rust).
+- Morning surprise: start 2026-11-25 draft + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for ttysclobber/spotlight — not another keep-pNN clone.
+
+## Overnight merge — v0.1.3040
+
+- Product fuel after TTY Clobber v0.1.3039: Spotlight indexing already readable via `mdutil -s /` but lacked `/spotlight` · `/mdutil` · `/spotlight-indexing` · `/mac-spotlight` and view/see/open/list phrases while Gatekeeper `/gatekeeper`, SIP `/sip`, FileVault `/filevault`, and Time Machine `/timemachine` already had slash+NL. Bare `spotlight` / `mdutil` / `indexing` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — ttysclobber/spotlight soft-state closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~06:00 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
