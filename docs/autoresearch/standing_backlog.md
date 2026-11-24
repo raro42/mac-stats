@@ -1,3 +1,18 @@
+## Overnight note 2026-11-24 ~22:35 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota; already_checked_today).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window (Soul content noise only).
+- Fuel attempt: Power log after System load v0.1.3048 — **remote raced UPS v0.1.3049**; local Power-log-on-3049 WIP discarded + remote keep backfill.
+- Then shipped **v0.1.3050** — `/pmlog` · `/pm-log` · `/powerlog` · `/power-log` · `/powermanagement-log` · `/pmset-log` · `/sleep-wake-log` · `/mac-pmlog` + view/open NL; bare pmlog/power log/power management log stay with agent; `/logs` · `/assertions` · `/sysload` · `/powersched` · `/ups` · `/thermal` intact; `/help` lists lane.
+- Ratchet: discard@a80a831 (dup 3049) + keep backfill remote 3049; keep @ 44ac03f2a for 3050; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched/sysload/ups/pmlog — not another keep-pNN clone.
+
+## Overnight merge — v0.1.3050
+
+- Product fuel after UPS v0.1.3049 (local Power log race on 3049 discarded): recent Sleep/Wake/DarkWake/Notification already readable via `pmset -g log` but lacked `/pmlog` · `/pm-log` · `/powerlog` · `/power-log` · `/powermanagement-log` · `/pmset-log` · `/sleep-wake-log` · `/mac-pmlog` and view/see/open/list phrases while Sleep assertions `/assertions`, Debug Log `/logs`, System load `/sysload`, Power schedule `/powersched`, and UPS `/ups` already had slash+NL. Bare `pmlog` / `power log` / `power management log` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled/assertions/powersched/sysload/ups/pmlog soft-state closed; not another keep-pNN clone.
 ## Overnight note 2026-11-24 ~22:28 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
