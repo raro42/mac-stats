@@ -2699,7 +2699,8 @@ body {
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #chat-send-btn {
-  background: color-mix(in srgb, #007aff 90%, #ffffff);
+  /* Opaque Swiss ink — resting fill was bare Apple #007aff (#14 / P2; Dark/Neon/cream Material parity; white type on ink). */
+  background: color-mix(in srgb, #121216 90%, #ffffff);
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
@@ -2713,31 +2714,31 @@ body {
 }
 
 #chat-send-btn:hover {
-  background: #007aff;
+  background: #121216;
   box-shadow: none;
 }
 
 #chat-send-btn:focus-visible {
-  /* Opaque Swiss ink — bare Apple #007aff lagged --accent / cream Send focus (#14 / P2; design-review AI Chat; fill stays white-on-blue). */
+  /* Opaque Swiss ink — bare Apple #007aff lagged --accent / cream Send focus (#14 / P2; design-review AI Chat). */
   outline: 2px solid color-mix(in srgb, var(--accent, #121216) 55%, #ffffff);
   outline-offset: 2px;
 }
 
 #chat-send-btn:active {
   box-shadow: none;
-  background: color-mix(in srgb, #0064dc 95%, #ffffff);
+  background: color-mix(in srgb, #121216 95%, #ffffff);
 }
 
 /* Opaque disabled — was missing (Light/Material/Architect/Dark/Apple parity). */
 #chat-send-btn:disabled {
-  color: color-mix(in srgb, #ffffff 55%, #007aff);
-  background: color-mix(in srgb, #007aff 50%, #ffffff);
+  color: color-mix(in srgb, #ffffff 55%, #121216);
+  background: color-mix(in srgb, #121216 50%, #ffffff);
   opacity: 1;
   cursor: not-allowed;
   box-shadow: none;
 }
 
-/* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream weather-card (#14 / P2; design-review Perplexity; Send fill white-on-blue intentional). */
+/* Opaque Swiss ink — bare Apple #0a84ff lagged --accent / cream weather-card (#14 / P2; design-review Perplexity). */
 .perplexity-weather-card {
   border: 1px solid color-mix(in srgb, var(--accent, #121216) 22%, #ffffff);
   border-left: 3px solid color-mix(in srgb, var(--accent, #121216) 70%, #ffffff);

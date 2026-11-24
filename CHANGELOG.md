@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3030] - 2026-11-24
+
+### Changed
+- Material (cream) and Swiss Minimalistic AI Chat Send leave bare Apple `#007aff` white-on-blue. Send fill now uses theme accent / Swiss ink (Material dark type on warm `--accent`; Swiss white type on `#121216`), matching Dark / Neon / Data Poster / Futuristic. Focus rings and weather-card remaps stay as they were.
+
 ## [0.1.3029] - 2026-11-24
 
 ### Added
