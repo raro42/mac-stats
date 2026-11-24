@@ -1,3 +1,20 @@
+## Overnight note 2026-11-24 ~03:16 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Autopower Off delay v0.1.3026 — Standby delay high / standbydelayhigh slash+NL (not keep-pNN; cream/Swiss Send fill white-on-blue intentional; standbydelaylow stays out).
+- Shipped **v0.1.3027** — `/standbydelayhigh` · `/standby-delay-high` · `/mac-standbydelayhigh` + view/open NL; bare standbydelayhigh/standby delay high stay with agent; `/standbydelay` · `/standby` · `/autopoweroffdelay` intact; `/help` lists lane.
+- Ratchet keep @ 73a81dd for 3027; backfill keep for 3026.
+- Morning surprise: refresh 2026-11-24 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (standbydelaylow) — Standby delay high slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3027
+
+- Product fuel after Autopower Off delay v0.1.3026: Standby delay high already readable via `pmset -g custom` Battery/AC `standbydelayhigh` (+ active `pmset -g`; seconds; often absent on Apple Silicon) but lacked `/standbydelayhigh` · `/standby-delay-high` · `/mac-standbydelayhigh` and view/see/open/list phrases while Standby delay `/standbydelay`, Standby `/standby`, and Autopower Off delay `/autopoweroffdelay` already had slash+NL. Bare `standbydelayhigh` / `standby delay high` stay with the agent; standbydelaylow stays out. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: cream/Swiss Send fill white-on-blue intentional · Dark layout-daily next calendar day · soft-state sibling/product fuel (standbydelaylow) — Standby delay high slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~02:55 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
