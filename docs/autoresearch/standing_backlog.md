@@ -1,4 +1,19 @@
-## Overnight note 2026-11-24 ~20:10 CET
+## Overnight note 2026-11-24 ~20:14 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota; already_checked_today).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: standing backlog soft-state after Spotlight v0.1.3040 — No Restore Sleep / norestoresleep (not keep-pNN; Dark layout-daily next calendar day; reducebrightness stays out).
+- Shipped **v0.1.3041** — `/norestoresleep` · `/no-restore-sleep` · `/mac-norestoresleep` + view/open NL; bare norestoresleep/no restore sleep stay with agent; `/systemsleep` · `/ttysclobber` · `/ttyskeepawake` · `/tcpkeepalive` intact; `/help` lists lane.
+- Ratchet keep @ 2d633203c for 3041; backfill keep for remote Spotlight 3040.
+- Morning surprise: refresh 2026-11-25 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: Dark layout-daily next calendar day · soft-state sibling/product fuel (reducebrightness) — No Restore Sleep slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3041
+
+- Product fuel after Spotlight v0.1.3040 (remote raced 3040 while local WIP targeted same patch): No Restore Sleep already readable via `pmset -g custom` Battery/AC `norestoresleep` (+ active `pmset -g`; often absent on Apple Silicon) but lacked `/norestoresleep` · `/no-restore-sleep` · `/mac-norestoresleep` and view/see/open/list phrases while System Sleep `/systemsleep`, TTY Clobber `/ttysclobber`, TTY keep awake `/ttyskeepawake`, and TCP Keep Alive `/tcpkeepalive` already had slash+NL. Bare `norestoresleep` / `no restore sleep` stay with the agent; reducebrightness stays out. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day · soft-state sibling/product fuel (reducebrightness) — No Restore Sleep slash NL closed; not another keep-pNN clone.## Overnight note 2026-11-24 ~20:10 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
 - Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
