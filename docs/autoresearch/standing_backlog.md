@@ -1,3 +1,18 @@
+## Overnight note 2026-11-24 ~21:31 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota; already_checked_today).
+- Sibling: OpenClaw/Hermes present; no clear port this tick (insights/cost already covered).
+- Debug.log: no ERROR/WARN clusters in 180m window (Soul content noise only).
+- Fuel: product after Sleep Disabled v0.1.3045 — Sleep assertions / preventers from `pmset -g assertions` (not keep-pNN; not SoftDisabled clone; Dark layout-daily next calendar day).
+- Shipped **v0.1.3046** — `/assertions` · `/sleep-preventers` · `/preventers` · `/who-keeps-awake` · `/mac-assertions` + view/open NL; bare assertions/sleep preventers/preventers/who keeps awake stay with agent; `/systemsleep` · `/sleep` · `/sleepdisabled` · `/displaysleep` · `/disksleep` · `/norestoresleep` intact; `/help` lists lane.
+- Ratchet keep @ eab938656 for 3046; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions — not another keep-pNN clone.
+
+## Overnight merge — v0.1.3046
+
+- Product fuel after Sleep Disabled v0.1.3045: who-keeps-awake already readable via `pmset -g assertions` (system-wide Prevent* flags + owning processes) but lacked `/assertions` · `/sleep-preventers` · `/preventers` · `/who-keeps-awake` · `/mac-assertions` and view/see/open/list phrases while System Sleep `/systemsleep`, Sleep Disabled `/sleepdisabled`, Display Sleep `/displaysleep`, Disk Sleep `/disksleep`, and No Restore Sleep `/norestoresleep` already had slash+NL. Bare `assertions` / `sleep preventers` / `preventers` / `who keeps awake` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled/assertions soft-state closed; not another keep-pNN clone.
 ## Overnight note 2026-11-24 ~21:20 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
