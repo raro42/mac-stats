@@ -1,3 +1,20 @@
+## Overnight note 2026-11-24 ~22:55 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota; already_checked_today).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Power log v0.1.3050 — Thermal / CPU speed limits from `pmset -g therm` (not live thermlog stream hang; not SoftDisabled/boolean soft-state clone; Dark layout-daily next calendar day).
+- Shipped **v0.1.3051** — `/therm` · `/pmset-therm` · `/cpu-speed-limit` · `/speed-limit` · `/thermal-limits` · `/sched-limit` · `/mac-therm` + view/open NL; bare therm/cpu speed limit/thermal limits stay with agent; `/thermal` · `/heat` · `/pmlog` · `/sysload` · `/ups` intact; `/help` lists lane.
+- Ratchet keep @ 29952f6c4 for 3051; backfill keep for 3050; push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm — try pmset adapters next, not another keep-pNN clone.
+
+## Overnight merge — v0.1.3051
+
+- Product fuel after Power log v0.1.3050: CPU scheduler/speed limits already readable via `pmset -g therm` but lacked `/therm` · `/pmset-therm` · `/cpu-speed-limit` · `/speed-limit` · `/thermal-limits` · `/sched-limit` · `/mac-therm` and view/see/open/list phrases while Heat `/thermal` · `/heat`, Power log `/pmlog`, System load `/sysload`, and UPS `/ups` already had slash+NL. Bare `therm` / `cpu speed limit` / `thermal limits` stay with the agent. Live `pmset -g thermlog` stream skipped (blocks). Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm soft-state closed; try pmset adapters; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~22:35 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
