@@ -21021,6 +21021,9 @@ pub fn looks_like_lessbright_request(content: &str) -> bool {
         || n.contains("half-dim")
         || n.contains("half brightness")
         || n.contains("half-brightness")
+        || n.contains("reducebrightness")
+        || n.contains("reduce brightness")
+        || n.contains("reduce-brightness")
         || n.contains("screensaver")
         || n.contains("screen saver")
         || n.contains("screen-saver")
@@ -21099,6 +21102,9 @@ pub fn looks_like_lessbright_request(content: &str) -> bool {
         || n == "/half-dim"
         || n == "/half-brightness"
         || n == "/mac-halfdim"
+        || n == "/reducebrightness"
+        || n == "/reduce-brightness"
+        || n == "/mac-reducebrightness"
         || n == "/screensaver"
         || n == "/screen-saver"
         || n == "/idle-time"
@@ -21715,6 +21721,9 @@ pub fn looks_like_halfdim_request(content: &str) -> bool {
         || n.contains("slightly-dim")
         || n.contains("dim display")
         || n.contains("dim-display")
+        || n.contains("reducebrightness")
+        || n.contains("reduce brightness")
+        || n.contains("reduce-brightness")
         || n.contains("screensaver")
         || n.contains("screen saver")
         || n.contains("screen-saver")
@@ -21793,6 +21802,9 @@ pub fn looks_like_halfdim_request(content: &str) -> bool {
         || n == "/less-bright"
         || n == "/slightly-dim"
         || n == "/dim-display"
+        || n == "/reducebrightness"
+        || n == "/reduce-brightness"
+        || n == "/mac-reducebrightness"
         || n == "/screensaver"
         || n == "/screen-saver"
         || n == "/idle-time"
@@ -25649,6 +25661,230 @@ pub fn format_norestoresleep_report() -> String {
         return "**No Restore Sleep** — _no No Restore Sleep reading on this Mac right now._".to_string();
     }
     format!("**No Restore Sleep** · `{v}`")
+}
+
+/// Reduce Brightness — `pmset` Battery/AC `reducebrightness` (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/reducebrightness` · `/reduce-brightness` · `view reducebrightness`).
+/// Bare `reducebrightness` / `reduce brightness` stay with the agent;
+/// `/lessbright` stays Less Bright; `/halfdim` stays Half Dim; `/dim-display` stays Less Bright;
+/// `/displaysleep` stays Display Sleep; `/norestoresleep` stays No Restore Sleep.
+pub fn looks_like_reducebrightness_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("lessbright")
+        || n.contains("less bright")
+        || n.contains("less-bright")
+        || n.contains("slightly dim")
+        || n.contains("slightly-dim")
+        || n.contains("dim display")
+        || n.contains("dim-display")
+        || n.contains("halfdim")
+        || n.contains("half dim")
+        || n.contains("half-dim")
+        || n.contains("half brightness")
+        || n.contains("half-brightness")
+        || n.contains("norestoresleep")
+        || n.contains("no restore sleep")
+        || n.contains("no-restore-sleep")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("system sleep")
+        || n.contains("systemsleep")
+        || n.contains("system-sleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("screensaver")
+        || n.contains("filevault")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/lessbright"
+        || n == "/less-bright"
+        || n == "/slightly-dim"
+        || n == "/dim-display"
+        || n == "/halfdim"
+        || n == "/half-dim"
+        || n == "/half-brightness"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/display"
+        || n == "/screen"
+        || n == "/norestoresleep"
+        || n == "/no-restore-sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/sleep"
+        || n == "/powermode"
+        || n == "/power-mode"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        // Bare phrases stay with the agent.
+        || n == "reducebrightness"
+        || n == "the reducebrightness"
+        || n == "reduce brightness"
+        || n == "the reduce brightness"
+        || n == "reduce-brightness"
+        || n == "the reduce-brightness"
+        || n == "reducebright"
+        || n == "the reducebright"
+        || n == "reduce bright"
+        || n == "the reduce bright"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/reducebrightness"
+            | "/reducebrightness-status"
+            | "/reducebrightness-state"
+            | "/reduce-brightness"
+            | "/reduce-brightness-status"
+            | "/reduce-brightness-state"
+            | "/reducebright"
+            | "/reducebright-status"
+            | "/reducebright-state"
+            | "/reduce-bright"
+            | "/reduce-bright-status"
+            | "/mac-reducebrightness"
+            | "/mac-reduce-brightness"
+            | "/mac-reducebright"
+            | "/mac-reduce-bright"
+            | "/mac-reducebrightness-status"
+            | "/mac-reduce-brightness-status"
+            | "reducebrightness status"
+            | "the reducebrightness status"
+            | "reduce brightness status"
+            | "the reduce brightness status"
+            | "reduce-brightness status"
+            | "the reduce-brightness status"
+            | "reducebrightness state"
+            | "the reducebrightness state"
+            | "reduce brightness state"
+            | "my reducebrightness"
+            | "my reducebrightness status"
+            | "my reduce brightness"
+            | "my reduce brightness status"
+            | "is reducebrightness on"
+            | "is reducebrightness off"
+            | "is reducebrightness enabled"
+            | "is reducebrightness disabled"
+            | "is reduce brightness on"
+            | "is reduce brightness off"
+            | "is reduce brightness enabled"
+            | "is reduce brightness disabled"
+            | "is reduce-brightness on"
+            | "is reduce-brightness enabled"
+            | "what's my reducebrightness"
+            | "whats my reducebrightness"
+            | "what is my reducebrightness"
+            | "what's my reducebrightness status"
+            | "whats my reducebrightness status"
+            | "what is my reducebrightness status"
+            | "what's my reduce brightness"
+            | "whats my reduce brightness"
+            | "what is my reduce brightness"
+            | "what's my reduce brightness status"
+            | "whats my reduce brightness status"
+            | "what is my reduce brightness status"
+            | "what's the reducebrightness"
+            | "whats the reducebrightness"
+            | "what is the reducebrightness"
+            | "what's the reducebrightness status"
+            | "whats the reducebrightness status"
+            | "what is the reducebrightness status"
+            | "what's the reduce brightness"
+            | "whats the reduce brightness"
+            | "what is the reduce brightness"
+            | "what's the reduce brightness status"
+            | "whats the reduce brightness status"
+            | "what is the reduce brightness status"
+            | "how's reducebrightness"
+            | "hows reducebrightness"
+            | "how's the reducebrightness"
+            | "hows the reducebrightness"
+            | "how's reduce brightness"
+            | "hows reduce brightness"
+            | "view reducebrightness"
+            | "view the reducebrightness"
+            | "view reducebrightness status"
+            | "view the reducebrightness status"
+            | "view reduce brightness"
+            | "view the reduce brightness"
+            | "view reduce brightness status"
+            | "view the reduce brightness status"
+            | "view reduce-brightness"
+            | "view the reduce-brightness"
+            | "see reducebrightness"
+            | "see the reducebrightness"
+            | "see reducebrightness status"
+            | "see the reducebrightness status"
+            | "see reduce brightness"
+            | "see the reduce brightness"
+            | "open reducebrightness"
+            | "open the reducebrightness"
+            | "open reducebrightness status"
+            | "open the reducebrightness status"
+            | "open reduce brightness"
+            | "open the reduce brightness"
+            | "open reduce-brightness"
+            | "open the reduce-brightness"
+            | "list reducebrightness"
+            | "list the reducebrightness"
+            | "list reducebrightness status"
+            | "list the reducebrightness status"
+            | "list reduce brightness"
+            | "list the reduce brightness"
+            | "list reduce-brightness"
+            | "list the reduce-brightness"
+    )
+}
+
+/// Zero-LLM Reduce Brightness from pmset (macOS-only; empty elsewhere).
+pub fn format_reducebrightness_report() -> String {
+    let v = crate::metrics::get_reducebrightness_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Reduce Brightness** — _no Reduce Brightness reading on this Mac right now._".to_string();
+    }
+    format!("**Reduce Brightness** · `{v}`")
 }
 
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).

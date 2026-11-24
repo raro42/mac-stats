@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3042] - 2026-11-24
+
+### Added
+- Instant Reduce Brightness accepts `/reducebrightness` · `/reducebrightness-status` · `/reducebrightness-state` · `/reduce-brightness` · `/reduce-brightness-status` · `/reduce-brightness-state` · `/reducebright` · `/reducebright-status` · `/reducebright-state` · `/reduce-bright` · `/reduce-bright-status` · `/mac-reducebrightness` · `/mac-reduce-brightness` · `/mac-reducebright` · `/mac-reduce-bright` · `/mac-reducebrightness-status` · `/mac-reduce-brightness-status` and view/see/open/list NL (`view reducebrightness`, `open reduce-brightness`, `list reduce brightness`, …), matching “reducebrightness status” / “is reduce brightness on” / “is reducebrightness enabled” / “what's my reducebrightness” / “what's the reduce brightness”. Bare `reducebrightness` / `reduce brightness` stay with the agent; `/lessbright` · `/less-bright` stay Less Bright; `/halfdim` · `/half-dim` stay Half Dim; `/dim-display` stays Less Bright; `/displaysleep` · `/display-sleep` stay Display Sleep; `/norestoresleep` · `/no-restore-sleep` stay No Restore Sleep. Operator `/help` lists the new lane.
+
 ## [0.1.3041] - 2026-11-24
 
 ### Added

@@ -5914,6 +5914,73 @@ mod tests {
     }
 
     #[test]
+    fn reducebrightness_slash_and_view_open_do_not_steal_lessbright_or_bare() {
+        // Slash + view/open NL → Reduce Brightness (`/lessbright` · `/halfdim` parity).
+        // Bare `reducebrightness` / `reduce brightness` stay with the agent;
+        // `/lessbright` stays Less Bright; `/halfdim` stays Half Dim;
+        // `/dim-display` stays Less Bright; `/norestoresleep` stays No Restore Sleep.
+        assert!(looks_like_reducebrightness_request("/reducebrightness"));
+        assert!(looks_like_reducebrightness_request("/reducebrightness-status"));
+        assert!(looks_like_reducebrightness_request("/reduce-brightness"));
+        assert!(looks_like_reducebrightness_request("/reducebright"));
+        assert!(looks_like_reducebrightness_request("/mac-reducebrightness"));
+        assert!(looks_like_reducebrightness_request("/mac-reduce-brightness"));
+        assert!(looks_like_reducebrightness_request("view reducebrightness"));
+        assert!(looks_like_reducebrightness_request("open reduce-brightness"));
+        assert!(looks_like_reducebrightness_request("list reduce brightness"));
+        assert!(looks_like_reducebrightness_request("reducebrightness status"));
+        assert!(looks_like_reducebrightness_request("is reduce brightness on"));
+        assert!(looks_like_reducebrightness_request("what's my reducebrightness"));
+        assert!(looks_like_reducebrightness_request("view reduce brightness"));
+        assert!(!looks_like_reducebrightness_request("reducebrightness"));
+        assert!(!looks_like_reducebrightness_request("reduce brightness"));
+        assert!(!looks_like_reducebrightness_request("/lessbright"));
+        assert!(!looks_like_reducebrightness_request("view less bright"));
+        assert!(!looks_like_reducebrightness_request("/halfdim"));
+        assert!(!looks_like_reducebrightness_request("/dim-display"));
+        assert!(!looks_like_reducebrightness_request("/norestoresleep"));
+        assert!(!looks_like_reducebrightness_request("/displaysleep"));
+        assert!(!looks_like_reducebrightness_request("/tasks"));
+        assert!(!looks_like_reducebrightness_request("enable reducebrightness"));
+        assert!(!looks_like_lessbright_request("/reducebrightness"));
+        assert!(!looks_like_lessbright_request("view reducebrightness"));
+        assert!(!looks_like_halfdim_request("/reducebrightness"));
+        assert!(!looks_like_norestoresleep_request("/reducebrightness"));
+        let s = try_operator_instant_reply("/reducebrightness").unwrap();
+        assert!(
+            s.contains("**Reduce Brightness**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view reducebrightness").unwrap();
+        assert!(
+            viewed.contains("**Reduce Brightness**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open reduce-brightness").unwrap();
+        assert!(
+            open.contains("**Reduce Brightness**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("reducebrightness").is_none());
+        assert!(try_operator_instant_reply("reduce brightness").is_none());
+        let lb = try_operator_instant_reply("/lessbright");
+        if let Some(reply) = lb {
+            assert!(
+                !reply.contains("**Reduce Brightness**"),
+                "/lessbright must stay Less Bright, not Reduce Brightness: {reply}"
+            );
+        }
+        let hd = try_operator_instant_reply("/halfdim");
+        if let Some(reply) = hd {
+            assert!(
+                !reply.contains("**Reduce Brightness**"),
+                "/halfdim must stay Half Dim, not Reduce Brightness: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn norestoresleep_slash_and_view_open_do_not_steal_systemsleep_or_bare() {
         // Slash + view/open NL → No Restore Sleep (`/systemsleep` · `/ttysclobber` parity).
         // Bare `norestoresleep` / `no restore sleep` stay with the agent;

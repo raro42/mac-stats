@@ -1321,9 +1321,16 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     // No Restore Sleep (bare `norestoresleep` / `no restore sleep` stay with the agent;
     // `/systemsleep` stays System Sleep; `/ttysclobber` stays TTY Clobber;
-    // `/tcpkeepalive` stays TCP Keep Alive; reducebrightness stays out).
+    // `/tcpkeepalive` stays TCP Keep Alive).
     if looks_like_norestoresleep_request(content) {
         return Some(format_norestoresleep_report());
+    }
+    // Reduce Brightness (bare `reducebrightness` / `reduce brightness` stay with the agent;
+    // `/lessbright` stays Less Bright; `/halfdim` stays Half Dim;
+    // `/dim-display` stays Less Bright; `/displaysleep` stays Display Sleep;
+    // `/norestoresleep` stays No Restore Sleep).
+    if looks_like_reducebrightness_request(content) {
+        return Some(format_reducebrightness_report());
     }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
