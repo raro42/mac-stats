@@ -22463,7 +22463,7 @@ pub fn format_standbydelay_report() -> String {
 /// Slash + view/open NL (`/standbydelayhigh` · `/standby-delay-high` · `view standbydelayhigh`).
 /// Bare `standbydelayhigh` / `standby delay high` stay with the agent;
 /// `/standbydelay` stays Standby delay; `/standby` stays Standby;
-/// standbydelaylow stays out; `/autopoweroffdelay` stays Autopower Off delay.
+/// `/standbydelaylow` stays Standby delay low; `/autopoweroffdelay` stays Autopower Off delay.
 pub fn looks_like_standbydelayhigh_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 88 {
@@ -22692,6 +22692,247 @@ pub fn format_standbydelayhigh_report() -> String {
             .to_string();
     }
     format!("**Standby delay high** · `{v}`")
+}
+
+/// Standby delay low — `pmset` Battery/AC `standbydelaylow` seconds (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/standbydelaylow` · `/standby-delay-low` · `view standbydelaylow`).
+/// Bare `standbydelaylow` / `standby delay low` stay with the agent;
+/// `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
+/// `/standby` stays Standby; `/autopoweroffdelay` stays Autopower Off delay.
+pub fn looks_like_standbydelaylow_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("standbydelayhigh")
+        || n.contains("standby delay high")
+        || n.contains("standby-delay-high")
+        || n.contains("autopoweroffdelay")
+        || n.contains("auto power off delay")
+        || n.contains("auto-power-off-delay")
+        || n.contains("autopoweroff")
+        || n.contains("auto power off")
+        || n.contains("auto-power-off")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("power-mode")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("system sleep")
+        || n.contains("systemsleep")
+        || n.contains("computer sleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("hibernatemode")
+        || n.contains("hibernate mode")
+        || n.contains("hibernatefile")
+        || n.contains("hibernate file")
+        || n.contains("sleepimage")
+        || n.contains("sleep image")
+        || n.contains("sleep on power")
+        || n.contains("power button")
+        || n.contains("sopb")
+        || n.contains("lessbright")
+        || n.contains("less bright")
+        || n.contains("halfdim")
+        || n.contains("half dim")
+        || n.contains("screensaver")
+        || n.contains("screen lock")
+        || n.contains("filevault")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/standby"
+        || n == "/stand-by"
+        || n == "/standbydelay"
+        || n == "/standby-delay"
+        || n == "/mac-standbydelay"
+        || n == "/mac-standby-delay"
+        || n == "/standbydelayhigh"
+        || n == "/standby-delay-high"
+        || n == "/mac-standbydelayhigh"
+        || n == "/mac-standby-delay-high"
+        || n == "/autopoweroff"
+        || n == "/auto-power-off"
+        || n == "/auto-poweroff"
+        || n == "/autopower-off"
+        || n == "/mac-autopoweroff"
+        || n == "/mac-auto-power-off"
+        || n == "/hibernatemode"
+        || n == "/hibernate"
+        || n == "/systemsleep"
+        || n == "/sleep"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare low phrases stay with the agent.
+        || n == "standbydelaylow"
+        || n == "the standbydelaylow"
+        || n == "standby delay low"
+        || n == "the standby delay low"
+        || n == "standby-delay-low"
+        || n == "the standby-delay-low"
+        // Bare Standby delay stays with the agent / standbydelay slash lane.
+        || n == "standbydelay"
+        || n == "the standbydelay"
+        || n == "standby delay"
+        || n == "the standby delay"
+        || n == "standby-delay"
+        || n == "the standby-delay"
+        // Bare Standby stays with the agent / standby slash lane.
+        || n == "standby"
+        || n == "the standby"
+        || n == "stand by"
+        || n == "the stand by"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/standbydelaylow"
+            | "/standbydelaylow-status"
+            | "/standbydelaylow-state"
+            | "/standby-delay-low"
+            | "/standby-delay-low-status"
+            | "/standby-delay-low-state"
+            | "/standbydelay-low"
+            | "/standbydelay-low-status"
+            | "/mac-standbydelaylow"
+            | "/mac-standby-delay-low"
+            | "/mac-standbydelaylow-status"
+            | "/mac-standby-delay-low-status"
+            | "standbydelaylow status"
+            | "the standbydelaylow status"
+            | "standby delay low status"
+            | "the standby delay low status"
+            | "standby-delay-low status"
+            | "the standby-delay-low status"
+            | "standbydelaylow state"
+            | "the standbydelaylow state"
+            | "standby delay low state"
+            | "the standby delay low state"
+            | "my standbydelaylow"
+            | "my standbydelaylow status"
+            | "my standby delay low"
+            | "my standby delay low status"
+            | "what's my standbydelaylow"
+            | "whats my standbydelaylow"
+            | "what is my standbydelaylow"
+            | "what's my standbydelaylow status"
+            | "whats my standbydelaylow status"
+            | "what is my standbydelaylow status"
+            | "what's my standby delay low"
+            | "whats my standby delay low"
+            | "what is my standby delay low"
+            | "what's my standby delay low status"
+            | "whats my standby delay low status"
+            | "what is my standby delay low status"
+            | "what's the standbydelaylow"
+            | "whats the standbydelaylow"
+            | "what is the standbydelaylow"
+            | "what's the standbydelaylow status"
+            | "whats the standbydelaylow status"
+            | "what is the standbydelaylow status"
+            | "what's the standby delay low"
+            | "whats the standby delay low"
+            | "what is the standby delay low"
+            | "what's the standby delay low status"
+            | "whats the standby delay low status"
+            | "what is the standby delay low status"
+            | "how's standbydelaylow"
+            | "hows standbydelaylow"
+            | "how's the standbydelaylow"
+            | "hows the standbydelaylow"
+            | "how's standby delay low"
+            | "hows standby delay low"
+            | "view standbydelaylow"
+            | "view the standbydelaylow"
+            | "view standbydelaylow status"
+            | "view the standbydelaylow status"
+            | "view standby delay low"
+            | "view the standby delay low"
+            | "view standby delay low status"
+            | "view the standby delay low status"
+            | "view standby-delay-low"
+            | "view the standby-delay-low"
+            | "see standbydelaylow"
+            | "see the standbydelaylow"
+            | "see standbydelaylow status"
+            | "see the standbydelaylow status"
+            | "see standby delay low"
+            | "see the standby delay low"
+            | "open standbydelaylow"
+            | "open the standbydelaylow"
+            | "open standbydelaylow status"
+            | "open the standbydelaylow status"
+            | "open standby delay low"
+            | "open the standby delay low"
+            | "open standby-delay-low"
+            | "open the standby-delay-low"
+            | "list standbydelaylow"
+            | "list the standbydelaylow"
+            | "list standbydelaylow status"
+            | "list the standbydelaylow status"
+            | "list standby delay low"
+            | "list the standby delay low"
+            | "list standby-delay-low"
+            | "list the standby-delay-low"
+    )
+}
+
+/// Zero-LLM Standby delay low from pmset (macOS-only; empty elsewhere).
+pub fn format_standbydelaylow_report() -> String {
+    let v = crate::metrics::get_standbydelaylow_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Standby delay low** — _no Standby delay low reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**Standby delay low** · `{v}`")
 }
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).

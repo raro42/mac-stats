@@ -5294,7 +5294,7 @@ pub(crate) fn format_standbydelayhigh_parts(
 /// macOS Standby delay high from `pmset -g custom` Battery/AC `standbydelayhigh`
 /// (fallback: active `pmset -g`; often absent on Apple Silicon). Distinct from
 /// Standby delay `/standbydelay`, Standby `/standby`, Autopower Off delay
-/// `/autopoweroffdelay`, and standbydelaylow.
+/// `/autopoweroffdelay`, and Standby delay low `/standbydelaylow`.
 /// Used by Discord/operator instant `/standbydelayhigh` · `/standby-delay-high` lane.
 pub fn get_standbydelayhigh_status() -> String {
     #[cfg(not(target_os = "macos"))]
@@ -5344,6 +5344,126 @@ pub fn get_standbydelayhigh_status() -> String {
             debug3!("standbydelayhigh: empty status");
         } else {
             debug3!("standbydelayhigh status: '{}'", info);
+        }
+        info
+    }
+}
+
+/// Parse `pmset -g custom` Battery/AC `standbydelaylow` seconds → (battery, ac).
+/// Exact key `standbydelaylow` only (not `standbydelay` / `standbydelayhigh` / `standby`).
+pub(crate) fn parse_pmset_custom_standbydelaylow(raw: &str) -> (Option<u32>, Option<u32>) {
+    let mut section: Option<&str> = None;
+    let mut battery = None;
+    let mut ac = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.eq_ignore_ascii_case("Battery Power:") {
+            section = Some("battery");
+            continue;
+        }
+        if t.eq_ignore_ascii_case("AC Power:") {
+            section = Some("ac");
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("standbydelaylow") {
+            continue;
+        }
+        let secs = match parts.next().and_then(|v| v.parse::<u32>().ok()) {
+            Some(v) => Some(v),
+            None => continue,
+        };
+        match section {
+            Some("battery") => battery = secs.or(battery),
+            Some("ac") => ac = secs.or(ac),
+            _ => {}
+        }
+    }
+    (battery, ac)
+}
+
+/// Parse active `pmset -g` `standbydelaylow` seconds (Currently in use).
+pub(crate) fn parse_pmset_active_standbydelaylow(raw: &str) -> Option<u32> {
+    for line in raw.lines() {
+        let mut parts = line.trim().split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("standbydelaylow") {
+            continue;
+        }
+        return parts.next().and_then(|v| v.parse::<u32>().ok());
+    }
+    None
+}
+
+/// Prefer Battery+AC custom when both set; else active `pmset -g`.
+pub(crate) fn format_standbydelaylow_parts(
+    battery: Option<u32>,
+    ac: Option<u32>,
+    active: Option<u32>,
+) -> String {
+    format_standbydelay_parts(battery, ac, active)
+}
+
+/// macOS Standby delay low from `pmset -g custom` Battery/AC `standbydelaylow`
+/// (fallback: active `pmset -g`; often absent on Apple Silicon). Distinct from
+/// Standby delay `/standbydelay`, Standby delay high `/standbydelayhigh`, and
+/// Standby `/standby`.
+/// Used by Discord/operator instant `/standbydelaylow` · `/standby-delay-low` lane.
+pub fn get_standbydelaylow_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let (battery, ac) = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g", "custom"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_custom_standbydelaylow(&stdout)
+                }
+                Ok(_) => (None, None),
+                Err(_) => {
+                    debug3!("standbydelaylow: pmset -g custom spawn failed");
+                    (None, None)
+                }
+            }
+        };
+
+        let active = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_active_standbydelaylow(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("standbydelaylow: pmset -g spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_standbydelaylow_parts(battery, ac, active);
+        if info.is_empty() {
+            debug3!("standbydelaylow: empty status");
+        } else {
+            debug3!("standbydelaylow status: '{}'", info);
         }
         info
     }
@@ -9791,6 +9911,78 @@ AC Power:
         );
         assert_eq!(format_standbydelayhigh_parts(None, None, Some(120)), "2m");
         assert_eq!(format_standbydelayhigh_parts(None, None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod standbydelaylow_parse_tests {
+    use super::{
+        format_standbydelaylow_parts, parse_pmset_active_standbydelaylow,
+        parse_pmset_custom_standbydelaylow,
+    };
+
+    #[test]
+    fn parses_custom_battery_and_ac() {
+        let sample = r#"
+Battery Power:
+ standbydelaylow      10800
+ standbydelay         10800
+AC Power:
+ standbydelaylow      3600
+ standbydelayhigh     86400
+"#;
+        assert_eq!(
+            parse_pmset_custom_standbydelaylow(sample),
+            (Some(10800), Some(3600))
+        );
+        assert_eq!(parse_pmset_custom_standbydelaylow("nope"), (None, None));
+        let other = r#"
+Battery Power:
+ standbydelay         10800
+AC Power:
+ standbydelayhigh     86400
+"#;
+        assert_eq!(parse_pmset_custom_standbydelaylow(other), (None, None));
+    }
+
+    #[test]
+    fn parses_active_standbydelaylow() {
+        assert_eq!(
+            parse_pmset_active_standbydelaylow(
+                "Currently in use:\n standbydelaylow      10800\n"
+            ),
+            Some(10800)
+        );
+        assert_eq!(
+            parse_pmset_active_standbydelaylow(" standbydelay         10800\n"),
+            None
+        );
+        assert_eq!(
+            parse_pmset_active_standbydelaylow(" standbydelayhigh     86400\n"),
+            None
+        );
+    }
+
+    #[test]
+    fn formats_parts() {
+        assert_eq!(
+            format_standbydelaylow_parts(Some(10800), Some(10800), Some(0)),
+            "3h"
+        );
+        assert_eq!(
+            format_standbydelaylow_parts(Some(10800), Some(3600), None),
+            "AC 1h · Battery 3h"
+        );
+        assert_eq!(
+            format_standbydelaylow_parts(Some(10800), None, None),
+            "3h (Battery)"
+        );
+        assert_eq!(
+            format_standbydelaylow_parts(None, Some(0), None),
+            "Never (AC)"
+        );
+        assert_eq!(format_standbydelaylow_parts(None, None, Some(120)), "2m");
+        assert_eq!(format_standbydelaylow_parts(None, None, None), "");
     }
 }
 

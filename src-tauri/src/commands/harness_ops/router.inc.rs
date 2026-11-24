@@ -1259,20 +1259,26 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     // Standby delay high (bare `standbydelayhigh` / `standby delay high` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standby` stays Standby;
-    // standbydelaylow stays out; `/autopoweroffdelay` stays Autopower Off delay).
+    // `/standbydelaylow` stays Standby delay low; `/autopoweroffdelay` stays Autopower Off delay).
     if looks_like_standbydelayhigh_request(content) {
         return Some(format_standbydelayhigh_report());
     }
+    // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
+    // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
+    // `/standby` stays Standby; `/autopoweroffdelay` stays Autopower Off delay).
+    if looks_like_standbydelaylow_request(content) {
+        return Some(format_standbydelaylow_report());
+    }
     // Standby delay (bare `standbydelay` / `standby delay` stay with the agent;
     // `/standby` stays Standby; `/hibernatefile` stays Hibernate file;
-    // `/standbydelayhigh` stays Standby delay high; standbydelaylow stays out;
+    // `/standbydelayhigh` stays Standby delay high; `/standbydelaylow` stays Standby delay low;
     // `/autopoweroff` stays Auto Power Off).
     if looks_like_standbydelay_request(content) {
         return Some(format_standbydelay_report());
     }
     // Autopower Off delay (bare `autopoweroffdelay` / `auto power off delay` stay with the agent;
     // `/autopoweroff` stays Auto Power Off; `/standbydelay` stays Standby delay;
-    // `/standbydelayhigh` stays Standby delay high; standbydelaylow stays out).
+    // `/standbydelayhigh` stays Standby delay high; `/standbydelaylow` stays Standby delay low).
     if looks_like_autopoweroffdelay_request(content) {
         return Some(format_autopoweroffdelay_report());
     }
