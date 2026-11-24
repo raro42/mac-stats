@@ -1279,9 +1279,15 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     // AC Wake (bare `acwake` / `ac wake` stay with the agent;
     // `/womp` stays Wake for network; `/proximitywake` stays Proximity Wake;
-    // `/lidwake` stays out; `/standby` stays Standby; `/destroyfvkeyonstandby` stays Destroy FV key).
+    // `/lidwake` stays Lid Wake; `/standby` stays Standby; `/destroyfvkeyonstandby` stays Destroy FV key).
     if looks_like_acwake_request(content) {
         return Some(format_acwake_report());
+    }
+    // Lid Wake (bare `lidwake` / `lid wake` stay with the agent;
+    // `/womp` stays Wake for network; `/proximitywake` stays Proximity Wake;
+    // `/acwake` stays AC Wake; `/standby` stays Standby; `/destroyfvkeyonstandby` stays Destroy FV key).
+    if looks_like_lidwake_request(content) {
+        return Some(format_lidwake_report());
     }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;

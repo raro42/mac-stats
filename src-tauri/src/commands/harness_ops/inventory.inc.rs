@@ -23648,7 +23648,7 @@ pub fn format_destroyfvkeyonstandby_report() -> String {
 /// Slash + view/open NL (`/acwake` · `/ac-wake` · `view acwake`).
 /// Bare `acwake` / `ac wake` stay with the agent;
 /// `/womp` · `/wake-for-network` stay Wake for network; `/proximitywake` stays Proximity Wake;
-/// `/lidwake` · `/lid-wake` stay out; `/standby` stays Standby; `/destroyfvkeyonstandby` stays Destroy FV key.
+/// `/lidwake` · `/lid-wake` stay Lid Wake; `/standby` stays Standby; `/destroyfvkeyonstandby` stays Destroy FV key.
 pub fn looks_like_acwake_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -23892,6 +23892,258 @@ pub fn format_acwake_report() -> String {
         return "**AC Wake** — _no AC Wake reading on this Mac right now._".to_string();
     }
     format!("**AC Wake** · `{v}`")
+}
+
+/// Lid Wake — `pmset` Battery/AC `lidwake` (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/lidwake` · `/lid-wake` · `/wake-on-lid` · `view lidwake`).
+/// Bare `lidwake` / `lid wake` stay with the agent;
+/// `/womp` · `/wake-for-network` stay Wake for network; `/proximitywake` stays Proximity Wake;
+/// `/acwake` · `/ac-wake` stay AC Wake; `/standby` stays Standby; `/destroyfvkeyonstandby` stays Destroy FV key.
+pub fn looks_like_lidwake_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("acwake")
+        || n.contains("ac wake")
+        || n.contains("ac-wake")
+        || n.contains("wake on ac")
+        || n.contains("wake-on-ac")
+        || n.contains("destroyfvkey")
+        || n.contains("destroy-fv-key")
+        || n.contains("destroy fv key")
+        || n.contains("fvkeyonstandby")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("wake on network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("hibernatemode")
+        || n.contains("hibernate")
+        || n.contains("standbydelay")
+        || n.contains("standby delay")
+        || n.contains("autopoweroff")
+        || n.contains("auto power off")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("system sleep")
+        || n.contains("systemsleep")
+        || n.contains("sleep on power")
+        || n.contains("power button")
+        || n.contains("sopb")
+        || n.contains("lessbright")
+        || n.contains("halfdim")
+        || n.contains("filevault")
+        || n.contains("screensaver")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/proximitywake"
+        || n == "/proximity-wake"
+        || n == "/standby"
+        || n == "/stand-by"
+        || n == "/destroyfvkeyonstandby"
+        || n == "/destroyfvkey"
+        || n == "/acwake"
+        || n == "/ac-wake"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "lidwake"
+        || n == "the lidwake"
+        || n == "lid wake"
+        || n == "the lid wake"
+        || n == "lid-wake"
+        || n == "the lid-wake"
+        || n == "wake on lid"
+        || n == "the wake on lid"
+        || n == "wake-on-lid"
+        || n == "the wake-on-lid"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/lidwake"
+            | "/lidwake-status"
+            | "/lidwake-state"
+            | "/lid-wake"
+            | "/lid-wake-status"
+            | "/lid-wake-state"
+            | "/wake-on-lid"
+            | "/wake-on-lid-status"
+            | "/wake-on-lid-state"
+            | "/wakeonlid"
+            | "/wakeonlid-status"
+            | "/mac-lidwake"
+            | "/mac-lid-wake"
+            | "/mac-wake-on-lid"
+            | "/mac-lidwake-status"
+            | "/mac-lid-wake-status"
+            | "lidwake status"
+            | "the lidwake status"
+            | "lid wake status"
+            | "the lid wake status"
+            | "lid-wake status"
+            | "the lid-wake status"
+            | "wake on lid status"
+            | "the wake on lid status"
+            | "wake-on-lid status"
+            | "the wake-on-lid status"
+            | "lidwake state"
+            | "the lidwake state"
+            | "lid wake state"
+            | "my lidwake"
+            | "my lidwake status"
+            | "my lid wake"
+            | "my lid wake status"
+            | "is lidwake on"
+            | "is lidwake off"
+            | "is lidwake enabled"
+            | "is lidwake disabled"
+            | "is lid wake on"
+            | "is lid wake off"
+            | "is lid wake enabled"
+            | "is lid wake disabled"
+            | "is lid-wake on"
+            | "is lid-wake enabled"
+            | "is wake on lid on"
+            | "is wake on lid enabled"
+            | "is wake-on-lid on"
+            | "is wake-on-lid enabled"
+            | "what's my lidwake"
+            | "whats my lidwake"
+            | "what is my lidwake"
+            | "what's my lidwake status"
+            | "whats my lidwake status"
+            | "what is my lidwake status"
+            | "what's my lid wake"
+            | "whats my lid wake"
+            | "what is my lid wake"
+            | "what's my lid wake status"
+            | "whats my lid wake status"
+            | "what is my lid wake status"
+            | "what's the lidwake"
+            | "whats the lidwake"
+            | "what is the lidwake"
+            | "what's the lidwake status"
+            | "whats the lidwake status"
+            | "what is the lidwake status"
+            | "what's the lid wake"
+            | "whats the lid wake"
+            | "what is the lid wake"
+            | "what's the lid wake status"
+            | "whats the lid wake status"
+            | "what is the lid wake status"
+            | "how's lidwake"
+            | "hows lidwake"
+            | "how's the lidwake"
+            | "hows the lidwake"
+            | "how's lid wake"
+            | "hows lid wake"
+            | "view lidwake"
+            | "view the lidwake"
+            | "view lidwake status"
+            | "view the lidwake status"
+            | "view lid wake"
+            | "view the lid wake"
+            | "view lid wake status"
+            | "view the lid wake status"
+            | "view lid-wake"
+            | "view the lid-wake"
+            | "view wake on lid"
+            | "view the wake on lid"
+            | "view wake-on-lid"
+            | "view the wake-on-lid"
+            | "see lidwake"
+            | "see the lidwake"
+            | "see lidwake status"
+            | "see the lidwake status"
+            | "see lid wake"
+            | "see the lid wake"
+            | "see wake on lid"
+            | "open lidwake"
+            | "open the lidwake"
+            | "open lidwake status"
+            | "open the lidwake status"
+            | "open lid wake"
+            | "open the lid wake"
+            | "open lid-wake"
+            | "open the lid-wake"
+            | "open wake on lid"
+            | "open the wake on lid"
+            | "open wake-on-lid"
+            | "open the wake-on-lid"
+            | "list lidwake"
+            | "list the lidwake"
+            | "list lidwake status"
+            | "list the lidwake status"
+            | "list lid wake"
+            | "list the lid wake"
+            | "list lid-wake"
+            | "list the lid-wake"
+            | "list wake on lid"
+            | "list the wake on lid"
+            | "list wake-on-lid"
+            | "list the wake-on-lid"
+    )
+}
+
+/// Zero-LLM Lid Wake from pmset (macOS-only; empty elsewhere).
+pub fn format_lidwake_report() -> String {
+    let v = crate::metrics::get_lidwake_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Lid Wake** — _no Lid Wake reading on this Mac right now._".to_string();
+    }
+    format!("**Lid Wake** · `{v}`")
 }
 
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).

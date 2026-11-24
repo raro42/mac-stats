@@ -5522,7 +5522,7 @@ mod tests {
         // Slash + view/open NL → AC Wake (`/womp` · `/proximitywake` parity).
         // Bare `acwake` / `ac wake` stay with the agent;
         // `/womp` stays Wake for network; `/proximitywake` stays Proximity Wake;
-        // `/lidwake` stays out; `/standby` stays Standby; `/destroyfvkeyonstandby` stays Destroy FV key;
+        // `/lidwake` stays Lid Wake; `/standby` stays Standby; `/destroyfvkeyonstandby` stays Destroy FV key;
         // `/charger` stays AC charger.
         assert!(looks_like_acwake_request("/acwake"));
         assert!(looks_like_acwake_request("/acwake-status"));
@@ -5544,6 +5544,7 @@ mod tests {
         assert!(!looks_like_acwake_request("/proximitywake"));
         assert!(!looks_like_acwake_request("/standby"));
         assert!(!looks_like_acwake_request("/destroyfvkeyonstandby"));
+        assert!(!looks_like_acwake_request("/lidwake"));
         assert!(!looks_like_acwake_request("/charger"));
         assert!(!looks_like_acwake_request("/tasks"));
         assert!(!looks_like_acwake_request("enable acwake"));
@@ -5579,6 +5580,72 @@ mod tests {
             assert!(
                 !reply.contains("**AC Wake**"),
                 "/charger must stay AC charger, not AC Wake: {reply}"
+            );
+        }
+    }
+
+    #[test]
+    fn lidwake_slash_and_view_open_do_not_steal_womp_or_bare() {
+        // Slash + view/open NL → Lid Wake (`/womp` · `/acwake` parity).
+        // Bare `lidwake` / `lid wake` stay with the agent;
+        // `/womp` stays Wake for network; `/proximitywake` stays Proximity Wake;
+        // `/acwake` stays AC Wake; `/standby` stays Standby; `/destroyfvkeyonstandby` stays Destroy FV key.
+        assert!(looks_like_lidwake_request("/lidwake"));
+        assert!(looks_like_lidwake_request("/lidwake-status"));
+        assert!(looks_like_lidwake_request("/lid-wake"));
+        assert!(looks_like_lidwake_request("/wake-on-lid"));
+        assert!(looks_like_lidwake_request("/mac-lidwake"));
+        assert!(looks_like_lidwake_request("/mac-lid-wake"));
+        assert!(looks_like_lidwake_request("view lidwake"));
+        assert!(looks_like_lidwake_request("open lid-wake"));
+        assert!(looks_like_lidwake_request("list wake on lid"));
+        assert!(looks_like_lidwake_request("lidwake status"));
+        assert!(looks_like_lidwake_request("is lid wake on"));
+        assert!(looks_like_lidwake_request("what's my lidwake"));
+        assert!(looks_like_lidwake_request("view lid wake"));
+        assert!(!looks_like_lidwake_request("lidwake"));
+        assert!(!looks_like_lidwake_request("lid wake"));
+        assert!(!looks_like_lidwake_request("/womp"));
+        assert!(!looks_like_lidwake_request("view womp"));
+        assert!(!looks_like_lidwake_request("/proximitywake"));
+        assert!(!looks_like_lidwake_request("/acwake"));
+        assert!(!looks_like_lidwake_request("/standby"));
+        assert!(!looks_like_lidwake_request("/destroyfvkeyonstandby"));
+        assert!(!looks_like_lidwake_request("/tasks"));
+        assert!(!looks_like_lidwake_request("enable lidwake"));
+        assert!(!looks_like_acwake_request("/lidwake"));
+        assert!(!looks_like_acwake_request("view lidwake"));
+        assert!(!looks_like_wake_for_network_request("/lidwake"));
+        assert!(!looks_like_destroyfvkeyonstandby_request("/lidwake"));
+        let s = try_operator_instant_reply("/lidwake").unwrap();
+        assert!(
+            s.contains("**Lid Wake**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view lidwake").unwrap();
+        assert!(
+            viewed.contains("**Lid Wake**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open lid-wake").unwrap();
+        assert!(
+            open.contains("**Lid Wake**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("lidwake").is_none());
+        assert!(try_operator_instant_reply("lid wake").is_none());
+        let acwake = try_operator_instant_reply("/acwake");
+        if let Some(reply) = acwake {
+            assert!(
+                !reply.contains("**Lid Wake**"),
+                "/acwake must stay AC Wake, not Lid Wake: {reply}"
+            );
+        }
+        let womp = try_operator_instant_reply("/womp");
+        if let Some(reply) = womp {
+            assert!(
+                !reply.contains("**Lid Wake**"),
+                "/womp must stay Wake for network, not Lid Wake: {reply}"
             );
         }
     }
