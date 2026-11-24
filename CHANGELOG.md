@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3034] - 2026-11-24
+
+### Changed
+- Light theme AI Chat Send leaves bare Apple `#007aff` white-on-blue. Send fill now uses soft theme `--accent` (`#6aa6df`) with white type, matching Dark / Neon / Material / Swiss / Data Poster / Futuristic. Focus ring already used `--accent`; Architect Send `#007aff` may remain.
+
 ## [0.1.3033] - 2026-11-24
 
 ### Added
