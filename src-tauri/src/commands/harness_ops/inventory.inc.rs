@@ -20846,6 +20846,9 @@ pub fn looks_like_lessbright_request(content: &str) -> bool {
         || n == "/sleep-on-power"
         || n == "/power-button-sleep"
         || n == "/sopb"
+        || n == "/powermode"
+        || n == "/power-mode"
+        || n == "/mac-powermode"
         || n == "/screensaver"
         || n == "/screen-saver"
         || n == "/idle-time"
@@ -20857,6 +20860,9 @@ pub fn looks_like_lessbright_request(content: &str) -> bool {
         || n == "/vpn"
         || n == "/tasks"
         || n == "/uptime"
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("power-mode")
         // Bare phrases stay with the agent.
         || n == "lessbright"
         || n == "the lessbright"
@@ -21039,6 +21045,315 @@ pub fn format_lessbright_report() -> String {
         return "**Less Bright** — _no Less Bright reading on this Mac right now._".to_string();
     }
     format!("**Less Bright** · `{v}`")
+}
+
+/// Power Mode — `pmset` Battery/AC `powermode` (+ active fallback; 0 Auto · 1 Low · 2 High).
+/// Slash + view/open NL (`/powermode` · `/power-mode` · `view power mode`).
+/// Bare `powermode` / `power mode` stay with the agent;
+/// `/lpm` · low power mode stay Low Power Mode chip; `/powernap` stays Power Nap;
+/// `/power` stays the strip; `/lessbright` stays Less Bright; halfdim stays out.
+pub fn looks_like_powermode_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("high power")
+        || n.contains("high-power")
+        || n.contains("highpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("wake on network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("hard disk sleep")
+        || n.contains("hdd sleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("systemsleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("computersleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("ttys keep awake")
+        || n.contains("tty-keep-awake")
+        || n.contains("ttys-keep-awake")
+        || n.contains("ttykeepawake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("tcp-keep-alive")
+        || n.contains("tcp keepalive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("network-over-sleep")
+        || n.contains("hibernate")
+        || n.contains("hibernatemode")
+        || n.contains("standby")
+        || n.contains("stand by")
+        || n.contains("stand-by")
+        || n.contains("sleep on power")
+        || n.contains("sleep-on-power")
+        || n.contains("power button")
+        || n.contains("power-button")
+        || n.contains("sopb")
+        || n.contains("lessbright")
+        || n.contains("less bright")
+        || n.contains("less-bright")
+        || n.contains("slightly dim")
+        || n.contains("slightly-dim")
+        || n.contains("dim display")
+        || n.contains("dim-display")
+        || n.contains("halfdim")
+        || n.contains("half dim")
+        || n.contains("half-dim")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n.contains("power draw")
+        || n.contains("power-draw")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/proximitywake"
+        || n == "/proximity-wake"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
+        || n == "/display"
+        || n == "/screen"
+        || n == "/resolution"
+        || n == "/disksleep"
+        || n == "/disk-sleep"
+        || n == "/hard-disk-sleep"
+        || n == "/hdd-sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/computer-sleep"
+        || n == "/computersleep"
+        || n == "/sleep"
+        || n == "/ttyskeepawake"
+        || n == "/tty-keep-awake"
+        || n == "/ttys-keep-awake"
+        || n == "/ttykeepawake"
+        || n == "/tcpkeepalive"
+        || n == "/tcp-keep-alive"
+        || n == "/tcp-keepalive"
+        || n == "/networkoversleep"
+        || n == "/network-over-sleep"
+        || n == "/hibernatemode"
+        || n == "/hibernate-mode"
+        || n == "/hibernate"
+        || n == "/standby"
+        || n == "/stand-by"
+        || n == "/sleep-on-power-button"
+        || n == "/sleep-on-power"
+        || n == "/power-button-sleep"
+        || n == "/sopb"
+        || n == "/lessbright"
+        || n == "/less-bright"
+        || n == "/slightly-dim"
+        || n == "/dim-display"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "powermode"
+        || n == "the powermode"
+        || n == "power mode"
+        || n == "the power mode"
+        || n == "power-mode"
+        || n == "the power-mode"
+        || n == "pmset powermode"
+        || n == "the pmset powermode"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/powermode"
+            | "/powermode-status"
+            | "/powermode-state"
+            | "/power-mode"
+            | "/power-mode-status"
+            | "/power-mode-state"
+            | "/mac-powermode"
+            | "/mac-power-mode"
+            | "/mac-powermode-status"
+            | "/mac-power-mode-status"
+            | "powermode status"
+            | "the powermode status"
+            | "power mode status"
+            | "the power mode status"
+            | "power-mode status"
+            | "the power-mode status"
+            | "powermode state"
+            | "the powermode state"
+            | "power mode state"
+            | "the power mode state"
+            | "my powermode"
+            | "my powermode status"
+            | "my power mode"
+            | "my power mode status"
+            | "is powermode on"
+            | "is powermode off"
+            | "is powermode enabled"
+            | "is powermode disabled"
+            | "is power mode on"
+            | "is power mode off"
+            | "is power mode enabled"
+            | "is power mode disabled"
+            | "is power-mode on"
+            | "is power-mode enabled"
+            | "what's my powermode"
+            | "whats my powermode"
+            | "what is my powermode"
+            | "what's my powermode status"
+            | "whats my powermode status"
+            | "what is my powermode status"
+            | "what's my power mode"
+            | "whats my power mode"
+            | "what is my power mode"
+            | "what's my power mode status"
+            | "whats my power mode status"
+            | "what is my power mode status"
+            | "what's the powermode"
+            | "whats the powermode"
+            | "what is the powermode"
+            | "what's the powermode status"
+            | "whats the powermode status"
+            | "what is the powermode status"
+            | "what's the power mode"
+            | "whats the power mode"
+            | "what is the power mode"
+            | "what's the power mode status"
+            | "whats the power mode status"
+            | "what is the power mode status"
+            | "how's powermode"
+            | "hows powermode"
+            | "how's the powermode"
+            | "hows the powermode"
+            | "how's power mode"
+            | "hows power mode"
+            | "view powermode"
+            | "view the powermode"
+            | "view powermode status"
+            | "view the powermode status"
+            | "view power mode"
+            | "view the power mode"
+            | "view power mode status"
+            | "view the power mode status"
+            | "view power-mode"
+            | "view the power-mode"
+            | "see powermode"
+            | "see the powermode"
+            | "see powermode status"
+            | "see the powermode status"
+            | "see power mode"
+            | "see the power mode"
+            | "open powermode"
+            | "open the powermode"
+            | "open powermode status"
+            | "open the powermode status"
+            | "open power mode"
+            | "open the power mode"
+            | "open power-mode"
+            | "open the power-mode"
+            | "list powermode"
+            | "list the powermode"
+            | "list powermode status"
+            | "list the powermode status"
+            | "list power mode"
+            | "list the power mode"
+            | "list power-mode"
+            | "list the power-mode"
+    )
+}
+
+/// Zero-LLM Power Mode status from pmset (macOS-only; empty elsewhere).
+pub fn format_powermode_report() -> String {
+    let v = crate::metrics::get_powermode_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Power Mode** — _no Power Mode reading on this Mac right now._".to_string();
+    }
+    format!("**Power Mode** · `{v}`")
 }
 
 /// System Sleep — `pmset` Battery/AC `sleep` minutes (+ active fallback; 0 = Never).

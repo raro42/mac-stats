@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.3021] - 2026-11-24
+
+### Added
+- Instant Power Mode accepts `/powermode` · `/powermode-status` · `/powermode-state` · `/power-mode` · `/power-mode-status` · `/power-mode-state` · `/mac-powermode` · `/mac-power-mode` · `/mac-powermode-status` · `/mac-power-mode-status` and view/see/open/list NL (`view power mode`, `open powermode`, `list power-mode`, …), matching “powermode status” / “is power mode on” / “is powermode enabled” / “what's my power mode” / “what's the powermode status”. Bare `powermode` / `power mode` stay with the agent; `/lpm` stays Low Power Mode; `/powernap` · `/power-nap` stay Power Nap; `/power` stays the strip; `/watts` · `/power-draw` stay draw; `/lessbright` · `/less-bright` stay Less Bright; halfdim stays out. Operator `/help` lists the new lane.
+
+
 ## [0.1.3020] - 2026-11-24
 
 ### Added

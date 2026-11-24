@@ -4852,6 +4852,72 @@ mod tests {
         }
     }
 
+    #[test]
+    fn powermode_slash_and_view_open_do_not_steal_lpm_or_bare() {
+        // Slash + view/open NL → Power Mode (`/lessbright` · `/hibernatemode` parity).
+        // Bare `powermode` / `power mode` stay with the agent;
+        // `/lpm` stays Low Power Mode; `/powernap` stays Power Nap; `/power` stays strip;
+        // `/lessbright` stays Less Bright; halfdim stays out.
+        assert!(looks_like_powermode_request("/powermode"));
+        assert!(looks_like_powermode_request("/powermode-status"));
+        assert!(looks_like_powermode_request("/power-mode"));
+        assert!(looks_like_powermode_request("/mac-powermode"));
+        assert!(looks_like_powermode_request("/mac-power-mode"));
+        assert!(looks_like_powermode_request("view powermode"));
+        assert!(looks_like_powermode_request("open power-mode"));
+        assert!(looks_like_powermode_request("list power mode"));
+        assert!(looks_like_powermode_request("powermode status"));
+        assert!(looks_like_powermode_request("is power mode on"));
+        assert!(looks_like_powermode_request("is powermode enabled"));
+        assert!(looks_like_powermode_request("what's my power mode"));
+        assert!(looks_like_powermode_request("view power mode"));
+        assert!(!looks_like_powermode_request("powermode"));
+        assert!(!looks_like_powermode_request("power mode"));
+        assert!(!looks_like_powermode_request("/lpm"));
+        assert!(!looks_like_powermode_request("view low power mode"));
+        assert!(!looks_like_powermode_request("low power mode"));
+        assert!(!looks_like_powermode_request("/powernap"));
+        assert!(!looks_like_powermode_request("/power"));
+        assert!(!looks_like_powermode_request("/watts"));
+        assert!(!looks_like_powermode_request("/lessbright"));
+        assert!(!looks_like_powermode_request("/sopb"));
+        assert!(!looks_like_powermode_request("/tasks"));
+        assert!(!looks_like_powermode_request("enable powermode"));
+        assert!(!looks_like_lessbright_request("/powermode"));
+        assert!(!looks_like_lessbright_request("view power mode"));
+        let s = try_operator_instant_reply("/powermode").unwrap();
+        assert!(
+            s.contains("**Power Mode**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view power mode").unwrap();
+        assert!(
+            viewed.contains("**Power Mode**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open powermode").unwrap();
+        assert!(
+            open.contains("**Power Mode**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("powermode").is_none());
+        assert!(try_operator_instant_reply("power mode").is_none());
+        let lpm = try_operator_instant_reply("/lpm");
+        if let Some(reply) = lpm {
+            assert!(
+                !reply.contains("**Power Mode**"),
+                "/lpm must stay Low Power Mode, not Power Mode: {reply}"
+            );
+        }
+        let less = try_operator_instant_reply("/lessbright");
+        if let Some(reply) = less {
+            assert!(
+                !reply.contains("**Power Mode**"),
+                "/lessbright must stay Less Bright, not Power Mode: {reply}"
+            );
+        }
+    }
+
 #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).
