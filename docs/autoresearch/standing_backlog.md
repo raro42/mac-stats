@@ -1,3 +1,20 @@
+## Overnight note 2026-11-25 ~00:25 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Power custom v0.1.3056 — Power adapters from `pmset -g adapters` (not SoftDisabled/boolean soft-state clone; not `/adapter` SPPower clone; Dark layout-daily next).
+- Backfill: missing keep row for v0.1.3056.
+- Shipped **v0.1.3057** — `/pmadapters` · `/pm-adapters` · `/pmset-adapters` · `/power-adapters` · `/adapters` · `/adapter-list` · `/mac-pmadapters` + view/open NL; bare pmadapters/power adapters/adapters stay with agent; `/adapter` · `/charger` · `/pmps` · `/pmcustom` · `/ups` · `/battery` intact; `/help` lists lane.
+- Ratchet keep @ c2bd7e295 for 3057; backfill keep for 3056; push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats/pmcap/useractivity/pmps/pmcustom/pmadapters — try history/live/everything only if non-blocking; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3057
+
+- Product fuel after Power custom v0.1.3056: adapter wattage/description already readable via `pmset -g adapters` but lacked `/pmadapters` · `/pm-adapters` · `/pmset-adapters` · `/power-adapters` · `/adapters` · `/adapter-list` · `/mac-pmadapters` and view/see/open/list phrases while AC charger `/adapter` (SPPower), Power source `/pmps`, Power custom `/pmcustom`, and UPS `/ups` already had slash+NL. Bare `pmadapters` / `power adapters` / `adapters` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-25 (Dark due next). Next: Dark layout-daily next calendar day — SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats/pmcap/useractivity/pmps/pmcustom/pmadapters soft-state closed; try history/live/everything only if non-blocking; not another keep-pNN clone.
 ## Overnight note 2026-11-24 ~23:05 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
