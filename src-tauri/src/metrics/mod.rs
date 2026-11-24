@@ -4702,6 +4702,138 @@ pub fn get_halfdim_status() -> String {
     }
 }
 
+/// Parse `pmset -g custom` Battery/AC `hibernatefile` path → (battery, ac).
+/// Exact key `hibernatefile` only (not `hibernatemode`). Path is the rest of the line.
+pub(crate) fn parse_pmset_custom_hibernatefile(
+    raw: &str,
+) -> (Option<String>, Option<String>) {
+    let mut section: Option<&str> = None;
+    let mut battery = None;
+    let mut ac = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.eq_ignore_ascii_case("Battery Power:") {
+            section = Some("battery");
+            continue;
+        }
+        if t.eq_ignore_ascii_case("AC Power:") {
+            section = Some("ac");
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("hibernatefile") {
+            continue;
+        }
+        let path = parts.collect::<Vec<_>>().join(" ");
+        if path.is_empty() {
+            continue;
+        }
+        let path = Some(path);
+        match section {
+            Some("battery") => battery = path.or(battery),
+            Some("ac") => ac = path.or(ac),
+            _ => {}
+        }
+    }
+    (battery, ac)
+}
+
+/// Parse active `pmset -g` `hibernatefile` path (Currently in use).
+pub(crate) fn parse_pmset_active_hibernatefile(raw: &str) -> Option<String> {
+    for line in raw.lines() {
+        let mut parts = line.trim().split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("hibernatefile") {
+            continue;
+        }
+        let path = parts.collect::<Vec<_>>().join(" ");
+        if path.is_empty() {
+            return None;
+        }
+        return Some(path);
+    }
+    None
+}
+
+/// Prefer Battery+AC custom when both set; else active `pmset -g`.
+pub(crate) fn format_hibernatefile_parts(
+    battery: Option<String>,
+    ac: Option<String>,
+    active: Option<String>,
+) -> String {
+    match (battery, ac) {
+        (Some(b), Some(a)) if b == a => b,
+        (Some(b), Some(a)) => format!("AC {a} · Battery {b}"),
+        (Some(b), None) => format!("{b} (Battery)"),
+        (None, Some(a)) => format!("{a} (AC)"),
+        (None, None) => active.unwrap_or_default(),
+    }
+}
+
+/// macOS Hibernate file from `pmset -g custom` Battery/AC `hibernatefile`
+/// (fallback: active `pmset -g`). Distinct from Hibernate mode `/hibernatemode` · `/hibernate`,
+/// System Sleep `/systemsleep`, and Standby `/standby`.
+/// Used by Discord/operator instant `/hibernatefile` · `/sleepimage` lane.
+pub fn get_hibernatefile_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let (battery, ac) = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g", "custom"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_custom_hibernatefile(&stdout)
+                }
+                Ok(_) => (None, None),
+                Err(_) => {
+                    debug3!("hibernatefile: pmset -g custom spawn failed");
+                    (None, None)
+                }
+            }
+        };
+
+        let active = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_active_hibernatefile(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("hibernatefile: pmset -g spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_hibernatefile_parts(battery, ac, active);
+        if info.is_empty() {
+            debug3!("hibernatefile: empty status");
+        } else {
+            debug3!("hibernatefile status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -8754,6 +8886,102 @@ AC Power:
         );
         assert_eq!(format_halfdim_parts(None, None, Some(true)), "On");
         assert_eq!(format_halfdim_parts(None, None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod hibernatefile_parse_tests {
+    use super::{
+        format_hibernatefile_parts, parse_pmset_active_hibernatefile,
+        parse_pmset_custom_hibernatefile,
+    };
+
+    #[test]
+    fn parses_custom_battery_and_ac() {
+        let sample = r#"
+Battery Power:
+ hibernatefile        /var/vm/sleepimage
+ hibernatemode        3
+AC Power:
+ hibernatefile        /var/vm/sleepimage
+ standby              1
+"#;
+        assert_eq!(
+            parse_pmset_custom_hibernatefile(sample),
+            (
+                Some("/var/vm/sleepimage".to_string()),
+                Some("/var/vm/sleepimage".to_string())
+            )
+        );
+        assert_eq!(parse_pmset_custom_hibernatefile("nope"), (None, None));
+        let split = r#"
+Battery Power:
+ hibernatefile        /private/var/vm/sleepimage
+AC Power:
+ hibernatefile        /Volumes/Other/sleepimage
+"#;
+        assert_eq!(
+            parse_pmset_custom_hibernatefile(split),
+            (
+                Some("/private/var/vm/sleepimage".to_string()),
+                Some("/Volumes/Other/sleepimage".to_string())
+            )
+        );
+        let other = r#"
+Battery Power:
+ hibernatemode        3
+AC Power:
+ standby              1
+"#;
+        assert_eq!(parse_pmset_custom_hibernatefile(other), (None, None));
+    }
+
+    #[test]
+    fn parses_active_hibernatefile() {
+        assert_eq!(
+            parse_pmset_active_hibernatefile(
+                "Currently in use:\n hibernatefile        /var/vm/sleepimage\n"
+            ),
+            Some("/var/vm/sleepimage".to_string())
+        );
+        assert_eq!(
+            parse_pmset_active_hibernatefile(" hibernatemode        3\n"),
+            None
+        );
+        assert_eq!(parse_pmset_active_hibernatefile(" halfdim              1\n"), None);
+    }
+
+    #[test]
+    fn formats_matched_split_and_active() {
+        assert_eq!(
+            format_hibernatefile_parts(
+                Some("/var/vm/sleepimage".into()),
+                Some("/var/vm/sleepimage".into()),
+                Some("/tmp/x".into())
+            ),
+            "/var/vm/sleepimage"
+        );
+        assert_eq!(
+            format_hibernatefile_parts(
+                Some("/a".into()),
+                Some("/b".into()),
+                None
+            ),
+            "AC /b · Battery /a"
+        );
+        assert_eq!(
+            format_hibernatefile_parts(Some("/a".into()), None, None),
+            "/a (Battery)"
+        );
+        assert_eq!(
+            format_hibernatefile_parts(None, Some("/b".into()), None),
+            "/b (AC)"
+        );
+        assert_eq!(
+            format_hibernatefile_parts(None, None, Some("/c".into())),
+            "/c"
+        );
+        assert_eq!(format_hibernatefile_parts(None, None, None), "");
     }
 }
 

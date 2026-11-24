@@ -19916,6 +19916,19 @@ pub fn looks_like_hibernatemode_request(content: &str) -> bool {
         || n == "/tcp-keepalive"
         || n == "/networkoversleep"
         || n == "/network-over-sleep"
+        || n.contains("hibernatefile")
+        || n.contains("hibernate file")
+        || n.contains("hibernate-file")
+        || n.contains("sleepimage")
+        || n.contains("sleep image")
+        || n.contains("sleep-image")
+        || n == "/hibernatefile"
+        || n == "/hibernate-file"
+        || n == "/sleepimage"
+        || n == "/sleep-image"
+        || n == "/mac-hibernatefile"
+        || n == "/mac-hibernate-file"
+        || n == "/mac-sleepimage"
         || n == "/screensaver"
         || n == "/screen-saver"
         || n == "/idle-time"
@@ -20248,6 +20261,10 @@ pub fn looks_like_standby_request(content: &str) -> bool {
         || n == "/hibernatemode"
         || n == "/hibernate-mode"
         || n == "/hibernate"
+        || n == "/hibernatefile"
+        || n == "/hibernate-file"
+        || n == "/sleepimage"
+        || n == "/sleep-image"
         || n == "/sleep-on-power-button"
         || n == "/sleep-on-power"
         || n == "/power-button-sleep"
@@ -20526,6 +20543,10 @@ pub fn looks_like_sleep_on_power_button_request(content: &str) -> bool {
         || n == "/hibernatemode"
         || n == "/hibernate-mode"
         || n == "/hibernate"
+        || n == "/hibernatefile"
+        || n == "/hibernate-file"
+        || n == "/sleepimage"
+        || n == "/sleep-image"
         || n == "/standby"
         || n == "/stand-by"
         || n == "/screensaver"
@@ -20845,6 +20866,10 @@ pub fn looks_like_lessbright_request(content: &str) -> bool {
         || n == "/hibernatemode"
         || n == "/hibernate-mode"
         || n == "/hibernate"
+        || n == "/hibernatefile"
+        || n == "/hibernate-file"
+        || n == "/sleepimage"
+        || n == "/sleep-image"
         || n == "/standby"
         || n == "/stand-by"
         || n == "/sleep-on-power-button"
@@ -21223,6 +21248,10 @@ pub fn looks_like_powermode_request(content: &str) -> bool {
         || n == "/hibernatemode"
         || n == "/hibernate-mode"
         || n == "/hibernate"
+        || n == "/hibernatefile"
+        || n == "/hibernate-file"
+        || n == "/sleepimage"
+        || n == "/sleep-image"
         || n == "/standby"
         || n == "/stand-by"
         || n == "/sleep-on-power-button"
@@ -21534,6 +21563,10 @@ pub fn looks_like_halfdim_request(content: &str) -> bool {
         || n == "/hibernatemode"
         || n == "/hibernate-mode"
         || n == "/hibernate"
+        || n == "/hibernatefile"
+        || n == "/hibernate-file"
+        || n == "/sleepimage"
+        || n == "/sleep-image"
         || n == "/standby"
         || n == "/stand-by"
         || n == "/sleep-on-power-button"
@@ -21708,6 +21741,390 @@ pub fn format_halfdim_report() -> String {
         return "**Half Dim** — _no Half Dim reading on this Mac right now._".to_string();
     }
     format!("**Half Dim** · `{v}`")
+}
+
+/// Hibernate file — `pmset` Battery/AC `hibernatefile` path (+ active fallback).
+/// Slash + view/open NL (`/hibernatefile` · `/hibernate-file` · `/sleepimage` · `view hibernatefile`).
+/// Bare `hibernatefile` / `hibernate file` / `sleepimage` / `sleep image` stay with the agent;
+/// `/hibernatemode` · `/hibernate` stay Hibernate mode; `/systemsleep` stays System Sleep;
+/// `/standby` stays Standby; `/halfdim` stays Half Dim.
+pub fn looks_like_hibernatefile_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("power-mode")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("wake on network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("hard disk sleep")
+        || n.contains("hdd sleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("systemsleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("computersleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("ttys keep awake")
+        || n.contains("tty-keep-awake")
+        || n.contains("ttys-keep-awake")
+        || n.contains("ttykeepawake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("tcp-keep-alive")
+        || n.contains("tcp keepalive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("network-over-sleep")
+        || n.contains("hibernatemode")
+        || n.contains("hibernate mode")
+        || n.contains("hibernate-mode")
+        || n.contains("standby")
+        || n.contains("stand by")
+        || n.contains("stand-by")
+        || n.contains("standbydelay")
+        || n.contains("standby delay")
+        || n.contains("autopoweroff")
+        || n.contains("auto power off")
+        || n.contains("sleep on power")
+        || n.contains("sleep-on-power")
+        || n.contains("power button")
+        || n.contains("power-button")
+        || n.contains("sopb")
+        || n.contains("lessbright")
+        || n.contains("less bright")
+        || n.contains("less-bright")
+        || n.contains("slightly dim")
+        || n.contains("slightly-dim")
+        || n.contains("dim display")
+        || n.contains("dim-display")
+        || n.contains("halfdim")
+        || n.contains("half dim")
+        || n.contains("half-dim")
+        || n.contains("half brightness")
+        || n.contains("half-brightness")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/powermode"
+        || n == "/power-mode"
+        || n == "/mac-powermode"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/proximitywake"
+        || n == "/proximity-wake"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
+        || n == "/display"
+        || n == "/screen"
+        || n == "/resolution"
+        || n == "/disksleep"
+        || n == "/disk-sleep"
+        || n == "/hard-disk-sleep"
+        || n == "/hdd-sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/computer-sleep"
+        || n == "/computersleep"
+        || n == "/sleep"
+        || n == "/ttyskeepawake"
+        || n == "/tty-keep-awake"
+        || n == "/ttys-keep-awake"
+        || n == "/ttykeepawake"
+        || n == "/tcpkeepalive"
+        || n == "/tcp-keep-alive"
+        || n == "/tcp-keepalive"
+        || n == "/networkoversleep"
+        || n == "/network-over-sleep"
+        || n == "/hibernatemode"
+        || n == "/hibernate-mode"
+        || n == "/hibernate"
+        || n == "/hibernate-status"
+        || n == "/hibernate-state"
+        || n == "/mac-hibernatemode"
+        || n == "/mac-hibernate-mode"
+        || n == "/mac-hibernate"
+        || n == "/standby"
+        || n == "/stand-by"
+        || n == "/sleep-on-power-button"
+        || n == "/sleep-on-power"
+        || n == "/power-button-sleep"
+        || n == "/sopb"
+        || n == "/lessbright"
+        || n == "/less-bright"
+        || n == "/slightly-dim"
+        || n == "/dim-display"
+        || n == "/halfdim"
+        || n == "/half-dim"
+        || n == "/half-brightness"
+        || n == "/mac-halfdim"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "hibernatefile"
+        || n == "the hibernatefile"
+        || n == "hibernate file"
+        || n == "the hibernate file"
+        || n == "hibernate-file"
+        || n == "the hibernate-file"
+        || n == "sleepimage"
+        || n == "the sleepimage"
+        || n == "sleep image"
+        || n == "the sleep image"
+        || n == "sleep-image"
+        || n == "the sleep-image"
+        || n == "hibernate"
+        || n == "the hibernate"
+        || n == "hibernatemode"
+        || n == "the hibernatemode"
+        || n == "hibernate mode"
+        || n == "the hibernate mode"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/hibernatefile"
+            | "/hibernatefile-status"
+            | "/hibernatefile-state"
+            | "/hibernate-file"
+            | "/hibernate-file-status"
+            | "/hibernate-file-state"
+            | "/sleepimage"
+            | "/sleepimage-status"
+            | "/sleepimage-state"
+            | "/sleep-image"
+            | "/sleep-image-status"
+            | "/sleep-image-state"
+            | "/mac-hibernatefile"
+            | "/mac-hibernate-file"
+            | "/mac-sleepimage"
+            | "/mac-sleep-image"
+            | "/mac-hibernatefile-status"
+            | "/mac-hibernate-file-status"
+            | "/mac-sleepimage-status"
+            | "hibernatefile status"
+            | "the hibernatefile status"
+            | "hibernate file status"
+            | "the hibernate file status"
+            | "hibernate-file status"
+            | "the hibernate-file status"
+            | "sleepimage status"
+            | "the sleepimage status"
+            | "sleep image status"
+            | "the sleep image status"
+            | "sleep-image status"
+            | "the sleep-image status"
+            | "hibernatefile state"
+            | "the hibernatefile state"
+            | "hibernate file state"
+            | "the hibernate file state"
+            | "sleepimage state"
+            | "the sleepimage state"
+            | "my hibernatefile"
+            | "my hibernatefile status"
+            | "my hibernate file"
+            | "my hibernate file status"
+            | "my sleepimage"
+            | "my sleepimage status"
+            | "my sleep image"
+            | "my sleep image status"
+            | "what's my hibernatefile"
+            | "whats my hibernatefile"
+            | "what is my hibernatefile"
+            | "what's my hibernatefile status"
+            | "whats my hibernatefile status"
+            | "what is my hibernatefile status"
+            | "what's my hibernate file"
+            | "whats my hibernate file"
+            | "what is my hibernate file"
+            | "what's my hibernate file status"
+            | "whats my hibernate file status"
+            | "what is my hibernate file status"
+            | "what's my sleepimage"
+            | "whats my sleepimage"
+            | "what is my sleepimage"
+            | "what's my sleep image"
+            | "whats my sleep image"
+            | "what is my sleep image"
+            | "what's the hibernatefile"
+            | "whats the hibernatefile"
+            | "what is the hibernatefile"
+            | "what's the hibernatefile status"
+            | "whats the hibernatefile status"
+            | "what is the hibernatefile status"
+            | "what's the hibernate file"
+            | "whats the hibernate file"
+            | "what is the hibernate file"
+            | "what's the hibernate file status"
+            | "whats the hibernate file status"
+            | "what is the hibernate file status"
+            | "what's the sleepimage"
+            | "whats the sleepimage"
+            | "what is the sleepimage"
+            | "what's the sleep image"
+            | "whats the sleep image"
+            | "what is the sleep image"
+            | "how's hibernatefile"
+            | "hows hibernatefile"
+            | "how's the hibernatefile"
+            | "hows the hibernatefile"
+            | "how's hibernate file"
+            | "hows hibernate file"
+            | "how's sleepimage"
+            | "hows sleepimage"
+            | "view hibernatefile"
+            | "view the hibernatefile"
+            | "view hibernatefile status"
+            | "view the hibernatefile status"
+            | "view hibernate file"
+            | "view the hibernate file"
+            | "view hibernate file status"
+            | "view the hibernate file status"
+            | "view hibernate-file"
+            | "view the hibernate-file"
+            | "view sleepimage"
+            | "view the sleepimage"
+            | "view sleepimage status"
+            | "view the sleepimage status"
+            | "view sleep image"
+            | "view the sleep image"
+            | "view sleep-image"
+            | "view the sleep-image"
+            | "see hibernatefile"
+            | "see the hibernatefile"
+            | "see hibernatefile status"
+            | "see the hibernatefile status"
+            | "see hibernate file"
+            | "see the hibernate file"
+            | "see sleepimage"
+            | "see the sleepimage"
+            | "see sleep image"
+            | "open hibernatefile"
+            | "open the hibernatefile"
+            | "open hibernatefile status"
+            | "open the hibernatefile status"
+            | "open hibernate file"
+            | "open the hibernate file"
+            | "open hibernate-file"
+            | "open the hibernate-file"
+            | "open sleepimage"
+            | "open the sleepimage"
+            | "open sleep image"
+            | "open the sleep image"
+            | "open sleep-image"
+            | "open the sleep-image"
+            | "list hibernatefile"
+            | "list the hibernatefile"
+            | "list hibernatefile status"
+            | "list the hibernatefile status"
+            | "list hibernate file"
+            | "list the hibernate file"
+            | "list hibernate-file"
+            | "list the hibernate-file"
+            | "list sleepimage"
+            | "list the sleepimage"
+            | "list sleep image"
+            | "list the sleep image"
+            | "list sleep-image"
+            | "list the sleep-image"
+    )
+}
+
+/// Zero-LLM Hibernate file path from pmset (macOS-only; empty elsewhere).
+pub fn format_hibernatefile_report() -> String {
+    let v = crate::metrics::get_hibernatefile_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Hibernate file** — _no Hibernate file reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**Hibernate file** · `{v}`")
 }
 
 /// System Sleep — `pmset` Battery/AC `sleep` minutes (+ active fallback; 0 = Never).

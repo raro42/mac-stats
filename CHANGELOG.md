@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3023] - 2026-11-24
+
+### Added
+- Instant Hibernate file accepts `/hibernatefile` · `/hibernatefile-status` · `/hibernatefile-state` · `/hibernate-file` · `/hibernate-file-status` · `/hibernate-file-state` · `/sleepimage` · `/sleepimage-status` · `/sleepimage-state` · `/sleep-image` · `/sleep-image-status` · `/sleep-image-state` · `/mac-hibernatefile` · `/mac-hibernate-file` · `/mac-sleepimage` · `/mac-sleep-image` · `/mac-hibernatefile-status` · `/mac-hibernate-file-status` · `/mac-sleepimage-status` and view/see/open/list NL (`view hibernatefile`, `open hibernate file`, `list sleepimage`, …), matching “hibernatefile status” / “what's my hibernatefile” / “what's the hibernate file status” / “what's my sleepimage”. Bare `hibernatefile` / `hibernate file` / `sleepimage` / `sleep image` stay with the agent; `/hibernatemode` · `/hibernate` stay Hibernate mode; `/systemsleep` · `/system-sleep` stay System Sleep; `/standby` · `/stand-by` stay Standby; `/halfdim` · `/half-dim` stay Half Dim. Operator `/help` lists the new lane.
+
 ## [0.1.3022] - 2026-11-24
 
 ### Added

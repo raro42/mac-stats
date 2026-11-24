@@ -4602,6 +4602,10 @@ mod tests {
         assert!(!looks_like_hibernatemode_request("/power"));
         assert!(!looks_like_hibernatemode_request("/tasks"));
         assert!(!looks_like_hibernatemode_request("enable hibernate mode"));
+        assert!(!looks_like_hibernatemode_request("/hibernatefile"));
+        assert!(!looks_like_hibernatemode_request("view hibernatefile"));
+        assert!(!looks_like_hibernatemode_request("/sleepimage"));
+        assert!(!looks_like_hibernatemode_request("view sleep image"));
         assert!(!looks_like_networkoversleep_request("/hibernatemode"));
         assert!(!looks_like_networkoversleep_request("view hibernate mode"));
         assert!(!looks_like_systemsleep_request("/hibernatemode"));
@@ -4986,7 +4990,82 @@ mod tests {
         }
     }
 
-#[test]
+    #[test]
+    fn hibernatefile_slash_and_view_open_do_not_steal_hibernatemode_or_bare() {
+        // Slash + view/open NL → Hibernate file (`/hibernatemode` · `/halfdim` parity).
+        // Bare `hibernatefile` / `hibernate file` / `sleepimage` / `sleep image` stay with the agent;
+        // `/hibernatemode` · `/hibernate` stay Hibernate mode; `/systemsleep` stays System Sleep;
+        // `/standby` stays Standby; `/halfdim` stays Half Dim.
+        assert!(looks_like_hibernatefile_request("/hibernatefile"));
+        assert!(looks_like_hibernatefile_request("/hibernatefile-status"));
+        assert!(looks_like_hibernatefile_request("/hibernate-file"));
+        assert!(looks_like_hibernatefile_request("/sleepimage"));
+        assert!(looks_like_hibernatefile_request("/sleep-image"));
+        assert!(looks_like_hibernatefile_request("/mac-hibernatefile"));
+        assert!(looks_like_hibernatefile_request("/mac-sleepimage"));
+        assert!(looks_like_hibernatefile_request("view hibernatefile"));
+        assert!(looks_like_hibernatefile_request("open hibernate file"));
+        assert!(looks_like_hibernatefile_request("list sleepimage"));
+        assert!(looks_like_hibernatefile_request("hibernatefile status"));
+        assert!(looks_like_hibernatefile_request("what's my hibernatefile"));
+        assert!(looks_like_hibernatefile_request("view sleep image"));
+        assert!(!looks_like_hibernatefile_request("hibernatefile"));
+        assert!(!looks_like_hibernatefile_request("hibernate file"));
+        assert!(!looks_like_hibernatefile_request("sleepimage"));
+        assert!(!looks_like_hibernatefile_request("sleep image"));
+        assert!(!looks_like_hibernatefile_request("/hibernatemode"));
+        assert!(!looks_like_hibernatefile_request("view hibernate mode"));
+        assert!(!looks_like_hibernatefile_request("/hibernate"));
+        assert!(!looks_like_hibernatefile_request("view hibernate"));
+        assert!(!looks_like_hibernatefile_request("/systemsleep"));
+        assert!(!looks_like_hibernatefile_request("/standby"));
+        assert!(!looks_like_hibernatefile_request("/halfdim"));
+        assert!(!looks_like_hibernatefile_request("/power"));
+        assert!(!looks_like_hibernatefile_request("/tasks"));
+        assert!(!looks_like_hibernatefile_request("enable hibernatefile"));
+        assert!(!looks_like_hibernatefile_request("standbydelay"));
+        assert!(!looks_like_hibernatemode_request("/hibernatefile"));
+        assert!(!looks_like_hibernatemode_request("view hibernatefile"));
+        assert!(!looks_like_hibernatemode_request("view sleepimage"));
+        assert!(!looks_like_hibernatemode_request("/sleepimage"));
+        assert!(!looks_like_halfdim_request("/hibernatefile"));
+        assert!(!looks_like_halfdim_request("view hibernate file"));
+        let s = try_operator_instant_reply("/hibernatefile").unwrap();
+        assert!(
+            s.contains("**Hibernate file**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view hibernatefile").unwrap();
+        assert!(
+            viewed.contains("**Hibernate file**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open sleepimage").unwrap();
+        assert!(
+            open.contains("**Hibernate file**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("hibernatefile").is_none());
+        assert!(try_operator_instant_reply("hibernate file").is_none());
+        assert!(try_operator_instant_reply("sleepimage").is_none());
+        let mode = try_operator_instant_reply("/hibernatemode");
+        if let Some(reply) = mode {
+            assert!(
+                !reply.contains("**Hibernate file**"),
+                "/hibernatemode must stay Hibernate mode, not Hibernate file: {reply}"
+            );
+        }
+        let hib = try_operator_instant_reply("/hibernate");
+        if let Some(reply) = hib {
+            assert!(
+                !reply.contains("**Hibernate file**"),
+                "/hibernate must stay Hibernate mode, not Hibernate file: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).
         // Bare `charger` / `adapter` stay with the agent; `/watts` stays CPU+GPU; `/battery` · is it charging stay Bat %.

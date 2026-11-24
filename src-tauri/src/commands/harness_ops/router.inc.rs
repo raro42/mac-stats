@@ -1246,9 +1246,16 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     // Hibernate mode (bare `hibernatemode` / `hibernate` / `hibernate mode` stay with the agent;
     // `/systemsleep` stays System Sleep; `/networkoversleep` stays Network over sleep;
-    // `/tcpkeepalive` stays TCP Keep Alive; `/womp` stays Wake for network; `/standby` stays Standby).
+    // `/tcpkeepalive` stays TCP Keep Alive; `/womp` stays Wake for network; `/standby` stays Standby;
+    // `/hibernatefile` · `/sleepimage` stay Hibernate file).
     if looks_like_hibernatemode_request(content) {
         return Some(format_hibernatemode_report());
+    }
+    // Hibernate file (bare `hibernatefile` / `hibernate file` / `sleepimage` stay with the agent;
+    // `/hibernatemode` · `/hibernate` stay Hibernate mode; `/systemsleep` stays System Sleep;
+    // `/standby` stays Standby; `/halfdim` stays Half Dim).
+    if looks_like_hibernatefile_request(content) {
+        return Some(format_hibernatefile_report());
     }
     // Standby (bare `standby` / `stand by` stay with the agent;
     // `/hibernatemode` stays Hibernate mode; `/systemsleep` stays System Sleep;
