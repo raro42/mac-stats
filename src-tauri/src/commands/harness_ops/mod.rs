@@ -6771,6 +6771,87 @@ mod tests {
     }
 
     #[test]
+    fn pmps_slash_and_view_open_do_not_steal_battery_adapter_or_bare() {
+        // Slash + view/open NL → Power source (`/battery` · `/adapter` parity).
+        assert!(looks_like_pmps_request("/pmps"));
+        assert!(looks_like_pmps_request("/pmps-status"));
+        assert!(looks_like_pmps_request("/pm-ps"));
+        assert!(looks_like_pmps_request("/pmset-ps"));
+        assert!(looks_like_pmps_request("/power-source"));
+        assert!(looks_like_pmps_request("/now-drawing"));
+        assert!(looks_like_pmps_request("/drawing-from"));
+        assert!(looks_like_pmps_request("/ps"));
+        assert!(looks_like_pmps_request("/mac-pmps"));
+        assert!(looks_like_pmps_request("/mac-power-source"));
+        assert!(looks_like_pmps_request("view pmps"));
+        assert!(looks_like_pmps_request("open power-source"));
+        assert!(looks_like_pmps_request("list now drawing"));
+        assert!(looks_like_pmps_request("pmps status"));
+        assert!(looks_like_pmps_request("is pmps ok"));
+        assert!(looks_like_pmps_request("what's my power source"));
+        assert!(looks_like_pmps_request("view now drawing"));
+        assert!(!looks_like_pmps_request("pmps"));
+        assert!(!looks_like_pmps_request("power source"));
+        assert!(!looks_like_pmps_request("now drawing"));
+        assert!(!looks_like_pmps_request("ps"));
+        assert!(!looks_like_pmps_request("pmset ps"));
+        assert!(!looks_like_pmps_request("/battery"));
+        assert!(!looks_like_pmps_request("view battery"));
+        assert!(!looks_like_pmps_request("/adapter"));
+        assert!(!looks_like_pmps_request("/charger"));
+        assert!(!looks_like_pmps_request("/ups"));
+        assert!(!looks_like_pmps_request("/useractivity"));
+        assert!(!looks_like_pmps_request("/processes"));
+        assert!(!looks_like_pmps_request("/top"));
+        assert!(!looks_like_pmps_request("/tasks"));
+        assert!(!looks_like_pmps_request("enable pmps"));
+        assert!(!looks_like_ac_charger_request("/pmps"));
+        assert!(!looks_like_ac_charger_request("view pmps"));
+        assert!(!looks_like_ups_request("/pmps"));
+        assert!(!looks_like_ups_request("view pmps"));
+        assert!(!looks_like_useractivity_request("/pmps"));
+        assert!(!looks_like_useractivity_request("view pmps"));
+        let s = try_operator_instant_reply("/pmps").unwrap();
+        assert!(
+            s.contains("**Power source**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view pmps").unwrap();
+        assert!(
+            viewed.contains("**Power source**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open power-source").unwrap();
+        assert!(
+            open.contains("**Power source**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("pmps").is_none());
+        assert!(try_operator_instant_reply("power source").is_none());
+        let battery = try_operator_instant_reply("/battery");
+        if let Some(reply) = battery {
+            assert!(
+                !reply.contains("**Power source**"),
+                "/battery must stay Bat %, not Power source: {reply}"
+            );
+        }
+        let adapter = try_operator_instant_reply("/adapter");
+        if let Some(reply) = adapter {
+            assert!(
+                !reply.contains("**Power source**"),
+                "/adapter must stay AC charger, not Power source: {reply}"
+            );
+        }
+        let useractivity = try_operator_instant_reply("/useractivity");
+        if let Some(reply) = useractivity {
+            assert!(
+                !reply.contains("**Power source**"),
+                "/useractivity must stay User activity, not Power source: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn sysload_slash_and_view_open_do_not_steal_load_heat_or_bare() {
         // Slash + view/open NL → System load (`/load` · `/thermal` parity).
         // Bare `sysload` / `load level` stay with the agent;

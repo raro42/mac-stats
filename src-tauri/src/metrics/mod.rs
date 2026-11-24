@@ -8205,6 +8205,176 @@ pub fn get_useractivity_status() -> String {
     }
 }
 
+/// Parse `pmset -g ps` → (drawing_from, battery_label, percent, state).
+/// Lines: `Now drawing from 'AC Power'` / `-InternalBattery-0 … 100%; charged; …`.
+pub(crate) fn parse_pmset_ps(
+    raw: &str,
+) -> (
+    Option<String>,
+    Option<String>,
+    Option<u32>,
+    Option<String>,
+) {
+    let mut drawing: Option<String> = None;
+    let mut label: Option<String> = None;
+    let mut percent: Option<u32> = None;
+    let mut state: Option<String> = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let lower = t.to_ascii_lowercase();
+        if lower.starts_with("now drawing from") {
+            if let Some(v) = extract_quoted_pmset_value(t) {
+                drawing = Some(v);
+            } else if let Some(idx) = lower.find("from") {
+                let rest = t[idx + 4..].trim().trim_matches(|c| c == '\'' || c == '"');
+                if !rest.is_empty() {
+                    drawing = Some(rest.to_string());
+                }
+            }
+            continue;
+        }
+        // Battery / UPS / AC source rows often start with '-' then a name token.
+        let body = t.strip_prefix('-').unwrap_or(t).trim();
+        let body_lower = body.to_ascii_lowercase();
+        if !(body_lower.contains("battery")
+            || body_lower.contains("ups")
+            || body_lower.starts_with("ac power")
+            || body_lower.contains("%"))
+        {
+            continue;
+        }
+        if label.is_none() {
+            let name = body
+                .split_whitespace()
+                .next()
+                .unwrap_or("")
+                .trim_matches(|c| c == '(' || c == ')');
+            if !name.is_empty() && !name.contains('%') {
+                label = Some(name.to_string());
+            }
+        }
+        if percent.is_none() {
+            if let Some(pct_idx) = body.find('%') {
+                let before = &body[..pct_idx];
+                let digits: String = before
+                    .chars()
+                    .rev()
+                    .take_while(|c| c.is_ascii_digit())
+                    .collect::<String>()
+                    .chars()
+                    .rev()
+                    .collect();
+                if let Ok(p) = digits.parse::<u32>() {
+                    if p <= 100 {
+                        percent = Some(p);
+                    }
+                }
+            }
+        }
+        if state.is_none() {
+            for key in [
+                "discharging",
+                "charging",
+                "charged",
+                "AC attached",
+                "finishing charge",
+                "not charging",
+            ] {
+                if body_lower.contains(&key.to_ascii_lowercase()) {
+                    state = Some(key.to_string());
+                    break;
+                }
+            }
+        }
+    }
+    (drawing, label, percent, state)
+}
+
+/// Compact power source: `AC Power · InternalBattery-0 100% charged`.
+pub(crate) fn format_pmps_parts(
+    drawing: Option<&str>,
+    label: Option<&str>,
+    percent: Option<u32>,
+    state: Option<&str>,
+) -> String {
+    let mut bits: Vec<String> = Vec::new();
+    if let Some(d) = drawing.filter(|s| !s.is_empty()) {
+        bits.push(d.to_string());
+    }
+    let mut bat = String::new();
+    if let Some(l) = label.filter(|s| !s.is_empty()) {
+        // Skip redundant "AC Power" label when drawing already says that.
+        let skip = drawing
+            .map(|d| d.eq_ignore_ascii_case(l))
+            .unwrap_or(false);
+        if !skip {
+            bat.push_str(l);
+        }
+    }
+    if let Some(p) = percent {
+        if !bat.is_empty() {
+            bat.push(' ');
+        }
+        bat.push_str(&format!("{p}%"));
+    }
+    if let Some(s) = state.filter(|s| !s.is_empty()) {
+        if !bat.is_empty() {
+            bat.push(' ');
+        }
+        bat.push_str(s);
+    }
+    if !bat.is_empty() {
+        bits.push(bat);
+    }
+    bits.join(" · ")
+}
+
+/// macOS power source from `pmset -g ps` (now drawing + battery row).
+/// Distinct from Bat % `/battery`, AC charger `/adapter`, UPS `/ups`, User activity `/useractivity`.
+/// Used by Discord/operator instant `/pmps` · `/power-source` lane.
+pub fn get_pmps_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "ps"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("pmps: pmset -g ps non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("pmps: pmset -g ps spawn failed");
+                return String::new();
+            }
+        };
+        let (drawing, label, percent, state) = parse_pmset_ps(&stdout);
+        let info = format_pmps_parts(
+            drawing.as_deref(),
+            label.as_deref(),
+            percent,
+            state.as_deref(),
+        );
+        if info.is_empty() {
+            debug3!("pmps: empty status");
+        } else {
+            debug3!("pmps status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -14117,6 +14287,57 @@ mod useractivity_parse_tests {
         assert_eq!(
             format_useractivity_parts(Some("PresentPassive"), None, Some(true)),
             "PresentPassive · idle"
+        );
+    }
+}
+
+#[cfg(test)]
+mod pmps_parse_tests {
+    use super::{format_pmps_parts, parse_pmset_ps};
+
+    const AC: &str = "\
+Now drawing from 'AC Power'
+ -InternalBattery-0\t(id=451383259)\t100%; charged; 0:00 remaining present: true
+";
+
+    const BATT: &str = "\
+Now drawing from 'Battery Power'
+ -InternalBattery-0 (id=1) 45%; discharging; 2:34 remaining present: true
+";
+
+    #[test]
+    fn parses_drawing_percent_and_state() {
+        let (drawing, label, percent, state) = parse_pmset_ps(AC);
+        assert_eq!(drawing.as_deref(), Some("AC Power"));
+        assert_eq!(label.as_deref(), Some("InternalBattery-0"));
+        assert_eq!(percent, Some(100));
+        assert_eq!(state.as_deref(), Some("charged"));
+        assert_eq!(
+            format_pmps_parts(
+                drawing.as_deref(),
+                label.as_deref(),
+                percent,
+                state.as_deref()
+            ),
+            "AC Power · InternalBattery-0 100% charged"
+        );
+        let (d2, l2, p2, s2) = parse_pmset_ps(BATT);
+        assert_eq!(d2.as_deref(), Some("Battery Power"));
+        assert_eq!(l2.as_deref(), Some("InternalBattery-0"));
+        assert_eq!(p2, Some(45));
+        assert_eq!(s2.as_deref(), Some("discharging"));
+        assert_eq!(
+            format_pmps_parts(d2.as_deref(), l2.as_deref(), p2, s2.as_deref()),
+            "Battery Power · InternalBattery-0 45% discharging"
+        );
+        assert_eq!(
+            parse_pmset_ps(""),
+            (None, None, None, None)
+        );
+        assert_eq!(format_pmps_parts(None, None, None, None), "");
+        assert_eq!(
+            format_pmps_parts(Some("AC Power"), Some("AC Power"), None, None),
+            "AC Power"
         );
     }
 }

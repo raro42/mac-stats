@@ -1405,6 +1405,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_useractivity_request(content) {
         return Some(format_useractivity_report());
     }
+    // Power source from `pmset -g ps` (bare `pmps` / `power source` / `now drawing` stay with the agent;
+    // `/battery` · `/bat` stay Bat %; `/adapter` · `/charger` stay AC charger; `/ups` stays UPS;
+    // `/useractivity` stays User activity; `/processes` · `/top` stay Top Processes).
+    if looks_like_pmps_request(content) {
+        return Some(format_pmps_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

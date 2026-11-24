@@ -29113,6 +29113,284 @@ pub fn format_useractivity_report() -> String {
     format!("**User activity** · `{v}`")
 }
 
+/// Slash + view/open NL (`/pmps` · `/power-source` · `view pmps`).
+/// Bare `pmps` / `power source` / `now drawing` stay with the agent;
+/// `/battery` · `/bat` stay Bat %; `/adapter` · `/charger` stay AC charger; `/ups` stays UPS;
+/// `/useractivity` stays User activity; `/processes` · `/top` stay Top Processes.
+pub fn looks_like_pmps_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("process")
+        || n == "/processes"
+        || n == "/top"
+        || n == "view processes"
+        || n == "open processes"
+        || n == "view top"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "view battery"
+        || n == "open battery"
+        || n == "/adapter"
+        || n == "/charger"
+        || n == "/ac-charger"
+        || n == "view adapter"
+        || n == "open charger"
+        || n == "/ups"
+        || n == "/ups-settings"
+        || n == "view ups"
+        || n == "open ups"
+        || n == "/useractivity"
+        || n == "/user-activity"
+        || n == "view useractivity"
+        || n == "open user-activity"
+        || n == "/pmcap"
+        || n == "/pmstats"
+        || n == "/pmlog"
+        || n == "/therm"
+        || n == "/thermal"
+        || n == "/heat"
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        || n == "/stats"
+        // Bare phrases stay with the agent.
+        || n == "pmps"
+        || n == "the pmps"
+        || n == "pm-ps"
+        || n == "the pm-ps"
+        || n == "pm ps"
+        || n == "the pm ps"
+        || n == "pmsetps"
+        || n == "the pmsetps"
+        || n == "pmset-ps"
+        || n == "the pmset-ps"
+        || n == "pmset ps"
+        || n == "the pmset ps"
+        || n == "powersource"
+        || n == "the powersource"
+        || n == "power-source"
+        || n == "the power-source"
+        || n == "power source"
+        || n == "the power source"
+        || n == "nowdrawing"
+        || n == "the nowdrawing"
+        || n == "now-drawing"
+        || n == "the now-drawing"
+        || n == "now drawing"
+        || n == "the now drawing"
+        || n == "drawingfrom"
+        || n == "the drawingfrom"
+        || n == "drawing-from"
+        || n == "the drawing-from"
+        || n == "drawing from"
+        || n == "the drawing from"
+        || n == "ps"
+        || n == "the ps"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/pmps"
+            | "/pmps-status"
+            | "/pmps-state"
+            | "/pm-ps"
+            | "/pm-ps-status"
+            | "/pm-ps-state"
+            | "/pmset-ps"
+            | "/pmset-ps-status"
+            | "/pmset-ps-state"
+            | "/pmsetps"
+            | "/pmsetps-status"
+            | "/power-source"
+            | "/power-source-status"
+            | "/power-source-state"
+            | "/powersource"
+            | "/powersource-status"
+            | "/powersource-state"
+            | "/now-drawing"
+            | "/now-drawing-status"
+            | "/now-drawing-state"
+            | "/nowdrawing"
+            | "/nowdrawing-status"
+            | "/drawing-from"
+            | "/drawing-from-status"
+            | "/drawingfrom"
+            | "/drawingfrom-status"
+            | "/ps"
+            | "/ps-status"
+            | "/ps-state"
+            | "/mac-pmps"
+            | "/mac-pm-ps"
+            | "/mac-pmset-ps"
+            | "/mac-power-source"
+            | "/mac-powersource"
+            | "/mac-now-drawing"
+            | "/mac-drawing-from"
+            | "/mac-pmps-status"
+            | "/mac-power-source-status"
+            | "pmps status"
+            | "the pmps status"
+            | "pmps state"
+            | "the pmps state"
+            | "pm-ps status"
+            | "the pm-ps status"
+            | "pmset-ps status"
+            | "the pmset-ps status"
+            | "pmset ps status"
+            | "the pmset ps status"
+            | "power-source status"
+            | "the power-source status"
+            | "power source status"
+            | "the power source status"
+            | "now-drawing status"
+            | "the now-drawing status"
+            | "now drawing status"
+            | "the now drawing status"
+            | "drawing-from status"
+            | "the drawing-from status"
+            | "drawing from status"
+            | "the drawing from status"
+            | "my pmps"
+            | "my pmps status"
+            | "my power source"
+            | "my now drawing"
+            | "is pmps ok"
+            | "is the pmps ok"
+            | "how's pmps"
+            | "hows pmps"
+            | "how's the pmps"
+            | "hows the pmps"
+            | "how's power source"
+            | "hows power source"
+            | "how's now drawing"
+            | "hows now drawing"
+            | "what's my pmps"
+            | "whats my pmps"
+            | "what is my pmps"
+            | "what's my pmps status"
+            | "whats my pmps status"
+            | "what is my pmps status"
+            | "what's my power source"
+            | "whats my power source"
+            | "what is my power source"
+            | "what's my now drawing"
+            | "whats my now drawing"
+            | "what is my now drawing"
+            | "what's the pmps"
+            | "whats the pmps"
+            | "what is the pmps"
+            | "what's the pmps status"
+            | "whats the pmps status"
+            | "what is the pmps status"
+            | "what's the power source"
+            | "whats the power source"
+            | "what is the power source"
+            | "what's the now drawing"
+            | "whats the now drawing"
+            | "what is the now drawing"
+            | "view pmps"
+            | "view the pmps"
+            | "view pmps status"
+            | "view the pmps status"
+            | "view pm-ps"
+            | "view the pm-ps"
+            | "view pmset-ps"
+            | "view the pmset-ps"
+            | "view pmset ps"
+            | "view the pmset ps"
+            | "view power-source"
+            | "view the power-source"
+            | "view power source"
+            | "view the power source"
+            | "view now-drawing"
+            | "view the now-drawing"
+            | "view now drawing"
+            | "view the now drawing"
+            | "view drawing-from"
+            | "view the drawing-from"
+            | "view drawing from"
+            | "view the drawing from"
+            | "see pmps"
+            | "see the pmps"
+            | "see power source"
+            | "see the power source"
+            | "see now drawing"
+            | "see the now drawing"
+            | "open pmps"
+            | "open the pmps"
+            | "open pmps status"
+            | "open the pmps status"
+            | "open pm-ps"
+            | "open pmset-ps"
+            | "open power-source"
+            | "open power source"
+            | "open now-drawing"
+            | "open now drawing"
+            | "open drawing-from"
+            | "open drawing from"
+            | "list pmps"
+            | "list the pmps"
+            | "list pmps status"
+            | "list the pmps status"
+            | "list power-source"
+            | "list the power-source"
+            | "list power source"
+            | "list the power source"
+            | "list now-drawing"
+            | "list the now-drawing"
+            | "list now drawing"
+            | "list the now drawing"
+    )
+}
+
+/// Zero-LLM power source from `pmset -g ps` (macOS-only; empty elsewhere).
+pub fn format_pmps_report() -> String {
+    let v = crate::metrics::get_pmps_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Power source** — _no power source listed on this Mac right now._".to_string();
+    }
+    format!("**Power source** · `{v}`")
+}
+
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).
 /// Bare `autopoweroff` / `auto power off` stay with the agent;

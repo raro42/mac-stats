@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3055] - 2026-11-24
+
+### Added
+- Instant Power source accepts `/pmps` · `/pmps-status` · `/pmps-state` · `/pm-ps` · `/pm-ps-status` · `/pm-ps-state` · `/pmset-ps` · `/pmset-ps-status` · `/pmset-ps-state` · `/pmsetps` · `/pmsetps-status` · `/power-source` · `/power-source-status` · `/power-source-state` · `/powersource` · `/powersource-status` · `/powersource-state` · `/now-drawing` · `/now-drawing-status` · `/now-drawing-state` · `/nowdrawing` · `/nowdrawing-status` · `/drawing-from` · `/drawing-from-status` · `/drawingfrom` · `/drawingfrom-status` · `/ps` · `/ps-status` · `/ps-state` · `/mac-pmps` · `/mac-pm-ps` · `/mac-pmset-ps` · `/mac-power-source` · `/mac-powersource` · `/mac-now-drawing` · `/mac-drawing-from` · `/mac-pmps-status` · `/mac-power-source-status` and view/see/open/list NL (`view pmps`, `open power-source`, `list now drawing`, …), matching “pmps status” / “is pmps ok” / “what's my power source” / “what's the now drawing”. Bare `pmps` / `power source` / `now drawing` stay with the agent; `/battery` · `/bat` stay Bat %; `/adapter` · `/charger` stay AC charger; `/ups` · `/ups-settings` stay UPS; `/useractivity` · `/user-activity` stay User activity; `/processes` · `/top` stay Top Processes. Uses `pmset -g ps` (now drawing + battery row). Operator `/help` lists the new lane.
+
 ## [0.1.3054] - 2026-11-24
 
 ### Added
