@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3036] - 2026-11-24
+
+### Added
+- Instant Auto Restart accepts `/autorestart` · `/autorestart-status` · `/autorestart-state` · `/auto-restart` · `/auto-restart-status` · `/auto-restart-state` · `/restart-on-power-loss` · `/restart-on-power-loss-status` · `/restart-on-power-loss-state` · `/restartonpowerloss` · `/restartonpowerloss-status` · `/mac-autorestart` · `/mac-auto-restart` · `/mac-restart-on-power-loss` · `/mac-autorestart-status` · `/mac-auto-restart-status` and view/see/open/list NL (`view autorestart`, `open auto-restart`, `list restart on power loss`, …), matching “autorestart status” / “is auto restart on” / “is autorestart enabled” / “what's my autorestart” / “what's the auto restart”. Bare `autorestart` / `auto restart` stay with the agent; `/autopoweroff` · `/auto-power-off` stay Auto Power Off; `/autopoweroffdelay` · `/auto-power-off-delay` stay Autopower Off delay; `/lidwake` · `/lid-wake` stay Lid Wake; `/acwake` · `/ac-wake` stay AC Wake; `/standby` · `/stand-by` stay Standby. Operator `/help` lists the new lane.
+
 ## [0.1.3035] - 2026-11-24
 
 ### Changed

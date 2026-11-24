@@ -23679,6 +23679,11 @@ pub fn looks_like_acwake_request(content: &str) -> bool {
         || n.contains("create")
         || n.contains("delete")
         || n.contains("remove")
+        || n.contains("autorestart")
+        || n.contains("auto restart")
+        || n.contains("auto-restart")
+        || n.contains("restart on power loss")
+        || n == "/autorestart"
         || n.contains("lidwake")
         || n.contains("lid wake")
         || n.contains("lid-wake")
@@ -23957,6 +23962,13 @@ pub fn looks_like_lidwake_request(content: &str) -> bool {
         || n.contains("hibernate")
         || n.contains("standbydelay")
         || n.contains("standby delay")
+        || n.contains("autorestart")
+        || n.contains("auto restart")
+        || n.contains("auto-restart")
+        || n.contains("restart on power loss")
+        || n.contains("restart-on-power-loss")
+        || n == "/autorestart"
+        || n == "/auto-restart"
         || n.contains("autopoweroff")
         || n.contains("auto power off")
         || n.contains("powernap")
@@ -24146,6 +24158,267 @@ pub fn format_lidwake_report() -> String {
     format!("**Lid Wake** · `{v}`")
 }
 
+/// Auto Restart — `pmset` Battery/AC `autorestart` (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/autorestart` · `/auto-restart` · `/restart-on-power-loss` · `view autorestart`).
+/// Bare `autorestart` / `auto restart` stay with the agent;
+/// `/autopoweroff` · `/auto-power-off` stay Auto Power Off; `/autopoweroffdelay` stays Autopower Off delay;
+/// `/lidwake` · `/acwake` · `/standby` stay their lanes.
+pub fn looks_like_autorestart_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("autopoweroffdelay")
+        || n.contains("auto power off delay")
+        || n.contains("auto-power-off-delay")
+        || n.contains("autopoweroff")
+        || n.contains("auto power off")
+        || n.contains("auto-power-off")
+        || n.contains("lidwake")
+        || n.contains("lid wake")
+        || n.contains("lid-wake")
+        || n.contains("acwake")
+        || n.contains("ac wake")
+        || n.contains("ac-wake")
+        || n.contains("wake on lid")
+        || n.contains("wake on ac")
+        || n.contains("destroyfvkey")
+        || n.contains("destroy-fv-key")
+        || n.contains("destroy fv key")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("hibernatemode")
+        || n.contains("hibernate")
+        || n.contains("standbydelay")
+        || n.contains("standby delay")
+        || n.contains("standby")
+        || n.contains("stand by")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("system sleep")
+        || n.contains("systemsleep")
+        || n.contains("sleep on power")
+        || n.contains("power button")
+        || n.contains("sopb")
+        || n.contains("lessbright")
+        || n.contains("halfdim")
+        || n.contains("filevault")
+        || n.contains("screensaver")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/autopoweroff"
+        || n == "/auto-power-off"
+        || n == "/autopoweroffdelay"
+        || n == "/proximitywake"
+        || n == "/standby"
+        || n == "/stand-by"
+        || n == "/lidwake"
+        || n == "/lid-wake"
+        || n == "/acwake"
+        || n == "/ac-wake"
+        || n == "/destroyfvkeyonstandby"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        // Bare phrases stay with the agent.
+        || n == "autorestart"
+        || n == "the autorestart"
+        || n == "auto restart"
+        || n == "the auto restart"
+        || n == "auto-restart"
+        || n == "the auto-restart"
+        || n == "restart on power loss"
+        || n == "the restart on power loss"
+        || n == "restart-on-power-loss"
+        || n == "the restart-on-power-loss"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/autorestart"
+            | "/autorestart-status"
+            | "/autorestart-state"
+            | "/auto-restart"
+            | "/auto-restart-status"
+            | "/auto-restart-state"
+            | "/restart-on-power-loss"
+            | "/restart-on-power-loss-status"
+            | "/restart-on-power-loss-state"
+            | "/restartonpowerloss"
+            | "/restartonpowerloss-status"
+            | "/mac-autorestart"
+            | "/mac-auto-restart"
+            | "/mac-restart-on-power-loss"
+            | "/mac-autorestart-status"
+            | "/mac-auto-restart-status"
+            | "autorestart status"
+            | "the autorestart status"
+            | "auto restart status"
+            | "the auto restart status"
+            | "auto-restart status"
+            | "the auto-restart status"
+            | "restart on power loss status"
+            | "the restart on power loss status"
+            | "restart-on-power-loss status"
+            | "the restart-on-power-loss status"
+            | "autorestart state"
+            | "the autorestart state"
+            | "auto restart state"
+            | "my autorestart"
+            | "my autorestart status"
+            | "my auto restart"
+            | "my auto restart status"
+            | "is autorestart on"
+            | "is autorestart off"
+            | "is autorestart enabled"
+            | "is autorestart disabled"
+            | "is auto restart on"
+            | "is auto restart off"
+            | "is auto restart enabled"
+            | "is auto restart disabled"
+            | "is auto-restart on"
+            | "is auto-restart enabled"
+            | "is restart on power loss on"
+            | "is restart on power loss enabled"
+            | "is restart-on-power-loss on"
+            | "is restart-on-power-loss enabled"
+            | "what's my autorestart"
+            | "whats my autorestart"
+            | "what is my autorestart"
+            | "what's my autorestart status"
+            | "whats my autorestart status"
+            | "what is my autorestart status"
+            | "what's my auto restart"
+            | "whats my auto restart"
+            | "what is my auto restart"
+            | "what's my auto restart status"
+            | "whats my auto restart status"
+            | "what is my auto restart status"
+            | "what's the autorestart"
+            | "whats the autorestart"
+            | "what is the autorestart"
+            | "what's the autorestart status"
+            | "whats the autorestart status"
+            | "what is the autorestart status"
+            | "what's the auto restart"
+            | "whats the auto restart"
+            | "what is the auto restart"
+            | "what's the auto restart status"
+            | "whats the auto restart status"
+            | "what is the auto restart status"
+            | "how's autorestart"
+            | "hows autorestart"
+            | "how's the autorestart"
+            | "hows the autorestart"
+            | "how's auto restart"
+            | "hows auto restart"
+            | "view autorestart"
+            | "view the autorestart"
+            | "view autorestart status"
+            | "view the autorestart status"
+            | "view auto restart"
+            | "view the auto restart"
+            | "view auto restart status"
+            | "view the auto restart status"
+            | "view auto-restart"
+            | "view the auto-restart"
+            | "view restart on power loss"
+            | "view the restart on power loss"
+            | "view restart-on-power-loss"
+            | "view the restart-on-power-loss"
+            | "see autorestart"
+            | "see the autorestart"
+            | "see autorestart status"
+            | "see the autorestart status"
+            | "see auto restart"
+            | "see the auto restart"
+            | "see restart on power loss"
+            | "open autorestart"
+            | "open the autorestart"
+            | "open autorestart status"
+            | "open the autorestart status"
+            | "open auto restart"
+            | "open the auto restart"
+            | "open auto-restart"
+            | "open the auto-restart"
+            | "open restart on power loss"
+            | "open the restart on power loss"
+            | "open restart-on-power-loss"
+            | "open the restart-on-power-loss"
+            | "list autorestart"
+            | "list the autorestart"
+            | "list autorestart status"
+            | "list the autorestart status"
+            | "list auto restart"
+            | "list the auto restart"
+            | "list auto-restart"
+            | "list the auto-restart"
+            | "list restart on power loss"
+            | "list the restart on power loss"
+            | "list restart-on-power-loss"
+            | "list the restart-on-power-loss"
+    )
+}
+
+/// Zero-LLM Auto Restart from pmset (macOS-only; empty elsewhere).
+pub fn format_autorestart_report() -> String {
+    let v = crate::metrics::get_autorestart_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Auto Restart** — _no Auto Restart reading on this Mac right now._".to_string();
+    }
+    format!("**Auto Restart** · `{v}`")
+}
+
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).
 /// Bare `autopoweroff` / `auto power off` stay with the agent;
@@ -24181,6 +24454,13 @@ pub fn looks_like_autopoweroff_request(content: &str) -> bool {
         || n.contains("create")
         || n.contains("delete")
         || n.contains("remove")
+        || n.contains("autorestart")
+        || n.contains("auto restart")
+        || n.contains("auto-restart")
+        || n.contains("restart on power loss")
+        || n.contains("restart-on-power-loss")
+        || n == "/autorestart"
+        || n == "/auto-restart"
         || n.contains("autopoweroffdelay")
         || n.contains("auto power off delay")
         || n.contains("auto-power-off-delay")

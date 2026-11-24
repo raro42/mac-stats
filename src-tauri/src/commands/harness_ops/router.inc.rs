@@ -1289,6 +1289,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_lidwake_request(content) {
         return Some(format_lidwake_report());
     }
+    // Auto Restart (bare `autorestart` / `auto restart` stay with the agent;
+    // `/autopoweroff` stays Auto Power Off; `/autopoweroffdelay` stays Autopower Off delay;
+    // `/lidwake` · `/acwake` · `/standby` stay their lanes).
+    if looks_like_autorestart_request(content) {
+        return Some(format_autorestart_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

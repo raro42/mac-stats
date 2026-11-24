@@ -5651,6 +5651,70 @@ mod tests {
     }
 
     #[test]
+    fn autorestart_slash_and_view_open_do_not_steal_autopoweroff_or_bare() {
+        // Slash + view/open NL → Auto Restart (`/lidwake` · `/autopoweroff` parity).
+        // Bare `autorestart` / `auto restart` stay with the agent;
+        // `/autopoweroff` stays Auto Power Off; `/lidwake` stays Lid Wake; `/acwake` stays AC Wake.
+        assert!(looks_like_autorestart_request("/autorestart"));
+        assert!(looks_like_autorestart_request("/autorestart-status"));
+        assert!(looks_like_autorestart_request("/auto-restart"));
+        assert!(looks_like_autorestart_request("/restart-on-power-loss"));
+        assert!(looks_like_autorestart_request("/mac-autorestart"));
+        assert!(looks_like_autorestart_request("/mac-auto-restart"));
+        assert!(looks_like_autorestart_request("view autorestart"));
+        assert!(looks_like_autorestart_request("open auto-restart"));
+        assert!(looks_like_autorestart_request("list restart on power loss"));
+        assert!(looks_like_autorestart_request("autorestart status"));
+        assert!(looks_like_autorestart_request("is auto restart on"));
+        assert!(looks_like_autorestart_request("what's my autorestart"));
+        assert!(looks_like_autorestart_request("view auto restart"));
+        assert!(!looks_like_autorestart_request("autorestart"));
+        assert!(!looks_like_autorestart_request("auto restart"));
+        assert!(!looks_like_autorestart_request("/autopoweroff"));
+        assert!(!looks_like_autorestart_request("view autopoweroff"));
+        assert!(!looks_like_autorestart_request("/lidwake"));
+        assert!(!looks_like_autorestart_request("/acwake"));
+        assert!(!looks_like_autorestart_request("/standby"));
+        assert!(!looks_like_autorestart_request("/tasks"));
+        assert!(!looks_like_autorestart_request("enable autorestart"));
+        assert!(!looks_like_autorestart_request("/restart"));
+        assert!(!looks_like_autopoweroff_request("/autorestart"));
+        assert!(!looks_like_autopoweroff_request("view autorestart"));
+        assert!(!looks_like_lidwake_request("/autorestart"));
+        let s = try_operator_instant_reply("/autorestart").unwrap();
+        assert!(
+            s.contains("**Auto Restart**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view autorestart").unwrap();
+        assert!(
+            viewed.contains("**Auto Restart**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open auto-restart").unwrap();
+        assert!(
+            open.contains("**Auto Restart**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("autorestart").is_none());
+        assert!(try_operator_instant_reply("auto restart").is_none());
+        let apo = try_operator_instant_reply("/autopoweroff");
+        if let Some(reply) = apo {
+            assert!(
+                !reply.contains("**Auto Restart**"),
+                "/autopoweroff must stay Auto Power Off, not Auto Restart: {reply}"
+            );
+        }
+        let lid = try_operator_instant_reply("/lidwake");
+        if let Some(reply) = lid {
+            assert!(
+                !reply.contains("**Auto Restart**"),
+                "/lidwake must stay Lid Wake, not Auto Restart: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn ac_charger_slash_and_view_open_do_not_steal_watts_or_battery() {
         // Slash + view/open NL → AC charger · adapter watts (`/cycles` · `/watts` parity).
         // Bare `charger` / `adapter` stay with the agent; `/watts` stays CPU+GPU; `/battery` · is it charging stay Bat %.
