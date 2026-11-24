@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~05:12 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel attempt: Architect Send after Light Send v0.1.3034 — **remote raced v0.1.3035**; local duplicate discarded + remote keep backfill.
+- Then shipped **v0.1.3036** — `/autorestart` · `/auto-restart` · `/restart-on-power-loss` · `/mac-autorestart` + view/open NL; bare autorestart/auto restart stay with agent; `/autopoweroff` · `/lidwake` · `/acwake` · `/standby` intact; `/help` lists lane.
+- Ratchet: discard@274bbc2 (dup 3035) + keep backfill remote 3035; keep @ 55e9f61 for 3036; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-24 + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state sibling/product fuel (gpuswitch / darkwakes) — Auto Restart slash NL closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3036
+
+- Product fuel after Architect Send v0.1.3035 (local Architect race discarded): Auto Restart already readable via `pmset -g custom` Battery/AC `autorestart` (+ active `pmset -g`; automatic restart on power loss; often absent on Apple Silicon) but lacked `/autorestart` · `/auto-restart` · `/restart-on-power-loss` · `/mac-autorestart` and view/see/open/list phrases while Auto Power Off `/autopoweroff`, Lid Wake `/lidwake`, and AC Wake `/acwake` already had slash+NL. Bare `autorestart` / `auto restart` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day · soft-state sibling/product fuel (gpuswitch / darkwakes) — Auto Restart slash NL closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-24 ~05:05 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC, polish-without-capture).
