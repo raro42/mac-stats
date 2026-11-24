@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3054] - 2026-11-24
+
+### Added
+- Instant User activity accepts `/useractivity` · `/useractivity-status` · `/useractivity-state` · `/user-activity` · `/user-activity-status` · `/user-activity-state` · `/pmset-useractivity` · `/pmset-useractivity-status` · `/pmset-useractivity-state` · `/pmsetuseractivity` · `/pmsetuseractivity-status` · `/pmset-user-activity` · `/pmset-user-activity-status` · `/useractivitylevel` · `/useractivitylevel-status` · `/user-activity-level` · `/user-activity-level-status` · `/user-activity-level-state` · `/activity-level` · `/activity-level-status` · `/activity-level-state` · `/activitylevel` · `/activitylevel-status` · `/mac-useractivity` · `/mac-user-activity` · `/mac-pmset-useractivity` · `/mac-user-activity-level` · `/mac-activity-level` · `/mac-useractivity-status` · `/mac-user-activity-status` and view/see/open/list NL (`view useractivity`, `open user-activity`, `list activity level`, …), matching “useractivity status” / “is useractivity ok” / “what's my user activity” / “what's the activity level”. Bare `useractivity` / `user activity` / `activity level` stay with the agent; `/idle-time` · `/screensaver` stay Screensaver idle; `/username` · `/whoami` stay Username; `/pmcap` · `/power-cap` stay Power capabilities; `/pmstats` · `/power-stats` stay Power stats. Uses `pmset -g useractivity` (Level / MostSignificant / idle hint). Operator `/help` lists the new lane.
+
 ## [0.1.3053] - 2026-11-24
 
 ### Added

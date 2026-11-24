@@ -6695,6 +6695,82 @@ mod tests {
     }
 
     #[test]
+    fn useractivity_slash_and_view_open_do_not_steal_idle_username_or_bare() {
+        // Slash + view/open NL -> User activity (/idle-time · /username parity).
+        assert!(looks_like_useractivity_request("/useractivity"));
+        assert!(looks_like_useractivity_request("/useractivity-status"));
+        assert!(looks_like_useractivity_request("/user-activity"));
+        assert!(looks_like_useractivity_request("/pmset-useractivity"));
+        assert!(looks_like_useractivity_request("/user-activity-level"));
+        assert!(looks_like_useractivity_request("/activity-level"));
+        assert!(looks_like_useractivity_request("/mac-useractivity"));
+        assert!(looks_like_useractivity_request("/mac-activity-level"));
+        assert!(looks_like_useractivity_request("view useractivity"));
+        assert!(looks_like_useractivity_request("open user-activity"));
+        assert!(looks_like_useractivity_request("list activity level"));
+        assert!(looks_like_useractivity_request("useractivity status"));
+        assert!(looks_like_useractivity_request("is useractivity ok"));
+        assert!(looks_like_useractivity_request("what's my user activity"));
+        assert!(looks_like_useractivity_request("view activity level"));
+        assert!(!looks_like_useractivity_request("useractivity"));
+        assert!(!looks_like_useractivity_request("user activity"));
+        assert!(!looks_like_useractivity_request("activity level"));
+        assert!(!looks_like_useractivity_request("pmset useractivity"));
+        assert!(!looks_like_useractivity_request("/idle-time"));
+        assert!(!looks_like_useractivity_request("view screensaver"));
+        assert!(!looks_like_useractivity_request("/username"));
+        assert!(!looks_like_useractivity_request("/whoami"));
+        assert!(!looks_like_useractivity_request("/user"));
+        assert!(!looks_like_useractivity_request("/pmcap"));
+        assert!(!looks_like_useractivity_request("view pmcap"));
+        assert!(!looks_like_useractivity_request("/pmstats"));
+        assert!(!looks_like_useractivity_request("/tasks"));
+        assert!(!looks_like_useractivity_request("enable useractivity"));
+        assert!(!looks_like_pmcap_request("/useractivity"));
+        assert!(!looks_like_pmcap_request("view useractivity"));
+        assert!(!looks_like_screensaver_idle_request("/useractivity"));
+        assert!(!looks_like_username_request("/useractivity"));
+        let s = try_operator_instant_reply("/useractivity").unwrap();
+        assert!(
+            s.contains("**User activity**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view useractivity").unwrap();
+        assert!(
+            viewed.contains("**User activity**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open user-activity").unwrap();
+        assert!(
+            open.contains("**User activity**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("useractivity").is_none());
+        assert!(try_operator_instant_reply("user activity").is_none());
+        let idle = try_operator_instant_reply("/idle-time");
+        if let Some(reply) = idle {
+            assert!(
+                !reply.contains("**User activity**"),
+                "/idle-time must stay Screensaver idle, not User activity: {reply}"
+            );
+        }
+        let username = try_operator_instant_reply("/username");
+        if let Some(reply) = username {
+            assert!(
+                !reply.contains("**User activity**"),
+                "/username must stay Username, not User activity: {reply}"
+            );
+        }
+        let pmcap = try_operator_instant_reply("/pmcap");
+        if let Some(reply) = pmcap {
+            assert!(
+                !reply.contains("**User activity**"),
+                "/pmcap must stay Power capabilities, not User activity: {reply}"
+            );
+        }
+    }
+
+    #[test]
     fn sysload_slash_and_view_open_do_not_steal_load_heat_or_bare() {
         // Slash + view/open NL → System load (`/load` · `/thermal` parity).
         // Bare `sysload` / `load level` stay with the agent;

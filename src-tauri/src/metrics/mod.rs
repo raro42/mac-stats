@@ -8076,6 +8076,135 @@ pub fn get_pmcap_status() -> String {
     }
 }
 
+/// Parse `pmset -g useractivity` → (level, most_significant, idle_hint).
+/// Lines: `Level = 'PresentPassive'` / `MostSignificant = '…'` / `User is idle on the system`.
+pub(crate) fn parse_pmset_useractivity(
+    raw: &str,
+) -> (Option<String>, Option<String>, Option<bool>) {
+    let mut level: Option<String> = None;
+    let mut most: Option<String> = None;
+    let mut idle: Option<bool> = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let lower = t.to_ascii_lowercase();
+        if lower.contains("user is idle") {
+            idle = Some(true);
+        } else if lower.contains("user is active") {
+            idle = Some(false);
+        }
+        // Prefer indented `Level = '…'` / `MostSignificant = '…'` over `UserActivity Level=0xNN`.
+        if lower.starts_with("mostsignificant") || lower.starts_with("most significant") {
+            if let Some(v) = extract_quoted_pmset_value(t) {
+                most = Some(v);
+            }
+            continue;
+        }
+        if lower.starts_with("level") && !lower.contains("useractivity") {
+            if let Some(v) = extract_quoted_pmset_value(t) {
+                level = Some(v);
+            }
+        }
+    }
+    (level, most, idle)
+}
+
+fn extract_quoted_pmset_value(line: &str) -> Option<String> {
+    let bytes = line.as_bytes();
+    let mut start = None;
+    for (i, &b) in bytes.iter().enumerate() {
+        if b == b'\'' || b == b'"' {
+            if start.is_none() {
+                start = Some(i + 1);
+            } else {
+                let s = start?;
+                if i > s {
+                    return Some(line[s..i].trim().to_string());
+                }
+                return None;
+            }
+        }
+    }
+    // Fallback: after '=' without quotes.
+    let Some(eq) = line.find('=') else {
+        return None;
+    };
+    let v = line[eq + 1..].trim().trim_matches(|c| c == '\'' || c == '"');
+    if v.is_empty() || v.starts_with("0x") || v.starts_with("0X") {
+        return None;
+    }
+    Some(v.to_string())
+}
+
+/// Compact user activity: `PresentPassive · idle` (include most when it differs).
+pub(crate) fn format_useractivity_parts(
+    level: Option<&str>,
+    most: Option<&str>,
+    idle: Option<bool>,
+) -> String {
+    let mut bits: Vec<String> = Vec::new();
+    if let Some(l) = level.filter(|s| !s.is_empty()) {
+        bits.push(l.to_string());
+        if let Some(m) = most.filter(|s| !s.is_empty()) {
+            if !m.eq_ignore_ascii_case(l) {
+                bits.push(format!("most {m}"));
+            }
+        }
+    } else if let Some(m) = most.filter(|s| !s.is_empty()) {
+        bits.push(m.to_string());
+    }
+    match idle {
+        Some(true) => bits.push("idle".to_string()),
+        Some(false) => bits.push("active".to_string()),
+        None => {}
+    }
+    bits.join(" · ")
+}
+
+/// macOS user activity from `pmset -g useractivity` (Level / MostSignificant / idle hint).
+/// Distinct from Screensaver idle `/idle-time`, Username `/username`, Power capabilities `/pmcap`.
+/// Used by Discord/operator instant `/useractivity` · `/user-activity` lane.
+pub fn get_useractivity_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "useractivity"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("useractivity: pmset -g useractivity non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("useractivity: pmset -g useractivity spawn failed");
+                return String::new();
+            }
+        };
+        let (level, most, idle) = parse_pmset_useractivity(&stdout);
+        let info = format_useractivity_parts(
+            level.as_deref(),
+            most.as_deref(),
+            idle,
+        );
+        if info.is_empty() {
+            debug3!("useractivity: empty status");
+        } else {
+            debug3!("useractivity status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -13940,6 +14069,54 @@ Capabilities may change depending on hardware configuration:
         assert_eq!(
             format_pmcap_parts(&many),
             "14 · c0 · c1 · c2 · c3 · c4 · c5 · c6 · c7 · c8 · c9 · c10 · c11 · +2 more"
+        );
+    }
+}
+
+#[cfg(test)]
+mod useractivity_parse_tests {
+    use super::{format_useractivity_parts, parse_pmset_useractivity};
+
+    const SAMPLE: &str = "\
+2026-11-24 23:27:00 +0100 [KernelDisplayEvent] User is idle on the system
+2026-11-24 23:27:00 +0100 UserActivity Level=0x06
+  Level = 'PresentPassive'
+  MostSignificant = 'PresentPassive'
+";
+
+    const ACTIVE: &str = "\
+2026-11-24 12:00:00 +0100 [KernelDisplayEvent] User is active on the system
+2026-11-24 12:00:00 +0100 UserActivity Level=0x01
+  Level = 'PresentActive'
+  MostSignificant = 'PresentPassive'
+";
+
+    #[test]
+    fn parses_level_most_and_idle() {
+        let (level, most, idle) = parse_pmset_useractivity(SAMPLE);
+        assert_eq!(level.as_deref(), Some("PresentPassive"));
+        assert_eq!(most.as_deref(), Some("PresentPassive"));
+        assert_eq!(idle, Some(true));
+        assert_eq!(
+            format_useractivity_parts(level.as_deref(), most.as_deref(), idle),
+            "PresentPassive · idle"
+        );
+        let (level2, most2, idle2) = parse_pmset_useractivity(ACTIVE);
+        assert_eq!(level2.as_deref(), Some("PresentActive"));
+        assert_eq!(most2.as_deref(), Some("PresentPassive"));
+        assert_eq!(idle2, Some(false));
+        assert_eq!(
+            format_useractivity_parts(level2.as_deref(), most2.as_deref(), idle2),
+            "PresentActive · most PresentPassive · active"
+        );
+        assert_eq!(
+            parse_pmset_useractivity(""),
+            (None, None, None)
+        );
+        assert_eq!(format_useractivity_parts(None, None, None), "");
+        assert_eq!(
+            format_useractivity_parts(Some("PresentPassive"), None, Some(true)),
+            "PresentPassive · idle"
         );
     }
 }

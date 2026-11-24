@@ -1399,6 +1399,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_pmcap_request(content) {
         return Some(format_pmcap_report());
     }
+    // User activity from `pmset -g useractivity` (bare `useractivity` / `user activity` stay with the agent;
+    // `/idle-time` · `/screensaver` stay Screensaver idle; `/username` · `/whoami` stay Username;
+    // `/pmcap` stays Power capabilities; `/pmstats` stays Power stats).
+    if looks_like_useractivity_request(content) {
+        return Some(format_useractivity_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

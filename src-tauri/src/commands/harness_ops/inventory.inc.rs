@@ -28841,6 +28841,278 @@ pub fn format_pmcap_report() -> String {
     format!("**Power capabilities** · `{v}`")
 }
 
+/// Slash + view/open NL (`/useractivity` · `/user-activity` · `view useractivity`).
+/// Bare `useractivity` / `user activity` / `activity level` stay with the agent;
+/// `/idle-time` · `/screensaver` stay Screensaver idle; `/username` · `/whoami` stay Username;
+/// `/pmcap` stays Power capabilities; `/pmstats` stays Power stats.
+pub fn looks_like_useractivity_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("screensaver")
+        || n == "/idle-time"
+        || n == "/idle-time-status"
+        || n == "view idle-time"
+        || n == "open idle-time"
+        || n == "view screensaver"
+        || n == "open screensaver"
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n == "/username"
+        || n == "/whoami"
+        || n == "/login-name"
+        || n == "/account-name"
+        || n == "/user"
+        || n == "view username"
+        || n == "open whoami"
+        || n == "whoami"
+        || n == "who am i"
+        || n.contains("login name")
+        || n.contains("account name")
+        || n == "/pmcap"
+        || n == "/power-cap"
+        || n == "/power-capabilities"
+        || n == "view pmcap"
+        || n == "open pmcap"
+        || n.contains("power capabilities")
+        || n.contains("power cap")
+        || n == "/pmstats"
+        || n == "/power-stats"
+        || n == "view pmstats"
+        || n == "/pmlog"
+        || n == "/therm"
+        || n == "/thermal"
+        || n == "/heat"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/restart"
+        || n == "restart"
+        || n == "/stats"
+        // Bare phrases stay with the agent.
+        || n == "useractivity"
+        || n == "the useractivity"
+        || n == "user-activity"
+        || n == "the user-activity"
+        || n == "user activity"
+        || n == "the user activity"
+        || n == "pmsetuseractivity"
+        || n == "the pmsetuseractivity"
+        || n == "pmset-useractivity"
+        || n == "the pmset-useractivity"
+        || n == "pmset useractivity"
+        || n == "the pmset useractivity"
+        || n == "pmset-user-activity"
+        || n == "the pmset-user-activity"
+        || n == "pmset user activity"
+        || n == "the pmset user activity"
+        || n == "useractivitylevel"
+        || n == "the useractivitylevel"
+        || n == "user-activity-level"
+        || n == "the user-activity-level"
+        || n == "user activity level"
+        || n == "the user activity level"
+        || n == "activitylevel"
+        || n == "the activitylevel"
+        || n == "activity-level"
+        || n == "the activity-level"
+        || n == "activity level"
+        || n == "the activity level"
+        || n == "presentpassive"
+        || n == "present passive"
+        || n == "presentactive"
+        || n == "present active"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/useractivity"
+            | "/useractivity-status"
+            | "/useractivity-state"
+            | "/user-activity"
+            | "/user-activity-status"
+            | "/user-activity-state"
+            | "/pmset-useractivity"
+            | "/pmset-useractivity-status"
+            | "/pmset-useractivity-state"
+            | "/pmsetuseractivity"
+            | "/pmsetuseractivity-status"
+            | "/pmset-user-activity"
+            | "/pmset-user-activity-status"
+            | "/pmsetuseractivitylevel"
+            | "/useractivitylevel"
+            | "/useractivitylevel-status"
+            | "/user-activity-level"
+            | "/user-activity-level-status"
+            | "/user-activity-level-state"
+            | "/activity-level"
+            | "/activity-level-status"
+            | "/activity-level-state"
+            | "/activitylevel"
+            | "/activitylevel-status"
+            | "/mac-useractivity"
+            | "/mac-user-activity"
+            | "/mac-pmset-useractivity"
+            | "/mac-user-activity-level"
+            | "/mac-activity-level"
+            | "/mac-useractivity-status"
+            | "/mac-user-activity-status"
+            | "useractivity status"
+            | "the useractivity status"
+            | "useractivity state"
+            | "the useractivity state"
+            | "user-activity status"
+            | "the user-activity status"
+            | "user activity status"
+            | "the user activity status"
+            | "pmset-useractivity status"
+            | "the pmset-useractivity status"
+            | "pmset useractivity status"
+            | "the pmset useractivity status"
+            | "user-activity-level status"
+            | "the user-activity-level status"
+            | "user activity level status"
+            | "the user activity level status"
+            | "activity-level status"
+            | "the activity-level status"
+            | "activity level status"
+            | "the activity level status"
+            | "my useractivity"
+            | "my useractivity status"
+            | "my user activity"
+            | "my activity level"
+            | "is useractivity ok"
+            | "is the useractivity ok"
+            | "how's useractivity"
+            | "hows useractivity"
+            | "how's the useractivity"
+            | "hows the useractivity"
+            | "how's user activity"
+            | "hows user activity"
+            | "how's activity level"
+            | "hows activity level"
+            | "what's my useractivity"
+            | "whats my useractivity"
+            | "what is my useractivity"
+            | "what's my useractivity status"
+            | "whats my useractivity status"
+            | "what is my useractivity status"
+            | "what's my user activity"
+            | "whats my user activity"
+            | "what is my user activity"
+            | "what's my activity level"
+            | "whats my activity level"
+            | "what is my activity level"
+            | "what's the useractivity"
+            | "whats the useractivity"
+            | "what is the useractivity"
+            | "what's the useractivity status"
+            | "whats the useractivity status"
+            | "what is the useractivity status"
+            | "what's the user activity"
+            | "whats the user activity"
+            | "what is the user activity"
+            | "what's the activity level"
+            | "whats the activity level"
+            | "what is the activity level"
+            | "view useractivity"
+            | "view the useractivity"
+            | "view useractivity status"
+            | "view the useractivity status"
+            | "view user-activity"
+            | "view the user-activity"
+            | "view user activity"
+            | "view the user activity"
+            | "view pmset-useractivity"
+            | "view the pmset-useractivity"
+            | "view pmset useractivity"
+            | "view the pmset useractivity"
+            | "view user-activity-level"
+            | "view the user-activity-level"
+            | "view user activity level"
+            | "view the user activity level"
+            | "view activity-level"
+            | "view the activity-level"
+            | "view activity level"
+            | "view the activity level"
+            | "see useractivity"
+            | "see the useractivity"
+            | "see user activity"
+            | "see the user activity"
+            | "see activity level"
+            | "see the activity level"
+            | "open useractivity"
+            | "open the useractivity"
+            | "open useractivity status"
+            | "open the useractivity status"
+            | "open user-activity"
+            | "open user activity"
+            | "open user-activity-level"
+            | "open activity-level"
+            | "open activity level"
+            | "open pmset-useractivity"
+            | "list useractivity"
+            | "list the useractivity"
+            | "list useractivity status"
+            | "list the useractivity status"
+            | "list user-activity"
+            | "list the user-activity"
+            | "list user activity"
+            | "list the user activity"
+            | "list user-activity-level"
+            | "list activity-level"
+            | "list activity level"
+            | "list the activity level"
+    )
+}
+
+/// Zero-LLM user activity from `pmset -g useractivity` (macOS-only; empty elsewhere).
+pub fn format_useractivity_report() -> String {
+    let v = crate::metrics::get_useractivity_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**User activity** — _no activity level on this Mac right now._".to_string();
+    }
+    format!("**User activity** · `{v}`")
+}
+
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).
 /// Bare `autopoweroff` / `auto power off` stay with the agent;
