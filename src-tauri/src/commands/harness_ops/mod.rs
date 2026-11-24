@@ -5311,7 +5311,8 @@ mod tests {
         // Slash + view/open NL → Standby delay low (`/standbydelay` · `/standbydelayhigh` parity).
         // Bare `standbydelaylow` / `standby delay low` stay with the agent;
         // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
-        // `/standby` stays Standby; `/autopoweroffdelay` stays Autopower Off delay.
+        // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;
+        // `/autopoweroffdelay` stays Autopower Off delay.
         assert!(looks_like_standbydelaylow_request("/standbydelaylow"));
         assert!(looks_like_standbydelaylow_request("/standbydelaylow-status"));
         assert!(looks_like_standbydelaylow_request("/standby-delay-low"));
@@ -5331,6 +5332,8 @@ mod tests {
         assert!(!looks_like_standbydelaylow_request("view standbydelayhigh"));
         assert!(!looks_like_standbydelaylow_request("/standby"));
         assert!(!looks_like_standbydelaylow_request("/autopoweroffdelay"));
+        assert!(!looks_like_standbydelaylow_request("/highstandbythreshold"));
+        assert!(!looks_like_standbydelaylow_request("view highstandbythreshold"));
         assert!(!looks_like_standbydelaylow_request("/tasks"));
         assert!(!looks_like_standbydelaylow_request("enable standbydelaylow"));
         assert!(!looks_like_standbydelaylow_request("standbydelayhigh"));
@@ -5367,6 +5370,74 @@ mod tests {
             assert!(
                 !reply.contains("**Standby delay low**"),
                 "/standbydelay must stay Standby delay, not low: {reply}"
+            );
+        }
+    }
+
+    #[test]
+    fn highstandbythreshold_slash_and_view_open_do_not_steal_delay_or_bare() {
+        // Slash + view/open NL → High Standby Threshold (`/standbydelay` · `/standbydelaylow` parity).
+        // Bare `highstandbythreshold` / `high standby threshold` / `standby threshold` stay with the agent;
+        // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
+        // `/standbydelaylow` stays Standby delay low; `/standby` stays Standby.
+        assert!(looks_like_highstandbythreshold_request("/highstandbythreshold"));
+        assert!(looks_like_highstandbythreshold_request("/highstandbythreshold-status"));
+        assert!(looks_like_highstandbythreshold_request("/high-standby-threshold"));
+        assert!(looks_like_highstandbythreshold_request("/standbythreshold"));
+        assert!(looks_like_highstandbythreshold_request("/standby-threshold"));
+        assert!(looks_like_highstandbythreshold_request("/mac-highstandbythreshold"));
+        assert!(looks_like_highstandbythreshold_request("/mac-high-standby-threshold"));
+        assert!(looks_like_highstandbythreshold_request("view highstandbythreshold"));
+        assert!(looks_like_highstandbythreshold_request("open high-standby-threshold"));
+        assert!(looks_like_highstandbythreshold_request("list standby threshold"));
+        assert!(looks_like_highstandbythreshold_request("highstandbythreshold status"));
+        assert!(looks_like_highstandbythreshold_request("what's my high standby threshold"));
+        assert!(looks_like_highstandbythreshold_request("view standby threshold"));
+        assert!(!looks_like_highstandbythreshold_request("highstandbythreshold"));
+        assert!(!looks_like_highstandbythreshold_request("high standby threshold"));
+        assert!(!looks_like_highstandbythreshold_request("standby threshold"));
+        assert!(!looks_like_highstandbythreshold_request("/standbydelay"));
+        assert!(!looks_like_highstandbythreshold_request("view standbydelay"));
+        assert!(!looks_like_highstandbythreshold_request("/standbydelayhigh"));
+        assert!(!looks_like_highstandbythreshold_request("/standbydelaylow"));
+        assert!(!looks_like_highstandbythreshold_request("/standby"));
+        assert!(!looks_like_highstandbythreshold_request("/tasks"));
+        assert!(!looks_like_highstandbythreshold_request("enable highstandbythreshold"));
+        assert!(!looks_like_standbydelay_request("/highstandbythreshold"));
+        assert!(!looks_like_standbydelayhigh_request("/highstandbythreshold"));
+        assert!(!looks_like_standbydelaylow_request("/highstandbythreshold"));
+        let s = try_operator_instant_reply("/highstandbythreshold").unwrap();
+        assert!(
+            s.contains("**High Standby Threshold**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view highstandbythreshold").unwrap();
+        assert!(
+            viewed.contains("**High Standby Threshold**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open high-standby-threshold").unwrap();
+        assert!(
+            open.contains("**High Standby Threshold**")
+                && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("highstandbythreshold").is_none());
+        assert!(try_operator_instant_reply("high standby threshold").is_none());
+        assert!(try_operator_instant_reply("standby threshold").is_none());
+        let low = try_operator_instant_reply("/standbydelaylow");
+        if let Some(reply) = low {
+            assert!(
+                !reply.contains("**High Standby Threshold**"),
+                "/standbydelaylow must stay Standby delay low, not threshold: {reply}"
+            );
+        }
+        let hi = try_operator_instant_reply("/standbydelayhigh");
+        if let Some(reply) = hi {
+            assert!(
+                !reply.contains("**High Standby Threshold**"),
+                "/standbydelayhigh must stay Standby delay high, not threshold: {reply}"
             );
         }
     }

@@ -1263,9 +1263,17 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_standbydelayhigh_request(content) {
         return Some(format_standbydelayhigh_report());
     }
+    // High Standby Threshold (bare `highstandbythreshold` / `high standby threshold` /
+    // `standby threshold` stay with the agent; `/standbydelay` stays Standby delay;
+    // `/standbydelayhigh` stays Standby delay high; `/standbydelaylow` stays Standby delay low;
+    // `/standby` stays Standby).
+    if looks_like_highstandbythreshold_request(content) {
+        return Some(format_highstandbythreshold_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
-    // `/standby` stays Standby; `/autopoweroffdelay` stays Autopower Off delay).
+    // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;
+    // `/autopoweroffdelay` stays Autopower Off delay).
     if looks_like_standbydelaylow_request(content) {
         return Some(format_standbydelaylow_report());
     }

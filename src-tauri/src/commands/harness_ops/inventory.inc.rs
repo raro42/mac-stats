@@ -22168,6 +22168,12 @@ pub fn looks_like_standbydelay_request(content: &str) -> bool {
         || n.contains("standbydelaylow")
         || n.contains("standby delay low")
         || n.contains("standby-delay-low")
+        || n.contains("highstandbythreshold")
+        || n.contains("high standby threshold")
+        || n.contains("high-standby-threshold")
+        || n.contains("standbythreshold")
+        || n.contains("standby threshold")
+        || n.contains("standby-threshold")
         || n.contains("autopoweroff")
         || n.contains("auto power off")
         || n.contains("auto-power-off")
@@ -22497,6 +22503,12 @@ pub fn looks_like_standbydelayhigh_request(content: &str) -> bool {
         || n.contains("standbydelaylow")
         || n.contains("standby delay low")
         || n.contains("standby-delay-low")
+        || n.contains("highstandbythreshold")
+        || n.contains("high standby threshold")
+        || n.contains("high-standby-threshold")
+        || n.contains("standbythreshold")
+        || n.contains("standby threshold")
+        || n.contains("standby-threshold")
         || n.contains("autopoweroffdelay")
         || n.contains("auto power off delay")
         || n.contains("auto-power-off-delay")
@@ -22698,7 +22710,8 @@ pub fn format_standbydelayhigh_report() -> String {
 /// Slash + view/open NL (`/standbydelaylow` · `/standby-delay-low` · `view standbydelaylow`).
 /// Bare `standbydelaylow` / `standby delay low` stay with the agent;
 /// `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
-/// `/standby` stays Standby; `/autopoweroffdelay` stays Autopower Off delay.
+/// `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;
+/// `/autopoweroffdelay` stays Autopower Off delay.
 pub fn looks_like_standbydelaylow_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 88 {
@@ -22732,6 +22745,12 @@ pub fn looks_like_standbydelaylow_request(content: &str) -> bool {
         || n.contains("standbydelayhigh")
         || n.contains("standby delay high")
         || n.contains("standby-delay-high")
+        || n.contains("highstandbythreshold")
+        || n.contains("high standby threshold")
+        || n.contains("high-standby-threshold")
+        || n.contains("standbythreshold")
+        || n.contains("standby threshold")
+        || n.contains("standby-threshold")
         || n.contains("autopoweroffdelay")
         || n.contains("auto power off delay")
         || n.contains("auto-power-off-delay")
@@ -22797,6 +22816,12 @@ pub fn looks_like_standbydelaylow_request(content: &str) -> bool {
         || n == "/standby-delay-high"
         || n == "/mac-standbydelayhigh"
         || n == "/mac-standby-delay-high"
+        || n == "/highstandbythreshold"
+        || n == "/high-standby-threshold"
+        || n == "/standbythreshold"
+        || n == "/standby-threshold"
+        || n == "/mac-highstandbythreshold"
+        || n == "/mac-high-standby-threshold"
         || n == "/autopoweroff"
         || n == "/auto-power-off"
         || n == "/auto-poweroff"
@@ -22933,6 +22958,301 @@ pub fn format_standbydelaylow_report() -> String {
             .to_string();
     }
     format!("**Standby delay low** · `{v}`")
+}
+
+/// High Standby Threshold — `pmset` Battery/AC `highstandbythreshold` percent (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/highstandbythreshold` · `/high-standby-threshold` · `view highstandbythreshold`).
+/// Bare `highstandbythreshold` / `high standby threshold` / `standby threshold` stay with the agent;
+/// `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
+/// `/standbydelaylow` stays Standby delay low; `/standby` stays Standby.
+pub fn looks_like_highstandbythreshold_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 96 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("standbydelayhigh")
+        || n.contains("standby delay high")
+        || n.contains("standby-delay-high")
+        || n.contains("standbydelaylow")
+        || n.contains("standby delay low")
+        || n.contains("standby-delay-low")
+        || n.contains("standbydelay")
+        || n.contains("standby delay")
+        || n.contains("standby-delay")
+        || n.contains("autopoweroffdelay")
+        || n.contains("auto power off delay")
+        || n.contains("auto-power-off-delay")
+        || n.contains("autopoweroff")
+        || n.contains("auto power off")
+        || n.contains("auto-power-off")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-mode")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("system sleep")
+        || n.contains("systemsleep")
+        || n.contains("computer sleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("hibernatemode")
+        || n.contains("hibernate mode")
+        || n.contains("hibernatefile")
+        || n.contains("hibernate file")
+        || n.contains("sleepimage")
+        || n.contains("sleep image")
+        || n.contains("sleep on power")
+        || n.contains("power button")
+        || n.contains("sopb")
+        || n.contains("lessbright")
+        || n.contains("less bright")
+        || n.contains("halfdim")
+        || n.contains("half dim")
+        || n.contains("screensaver")
+        || n.contains("screen lock")
+        || n.contains("filevault")
+        || n.contains("watt")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/standby"
+        || n == "/stand-by"
+        || n == "/standbydelay"
+        || n == "/standby-delay"
+        || n == "/mac-standbydelay"
+        || n == "/mac-standby-delay"
+        || n == "/standbydelayhigh"
+        || n == "/standby-delay-high"
+        || n == "/mac-standbydelayhigh"
+        || n == "/mac-standby-delay-high"
+        || n == "/standbydelaylow"
+        || n == "/standby-delay-low"
+        || n == "/mac-standbydelaylow"
+        || n == "/mac-standby-delay-low"
+        || n == "/autopoweroff"
+        || n == "/auto-power-off"
+        || n == "/auto-poweroff"
+        || n == "/autopower-off"
+        || n == "/mac-autopoweroff"
+        || n == "/mac-auto-power-off"
+        || n == "/hibernatemode"
+        || n == "/hibernate"
+        || n == "/systemsleep"
+        || n == "/sleep"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "highstandbythreshold"
+        || n == "the highstandbythreshold"
+        || n == "high standby threshold"
+        || n == "the high standby threshold"
+        || n == "high-standby-threshold"
+        || n == "the high-standby-threshold"
+        || n == "standbythreshold"
+        || n == "the standbythreshold"
+        || n == "standby threshold"
+        || n == "the standby threshold"
+        || n == "standby-threshold"
+        || n == "the standby-threshold"
+        // Bare Standby stays with the agent / standby slash lane.
+        || n == "standby"
+        || n == "the standby"
+        || n == "stand by"
+        || n == "the stand by"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/highstandbythreshold"
+            | "/highstandbythreshold-status"
+            | "/highstandbythreshold-state"
+            | "/high-standby-threshold"
+            | "/high-standby-threshold-status"
+            | "/high-standby-threshold-state"
+            | "/standbythreshold"
+            | "/standbythreshold-status"
+            | "/standby-threshold"
+            | "/standby-threshold-status"
+            | "/mac-highstandbythreshold"
+            | "/mac-high-standby-threshold"
+            | "/mac-highstandbythreshold-status"
+            | "/mac-high-standby-threshold-status"
+            | "/mac-standbythreshold"
+            | "/mac-standby-threshold"
+            | "highstandbythreshold status"
+            | "the highstandbythreshold status"
+            | "high standby threshold status"
+            | "the high standby threshold status"
+            | "high-standby-threshold status"
+            | "the high-standby-threshold status"
+            | "standbythreshold status"
+            | "the standbythreshold status"
+            | "standby threshold status"
+            | "the standby threshold status"
+            | "standby-threshold status"
+            | "the standby-threshold status"
+            | "highstandbythreshold state"
+            | "the highstandbythreshold state"
+            | "high standby threshold state"
+            | "the high standby threshold state"
+            | "my highstandbythreshold"
+            | "my highstandbythreshold status"
+            | "my high standby threshold"
+            | "my high standby threshold status"
+            | "my standby threshold"
+            | "my standby threshold status"
+            | "what's my highstandbythreshold"
+            | "whats my highstandbythreshold"
+            | "what is my highstandbythreshold"
+            | "what's my highstandbythreshold status"
+            | "whats my highstandbythreshold status"
+            | "what is my highstandbythreshold status"
+            | "what's my high standby threshold"
+            | "whats my high standby threshold"
+            | "what is my high standby threshold"
+            | "what's my high standby threshold status"
+            | "whats my high standby threshold status"
+            | "what is my high standby threshold status"
+            | "what's my standby threshold"
+            | "whats my standby threshold"
+            | "what is my standby threshold"
+            | "what's my standby threshold status"
+            | "whats my standby threshold status"
+            | "what is my standby threshold status"
+            | "what's the highstandbythreshold"
+            | "whats the highstandbythreshold"
+            | "what is the highstandbythreshold"
+            | "what's the highstandbythreshold status"
+            | "whats the highstandbythreshold status"
+            | "what is the highstandbythreshold status"
+            | "what's the high standby threshold"
+            | "whats the high standby threshold"
+            | "what is the high standby threshold"
+            | "what's the high standby threshold status"
+            | "whats the high standby threshold status"
+            | "what is the high standby threshold status"
+            | "what's the standby threshold"
+            | "whats the standby threshold"
+            | "what is the standby threshold"
+            | "what's the standby threshold status"
+            | "whats the standby threshold status"
+            | "what is the standby threshold status"
+            | "how's highstandbythreshold"
+            | "hows highstandbythreshold"
+            | "how's the highstandbythreshold"
+            | "hows the highstandbythreshold"
+            | "how's high standby threshold"
+            | "hows high standby threshold"
+            | "how's standby threshold"
+            | "hows standby threshold"
+            | "view highstandbythreshold"
+            | "view the highstandbythreshold"
+            | "view highstandbythreshold status"
+            | "view the highstandbythreshold status"
+            | "view high standby threshold"
+            | "view the high standby threshold"
+            | "view high standby threshold status"
+            | "view the high standby threshold status"
+            | "view high-standby-threshold"
+            | "view the high-standby-threshold"
+            | "view standbythreshold"
+            | "view the standbythreshold"
+            | "view standby threshold"
+            | "view the standby threshold"
+            | "view standby-threshold"
+            | "view the standby-threshold"
+            | "see highstandbythreshold"
+            | "see the highstandbythreshold"
+            | "see highstandbythreshold status"
+            | "see the highstandbythreshold status"
+            | "see high standby threshold"
+            | "see the high standby threshold"
+            | "see standby threshold"
+            | "see the standby threshold"
+            | "open highstandbythreshold"
+            | "open the highstandbythreshold"
+            | "open highstandbythreshold status"
+            | "open the highstandbythreshold status"
+            | "open high standby threshold"
+            | "open the high standby threshold"
+            | "open high-standby-threshold"
+            | "open the high-standby-threshold"
+            | "open standbythreshold"
+            | "open the standbythreshold"
+            | "open standby threshold"
+            | "open the standby threshold"
+            | "open standby-threshold"
+            | "open the standby-threshold"
+            | "list highstandbythreshold"
+            | "list the highstandbythreshold"
+            | "list highstandbythreshold status"
+            | "list the highstandbythreshold status"
+            | "list high standby threshold"
+            | "list the high standby threshold"
+            | "list high-standby-threshold"
+            | "list the high-standby-threshold"
+            | "list standbythreshold"
+            | "list the standbythreshold"
+            | "list standby threshold"
+            | "list the standby threshold"
+            | "list standby-threshold"
+            | "list the standby-threshold"
+    )
+}
+
+/// Zero-LLM High Standby Threshold from pmset (macOS-only; empty elsewhere).
+pub fn format_highstandbythreshold_report() -> String {
+    let v = crate::metrics::get_highstandbythreshold_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**High Standby Threshold** — _no High Standby Threshold reading on this Mac right now._"
+            .to_string();
+    }
+    format!("**High Standby Threshold** · `{v}`")
 }
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).
 /// Slash + view/open NL (`/autopoweroff` · `/auto-power-off` · `view autopoweroff`).

@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.3029] - 2026-11-24
+
+### Added
+- Instant High Standby Threshold accepts `/highstandbythreshold` · `/highstandbythreshold-status` · `/highstandbythreshold-state` · `/high-standby-threshold` · `/high-standby-threshold-status` · `/high-standby-threshold-state` · `/standbythreshold` · `/standbythreshold-status` · `/standby-threshold` · `/standby-threshold-status` · `/mac-highstandbythreshold` · `/mac-high-standby-threshold` · `/mac-highstandbythreshold-status` · `/mac-high-standby-threshold-status` · `/mac-standbythreshold` · `/mac-standby-threshold` and view/see/open/list NL (`view highstandbythreshold`, `open high-standby-threshold`, `list standby threshold`, …), matching “highstandbythreshold status” / “what's my high standby threshold” / “what's the standby threshold”. Bare `highstandbythreshold` / `high standby threshold` / `standby threshold` stay with the agent; `/standbydelay` · `/standby-delay` stay Standby delay; `/standbydelayhigh` · `/standby-delay-high` stay Standby delay high; `/standbydelaylow` · `/standby-delay-low` stay Standby delay low; `/standby` · `/stand-by` stay Standby. Operator `/help` lists the new lane.
+
+
 ## [0.1.3028] - 2026-11-24
 
 ### Added
