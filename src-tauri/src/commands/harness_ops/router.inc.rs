@@ -1264,9 +1264,15 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     // Power Mode (bare `powermode` / `power mode` stay with the agent;
     // `/lpm` · low power mode stay Low Power Mode chip; `/powernap` stays Power Nap;
-    // `/power` stays the strip; `/lessbright` stays Less Bright; halfdim stays out).
+    // `/power` stays the strip; `/lessbright` stays Less Bright; `/halfdim` stays Half Dim).
     if looks_like_powermode_request(content) {
         return Some(format_powermode_report());
+    }
+    // Half Dim (bare `halfdim` / `half dim` / `half brightness` stay with the agent;
+    // `/lessbright` stays Less Bright; `/displaysleep` stays Display Sleep;
+    // `/powermode` stays Power Mode; `/dim-display` stays Less Bright).
+    if looks_like_halfdim_request(content) {
+        return Some(format_halfdim_report());
     }
     // Last boot wall-clock (bare `/uptime` / `view uptime` stay Mac Up; `/app-uptime` stays process;
     // `/boot-volume` · `/startup-disk` stay boot volume).

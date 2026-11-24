@@ -20779,6 +20779,11 @@ pub fn looks_like_lessbright_request(content: &str) -> bool {
         || n.contains("power button")
         || n.contains("power-button")
         || n.contains("sopb")
+        || n.contains("halfdim")
+        || n.contains("half dim")
+        || n.contains("half-dim")
+        || n.contains("half brightness")
+        || n.contains("half-brightness")
         || n.contains("screensaver")
         || n.contains("screen saver")
         || n.contains("screen-saver")
@@ -20849,6 +20854,10 @@ pub fn looks_like_lessbright_request(content: &str) -> bool {
         || n == "/powermode"
         || n == "/power-mode"
         || n == "/mac-powermode"
+        || n == "/halfdim"
+        || n == "/half-dim"
+        || n == "/half-brightness"
+        || n == "/mac-halfdim"
         || n == "/screensaver"
         || n == "/screen-saver"
         || n == "/idle-time"
@@ -21051,7 +21060,7 @@ pub fn format_lessbright_report() -> String {
 /// Slash + view/open NL (`/powermode` · `/power-mode` · `view power mode`).
 /// Bare `powermode` / `power mode` stay with the agent;
 /// `/lpm` · low power mode stay Low Power Mode chip; `/powernap` stays Power Nap;
-/// `/power` stays the strip; `/lessbright` stays Less Bright; halfdim stays out.
+/// `/power` stays the strip; `/lessbright` stays Less Bright; `/halfdim` stays Half Dim.
 pub fn looks_like_powermode_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -21149,6 +21158,8 @@ pub fn looks_like_powermode_request(content: &str) -> bool {
         || n.contains("halfdim")
         || n.contains("half dim")
         || n.contains("half-dim")
+        || n.contains("half brightness")
+        || n.contains("half-brightness")
         || n.contains("screensaver")
         || n.contains("screen saver")
         || n.contains("screen-saver")
@@ -21222,6 +21233,10 @@ pub fn looks_like_powermode_request(content: &str) -> bool {
         || n == "/less-bright"
         || n == "/slightly-dim"
         || n == "/dim-display"
+        || n == "/halfdim"
+        || n == "/half-dim"
+        || n == "/half-brightness"
+        || n == "/mac-halfdim"
         || n == "/screensaver"
         || n == "/screen-saver"
         || n == "/idle-time"
@@ -21354,6 +21369,345 @@ pub fn format_powermode_report() -> String {
         return "**Power Mode** — _no Power Mode reading on this Mac right now._".to_string();
     }
     format!("**Power Mode** · `{v}`")
+}
+
+/// Half Dim — `pmset` Battery/AC `halfdim` (+ active fallback; often absent on Apple Silicon).
+/// Slash + view/open NL (`/halfdim` · `/half-dim` · `/half-brightness` · `view halfdim`).
+/// Bare `halfdim` / `half dim` / `half brightness` stay with the agent;
+/// `/lessbright` stays Less Bright; `/displaysleep` stays Display Sleep;
+/// `/powermode` stays Power Mode; `/dim-display` stays Less Bright.
+pub fn looks_like_halfdim_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("low power")
+        || n.contains("low-power")
+        || n.contains("lowpower")
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n.contains("power-nap")
+        || n.contains("powermode")
+        || n.contains("power mode")
+        || n.contains("power-mode")
+        || n.contains("wake for network")
+        || n.contains("wake-for-network")
+        || n.contains("wake on lan")
+        || n.contains("wake-on-lan")
+        || n.contains("wake on network")
+        || n.contains("womp")
+        || n.contains("proximitywake")
+        || n.contains("proximity wake")
+        || n.contains("proximity-wake")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("display-sleep")
+        || n.contains("screen sleep")
+        || n.contains("screen-sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n.contains("disk-sleep")
+        || n.contains("hard disk sleep")
+        || n.contains("hdd sleep")
+        || n.contains("system sleep")
+        || n.contains("system-sleep")
+        || n.contains("systemsleep")
+        || n.contains("computer sleep")
+        || n.contains("computer-sleep")
+        || n.contains("computersleep")
+        || n.contains("ttyskeepawake")
+        || n.contains("tty keep awake")
+        || n.contains("ttys keep awake")
+        || n.contains("tty-keep-awake")
+        || n.contains("ttys-keep-awake")
+        || n.contains("ttykeepawake")
+        || n.contains("tcpkeepalive")
+        || n.contains("tcp keep alive")
+        || n.contains("tcp-keep-alive")
+        || n.contains("tcp keepalive")
+        || n.contains("networkoversleep")
+        || n.contains("network over sleep")
+        || n.contains("network-over-sleep")
+        || n.contains("hibernate")
+        || n.contains("hibernatemode")
+        || n.contains("standby")
+        || n.contains("stand by")
+        || n.contains("stand-by")
+        || n.contains("sleep on power")
+        || n.contains("sleep-on-power")
+        || n.contains("power button")
+        || n.contains("power-button")
+        || n.contains("sopb")
+        || n.contains("lessbright")
+        || n.contains("less bright")
+        || n.contains("less-bright")
+        || n.contains("slightly dim")
+        || n.contains("slightly-dim")
+        || n.contains("dim display")
+        || n.contains("dim-display")
+        || n.contains("screensaver")
+        || n.contains("screen saver")
+        || n.contains("screen-saver")
+        || n.contains("idle time")
+        || n.contains("idle-time")
+        || n.contains("screen lock")
+        || n.contains("screen-lock")
+        || n.contains("lock screen")
+        || n.contains("filevault")
+        || n.contains("file vault")
+        || n.contains("battery time")
+        || n.contains("time remaining")
+        || n.contains("cycle")
+        || n.contains("charger")
+        || n.contains("adapter")
+        || n.contains("watt")
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/power-draw"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/charger"
+        || n == "/adapter"
+        || n == "/powernap"
+        || n == "/power-nap"
+        || n == "/powermode"
+        || n == "/power-mode"
+        || n == "/mac-powermode"
+        || n == "/womp"
+        || n == "/wake-for-network"
+        || n == "/wake-on-lan"
+        || n == "/wol"
+        || n == "/proximitywake"
+        || n == "/proximity-wake"
+        || n == "/displaysleep"
+        || n == "/display-sleep"
+        || n == "/screen-sleep"
+        || n == "/display"
+        || n == "/screen"
+        || n == "/resolution"
+        || n == "/disksleep"
+        || n == "/disk-sleep"
+        || n == "/hard-disk-sleep"
+        || n == "/hdd-sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/computer-sleep"
+        || n == "/computersleep"
+        || n == "/sleep"
+        || n == "/ttyskeepawake"
+        || n == "/tty-keep-awake"
+        || n == "/ttys-keep-awake"
+        || n == "/ttykeepawake"
+        || n == "/tcpkeepalive"
+        || n == "/tcp-keep-alive"
+        || n == "/tcp-keepalive"
+        || n == "/networkoversleep"
+        || n == "/network-over-sleep"
+        || n == "/hibernatemode"
+        || n == "/hibernate-mode"
+        || n == "/hibernate"
+        || n == "/standby"
+        || n == "/stand-by"
+        || n == "/sleep-on-power-button"
+        || n == "/sleep-on-power"
+        || n == "/power-button-sleep"
+        || n == "/sopb"
+        || n == "/lessbright"
+        || n == "/less-bright"
+        || n == "/slightly-dim"
+        || n == "/dim-display"
+        || n == "/screensaver"
+        || n == "/screen-saver"
+        || n == "/idle-time"
+        || n == "/screen-lock"
+        || n == "/lock-screen"
+        || n == "/filevault"
+        || n == "/wifi"
+        || n == "/ssid"
+        || n == "/vpn"
+        || n == "/tasks"
+        || n == "/uptime"
+        // Bare phrases stay with the agent.
+        || n == "halfdim"
+        || n == "the halfdim"
+        || n == "half dim"
+        || n == "the half dim"
+        || n == "half-dim"
+        || n == "the half-dim"
+        || n == "half brightness"
+        || n == "the half brightness"
+        || n == "half-brightness"
+        || n == "the half-brightness"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/halfdim"
+            | "/halfdim-status"
+            | "/halfdim-state"
+            | "/half-dim"
+            | "/half-dim-status"
+            | "/half-dim-state"
+            | "/half-brightness"
+            | "/half-brightness-status"
+            | "/half-brightness-state"
+            | "/mac-halfdim"
+            | "/mac-half-dim"
+            | "/mac-half-brightness"
+            | "/mac-halfdim-status"
+            | "/mac-half-dim-status"
+            | "halfdim status"
+            | "the halfdim status"
+            | "half dim status"
+            | "the half dim status"
+            | "half-dim status"
+            | "the half-dim status"
+            | "half brightness status"
+            | "the half brightness status"
+            | "half-brightness status"
+            | "the half-brightness status"
+            | "halfdim state"
+            | "the halfdim state"
+            | "half dim state"
+            | "the half dim state"
+            | "half brightness state"
+            | "my halfdim"
+            | "my halfdim status"
+            | "my half dim"
+            | "my half dim status"
+            | "my half brightness"
+            | "my half brightness status"
+            | "is halfdim on"
+            | "is halfdim off"
+            | "is halfdim enabled"
+            | "is halfdim disabled"
+            | "is half dim on"
+            | "is half dim off"
+            | "is half dim enabled"
+            | "is half dim disabled"
+            | "is half-dim on"
+            | "is half-dim enabled"
+            | "is half brightness on"
+            | "is half brightness enabled"
+            | "is half-brightness on"
+            | "is half-brightness enabled"
+            | "what's my halfdim"
+            | "whats my halfdim"
+            | "what is my halfdim"
+            | "what's my halfdim status"
+            | "whats my halfdim status"
+            | "what is my halfdim status"
+            | "what's my half dim"
+            | "whats my half dim"
+            | "what is my half dim"
+            | "what's my half dim status"
+            | "whats my half dim status"
+            | "what is my half dim status"
+            | "what's my half brightness"
+            | "whats my half brightness"
+            | "what is my half brightness"
+            | "what's the halfdim"
+            | "whats the halfdim"
+            | "what is the halfdim"
+            | "what's the halfdim status"
+            | "whats the halfdim status"
+            | "what is the halfdim status"
+            | "what's the half dim"
+            | "whats the half dim"
+            | "what is the half dim"
+            | "what's the half dim status"
+            | "whats the half dim status"
+            | "what is the half dim status"
+            | "how's halfdim"
+            | "hows halfdim"
+            | "how's the halfdim"
+            | "hows the halfdim"
+            | "how's half dim"
+            | "hows half dim"
+            | "view halfdim"
+            | "view the halfdim"
+            | "view halfdim status"
+            | "view the halfdim status"
+            | "view half dim"
+            | "view the half dim"
+            | "view half dim status"
+            | "view the half dim status"
+            | "view half-dim"
+            | "view the half-dim"
+            | "view half brightness"
+            | "view the half brightness"
+            | "view half-brightness"
+            | "view the half-brightness"
+            | "see halfdim"
+            | "see the halfdim"
+            | "see halfdim status"
+            | "see the halfdim status"
+            | "see half dim"
+            | "see the half dim"
+            | "see half brightness"
+            | "open halfdim"
+            | "open the halfdim"
+            | "open halfdim status"
+            | "open the halfdim status"
+            | "open half dim"
+            | "open the half dim"
+            | "open half-dim"
+            | "open the half-dim"
+            | "open half brightness"
+            | "open the half brightness"
+            | "open half-brightness"
+            | "open the half-brightness"
+            | "list halfdim"
+            | "list the halfdim"
+            | "list halfdim status"
+            | "list the halfdim status"
+            | "list half dim"
+            | "list the half dim"
+            | "list half-dim"
+            | "list the half-dim"
+            | "list half brightness"
+            | "list the half brightness"
+            | "list half-brightness"
+    )
+}
+
+/// Zero-LLM Half Dim status from pmset (macOS-only; empty elsewhere).
+pub fn format_halfdim_report() -> String {
+    let v = crate::metrics::get_halfdim_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Half Dim** — _no Half Dim reading on this Mac right now._".to_string();
+    }
+    format!("**Half Dim** · `{v}`")
 }
 
 /// System Sleep — `pmset` Battery/AC `sleep` minutes (+ active fallback; 0 = Never).

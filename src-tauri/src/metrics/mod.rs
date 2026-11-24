@@ -4578,6 +4578,130 @@ pub fn get_powermode_status() -> String {
     }
 }
 
+/// Parse `pmset -g custom` Battery/AC `halfdim` flag → (battery, ac).
+/// Exact key `halfdim` only (often absent on Apple Silicon; Intel/legacy may show it).
+pub(crate) fn parse_pmset_custom_halfdim(raw: &str) -> (Option<bool>, Option<bool>) {
+    let mut section: Option<&str> = None;
+    let mut battery = None;
+    let mut ac = None;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.eq_ignore_ascii_case("Battery Power:") {
+            section = Some("battery");
+            continue;
+        }
+        if t.eq_ignore_ascii_case("AC Power:") {
+            section = Some("ac");
+            continue;
+        }
+        let mut parts = t.split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("halfdim") {
+            continue;
+        }
+        let on = match parts.next() {
+            Some("1") | Some("true") | Some("yes") => Some(true),
+            Some("0") | Some("false") | Some("no") => Some(false),
+            _ => None,
+        };
+        match section {
+            Some("battery") => battery = on.or(battery),
+            Some("ac") => ac = on.or(ac),
+            _ => {}
+        }
+    }
+    (battery, ac)
+}
+
+/// Parse active `pmset -g` `halfdim` flag (Currently in use).
+pub(crate) fn parse_pmset_active_halfdim(raw: &str) -> Option<bool> {
+    for line in raw.lines() {
+        let mut parts = line.trim().split_whitespace();
+        let key = match parts.next() {
+            Some(k) => k,
+            None => continue,
+        };
+        if !key.eq_ignore_ascii_case("halfdim") {
+            continue;
+        }
+        return match parts.next() {
+            Some("1") | Some("true") | Some("yes") => Some(true),
+            Some("0") | Some("false") | Some("no") => Some(false),
+            _ => None,
+        };
+    }
+    None
+}
+
+/// Prefer Battery+AC custom when both set; else active `pmset -g`.
+pub(crate) fn format_halfdim_parts(
+    battery: Option<bool>,
+    ac: Option<bool>,
+    active: Option<bool>,
+) -> String {
+    format_wake_for_network_parts(battery, ac, active)
+}
+
+/// macOS Half Dim from `pmset -g custom` Battery/AC `halfdim`
+/// (fallback: active `pmset -g`). Distinct from Less Bright `/lessbright`,
+/// Display Sleep `/displaysleep`, and Power Mode `/powermode`.
+/// Used by Discord/operator instant `/halfdim` · `/half-dim` lane.
+pub fn get_halfdim_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let (battery, ac) = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g", "custom"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_custom_halfdim(&stdout)
+                }
+                Ok(_) => (None, None),
+                Err(_) => {
+                    debug3!("halfdim: pmset -g custom spawn failed");
+                    (None, None)
+                }
+            }
+        };
+
+        let active = {
+            let output = Command::new("/usr/bin/pmset")
+                .args(["-g"])
+                .stderr(std::process::Stdio::null())
+                .output();
+            match output {
+                Ok(output) if output.status.success() => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    parse_pmset_active_halfdim(&stdout)
+                }
+                Ok(_) => None,
+                Err(_) => {
+                    debug3!("halfdim: pmset -g spawn failed");
+                    None
+                }
+            }
+        };
+
+        let info = format_halfdim_parts(battery, ac, active);
+        if info.is_empty() {
+            debug3!("halfdim: empty status");
+        } else {
+            debug3!("halfdim status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -8558,6 +8682,78 @@ AC Power:
             "2 (High Power)"
         );
         assert_eq!(format_powermode_parts(None, None, None), "");
+    }
+}
+
+#[cfg(test)]
+mod halfdim_parse_tests {
+    use super::{
+        format_halfdim_parts, parse_pmset_active_halfdim, parse_pmset_custom_halfdim,
+    };
+
+    #[test]
+    fn parses_custom_battery_and_ac() {
+        let sample = r#"
+Battery Power:
+ Sleep On Power Button 1
+ halfdim              1
+ lessbright           1
+AC Power:
+ halfdim              0
+ standby              1
+"#;
+        assert_eq!(
+            parse_pmset_custom_halfdim(sample),
+            (Some(true), Some(false))
+        );
+        assert_eq!(parse_pmset_custom_halfdim("nope"), (None, None));
+        let other = r#"
+Battery Power:
+ lessbright           1
+AC Power:
+ displaysleep         5
+"#;
+        assert_eq!(parse_pmset_custom_halfdim(other), (None, None));
+    }
+
+    #[test]
+    fn parses_active_halfdim() {
+        assert_eq!(
+            parse_pmset_active_halfdim("Currently in use:\n halfdim              1\n"),
+            Some(true)
+        );
+        assert_eq!(
+            parse_pmset_active_halfdim(" halfdim              0\n"),
+            Some(false)
+        );
+        assert_eq!(parse_pmset_active_halfdim(" lessbright           1\n"), None);
+        assert_eq!(parse_pmset_active_halfdim(" displaysleep         5\n"), None);
+    }
+
+    #[test]
+    fn formats_matched_split_and_active() {
+        assert_eq!(
+            format_halfdim_parts(Some(true), Some(true), Some(false)),
+            "On"
+        );
+        assert_eq!(
+            format_halfdim_parts(Some(false), Some(false), Some(true)),
+            "Off"
+        );
+        assert_eq!(
+            format_halfdim_parts(Some(true), Some(false), None),
+            "AC Off · Battery On"
+        );
+        assert_eq!(
+            format_halfdim_parts(Some(true), None, None),
+            "On (Battery)"
+        );
+        assert_eq!(
+            format_halfdim_parts(None, Some(false), None),
+            "Off (AC)"
+        );
+        assert_eq!(format_halfdim_parts(None, None, Some(true)), "On");
+        assert_eq!(format_halfdim_parts(None, None, None), "");
     }
 }
 

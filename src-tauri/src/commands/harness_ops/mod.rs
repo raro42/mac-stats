@@ -4857,7 +4857,7 @@ mod tests {
         // Slash + view/open NL → Power Mode (`/lessbright` · `/hibernatemode` parity).
         // Bare `powermode` / `power mode` stay with the agent;
         // `/lpm` stays Low Power Mode; `/powernap` stays Power Nap; `/power` stays strip;
-        // `/lessbright` stays Less Bright; halfdim stays out.
+        // `/lessbright` stays Less Bright; `/halfdim` stays Half Dim.
         assert!(looks_like_powermode_request("/powermode"));
         assert!(looks_like_powermode_request("/powermode-status"));
         assert!(looks_like_powermode_request("/power-mode"));
@@ -4914,6 +4914,74 @@ mod tests {
             assert!(
                 !reply.contains("**Power Mode**"),
                 "/lessbright must stay Less Bright, not Power Mode: {reply}"
+            );
+        }
+    }
+
+    #[test]
+    fn halfdim_slash_and_view_open_do_not_steal_lessbright_or_bare() {
+        // Slash + view/open NL → Half Dim (`/lessbright` · `/powermode` parity).
+        // Bare `halfdim` / `half dim` / `half brightness` stay with the agent;
+        // `/lessbright` stays Less Bright; `/displaysleep` stays Display Sleep;
+        // `/powermode` stays Power Mode; `/dim-display` stays Less Bright.
+        assert!(looks_like_halfdim_request("/halfdim"));
+        assert!(looks_like_halfdim_request("/halfdim-status"));
+        assert!(looks_like_halfdim_request("/half-dim"));
+        assert!(looks_like_halfdim_request("/half-brightness"));
+        assert!(looks_like_halfdim_request("/mac-halfdim"));
+        assert!(looks_like_halfdim_request("/mac-half-dim"));
+        assert!(looks_like_halfdim_request("view halfdim"));
+        assert!(looks_like_halfdim_request("open half-dim"));
+        assert!(looks_like_halfdim_request("list half brightness"));
+        assert!(looks_like_halfdim_request("halfdim status"));
+        assert!(looks_like_halfdim_request("is half dim on"));
+        assert!(looks_like_halfdim_request("is half brightness enabled"));
+        assert!(looks_like_halfdim_request("what's my halfdim"));
+        assert!(looks_like_halfdim_request("view half dim"));
+        assert!(!looks_like_halfdim_request("halfdim"));
+        assert!(!looks_like_halfdim_request("half dim"));
+        assert!(!looks_like_halfdim_request("half brightness"));
+        assert!(!looks_like_halfdim_request("/lessbright"));
+        assert!(!looks_like_halfdim_request("view lessbright"));
+        assert!(!looks_like_halfdim_request("/dim-display"));
+        assert!(!looks_like_halfdim_request("/displaysleep"));
+        assert!(!looks_like_halfdim_request("/powermode"));
+        assert!(!looks_like_halfdim_request("/power"));
+        assert!(!looks_like_halfdim_request("/tasks"));
+        assert!(!looks_like_halfdim_request("enable halfdim"));
+        assert!(!looks_like_lessbright_request("/halfdim"));
+        assert!(!looks_like_lessbright_request("view halfdim"));
+        assert!(!looks_like_powermode_request("/halfdim"));
+        assert!(!looks_like_powermode_request("view half dim"));
+        let s = try_operator_instant_reply("/halfdim").unwrap();
+        assert!(
+            s.contains("**Half Dim**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view halfdim").unwrap();
+        assert!(
+            viewed.contains("**Half Dim**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open half-dim").unwrap();
+        assert!(
+            open.contains("**Half Dim**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("halfdim").is_none());
+        assert!(try_operator_instant_reply("half dim").is_none());
+        let less = try_operator_instant_reply("/lessbright");
+        if let Some(reply) = less {
+            assert!(
+                !reply.contains("**Half Dim**"),
+                "/lessbright must stay Less Bright, not Half Dim: {reply}"
+            );
+        }
+        let mode = try_operator_instant_reply("/powermode");
+        if let Some(reply) = mode {
+            assert!(
+                !reply.contains("**Half Dim**"),
+                "/powermode must stay Power Mode, not Half Dim: {reply}"
             );
         }
     }
