@@ -1423,10 +1423,17 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         return Some(format_pmadapters_report());
     }
     // Power live from `pmset -g live` (bare `pmlive` / `power live` / `currently in use` stay with the agent;
-    // `/pmcustom` stays Power custom; `/pmadapters` stays Power adapters; `/pmps` stays Power source;
-    // `/pmcap` stays Power capabilities; `/pmstats` stays Power stats; per-key soft-state stays put).
+    // `/pmeverything` stays Power everything; `/pmcustom` stays Power custom; `/pmadapters` stays Power adapters;
+    // `/pmps` stays Power source; `/pmcap` stays Power capabilities; `/pmstats` stays Power stats;
+    // per-key soft-state stays put).
     if looks_like_pmlive_request(content) {
         return Some(format_pmlive_report());
+    }
+    // Power everything from `pmset -g everything` (bare `pmeverything` / `power everything` stay with the agent;
+    // `/pmlive` stays Power live; `/pmcustom` stays Power custom; `/pmadapters` stays Power adapters;
+    // `is everything ok` health phrases stay put).
+    if looks_like_pmeverything_request(content) {
+        return Some(format_pmeverything_report());
     }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3059] - 2026-11-25
+
+### Added
+- Instant Power everything accepts `/pmeverything` · `/pmeverything-status` · `/pmeverything-state` · `/pm-everything` · `/pm-everything-status` · `/pm-everything-state` · `/pmset-everything` · `/pmset-everything-status` · `/pmset-everything-state` · `/pmseteverything` · `/pmseteverything-status` · `/power-everything` · `/power-everything-status` · `/power-everything-state` · `/powereverything` · `/powereverything-status` · `/all-power-settings` · `/all-power-settings-status` · `/all-power-settings-state` · `/power-all-settings` · `/power-all-settings-status` · `/power-all-settings-state` · `/mac-pmeverything` · `/mac-pm-everything` · `/mac-pmset-everything` · `/mac-power-everything` · `/mac-all-power-settings` · `/mac-pmeverything-status` · `/mac-power-everything-status` and view/see/open/list NL (`view pmeverything`, `open power-everything`, `list all power settings`, …), matching “pmeverything status” / “is pmeverything ok” / “what's my pmeverything” / “what's the all power settings”. Bare `pmeverything` / `power everything` stay with the agent; `/pmlive` · `/power-live` stay Power live; `/pmcustom` · `/power-profiles` stay Power custom; `/pmadapters` · `/power-adapters` stay Power adapters; health `is everything ok` stays put. Uses `pmset -g everything` (section labels + Currently-in-use snapshot). Operator `/help` lists the new lane.
+
 ## [0.1.3058] - 2026-11-25
 
 ### Added

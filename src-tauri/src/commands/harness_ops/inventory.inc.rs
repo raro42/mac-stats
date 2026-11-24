@@ -29542,6 +29542,14 @@ pub fn looks_like_pmcustom_request(content: &str) -> bool {
         || n == "/in-use"
         || n == "/live-settings"
         || n == "/live-power"
+        || n.contains("pmeverything")
+        || n.contains("pm-everything")
+        || n.contains("power everything")
+        || n.contains("power-everything")
+        || n.contains("all-power-settings")
+        || n.contains("all power settings")
+        || n.contains("power-all-settings")
+        || n.contains("power all settings")
         || n == "/idle-time"
         || n.contains("screensaver")
         || n == "/username"
@@ -29914,6 +29922,14 @@ pub fn looks_like_pmadapters_request(content: &str) -> bool {
         || n == "/in-use"
         || n == "/live-settings"
         || n == "/live-power"
+        || n.contains("pmeverything")
+        || n.contains("pm-everything")
+        || n.contains("power everything")
+        || n.contains("power-everything")
+        || n.contains("all-power-settings")
+        || n.contains("all power settings")
+        || n.contains("power-all-settings")
+        || n.contains("power all settings")
     {
         return false;
     }
@@ -30071,8 +30087,9 @@ pub fn format_pmadapters_report() -> String {
 /// Power live — Currently in use from `pmset -g live`.
 /// Slash + view/open NL (`/pmlive` · `/power-live` · `/currently-in-use` · `view pmlive`).
 /// Bare `pmlive` / `power live` / `currently in use` stay with the agent;
-/// `/pmcustom` stays Power custom; `/pmadapters` stays Power adapters; `/pmps` stays Power source;
-/// `/pmcap` stays Power capabilities; `/pmstats` stays Power stats; per-key soft-state stays put.
+/// `/pmeverything` stays Power everything; `/pmcustom` stays Power custom; `/pmadapters` stays Power adapters;
+/// `/pmps` stays Power source; `/pmcap` stays Power capabilities; `/pmstats` stays Power stats;
+/// per-key soft-state stays put.
 pub fn looks_like_pmlive_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -30157,6 +30174,14 @@ pub fn looks_like_pmlive_request(content: &str) -> bool {
         || n == "/thermal"
         || n == "/heat"
         || n == "/ps"
+        || n.contains("pmeverything")
+        || n.contains("pm-everything")
+        || n.contains("power everything")
+        || n.contains("power-everything")
+        || n.contains("all-power-settings")
+        || n.contains("all power settings")
+        || n.contains("power-all-settings")
+        || n.contains("power all settings")
         || n == "pmlive"
         || n == "the pmlive"
         || n == "pm-live"
@@ -30359,6 +30384,288 @@ pub fn format_pmlive_report() -> String {
         return "**Power live** — _no live power settings on this Mac right now._".to_string();
     }
     format!("**Power live** · `{v}`")
+}
+
+/// Power everything — compact summary from `pmset -g everything`.
+/// Slash + view/open NL (`/pmeverything` · `/power-everything` · `/all-power-settings` · `view pmeverything`).
+/// Bare `pmeverything` / `power everything` stay with the agent;
+/// `/pmlive` stays Power live; `/pmcustom` stays Power custom; `/pmadapters` stays Power adapters;
+/// health phrases like `is everything ok` stay put (not this lane).
+pub fn looks_like_pmeverything_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("everything ok")
+        || n.contains("everything working")
+        || n == "is everything ok"
+        || n == "everything ok"
+        || n.contains("pmcustom")
+        || n.contains("power custom")
+        || n.contains("power profiles")
+        || n.contains("pmadapters")
+        || n.contains("power adapters")
+        || n.contains("power adapter")
+        || n == "/adapters"
+        || n.contains("pmps")
+        || n.contains("power source")
+        || n.contains("now drawing")
+        || n.contains("pmcap")
+        || n.contains("power cap")
+        || n.contains("power capabilities")
+        || n.contains("pmstats")
+        || n.contains("power stats")
+        || n.contains("useractivity")
+        || n.contains("user activity")
+        || n.contains("pmlog")
+        || n.contains("power log")
+        || n == "/therm"
+        || n.contains("assertions")
+        || n.contains("powersched")
+        || n.contains("power schedule")
+        || n.contains("sysload")
+        || n == "/ups"
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n == "/womp"
+        || n.contains("wake for network")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n == "/sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/adapter"
+        || n == "/charger"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/thermal"
+        || n == "/heat"
+        || n == "/ps"
+        || n.contains("pmlive")
+        || n.contains("pm-live")
+        || n.contains("power live")
+        || n.contains("currently in use")
+        || n.contains("currently-in-use")
+        || n == "/in-use"
+        || n == "/live-settings"
+        || n == "/live-power"
+        || n == "pmeverything"
+        || n == "the pmeverything"
+        || n == "pm-everything"
+        || n == "the pm-everything"
+        || n == "pm everything"
+        || n == "the pm everything"
+        || n == "pmseteverything"
+        || n == "the pmseteverything"
+        || n == "pmset-everything"
+        || n == "the pmset-everything"
+        || n == "pmset everything"
+        || n == "the pmset everything"
+        || n == "powereverything"
+        || n == "the powereverything"
+        || n == "power-everything"
+        || n == "the power-everything"
+        || n == "power everything"
+        || n == "the power everything"
+        || n == "all-power-settings"
+        || n == "the all-power-settings"
+        || n == "all power settings"
+        || n == "the all power settings"
+        || n == "power-all-settings"
+        || n == "the power-all-settings"
+        || n == "power all settings"
+        || n == "the power all settings"
+        || n == "everything"
+        || n == "the everything"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+            "/pmeverything"
+            | "/pmeverything-status"
+            | "/pmeverything-state"
+            | "/pm-everything"
+            | "/pm-everything-status"
+            | "/pm-everything-state"
+            | "/pmset-everything"
+            | "/pmset-everything-status"
+            | "/pmset-everything-state"
+            | "/pmseteverything"
+            | "/pmseteverything-status"
+            | "/power-everything"
+            | "/power-everything-status"
+            | "/power-everything-state"
+            | "/powereverything"
+            | "/powereverything-status"
+            | "/all-power-settings"
+            | "/all-power-settings-status"
+            | "/all-power-settings-state"
+            | "/power-all-settings"
+            | "/power-all-settings-status"
+            | "/power-all-settings-state"
+            | "/mac-pmeverything"
+            | "/mac-pm-everything"
+            | "/mac-pmset-everything"
+            | "/mac-power-everything"
+            | "/mac-all-power-settings"
+            | "/mac-pmeverything-status"
+            | "/mac-power-everything-status"
+            | "pmeverything status"
+            | "the pmeverything status"
+            | "pmeverything state"
+            | "the pmeverything state"
+            | "pm-everything status"
+            | "the pm-everything status"
+            | "pm everything status"
+            | "the pm everything status"
+            | "pmset-everything status"
+            | "the pmset-everything status"
+            | "pmset everything status"
+            | "the pmset everything status"
+            | "power-everything status"
+            | "the power-everything status"
+            | "power everything status"
+            | "the power everything status"
+            | "all-power-settings status"
+            | "the all-power-settings status"
+            | "all power settings status"
+            | "the all power settings status"
+            | "my pmeverything"
+            | "my pmeverything status"
+            | "my power everything"
+            | "my all power settings"
+            | "is pmeverything ok"
+            | "is the pmeverything ok"
+            | "how's pmeverything"
+            | "hows pmeverything"
+            | "how's the pmeverything"
+            | "hows the pmeverything"
+            | "how's power everything"
+            | "hows power everything"
+            | "what's my pmeverything"
+            | "whats my pmeverything"
+            | "what is my pmeverything"
+            | "what's my pmeverything status"
+            | "whats my pmeverything status"
+            | "what is my pmeverything status"
+            | "what's my power everything"
+            | "whats my power everything"
+            | "what is my power everything"
+            | "what's my all power settings"
+            | "whats my all power settings"
+            | "what is my all power settings"
+            | "what's the pmeverything"
+            | "whats the pmeverything"
+            | "what is the pmeverything"
+            | "what's the pmeverything status"
+            | "whats the pmeverything status"
+            | "what is the pmeverything status"
+            | "what's the power everything"
+            | "whats the power everything"
+            | "what is the power everything"
+            | "what's the all power settings"
+            | "whats the all power settings"
+            | "what is the all power settings"
+            | "view pmeverything"
+            | "view the pmeverything"
+            | "view pmeverything status"
+            | "view the pmeverything status"
+            | "view pm-everything"
+            | "view the pm-everything"
+            | "view pm everything"
+            | "view the pm everything"
+            | "view pmset-everything"
+            | "view the pmset-everything"
+            | "view pmset everything"
+            | "view the pmset everything"
+            | "view power-everything"
+            | "view the power-everything"
+            | "view power everything"
+            | "view the power everything"
+            | "view all-power-settings"
+            | "view the all-power-settings"
+            | "view all power settings"
+            | "view the all power settings"
+            | "see pmeverything"
+            | "see the pmeverything"
+            | "see power everything"
+            | "see the power everything"
+            | "see all power settings"
+            | "see the all power settings"
+            | "open pmeverything"
+            | "open the pmeverything"
+            | "open pmeverything status"
+            | "open the pmeverything status"
+            | "open pm-everything"
+            | "open power-everything"
+            | "open power everything"
+            | "open all-power-settings"
+            | "open all power settings"
+            | "open pmset-everything"
+            | "list pmeverything"
+            | "list the pmeverything"
+            | "list pmeverything status"
+            | "list the pmeverything status"
+            | "list pm-everything"
+            | "list the pm-everything"
+            | "list power-everything"
+            | "list the power-everything"
+            | "list power everything"
+            | "list the power everything"
+            | "list all-power-settings"
+            | "list the all-power-settings"
+            | "list all power settings"
+            | "list the all power settings"
+    )
+}
+
+/// Zero-LLM power everything summary from `pmset -g everything` (macOS-only; empty elsewhere).
+pub fn format_pmeverything_report() -> String {
+    let v = crate::metrics::get_pmeverything_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Power everything** — _no power dump on this Mac right now._".to_string();
+    }
+    format!("**Power everything** · `{v}`")
 }
 
 

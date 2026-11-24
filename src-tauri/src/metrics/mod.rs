@@ -8776,6 +8776,138 @@ pub fn get_pmlive_status() -> String {
     }
 }
 
+fn pmset_everything_section_label(lower: &str) -> Option<&'static str> {
+    if lower.starts_with("battery power") {
+        Some("Battery")
+    } else if lower.starts_with("ac power") || lower.starts_with("ac charger") {
+        Some("AC")
+    } else if lower.starts_with("ups power") || lower == "ups:" {
+        Some("UPS")
+    } else if lower.starts_with("scheduled power") {
+        Some("Sched")
+    } else if lower.starts_with("assertions") {
+        Some("Assertions")
+    } else if lower.starts_with("currently in use") {
+        Some("Live")
+    } else if lower.starts_with("thermal") || lower.starts_with("cpu power") {
+        Some("Therm")
+    } else {
+        None
+    }
+}
+
+/// Section labels from `pmset -g everything` (Battery / AC / UPS / Sched / Assertions / Live / Therm).
+pub(crate) fn parse_pmset_everything_sections(raw: &str) -> Vec<String> {
+    let mut sections = Vec::new();
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let lower = t.to_ascii_lowercase();
+        if let Some(l) = pmset_everything_section_label(&lower) {
+            if !sections.iter().any(|s| s == l) {
+                sections.push(l.to_string());
+            }
+        }
+    }
+    sections
+}
+
+/// Slice of `pmset -g everything` that is only the Currently-in-use block (before Battery/AC/…).
+pub(crate) fn extract_pmset_everything_live_block(raw: &str) -> String {
+    let mut out = String::new();
+    let mut in_live = false;
+    for line in raw.lines() {
+        let t = line.trim();
+        let lower = t.to_ascii_lowercase();
+        if lower.starts_with("currently in use") {
+            in_live = true;
+            out.push_str(line);
+            out.push('\n');
+            continue;
+        }
+        if in_live {
+            if let Some(label) = pmset_everything_section_label(&lower) {
+                if label != "Live" {
+                    break;
+                }
+            }
+            out.push_str(line);
+            out.push('\n');
+        }
+    }
+    out
+}
+
+/// Compact everything dump: `Battery · AC · live: key=val · …` (cap length for Discord).
+pub(crate) fn format_pmeverything_parts(
+    sections: &[String],
+    live: &[(String, String)],
+) -> String {
+    let mut parts: Vec<String> = Vec::new();
+    let section_show: Vec<&str> = sections
+        .iter()
+        .map(|s| s.as_str())
+        .filter(|s| *s != "Live")
+        .collect();
+    if !section_show.is_empty() {
+        parts.push(section_show.join(" · "));
+    }
+    let live_s = format_pmlive_parts(live);
+    if !live_s.is_empty() {
+        if parts.is_empty() {
+            parts.push(live_s);
+        } else {
+            parts.push(format!("live: {live_s}"));
+        }
+    }
+    let mut s = parts.join(" · ");
+    if s.len() > 420 {
+        s.truncate(417);
+        s.push_str("…");
+    }
+    s
+}
+
+/// macOS full power dump summary from `pmset -g everything`.
+pub fn get_pmeverything_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "everything"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("pmeverything: pmset -g everything non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("pmeverything: pmset -g everything spawn failed");
+                return String::new();
+            }
+        };
+        let sections = parse_pmset_everything_sections(&stdout);
+        let live_block = extract_pmset_everything_live_block(&stdout);
+        let live = parse_pmset_live(&live_block);
+        let info = format_pmeverything_parts(&sections, &live);
+        if info.is_empty() {
+            debug3!("pmeverything: empty status");
+        } else {
+            debug3!("pmeverything status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -14881,6 +15013,65 @@ Currently in use:
         let shortened = format_pmlive_parts(&long);
         assert!(shortened.contains("…"), "long path should shorten: {shortened}");
         assert_eq!(format_pmlive_parts(&[]), "");
+    }
+}
+
+#[cfg(test)]
+mod pmeverything_parse_tests {
+    use super::{
+        extract_pmset_everything_live_block, format_pmeverything_parts,
+        parse_pmset_everything_sections, parse_pmset_live,
+    };
+
+    const SAMPLE: &str = "\
+System-wide power settings:
+Currently in use:
+ standby              1
+ powernap             1
+ sleep                0
+Battery Power:
+ sleep                10
+ displaysleep         5
+AC Power:
+ sleep                0
+ displaysleep         10
+UPS Power:
+ haltlevel            5
+Scheduled power events (* denotes user-scheduled):
+ [0]  wake at 01/01/26 07:00:00
+Assertions from kernel:
+ PreventUserIdleSystemSleep named: \"App\"
+";
+
+    #[test]
+    fn parse_pmset_everything_reads_sections_and_live() {
+        let sections = parse_pmset_everything_sections(SAMPLE);
+        assert!(sections.iter().any(|s| s == "Live"), "got: {sections:?}");
+        assert!(sections.iter().any(|s| s == "Battery"), "got: {sections:?}");
+        assert!(sections.iter().any(|s| s == "AC"), "got: {sections:?}");
+        assert!(sections.iter().any(|s| s == "UPS"), "got: {sections:?}");
+        assert!(sections.iter().any(|s| s == "Sched"), "got: {sections:?}");
+        assert!(
+            sections.iter().any(|s| s == "Assertions"),
+            "got: {sections:?}"
+        );
+        let live_block = extract_pmset_everything_live_block(SAMPLE);
+        assert!(
+            !live_block.to_ascii_lowercase().contains("battery power"),
+            "live block leaked Battery: {live_block}"
+        );
+        let live = parse_pmset_live(&live_block);
+        assert!(live.iter().any(|(k, v)| k == "standby" && v == "1"));
+        assert!(
+            !live.iter().any(|(k, v)| k == "sleep" && v == "10"),
+            "Battery sleep must not land in live: {live:?}"
+        );
+        let s = format_pmeverything_parts(&sections, &live);
+        assert!(s.contains("Battery"), "got: {s}");
+        assert!(s.contains("AC"), "got: {s}");
+        assert!(s.contains("live:"), "got: {s}");
+        assert!(s.contains("standby=1"), "got: {s}");
+        assert_eq!(format_pmeverything_parts(&[], &[]), "");
     }
 }
 

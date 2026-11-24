@@ -7040,6 +7040,8 @@ mod tests {
         assert!(!looks_like_pmlive_request("view pmcustom"));
         assert!(!looks_like_pmlive_request("/pmadapters"));
         assert!(!looks_like_pmlive_request("view pmadapters"));
+        assert!(!looks_like_pmlive_request("/pmeverything"));
+        assert!(!looks_like_pmlive_request("view pmeverything"));
         assert!(!looks_like_pmlive_request("/pmps"));
         assert!(!looks_like_pmlive_request("/pmcap"));
         assert!(!looks_like_pmlive_request("/powernap"));
@@ -7067,6 +7069,71 @@ mod tests {
         assert!(try_operator_instant_reply("pmlive").is_none());
         assert!(try_operator_instant_reply("power live").is_none());
         assert!(try_operator_instant_reply("currently in use").is_none());
+    }
+
+    #[test]
+    fn pmeverything_slash_and_view_open_do_not_steal_pmlive_or_bare_or_health() {
+        assert!(looks_like_pmeverything_request("/pmeverything"));
+        assert!(looks_like_pmeverything_request("/pmeverything-status"));
+        assert!(looks_like_pmeverything_request("/pm-everything"));
+        assert!(looks_like_pmeverything_request("/pmset-everything"));
+        assert!(looks_like_pmeverything_request("/power-everything"));
+        assert!(looks_like_pmeverything_request("/all-power-settings"));
+        assert!(looks_like_pmeverything_request("/power-all-settings"));
+        assert!(looks_like_pmeverything_request("/mac-pmeverything"));
+        assert!(looks_like_pmeverything_request("/mac-power-everything"));
+        assert!(looks_like_pmeverything_request("view pmeverything"));
+        assert!(looks_like_pmeverything_request("open power-everything"));
+        assert!(looks_like_pmeverything_request("list all power settings"));
+        assert!(looks_like_pmeverything_request("pmeverything status"));
+        assert!(looks_like_pmeverything_request("is pmeverything ok"));
+        assert!(looks_like_pmeverything_request("what's my all power settings"));
+        assert!(looks_like_pmeverything_request("view all power settings"));
+        assert!(!looks_like_pmeverything_request("pmeverything"));
+        assert!(!looks_like_pmeverything_request("power everything"));
+        assert!(!looks_like_pmeverything_request("all power settings"));
+        assert!(!looks_like_pmeverything_request("pmset everything"));
+        assert!(!looks_like_pmeverything_request("everything"));
+        assert!(!looks_like_pmeverything_request("is everything ok"));
+        assert!(!looks_like_pmeverything_request("everything ok"));
+        assert!(!looks_like_pmeverything_request("everything working"));
+        assert!(!looks_like_pmeverything_request("/pmlive"));
+        assert!(!looks_like_pmeverything_request("view pmlive"));
+        assert!(!looks_like_pmeverything_request("/pmcustom"));
+        assert!(!looks_like_pmeverything_request("/pmadapters"));
+        assert!(!looks_like_pmeverything_request("/pmps"));
+        assert!(!looks_like_pmeverything_request("/tasks"));
+        assert!(!looks_like_pmeverything_request("enable pmeverything"));
+        assert!(!looks_like_pmlive_request("/pmeverything"));
+        assert!(!looks_like_pmlive_request("view pmeverything"));
+        assert!(!looks_like_pmcustom_request("/pmeverything"));
+        assert!(!looks_like_pmadapters_request("/pmeverything"));
+        let s = try_operator_instant_reply("/pmeverything").unwrap();
+        assert!(
+            s.contains("**Power everything**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view pmeverything").unwrap();
+        assert!(
+            viewed.contains("**Power everything**")
+                && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open all-power-settings").unwrap();
+        assert!(
+            open.contains("**Power everything**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("pmeverything").is_none());
+        assert!(try_operator_instant_reply("power everything").is_none());
+        assert!(try_operator_instant_reply("everything").is_none());
+        // Health lane must stay put (not Power everything).
+        if let Some(reply) = try_operator_instant_reply("is everything ok") {
+            assert!(
+                !reply.contains("**Power everything**"),
+                "is everything ok must not become Power everything: {reply}"
+            );
+        }
     }
 
 
