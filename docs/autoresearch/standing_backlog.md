@@ -1,3 +1,19 @@
+## Overnight note 2026-11-24 ~22:28 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-24 (Dark next calendar quota; already_checked_today).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after System load v0.1.3048 — UPS from `pmset -g ups` (not keep-pNN; not SoftDisabled/boolean soft-state clone; Dark layout-daily next calendar day).
+- Shipped **v0.1.3049** — `/ups` · `/ups-settings` · `/pmset-ups` · `/uninterruptible-power` · `/mac-ups` + view/open NL; bare ups/ups settings stay with agent; `/battery` · `/charger` · `/sysload` · `/powersched` intact; `/help` lists lane.
+- Ratchet keep @ aef95fa88 for 3049; backfill keep for 3048; push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched/sysload/ups — try thermlog/adapters next, not another keep-pNN clone.
+
+## Overnight merge — v0.1.3049
+
+- Product fuel after System load v0.1.3048: UPS settings already readable via `pmset -g ups` (haltlevel / haltafter / haltremain) but lacked `/ups` · `/ups-settings` · `/pmset-ups` · `/uninterruptible-power` · `/mac-ups` and view/see/open/list phrases while Bat `/battery`, AC charger `/charger`, System load `/sysload`, and Power schedule `/powersched` already had slash+NL. Bare `ups` / `ups settings` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-24 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled/assertions/powersched/sysload/ups soft-state closed; try thermlog/adapters; not another keep-pNN clone.
 ## Overnight note 2026-11-24 ~22:00 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
