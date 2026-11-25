@@ -1,3 +1,19 @@
+## Overnight note 2026-11-25 ~22:16 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Disk Cleanup list tips already shipped as v0.1.3087).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window (1 interesting content line only).
+- Fuel: standing backlog filter-chip leftover tips after v0.1.3087 — still said “Tab a chip · …” while Disk Cleanup / Monitors lists already named chips; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Concurrent: #29 MS_UNTRUSTED operator-wrap fix landed as **v0.1.3089** (separate commit) during this tick.
+- Shipped **v0.1.3088** — Filter-chip toolbar name tips (+ theme seeds); Mac capture still TCC-blocked.
+- Ratchet keep @ 3331f94cf for 3088; sync-dist + install/kickstart + push (UI).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…pmhistory closed — remaining useful non-blocking `pmset -g` adapters only if clearly distinct (`disk` == `custom`; `uuidlog` blocks); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3088
+
+- Standing-backlog fuel after Disk Cleanup scope/category list tips v0.1.3087: filter-chip toolbar tips still said “Tab a chip · …” while Disk Cleanup / Monitors / Top Processes lists already sat on filter-aware chip names. Digester empty; design-review due=false — polish-without-capture; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory soft-state closed; not another keep-pNN clone.
 ## Overnight note 2026-11-25 ~21:49 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Appearance · Product · Changelog body Tab-first already shipped as v0.1.3086).

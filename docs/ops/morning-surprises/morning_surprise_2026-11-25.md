@@ -1,38 +1,13 @@
 # Morning surprise — 2026-11-25
 
-Overnight Track B (mac-stats product ratchet). Digester open empty; design-review grace; layout-daily data-poster marked (Dark next). Avoided another soft-state keep-pNN.
+## Shipped overnight
+- **v0.1.3088** — Filter-chip toolbar keyboard hints name the chips (`All · Pinned · Hot`, `All · Up · Down · Slow`, Disk Cleanup / Logs / Chat / Agent Ops) so first paint matches list KISS tips (JS + all theme seeds).
+- **v0.1.3089** — Schedules / heartbeat / task runner / CLI no longer wrap operator-local instructions in `MS_UNTRUSTED` (#29). Discord schedules stop refusing the job.
 
-## Shipped tonight
-- **v0.1.3087** — Disk Cleanup scope · category list filter-aware kb-hints (+ theme seeds)
-- **v0.1.3086** — Settings Appearance · Product · Changelog body Tab-first kb-hints (+ theme seeds)
-- **v0.1.3085** — CPU window header · footer Tab-first kb-hints (+ theme seeds)
-- **v0.1.3084** — Settings Credentials Mastodon · Browser · Cursor · Telegram · Slack Tab-first kb-hints (+ theme seeds)
-- **v0.1.3083** — Settings Credentials Brave · Redmine · MCP Tab-first kb-hints (+ theme seeds); changelog also folds #28 layout Fixed (history time selector removed · Neon scroll/widen · title `mac-stats`)
-- **v0.1.3082** — Settings Credentials Tab-first kb-hints (Discord · Perplexity · section; + theme seeds)
-- **v0.1.3081** — Disk Cleanup meta · Clean now/Refresh/Save · add-scope Tab-first kb-hints (+ theme seeds)
-- **v0.1.3080** — warmer Monitors add-form tip seeds (first-paint parity with JS; Tab URL · Cancel · Add…)
-- **v0.1.3079** — Monitors add/detail Tab-first kb-hints
-- **v0.1.3078** — warmer Agent Ops tip seeds (first-paint parity with JS; drop dense Tips: 0 overview)
-- **v0.1.3077** — Process Details Tab-first kb-hints
-- **v0.1.3076** — Monitors list + row tooltips: Enter checks · d opens (tips match real keys)
-- **v0.1.3075** — warmer Appearance theme-list Tab tip seeds (first-paint parity with JS)
-- **v0.1.3074** — warmer Settings/Appearance/Changelog theme HTML Tab tip seeds
-- **v0.1.3073** — warmer Settings/Changelog header Tab tips (JS; remote race, local dup discarded)
-- **v0.1.3072** — Power history instant status from `pmset -g history`
-- **v0.1.3071** — warmer theme HTML Tab tip parity
-- **v0.1.3070** — warmer theme HTML kb-hint seeds (drop Home/End move)
-- **v0.1.3069** — warmer Perplexity + Debug Log kb-hints
-- **v0.1.3068** — warmer Settings leftover kb-hints
-- **v0.1.3067** — warmer CPU metrics ring filter kb-hints
-- **v0.1.3066** — Power user-clients from `pmset -g userclients`
-- **v0.1.3064** — Battery charge limit from `pmset -g battlimit`
-- **v0.1.3062** — Raw battery from `pmset -g rawbatt`
+## Also tried / context
+- Digester open empty all night; design-review surfaces in grace; layout-daily data-poster marked (Dark waits for next calendar day).
+- Earlier same night: Tab-first Settings / header / footer / Disk Cleanup list polish (3081–3087).
 
-## Notes
-Digester empty; layout-daily Dark waits for next calendar day. Disk Cleanup scope/category list filter-aware tips finished with v0.1.3087. Soft-state keep-pNN closed for SoftDisabled…pmhistory.
-
-## Next
-- Soft-state leftover closed for SoftDisabled…pmhistory
-- Optional: filter-chip leftover tips
-- Remaining useful non-blocking `pmset -g` adapters only if clearly distinct
-- Dark layout-daily next calendar day
+## Next fuel
+- Dark layout-daily next calendar day.
+- Remaining useful non-blocking `pmset -g` adapters only if clearly distinct (`disk` == `custom`; `uuidlog` blocks) — not another keep-pNN clone.
