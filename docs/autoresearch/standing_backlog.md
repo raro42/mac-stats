@@ -1,3 +1,20 @@
+## Overnight note 2026-11-25 ~03:08 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Settings leftover polish already shipped tonight as v0.1.3068).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: design-review Perplexity + Debug Log after Settings leftover v0.1.3068 — search/setup + logs toolbar still said “Home/End move…” after Settings / filter-chip warm; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Backfill: missing keep row for v0.1.3068.
+- Shipped **v0.1.3069** — warmer Perplexity search/setup + Debug Log toolbar Tab tips (KISS; Settings / filter-chip parity); Mac capture still TCC-blocked.
+- Ratchet keep @ 0c0fd926c for 3069; backfill keep for 3068; sync-dist + push (UI; Linux rack no /Applications install/kickstart).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…userclients closed — remaining useful non-blocking `pmset -g` adapters only if clearly distinct; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3069
+
+- Design-review fuel after Settings leftover v0.1.3068: Perplexity Search · setup and Debug Log toolbar still used the older “Home/End move…” phrasing while Settings · filter chips · Agent Ops already sat on shorter warmer KISS copy. Digester empty; design-review due=false — polish-without-capture; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…userclients closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~02:50 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Agent Ops + CPU metrics polish already shipped tonight).
