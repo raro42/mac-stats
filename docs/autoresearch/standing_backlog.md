@@ -1,3 +1,20 @@
+## Overnight note 2026-11-25 ~04:55 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Monitors tip correctness already shipped as v0.1.3076).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: design-review feature-processes after Monitors tips v0.1.3076 — Process Details header · name/PID · Force Quit still lacked Tab-first tips while Settings/Ollama/Changelog already warm; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Backfill: missing keep row for v0.1.3076.
+- Shipped **v0.1.3077** — Process Details Tab-first kb-hints (JS + theme seeds); Mac capture still TCC-blocked.
+- Ratchet keep @ 00ce70743 for 3077; backfill keep for 3076; sync-dist + push (UI; Linux rack no /Applications install/kickstart).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…pmhistory closed — Monitors add/detail leftover “← → / h l · Home/End…” optional Tab-first · remaining useful non-blocking `pmset -g` adapters only if clearly distinct (`disk` == `custom`; `uuidlog` blocks); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3077
+
+- Design-review fuel after Monitors tips v0.1.3076: Process Details header · name/PID hero · Advanced/Force Quit still started with bare “← → / h l · Home/End…” while Settings / Ollama / Changelog already sat on Tab-first KISS tips. Digester empty; design-review due=false — polish-without-capture feature-processes; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory soft-state closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~04:40 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; theme-list seeds already shipped as v0.1.3075).
