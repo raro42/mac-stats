@@ -1,3 +1,19 @@
+## Overnight note 2026-11-25 ~05:06 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Process Details tips already shipped as v0.1.3077).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: design-review feature-agent-ops after Process Details Tab tips v0.1.3077 — theme HTML `#ops-keyboard-hint` still seeded dense “Tips: 0 overview · …” while JS `OPS_KEYBOARD_HINT` already warm; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Backfill: missing keep row for v0.1.3077.
+- Shipped **v0.1.3078** — warmer Agent Ops tip seeds (all shells; first-paint parity with JS); Mac capture still TCC-blocked.
+- Ratchet keep @ 77a73ded4 for 3078; backfill keep for 3077; install/kickstart + push (UI themes).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…pmhistory closed — remaining useful non-blocking `pmset -g` adapters only if clearly distinct (`disk` == `custom`; `uuidlog` blocks); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3078
+
+- Design-review fuel after Process Details Tab tips v0.1.3077: Agent Ops tip seeds across all shells still used dense “Tips: 0 overview · …” on first paint while JS `OPS_KEYBOARD_HINT` already sat on shorter warmer KISS copy. Digester empty; design-review due=false — polish-without-capture feature-agent-ops; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory soft-state closed; not another keep-pNN clone.
 ## Overnight note 2026-11-25 ~04:55 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Monitors tip correctness already shipped as v0.1.3076).

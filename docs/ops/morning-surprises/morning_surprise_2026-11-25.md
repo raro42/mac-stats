@@ -3,7 +3,8 @@
 Overnight Track B (mac-stats product ratchet). Digester open empty; design-review grace; layout-daily data-poster marked (Dark next). Avoided another soft-state keep-pNN.
 
 ## Shipped tonight
-- **v0.1.3077** — Process Details header · name/PID · Advanced/Force Quit Tab-first kb-hints (JS + all theme seeds; Settings/Ollama parity)
+- **v0.1.3078** — warmer Agent Ops tip seeds (first-paint parity with JS; drop dense Tips: 0 overview)
+- **v0.1.3077** — Process Details Tab-first kb-hints
 - **v0.1.3076** — Monitors list + row tooltips: Enter checks · d opens (tips match real keys)
 - **v0.1.3075** — warmer Appearance theme-list Tab tip seeds (first-paint parity with JS)
 - **v0.1.3074** — warmer Settings/Appearance/Changelog theme HTML Tab tip seeds
@@ -15,13 +16,13 @@ Overnight Track B (mac-stats product ratchet). Digester open empty; design-revie
 - **v0.1.3068** — warmer Settings leftover kb-hints
 - **v0.1.3067** — warmer CPU metrics ring filter kb-hints
 - **v0.1.3066** — Power user-clients from `pmset -g userclients`
-- Earlier: Battery charge limit · System state · Raw battery · Sleep/Wake UUID · Accessory power · …
+- **v0.1.3064** — Battery charge limit from `pmset -g battlimit`
+- **v0.1.3062** — Raw battery from `pmset -g rawbatt`
 
 ## Notes
-Digester empty; layout-daily Dark waits for next calendar day. Last unwired non-blocking `pmset -g` getter was `history` (`disk` mirrors `custom`; `uuidlog` blocks). After Monitors tip correctness (v0.1.3076), Process Details still lacked Tab-first tips — shipped that leftover (v0.1.3077).
+Digester empty; layout-daily Dark waits for next calendar day. Last unwired non-blocking `pmset -g` getter was `history` (`disk` mirrors `custom`; `uuidlog` blocks). Shipped `/pmhistory` (v0.1.3072), then tip polish (v0.1.3073–3077), then Agent Ops tip seed parity (v0.1.3078).
 
 ## Next
-- Soft-state leftover closed for SoftDisabled…pmhistory
-- Optional: Monitors add/detail Tab-first leftover tips
+- Soft-state leftover closed for SoftDisabled…userclients/pmhistory
 - Remaining useful non-blocking `pmset -g` adapters only if clearly distinct
 - Dark layout-daily next calendar day
