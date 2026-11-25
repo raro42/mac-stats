@@ -9704,6 +9704,105 @@ pub fn get_userclients_status() -> String {
     }
 }
 
+/// Parse `pmset -g history` → compact sleep/wake UUID timeline (or "none yet").
+/// Empty / IOPMCopyPowerHistory errors map to `none yet` (boot-arg io=0x3000000 enables capture).
+pub(crate) fn parse_pmset_history(raw: &str) -> Option<String> {
+    let trimmed = raw.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    let lower = trimmed.to_ascii_lowercase();
+    if lower.starts_with("usage:") || lower.contains("see pmset") {
+        return None;
+    }
+    if lower.contains("no power history")
+        || lower.contains("error reading power management history")
+        || lower.contains("iopmcopypowerhistory")
+        || (lower.starts_with("error") && lower.contains("history"))
+    {
+        return Some("none yet".to_string());
+    }
+    let mut bits: Vec<String> = Vec::new();
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let ll = t.to_ascii_lowercase();
+        if ll.starts_with("error") || ll.starts_with("usage:") || ll.starts_with("see pmset") {
+            continue;
+        }
+        bits.push(t.to_string());
+        if bits.len() >= 6 {
+            break;
+        }
+    }
+    if bits.is_empty() {
+        return None;
+    }
+    let mut out = bits.join(" · ");
+    if out.len() > 420 {
+        out.truncate(417);
+        out.push_str("…");
+    }
+    Some(out)
+}
+
+/// Compact power-history status for Discord-sized chips.
+pub(crate) fn format_pmhistory_parts(info: Option<&str>) -> String {
+    info.map(str::trim)
+        .filter(|s| !s.is_empty())
+        .map(|s| s.to_string())
+        .unwrap_or_default()
+}
+
+/// macOS power history from `pmset -g history` (sleep/wake UUID timeline when enabled).
+/// Distinct from Power log `/pmlog`, Sleep/Wake UUID `/pmuuid`, Power stats `/pmstats`,
+/// and metrics `history.json` path/size/age lanes.
+/// Used by Discord/operator instant `/pmhistory` · `/power-history` lane.
+pub fn get_pmhistory_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "history"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(output) => {
+                // Some macOS builds put the "no history" message on non-zero exit.
+                let combined = format!(
+                    "{}{}",
+                    String::from_utf8_lossy(&output.stdout),
+                    String::from_utf8_lossy(&output.stderr)
+                );
+                if combined.trim().is_empty() {
+                    debug3!("pmhistory: pmset -g history non-zero");
+                    return String::new();
+                }
+                combined
+            }
+            Err(_) => {
+                debug3!("pmhistory: pmset -g history spawn failed");
+                return String::new();
+            }
+        };
+        let info = format_pmhistory_parts(parse_pmset_history(&stdout).as_deref());
+        if info.is_empty() {
+            debug3!("pmhistory: empty status");
+        } else {
+            debug3!("pmhistory status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -16061,6 +16160,34 @@ mod userclients_parse_tests {
         assert_eq!(format_userclients_parts(0, &[]), "");
         assert_eq!(parse_pmset_userclients("Usage: pmset").0, 0);
         assert_eq!(parse_pmset_userclients("").0, 0);
+    }
+}
+
+#[cfg(test)]
+mod pmhistory_parse_tests {
+    use super::{format_pmhistory_parts, parse_pmset_history};
+
+    const NONE: &str =
+        "Error - no power history found. (IOPMCopyPowerHistory error = 0xe00002bc)\n";
+    const SAMPLE: &str = "\
+UUID: ABC-123-DEF
+  Sleep: 2026-11-24 22:00:00
+  Wake:  2026-11-25 07:00:00
+UUID: GHI-456-JKL
+  Sleep: 2026-11-23 23:10:00
+";
+
+    #[test]
+    fn parse_pmset_history_none_and_timeline() {
+        let none = parse_pmset_history(NONE).expect("parsed none");
+        assert_eq!(none, "none yet");
+        let s = parse_pmset_history(SAMPLE).expect("parsed sample");
+        assert!(s.contains("UUID: ABC-123-DEF"), "got: {s}");
+        assert!(s.contains("Wake:"), "got: {s}");
+        assert_eq!(format_pmhistory_parts(Some(&s)), s);
+        assert_eq!(format_pmhistory_parts(None), "");
+        assert_eq!(parse_pmset_history(""), None);
+        assert_eq!(parse_pmset_history("Usage: pmset"), None);
     }
 }
 

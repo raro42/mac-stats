@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.3072] - 2026-11-25
+
+### Added
+- Instant Power history accepts `/pmhistory` · `/pmhistory-status` · `/pmhistory-state` · `/pm-history` · `/pm-history-status` · `/pm-history-state` · `/pmset-history` · `/pmset-history-status` · `/pmset-history-state` · `/pmsethistory` · `/pmsethistory-status` · `/power-history` · `/power-history-status` · `/power-history-state` · `/powerhistory` · `/powerhistory-status` · `/sleep-wake-history` · `/sleep-wake-history-status` · `/sleep-wake-history-state` · `/sleepwake-history` · `/sleepwake-history-status` · `/sleepwakehistory` · `/sleepwakehistory-status` · `/sw-history` · `/sw-history-status` · `/swhistory` · `/swhistory-status` · `/mac-pmhistory` · `/mac-pm-history` · `/mac-pmset-history` · `/mac-power-history` · `/mac-sleep-wake-history` · `/mac-sleepwake-history` · `/mac-pmhistory-status` · `/mac-power-history-status` and view/see/open/list NL (`view pmhistory`, `open power-history`, `list sleep wake history`, ...), matching "pmhistory status" / "is pmhistory ok" / "what's my pmhistory" / "what's the power history". Bare `pmhistory` / `power history` / `sleep wake history` stay with the agent; `/pmlog` · `/powerlog` stay Power log; `/pmuuid` · `/sleep-wake-uuid` stay Sleep/Wake UUID; `/pmstats` · `/power-stats` stay Power stats; metrics `history path` / `history size` / `history age` stay put. Uses `pmset -g history` (sleep/wake UUID timeline · `none yet` when disabled). Operator `/help` lists the new lane.
+
+
 ## [0.1.3071] - 2026-11-25
 
 ### Changed

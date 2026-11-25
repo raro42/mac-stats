@@ -27790,6 +27790,19 @@ pub fn looks_like_pmlog_request(content: &str) -> bool {
         || n == "/sleep-stats"
         || n == "view pmstats"
         || n == "open pmstats"
+        || n.contains("pmhistory")
+        || n.contains("pm-history")
+        || n.contains("pm history")
+        || n.contains("power-history")
+        || n.contains("power history")
+        || n.contains("sleep-wake-history")
+        || n.contains("sleep wake history")
+        || n.contains("sleepwake-history")
+        || n == "/pmhistory"
+        || n == "/power-history"
+        || n == "/sleep-wake-history"
+        || n == "view pmhistory"
+        || n == "open pmhistory"
         // Bare phrases stay with the agent.
         || n == "pmlog"
         || n == "the pmlog"
@@ -31242,6 +31255,18 @@ pub fn looks_like_pmuuid_request(content: &str) -> bool {
         || n.contains("sleep wake log")
         || n.contains("sleep-wake-stats")
         || n.contains("sleep wake stats")
+        || n.contains("pmhistory")
+        || n.contains("pm-history")
+        || n.contains("power-history")
+        || n.contains("power history")
+        || n.contains("sleep-wake-history")
+        || n.contains("sleep wake history")
+        || n.contains("sleepwake-history")
+        || n == "/pmhistory"
+        || n == "/power-history"
+        || n == "/sleep-wake-history"
+        || n == "view pmhistory"
+        || n == "open pmhistory"
         || n.contains("assertions")
         || n.contains("pmlive")
         || n.contains("pmeverything")
@@ -32367,6 +32392,15 @@ pub fn looks_like_userclients_request(content: &str) -> bool {
         || n.contains("battlimit")
         || n.contains("battery limit")
         || n.contains("charge limit")
+        || n.contains("pmhistory")
+        || n.contains("pm-history")
+        || n.contains("power-history")
+        || n.contains("power history")
+        || n.contains("sleep-wake-history")
+        || n.contains("sleep wake history")
+        || n == "/pmhistory"
+        || n == "/power-history"
+        || n == "/sleep-wake-history"
         || n == "/useractivity"
         || n == "/user-activity"
         || n == "/activity-level"
@@ -32577,6 +32611,285 @@ pub fn format_userclients_report() -> String {
         return "**User clients** — _no power user-clients on this Mac right now._".to_string();
     }
     format!("**User clients** · `{v}`")
+}
+
+/// Power history — sleep/wake UUID timeline from `pmset -g history`.
+/// Slash + view/open NL (`/pmhistory` · `/power-history` · `view pmhistory`).
+/// Bare `pmhistory` / `power history` / `sleep wake history` stay with the agent;
+/// `/pmlog` stays Power log; `/pmuuid` stays Sleep/Wake UUID; `/pmstats` stays Power stats;
+/// metrics `history path` / `history size` / `history age` stay put.
+pub fn looks_like_pmhistory_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("pmlog")
+        || n.contains("power log")
+        || n.contains("power-log")
+        || n.contains("powermanagement log")
+        || n.contains("power management log")
+        || n.contains("sleep-wake-log")
+        || n.contains("sleep wake log")
+        || n.contains("pmuuid")
+        || n.contains("pm-uuid")
+        || n.contains("sleep-wake-uuid")
+        || n.contains("sleep wake uuid")
+        || n.contains("sleepwake-uuid")
+        || n.contains("pmstats")
+        || n.contains("power stats")
+        || n.contains("sleep stats")
+        || n.contains("wake stats")
+        || n.contains("sleep-wake-stats")
+        || n.contains("sleep wake stats")
+        || n.contains("userclients")
+        || n.contains("user-clients")
+        || n.contains("user clients")
+        || n.contains("power-clients")
+        || n.contains("power clients")
+        || n.contains("history.json")
+        || n.contains("history json")
+        || n.contains("metrics history")
+        || n.contains("cpu history")
+        || n.contains("chat history")
+        || n.contains("session history")
+        || n == "/pmlog"
+        || n == "/powerlog"
+        || n == "/power-log"
+        || n == "/pmuuid"
+        || n == "/sleep-wake-uuid"
+        || n == "/pmstats"
+        || n == "/power-stats"
+        || n == "/userclients"
+        || n == "/power-clients"
+        || n == "/logs"
+        || n == "/uuid"
+        || n == "/hw-uuid"
+        || n == "/tasks"
+        || n == "/assertions"
+        // Bare phrases stay with the agent.
+        || n == "pmhistory"
+        || n == "the pmhistory"
+        || n == "pm-history"
+        || n == "the pm-history"
+        || n == "pm history"
+        || n == "the pm history"
+        || n == "pmsethistory"
+        || n == "the pmsethistory"
+        || n == "pmset-history"
+        || n == "the pmset-history"
+        || n == "pmset history"
+        || n == "the pmset history"
+        || n == "power-history"
+        || n == "the power-history"
+        || n == "power history"
+        || n == "the power history"
+        || n == "powerhistory"
+        || n == "the powerhistory"
+        || n == "sleep-wake-history"
+        || n == "the sleep-wake-history"
+        || n == "sleep wake history"
+        || n == "the sleep wake history"
+        || n == "sleepwake-history"
+        || n == "the sleepwake-history"
+        || n == "sleepwake history"
+        || n == "the sleepwake history"
+        || n == "sw-history"
+        || n == "the sw-history"
+        || n == "sw history"
+        || n == "the sw history"
+        || n == "history"
+        || n == "the history"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+            "/pmhistory"
+            | "/pmhistory-status"
+            | "/pmhistory-state"
+            | "/pm-history"
+            | "/pm-history-status"
+            | "/pm-history-state"
+            | "/pmset-history"
+            | "/pmset-history-status"
+            | "/pmset-history-state"
+            | "/pmsethistory"
+            | "/pmsethistory-status"
+            | "/power-history"
+            | "/power-history-status"
+            | "/power-history-state"
+            | "/powerhistory"
+            | "/powerhistory-status"
+            | "/sleep-wake-history"
+            | "/sleep-wake-history-status"
+            | "/sleep-wake-history-state"
+            | "/sleepwake-history"
+            | "/sleepwake-history-status"
+            | "/sleepwakehistory"
+            | "/sleepwakehistory-status"
+            | "/sw-history"
+            | "/sw-history-status"
+            | "/swhistory"
+            | "/swhistory-status"
+            | "/mac-pmhistory"
+            | "/mac-pm-history"
+            | "/mac-pmset-history"
+            | "/mac-power-history"
+            | "/mac-sleep-wake-history"
+            | "/mac-sleepwake-history"
+            | "/mac-pmhistory-status"
+            | "/mac-power-history-status"
+            | "pmhistory status"
+            | "the pmhistory status"
+            | "pmhistory state"
+            | "the pmhistory state"
+            | "pm-history status"
+            | "the pm-history status"
+            | "pm history status"
+            | "the pm history status"
+            | "power-history status"
+            | "the power-history status"
+            | "power history status"
+            | "the power history status"
+            | "sleep-wake-history status"
+            | "the sleep-wake-history status"
+            | "sleep wake history status"
+            | "the sleep wake history status"
+            | "pmset-history status"
+            | "the pmset-history status"
+            | "pmset history status"
+            | "the pmset history status"
+            | "my pmhistory"
+            | "my pmhistory status"
+            | "my power history"
+            | "my power-history"
+            | "my sleep wake history"
+            | "is pmhistory ok"
+            | "is the pmhistory ok"
+            | "how's pmhistory"
+            | "hows pmhistory"
+            | "how's the pmhistory"
+            | "hows the pmhistory"
+            | "how's power history"
+            | "hows power history"
+            | "how's sleep wake history"
+            | "hows sleep wake history"
+            | "what's my pmhistory"
+            | "whats my pmhistory"
+            | "what is my pmhistory"
+            | "what's my pmhistory status"
+            | "whats my pmhistory status"
+            | "what is my pmhistory status"
+            | "what's my power history"
+            | "whats my power history"
+            | "what is my power history"
+            | "what's my sleep wake history"
+            | "whats my sleep wake history"
+            | "what is my sleep wake history"
+            | "what's the pmhistory"
+            | "whats the pmhistory"
+            | "what is the pmhistory"
+            | "what's the pmhistory status"
+            | "whats the pmhistory status"
+            | "what is the pmhistory status"
+            | "what's the power history"
+            | "whats the power history"
+            | "what is the power history"
+            | "what's the sleep wake history"
+            | "whats the sleep wake history"
+            | "what is the sleep wake history"
+            | "view pmhistory"
+            | "view the pmhistory"
+            | "view pmhistory status"
+            | "view the pmhistory status"
+            | "view pm-history"
+            | "view the pm-history"
+            | "view pm history"
+            | "view the pm history"
+            | "view power-history"
+            | "view the power-history"
+            | "view power history"
+            | "view the power history"
+            | "view sleep-wake-history"
+            | "view the sleep-wake-history"
+            | "view sleep wake history"
+            | "view the sleep wake history"
+            | "view pmset-history"
+            | "view the pmset-history"
+            | "view pmset history"
+            | "view the pmset history"
+            | "see pmhistory"
+            | "see the pmhistory"
+            | "see power history"
+            | "see the power history"
+            | "see sleep wake history"
+            | "see the sleep wake history"
+            | "open pmhistory"
+            | "open the pmhistory"
+            | "open pmhistory status"
+            | "open the pmhistory status"
+            | "open pm-history"
+            | "open power-history"
+            | "open power history"
+            | "open sleep-wake-history"
+            | "open sleep wake history"
+            | "open pmset-history"
+            | "list pmhistory"
+            | "list the pmhistory"
+            | "list pmhistory status"
+            | "list the pmhistory status"
+            | "list pm-history"
+            | "list the pm-history"
+            | "list power-history"
+            | "list the power-history"
+            | "list power history"
+            | "list the power history"
+            | "list sleep-wake-history"
+            | "list the sleep-wake-history"
+            | "list sleep wake history"
+            | "list the sleep wake history"
+    )
+}
+
+/// Zero-LLM power history from `pmset -g history` (macOS-only; empty elsewhere).
+pub fn format_pmhistory_report() -> String {
+    let v = crate::metrics::get_pmhistory_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Power history** — _no sleep/wake history on this Mac right now._".to_string();
+    }
+    format!("**Power history** · `{v}`")
 }
 
 

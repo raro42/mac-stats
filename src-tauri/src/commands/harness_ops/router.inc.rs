@@ -1472,6 +1472,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_userclients_request(content) {
         return Some(format_userclients_report());
     }
+    // Power history from `pmset -g history` (bare `pmhistory` / `power history` / `sleep wake history`
+    // stay with the agent; `/pmlog` stays Power log; `/pmuuid` stays Sleep/Wake UUID;
+    // `/pmstats` stays Power stats; metrics history path/size/age stay put).
+    if looks_like_pmhistory_request(content) {
+        return Some(format_pmhistory_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

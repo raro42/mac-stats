@@ -7502,6 +7502,64 @@ mod tests {
 
 
     #[test]
+    fn pmhistory_slash_and_view_open_do_not_steal_pmlog_pmuuid_or_bare() {
+        assert!(looks_like_pmhistory_request("/pmhistory"));
+        assert!(looks_like_pmhistory_request("/pmhistory-status"));
+        assert!(looks_like_pmhistory_request("/pm-history"));
+        assert!(looks_like_pmhistory_request("/pmset-history"));
+        assert!(looks_like_pmhistory_request("/power-history"));
+        assert!(looks_like_pmhistory_request("/sleep-wake-history"));
+        assert!(looks_like_pmhistory_request("/mac-pmhistory"));
+        assert!(looks_like_pmhistory_request("/mac-power-history"));
+        assert!(looks_like_pmhistory_request("view pmhistory"));
+        assert!(looks_like_pmhistory_request("open power-history"));
+        assert!(looks_like_pmhistory_request("list sleep wake history"));
+        assert!(looks_like_pmhistory_request("pmhistory status"));
+        assert!(looks_like_pmhistory_request("is pmhistory ok"));
+        assert!(looks_like_pmhistory_request("what's my pmhistory"));
+        assert!(looks_like_pmhistory_request("what's the power history"));
+        assert!(looks_like_pmhistory_request("view sleep wake history"));
+        assert!(!looks_like_pmhistory_request("pmhistory"));
+        assert!(!looks_like_pmhistory_request("power history"));
+        assert!(!looks_like_pmhistory_request("sleep wake history"));
+        assert!(!looks_like_pmhistory_request("history"));
+        assert!(!looks_like_pmhistory_request("/pmlog"));
+        assert!(!looks_like_pmhistory_request("view pmlog"));
+        assert!(!looks_like_pmhistory_request("/pmuuid"));
+        assert!(!looks_like_pmhistory_request("/pmstats"));
+        assert!(!looks_like_pmhistory_request("/userclients"));
+        assert!(!looks_like_pmhistory_request("history path"));
+        assert!(!looks_like_pmhistory_request("enable pmhistory"));
+        assert!(!looks_like_pmlog_request("/pmhistory"));
+        assert!(!looks_like_pmlog_request("view pmhistory"));
+        assert!(!looks_like_pmuuid_request("/pmhistory"));
+        assert!(!looks_like_userclients_request("/pmhistory"));
+        let s = try_operator_instant_reply("/pmhistory").unwrap();
+        assert!(
+            s.contains("**Power history**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view pmhistory").unwrap();
+        assert!(
+            viewed.contains("**Power history**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open power-history").unwrap();
+        assert!(
+            open.contains("**Power history**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("pmhistory").is_none());
+        assert!(try_operator_instant_reply("power history").is_none());
+        let pmlog = try_operator_instant_reply("/pmlog").unwrap();
+        assert!(
+            !pmlog.contains("**Power history**"),
+            "Power log /pmlog must stay put, got: {pmlog}"
+        );
+    }
+
+
+    #[test]
     fn sysload_slash_and_view_open_do_not_steal_load_heat_or_bare() {
         // Slash + view/open NL → System load (`/load` · `/thermal` parity).
         // Bare `sysload` / `load level` stay with the agent;
