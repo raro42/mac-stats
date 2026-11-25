@@ -1,3 +1,19 @@
+## Overnight note 2026-11-25 ~05:55 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Disk Cleanup Tab tips already shipped as v0.1.3081).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: design-review Settings Credentials after Disk Cleanup Tab tips v0.1.3081 — Discord · Perplexity · Credentials section still started bare “← → / h l · Home/End…” while Ollama/Monitors/Disk Cleanup already Tab-first; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Backfill: missing keep row for v0.1.3081.
+- Shipped **v0.1.3082** — Settings Credentials Tab-first kb-hints (Discord · Perplexity · section; + theme seeds); Mac capture still TCC-blocked.
+- Ratchet keep @ ae7c24f5d for 3082; backfill keep for 3081; sync-dist + install/kickstart + push (UI).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…pmhistory closed — Brave/Redmine/MCP/other settings toolbars optional Tab-first · Disk Cleanup scope/category list polish optional · remaining useful non-blocking `pmset -g` adapters only if clearly distinct (`disk` == `custom`; `uuidlog` blocks); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3082
+
+- Design-review fuel after Disk Cleanup Tab tips v0.1.3081: Settings Credentials Discord · Perplexity · section tips still started with bare “← → / h l · Home/End…” while Ollama / Monitors / Disk Cleanup already sat on Tab-first KISS tips. Digester empty; design-review due=false — polish-without-capture; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory soft-state closed; not another keep-pNN clone.
 ## Overnight note 2026-11-25 ~05:47 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Monitors add-form tip seeds already shipped as v0.1.3080).

@@ -3,6 +3,7 @@
 Overnight Track B (mac-stats product ratchet). Digester open empty; design-review grace; layout-daily data-poster marked (Dark next). Avoided another soft-state keep-pNN.
 
 ## Shipped tonight
+- **v0.1.3082** — Settings Credentials Tab-first kb-hints (Discord · Perplexity · section; + theme seeds)
 - **v0.1.3081** — Disk Cleanup meta · Clean now/Refresh/Save · add-scope Tab-first kb-hints (+ theme seeds)
 - **v0.1.3080** — warmer Monitors add-form tip seeds (first-paint parity with JS; Tab URL · Cancel · Add…)
 - **v0.1.3079** — Monitors add/detail Tab-first kb-hints
@@ -23,10 +24,10 @@ Overnight Track B (mac-stats product ratchet). Digester open empty; design-revie
 - **v0.1.3062** — Raw battery from `pmset -g rawbatt`
 
 ## Notes
-Digester empty; layout-daily Dark waits for next calendar day. Last unwired non-blocking `pmset -g` getter was `history` (`disk` mirrors `custom`; `uuidlog` blocks). Shipped `/pmhistory` (v0.1.3072), tip polish (v0.1.3073–3080), then Disk Cleanup Tab-first tips (v0.1.3081).
+Digester empty; layout-daily Dark waits for next calendar day. Last unwired non-blocking `pmset -g` getter was `history` (`disk` mirrors `custom`; `uuidlog` blocks). Shipped `/pmhistory` (v0.1.3072), tip polish (v0.1.3073–3081), then Credentials Tab-first tips (v0.1.3082).
 
 ## Next
 - Soft-state leftover closed for SoftDisabled…pmhistory
-- Optional: Discord/settings credential toolbars Tab-first leftover tips · Disk Cleanup scope/category list polish
+- Optional: Brave/Redmine/MCP/other settings toolbars Tab-first leftover tips · Disk Cleanup scope/category list polish
 - Remaining useful non-blocking `pmset -g` adapters only if clearly distinct
 - Dark layout-daily next calendar day
