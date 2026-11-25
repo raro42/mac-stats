@@ -1,3 +1,21 @@
+## Overnight note 2026-11-25 ~01:45 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Raw battery v0.1.3062 — System state from `pmset -g systemstate` (Current Power State + CPU/Graphics/Audio/Network; not SoftDisabled/boolean soft-state clone; not `/pmcap` settings list; not `/sysload`; not IOKit `/powerstate`; Dark layout-daily next calendar day).
+- Backfill: missing keep row for v0.1.3062.
+- Shipped **v0.1.3063** — `/systemstate` · `/system-state` · `/pmset-systemstate` · `/sysstate` · `/system-power-state` · `/system-capabilities` · `/mac-systemstate` · `/mac-sysstate` + view/open NL; bare systemstate/system state/sysstate stay with agent; `/pmcap` · `/sysload` · `/pmlive` · `/powerstate` intact; `/help` lists lane.
+- Ratchet keep @ 09440f3a5 for 3063; backfill keep for 3062; push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats/pmcap/useractivity/pmps/pmcustom/pmadapters/pmlive/pmeverything/accps/pmuuid/rawbatt/systemstate — try `pmset -g profiles` / `battlimit` if useful; history only if non-blocking; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3063
+
+- Product fuel after Raw battery v0.1.3062: current power state + capability bits already readable via `pmset -g systemstate` but lacked `/systemstate` · `/system-state` · `/pmset-systemstate` · `/sysstate` · `/system-power-state` · `/system-capabilities` · `/mac-systemstate` and view/see/open/list phrases while Power capabilities `/pmcap`, System load `/sysload`, and Power live `/pmlive` already had slash+NL. Bare `systemstate` / `system state` / `sysstate` stay with the agent; `/powerstate` reserved for IOKit drivers. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…rawbatt/systemstate soft-state closed; try profiles/battlimit; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~01:30 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).

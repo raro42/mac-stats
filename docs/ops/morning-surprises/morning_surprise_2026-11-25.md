@@ -1,20 +1,20 @@
-# Morning surprise — 2026-11-25
+# Morning surprise 2026-11-25
 
-Overnight Track B (mac-stats product ratchet). Digester open empty; design-review grace; layout-daily data-poster marked (Dark next).
+Overnight autoresearch kept shipping power/pmset instant lanes.
 
 ## Shipped
-- **v0.1.3062** — Raw battery instant status from `pmset -g rawbatt`
-  - Slash + NL: `/rawbatt` · `/raw-batt` · `/pmset-rawbatt` · `/raw-battery` · `/battery-raw` · `/mac-rawbatt` (+ view/open/list)
-  - Shows Cap · FCC · Design · Cycles · mA (compact; skips Polled / Time / Location)
-  - Does not steal `/battery` · `/cycles` · `/battery-time` · `/accps` · `/pmps` · `/pmuuid`
-- **v0.1.3061** — Sleep/Wake UUID from `pmset -g uuid` (prior tick)
-- **v0.1.3060** — Accessory power from `pmset -g accps` (prior tick)
-- Earlier tonight: Power everything / live / adapters / custom / source / … soft-state lane chain
+- **v0.1.3063** System state — `/systemstate` · `/sysstate` · `/system-power-state` · `/system-capabilities` (+ view/open NL) from `pmset -g systemstate` (state + CPU/Graphics/Audio/Network)
+- **v0.1.3062** Raw battery — `/rawbatt` · `/raw-battery` from `pmset -g rawbatt` (Cap/FCC/Design/Cycles/mA)
+- **v0.1.3061** Sleep/Wake UUID — `/pmuuid` · `/sleep-wake-uuid` from `pmset -g uuid`
+- **v0.1.3060** Accessory power — `/accps` · `/accessory-power` from `pmset -g accps`
+- Earlier tonight: Power everything / live / adapters / custom / source / useractivity / cap / stats / therm / …
 
-## Fuel choice
-Standing backlog after `pmuuid` — Linux skipped `rawbatt` as unused; this Mac returns a live Cap/FCC/Cycles dump, so ship it. `systemstate` / `battlimit` next.
+## Tried / skipped
+- Digester empty (0 runs / 7d)
+- Design review due=false (grace; Mac TCC — polish-without-capture)
+- Layout daily: data-poster marked today; **Dark** next calendar quota
+- `battlimit` not a useful getter yet; blocking `history`/`thermlog`/`rawlog` skipped
 
 ## Next
-- Dark layout-daily (next calendar quota)
-- `pmset -g systemstate` or `battlimit` if useful
-- history only if non-blocking
+- Dark layout-daily next calendar day
+- Optional: `pmset -g profiles` if useful; avoid blocking streams
