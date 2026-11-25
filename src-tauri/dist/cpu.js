@@ -21758,9 +21758,9 @@ function ensureDiskCleanupMetaKbStyles() {
 }
 
 /** How to move across Reclaim · Next · Runs when · Enabled scopes. */
-/* Design-review feature-disk-cleanup: shorter, warmer meta tip (KISS). */
+/* Design-review feature-disk-cleanup: Tab-first meta tip (Settings/Monitors parity). */
 const DISK_CLEANUP_META_KB_HINT =
-  '← → / h l · Home/End · Enter opens reclaim · next · runs · or scopes';
+  'Tab Reclaim · Next · Runs · Scopes · ← → / h l · Home/End · Enter opens';
 
 /** Theme HTML ships the hint under the meta cards. Create it only on older shells. */
 function ensureDiskCleanupMetaKbHint() {
@@ -21879,9 +21879,9 @@ function refreshDiskCleanupToolbarRovingTabindex(row, preferred) {
 }
 
 /** How to move across Clean now · Refresh · Save scopes. */
-/* Design-review feature-disk-cleanup: shorter, warmer toolbar tip (KISS). */
+/* Design-review feature-disk-cleanup: Tab-first toolbar tip (Settings/Monitors parity). */
 const DISK_CLEANUP_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End · Enter activates Clean now · Refresh · or Save';
+  'Tab Clean now · Refresh · Save · ← → / h l · Home/End · Enter activates';
 
 /** Theme HTML ships the hint under the action buttons. Create it only on older shells. */
 function ensureDiskCleanupToolbarKbHint(row) {
@@ -21949,9 +21949,9 @@ function refreshDiskCleanupAddScopeToolbarRovingTabindex(wrap, preferred) {
 }
 
 /** How to move across label · path · days · Recursive · Add scope. */
-/* Design-review feature-disk-cleanup: shorter, warmer add-scope tip (KISS). */
+/* Design-review feature-disk-cleanup: Tab-first add-scope tip (Monitors add-form parity). */
 const DISK_CLEANUP_ADD_SCOPE_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End · Enter adds · edges jump to scopes or categories';
+  'Tab label · path · days · Recursive · Add · ← → / h l · Home/End · Enter adds · edges jump to scopes or categories';
 
 /** Theme HTML ships the hint under the add-scope fields. Create it only on older shells. */
 function ensureDiskCleanupAddScopeToolbarKbHint(wrap) {

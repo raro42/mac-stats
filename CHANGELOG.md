@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.3081] - 2026-11-25
+
+### Changed
+- Disk Cleanup meta · Clean now/Refresh/Save · add-scope keyboard hints (+ theme seeds): Tab-first tips so first paint matches Monitors / Settings KISS hints (design-review feature-disk-cleanup polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
+
 ## [0.1.3080] - 2026-11-25
 
 ### Changed
