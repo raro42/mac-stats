@@ -1,18 +1,15 @@
-# UNTESTED-27: RAM usage as ring widget (#27)
+# WIP-28 Layout problems
 
 ## Plan
-- [x] Add RAM metric-card + history sparkline to all theme `cpu.html` (after GPU)
-- [x] CSS grids: metrics + history `repeat(4)` → `repeat(5)` in theme `cpu.css`
-- [x] `chart-line.js` + data-poster `poster-charts.js`: ram buffer / seed / updateRam
-- [x] `cpu.js`: live ring, hot wash (85%), seed gauges, feed charts, kb/history maps
-- [x] Harness `/rings`: include RAM + hot threshold
-- [x] Bump v0.1.2915 + CHANGELOG; sync dist; `cargo check`
-- [x] Rename `WIP-27-…` → `UNTESTED-27-…`; commit + push `origin/main` (issue left open)
-
-## Notes
-GitHub: https://github.com/raro42/mac-stats/issues/27
-RAM already in history.json / Details; gauge chips were pruned from the power strip — ring was missing.
+- [x] Locate time-range selector markup/CSS/JS across themes
+- [x] Remove time selector UI from all themes (keep default history window)
+- [x] Fix neon theme: scroll + widen with window
+- [x] Rename top "CPU" label/title to "mac-stats" (warm title rule)
+- [x] cargo check in src-tauri/
+- [x] CHANGELOG under [Unreleased]
+- [x] Rename WIP-28 → UNTESTED-28; commit + push; do not close issue
 
 ## Review
-- v0.1.2915: RAM ring + sparkline across themes; `/rings` lists 5.
-- Handoff: tester / 004 (issue left open).
+- Root cause: `#history-controls` sat inside the 5-col `.history-section` grid; when shown (`display:flex` after >24h history), it stole a column and misaligned sparklines under gauges.
+- Neon: `.neon-panel` had `max-width: 520px` and no `overflow-y: auto` (scroll lived on decorative `.neon-frame` with `pointer-events: none`).
+- Removed 24h history availability poll (only existed to show the dropdown).

@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+### Fixed
+- Layout (#28): remove History time-range selector from all themes so sparklines stay aligned under gauges; Neon panel scrolls and widens with the window; top title reads `mac-stats` instead of `CPU`.
+
 ## [0.1.3082] - 2026-11-25
 
 ### Changed

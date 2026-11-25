@@ -2991,7 +2991,6 @@ function unparkCpuWindowHistoryGpu() {
   }
   window.__macStatsSparklinesUnparked = true;
   wireCpuWindowChromeOnce();
-  startHistoryAvailabilityPoll();
 }
 window.__macStatsUnparkHistoryGpu = unparkCpuWindowHistoryGpu;
 
@@ -6533,7 +6532,6 @@ function pauseIdleWindowPolls() {
   stopLogsGlancePoll();
   stopLogsAutoRefresh();
   stopDiskCleanupGlancePoll();
-  stopHistoryAvailabilityPoll();
   // Process Details live refresh: stop while parked (#14).
   if (processDetailsRefreshInterval) {
     clearInterval(processDetailsRefreshInterval);
@@ -6590,10 +6588,6 @@ function applyDeferredResumeIdleWindowPolls() {
     startLogsGlancePoll();
   } else {
     stopLogsGlancePoll();
-  }
-  // 24h history probe only after sparklines have unparked once (#14).
-  if (window.__macStatsSparklinesUnparked || sparklineHistoryReady) {
-    startHistoryAvailabilityPoll();
   }
   // Debug Log live tail — only when the section is open and auto-refresh is on.
   const logsAuto = document.getElementById("logs-autorefresh");
@@ -26194,8 +26188,6 @@ async function seedThemeHistoryFromBackend() {
         applyHistoryPointToGauges(result.points[result.points.length - 1]);
         sparklineHistoryReady = true;
         lastSparklineSeedMs = Date.now();
-        // Seed implies history IPC is warm — allow deferred 24h probe (#14).
-        startHistoryAvailabilityPoll();
         return true;
       }
     } catch (err) {
@@ -26205,80 +26197,9 @@ async function seedThemeHistoryFromBackend() {
   }
   sparklineHistoryReady = true;
   lastSparklineSeedMs = Date.now();
-  startHistoryAvailabilityPoll();
   return false;
 }
 window.seedThemeHistoryFromBackend = seedThemeHistoryFromBackend;
-
-// Check if history data is available and show/hide dropdown accordingly
-async function checkHistoryAvailability() {
-  // Parked shell: skip 24h history probe + controls DOM (#14).
-  if (windowWorkPaused()) return;
-  try {
-    // Check if we have >24h of data available to show the dropdown
-    const inv = getInvoke();
-    if (!inv) return;
-      const result = await inv('get_metrics_history', {
-      timeRangeSeconds: 86400, // 24 hours
-      maxDisplayPoints: null
-    });
-    // Alt-tab during history probe: do not toggle controls (#14).
-    if (windowWorkPaused()) return;
-
-    if (result && result.oldest_available_timestamp) {
-      const now = Math.floor(Date.now() / 1000);
-      const availableSeconds = now - result.oldest_available_timestamp;
-      const hasMore24h = availableSeconds > 86400;
-
-      const historyControls = document.getElementById('history-controls');
-      if (historyControls) {
-        // Show dropdown if we have >24h of data
-        historyControls.style.display = hasMore24h ? 'flex' : 'none';
-      }
-    }
-  } catch (error) {
-    // History not yet available (normal on startup) - silent
-  }
-}
-
-let historyAvailabilityInterval = null;
-
-function stopHistoryAvailabilityPoll() {
-  if (historyAvailabilityInterval) {
-    clearInterval(historyAvailabilityInterval);
-    historyAvailabilityInterval = null;
-  }
-}
-
-function startHistoryAvailabilityPoll() {
-  stopHistoryAvailabilityPoll();
-  if (windowWorkPaused()) return;
-  // Skip until sparkline GPU / history seed has unparked once (#14).
-  if (!window.__macStatsSparklinesUnparked && !sparklineHistoryReady) return;
-  checkHistoryAvailability();
-  // 24h history probe is heavy IPC; every 5 minutes is enough for the dropdown (#14 / #15).
-  historyAvailabilityInterval = setInterval(() => {
-    // Prefer shared pause — blur / Focused(false) sets windowPollsPaused (#14).
-    if (windowWorkPaused()) return;
-    checkHistoryAvailability();
-  }, 300000);
-}
-
-// Initialize history controls
-function initHistoryControls() {
-  const timeRangeSelect = document.getElementById('time-range-select');
-  if (timeRangeSelect) {
-    timeRangeSelect.addEventListener('change', (e) => {
-      const timeRange = e.target.value;
-      // Time range selection removed - charts now use real-time updates only
-    });
-  }
-
-  // Do not probe 24h history on monitoring idle — wait for sparkline unpark (#14).
-  if (window.__macStatsSparklinesUnparked || sparklineHistoryReady) {
-    startHistoryAvailabilityPoll();
-  }
-}
 
 /**
  * Settings Save/Clear + status APIs. Monitoring idle used to wire every
@@ -26318,7 +26239,7 @@ function initMonitoringFeatures() {
   initLogsSection();
   initDiskCleanupSection();
   initOllamaSection();
-  initHistoryControls();
+  // History time-range dropdown removed (#28) — sparklines stay live-aligned under gauges.
   // Ollama module init (`initializeOllama`) owns configure_ollama — do not
   // stack a second autoConfigure here on monitoring idle (#14).
   // Compact: localStorage only here; Settings Product path syncs backend (#14).

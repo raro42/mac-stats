@@ -70,8 +70,11 @@ body::before {
   position: relative;
   height: 100%;
   width: 100%;
-  max-width: 520px;
+  /* Fill the window; old 520px cap blocked widen (#28). */
+  max-width: none;
   margin: 0 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   border-radius: 34px;
   background: var(--panel-bg);

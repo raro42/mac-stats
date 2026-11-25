@@ -13,7 +13,7 @@
     <main class="mat-card">
       <header class="mat-header">
         <div class="mat-title">
-          <h1>CPU <span class="mat-subtitle" id="chip-info">Unknown</span></h1>
+          <h1>mac-stats <span class="mat-subtitle" id="chip-info">Unknown</span></h1>
         </div>
 
         <div class="mat-actions">
@@ -95,16 +95,6 @@
       </section>
 
       <section class="history-section">
-        <div class="history-controls" id="history-controls" style="display: none;">
-          <label for="time-range-select">History:</label>
-          <select id="time-range-select" class="time-range-dropdown">
-            <option value="5m" selected>Last 5 minutes</option>
-            <option value="1h">Last 1 hour</option>
-            <option value="6h">Last 6 hours</option>
-            <option value="24h">Last 24 hours</option>
-            <option value="7d">Last 7 days</option>
-          </select>
-        </div>
         <div class="history-chart-container" aria-label="CPU usage history">
           <span class="history-chart-caption">CPU</span>
           <canvas class="history-chart" id="usage-history-chart" width="1" height="1"></canvas>
