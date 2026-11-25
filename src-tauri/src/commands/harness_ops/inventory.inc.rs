@@ -26779,6 +26779,20 @@ pub fn looks_like_assertions_request(content: &str) -> bool {
         || n.contains("filevault")
         || n.contains("watt")
         || n.contains("charger")
+        || n.contains("userclients")
+        || n.contains("user-clients")
+        || n.contains("user clients")
+        || n.contains("power-clients")
+        || n.contains("power clients")
+        || n.contains("iokit-clients")
+        || n.contains("iokit clients")
+        || n == "/userclients"
+        || n == "/user-clients"
+        || n == "/power-clients"
+        || n == "/pm-clients"
+        || n == "/iokit-clients"
+        || n == "view userclients"
+        || n == "open power-clients"
         || n == "/lpm"
         || n == "/power"
         || n == "/watts"
@@ -28972,6 +28986,22 @@ pub fn looks_like_useractivity_request(content: &str) -> bool {
         || n.contains("debug.log")
         || n.contains("debug log")
         || n.contains("screensaver")
+        || n.contains("userclients")
+        || n.contains("user-clients")
+        || n.contains("user clients")
+        || n.contains("power-clients")
+        || n.contains("power clients")
+        || n.contains("iokit-clients")
+        || n.contains("iokit clients")
+        || n == "/userclients"
+        || n == "/user-clients"
+        || n == "/power-clients"
+        || n == "/pm-clients"
+        || n == "/iokit-clients"
+        || n == "view userclients"
+        || n == "open userclients"
+        || n == "view power clients"
+        || n == "open power-clients"
         || n == "/idle-time"
         || n == "/idle-time-status"
         || n == "view idle-time"
@@ -32275,6 +32305,278 @@ pub fn format_battlimit_report() -> String {
         return "**Battery limit** — _no charge-limit info on this Mac right now._".to_string();
     }
     format!("**Battery limit** · `{v}`")
+}
+
+/// Power user-clients — who holds IOKit PM clients from `pmset -g userclients`.
+/// Slash + view/open NL (`/userclients` · `/power-clients` · `view userclients`).
+/// Bare `userclients` / `user clients` / `power clients` stay with the agent;
+/// `/useractivity` stays User activity; `/assertions` stays Sleep assertions;
+/// `/tasks` stays process list; `/powerstate` stays IOKit drivers.
+pub fn looks_like_userclients_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("useractivity")
+        || n.contains("user-activity")
+        || n.contains("user activity")
+        || n.contains("activity level")
+        || n.contains("activity-level")
+        || n.contains("assertions")
+        || n.contains("sleep preventers")
+        || n.contains("sleep-preventers")
+        || n.contains("who keeps awake")
+        || n.contains("keeps awake")
+        || n.contains("powerstate")
+        || n.contains("power-state")
+        || n.contains("power state")
+        || n.contains("systemstate")
+        || n.contains("system-state")
+        || n.contains("system state")
+        || n.contains("battlimit")
+        || n.contains("battery limit")
+        || n.contains("charge limit")
+        || n == "/useractivity"
+        || n == "/user-activity"
+        || n == "/activity-level"
+        || n == "/assertions"
+        || n == "/sleep-preventers"
+        || n == "/who-keeps-awake"
+        || n == "/powerstate"
+        || n == "/systemstate"
+        || n == "/battlimit"
+        || n == "/tasks"
+        || n == "/processes"
+        || n == "/username"
+        || n == "/whoami"
+        || n == "/user"
+        // Bare phrases stay with the agent.
+        || n == "userclients"
+        || n == "the userclients"
+        || n == "user-clients"
+        || n == "the user-clients"
+        || n == "user clients"
+        || n == "the user clients"
+        || n == "pmsetuserclients"
+        || n == "the pmsetuserclients"
+        || n == "pmset-userclients"
+        || n == "the pmset-userclients"
+        || n == "pmset userclients"
+        || n == "the pmset userclients"
+        || n == "pm-userclients"
+        || n == "the pm-userclients"
+        || n == "power-clients"
+        || n == "the power-clients"
+        || n == "power clients"
+        || n == "the power clients"
+        || n == "powerclients"
+        || n == "the powerclients"
+        || n == "pm-clients"
+        || n == "the pm-clients"
+        || n == "pm clients"
+        || n == "the pm clients"
+        || n == "iokit-clients"
+        || n == "the iokit-clients"
+        || n == "iokit clients"
+        || n == "the iokit clients"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+            "/userclients"
+            | "/userclients-status"
+            | "/userclients-state"
+            | "/user-clients"
+            | "/user-clients-status"
+            | "/user-clients-state"
+            | "/pmset-userclients"
+            | "/pmset-userclients-status"
+            | "/pmset-userclients-state"
+            | "/pmsetuserclients"
+            | "/pmsetuserclients-status"
+            | "/pm-userclients"
+            | "/pm-userclients-status"
+            | "/power-clients"
+            | "/power-clients-status"
+            | "/power-clients-state"
+            | "/powerclients"
+            | "/powerclients-status"
+            | "/pm-clients"
+            | "/pm-clients-status"
+            | "/pmclients"
+            | "/pmclients-status"
+            | "/iokit-clients"
+            | "/iokit-clients-status"
+            | "/iokitclients"
+            | "/iokitclients-status"
+            | "/mac-userclients"
+            | "/mac-user-clients"
+            | "/mac-pmset-userclients"
+            | "/mac-power-clients"
+            | "/mac-pm-clients"
+            | "/mac-iokit-clients"
+            | "/mac-userclients-status"
+            | "/mac-power-clients-status"
+            | "userclients status"
+            | "the userclients status"
+            | "userclients state"
+            | "the userclients state"
+            | "user-clients status"
+            | "the user-clients status"
+            | "user clients status"
+            | "the user clients status"
+            | "power-clients status"
+            | "the power-clients status"
+            | "power clients status"
+            | "the power clients status"
+            | "pmset-userclients status"
+            | "the pmset-userclients status"
+            | "pmset userclients status"
+            | "the pmset userclients status"
+            | "pm-clients status"
+            | "the pm-clients status"
+            | "iokit-clients status"
+            | "the iokit-clients status"
+            | "iokit clients status"
+            | "the iokit clients status"
+            | "my userclients"
+            | "my userclients status"
+            | "my user clients"
+            | "my user-clients"
+            | "my power clients"
+            | "my power-clients"
+            | "is userclients ok"
+            | "is the userclients ok"
+            | "how's userclients"
+            | "hows userclients"
+            | "how's the userclients"
+            | "hows the userclients"
+            | "how's user clients"
+            | "hows user clients"
+            | "how's power clients"
+            | "hows power clients"
+            | "what's my userclients"
+            | "whats my userclients"
+            | "what is my userclients"
+            | "what's my userclients status"
+            | "whats my userclients status"
+            | "what is my userclients status"
+            | "what's my user clients"
+            | "whats my user clients"
+            | "what is my user clients"
+            | "what's my power clients"
+            | "whats my power clients"
+            | "what is my power clients"
+            | "what's the userclients"
+            | "whats the userclients"
+            | "what is the userclients"
+            | "what's the userclients status"
+            | "whats the userclients status"
+            | "what is the userclients status"
+            | "what's the user clients"
+            | "whats the user clients"
+            | "what is the user clients"
+            | "what's the power clients"
+            | "whats the power clients"
+            | "what is the power clients"
+            | "view userclients"
+            | "view the userclients"
+            | "view userclients status"
+            | "view the userclients status"
+            | "view user-clients"
+            | "view the user-clients"
+            | "view user clients"
+            | "view the user clients"
+            | "view power-clients"
+            | "view the power-clients"
+            | "view power clients"
+            | "view the power clients"
+            | "view pmset-userclients"
+            | "view the pmset-userclients"
+            | "view pmset userclients"
+            | "view the pmset userclients"
+            | "view pm-clients"
+            | "view the pm-clients"
+            | "view iokit-clients"
+            | "view the iokit-clients"
+            | "view iokit clients"
+            | "view the iokit clients"
+            | "see userclients"
+            | "see the userclients"
+            | "see user clients"
+            | "see the user clients"
+            | "see power clients"
+            | "see the power clients"
+            | "open userclients"
+            | "open the userclients"
+            | "open userclients status"
+            | "open the userclients status"
+            | "open user-clients"
+            | "open user clients"
+            | "open power-clients"
+            | "open power clients"
+            | "open pmset-userclients"
+            | "open pm-clients"
+            | "open iokit-clients"
+            | "list userclients"
+            | "list the userclients"
+            | "list userclients status"
+            | "list the userclients status"
+            | "list user-clients"
+            | "list the user-clients"
+            | "list user clients"
+            | "list the user clients"
+            | "list power-clients"
+            | "list the power-clients"
+            | "list power clients"
+            | "list the power clients"
+            | "list pm-clients"
+            | "list the pm-clients"
+            | "list iokit-clients"
+            | "list the iokit-clients"
+    )
+}
+
+/// Zero-LLM power user-clients from `pmset -g userclients` (macOS-only; empty elsewhere).
+pub fn format_userclients_report() -> String {
+    let v = crate::metrics::get_userclients_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**User clients** — _no power user-clients on this Mac right now._".to_string();
+    }
+    format!("**User clients** · `{v}`")
 }
 
 

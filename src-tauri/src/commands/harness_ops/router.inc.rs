@@ -1465,6 +1465,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_battlimit_request(content) {
         return Some(format_battlimit_report());
     }
+    // Power user-clients from `pmset -g userclients` (bare `userclients` / `user clients` /
+    // `power clients` stay with the agent; `/useractivity` stays User activity;
+    // `/assertions` stays Sleep assertions; `/tasks` stays process list;
+    // `/powerstate` stays IOKit drivers).
+    if looks_like_userclients_request(content) {
+        return Some(format_userclients_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;

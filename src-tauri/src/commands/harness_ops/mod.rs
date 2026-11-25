@@ -7438,6 +7438,68 @@ mod tests {
         );
     }
 
+    #[test]
+    fn userclients_slash_and_view_open_do_not_steal_useractivity_assertions_or_bare() {
+        assert!(looks_like_userclients_request("/userclients"));
+        assert!(looks_like_userclients_request("/userclients-status"));
+        assert!(looks_like_userclients_request("/user-clients"));
+        assert!(looks_like_userclients_request("/pmset-userclients"));
+        assert!(looks_like_userclients_request("/power-clients"));
+        assert!(looks_like_userclients_request("/pm-clients"));
+        assert!(looks_like_userclients_request("/iokit-clients"));
+        assert!(looks_like_userclients_request("/mac-userclients"));
+        assert!(looks_like_userclients_request("/mac-power-clients"));
+        assert!(looks_like_userclients_request("view userclients"));
+        assert!(looks_like_userclients_request("open power-clients"));
+        assert!(looks_like_userclients_request("list user clients"));
+        assert!(looks_like_userclients_request("userclients status"));
+        assert!(looks_like_userclients_request("is userclients ok"));
+        assert!(looks_like_userclients_request("what's my userclients"));
+        assert!(looks_like_userclients_request("what's the power clients"));
+        assert!(looks_like_userclients_request("view user clients"));
+        assert!(!looks_like_userclients_request("userclients"));
+        assert!(!looks_like_userclients_request("user clients"));
+        assert!(!looks_like_userclients_request("power clients"));
+        assert!(!looks_like_userclients_request("/useractivity"));
+        assert!(!looks_like_userclients_request("view useractivity"));
+        assert!(!looks_like_userclients_request("/assertions"));
+        assert!(!looks_like_userclients_request("/who-keeps-awake"));
+        assert!(!looks_like_userclients_request("/tasks"));
+        assert!(!looks_like_userclients_request("/powerstate"));
+        assert!(!looks_like_userclients_request("enable userclients"));
+        assert!(!looks_like_useractivity_request("/userclients"));
+        assert!(!looks_like_useractivity_request("view userclients"));
+        assert!(!looks_like_assertions_request("/userclients"));
+        assert!(!looks_like_assertions_request("view power clients"));
+        let s = try_operator_instant_reply("/userclients").unwrap();
+        assert!(
+            s.contains("**User clients**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view userclients").unwrap();
+        assert!(
+            viewed.contains("**User clients**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open power-clients").unwrap();
+        assert!(
+            open.contains("**User clients**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("userclients").is_none());
+        assert!(try_operator_instant_reply("user clients").is_none());
+        let ua = try_operator_instant_reply("/useractivity").unwrap();
+        assert!(
+            !ua.contains("**User clients**"),
+            "User activity /useractivity must stay put, got: {ua}"
+        );
+        let assertions = try_operator_instant_reply("/assertions").unwrap();
+        assert!(
+            !assertions.contains("**User clients**"),
+            "Sleep assertions /assertions must stay put, got: {assertions}"
+        );
+    }
+
 
     #[test]
     fn sysload_slash_and_view_open_do_not_steal_load_heat_or_bare() {

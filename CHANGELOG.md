@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3066] - 2026-11-25
+
+### Added
+- Instant Power user-clients accepts `/userclients` · `/userclients-status` · `/userclients-state` · `/user-clients` · `/user-clients-status` · `/user-clients-state` · `/pmset-userclients` · `/pmset-userclients-status` · `/pmset-userclients-state` · `/pmsetuserclients` · `/pmsetuserclients-status` · `/pm-userclients` · `/pm-userclients-status` · `/power-clients` · `/power-clients-status` · `/power-clients-state` · `/powerclients` · `/powerclients-status` · `/pm-clients` · `/pm-clients-status` · `/pmclients` · `/pmclients-status` · `/iokit-clients` · `/iokit-clients-status` · `/iokitclients` · `/iokitclients-status` · `/mac-userclients` · `/mac-user-clients` · `/mac-pmset-userclients` · `/mac-power-clients` · `/mac-pm-clients` · `/mac-iokit-clients` · `/mac-userclients-status` · `/mac-power-clients-status` and view/see/open/list NL (`view userclients`, `open power-clients`, `list user clients`, …), matching “userclients status” / “is userclients ok” / “what's my userclients” / “what's the power clients”. Bare `userclients` / `user clients` / `power clients` stay with the agent; `/useractivity` · `/user-activity` stay User activity; `/assertions` · `/sleep-preventers` stay Sleep assertions; `/tasks` stays process list; `/powerstate` stays IOKit drivers. Uses `pmset -g userclients` (hold count · unique procs · top names). Operator `/help` lists the new lane.
+
 ## [0.1.3065] - 2026-11-25
 
 ### Changed

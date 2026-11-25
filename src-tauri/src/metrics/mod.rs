@@ -9592,6 +9592,118 @@ pub fn get_battlimit_status() -> String {
     }
 }
 
+/// Parse `pmset -g userclients` → (hold count, names ranked by count desc).
+/// Lines look like: ` - pid 331, logd`
+pub(crate) fn parse_pmset_userclients(raw: &str) -> (usize, Vec<(String, usize)>) {
+    use std::collections::HashMap;
+    let mut counts: HashMap<String, usize> = HashMap::new();
+    let mut total = 0usize;
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let lower = t.to_ascii_lowercase();
+        if lower.starts_with("error")
+            || lower.starts_with("usage:")
+            || lower.starts_with("see pmset")
+        {
+            continue;
+        }
+        // ` - pid 331, logd` or `pid 331, logd`
+        let rest = if let Some(idx) = lower.find("pid ") {
+            t[idx + 4..].trim()
+        } else {
+            continue;
+        };
+        let name = if let Some(comma) = rest.find(',') {
+            rest[comma + 1..].trim()
+        } else {
+            // Fallback: last whitespace token after the pid digits.
+            rest.split_whitespace().nth(1).unwrap_or("").trim()
+        };
+        if name.is_empty() {
+            continue;
+        }
+        let mut short = name.to_string();
+        if short.len() > 28 {
+            short.truncate(27);
+            short.push('…');
+        }
+        total += 1;
+        *counts.entry(short).or_insert(0) += 1;
+    }
+    let mut ranked: Vec<(String, usize)> = counts.into_iter().collect();
+    ranked.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+    (total, ranked)
+}
+
+/// Compact user-clients status: hold count · unique procs · top names (+N).
+pub(crate) fn format_userclients_parts(total: usize, ranked: &[(String, usize)]) -> String {
+    if total == 0 {
+        return String::new();
+    }
+    let unique = ranked.len();
+    let mut bits: Vec<String> = Vec::new();
+    bits.push(format!("{total} holds · {unique} procs"));
+    const MAX_NAMES: usize = 5;
+    for (name, n) in ranked.iter().take(MAX_NAMES) {
+        if *n > 1 {
+            bits.push(format!("{name}×{n}"));
+        } else {
+            bits.push(name.clone());
+        }
+    }
+    if ranked.len() > MAX_NAMES {
+        bits.push(format!("(+{})", ranked.len() - MAX_NAMES));
+    }
+    let mut out = bits.join(" · ");
+    if out.len() > 420 {
+        out.truncate(417);
+        out.push_str("…");
+    }
+    out
+}
+
+/// macOS power user-clients from `pmset -g userclients` (who holds IOKit PM clients).
+/// Distinct from User activity `/useractivity`, Sleep assertions `/assertions`,
+/// process list `/tasks`, and IOKit `/powerstate`.
+/// Used by Discord/operator instant `/userclients` · `/power-clients` lane.
+pub fn get_userclients_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "userclients"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("userclients: pmset -g userclients non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("userclients: pmset -g userclients spawn failed");
+                return String::new();
+            }
+        };
+        let (total, ranked) = parse_pmset_userclients(&stdout);
+        let info = format_userclients_parts(total, &ranked);
+        if info.is_empty() {
+            debug3!("userclients: empty status");
+        } else {
+            debug3!("userclients status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -15915,6 +16027,40 @@ Battery level limits:
         assert_eq!(format_battlimit_parts(None), "");
         assert_eq!(parse_pmset_battlimit(""), None);
         assert_eq!(parse_pmset_battlimit("Usage: pmset"), None);
+    }
+}
+
+#[cfg(test)]
+mod userclients_parse_tests {
+    use super::{format_userclients_parts, parse_pmset_userclients};
+
+    const SAMPLE: &str = "\
+ - pid 331, logd
+ - pid 345, powerd
+ - pid 345, powerd
+ - pid 406, WindowServer
+ - pid 406, WindowServer
+ - pid 406, WindowServer
+ - pid 652, Finder
+";
+
+    #[test]
+    fn parse_pmset_userclients_ranks_by_count() {
+        let (total, ranked) = parse_pmset_userclients(SAMPLE);
+        assert_eq!(total, 7);
+        assert_eq!(ranked.len(), 4);
+        assert_eq!(ranked[0].0, "WindowServer");
+        assert_eq!(ranked[0].1, 3);
+        assert_eq!(ranked[1].0, "powerd");
+        assert_eq!(ranked[1].1, 2);
+        let s = format_userclients_parts(total, &ranked);
+        assert!(s.contains("7 holds · 4 procs"), "got: {s}");
+        assert!(s.contains("WindowServer×3"), "got: {s}");
+        assert!(s.contains("powerd×2"), "got: {s}");
+        assert!(s.contains("Finder"), "got: {s}");
+        assert_eq!(format_userclients_parts(0, &[]), "");
+        assert_eq!(parse_pmset_userclients("Usage: pmset").0, 0);
+        assert_eq!(parse_pmset_userclients("").0, 0);
     }
 }
 
