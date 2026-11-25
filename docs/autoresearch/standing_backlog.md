@@ -1,3 +1,23 @@
+## Overnight note 2026-11-25 ~22:49 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; filter-chip tips already shipped as v0.1.3088).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear tiny port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window (1 interesting content line only).
+- Fuel: standing backlog memory hygiene after tip train + #29 MS_UNTRUSTED wrap v0.1.3089 — Discord memory still held `<th>` / `\text{…}` / untrusted-data-points spam the `<td>`-only scrub missed; not another tip/keep-pNN/pmset clone; Dark layout-daily next calendar day.
+- Shipped **v0.1.3090** — scrub MS_UNTRUSTED `<th>`/`<tr>`/`\text` + Treat everything until… / untrusted data points / unverified claims (12 lines scrubbed at startup).
+- Shipped **v0.1.3091** — scrub leftover `<thead>`/`<tbody>` + session-compactor / **DROP** / hallucinated unverified-claims instruction lines.
+- Ratchet keep @ 41aea0bbf (3090) + bf07bbc92 (3091); install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…pmhistory closed — remaining useful non-blocking `pmset -g` adapters only if clearly distinct (`disk` == `custom`; `uuidlog` blocks); not another keep-pNN clone · tip train closed for night.
+
+## Overnight merge — v0.1.3091
+
+- Memory-hygiene fuel after MS_UNTRUSTED `<th>` scrub v0.1.3090: Discord memory still held HTML table scaffolding and session-compactor DROP instruction lines. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory soft-state closed; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3090
+
+- Standing-backlog fuel after filter-chip tips v0.1.3088 + #29 schedule wrap v0.1.3089: Discord channel memory still re-injected MS_UNTRUSTED `<th>` / `\text{untrusted data points…}` spam the `<td>`-only pollution filter missed. Digester empty; design-review due=false — memory hygiene; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory soft-state closed; not another keep-pNN clone.
 ## Overnight note 2026-11-25 ~22:16 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Disk Cleanup list tips already shipped as v0.1.3087).
