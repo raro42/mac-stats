@@ -1,3 +1,19 @@
+## Overnight note 2026-11-25 ~03:50 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; theme Tab tip parity already shipped as v0.1.3071).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after theme Tab tip parity v0.1.3071 — Power history from `pmset -g history` (sleep/wake UUID timeline · none yet when disabled; non-blocking; not soft-state keep-pNN; not `/pmlog` · `/pmuuid` · `/pmstats` · metrics history.json clone; Dark layout-daily next calendar day).
+- Shipped **v0.1.3072** — `/pmhistory` · `/pm-history` · `/pmset-history` · `/power-history` · `/sleep-wake-history` · `/sw-history` · `/mac-pmhistory` · `/mac-power-history` + view/open NL; bare pmhistory/power history/sleep wake history stay with agent; `/pmlog` · `/pmuuid` · `/pmstats` · metrics history path/size/age intact; `/help` lists lane.
+- Ratchet keep @ 5951ec4cf for 3072; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…userclients/pmhistory closed — remaining useful non-blocking `pmset -g` adapters only if clearly distinct (`disk` == `custom`; `uuidlog` blocks; history was last unwired getter); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3072
+
+- Product fuel after theme Tab tip parity v0.1.3071: sleep/wake UUID timeline already readable via `pmset -g history` but lacked `/pmhistory` · `/pm-history` · `/pmset-history` · `/power-history` · `/sleep-wake-history` · `/sw-history` · `/mac-pmhistory` and view/see/open/list phrases while Power log `/pmlog`, Sleep/Wake UUID `/pmuuid`, and Power stats `/pmstats` already had slash+NL. Bare `pmhistory` / `power history` / `sleep wake history` stay with the agent; metrics `history.json` path/size/age stay put. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory soft-state closed; `disk` mirrors custom; `uuidlog` blocks; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~03:37 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace; theme HTML move-drop already shipped as v0.1.3070).
