@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3077] - 2026-11-25
+
+### Changed
+- Process Details keyboard hints (header · name/PID hero · Advanced/Force Quit): Tab-first tips so first paint matches Settings / Ollama / Changelog KISS hints (design-review feature-processes polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
 ## [0.1.3076] - 2026-11-25
 
 ### Changed

@@ -6996,9 +6996,9 @@ function wireProcessDetailsHeaderToolbarKeyboard(header) {
     closeId: "close-process-details",
     ariaLabel: "Process details header",
     wireKey: "processDetailsHeaderToolbarKbWired",
-    /* Design-review feature-processes: shorter, warmer header tip (KISS). */
+    /* Design-review feature-processes: Tab-first header tip (KISS; Settings / Ollama parity). */
     hintText:
-      "← → / h l · Home/End · Enter closes · edges jump to name or Force Quit",
+      "Tab title · Close · ← → / h l · Home/End · Enter closes · edges jump to name or Force Quit",
     chainForwardFromEnd: () => tryChainProcessDetailsHeaderToHero(),
     chainBackFromStart: () => tryChainProcessDetailsHeaderToForceQuitLast(),
   });
@@ -7252,14 +7252,14 @@ function refreshProcessDetailHeroToolbarRovingTabindex(hero, preferred) {
   }
 }
 
-/* Design-review feature-processes: shorter, warmer detail hero tips (KISS). */
+/* Design-review feature-processes: Tab-first detail hero tips (KISS; Settings / Ollama parity). */
 /** Closed Process Details panel: how to move across name and PID. */
 const PROCESS_DETAIL_HERO_KB_HINT_CLOSED =
-  "← → / h l · Home/End · Enter copies · edges jump to Close or Force Quit";
+  "Tab name · PID · ← → / h l · Home/End · Enter copies · edges jump to Close or Force Quit";
 
 /** Open Process Details modal: how to move across name and PID. */
 const PROCESS_DETAIL_HERO_KB_HINT_OPEN =
-  "← → / h l · Home/End · Enter copies · name jumps back to the row · Force Quit jumps to footer";
+  "Tab name · PID · ← → / h l · Home/End · Enter copies · name jumps back to the row · Force Quit jumps to footer";
 
 function processDetailHeroKbHintText() {
   return isProcessDetailsModalOpen()
@@ -7398,14 +7398,14 @@ function refreshForceQuitToolbarRovingTabindex(section, preferred) {
   }
 }
 
-/* Design-review feature-processes: shorter, warmer Force Quit tips (KISS). */
+/* Design-review feature-processes: Tab-first Force Quit tips (KISS; Settings / Ollama parity). */
 /** Closed Process Details panel: how to move across Advanced and Force Quit. */
 const FORCE_QUIT_TOOLBAR_KB_HINT_CLOSED =
-  "← → / h l · Home/End · Enter activates · edge jumps to PID";
+  "Tab Advanced · Force Quit · ← → / h l · Home/End · Enter activates · edge jumps to PID";
 
 /** Open Process Details modal: how to move across Advanced and Force Quit. */
 const FORCE_QUIT_TOOLBAR_KB_HINT_OPEN =
-  "← → / h l · Home/End · Enter activates · edges jump to PID or footer version";
+  "Tab Advanced · Force Quit · ← → / h l · Home/End · Enter activates · edges jump to PID or footer version";
 
 function forceQuitToolbarKbHintText() {
   return isProcessDetailsModalOpen()
@@ -7802,7 +7802,7 @@ async function showProcessDetails(pid) {
         <div class="settings-card">
           <div class="settings-header">
             <h2 id="process-details-title">Process Details</h2>
-            <div class="process-details-header-kb-hint" hidden aria-hidden="true">← → / h l · Home/End · Enter closes · edges jump to name or Force Quit</div>
+            <div class="process-details-header-kb-hint" hidden aria-hidden="true">Tab title · Close · ← → / h l · Home/End · Enter closes · edges jump to name or Force Quit</div>
             <button id="close-process-details" class="icon-btn" aria-label="Close">×</button>
           </div>
           <div class="settings-body" id="process-details-body">
