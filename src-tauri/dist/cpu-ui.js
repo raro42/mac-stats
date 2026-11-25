@@ -995,7 +995,7 @@
   /* Settings Appearance: shorter, warmer tip (KISS; theme-list / Credentials parity). */
   /** How to move across Appearance controls when Settings is open. */
   const APPEARANCE_SETTING_KB_HINT =
-    "← → / h l · Home/End · Enter theme or frame · ↑ header · → Product";
+    "Tab theme · frame · ← → / h l · Home/End · Enter theme or frame · ↑ header · → Product";
 
   /**
    * Theme HTML ships the hint at the end of the Appearance section.
@@ -1254,9 +1254,9 @@
   /* Settings Product: shorter, warmer tip (KISS; Appearance / Credentials parity). */
   /** How to move across Product controls when Settings is open. */
   const PRODUCT_SETTING_KB_HINT =
-    "← → / h l · Home/End · Space toggles · Enter Help / Reset · ← Appearance · → Credentials";
+    "Tab toggles · Help · Reset · ← → / h l · Home/End · Space toggles · Enter Help / Reset · ← Appearance · → Credentials";
   const PRODUCT_SETTING_KB_HINT_SHEET =
-    "← → / h l · Home/End · Space toggles · Enter / c copies sheet · Esc closes · ← Appearance · → Credentials";
+    "Tab toggles · Help · Reset · ← → / h l · Home/End · Space toggles · Enter / c copies sheet · Esc closes · ← Appearance · → Credentials";
 
   /**
    * Theme HTML ships the hint at the end of the Product setting.
@@ -5158,7 +5158,7 @@
   /* Changelog body: shorter, warmer tip (KISS; Settings Appearance parity). */
   /** How to move across changelog version headings when two or more are on screen. */
   const CHANGELOG_BODY_TOOLBAR_KB_HINT =
-    "← → / h l · Home/End versions · ↑ footer version or Close · → Close";
+    "Tab a version · ← → / h l · Home/End · ↑ footer version or Close · → Close";
 
   /** Focus styles for older shells that lack agent-ops.css rules. */
   function ensureChangelogBodyKbStyles() {

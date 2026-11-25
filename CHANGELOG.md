@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3086] - 2026-11-25
+
+### Changed
+- Settings Appearance · Product · Changelog body keyboard hints (+ theme seeds): Tab-first tips (`Tab theme · frame…` / `Tab toggles · Help · Reset…` / `Tab a version…`) so first paint matches header / Credentials / Logs KISS hints (standing-backlog polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
 ## [0.1.3085] - 2026-11-25
 
 ### Changed
