@@ -1,3 +1,19 @@
+## Overnight note 2026-11-25 ~23:45 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear tiny port this tick.
+- Debug.log: soul/content noise only; historical MS_UNTRUSTED scheduler wraps pre-3089 only.
+- Fuel: #29 residual after wrap-stop v0.1.3089 — `scheduler_delivery_awareness.json` still stored refusal replies as “successful” deliveries and re-injected them into Last delivery / CPU chat continuity; not tip/keep-pNN/pmset clone; Dark layout-daily next calendar day.
+- Shipped **v0.1.3093** — skip recording MS_UNTRUSTED refusal bodies; scrub legacy refusal rows on load (5 scrubbed from live file).
+- Ratchet keep @ fb20c1e4f; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…pmhistory + powerstate + delivery-awareness refusal scrub closed — remaining useful non-blocking `pmset -g` only if clearly distinct (`disk` == `custom`; `uuidlog` / logs block); not another keep-pNN clone · tip train closed for night.
+
+## Overnight merge — v0.1.3093
+
+- #29 residual after schedule wrap-stop v0.1.3089: delivery awareness still treated MS_UNTRUSTED refusal Discord posts as successful continuity. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory + powerstate + refusal-awareness closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~23:18 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
