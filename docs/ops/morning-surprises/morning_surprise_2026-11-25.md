@@ -1,20 +1,16 @@
 # Morning surprise — 2026-11-25
 
-Overnight 2026-11-24/25 shipped more pmset instant-status lanes, then Power everything.
+## Shipped overnight
+- **v0.1.3060** — Accessory power instant status from `pmset -g accps`
+  - Slash + NL: `/accps` · `/pmaccps` · `/pm-accps` · `/pmset-accps` · `/accessory-power` · `/accessory-batteries` · `/peripheral-batteries` · `/bt-batteries` · `/mac-accps` (+ view/open/list)
+  - Shows drawing source + InternalBattery / Magic Keyboard / Magic Mouse rows (present devices only)
+  - Does not steal `/pmps` · `/battery` · `/ups` · `/adapter` · `/pmadapters` · `/pmeverything` · `/pmlive`
+- Earlier same night (already on main before this tick): Power everything **v0.1.3059**, Power live **v0.1.3058**, Power adapters **v0.1.3057**, …
 
-## Shipped
-- **v0.1.3059** Power everything — `/pmeverything` · `/power-everything` · `/all-power-settings` (+ aliases) summarize section labels (Battery · AC · UPS · Sched · Assertions) plus a Currently-in-use snapshot from `pmset -g everything`. Distinct from Power live `/pmlive` and from health `is everything ok`.
-- **v0.1.3058** Power live — `/pmlive` · `/power-live` · `/currently-in-use` (+ aliases) from `pmset -g live`.
-- Earlier tonight: Power adapters `/pmadapters` (3057), Power custom `/pmcustom` (3056), Power source `/pmps` (3055), User activity `/useractivity` (3054), and the SoftDisabled → assertions → powersched → sysload → ups → pmlog → therm → pmstats → pmcap chain.
-
-## Tried / context
-- Digester open stayed empty.
-- Design review due=false (grace; Mac TCC — polish-without-capture).
-- Layout daily: data-poster audited 2026-11-25 (missing_remaps=none; Dark due next).
-- Sibling OpenClaw/Hermes missing on rack; no port.
+## Context
+- Digester open empty; design-review due=false (grace / Mac TCC); layout-daily data-poster marked today (Dark next calendar day).
+- Fuel choice: standing backlog after `pmeverything` — `history` can block; `accps` is fast and user-facing (BT peripheral %).
 
 ## Next
-- Dark layout-daily next calendar quota.
-- Optional `pmset -g history` if non-blocking; avoid keep-pNN soft-state clones.
-
-Generated: 2026-11-25T00:53:53+01:00
+- Dark layout-daily next calendar day
+- Optional: `pmset -g battlimit` / `rawbatt` if useful; avoid blocking `history`/`thermlog`

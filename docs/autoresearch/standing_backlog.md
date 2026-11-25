@@ -1,3 +1,19 @@
+## Overnight note 2026-11-25 ~01:02 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window (Soul content noise only).
+- Fuel: product after Power everything v0.1.3059 — Accessory power from `pmset -g accps` (InternalBattery + Magic Keyboard/Mouse; not SoftDisabled/boolean soft-state clone; not `/pmps` first-row clone; history skipped as blocking; Dark layout-daily next calendar day).
+- Shipped **v0.1.3060** — `/accps` · `/pmaccps` · `/pm-accps` · `/pmset-accps` · `/accessory-power` · `/accessory-batteries` · `/peripheral-batteries` · `/bt-batteries` · `/mac-accps` + view/open NL; bare accps/accessory power/accessory batteries stay with agent; `/pmps` · `/battery` · `/ups` · `/adapter` · `/pmadapters` · `/pmeverything` · `/pmlive` intact; `/help` lists lane.
+- Ratchet keep @ 63748bb44 for 3060; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats/pmcap/useractivity/pmps/pmcustom/pmadapters/pmlive/pmeverything/accps — try `pmset -g battlimit` / `rawbatt` if useful; history only if non-blocking; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3060
+
+- Product fuel after Power everything v0.1.3059: accessory + BT peripheral batteries already readable via `pmset -g accps` but lacked `/accps` · `/pmaccps` · `/pm-accps` · `/pmset-accps` · `/accessory-power` · `/accessory-batteries` · `/peripheral-batteries` · `/bt-batteries` · `/mac-accps` and view/see/open/list phrases while Power source `/pmps` (first battery row), Bat % `/battery`, UPS `/ups`, AC charger `/adapter`, and Power adapters `/pmadapters` already had slash+NL. Bare `accps` / `accessory power` / `accessory batteries` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmeverything/accps soft-state closed; try battlimit/rawbatt; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~00:53 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
