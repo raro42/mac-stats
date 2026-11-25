@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3084] - 2026-11-25
+
+### Changed
+- Settings Credentials Mastodon · Browser · Cursor · Telegram · Slack keyboard hints (+ theme seeds): Tab-first tips so first paint matches Brave / Redmine / MCP / Perplexity KISS hints (design-review polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
 ## [0.1.3083] - 2026-11-25
 
 ### Fixed
