@@ -9980,9 +9980,9 @@ function refreshMonitorAddFormToolbarRovingTabindex(wrap, preferred) {
 }
 
 /** How to move across URL, Cancel, and Add Monitor. */
-/* Design-review feature-monitors: shorter, warmer add-form tip (KISS). */
+/* Design-review feature-monitors: Tab-first add-form tip (Settings/Ollama parity). */
 const MONITOR_ADD_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End · Enter adds · edges jump to list or footer';
+  'Tab URL · Cancel · Add · ← → / h l · Home/End · Enter adds · edges jump to list or footer';
 
 /** Theme HTML ships the hint inside the add form. It stays hidden until the form is open. Create it only on older shells. */
 function ensureMonitorAddFormToolbarKbHint(wrap) {
@@ -10506,9 +10506,9 @@ function refreshMonitorDetailActionsRovingTabindex(row, preferred) {
 }
 
 /** How to move across Check now · Remove. */
-/* Design-review feature-monitors: shorter, warmer detail-toolbar tip (KISS). */
+/* Design-review feature-monitors: Tab-first detail-toolbar tip (Settings/Ollama parity). */
 const MONITOR_DETAIL_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End · Enter activates Check now or Remove · edges jump to row or footer';
+  'Tab Check now · Remove · ← → / h l · Home/End · Enter activates · edges jump to row or footer';
 
 /** Detail HTML ships the hint under Check now and Remove. Create it only on older shells. */
 function ensureMonitorDetailActionsKbHint(row) {

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3079] - 2026-11-25
+
+### Changed
+- Monitors add-form + detail action keyboard hints: Tab-first tips (`Tab URL · Cancel · Add…` / `Tab Check now · Remove…`) so first paint matches Settings / Ollama / Process Details KISS hints (design-review feature-monitors polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
 ## [0.1.3078] - 2026-11-25
 
 ### Changed
