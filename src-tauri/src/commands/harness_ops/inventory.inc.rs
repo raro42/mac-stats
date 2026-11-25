@@ -31730,7 +31730,7 @@ pub fn format_rawbatt_report() -> String {
 /// Bare `systemstate` / `system state` / `sysstate` stay with the agent;
 /// `/pmcap` · `/power-capabilities` stay Power capabilities (`pmset -g cap`);
 /// `/sysload` stays System load; `/pmlive` stays Power live;
-/// `/powerstate` reserved for IOKit driver states (not this lane).
+/// `/powerstate` stays IOKit driver summary (not this lane).
 pub fn looks_like_systemstate_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -32336,7 +32336,7 @@ pub fn format_battlimit_report() -> String {
 /// Slash + view/open NL (`/userclients` · `/power-clients` · `view userclients`).
 /// Bare `userclients` / `user clients` / `power clients` stay with the agent;
 /// `/useractivity` stays User activity; `/assertions` stays Sleep assertions;
-/// `/tasks` stays process list; `/powerstate` stays IOKit drivers.
+/// `/tasks` stays process list; `/powerstate` stays IOKit driver summary.
 pub fn looks_like_userclients_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -32611,6 +32611,268 @@ pub fn format_userclients_report() -> String {
         return "**User clients** — _no power user-clients on this Mac right now._".to_string();
     }
     format!("**User clients** · `{v}`")
+}
+
+/// IOKit driver power states — summarized from `pmset -g powerstate`.
+/// Slash + view/open NL (`/powerstate` · `/iokit-drivers` · `view powerstate`).
+/// Bare `powerstate` / `power state` / `iokit drivers` stay with the agent;
+/// `/systemstate` stays System state; `/userclients` stays Power user-clients;
+/// `/assertions` stays Sleep assertions; `/tasks` stays process list.
+pub fn looks_like_powerstate_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("systemstate")
+        || n.contains("system-state")
+        || n.contains("system state")
+        || n.contains("sysstate")
+        || n.contains("userclients")
+        || n.contains("user-clients")
+        || n.contains("user clients")
+        || n.contains("power-clients")
+        || n.contains("power clients")
+        || n.contains("useractivity")
+        || n.contains("user-activity")
+        || n.contains("user activity")
+        || n.contains("assertions")
+        || n.contains("sleep preventers")
+        || n.contains("sleep-preventers")
+        || n.contains("pmcap")
+        || n.contains("power-cap")
+        || n.contains("power capabilities")
+        || n.contains("pmlive")
+        || n.contains("power-live")
+        || n.contains("power live")
+        || n.contains("sysload")
+        || n.contains("pmhistory")
+        || n.contains("power-history")
+        || n.contains("power history")
+        || n == "/systemstate"
+        || n == "/sysstate"
+        || n == "/userclients"
+        || n == "/power-clients"
+        || n == "/useractivity"
+        || n == "/assertions"
+        || n == "/tasks"
+        || n == "/processes"
+        || n == "/pmcap"
+        || n == "/pmlive"
+        || n == "/sysload"
+        || n == "/pmhistory"
+        // Bare phrases stay with the agent.
+        || n == "powerstate"
+        || n == "the powerstate"
+        || n == "power-state"
+        || n == "the power-state"
+        || n == "power state"
+        || n == "the power state"
+        || n == "pmsetpowerstate"
+        || n == "the pmsetpowerstate"
+        || n == "pmset-powerstate"
+        || n == "the pmset-powerstate"
+        || n == "pmset powerstate"
+        || n == "the pmset powerstate"
+        || n == "pm-powerstate"
+        || n == "the pm-powerstate"
+        || n == "iokit-drivers"
+        || n == "the iokit-drivers"
+        || n == "iokit drivers"
+        || n == "the iokit drivers"
+        || n == "iokit-powerstate"
+        || n == "the iokit-powerstate"
+        || n == "iokit powerstate"
+        || n == "the iokit powerstate"
+        || n == "driver-power-state"
+        || n == "the driver-power-state"
+        || n == "driver power state"
+        || n == "the driver power state"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+            "/powerstate"
+            | "/powerstate-status"
+            | "/powerstate-state"
+            | "/power-state"
+            | "/power-state-status"
+            | "/power-state-state"
+            | "/pmset-powerstate"
+            | "/pmset-powerstate-status"
+            | "/pmset-powerstate-state"
+            | "/pmsetpowerstate"
+            | "/pmsetpowerstate-status"
+            | "/pm-powerstate"
+            | "/pm-powerstate-status"
+            | "/iokit-powerstate"
+            | "/iokit-powerstate-status"
+            | "/iokitpowerstate"
+            | "/iokitpowerstate-status"
+            | "/iokit-drivers"
+            | "/iokit-drivers-status"
+            | "/iokitdrivers"
+            | "/iokitdrivers-status"
+            | "/driver-power-state"
+            | "/driver-power-state-status"
+            | "/driverpowerstate"
+            | "/driverpowerstate-status"
+            | "/mac-powerstate"
+            | "/mac-power-state"
+            | "/mac-pmset-powerstate"
+            | "/mac-iokit-powerstate"
+            | "/mac-iokit-drivers"
+            | "/mac-powerstate-status"
+            | "/mac-iokit-drivers-status"
+            | "powerstate status"
+            | "the powerstate status"
+            | "powerstate state"
+            | "the powerstate state"
+            | "power-state status"
+            | "the power-state status"
+            | "power state status"
+            | "the power state status"
+            | "pmset-powerstate status"
+            | "the pmset-powerstate status"
+            | "pmset powerstate status"
+            | "the pmset powerstate status"
+            | "iokit-drivers status"
+            | "the iokit-drivers status"
+            | "iokit drivers status"
+            | "the iokit drivers status"
+            | "iokit-powerstate status"
+            | "the iokit-powerstate status"
+            | "driver-power-state status"
+            | "the driver-power-state status"
+            | "my powerstate"
+            | "my powerstate status"
+            | "my power state"
+            | "my power-state"
+            | "my iokit drivers"
+            | "is powerstate ok"
+            | "is the powerstate ok"
+            | "how's powerstate"
+            | "hows powerstate"
+            | "how's the powerstate"
+            | "hows the powerstate"
+            | "how's power state"
+            | "hows power state"
+            | "what's my powerstate"
+            | "whats my powerstate"
+            | "what is my powerstate"
+            | "what's my powerstate status"
+            | "whats my powerstate status"
+            | "what is my powerstate status"
+            | "what's my power state"
+            | "whats my power state"
+            | "what is my power state"
+            | "what's my iokit drivers"
+            | "whats my iokit drivers"
+            | "what is my iokit drivers"
+            | "what's the powerstate"
+            | "whats the powerstate"
+            | "what is the powerstate"
+            | "what's the powerstate status"
+            | "whats the powerstate status"
+            | "what is the powerstate status"
+            | "what's the power state"
+            | "whats the power state"
+            | "what is the power state"
+            | "what's the iokit drivers"
+            | "whats the iokit drivers"
+            | "what is the iokit drivers"
+            | "view powerstate"
+            | "view the powerstate"
+            | "view powerstate status"
+            | "view the powerstate status"
+            | "view power-state"
+            | "view the power-state"
+            | "view power state"
+            | "view the power state"
+            | "view iokit-drivers"
+            | "view the iokit-drivers"
+            | "view iokit drivers"
+            | "view the iokit drivers"
+            | "view iokit-powerstate"
+            | "view the iokit-powerstate"
+            | "view pmset-powerstate"
+            | "view the pmset-powerstate"
+            | "view pmset powerstate"
+            | "view the pmset powerstate"
+            | "view driver-power-state"
+            | "view the driver-power-state"
+            | "see powerstate"
+            | "see the powerstate"
+            | "see power state"
+            | "see the power state"
+            | "see iokit drivers"
+            | "see the iokit drivers"
+            | "open powerstate"
+            | "open the powerstate"
+            | "open powerstate status"
+            | "open the powerstate status"
+            | "open power-state"
+            | "open power state"
+            | "open iokit-drivers"
+            | "open iokit drivers"
+            | "open pmset-powerstate"
+            | "open iokit-powerstate"
+            | "list powerstate"
+            | "list the powerstate"
+            | "list powerstate status"
+            | "list the powerstate status"
+            | "list power-state"
+            | "list the power-state"
+            | "list power state"
+            | "list the power state"
+            | "list iokit-drivers"
+            | "list the iokit-drivers"
+            | "list iokit drivers"
+            | "list the iokit drivers"
+            | "list iokit-powerstate"
+            | "list the iokit-powerstate"
+    )
+}
+
+/// Zero-LLM IOKit driver power states from `pmset -g powerstate` (macOS-only; empty elsewhere).
+pub fn format_powerstate_report() -> String {
+    let v = crate::metrics::get_powerstate_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Power state** — _no IOKit driver power states on this Mac right now._".to_string();
+    }
+    format!("**Power state** · `{v}`")
 }
 
 /// Power history — sleep/wake UUID timeline from `pmset -g history`.

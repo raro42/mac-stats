@@ -9414,7 +9414,7 @@ pub(crate) fn format_systemstate_parts(info: Option<&str>) -> String {
 
 /// macOS system power state + capability bits from `pmset -g systemstate`.
 /// Distinct from Power capabilities `/pmcap` (`pmset -g cap` settings list),
-/// System load `/sysload`, Power live `/pmlive`, IOKit driver `/powerstate` (not this lane).
+/// System load `/sysload`, Power live `/pmlive`, IOKit driver `/powerstate`.
 /// Used by Discord/operator instant `/systemstate` · `/sysstate` lane.
 pub fn get_systemstate_status() -> String {
     #[cfg(not(target_os = "macos"))]
@@ -9667,7 +9667,7 @@ pub(crate) fn format_userclients_parts(total: usize, ranked: &[(String, usize)])
 
 /// macOS power user-clients from `pmset -g userclients` (who holds IOKit PM clients).
 /// Distinct from User activity `/useractivity`, Sleep assertions `/assertions`,
-/// process list `/tasks`, and IOKit `/powerstate`.
+/// process list `/tasks`, and IOKit driver `/powerstate`.
 /// Used by Discord/operator instant `/userclients` · `/power-clients` lane.
 pub fn get_userclients_status() -> String {
     #[cfg(not(target_os = "macos"))]
@@ -9699,6 +9699,166 @@ pub fn get_userclients_status() -> String {
             debug3!("userclients: empty status");
         } else {
             debug3!("userclients status: '{}'", info);
+        }
+        info
+    }
+}
+
+/// Parsed `pmset -g powerstate` summary: driver count, root domain, desc tallies, below-max.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct PowerstateSummary {
+    pub total: usize,
+    pub root: Option<String>,
+    pub desc_ranked: Vec<(String, usize)>,
+    pub below_max: usize,
+}
+
+/// Parse one IOKit powerstate table row → (name, cur, max, desc).
+fn parse_powerstate_row(line: &str) -> Option<(String, u32, u32, String)> {
+    let parts: Vec<&str> = line.split_whitespace().collect();
+    if parts.len() < 3 {
+        return None;
+    }
+    // Find first consecutive integer pair after the driver name token(s).
+    for i in 1..parts.len().saturating_sub(1) {
+        if let (Ok(cur), Ok(max)) = (parts[i].parse::<u32>(), parts[i + 1].parse::<u32>()) {
+            let name = parts[..i].join(" ");
+            if name.is_empty() {
+                return None;
+            }
+            let desc = if i + 2 < parts.len() {
+                parts[i + 2..].join(" ")
+            } else {
+                String::new()
+            };
+            return Some((name, cur, max, desc));
+        }
+    }
+    None
+}
+
+/// Parse `pmset -g powerstate` → compact summary (full dump is thousands of rows).
+pub(crate) fn parse_pmset_powerstate(raw: &str) -> PowerstateSummary {
+    use std::collections::HashMap;
+    let mut total = 0usize;
+    let mut below_max = 0usize;
+    let mut root: Option<String> = None;
+    let mut desc_counts: HashMap<String, usize> = HashMap::new();
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let lower = t.to_ascii_lowercase();
+        if lower.starts_with("driver id")
+            || lower.starts_with("error")
+            || lower.starts_with("usage:")
+            || lower.starts_with("see pmset")
+        {
+            continue;
+        }
+        let Some((name, cur, max, desc)) = parse_powerstate_row(t) else {
+            continue;
+        };
+        total += 1;
+        if cur < max {
+            below_max += 1;
+        }
+        let desc_key = if desc.is_empty() {
+            "None".to_string()
+        } else if desc.len() > 24 {
+            let mut s: String = desc.chars().take(23).collect();
+            s.push('…');
+            s
+        } else {
+            desc.clone()
+        };
+        *desc_counts.entry(desc_key).or_insert(0) += 1;
+        if name.eq_ignore_ascii_case("IOPMrootDomain") {
+            let label = if desc.is_empty() {
+                format!("{cur}/{max}")
+            } else {
+                format!("{desc}({cur}/{max})")
+            };
+            root = Some(label);
+        }
+    }
+    let mut desc_ranked: Vec<(String, usize)> = desc_counts.into_iter().collect();
+    desc_ranked.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+    PowerstateSummary {
+        total,
+        root,
+        desc_ranked,
+        below_max,
+    }
+}
+
+/// Compact IOKit powerstate status for Discord-sized chips.
+pub(crate) fn format_powerstate_parts(s: &PowerstateSummary) -> String {
+    if s.total == 0 {
+        return String::new();
+    }
+    let mut bits: Vec<String> = Vec::new();
+    bits.push(format!("{} drivers", s.total));
+    if let Some(ref root) = s.root {
+        bits.push(format!("root {root}"));
+    }
+    const MAX_DESC: usize = 4;
+    for (desc, n) in s.desc_ranked.iter().take(MAX_DESC) {
+        if *n > 1 {
+            bits.push(format!("{desc}×{n}"));
+        } else {
+            bits.push(desc.clone());
+        }
+    }
+    if s.desc_ranked.len() > MAX_DESC {
+        bits.push(format!("(+{})", s.desc_ranked.len() - MAX_DESC));
+    }
+    if s.below_max > 0 {
+        bits.push(format!("below-max {}", s.below_max));
+    }
+    let mut out = bits.join(" · ");
+    if out.len() > 420 {
+        out.truncate(417);
+        out.push_str("…");
+    }
+    out
+}
+
+/// macOS IOKit driver power states from `pmset -g powerstate` (summarized).
+/// Distinct from System state `/systemstate`, Power user-clients `/userclients`,
+/// Sleep assertions `/assertions`, and process list `/tasks`.
+/// Used by Discord/operator instant `/powerstate` · `/iokit-drivers` lane.
+pub fn get_powerstate_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "powerstate"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("powerstate: pmset -g powerstate non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("powerstate: pmset -g powerstate spawn failed");
+                return String::new();
+            }
+        };
+        let summary = parse_pmset_powerstate(&stdout);
+        let info = format_powerstate_parts(&summary);
+        if info.is_empty() {
+            debug3!("powerstate: empty status");
+        } else {
+            debug3!("powerstate status: '{}'", info);
         }
         info
     }
@@ -16160,6 +16320,36 @@ mod userclients_parse_tests {
         assert_eq!(format_userclients_parts(0, &[]), "");
         assert_eq!(parse_pmset_userclients("Usage: pmset").0, 0);
         assert_eq!(parse_pmset_userclients("").0, 0);
+    }
+}
+
+#[cfg(test)]
+mod powerstate_parse_tests {
+    use super::{format_powerstate_parts, parse_pmset_powerstate};
+
+    const SAMPLE: &str = "\
+      Driver ID  Current State  Max State  Current State Description
+IOPMrootDomain              4          4  ON
+AppleHPMARMSPMI             1          1  USEABLE
+AppleHPMARMSPMI             1          1  USEABLE
+AppleSPUHIDDriver           1          2  LOW_POWER
+AppleDisplay                0          1  OFF
+";
+
+    #[test]
+    fn parse_pmset_powerstate_summarizes_root_and_descs() {
+        let s = parse_pmset_powerstate(SAMPLE);
+        assert_eq!(s.total, 5);
+        assert_eq!(s.below_max, 2);
+        assert_eq!(s.root.as_deref(), Some("ON(4/4)"));
+        assert!(s.desc_ranked.iter().any(|(d, n)| d == "USEABLE" && *n == 2));
+        let out = format_powerstate_parts(&s);
+        assert!(out.contains("5 drivers"), "got: {out}");
+        assert!(out.contains("root ON(4/4)"), "got: {out}");
+        assert!(out.contains("USEABLE×2"), "got: {out}");
+        assert!(out.contains("below-max 2"), "got: {out}");
+        assert_eq!(format_powerstate_parts(&parse_pmset_powerstate("")), "");
+        assert_eq!(parse_pmset_powerstate("Usage: pmset").total, 0);
     }
 }
 

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3092] - 2026-11-25
+
+### Added
+- Discord / operator instant `/powerstate` · `/iokit-drivers` · `/power-state` (+ view/open NL): summarized IOKit driver power states from `pmset -g powerstate` (driver count · root · top descs · below-max). Bare `powerstate` / `power state` stay with the agent; `/systemstate` and `/userclients` stay put.
+
 ## [0.1.3091] - 2026-11-25
 
 ### Fixed

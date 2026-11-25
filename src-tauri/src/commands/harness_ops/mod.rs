@@ -7500,6 +7500,66 @@ mod tests {
         );
     }
 
+    #[test]
+    fn powerstate_slash_and_view_open_do_not_steal_systemstate_userclients_or_bare() {
+        assert!(looks_like_powerstate_request("/powerstate"));
+        assert!(looks_like_powerstate_request("/powerstate-status"));
+        assert!(looks_like_powerstate_request("/power-state"));
+        assert!(looks_like_powerstate_request("/pmset-powerstate"));
+        assert!(looks_like_powerstate_request("/iokit-drivers"));
+        assert!(looks_like_powerstate_request("/iokit-powerstate"));
+        assert!(looks_like_powerstate_request("/mac-powerstate"));
+        assert!(looks_like_powerstate_request("/mac-iokit-drivers"));
+        assert!(looks_like_powerstate_request("view powerstate"));
+        assert!(looks_like_powerstate_request("open iokit-drivers"));
+        assert!(looks_like_powerstate_request("list iokit drivers"));
+        assert!(looks_like_powerstate_request("powerstate status"));
+        assert!(looks_like_powerstate_request("is powerstate ok"));
+        assert!(looks_like_powerstate_request("what's my powerstate"));
+        assert!(looks_like_powerstate_request("what's the power state"));
+        assert!(looks_like_powerstate_request("view power state"));
+        assert!(!looks_like_powerstate_request("powerstate"));
+        assert!(!looks_like_powerstate_request("power state"));
+        assert!(!looks_like_powerstate_request("iokit drivers"));
+        assert!(!looks_like_powerstate_request("/systemstate"));
+        assert!(!looks_like_powerstate_request("view systemstate"));
+        assert!(!looks_like_powerstate_request("/userclients"));
+        assert!(!looks_like_powerstate_request("/assertions"));
+        assert!(!looks_like_powerstate_request("/tasks"));
+        assert!(!looks_like_powerstate_request("enable powerstate"));
+        assert!(!looks_like_systemstate_request("/powerstate"));
+        assert!(!looks_like_systemstate_request("view powerstate"));
+        assert!(!looks_like_userclients_request("/powerstate"));
+        assert!(!looks_like_userclients_request("view power state"));
+        let s = try_operator_instant_reply("/powerstate").unwrap();
+        assert!(
+            s.contains("**Power state**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view powerstate").unwrap();
+        assert!(
+            viewed.contains("**Power state**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open iokit-drivers").unwrap();
+        assert!(
+            open.contains("**Power state**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("powerstate").is_none());
+        assert!(try_operator_instant_reply("power state").is_none());
+        let systemstate = try_operator_instant_reply("/systemstate").unwrap();
+        assert!(
+            !systemstate.contains("**Power state**") || systemstate.contains("**System state**"),
+            "System state /systemstate must stay put, got: {systemstate}"
+        );
+        assert!(!systemstate.starts_with("**Power state**"));
+        let uc = try_operator_instant_reply("/userclients").unwrap();
+        assert!(
+            !uc.contains("**Power state**"),
+            "User clients /userclients must stay put, got: {uc}"
+        );
+    }
 
     #[test]
     fn pmhistory_slash_and_view_open_do_not_steal_pmlog_pmuuid_or_bare() {

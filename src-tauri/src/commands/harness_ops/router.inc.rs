@@ -1455,7 +1455,7 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     // System state from `pmset -g systemstate` (bare `systemstate` / `system state` stay with the agent;
     // `/pmcap` stays Power capabilities; `/sysload` stays System load; `/pmlive` stays Power live;
-    // `/powerstate` reserved for IOKit drivers — not this lane).
+    // `/powerstate` stays IOKit driver summary).
     if looks_like_systemstate_request(content) {
         return Some(format_systemstate_report());
     }
@@ -1468,9 +1468,16 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // Power user-clients from `pmset -g userclients` (bare `userclients` / `user clients` /
     // `power clients` stay with the agent; `/useractivity` stays User activity;
     // `/assertions` stays Sleep assertions; `/tasks` stays process list;
-    // `/powerstate` stays IOKit drivers).
+    // `/powerstate` stays IOKit driver summary).
     if looks_like_userclients_request(content) {
         return Some(format_userclients_report());
+    }
+    // IOKit driver power states from `pmset -g powerstate` (bare `powerstate` / `power state` /
+    // `iokit drivers` stay with the agent; `/systemstate` stays System state;
+    // `/userclients` stays Power user-clients; `/assertions` stays Sleep assertions;
+    // `/tasks` stays process list).
+    if looks_like_powerstate_request(content) {
+        return Some(format_powerstate_report());
     }
     // Power history from `pmset -g history` (bare `pmhistory` / `power history` / `sleep wake history`
     // stay with the agent; `/pmlog` stays Power log; `/pmuuid` stays Sleep/Wake UUID;
