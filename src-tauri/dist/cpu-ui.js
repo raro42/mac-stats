@@ -301,9 +301,10 @@
     }
     const items = getModalHeaderToolbarItems(header, titleId, closeId);
     hint.hidden = items.length < 2;
+    /* Design-review Settings: shorter, warmer modal-header tip (KISS; Agent Ops / Appearance parity). */
     hint.textContent =
       hintText ||
-      "← → / h l · Home/End move · Enter / Space on Close closes";
+      "Tab Close · ← → / h l · Home/End · Enter closes";
   }
 
   /**
@@ -900,9 +901,10 @@
     document.head.appendChild(style);
   }
 
+  /* Design-review Settings: shorter, warmer theme-list tip (KISS; Appearance / Agent Ops parity). */
   /** How to move across theme buttons when the Appearance section is missing. */
   const THEME_LIST_KB_HINT =
-    "← → / h l · Home/End move · Enter / Space applies theme";
+    "Tab a theme · ← → / h l · Home/End · Enter applies";
 
   /**
    * Theme HTML ships the hint at the end of the theme list.

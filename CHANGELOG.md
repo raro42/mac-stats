@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3068] - 2026-11-25
+
+### Changed
+- Settings keyboard hints (modal header Close fallback · theme-list when Appearance section is missing): shorter, warmer copy so leftover Tab tips match Appearance / Product / Credentials / Agent Ops KISS hints (design-review polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
 ## [0.1.3067] - 2026-11-25
 
 ### Changed
