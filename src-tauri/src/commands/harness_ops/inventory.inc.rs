@@ -29550,6 +29550,20 @@ pub fn looks_like_pmcustom_request(content: &str) -> bool {
         || n.contains("all power settings")
         || n.contains("power-all-settings")
         || n.contains("power all settings")
+        || n.contains("accps")
+        || n.contains("pmaccps")
+        || n.contains("pm-accps")
+        || n.contains("pmset-accps")
+        || n.contains("accessory-power")
+        || n.contains("accessory power")
+        || n.contains("accessory-batteries")
+        || n.contains("accessory batteries")
+        || n.contains("accessory-battery")
+        || n.contains("accessory battery")
+        || n.contains("peripheral-batteries")
+        || n.contains("peripheral batteries")
+        || n.contains("bt-batteries")
+        || n.contains("bt batteries")
         || n == "/idle-time"
         || n.contains("screensaver")
         || n == "/username"
@@ -29930,6 +29944,20 @@ pub fn looks_like_pmadapters_request(content: &str) -> bool {
         || n.contains("all power settings")
         || n.contains("power-all-settings")
         || n.contains("power all settings")
+        || n.contains("accps")
+        || n.contains("pmaccps")
+        || n.contains("pm-accps")
+        || n.contains("pmset-accps")
+        || n.contains("accessory-power")
+        || n.contains("accessory power")
+        || n.contains("accessory-batteries")
+        || n.contains("accessory batteries")
+        || n.contains("accessory-battery")
+        || n.contains("accessory battery")
+        || n.contains("peripheral-batteries")
+        || n.contains("peripheral batteries")
+        || n.contains("bt-batteries")
+        || n.contains("bt batteries")
     {
         return false;
     }
@@ -30182,6 +30210,20 @@ pub fn looks_like_pmlive_request(content: &str) -> bool {
         || n.contains("all power settings")
         || n.contains("power-all-settings")
         || n.contains("power all settings")
+        || n.contains("accps")
+        || n.contains("pmaccps")
+        || n.contains("pm-accps")
+        || n.contains("pmset-accps")
+        || n.contains("accessory-power")
+        || n.contains("accessory power")
+        || n.contains("accessory-batteries")
+        || n.contains("accessory batteries")
+        || n.contains("accessory-battery")
+        || n.contains("accessory battery")
+        || n.contains("peripheral-batteries")
+        || n.contains("peripheral batteries")
+        || n.contains("bt-batteries")
+        || n.contains("bt batteries")
         || n == "pmlive"
         || n == "the pmlive"
         || n == "pm-live"
@@ -30487,6 +30529,20 @@ pub fn looks_like_pmeverything_request(content: &str) -> bool {
         || n == "/in-use"
         || n == "/live-settings"
         || n == "/live-power"
+        || n.contains("accps")
+        || n.contains("pmaccps")
+        || n.contains("pm-accps")
+        || n.contains("pmset-accps")
+        || n.contains("accessory-power")
+        || n.contains("accessory power")
+        || n.contains("accessory-batteries")
+        || n.contains("accessory batteries")
+        || n.contains("accessory-battery")
+        || n.contains("accessory battery")
+        || n.contains("peripheral-batteries")
+        || n.contains("peripheral batteries")
+        || n.contains("bt-batteries")
+        || n.contains("bt batteries")
         || n == "pmeverything"
         || n == "the pmeverything"
         || n == "pm-everything"
@@ -30666,6 +30722,321 @@ pub fn format_pmeverything_report() -> String {
         return "**Power everything** — _no power dump on this Mac right now._".to_string();
     }
     format!("**Power everything** · `{v}`")
+}
+
+/// Accessory power sources — InternalBattery + BT peripherals from `pmset -g accps`.
+/// Slash + view/open NL (`/accps` · `/accessory-power` · `/accessory-batteries` · `view accps`).
+/// Bare `accps` / `accessory power` / `accessory batteries` stay with the agent;
+/// `/pmps` stays Power source; `/battery` stays Bat %; `/ups` stays UPS;
+/// `/adapter` · `/charger` stay AC charger; `/pmadapters` stays Power adapters.
+pub fn looks_like_accps_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("pmcustom")
+        || n.contains("power custom")
+        || n.contains("power profiles")
+        || n.contains("pmadapters")
+        || n.contains("power adapters")
+        || n.contains("power adapter")
+        || n == "/adapters"
+        || n.contains("pmps")
+        || n.contains("power source")
+        || n.contains("now drawing")
+        || n.contains("drawing from")
+        || n.contains("pmcap")
+        || n.contains("power cap")
+        || n.contains("power capabilities")
+        || n.contains("pmstats")
+        || n.contains("power stats")
+        || n.contains("useractivity")
+        || n.contains("user activity")
+        || n.contains("pmlog")
+        || n.contains("power log")
+        || n == "/therm"
+        || n.contains("assertions")
+        || n.contains("powersched")
+        || n.contains("power schedule")
+        || n.contains("sysload")
+        || n == "/ups"
+        || n.contains("powernap")
+        || n.contains("power nap")
+        || n == "/womp"
+        || n.contains("wake for network")
+        || n.contains("displaysleep")
+        || n.contains("display sleep")
+        || n.contains("disksleep")
+        || n.contains("disk sleep")
+        || n == "/sleep"
+        || n == "/systemsleep"
+        || n == "/system-sleep"
+        || n == "/adapter"
+        || n == "/charger"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/lpm"
+        || n == "/power"
+        || n == "/watts"
+        || n == "/tasks"
+        || n == "/uptime"
+        || n == "/thermal"
+        || n == "/heat"
+        || n == "/ps"
+        || n.contains("pmlive")
+        || n.contains("pm-live")
+        || n.contains("power live")
+        || n.contains("currently in use")
+        || n.contains("currently-in-use")
+        || n == "/in-use"
+        || n == "/live-settings"
+        || n == "/live-power"
+        || n.contains("pmeverything")
+        || n.contains("pm-everything")
+        || n.contains("power everything")
+        || n.contains("power-everything")
+        || n.contains("all-power-settings")
+        || n.contains("all power settings")
+        || n.contains("power-all-settings")
+        || n.contains("power all settings")
+        || n == "accps"
+        || n == "the accps"
+        || n == "pmaccps"
+        || n == "the pmaccps"
+        || n == "pm-accps"
+        || n == "the pm-accps"
+        || n == "pm accps"
+        || n == "the pm accps"
+        || n == "pmsetaccps"
+        || n == "the pmsetaccps"
+        || n == "pmset-accps"
+        || n == "the pmset-accps"
+        || n == "pmset accps"
+        || n == "the pmset accps"
+        || n == "accessory-power"
+        || n == "the accessory-power"
+        || n == "accessory power"
+        || n == "the accessory power"
+        || n == "accessory-batteries"
+        || n == "the accessory-batteries"
+        || n == "accessory batteries"
+        || n == "the accessory batteries"
+        || n == "accessory-battery"
+        || n == "the accessory-battery"
+        || n == "accessory battery"
+        || n == "the accessory battery"
+        || n == "peripheral-batteries"
+        || n == "the peripheral-batteries"
+        || n == "peripheral batteries"
+        || n == "the peripheral batteries"
+        || n == "bt-batteries"
+        || n == "the bt-batteries"
+        || n == "bt batteries"
+        || n == "the bt batteries"
+        || n == "accessories"
+        || n == "the accessories"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+            "/accps"
+            | "/accps-status"
+            | "/accps-state"
+            | "/pmaccps"
+            | "/pmaccps-status"
+            | "/pmaccps-state"
+            | "/pm-accps"
+            | "/pm-accps-status"
+            | "/pm-accps-state"
+            | "/pmset-accps"
+            | "/pmset-accps-status"
+            | "/pmset-accps-state"
+            | "/pmsetaccps"
+            | "/pmsetaccps-status"
+            | "/accessory-power"
+            | "/accessory-power-status"
+            | "/accessory-power-state"
+            | "/accessorypower"
+            | "/accessorypower-status"
+            | "/accessory-batteries"
+            | "/accessory-batteries-status"
+            | "/accessory-batteries-state"
+            | "/accessorybatteries"
+            | "/accessorybatteries-status"
+            | "/accessory-battery"
+            | "/accessory-battery-status"
+            | "/peripheral-batteries"
+            | "/peripheral-batteries-status"
+            | "/bt-batteries"
+            | "/bt-batteries-status"
+            | "/mac-accps"
+            | "/mac-pmaccps"
+            | "/mac-pm-accps"
+            | "/mac-pmset-accps"
+            | "/mac-accessory-power"
+            | "/mac-accessory-batteries"
+            | "/mac-accps-status"
+            | "/mac-accessory-power-status"
+            | "accps status"
+            | "the accps status"
+            | "accps state"
+            | "the accps state"
+            | "pmaccps status"
+            | "the pmaccps status"
+            | "pm-accps status"
+            | "the pm-accps status"
+            | "pm accps status"
+            | "the pm accps status"
+            | "pmset-accps status"
+            | "the pmset-accps status"
+            | "pmset accps status"
+            | "the pmset accps status"
+            | "accessory-power status"
+            | "the accessory-power status"
+            | "accessory power status"
+            | "the accessory power status"
+            | "accessory-batteries status"
+            | "the accessory-batteries status"
+            | "accessory batteries status"
+            | "the accessory batteries status"
+            | "my accps"
+            | "my accps status"
+            | "my accessory power"
+            | "my accessory batteries"
+            | "is accps ok"
+            | "is the accps ok"
+            | "how's accps"
+            | "hows accps"
+            | "how's the accps"
+            | "hows the accps"
+            | "how's accessory power"
+            | "hows accessory power"
+            | "what's my accps"
+            | "whats my accps"
+            | "what is my accps"
+            | "what's my accps status"
+            | "whats my accps status"
+            | "what is my accps status"
+            | "what's my accessory power"
+            | "whats my accessory power"
+            | "what is my accessory power"
+            | "what's my accessory batteries"
+            | "whats my accessory batteries"
+            | "what is my accessory batteries"
+            | "what's the accps"
+            | "whats the accps"
+            | "what is the accps"
+            | "what's the accps status"
+            | "whats the accps status"
+            | "what is the accps status"
+            | "what's the accessory power"
+            | "whats the accessory power"
+            | "what is the accessory power"
+            | "what's the accessory batteries"
+            | "whats the accessory batteries"
+            | "what is the accessory batteries"
+            | "view accps"
+            | "view the accps"
+            | "view accps status"
+            | "view the accps status"
+            | "view pmaccps"
+            | "view the pmaccps"
+            | "view pm-accps"
+            | "view the pm-accps"
+            | "view pm accps"
+            | "view the pm accps"
+            | "view pmset-accps"
+            | "view the pmset-accps"
+            | "view pmset accps"
+            | "view the pmset accps"
+            | "view accessory-power"
+            | "view the accessory-power"
+            | "view accessory power"
+            | "view the accessory power"
+            | "view accessory-batteries"
+            | "view the accessory-batteries"
+            | "view accessory batteries"
+            | "view the accessory batteries"
+            | "view peripheral-batteries"
+            | "view peripheral batteries"
+            | "view bt-batteries"
+            | "view bt batteries"
+            | "see accps"
+            | "see the accps"
+            | "see accessory power"
+            | "see the accessory power"
+            | "see accessory batteries"
+            | "see the accessory batteries"
+            | "open accps"
+            | "open the accps"
+            | "open accps status"
+            | "open the accps status"
+            | "open pmaccps"
+            | "open pm-accps"
+            | "open accessory-power"
+            | "open accessory power"
+            | "open accessory-batteries"
+            | "open accessory batteries"
+            | "open pmset-accps"
+            | "list accps"
+            | "list the accps"
+            | "list accps status"
+            | "list the accps status"
+            | "list pmaccps"
+            | "list the pmaccps"
+            | "list accessory-power"
+            | "list the accessory-power"
+            | "list accessory power"
+            | "list the accessory power"
+            | "list accessory-batteries"
+            | "list the accessory-batteries"
+            | "list accessory batteries"
+            | "list the accessory batteries"
+            | "list peripheral batteries"
+            | "list bt batteries"
+    )
+}
+
+/// Zero-LLM accessory power sources from `pmset -g accps` (macOS-only; empty elsewhere).
+pub fn format_accps_report() -> String {
+    let v = crate::metrics::get_accps_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Accessory power** — _no accessory power sources on this Mac right now._".to_string();
+    }
+    format!("**Accessory power** · `{v}`")
 }
 
 

@@ -8908,6 +8908,196 @@ pub fn get_pmeverything_status() -> String {
     }
 }
 
+/// Shorten accessory / battery labels from `pmset -g accps` for Discord-sized status.
+pub(crate) fn shorten_accps_name(raw_name: &str) -> String {
+    let t = raw_name.trim();
+    if t.is_empty() {
+        return String::new();
+    }
+    let lower = t.to_ascii_lowercase();
+    if lower.starts_with("internalbattery") {
+        return "Battery".to_string();
+    }
+    if lower.contains("magic keyboard") {
+        return "Magic Keyboard".to_string();
+    }
+    if lower.contains("magic mouse") {
+        return "Magic Mouse".to_string();
+    }
+    if lower.contains("magic trackpad") {
+        return "Magic Trackpad".to_string();
+    }
+    if t.chars().count() > 28 {
+        let mut s: String = t.chars().take(27).collect();
+        s.push('…');
+        return s;
+    }
+    t.to_string()
+}
+
+/// Parse `pmset -g accps` → (drawing source, devices as name/percent/state).
+/// Includes InternalBattery + Bluetooth accessories (Magic Keyboard / Mouse / …).
+pub(crate) fn parse_pmset_accps(
+    raw: &str,
+) -> (Option<String>, Vec<(String, Option<u32>, Option<String>)>) {
+    let mut drawing: Option<String> = None;
+    let mut devices: Vec<(String, Option<u32>, Option<String>)> = Vec::new();
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let lower = t.to_ascii_lowercase();
+        if lower.starts_with("now drawing from") {
+            if let Some(v) = extract_quoted_pmset_value(t) {
+                drawing = Some(v);
+            } else if let Some(idx) = lower.find("from") {
+                let rest = t[idx + 4..].trim().trim_matches(|c| c == '\'' || c == '"');
+                if !rest.is_empty() {
+                    drawing = Some(rest.to_string());
+                }
+            }
+            continue;
+        }
+        if lower.contains("present: false") {
+            continue;
+        }
+        let body = t.strip_prefix('-').unwrap_or(t).trim();
+        if !body.contains('%') {
+            continue;
+        }
+        let mut name = body.to_string();
+        if let Some(idx) = name.find("(id=") {
+            name = name[..idx].trim().to_string();
+        } else if let Some(idx) = name.find('\t') {
+            name = name[..idx].trim().to_string();
+        } else if let Some(idx) = name.find('%') {
+            // Fall back: take tokens before the percent cluster.
+            let before = name[..idx].trim();
+            let tokens: Vec<&str> = before.split_whitespace().collect();
+            if let Some(last) = tokens.last() {
+                if last.chars().all(|c| c.is_ascii_digit()) && tokens.len() > 1 {
+                    name = tokens[..tokens.len() - 1].join(" ");
+                } else {
+                    name = before.to_string();
+                }
+            }
+        }
+        name = name
+            .trim()
+            .trim_matches(|c| c == ';' || c == ',')
+            .to_string();
+        if name.is_empty() {
+            continue;
+        }
+        let mut percent: Option<u32> = None;
+        if let Some(pct_idx) = body.find('%') {
+            let before = &body[..pct_idx];
+            let digits: String = before
+                .chars()
+                .rev()
+                .take_while(|c| c.is_ascii_digit())
+                .collect::<String>()
+                .chars()
+                .rev()
+                .collect();
+            if let Ok(p) = digits.parse::<u32>() {
+                if p <= 100 {
+                    percent = Some(p);
+                }
+            }
+        }
+        let body_lower = body.to_ascii_lowercase();
+        let mut state: Option<String> = None;
+        for key in [
+            "discharging",
+            "charging",
+            "charged",
+            "AC attached",
+            "finishing charge",
+            "not charging",
+        ] {
+            if body_lower.contains(&key.to_ascii_lowercase()) {
+                state = Some(key.to_string());
+                break;
+            }
+        }
+        devices.push((shorten_accps_name(&name), percent, state));
+    }
+    (drawing, devices)
+}
+
+/// Compact accessory power: `AC Power · Battery 100% charged · Magic Keyboard 67% discharging`.
+pub(crate) fn format_accps_parts(
+    drawing: Option<&str>,
+    devices: &[(String, Option<u32>, Option<String>)],
+) -> String {
+    let mut bits: Vec<String> = Vec::new();
+    if let Some(d) = drawing.filter(|s| !s.is_empty()) {
+        bits.push(d.to_string());
+    }
+    for (name, percent, state) in devices {
+        if name.is_empty() {
+            continue;
+        }
+        let mut bit = name.clone();
+        if let Some(p) = percent {
+            bit.push(' ');
+            bit.push_str(&format!("{p}%"));
+        }
+        if let Some(s) = state.as_ref().filter(|s| !s.is_empty()) {
+            bit.push(' ');
+            bit.push_str(s);
+        }
+        bits.push(bit);
+    }
+    let mut s = bits.join(" · ");
+    if s.len() > 420 {
+        s.truncate(417);
+        s.push_str("…");
+    }
+    s
+}
+
+/// macOS accessory power sources from `pmset -g accps` (InternalBattery + BT peripherals).
+/// Distinct from Power source `/pmps` (first battery row), Bat % `/battery`, UPS `/ups`,
+/// AC charger `/adapter`, Power adapters `/pmadapters`.
+/// Used by Discord/operator instant `/accps` · `/accessory-power` lane.
+pub fn get_accps_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "accps"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("accps: pmset -g accps non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("accps: pmset -g accps spawn failed");
+                return String::new();
+            }
+        };
+        let (drawing, devices) = parse_pmset_accps(&stdout);
+        let info = format_accps_parts(drawing.as_deref(), &devices);
+        if info.is_empty() {
+            debug3!("accps: empty status");
+        } else {
+            debug3!("accps status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -15072,6 +15262,50 @@ Assertions from kernel:
         assert!(s.contains("live:"), "got: {s}");
         assert!(s.contains("standby=1"), "got: {s}");
         assert_eq!(format_pmeverything_parts(&[], &[]), "");
+    }
+}
+
+#[cfg(test)]
+mod accps_parse_tests {
+    use super::{format_accps_parts, parse_pmset_accps, shorten_accps_name};
+
+    const SAMPLE: &str = "\
+Now drawing from 'AC Power'
+ -InternalBattery-0 (id=22610019)\t100%; charged; 0:00 remaining present: true
+ -Magic Keyboard with Numeric Keypad (id=340852736)\t67%; discharging present: true
+ -Ralf's Magic Mouse #2 (id=340852737)\t74%; discharging present: true
+ -Ghost Trackpad (id=1)\t12%; discharging present: false
+";
+
+    #[test]
+    fn parse_pmset_accps_reads_drawing_and_present_devices() {
+        assert_eq!(shorten_accps_name("InternalBattery-0"), "Battery");
+        assert_eq!(
+            shorten_accps_name("Magic Keyboard with Numeric Keypad"),
+            "Magic Keyboard"
+        );
+        assert_eq!(shorten_accps_name("Ralf's Magic Mouse #2"), "Magic Mouse");
+        let (drawing, devices) = parse_pmset_accps(SAMPLE);
+        assert_eq!(drawing.as_deref(), Some("AC Power"));
+        assert_eq!(devices.len(), 3, "present:false must drop: {devices:?}");
+        assert_eq!(devices[0].0, "Battery");
+        assert_eq!(devices[0].1, Some(100));
+        assert_eq!(devices[0].2.as_deref(), Some("charged"));
+        assert_eq!(devices[1].0, "Magic Keyboard");
+        assert_eq!(devices[1].1, Some(67));
+        assert_eq!(devices[1].2.as_deref(), Some("discharging"));
+        assert_eq!(devices[2].0, "Magic Mouse");
+        assert_eq!(devices[2].1, Some(74));
+        let s = format_accps_parts(drawing.as_deref(), &devices);
+        assert!(s.contains("AC Power"), "got: {s}");
+        assert!(s.contains("Battery 100% charged"), "got: {s}");
+        assert!(s.contains("Magic Keyboard 67% discharging"), "got: {s}");
+        assert!(s.contains("Magic Mouse 74%"), "got: {s}");
+        assert_eq!(format_accps_parts(None, &[]), "");
+        assert_eq!(
+            parse_pmset_accps(""),
+            (None, Vec::<(String, Option<u32>, Option<String>)>::new())
+        );
     }
 }
 

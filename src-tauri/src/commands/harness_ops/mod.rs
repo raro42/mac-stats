@@ -7136,6 +7136,67 @@ mod tests {
         }
     }
 
+    #[test]
+    fn accps_slash_and_view_open_do_not_steal_pmps_battery_or_bare() {
+        assert!(looks_like_accps_request("/accps"));
+        assert!(looks_like_accps_request("/accps-status"));
+        assert!(looks_like_accps_request("/pmaccps"));
+        assert!(looks_like_accps_request("/pm-accps"));
+        assert!(looks_like_accps_request("/pmset-accps"));
+        assert!(looks_like_accps_request("/accessory-power"));
+        assert!(looks_like_accps_request("/accessory-batteries"));
+        assert!(looks_like_accps_request("/peripheral-batteries"));
+        assert!(looks_like_accps_request("/bt-batteries"));
+        assert!(looks_like_accps_request("/mac-accps"));
+        assert!(looks_like_accps_request("/mac-accessory-power"));
+        assert!(looks_like_accps_request("view accps"));
+        assert!(looks_like_accps_request("open accessory-power"));
+        assert!(looks_like_accps_request("list accessory batteries"));
+        assert!(looks_like_accps_request("accps status"));
+        assert!(looks_like_accps_request("is accps ok"));
+        assert!(looks_like_accps_request("what's my accessory batteries"));
+        assert!(looks_like_accps_request("view accessory power"));
+        assert!(!looks_like_accps_request("accps"));
+        assert!(!looks_like_accps_request("accessory power"));
+        assert!(!looks_like_accps_request("accessory batteries"));
+        assert!(!looks_like_accps_request("pmset accps"));
+        assert!(!looks_like_accps_request("accessories"));
+        assert!(!looks_like_accps_request("/pmps"));
+        assert!(!looks_like_accps_request("view pmps"));
+        assert!(!looks_like_accps_request("/battery"));
+        assert!(!looks_like_accps_request("view battery"));
+        assert!(!looks_like_accps_request("/ups"));
+        assert!(!looks_like_accps_request("/adapter"));
+        assert!(!looks_like_accps_request("/pmadapters"));
+        assert!(!looks_like_accps_request("/pmeverything"));
+        assert!(!looks_like_accps_request("/pmlive"));
+        assert!(!looks_like_accps_request("/tasks"));
+        assert!(!looks_like_accps_request("enable accps"));
+        assert!(!looks_like_pmps_request("/accps"));
+        assert!(!looks_like_pmps_request("view accps"));
+        assert!(!looks_like_pmlive_request("/accps"));
+        assert!(!looks_like_pmeverything_request("/accps"));
+        assert!(!looks_like_pmadapters_request("/accps"));
+        let s = try_operator_instant_reply("/accps").unwrap();
+        assert!(
+            s.contains("**Accessory power**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view accps").unwrap();
+        assert!(
+            viewed.contains("**Accessory power**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open accessory-batteries").unwrap();
+        assert!(
+            open.contains("**Accessory power**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("accps").is_none());
+        assert!(try_operator_instant_reply("accessory power").is_none());
+        assert!(try_operator_instant_reply("accessory batteries").is_none());
+    }
+
 
     #[test]
     fn sysload_slash_and_view_open_do_not_steal_load_heat_or_bare() {

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3060] - 2026-11-25
+
+### Added
+- Instant Accessory power accepts `/accps` · `/accps-status` · `/accps-state` · `/pmaccps` · `/pmaccps-status` · `/pmaccps-state` · `/pm-accps` · `/pm-accps-status` · `/pm-accps-state` · `/pmset-accps` · `/pmset-accps-status` · `/pmset-accps-state` · `/pmsetaccps` · `/pmsetaccps-status` · `/accessory-power` · `/accessory-power-status` · `/accessory-power-state` · `/accessorypower` · `/accessorypower-status` · `/accessory-batteries` · `/accessory-batteries-status` · `/accessory-batteries-state` · `/accessorybatteries` · `/accessorybatteries-status` · `/accessory-battery` · `/accessory-battery-status` · `/peripheral-batteries` · `/peripheral-batteries-status` · `/bt-batteries` · `/bt-batteries-status` · `/mac-accps` · `/mac-pmaccps` · `/mac-pm-accps` · `/mac-pmset-accps` · `/mac-accessory-power` · `/mac-accessory-batteries` · `/mac-accps-status` · `/mac-accessory-power-status` and view/see/open/list NL (`view accps`, `open accessory-power`, `list accessory batteries`, …), matching “accps status” / “is accps ok” / “what's my accps” / “what's the accessory batteries”. Bare `accps` / `accessory power` / `accessory batteries` stay with the agent; `/pmps` · `/power-source` stay Power source; `/battery` · `/bat` stay Bat %; `/ups` · `/ups-settings` stay UPS; `/adapter` · `/charger` stay AC charger; `/pmadapters` · `/power-adapters` stay Power adapters. Uses `pmset -g accps` (drawing source + InternalBattery / Magic Keyboard / Magic Mouse rows). Operator `/help` lists the new lane.
+
 ## [0.1.3059] - 2026-11-25
 
 ### Added
