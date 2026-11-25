@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3069] - 2026-11-25
+
+### Changed
+- Perplexity Search · setup and Debug Log toolbar keyboard hints: shorter, warmer Tab tips so leftover “Home/End move…” copy matches Settings / filter-chip KISS hints (design-review polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
 ## [0.1.3068] - 2026-11-25
 
 ### Changed

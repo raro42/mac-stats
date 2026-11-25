@@ -18249,13 +18249,14 @@ function refreshPerplexitySearchRovingTabindex(container, preferred) {
   }
 }
 
+/* Design-review Perplexity: shorter, warmer search tip (KISS; Settings / filter-chip parity). */
 /** How to move across query · Search before a search. */
 const PERPLEXITY_SEARCH_KB_HINT_EMPTY =
-  '← → / h l · Home/End move · Enter searches from input · Search on button';
+  'Tab query · Search · ← → / h l · Home/End · Enter searches';
 
 /** How to move across query · Search after results exist. */
 const PERPLEXITY_SEARCH_KB_HINT_RESULTS =
-  '← → / h l · Home/End move · at start ← last result · Search → footer · Enter searches from input';
+  'Tab query · Search · ← → / h l · Home/End · Enter searches · at start ← last result · Search → footer';
 
 function ensurePerplexitySearchKbStyles() {
   if (document.getElementById('mac-stats-perplexity-search-kb-styles')) return;
@@ -18433,9 +18434,10 @@ function refreshPerplexitySetupRovingTabindex(container, preferred) {
   }
 }
 
+/* Design-review Perplexity: shorter, warmer setup tip (KISS; Settings / search parity). */
 /** How to move across key · Save key on the Perplexity setup toolbar. */
 const PERPLEXITY_SETUP_KB_HINT =
-  '← → / h l · Home/End move · key first ↑ → Perplexity icon · Save key → footer · Enter saves from key field';
+  'Tab key · Save · ← → / h l · Home/End · Enter saves · key ↑ Perplexity icon · Save → footer';
 
 function ensurePerplexitySetupKbStyles() {
   if (document.getElementById('mac-stats-perplexity-setup-kb-styles')) return;
@@ -20328,13 +20330,14 @@ function refreshLogsToolbarRovingTabindex(row, preferred) {
   }
 }
 
+/* Design-review Debug Log: shorter, warmer toolbar tip (KISS; Perplexity / Settings parity). */
 /** How to move across Refresh · Open in editor · Auto-refresh before a log load. */
 const LOGS_TOOLBAR_KB_HINT_EMPTY =
-  '← → / h l · Home/End move · Refresh ← logs icon · Space toggles auto-refresh · Enter / Space on buttons';
+  'Tab Refresh · Auto-refresh · ← → / h l · Home/End · Enter refreshes · Space toggles auto-refresh';
 
 /** How to move across Refresh · Open in editor · Auto-refresh after lines exist. */
 const LOGS_TOOLBAR_KB_HINT_LINES =
-  '← → / h l · Home/End move · Refresh ← last line · Auto-refresh → footer · Space toggles auto-refresh';
+  'Tab Refresh · Auto-refresh · ← → / h l · Home/End · Refresh ← last line · Auto-refresh → footer · Space toggles';
 
 /** Theme HTML ships the hint under the toolbar buttons. Create it only on older shells. */
 function ensureLogsToolbarKbHint(row) {
