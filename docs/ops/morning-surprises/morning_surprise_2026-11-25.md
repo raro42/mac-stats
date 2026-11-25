@@ -1,18 +1,20 @@
-# Morning surprise 2026-11-25
+# Morning surprise — 2026-11-25
 
-Overnight autoresearch kept shipping power/pmset instant lanes.
+Overnight Track B (mac-stats product ratchet). Digester open empty; design-review grace; layout-daily data-poster marked (Dark next).
 
 ## Shipped
-- **v0.1.3061** Sleep/Wake UUID — `/pmuuid` · `/sleep-wake-uuid` · `/pmset-uuid` (+ view/open NL) from `pmset -g uuid`
-- **v0.1.3060** Accessory power — `/accps` · `/accessory-power` · `/accessory-batteries` from `pmset -g accps`
-- Earlier tonight: Power everything / live / adapters / custom / source / useractivity / cap / stats / therm / …
+- **v0.1.3062** — Raw battery instant status from `pmset -g rawbatt`
+  - Slash + NL: `/rawbatt` · `/raw-batt` · `/pmset-rawbatt` · `/raw-battery` · `/battery-raw` · `/mac-rawbatt` (+ view/open/list)
+  - Shows Cap · FCC · Design · Cycles · mA (compact; skips Polled / Time / Location)
+  - Does not steal `/battery` · `/cycles` · `/battery-time` · `/accps` · `/pmps` · `/pmuuid`
+- **v0.1.3061** — Sleep/Wake UUID from `pmset -g uuid` (prior tick)
+- **v0.1.3060** — Accessory power from `pmset -g accps` (prior tick)
+- Earlier tonight: Power everything / live / adapters / custom / source / … soft-state lane chain
 
-## Tried / skipped
-- Digester empty (0 runs / 7d)
-- Design review due=false (grace; Mac TCC — polish-without-capture)
-- Layout daily: data-poster marked today; **Dark** next calendar quota
-- `battlimit` / `rawbatt` not useful pmset getters (rawlog/pslog block; batt ≡ ps already `/pmps`)
+## Fuel choice
+Standing backlog after `pmuuid` — Linux skipped `rawbatt` as unused; this Mac returns a live Cap/FCC/Cycles dump, so ship it. `systemstate` / `battlimit` next.
 
 ## Next
-- Dark layout-daily next calendar day
-- Optional: `pmset -g systemstate` / `profiles` if useful; avoid blocking `history`/`thermlog`/`rawlog`
+- Dark layout-daily (next calendar quota)
+- `pmset -g systemstate` or `battlimit` if useful
+- history only if non-blocking

@@ -1,3 +1,19 @@
+## Overnight note 2026-11-25 ~01:30 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Sleep/Wake UUID v0.1.3061 — Raw battery from `pmset -g rawbatt` (Cap/FCC/Design/Cycles/mA; Linux tick skipped as “not useful”; Mac has live dump; not SoftDisabled/boolean soft-state clone; not `/battery` · `/cycles` · `/accps` clone; Dark layout-daily next calendar day).
+- Shipped **v0.1.3062** — `/rawbatt` · `/raw-batt` · `/pmset-rawbatt` · `/raw-battery` · `/battery-raw` · `/mac-rawbatt` · `/mac-raw-battery` + view/open NL; bare rawbatt/raw battery stay with agent; `/battery` · `/cycles` · `/battery-time` · `/accps` · `/pmps` · `/pmuuid` intact; `/help` lists lane.
+- Ratchet keep @ 416fd4b10 for 3062; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats/pmcap/useractivity/pmps/pmcustom/pmadapters/pmlive/pmeverything/accps/pmuuid/rawbatt — try `pmset -g systemstate` / `battlimit` if useful; history only if non-blocking; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3062
+
+- Product fuel after Sleep/Wake UUID v0.1.3061: raw Cap/FCC/Design/Cycles/mA already readable via `pmset -g rawbatt` but lacked `/rawbatt` · `/raw-batt` · `/pmset-rawbatt` · `/raw-battery` · `/battery-raw` · `/mac-rawbatt` and view/see/open/list phrases while Bat % `/battery`, SPPower cycles `/cycles`, battery ETA `/battery-time`, Accessory power `/accps`, and Power source `/pmps` already had slash+NL. Bare `rawbatt` / `raw battery` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmuuid/rawbatt soft-state closed; try systemstate/battlimit; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~01:20 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
