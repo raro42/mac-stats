@@ -5850,7 +5850,8 @@ function wireFilterChipToolbarKeyboard(wrap) {
       /* Design-review feature-processes: shorter, warmer chip hint (KISS; Agent Ops / AI Chat parity). */
       ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to temperature ring or the process list'
       : wrap.id === 'rings-filter-chips'
-        ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Details or Settings · at end → ring gauges · Enter / Space selects'
+        /* Design-review feature-cpu-metrics: shorter, warmer chip hint (KISS; processes / Agent Ops parity). */
+        ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Details, Settings, or ring gauges'
         : wrap.id === 'monitors-filter-chips'
           /* Design-review feature-monitors: shorter, warmer chip hint (KISS; Agent Ops / Disk Cleanup parity). */
           ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Monitors icon or the monitor list'
@@ -5880,7 +5881,8 @@ function wireFilterChipToolbarKeyboard(wrap) {
                             ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the knowledge list'
                             : wrap.id === 'ops-runs-lane-chips'
                               ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the run list'
-                              : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
+                              /* Design-review feature-cpu-metrics: shorter, warmer fallback chip tip (KISS; rings parity). */
+                              : 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to section icons or the section list';
   if (wrap.dataset.filterChipChainKbWired !== '1') {
     wrap.dataset.filterChipChainKbWired = '1';
     wrap.addEventListener(

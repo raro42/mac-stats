@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3067] - 2026-11-25
+
+### Changed
+- CPU metrics ring filter chips (+ generic filter-chip fallback): shorter, warmer Tab tips so leftover “Home/End move · Enter / Space…” copy matches processes / Agent Ops / Monitors KISS hints (design-review `feature-cpu-metrics`; Mac capture still TCC-blocked — polish-without-capture grace).
+
 ## [0.1.3066] - 2026-11-25
 
 ### Added
