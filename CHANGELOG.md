@@ -1,5 +1,15 @@
 ## [Unreleased]
 
+## [0.1.3089] - 2026-11-25
+
+### Fixed
+- Schedules / heartbeat / task runner / CLI: stop wrapping operator-local instructions in `MS_UNTRUSTED` envelopes. That wrapper told the model to ignore the job, so Discord got “untrusted data will not be processed” (e.g. `discord-layout-daily`, #29). External blobs (Discord users, fetch, APIs) still wrap as before.
+
+## [0.1.3088] - 2026-11-25
+
+### Changed
+- Filter-chip toolbar keyboard hints (+ theme seeds): name the chips (`All · Pinned · Hot…` / `All · Up · Down · Slow…` / Disk Cleanup · Logs · Chat · Agent Ops) so first paint matches Disk Cleanup / Monitors list KISS hints (standing-backlog polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
 ## [0.1.3087] - 2026-11-25
 
 ### Changed

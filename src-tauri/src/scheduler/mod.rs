@@ -618,6 +618,8 @@ async fn execute_task(
         .map(|id| format!("discord:{}", id))
         .unwrap_or_else(|| format!("scheduler:{}", id_info));
     let stale_mid = format!("scheduler-due:{}:{}", id_info, due_utc.timestamp_millis());
+    // Operator-authored schedule text is trusted instruction, not external data.
+    // Do not wrap with MS_UNTRUSTED — that makes the model refuse the job (#29).
     crate::commands::suspicious_patterns::log_untrusted_suspicious_scan("scheduler-task", task);
     let ollama_k = session_key.clone();
     let task_body = task.to_string();
@@ -626,10 +628,7 @@ async fn execute_task(
     crate::keyed_queue::run_serial(session_key, async move {
         match crate::commands::ollama::answer_with_ollama_and_fetch(
             crate::commands::ollama::OllamaRequest {
-                question: crate::commands::untrusted_content::wrap_untrusted_content(
-                    "scheduler-task",
-                    &task_body,
-                ),
+                question: task_body.clone(),
                 retry_on_verification_no: true,
                 from_remote: true,
                 discord_reply_channel_id: reply_to_ch,

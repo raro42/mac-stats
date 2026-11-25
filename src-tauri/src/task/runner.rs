@@ -77,17 +77,15 @@ pub async fn run_task_until_finished(
             let agents = crate::agents::load_agents();
             let agent_override =
                 crate::agents::find_agent_by_id_or_name(&agents, &assignee).cloned();
+            // Local task files are operator/agent work product — trusted instruction, not
+            // external fetch/Discord blobs. Wrapping as MS_UNTRUSTED makes the model refuse (#29).
             crate::commands::suspicious_patterns::log_untrusted_suspicious_scan(
-                "task-file-content",
-                &content_for_prompt,
-            );
-            let wrapped_content = crate::commands::untrusted_content::wrap_untrusted_content(
                 "task-file-content",
                 &content_for_prompt,
             );
             let question = format!(
             "Current task file content:\n\n{}\n\nDecide the next step. For implement/refactor/add-feature/code tasks: use CURSOR_AGENT: <instruction> to have the editor apply changes, then TASK_APPEND with the result and TASK_STATUS when done. Otherwise use TASK_APPEND to add feedback and TASK_STATUS to set wip or finished. Prefer finishing: if progress is done or blocked with a clear outcome, reply TASK_STATUS finished or unsuccessful — do not keep TASK_APPEND-only loops without new progress. Reply with your action (CURSOR_AGENT, TASK_APPEND, TASK_STATUS, or a final summary).",
-            wrapped_content
+            content_for_prompt
         );
             info!(
                 "Task loop: iteration {}/{} for task '{}' (assignee: {})",

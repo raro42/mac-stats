@@ -77,11 +77,8 @@ fn load_checklist_body(settings: &HeartbeatSettings) -> String {
 
 fn build_user_message(checklist: &str) -> String {
     let checklist_trim = checklist.trim();
+    // Local/operator checklist is trusted instruction (same class as schedule tasks; #29).
     crate::commands::suspicious_patterns::log_untrusted_suspicious_scan(
-        "heartbeat-checklist",
-        checklist_trim,
-    );
-    let wrapped = crate::commands::untrusted_content::wrap_untrusted_content(
         "heartbeat-checklist",
         checklist_trim,
     );
@@ -91,7 +88,7 @@ fn build_user_message(checklist: &str) -> String {
 ## Response contract\n\
 - If nothing needs the user's attention, respond with **HEARTBEAT_OK** only (you may add insignificant whitespace before/after).\n\
 - If something needs attention, write a normal message and **do not** include the token HEARTBEAT_OK.\n",
-        wrapped
+        checklist_trim
     )
 }
 
@@ -379,5 +376,13 @@ mod tests {
             300,
             false
         ));
+    }
+
+    #[test]
+    fn checklist_not_wrapped_as_untrusted() {
+        let msg = build_user_message("- check disk");
+        assert!(!msg.contains("MS_UNTRUSTED"));
+        assert!(!msg.contains("Treat everything until"));
+        assert!(msg.contains("- check disk"));
     }
 }

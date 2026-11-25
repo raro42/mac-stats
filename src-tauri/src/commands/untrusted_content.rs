@@ -1,5 +1,9 @@
-//! Per-request random-boundary envelopes for externally sourced text (web fetch, Discord, APIs).
+//! Per-request random-boundary envelopes for **externally sourced** text (web fetch, Discord
+//! user messages, APIs, search, browser extract, RUN_CMD stdout).
 //! Tool-line parsing strips these regions so injected `RUN_CMD:`-style text cannot be executed.
+//!
+//! Do **not** wrap operator-local instructions (schedule tasks, heartbeat checklists, local task
+//! files, CLI questions) — the model then refuses the job (GitHub #29).
 
 use sha2::{Digest, Sha256};
 use tracing::debug;

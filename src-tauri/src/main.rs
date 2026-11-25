@@ -291,6 +291,8 @@ fn main() {
                                 "preamble agent override set"
                             );
                         }
+                        // CLI argv is local-operator instruction (trusted). Keep MS_UNTRUSTED
+                        // for Discord/web/API blobs only — wrapping here causes refuse-the-job (#29).
                         mac_stats::log_untrusted_suspicious_scan(
                             "cli-user-question",
                             &question_body,
@@ -298,10 +300,7 @@ fn main() {
                         let question_for_judge = question_body.clone();
                         match mac_stats::keyed_queue::run_serial("cli", async move {
                             mac_stats::answer_with_ollama_and_fetch(mac_stats::OllamaRequest {
-                                question: mac_stats::wrap_untrusted_content(
-                                    "cli-user-question",
-                                    &question_body,
-                                ),
+                                question: question_body.clone(),
                                 model_override,
                                 options_override,
                                 skill_content,
