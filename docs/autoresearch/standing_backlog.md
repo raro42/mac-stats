@@ -1,3 +1,20 @@
+## Overnight note 2026-11-25 ~03:20 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Perplexity + Debug Log polish already shipped as v0.1.3069).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel attempt: Perplexity + Debug Log kb-hints after Settings leftover v0.1.3068 — **remote raced same as v0.1.3069**; local WIP discarded + remote keep backfill.
+- Fuel: design-review theme HTML seeds after v0.1.3069 — all shells still seeded “Home/End move…” while JS already warm; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Shipped **v0.1.3070** — warmer theme HTML kb-hint seeds (drop Home/End move; first-paint parity with JS); Mac capture still TCC-blocked.
+- Ratchet: discard@7b54e2d (dup 3069) + keep backfill remote 3069; keep @ 1f5413c6b for 3070; install/kickstart + push (UI themes).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…userclients closed — remaining useful non-blocking `pmset -g` adapters only if clearly distinct; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3070
+
+- Design-review fuel after Perplexity + Debug Log v0.1.3069 (local dup discarded): theme HTML seeds across all shells still used the older “Home/End move…” phrasing on first paint while JS ensure* paths already sat on shorter warmer KISS copy. Digester empty; design-review due=false — polish-without-capture; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…userclients soft-state closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~03:08 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Settings leftover polish already shipped tonight as v0.1.3068).

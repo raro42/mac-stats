@@ -3,7 +3,8 @@
 Overnight Track B (mac-stats product ratchet). Digester open empty; design-review grace; layout-daily data-poster marked (Dark next). Avoided another pmset keep-pNN.
 
 ## Shipped
-- **v0.1.3069** — Perplexity Search · setup + Debug Log toolbar kb-hints: shorter, warmer Tab tips; polish-without-capture
+- **v0.1.3070** — Theme HTML kb-hint seeds (all shells): drop leftover “Home/End move” so first paint matches warmer JS Tab tips
+- **v0.1.3069** — Perplexity Search · setup + Debug Log toolbar kb-hints (shorter, warmer Tab tips; polish-without-capture)
 - **v0.1.3068** — Settings leftover kb-hints (modal header Close fallback · theme-list): shorter, warmer Tab tips; polish-without-capture
 - **v0.1.3067** — CPU metrics rings-filter + generic filter-chip fallback kb-hints (shorter, warmer Tab tips; polish-without-capture `feature-cpu-metrics`)
 - **v0.1.3066** — Power user-clients instant status from `pmset -g userclients`
@@ -16,7 +17,7 @@ Overnight Track B (mac-stats product ratchet). Digester open empty; design-revie
 - Earlier tonight: Sleep/Wake UUID · Accessory power · Power everything / live / adapters / custom / source / … soft-state lane chain
 
 ## Fuel choice
-Digester empty; Settings design polish already used; layout-daily Dark waits for next calendar day. Standing backlog said not another keep-pNN — warmed leftover Perplexity search/setup + Debug Log toolbar tips (parity with Settings / filter-chip KISS).
+Digester empty; layout-daily Dark waits for next calendar day. Perplexity + Debug Log tips already warm in JS (v0.1.3069). Theme HTML seeds still said “Home/End move” on first paint — warmed all shells to match JS KISS tips (v0.1.3070). Local Perplexity/Debug Log WIP discarded as remote race.
 
 ## Next
 - Dark layout-daily (next calendar quota)
