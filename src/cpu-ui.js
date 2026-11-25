@@ -470,8 +470,9 @@
       closeId: "close-settings",
       ariaLabel: "Settings header",
       wireKey: "settingsHeaderToolbarKbWired",
+      /* Design-review Settings: shorter, warmer header tip (KISS; Ollama / modal-header parity). */
       hintText:
-        "← → / h l · Home/End · Enter / Space Close · ← Credentials · → Appearance",
+        "Tab title · Close · ← → / h l · Home/End · Enter closes · ← Credentials · → Appearance",
       chainForwardFromEnd: () => tryChainSettingsHeaderToAppearance(),
       chainBackFromStart: () => tryChainSettingsHeaderToCredentials(),
     });
@@ -991,10 +992,10 @@
     document.head.appendChild(style);
   }
 
-  /* Settings Appearance: shorter, warmer tip (KISS; Credentials parity). */
+  /* Settings Appearance: shorter, warmer tip (KISS; theme-list / Credentials parity). */
   /** How to move across Appearance controls when Settings is open. */
   const APPEARANCE_SETTING_KB_HINT =
-    "← → / h l · Home/End · Enter / Space theme or frame · ↑ header · → Product";
+    "← → / h l · Home/End · Enter theme or frame · ↑ header · → Product";
 
   /**
    * Theme HTML ships the hint at the end of the Appearance section.
@@ -5388,8 +5389,9 @@
       closeId: "close-changelog",
       ariaLabel: "Changelog header",
       wireKey: "changelogHeaderToolbarKbWired",
+      /* Design-review Changelog: shorter, warmer header tip (KISS; Settings / Ollama parity). */
       hintText:
-        "← → / h l · Home/End · Enter / Space Close · → versions · ← last version",
+        "Tab title · Close · ← → / h l · Home/End · Enter closes · → versions · ← last version",
       chainForwardFromEnd: () => tryChainChangelogHeaderToBody(),
       chainBackFromStart: () => tryChainChangelogHeaderToBodyLast(),
     });

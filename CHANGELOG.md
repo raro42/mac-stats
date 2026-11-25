@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3073] - 2026-11-25
+
+### Changed
+- Settings header · Appearance · Changelog header keyboard hints: shorter, warmer Tab tips so leftover “Enter / Space …” copy matches Ollama / modal-header / theme-list KISS hints (design-review polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
 ## [0.1.3072] - 2026-11-25
 
 ### Added
