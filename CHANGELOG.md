@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3074] - 2026-11-25
+
+### Changed
+- Theme HTML Settings header · Appearance · Changelog keyboard-hint seeds (all shells): first-paint Tab tip parity with warmer JS from v0.1.3073 (design-review polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
 ## [0.1.3073] - 2026-11-25
 
 ### Changed
