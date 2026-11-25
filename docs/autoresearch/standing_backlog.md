@@ -1,3 +1,20 @@
+## Overnight note 2026-11-25 ~04:20 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Settings/Changelog tips already shipped remote as v0.1.3073).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel attempt: Settings header · Appearance · Changelog JS tips after Power history v0.1.3072 — **remote raced same as v0.1.3073**; local WIP discarded + remote keep backfill.
+- Fuel: design-review theme HTML seeds after v0.1.3073 — Settings header · Appearance · Changelog still seeded “Enter / Space Close…” while JS already warm; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Shipped **v0.1.3074** — warmer theme HTML Settings/Appearance/Changelog Tab tip seeds (first-paint parity with JS); Mac capture still TCC-blocked.
+- Ratchet: discard@c760a4d (dup 3073) + keep backfill remote 3073; keep @ c0245febf for 3074; install/kickstart + push (UI themes).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…pmhistory closed — remaining useful non-blocking `pmset -g` adapters only if clearly distinct (`disk` == `custom`; `uuidlog` blocks); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3074
+
+- Design-review fuel after Settings/Changelog JS tips v0.1.3073 (local dup discarded): theme HTML seeds across all shells still used cold “Enter / Space Close…” / “Enter / Space theme…” on first paint while JS ensure* paths already sat on warmer Tab-first / Enter closes copy. Digester empty; design-review due=false — polish-without-capture; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory soft-state closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~04:05 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Power history already shipped as v0.1.3072).
