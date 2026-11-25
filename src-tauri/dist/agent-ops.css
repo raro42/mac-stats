@@ -1968,6 +1968,12 @@ body.theme-data-poster #icon-agent-ops {
   /* Opaque type — was rgba(255,255,255,0.95) glass over the poster field (#14). */
   color: color-mix(in srgb, #ffffff 95%, #0b0b10);
 }
+/*
+ * Data Poster layout-daily (AI Chat + Monitors): shared `.section-open` still
+ * mixed accent into `transparent` → muddy glass wash over opaque CRT chips
+ * when Monitors / AI Chat (and kin) are expanded. Opaque poster `--accent`
+ * mixes on `#0b0b10` (parity with status-good / icon-line chips).
+ */
 body.theme-data-poster #icon-monitors.section-open,
 body.theme-data-poster #icon-ollama.section-open,
 body.theme-data-poster #icon-perplexity.section-open,
@@ -1976,6 +1982,8 @@ body.theme-data-poster #icon-disk-cleanup.section-open,
 body.theme-data-poster #icon-agent-ops.section-open {
   opacity: 1;
   color: var(--accent, #55c7ff);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
 }
 body.theme-data-poster #icon-discord.status-good,
 body.theme-data-poster #icon-monitors.status-good,

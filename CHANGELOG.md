@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3094] - 2026-11-26
+
+### Fixed
+- Data Poster layout-daily (AI Chat + Monitors): open section icons (`#icon-monitors` / `#icon-ollama` and kin) no longer keep the shared transparent accent wash. They use opaque poster `--accent` mixes on `#0b0b10`, matching status-good / icon-line chips.
+
 ## [0.1.3093] - 2026-11-25
 
 ### Fixed
