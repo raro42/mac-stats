@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3062] - 2026-11-25
+
+### Added
+- Instant Raw battery accepts `/rawbatt` · `/rawbatt-status` · `/rawbatt-state` · `/raw-batt` · `/raw-batt-status` · `/raw-batt-state` · `/pmset-rawbatt` · `/pmset-rawbatt-status` · `/pmset-rawbatt-state` · `/pmsetrawbatt` · `/pmsetrawbatt-status` · `/raw-battery` · `/raw-battery-status` · `/raw-battery-state` · `/rawbattery` · `/rawbattery-status` · `/battery-raw` · `/battery-raw-status` · `/batteryraw` · `/batteryraw-status` · `/mac-rawbatt` · `/mac-raw-batt` · `/mac-pmset-rawbatt` · `/mac-raw-battery` · `/mac-battery-raw` · `/mac-rawbatt-status` · `/mac-raw-battery-status` and view/see/open/list NL (`view rawbatt`, `open raw-battery`, `list raw battery`, …), matching “rawbatt status” / “is rawbatt ok” / “what's my rawbatt” / “what's the raw battery”. Bare `rawbatt` / `raw battery` stay with the agent; `/battery` · `/bat` stay Bat %; `/cycles` · `/battery-health` stay SPPower cycles; `/battery-time` stays ETA; `/accps` · `/accessory-power` stay Accessory power; `/pmps` · `/power-source` stay Power source. Uses `pmset -g rawbatt` (Cap · FCC · Design · Cycles · mA). Operator `/help` lists the new lane.
+
 ## [0.1.3061] - 2026-11-25
 
 ### Added

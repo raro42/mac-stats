@@ -9219,6 +9219,125 @@ pub fn get_pmuuid_status() -> String {
     }
 }
 
+/// Parse `pmset -g rawbatt` → compact status fields (source · state · % · Cap/FCC/Design · mA · Cycles).
+/// Skips timestamp / Polled lines; keeps Discord-sized output.
+pub(crate) fn parse_pmset_rawbatt(raw: &str) -> Option<String> {
+    let mut bits: Vec<String> = Vec::new();
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let lower = t.to_ascii_lowercase();
+        if lower.starts_with("polled ")
+            || lower.starts_with("full=")
+            || lower.starts_with("user visible")
+        {
+            continue;
+        }
+        // Skip pure date stamps like `11/25/2026 01:24:40`.
+        if t.chars().next().map(|c| c.is_ascii_digit()).unwrap_or(false)
+            && (lower.contains('/') || lower.contains('-'))
+            && !lower.contains("cap=")
+            && !lower.contains("cycles=")
+            && !lower.contains('%')
+        {
+            continue;
+        }
+        if !(lower.contains('%')
+            || lower.contains("cap=")
+            || lower.contains("fcc=")
+            || lower.contains("cycles=")
+            || lower.contains("design=")
+            || lower.contains("ma")
+            || lower.contains("charging")
+            || lower.contains("ac")
+            || lower.contains("battery"))
+        {
+            continue;
+        }
+        for part in t.split(';') {
+            let p = part.trim().trim_matches(|c| c == ':' || c == ',');
+            if p.is_empty() {
+                continue;
+            }
+            let pl = p.to_ascii_lowercase();
+            if pl.starts_with("location") || pl.starts_with("time=") || pl.starts_with("time:") {
+                continue;
+            }
+            // Cap=100: FCC=100 sometimes glues with a colon — split.
+            if pl.starts_with("cap=") && pl.contains("fcc=") {
+                for sub in p.split(':') {
+                    let s = sub.trim();
+                    if !s.is_empty() {
+                        bits.push(s.to_string());
+                    }
+                }
+                continue;
+            }
+            bits.push(p.to_string());
+        }
+        if !bits.is_empty() {
+            break;
+        }
+    }
+    if bits.is_empty() {
+        return None;
+    }
+    let mut s = bits.join(" · ");
+    if s.len() > 420 {
+        s.truncate(417);
+        s.push_str("…");
+    }
+    Some(s)
+}
+
+/// Compact raw battery status for Discord-sized chips.
+pub(crate) fn format_rawbatt_parts(info: Option<&str>) -> String {
+    info.map(str::trim)
+        .filter(|s| !s.is_empty())
+        .map(|s| s.to_string())
+        .unwrap_or_default()
+}
+
+/// macOS raw battery dump from `pmset -g rawbatt` (Cap / FCC / Design / Cycles / mA).
+/// Distinct from Bat % `/battery`, cycle health `/cycles` (SPPower), battery time `/battery-time`,
+/// Accessory power `/accps`, Power source `/pmps`.
+/// Used by Discord/operator instant `/rawbatt` · `/raw-battery` lane.
+pub fn get_rawbatt_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "rawbatt"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("rawbatt: pmset -g rawbatt non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("rawbatt: pmset -g rawbatt spawn failed");
+                return String::new();
+            }
+        };
+        let info = format_rawbatt_parts(parse_pmset_rawbatt(&stdout).as_deref());
+        if info.is_empty() {
+            debug3!("rawbatt: empty status");
+        } else {
+            debug3!("rawbatt status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -15459,6 +15578,39 @@ mod pmuuid_parse_tests {
         );
         assert_eq!(format_pmuuid_parts(None), "");
         assert_eq!(format_pmuuid_parts(Some("   ")), "");
+    }
+}
+
+
+
+#[cfg(test)]
+mod rawbatt_parse_tests {
+    use super::{format_rawbatt_parts, parse_pmset_rawbatt};
+
+    const SAMPLE: &str = "\
+11/25/2026 01:24:40
+ AC; Not Charging; 100%; Cap=100: FCC=100; Design=8579; Time=1092:15; 0mA; Cycles=210/1000; Location=0; 
+ Polled boot=11/17/2026 19:06:52; Full=11/25/2026 01:20:22; User visible=11/25/2026 01:24:22
+";
+
+    #[test]
+    fn parse_pmset_rawbatt_reads_cap_fcc_cycles() {
+        let s = parse_pmset_rawbatt(SAMPLE).expect("parsed");
+        assert!(s.contains("AC"), "got: {s}");
+        assert!(s.contains("Not Charging"), "got: {s}");
+        assert!(s.contains("100%"), "got: {s}");
+        assert!(s.contains("Cap=100"), "got: {s}");
+        assert!(s.contains("FCC=100"), "got: {s}");
+        assert!(s.contains("Design=8579"), "got: {s}");
+        assert!(s.contains("0mA"), "got: {s}");
+        assert!(s.contains("Cycles=210/1000"), "got: {s}");
+        assert!(!s.to_ascii_lowercase().contains("location"), "got: {s}");
+        assert!(!s.to_ascii_lowercase().contains("polled"), "got: {s}");
+        assert!(!s.contains("Time="), "got: {s}");
+        assert_eq!(format_rawbatt_parts(Some(&s)), s);
+        assert_eq!(format_rawbatt_parts(None), "");
+        assert_eq!(parse_pmset_rawbatt(""), None);
+        assert_eq!(parse_pmset_rawbatt("Polled boot=now"), None);
     }
 }
 

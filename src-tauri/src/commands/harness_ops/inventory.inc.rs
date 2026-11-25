@@ -8414,6 +8414,13 @@ pub fn looks_like_battery_cycles_request(content: &str) -> bool {
         || n == "the capacity"
         || n == "battery"
         || n == "the battery"
+        || n.contains("rawbatt")
+        || n.contains("raw-batt")
+        || n.contains("raw battery")
+        || n.contains("raw-battery")
+        || n.contains("battery-raw")
+        || n == "/rawbatt"
+        || n == "/raw-battery"
         || n == "/battery"
         || n == "/bat"
         || n == "view battery"
@@ -8810,6 +8817,13 @@ pub fn looks_like_battery_time_request(content: &str) -> bool {
         || n == "the remaining"
         || n == "battery"
         || n == "the battery"
+        || n.contains("rawbatt")
+        || n.contains("raw-batt")
+        || n.contains("raw battery")
+        || n.contains("raw-battery")
+        || n.contains("battery-raw")
+        || n == "/rawbatt"
+        || n == "/raw-battery"
         || n == "/battery"
         || n == "/bat"
         || n == "view battery"
@@ -29571,6 +29585,13 @@ pub fn looks_like_pmcustom_request(content: &str) -> bool {
         || n.contains("peripheral batteries")
         || n.contains("bt-batteries")
         || n.contains("bt batteries")
+        || n.contains("rawbatt")
+        || n.contains("raw-batt")
+        || n.contains("pmset-rawbatt")
+        || n.contains("raw-battery")
+        || n.contains("raw battery")
+        || n.contains("battery-raw")
+        || n.contains("battery raw")
         || n == "/idle-time"
         || n.contains("screensaver")
         || n == "/username"
@@ -30837,6 +30858,14 @@ pub fn looks_like_accps_request(content: &str) -> bool {
         || n.contains("all power settings")
         || n.contains("power-all-settings")
         || n.contains("power all settings")
+        || n.contains("rawbatt")
+        || n.contains("raw-batt")
+        || n.contains("raw battery")
+        || n.contains("raw-battery")
+        || n.contains("battery-raw")
+        || n.contains("pmuuid")
+        || n.contains("sleep-wake-uuid")
+        || n.contains("sleep wake uuid")
         || n == "accps"
         || n == "the accps"
         || n == "pmaccps"
@@ -31110,6 +31139,11 @@ pub fn looks_like_pmuuid_request(content: &str) -> bool {
         || n.contains("accps")
         || n.contains("accessory power")
         || n.contains("accessory batteries")
+        || n.contains("rawbatt")
+        || n.contains("raw-batt")
+        || n.contains("raw battery")
+        || n.contains("raw-battery")
+        || n.contains("battery-raw")
         || n.contains("pmps")
         || n.contains("power source")
         || n.contains("pmlog")
@@ -31306,6 +31340,258 @@ pub fn format_pmuuid_report() -> String {
     format!("**Sleep/Wake UUID** · `{v}`")
 }
 
+
+
+
+/// Raw battery — Cap / FCC / Design / Cycles / mA from `pmset -g rawbatt`.
+/// Slash + view/open NL (`/rawbatt` · `/raw-battery` · `view rawbatt`).
+/// Bare `rawbatt` / `raw battery` stay with the agent;
+/// `/battery` · `/bat` stay Bat %; `/cycles` stays SPPower cycle health;
+/// `/battery-time` stays ETA; `/accps` stays Accessory power; `/pmps` stays Power source.
+pub fn looks_like_rawbatt_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("accps")
+        || n.contains("accessory power")
+        || n.contains("accessory batteries")
+        || n.contains("pmps")
+        || n.contains("power source")
+        || n.contains("now drawing")
+        || n.contains("pmuuid")
+        || n.contains("sleep-wake-uuid")
+        || n.contains("sleep wake uuid")
+        || n.contains("pmlive")
+        || n.contains("pmeverything")
+        || n.contains("pmadapters")
+        || n.contains("pmcustom")
+        || n.contains("battery-time")
+        || n.contains("battery time")
+        || n.contains("time-remaining")
+        || n.contains("time remaining")
+        || n.contains("time-to-empty")
+        || n.contains("time to empty")
+        || n.contains("time-to-full")
+        || n.contains("time to full")
+        || n.contains("cycle count")
+        || n.contains("battery cycles")
+        || n.contains("battery-cycles")
+        || n.contains("battery health")
+        || n.contains("battery-health")
+        || n.contains("battery condition")
+        || n.contains("max capacity")
+        || n.contains("max-capacity")
+        || n == "/cycles"
+        || n == "/cycle-count"
+        || n == "/battery-cycles"
+        || n == "/battery-health"
+        || n == "/max-capacity"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "view battery"
+        || n == "open battery"
+        || n == "list battery"
+        || n == "see battery"
+        || n == "/battery-time"
+        || n == "/bat-time"
+        || n == "/tasks"
+        || n == "/ups"
+        || n == "/adapter"
+        || n == "/charger"
+        || n == "/accps"
+        || n == "/pmps"
+        || n == "/pmuuid"
+        || n == "rawbatt"
+        || n == "the rawbatt"
+        || n == "raw-batt"
+        || n == "the raw-batt"
+        || n == "raw batt"
+        || n == "the raw batt"
+        || n == "pmsetrawbatt"
+        || n == "the pmsetrawbatt"
+        || n == "pmset-rawbatt"
+        || n == "the pmset-rawbatt"
+        || n == "pmset rawbatt"
+        || n == "the pmset rawbatt"
+        || n == "raw-battery"
+        || n == "the raw-battery"
+        || n == "raw battery"
+        || n == "the raw battery"
+        || n == "battery-raw"
+        || n == "the battery-raw"
+        || n == "battery raw"
+        || n == "the battery raw"
+        || n == "rawbattery"
+        || n == "the rawbattery"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+            "/rawbatt"
+            | "/rawbatt-status"
+            | "/rawbatt-state"
+            | "/raw-batt"
+            | "/raw-batt-status"
+            | "/raw-batt-state"
+            | "/pmset-rawbatt"
+            | "/pmset-rawbatt-status"
+            | "/pmset-rawbatt-state"
+            | "/pmsetrawbatt"
+            | "/pmsetrawbatt-status"
+            | "/raw-battery"
+            | "/raw-battery-status"
+            | "/raw-battery-state"
+            | "/rawbattery"
+            | "/rawbattery-status"
+            | "/battery-raw"
+            | "/battery-raw-status"
+            | "/batteryraw"
+            | "/batteryraw-status"
+            | "/mac-rawbatt"
+            | "/mac-raw-batt"
+            | "/mac-pmset-rawbatt"
+            | "/mac-raw-battery"
+            | "/mac-battery-raw"
+            | "/mac-rawbatt-status"
+            | "/mac-raw-battery-status"
+            | "rawbatt status"
+            | "the rawbatt status"
+            | "rawbatt state"
+            | "the rawbatt state"
+            | "raw-batt status"
+            | "the raw-batt status"
+            | "raw batt status"
+            | "the raw batt status"
+            | "pmset-rawbatt status"
+            | "the pmset-rawbatt status"
+            | "pmset rawbatt status"
+            | "the pmset rawbatt status"
+            | "raw-battery status"
+            | "the raw-battery status"
+            | "raw battery status"
+            | "the raw battery status"
+            | "battery-raw status"
+            | "the battery-raw status"
+            | "my rawbatt"
+            | "my rawbatt status"
+            | "my raw battery"
+            | "my raw-battery"
+            | "is rawbatt ok"
+            | "is the rawbatt ok"
+            | "how's rawbatt"
+            | "hows rawbatt"
+            | "how's the rawbatt"
+            | "hows the rawbatt"
+            | "how's raw battery"
+            | "hows raw battery"
+            | "what's my rawbatt"
+            | "whats my rawbatt"
+            | "what is my rawbatt"
+            | "what's my rawbatt status"
+            | "whats my rawbatt status"
+            | "what is my rawbatt status"
+            | "what's my raw battery"
+            | "whats my raw battery"
+            | "what is my raw battery"
+            | "what's the rawbatt"
+            | "whats the rawbatt"
+            | "what is the rawbatt"
+            | "what's the rawbatt status"
+            | "whats the rawbatt status"
+            | "what is the rawbatt status"
+            | "what's the raw battery"
+            | "whats the raw battery"
+            | "what is the raw battery"
+            | "view rawbatt"
+            | "view the rawbatt"
+            | "view rawbatt status"
+            | "view the rawbatt status"
+            | "view raw-batt"
+            | "view the raw-batt"
+            | "view raw batt"
+            | "view the raw batt"
+            | "view pmset-rawbatt"
+            | "view the pmset-rawbatt"
+            | "view pmset rawbatt"
+            | "view the pmset rawbatt"
+            | "view raw-battery"
+            | "view the raw-battery"
+            | "view raw battery"
+            | "view the raw battery"
+            | "view battery-raw"
+            | "view the battery-raw"
+            | "see rawbatt"
+            | "see the rawbatt"
+            | "see raw battery"
+            | "see the raw battery"
+            | "see raw-battery"
+            | "see the raw-battery"
+            | "open rawbatt"
+            | "open the rawbatt"
+            | "open rawbatt status"
+            | "open the rawbatt status"
+            | "open raw-batt"
+            | "open raw-battery"
+            | "open raw battery"
+            | "open battery-raw"
+            | "open pmset-rawbatt"
+            | "list rawbatt"
+            | "list the rawbatt"
+            | "list rawbatt status"
+            | "list the rawbatt status"
+            | "list raw-batt"
+            | "list the raw-batt"
+            | "list raw-battery"
+            | "list the raw-battery"
+            | "list raw battery"
+            | "list the raw battery"
+            | "list battery-raw"
+            | "list the battery-raw"
+    )
+}
+
+/// Zero-LLM raw battery from `pmset -g rawbatt` (macOS-only; empty elsewhere).
+pub fn format_rawbatt_report() -> String {
+    let v = crate::metrics::get_rawbatt_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Raw battery** — _no raw battery dump on this Mac right now._".to_string();
+    }
+    format!("**Raw battery** · `{v}`")
+}
 
 
 /// Auto Power Off — `pmset` Battery/AC `autopoweroff` (+ active fallback; often absent on Apple Silicon).

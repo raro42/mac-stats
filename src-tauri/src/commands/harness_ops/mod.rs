@@ -7259,6 +7259,65 @@ mod tests {
         assert!(!hw.contains("**Sleep/Wake UUID**"), "got: {hw}");
     }
 
+    #[test]
+    fn rawbatt_slash_and_view_open_do_not_steal_battery_cycles_or_bare() {
+        assert!(looks_like_rawbatt_request("/rawbatt"));
+        assert!(looks_like_rawbatt_request("/rawbatt-status"));
+        assert!(looks_like_rawbatt_request("/raw-batt"));
+        assert!(looks_like_rawbatt_request("/pmset-rawbatt"));
+        assert!(looks_like_rawbatt_request("/raw-battery"));
+        assert!(looks_like_rawbatt_request("/battery-raw"));
+        assert!(looks_like_rawbatt_request("/mac-rawbatt"));
+        assert!(looks_like_rawbatt_request("/mac-raw-battery"));
+        assert!(looks_like_rawbatt_request("view rawbatt"));
+        assert!(looks_like_rawbatt_request("open raw-battery"));
+        assert!(looks_like_rawbatt_request("list raw battery"));
+        assert!(looks_like_rawbatt_request("rawbatt status"));
+        assert!(looks_like_rawbatt_request("is rawbatt ok"));
+        assert!(looks_like_rawbatt_request("what's my rawbatt"));
+        assert!(looks_like_rawbatt_request("what's the raw battery"));
+        assert!(looks_like_rawbatt_request("view raw battery"));
+        assert!(!looks_like_rawbatt_request("rawbatt"));
+        assert!(!looks_like_rawbatt_request("raw battery"));
+        assert!(!looks_like_rawbatt_request("pmset rawbatt"));
+        assert!(!looks_like_rawbatt_request("/battery"));
+        assert!(!looks_like_rawbatt_request("view battery"));
+        assert!(!looks_like_rawbatt_request("/cycles"));
+        assert!(!looks_like_rawbatt_request("battery health"));
+        assert!(!looks_like_rawbatt_request("/battery-time"));
+        assert!(!looks_like_rawbatt_request("/accps"));
+        assert!(!looks_like_rawbatt_request("/pmps"));
+        assert!(!looks_like_rawbatt_request("/pmuuid"));
+        assert!(!looks_like_rawbatt_request("/tasks"));
+        assert!(!looks_like_rawbatt_request("enable rawbatt"));
+        assert!(!looks_like_battery_cycles_request("/rawbatt"));
+        assert!(!looks_like_battery_cycles_request("view rawbatt"));
+        assert!(!looks_like_accps_request("/rawbatt"));
+        assert!(!looks_like_pmuuid_request("/rawbatt"));
+        let s = try_operator_instant_reply("/rawbatt").unwrap();
+        assert!(
+            s.contains("**Raw battery**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view rawbatt").unwrap();
+        assert!(
+            viewed.contains("**Raw battery**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open raw-battery").unwrap();
+        assert!(
+            open.contains("**Raw battery**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("rawbatt").is_none());
+        assert!(try_operator_instant_reply("raw battery").is_none());
+        let bat = try_operator_instant_reply("/battery").unwrap();
+        assert!(
+            !bat.contains("**Raw battery**"),
+            "Bat % /battery must stay put, got: {bat}"
+        );
+    }
+
 
     #[test]
     fn sysload_slash_and_view_open_do_not_steal_load_heat_or_bare() {

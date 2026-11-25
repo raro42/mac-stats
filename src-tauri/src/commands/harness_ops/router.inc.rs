@@ -1447,6 +1447,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_pmuuid_request(content) {
         return Some(format_pmuuid_report());
     }
+    // Raw battery from `pmset -g rawbatt` (bare `rawbatt` / `raw battery` stay with the agent;
+    // `/battery` · `/bat` stay Bat %; `/cycles` stays SPPower cycle health;
+    // `/battery-time` stays ETA; `/accps` stays Accessory power; `/pmps` stays Power source).
+    if looks_like_rawbatt_request(content) {
+        return Some(format_rawbatt_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;
