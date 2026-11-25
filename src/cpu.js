@@ -5844,44 +5844,35 @@ function ensureFilterChipKbStyles() {
 function wireFilterChipToolbarKeyboard(wrap) {
   if (!wrap) return;
   ensureFilterChipKbStyles();
+  /* Standing-backlog: filter-aware chip names (Disk Cleanup list / Monitors list parity). */
   const hint =
     wrap.id === 'processes-filter-chips'
-      /* Design-review feature-processes: shorter, warmer chip hint (KISS; Agent Ops / AI Chat parity). */
-      ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to temperature ring or the process list'
+      ? 'All · Pinned · Hot · ← → / h l · Home/End · Enter selects · edges jump to temperature ring or the process list'
       : wrap.id === 'rings-filter-chips'
-        /* Design-review feature-cpu-metrics: shorter, warmer chip hint (KISS; processes / Agent Ops parity). */
-        ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Details, Settings, or ring gauges'
+        ? 'All · Hot · ← → / h l · Home/End · Enter selects · edges jump to Details, Settings, or ring gauges'
         : wrap.id === 'monitors-filter-chips'
-          /* Design-review feature-monitors: shorter, warmer chip hint (KISS; Agent Ops / Disk Cleanup parity). */
-          ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Monitors icon or the monitor list'
+          ? 'All · Up · Down · Slow · ← → / h l · Home/End · Enter selects · edges jump to Monitors icon or the monitor list'
           : wrap.id === 'perplexity-filter-chips'
-            /* Soft-state after Credentials kb-hints: shorter, warmer chip hint (KISS; Monitors / AI Chat parity). */
-            ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Perplexity icon or the result list'
+            ? 'All · Top · Snippet · ← → / h l · Home/End · Enter selects · edges jump to Perplexity icon or the result list'
             : wrap.id === 'logs-filter-chips'
-              /* Soft-state after Credentials kb-hints: shorter, warmer chip hint (KISS; Monitors / AI Chat parity). */
-              ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Debug Log icon or the log viewer'
+              ? 'All · Error · Warn · ← → / h l · Home/End · Enter selects · edges jump to Debug Log icon or the log viewer'
               : wrap.id === 'disk-cleanup-scope-filter-chips'
-                /* Design-review feature-disk-cleanup: shorter, warmer chip hint (KISS; Agent Ops / AI Chat parity). */
-                ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Disk Cleanup icon or the scope list'
+                ? 'All · On · Off · ← → / h l · Home/End · Enter selects · edges jump to Disk Cleanup icon or the scope list'
                 : wrap.id === 'disk-cleanup-filter-chips'
-                  /* Design-review feature-disk-cleanup: shorter, warmer chip hint (KISS; Agent Ops / AI Chat parity). */
-                  ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Disk Cleanup icon or the category list'
+                  ? 'All · Reclaim · Big · Clean · ← → / h l · Home/End · Enter selects · edges jump to Disk Cleanup icon or the category list'
                   : wrap.id === 'chat-filter-chips'
-                    /* Design-review feature-ai-chat: shorter, warmer chip hint (KISS; Agent Ops parity). */
-                    ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to AI Chat icon or the message list'
+                    ? 'All · You · Assistant · Errors · ← → / h l · Home/End · Enter selects · edges jump to AI Chat icon or the message list'
                     : wrap.id === 'ops-agents-enabled-chips'
-                      /* Design-review feature-agent-ops: shorter, warmer chip hint (KISS). */
-                      ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the agent list'
+                      ? 'All · On · Off · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the agent list'
                       : wrap.id === 'ops-session-kind-chips'
-                        ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the session list'
+                        ? 'All · Live · Files · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the session list'
                         : wrap.id === 'ops-schedules-kind-chips'
-                          ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the schedule list'
+                          ? 'All · Jobs · Deliveries · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the schedule list'
                           : wrap.id === 'ops-memory-kind-chips'
-                            ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the knowledge list'
+                            ? 'All · Discord · Core · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the knowledge list'
                             : wrap.id === 'ops-runs-lane-chips'
-                              ? 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the run list'
-                              /* Design-review feature-cpu-metrics: shorter, warmer fallback chip tip (KISS; rings parity). */
-                              : 'Tab a chip · ← → / h l · Home/End · Enter selects · edges jump to section icons or the section list';
+                              ? 'All · Instant · Lite · Direct · Slow · Fail · ← → / h l · Home/End · Enter selects · edges jump to Agent Ops or the run list'
+                              : 'All · ← → / h l · Home/End · Enter selects · edges jump to section icons or the section list';
   if (wrap.dataset.filterChipChainKbWired !== '1') {
     wrap.dataset.filterChipChainKbWired = '1';
     wrap.addEventListener(
