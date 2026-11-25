@@ -1,3 +1,20 @@
+## Overnight note 2026-11-25 ~03:37 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace; theme HTML move-drop already shipped as v0.1.3070).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: design-review theme HTML Tab tip parity after v0.1.3070 — seeds still said “Enter / Space” / “Tab or click…” while JS already warm; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Backfill: missing keep row for v0.1.3070.
+- Shipped **v0.1.3071** — warmer theme HTML Tab tip seeds (Agent Ops · Perplexity · Debug Log · rings · sparklines · power strip · icon line · filter chips · Details · header/footer); Mac capture still TCC-blocked.
+- Ratchet keep @ 2b6528749 for 3071; backfill keep for 3070; push (UI themes; Linux rack no /Applications install/kickstart).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…userclients closed — Settings header/Appearance/Changelog optional JS warm · not another keep-pNN clone.
+
+## Overnight merge — v0.1.3071
+
+- Design-review fuel after theme HTML move-drop v0.1.3070: first-paint seeds across all shells still used cold “Enter / Space” / “Tab or click…” phrasing while JS ensure* paths already sat on shorter warmer KISS Tab tips. Digester empty; design-review due=false — polish-without-capture; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…userclients closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~03:20 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Perplexity + Debug Log polish already shipped as v0.1.3069).
