@@ -1,3 +1,20 @@
+## Overnight note 2026-11-25 ~02:50 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Agent Ops + CPU metrics polish already shipped tonight).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: design-review Settings leftover after CPU metrics ring filters v0.1.3067 — modal header Close fallback + theme-list still said “Home/End move · Enter / Space…” after Appearance/Product/Credentials/Agent Ops warm; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Backfill: missing keep row for remote v0.1.3067.
+- Shipped **v0.1.3068** — warmer Settings leftover Tab tips (KISS; Appearance/Agent Ops parity); Mac capture still TCC-blocked.
+- Ratchet keep @ 4311a26b4 for 3068; backfill keep for 3067; sync-dist + install/kickstart + push (UI).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · leftover cold kb-hints (Perplexity / Debug Log) optional · soft-state leftover closed for SoftDisabled…userclients — remaining useful non-blocking `pmset -g` adapters only if clearly distinct; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3068
+
+- Design-review fuel after CPU metrics ring filters v0.1.3067: Settings modal-header Close fallback / theme-list (when Appearance section missing) still used the older “Home/End move · Enter / Space…” phrasing while Appearance · Product · Credentials · Agent Ops already sat on shorter warmer KISS copy. Digester empty; design-review due=false — polish-without-capture; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…userclients soft-state closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~02:42 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Agent Ops polish already shipped tonight as v0.1.3065).
