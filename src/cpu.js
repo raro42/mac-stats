@@ -9730,7 +9730,7 @@ function buildMonitorRowTooltip(monitorUrl, status, monitorId) {
     if (backoff) lines.push(backoff);
   }
   lines.push(
-    'Click or d for details · Enter / Space checks now · Delete removes · PgUp/PgDn'
+    'Click or d for details · Enter checks now · Delete removes · PgUp/PgDn'
   );
   return lines.join('\n');
 }
@@ -11253,9 +11253,10 @@ function ensureProcessesListKbHint(processList, show) {
 }
 
 /** How to move across monitor rows when the list has rows. */
-/* Design-review feature-monitors: shorter, warmer list tip (KISS; Top Processes parity). */
+/* Design-review feature-monitors: shorter, warmer list tip (KISS; Top Processes parity).
+ * Enter/Space force a check; d opens details (do not say “Enter opens”). */
 const MONITORS_LIST_KB_HINT =
-  'All · Up · Down · Slow · ↑↓ / j k · Enter / d opens · c copies · Delete removes · Esc clears';
+  'All · Up · Down · Slow · ↑↓ / j k · Enter checks · d opens · c copies · Delete removes · Esc clears';
 
 /** Theme HTML ships the hint above the monitor list. It stays hidden until rows exist. Create it only on older shells. */
 function ensureMonitorsListKbHint(monitorsList, show) {
