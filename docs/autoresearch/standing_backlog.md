@@ -1,3 +1,20 @@
+## Overnight note 2026-11-25 ~02:42 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Agent Ops polish already shipped tonight as v0.1.3065).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: design-review feature-cpu-metrics after Power user-clients v0.1.3066 — leftover cold rings-filter + generic filter-chip fallback still said “Home/End move · Enter / Space…” after processes/Agent Ops/Monitors warm tips; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Backfill: missing keep row for v0.1.3066.
+- Shipped **v0.1.3067** — warmer CPU metrics rings-filter + fallback Tab tips (KISS; processes/Agent Ops parity); Mac capture still TCC-blocked.
+- Ratchet keep @ a785391b7 for 3067; backfill keep for 3066; sync-dist + push (UI; Linux rack no /Applications install/kickstart).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · leftover cold Perplexity/Debug Log/Settings theme-list kb-hints · SoftDisabled…userclients closed — not another keep-pNN pmset clone.
+
+## Overnight merge — v0.1.3067
+
+- Design-review fuel after Power user-clients v0.1.3066: rings-filter chips and the generic filter-chip fallback still used the older “Home/End move · Enter / Space…” phrasing while processes · Monitors · Disk Cleanup · AI Chat · Agent Ops chip bars already sat on shorter warmer KISS copy. Digester empty; design-review due=false — polish-without-capture feature-cpu-metrics (Mac TCC); layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…userclients closed; leftover Perplexity/Debug Log/Settings theme-list tips optional; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~02:25 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Agent Ops polish already shipped tonight as v0.1.3065).
