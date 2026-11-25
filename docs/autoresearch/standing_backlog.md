@@ -1,3 +1,18 @@
+## Overnight note 2026-11-25 ~21:49 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Appearance · Product · Changelog body Tab-first already shipped as v0.1.3086).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window (1 interesting content line only).
+- Fuel: standing backlog Disk Cleanup scope/category list polish after v0.1.3086 — still said “Scopes · …” / “Categories · … · ⌘S saves” while Monitors / Top Processes already used filter-chip names; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Shipped **v0.1.3087** — Disk Cleanup scope · category list filter-aware kb-hints (+ theme seeds); Mac capture still TCC-blocked.
+- Ratchet keep @ cb94982a2 for 3087; sync-dist + install/kickstart + push (UI).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…pmhistory closed — filter-chip leftover tips optional · remaining useful non-blocking `pmset -g` adapters only if clearly distinct (`disk` == `custom`; `uuidlog` blocks); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3087
+
+- Standing-backlog fuel after Appearance · Product · Changelog body Tab-first v0.1.3086: Disk Cleanup scope/category list tips still said “Scopes · …” / “Categories · … · ⌘S saves” while Monitors / Top Processes already sat on filter-aware KISS tips. Digester empty; design-review due=false — polish-without-capture; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory soft-state closed; not another keep-pNN clone.
 ## Overnight note 2026-11-25 ~21:23 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; header · footer Tab-first already shipped as v0.1.3085).

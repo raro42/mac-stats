@@ -3,6 +3,7 @@
 Overnight Track B (mac-stats product ratchet). Digester open empty; design-review grace; layout-daily data-poster marked (Dark next). Avoided another soft-state keep-pNN.
 
 ## Shipped tonight
+- **v0.1.3087** — Disk Cleanup scope · category list filter-aware kb-hints (+ theme seeds)
 - **v0.1.3086** — Settings Appearance · Product · Changelog body Tab-first kb-hints (+ theme seeds)
 - **v0.1.3085** — CPU window header · footer Tab-first kb-hints (+ theme seeds)
 - **v0.1.3084** — Settings Credentials Mastodon · Browser · Cursor · Telegram · Slack Tab-first kb-hints (+ theme seeds)
@@ -28,10 +29,10 @@ Overnight Track B (mac-stats product ratchet). Digester open empty; design-revie
 - **v0.1.3062** — Raw battery from `pmset -g rawbatt`
 
 ## Notes
-Digester empty; layout-daily Dark waits for next calendar day. Appearance · Product · Changelog body leftover Tab-first tips finished with v0.1.3086. Soft-state keep-pNN closed for SoftDisabled…pmhistory.
+Digester empty; layout-daily Dark waits for next calendar day. Disk Cleanup scope/category list filter-aware tips finished with v0.1.3087. Soft-state keep-pNN closed for SoftDisabled…pmhistory.
 
 ## Next
 - Soft-state leftover closed for SoftDisabled…pmhistory
-- Optional: Disk Cleanup scope/category list polish · filter-chip leftover tips
+- Optional: filter-chip leftover tips
 - Remaining useful non-blocking `pmset -g` adapters only if clearly distinct
 - Dark layout-daily next calendar day
