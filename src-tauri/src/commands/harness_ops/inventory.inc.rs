@@ -27241,6 +27241,16 @@ pub fn looks_like_sysload_request(content: &str) -> bool {
         || n.contains("assertions")
         || n.contains("systemsleep")
         || n.contains("sleepdisabled")
+        || n.contains("systemstate")
+        || n.contains("system-state")
+        || n.contains("system state")
+        || n.contains("sysstate")
+        || n.contains("system-power-state")
+        || n.contains("system power state")
+        || n.contains("system-capabilities")
+        || n.contains("system capabilities")
+        || n == "/systemstate"
+        || n == "/sysstate"
         || n.contains("1m")
         || n.contains("5m")
         || n.contains("15m")
@@ -28718,6 +28728,17 @@ pub fn looks_like_pmcap_request(content: &str) -> bool {
         || n == "the pm-capabilities"
         || n == "capabilities"
         || n == "the capabilities"
+        || n.contains("systemstate")
+        || n.contains("system-state")
+        || n.contains("system state")
+        || n.contains("sysstate")
+        || n.contains("system-power-state")
+        || n.contains("system power state")
+        || n.contains("system-capabilities")
+        || n.contains("system capabilities")
+        || n == "/systemstate"
+        || n == "/sysstate"
+        || n == "/system-capabilities"
     {
         return false;
     }
@@ -31433,6 +31454,12 @@ pub fn looks_like_rawbatt_request(content: &str) -> bool {
         || n == "/accps"
         || n == "/pmps"
         || n == "/pmuuid"
+        || n.contains("systemstate")
+        || n.contains("system-state")
+        || n.contains("system state")
+        || n.contains("sysstate")
+        || n == "/systemstate"
+        || n == "/sysstate"
         || n == "rawbatt"
         || n == "the rawbatt"
         || n == "raw-batt"
@@ -31591,6 +31618,291 @@ pub fn format_rawbatt_report() -> String {
         return "**Raw battery** — _no raw battery dump on this Mac right now._".to_string();
     }
     format!("**Raw battery** · `{v}`")
+}
+
+
+/// System state — power state + capability bits from `pmset -g systemstate`.
+/// Slash + view/open NL (`/systemstate` · `/sysstate` · `view systemstate`).
+/// Bare `systemstate` / `system state` / `sysstate` stay with the agent;
+/// `/pmcap` · `/power-capabilities` stay Power capabilities (`pmset -g cap`);
+/// `/sysload` stays System load; `/pmlive` stays Power live;
+/// `/powerstate` reserved for IOKit driver states (not this lane).
+pub fn looks_like_systemstate_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("pmcap")
+        || n.contains("power-cap")
+        || n.contains("power cap")
+        || n.contains("power-capabilities")
+        || n.contains("power capabilities")
+        || n.contains("pm-capabilities")
+        || n.contains("pm capabilities")
+        || n.contains("sysload")
+        || n.contains("sys-load")
+        || n.contains("sys load")
+        || n.contains("load-level")
+        || n.contains("load level")
+        || n.contains("system-load-level")
+        || n.contains("system load level")
+        || n.contains("pmlive")
+        || n.contains("pm-live")
+        || n.contains("power-live")
+        || n.contains("power live")
+        || n.contains("currently-in-use")
+        || n.contains("currently in use")
+        || n.contains("rawbatt")
+        || n.contains("raw-batt")
+        || n.contains("raw battery")
+        || n.contains("pmuuid")
+        || n.contains("sleep-wake-uuid")
+        || n.contains("sleep wake uuid")
+        || n.contains("accps")
+        || n.contains("accessory power")
+        || n.contains("pmps")
+        || n.contains("power source")
+        || n.contains("assertions")
+        || n.contains("powersched")
+        || n.contains("power schedule")
+        || n == "/pmcap"
+        || n == "/power-cap"
+        || n == "/power-capabilities"
+        || n == "/sysload"
+        || n == "/load-level"
+        || n == "/pmlive"
+        || n == "/power-live"
+        || n == "/powerstate"
+        || n == "/power-state"
+        || n == "/tasks"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/ups"
+        || n == "/adapter"
+        || n == "/charger"
+        // Bare phrases stay with the agent.
+        || n == "systemstate"
+        || n == "the systemstate"
+        || n == "system-state"
+        || n == "the system-state"
+        || n == "system state"
+        || n == "the system state"
+        || n == "pmsetsystemstate"
+        || n == "the pmsetsystemstate"
+        || n == "pmset-systemstate"
+        || n == "the pmset-systemstate"
+        || n == "pmset systemstate"
+        || n == "the pmset systemstate"
+        || n == "pm-systemstate"
+        || n == "the pm-systemstate"
+        || n == "sysstate"
+        || n == "the sysstate"
+        || n == "sys-state"
+        || n == "the sys-state"
+        || n == "system-power-state"
+        || n == "the system-power-state"
+        || n == "system power state"
+        || n == "the system power state"
+        || n == "system-capabilities"
+        || n == "the system-capabilities"
+        || n == "system capabilities"
+        || n == "the system capabilities"
+        || n == "powerstate"
+        || n == "the powerstate"
+        || n == "power-state"
+        || n == "the power-state"
+        || n == "power state"
+        || n == "the power state"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+            "/systemstate"
+            | "/systemstate-status"
+            | "/systemstate-state"
+            | "/system-state"
+            | "/system-state-status"
+            | "/system-state-state"
+            | "/pmset-systemstate"
+            | "/pmset-systemstate-status"
+            | "/pmset-systemstate-state"
+            | "/pmsetsystemstate"
+            | "/pmsetsystemstate-status"
+            | "/pm-systemstate"
+            | "/pm-systemstate-status"
+            | "/sysstate"
+            | "/sysstate-status"
+            | "/sysstate-state"
+            | "/system-power-state"
+            | "/system-power-state-status"
+            | "/system-capabilities"
+            | "/system-capabilities-status"
+            | "/mac-systemstate"
+            | "/mac-system-state"
+            | "/mac-pmset-systemstate"
+            | "/mac-sysstate"
+            | "/mac-system-power-state"
+            | "/mac-system-capabilities"
+            | "/mac-systemstate-status"
+            | "/mac-sysstate-status"
+            | "systemstate status"
+            | "the systemstate status"
+            | "systemstate state"
+            | "the systemstate state"
+            | "system-state status"
+            | "the system-state status"
+            | "system state status"
+            | "the system state status"
+            | "pmset-systemstate status"
+            | "the pmset-systemstate status"
+            | "pmset systemstate status"
+            | "the pmset systemstate status"
+            | "sysstate status"
+            | "the sysstate status"
+            | "sysstate state"
+            | "the sysstate state"
+            | "system-power-state status"
+            | "the system-power-state status"
+            | "system power state status"
+            | "the system power state status"
+            | "system-capabilities status"
+            | "the system-capabilities status"
+            | "system capabilities status"
+            | "the system capabilities status"
+            | "my systemstate"
+            | "my systemstate status"
+            | "my system state"
+            | "my system-state"
+            | "my sysstate"
+            | "my system capabilities"
+            | "is systemstate ok"
+            | "is the systemstate ok"
+            | "how's systemstate"
+            | "hows systemstate"
+            | "how's the systemstate"
+            | "hows the systemstate"
+            | "how's system state"
+            | "hows system state"
+            | "what's my systemstate"
+            | "whats my systemstate"
+            | "what is my systemstate"
+            | "what's my systemstate status"
+            | "whats my systemstate status"
+            | "what is my systemstate status"
+            | "what's my system state"
+            | "whats my system state"
+            | "what is my system state"
+            | "what's the systemstate"
+            | "whats the systemstate"
+            | "what is the systemstate"
+            | "what's the systemstate status"
+            | "whats the systemstate status"
+            | "what is the systemstate status"
+            | "what's the system state"
+            | "whats the system state"
+            | "what is the system state"
+            | "what's the system capabilities"
+            | "whats the system capabilities"
+            | "what is the system capabilities"
+            | "view systemstate"
+            | "view the systemstate"
+            | "view systemstate status"
+            | "view the systemstate status"
+            | "view system-state"
+            | "view the system-state"
+            | "view system state"
+            | "view the system state"
+            | "view pmset-systemstate"
+            | "view the pmset-systemstate"
+            | "view pmset systemstate"
+            | "view the pmset systemstate"
+            | "view sysstate"
+            | "view the sysstate"
+            | "view system-power-state"
+            | "view the system-power-state"
+            | "view system power state"
+            | "view the system power state"
+            | "view system-capabilities"
+            | "view the system-capabilities"
+            | "view system capabilities"
+            | "view the system capabilities"
+            | "see systemstate"
+            | "see the systemstate"
+            | "see system state"
+            | "see the system state"
+            | "see sysstate"
+            | "see the sysstate"
+            | "see system capabilities"
+            | "see the system capabilities"
+            | "open systemstate"
+            | "open the systemstate"
+            | "open systemstate status"
+            | "open the systemstate status"
+            | "open system-state"
+            | "open system state"
+            | "open sysstate"
+            | "open system-power-state"
+            | "open system power state"
+            | "open system-capabilities"
+            | "open system capabilities"
+            | "open pmset-systemstate"
+            | "list systemstate"
+            | "list the systemstate"
+            | "list systemstate status"
+            | "list the systemstate status"
+            | "list system-state"
+            | "list the system-state"
+            | "list system state"
+            | "list the system state"
+            | "list sysstate"
+            | "list the sysstate"
+            | "list system-power-state"
+            | "list the system-power-state"
+            | "list system capabilities"
+            | "list the system capabilities"
+    )
+}
+
+/// Zero-LLM system state from `pmset -g systemstate` (macOS-only; empty elsewhere).
+pub fn format_systemstate_report() -> String {
+    let v = crate::metrics::get_systemstate_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**System state** — _no system power state on this Mac right now._".to_string();
+    }
+    format!("**System state** · `{v}`")
 }
 
 

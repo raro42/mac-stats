@@ -7318,6 +7318,66 @@ mod tests {
         );
     }
 
+    #[test]
+    fn systemstate_slash_and_view_open_do_not_steal_pmcap_sysload_or_bare() {
+        assert!(looks_like_systemstate_request("/systemstate"));
+        assert!(looks_like_systemstate_request("/systemstate-status"));
+        assert!(looks_like_systemstate_request("/system-state"));
+        assert!(looks_like_systemstate_request("/pmset-systemstate"));
+        assert!(looks_like_systemstate_request("/sysstate"));
+        assert!(looks_like_systemstate_request("/system-power-state"));
+        assert!(looks_like_systemstate_request("/system-capabilities"));
+        assert!(looks_like_systemstate_request("/mac-systemstate"));
+        assert!(looks_like_systemstate_request("/mac-sysstate"));
+        assert!(looks_like_systemstate_request("view systemstate"));
+        assert!(looks_like_systemstate_request("open system-state"));
+        assert!(looks_like_systemstate_request("list system capabilities"));
+        assert!(looks_like_systemstate_request("systemstate status"));
+        assert!(looks_like_systemstate_request("is systemstate ok"));
+        assert!(looks_like_systemstate_request("what's my systemstate"));
+        assert!(looks_like_systemstate_request("what's the system state"));
+        assert!(looks_like_systemstate_request("view system capabilities"));
+        assert!(!looks_like_systemstate_request("systemstate"));
+        assert!(!looks_like_systemstate_request("system state"));
+        assert!(!looks_like_systemstate_request("sysstate"));
+        assert!(!looks_like_systemstate_request("system capabilities"));
+        assert!(!looks_like_systemstate_request("/pmcap"));
+        assert!(!looks_like_systemstate_request("view power capabilities"));
+        assert!(!looks_like_systemstate_request("/sysload"));
+        assert!(!looks_like_systemstate_request("view sysload"));
+        assert!(!looks_like_systemstate_request("/pmlive"));
+        assert!(!looks_like_systemstate_request("/powerstate"));
+        assert!(!looks_like_systemstate_request("/tasks"));
+        assert!(!looks_like_systemstate_request("enable systemstate"));
+        assert!(!looks_like_pmcap_request("/systemstate"));
+        assert!(!looks_like_pmcap_request("view systemstate"));
+        assert!(!looks_like_sysload_request("/systemstate"));
+        assert!(!looks_like_sysload_request("view systemstate"));
+        assert!(!looks_like_rawbatt_request("/systemstate"));
+        let s = try_operator_instant_reply("/systemstate").unwrap();
+        assert!(
+            s.contains("**System state**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view systemstate").unwrap();
+        assert!(
+            viewed.contains("**System state**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open system-state").unwrap();
+        assert!(
+            open.contains("**System state**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("systemstate").is_none());
+        assert!(try_operator_instant_reply("system state").is_none());
+        let pmcap = try_operator_instant_reply("/pmcap").unwrap();
+        assert!(
+            !pmcap.contains("**System state**"),
+            "Power capabilities /pmcap must stay put, got: {pmcap}"
+        );
+    }
+
 
     #[test]
     fn sysload_slash_and_view_open_do_not_steal_load_heat_or_bare() {

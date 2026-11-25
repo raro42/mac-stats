@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.3063] - 2026-11-25
+
+### Added
+- Instant System state accepts `/systemstate` · `/systemstate-status` · `/systemstate-state` · `/system-state` · `/system-state-status` · `/system-state-state` · `/pmset-systemstate` · `/pmset-systemstate-status` · `/pmset-systemstate-state` · `/pmsetsystemstate` · `/pmsetsystemstate-status` · `/pm-systemstate` · `/pm-systemstate-status` · `/sysstate` · `/sysstate-status` · `/sysstate-state` · `/system-power-state` · `/system-power-state-status` · `/system-capabilities` · `/system-capabilities-status` · `/mac-systemstate` · `/mac-system-state` · `/mac-pmset-systemstate` · `/mac-sysstate` · `/mac-system-power-state` · `/mac-system-capabilities` · `/mac-systemstate-status` · `/mac-sysstate-status` and view/see/open/list NL (`view systemstate`, `open system-state`, `list system capabilities`, …), matching “systemstate status” / “is systemstate ok” / “what's my systemstate” / “what's the system state”. Bare `systemstate` / `system state` / `sysstate` stay with the agent; `/pmcap` · `/power-capabilities` stay Power capabilities; `/sysload` · `/load-level` stay System load; `/pmlive` · `/power-live` stay Power live; `/powerstate` stays IOKit drivers. Uses `pmset -g systemstate` (Current Power State + CPU/Graphics/Audio/Network caps). Operator `/help` lists the new lane.
+
+
 ## [0.1.3062] - 2026-11-25
 
 ### Added

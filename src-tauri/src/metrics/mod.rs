@@ -9338,6 +9338,118 @@ pub fn get_rawbatt_status() -> String {
     }
 }
 
+/// Parse `pmset -g systemstate` → compact status (power state + capability bits).
+/// Sample:
+///   Current System Capabilities are: CPU Graphics Audio Network
+///   Current Power State: 3
+pub(crate) fn parse_pmset_systemstate(raw: &str) -> Option<String> {
+    let mut caps: Vec<String> = Vec::new();
+    let mut state: Option<String> = None;
+    let mut notes: Vec<String> = Vec::new();
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let lower = t.to_ascii_lowercase();
+        if lower.starts_with("current system capabilities are:") {
+            let rest = t.splitn(2, ':').nth(1).unwrap_or("").trim();
+            for tok in rest.split_whitespace() {
+                let p = tok.trim().trim_matches(|c| c == ',' || c == ';');
+                if !p.is_empty() {
+                    caps.push(p.to_string());
+                }
+            }
+            continue;
+        }
+        if lower.starts_with("current power state:") {
+            let rest = t.splitn(2, ':').nth(1).unwrap_or("").trim();
+            if !rest.is_empty() {
+                state = Some(rest.to_string());
+            }
+            continue;
+        }
+        if lower.starts_with("desired state:")
+            || lower.starts_with("system restart is in progress")
+            || lower.starts_with("system state is changing")
+            || lower.starts_with("system is waking")
+            || lower.starts_with("transitioning")
+        {
+            let note = if t.len() > 80 {
+                let mut s: String = t.chars().take(77).collect();
+                s.push('…');
+                s
+            } else {
+                t.to_string()
+            };
+            notes.push(note);
+        }
+    }
+    let mut bits: Vec<String> = Vec::new();
+    if let Some(s) = state {
+        bits.push(format!("state {s}"));
+    }
+    if !caps.is_empty() {
+        bits.push(caps.join(" · "));
+    }
+    bits.extend(notes);
+    if bits.is_empty() {
+        return None;
+    }
+    let mut out = bits.join(" · ");
+    if out.len() > 420 {
+        out.truncate(417);
+        out.push_str("…");
+    }
+    Some(out)
+}
+
+/// Compact system power state for Discord-sized chips.
+pub(crate) fn format_systemstate_parts(info: Option<&str>) -> String {
+    info.map(str::trim)
+        .filter(|s| !s.is_empty())
+        .map(|s| s.to_string())
+        .unwrap_or_default()
+}
+
+/// macOS system power state + capability bits from `pmset -g systemstate`.
+/// Distinct from Power capabilities `/pmcap` (`pmset -g cap` settings list),
+/// System load `/sysload`, Power live `/pmlive`, IOKit driver `/powerstate` (not this lane).
+/// Used by Discord/operator instant `/systemstate` · `/sysstate` lane.
+pub fn get_systemstate_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "systemstate"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("systemstate: pmset -g systemstate non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("systemstate: pmset -g systemstate spawn failed");
+                return String::new();
+            }
+        };
+        let info = format_systemstate_parts(parse_pmset_systemstate(&stdout).as_deref());
+        if info.is_empty() {
+            debug3!("systemstate: empty status");
+        } else {
+            debug3!("systemstate status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -15611,6 +15723,31 @@ mod rawbatt_parse_tests {
         assert_eq!(format_rawbatt_parts(None), "");
         assert_eq!(parse_pmset_rawbatt(""), None);
         assert_eq!(parse_pmset_rawbatt("Polled boot=now"), None);
+    }
+}
+
+
+#[cfg(test)]
+mod systemstate_parse_tests {
+    use super::{format_systemstate_parts, parse_pmset_systemstate};
+
+    const SAMPLE: &str = "\
+Current System Capabilities are: CPU Graphics Audio Network
+Current Power State: 3
+";
+
+    #[test]
+    fn parse_pmset_systemstate_reads_state_and_caps() {
+        let s = parse_pmset_systemstate(SAMPLE).expect("parsed");
+        assert!(s.contains("state 3"), "got: {s}");
+        assert!(s.contains("CPU"), "got: {s}");
+        assert!(s.contains("Graphics"), "got: {s}");
+        assert!(s.contains("Audio"), "got: {s}");
+        assert!(s.contains("Network"), "got: {s}");
+        assert_eq!(format_systemstate_parts(Some(&s)), s);
+        assert_eq!(format_systemstate_parts(None), "");
+        assert_eq!(parse_pmset_systemstate(""), None);
+        assert_eq!(parse_pmset_systemstate("nope"), None);
     }
 }
 

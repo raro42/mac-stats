@@ -1453,6 +1453,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_rawbatt_request(content) {
         return Some(format_rawbatt_report());
     }
+    // System state from `pmset -g systemstate` (bare `systemstate` / `system state` stay with the agent;
+    // `/pmcap` stays Power capabilities; `/sysload` stays System load; `/pmlive` stays Power live;
+    // `/powerstate` reserved for IOKit drivers — not this lane).
+    if looks_like_systemstate_request(content) {
+        return Some(format_systemstate_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;
