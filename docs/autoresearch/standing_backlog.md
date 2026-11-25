@@ -1,3 +1,19 @@
+## Overnight note 2026-11-25 ~04:30 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Settings/Changelog theme seeds already shipped as v0.1.3074).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: design-review theme-list seeds after Settings/Changelog seeds v0.1.3074 — still said “Enter / Space applies theme” while JS THEME_LIST_KB_HINT already warm; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Backfill: missing keep row for v0.1.3074.
+- Shipped **v0.1.3075** — warmer Appearance theme-list Tab tip seeds (all shells; first-paint parity with JS); Mac capture still TCC-blocked.
+- Ratchet keep @ e4113ccd4 for 3075; backfill keep for 3074; sync-dist + push (UI themes; Linux rack no /Applications install/kickstart).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…pmhistory closed — Monitors row tooltip leftover “Click or d · Enter / Space checks now” optional · remaining useful non-blocking `pmset -g` adapters only if clearly distinct (`disk` == `custom`; `uuidlog` blocks); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3075
+
+- Design-review fuel after Settings/Changelog theme seeds v0.1.3074: Appearance theme-list first-paint seeds across all shells still used cold “Enter / Space applies theme” while JS `THEME_LIST_KB_HINT` already sat on “Tab a theme · … · Enter applies”. Digester empty; design-review due=false — polish-without-capture; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory soft-state closed; Monitors row tooltip optional; not another keep-pNN clone.
 ## Overnight note 2026-11-25 ~04:20 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Settings/Changelog tips already shipped remote as v0.1.3073).

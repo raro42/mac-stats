@@ -1,24 +1,26 @@
 # Morning surprise — 2026-11-25
 
-Overnight Track B (mac-stats product ratchet). Digester open empty; design-review grace; layout-daily data-poster marked (Dark next). Avoided another soft-state keep-pNN.
+Overnight Track B (mac-stats product ratchet). Digester open empty; design-review grace; layout-daily data-poster marked (Dark next). Avoided another pmset keep-pNN.
 
-## Shipped tonight
-- **v0.1.3074** — warmer Settings/Appearance/Changelog theme HTML Tab tip seeds (first-paint parity with JS v0.1.3073)
-- **v0.1.3073** — warmer Settings/Changelog header Tab tips (JS; remote race, local dup discarded)
+## Shipped
+- **v0.1.3075** — Appearance theme-list Tab tip seeds (all shells): first-paint matches warmer JS (`Tab a theme · … · Enter applies`; drop leftover “Enter / Space applies theme”)
+- **v0.1.3074** — Theme HTML Settings header · Appearance · Changelog Tab tip seeds
+- **v0.1.3073** — Settings header · Appearance · Changelog header kb-hints (JS)
 - **v0.1.3072** — Power history instant status from `pmset -g history`
-- **v0.1.3071** — warmer theme HTML Tab tip parity
-- **v0.1.3070** — warmer theme HTML kb-hint seeds (drop Home/End move)
-- **v0.1.3069** — warmer Perplexity + Debug Log kb-hints
-- **v0.1.3068** — warmer Settings leftover kb-hints
-- **v0.1.3067** — warmer CPU metrics ring filter kb-hints
-- **v0.1.3066** — Power user-clients from `pmset -g userclients`
-- **v0.1.3064** — Battery charge limit from `pmset -g battlimit`
-- **v0.1.3062** — Raw battery from `pmset -g rawbatt`
+  - Slash + NL: `/pmhistory` · `/pm-history` · `/pmset-history` · `/power-history` · `/sleep-wake-history` · `/sw-history` · `/mac-pmhistory` (+ view/open/list)
+  - Sleep/wake UUID timeline · none yet when disabled; does not steal `/pmlog` · `/pmuuid` · `/pmstats` or metrics history.json
+- **v0.1.3071** — Theme HTML Tab tip parity (all shells; finish first-paint warmer tips after 3070)
+- **v0.1.3070** — Theme HTML kb-hint seeds drop leftover “Home/End move”
+- **v0.1.3069** — Perplexity Search · setup + Debug Log toolbar kb-hints
+- **v0.1.3068** — Settings leftover kb-hints (modal header Close fallback · theme-list JS)
+- Earlier tonight: Power user-clients · Agent Ops leftover tips · Battery charge limit · System state · Raw battery · Sleep/Wake UUID · Accessory power · …
 
-## Notes
-Digester empty; layout-daily Dark waits for next calendar day. Last unwired non-blocking `pmset -g` getter was `history` (`disk` mirrors `custom`; `uuidlog` blocks). Shipped `/pmhistory` (v0.1.3072), then Settings tip polish (v0.1.3073–3074).
+## Fuel choice
+Digester empty; layout-daily Dark waits for next calendar day. After Settings/Changelog seeds (v0.1.3074), Appearance theme-list HTML still seeded cold “Enter / Space applies theme” while JS already warm — finished that leftover (v0.1.3075).
 
 ## Next
-- Soft-state leftover closed for SoftDisabled…userclients/pmhistory
-- Remaining useful non-blocking `pmset -g` adapters only if clearly distinct
-- Dark layout-daily next calendar day
+- Dark layout-daily (next calendar quota)
+- Soft-state leftover closed for SoftDisabled…pmhistory
+- Optional: Monitors row tooltip leftover “Click or d · Enter / Space checks now”
+- Remaining useful non-blocking `pmset -g` adapters only if clearly distinct (`disk` mirrors custom; `uuidlog` blocks)
+- not another keep-pNN clone
