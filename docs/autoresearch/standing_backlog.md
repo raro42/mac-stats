@@ -1,3 +1,18 @@
+## Overnight note 2026-11-25 ~20:57 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Credentials Mastodon·Browser·Cursor·Telegram·Slack already shipped as v0.1.3084).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window (1 interesting content line only).
+- Fuel: standing backlog header/footer leftover tips after v0.1.3084 — CPU header · footer still started bare “← → / h l · Home/End…” while Logs / Disk Cleanup / icon-line already Tab-first; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Shipped **v0.1.3085** — CPU window header · footer Tab-first kb-hints (+ theme seeds); Mac capture still TCC-blocked.
+- Ratchet keep @ e4fd6c275 for 3085; sync-dist + install/kickstart + push (UI).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…pmhistory closed — Appearance/Product/Changelog body leftover bare tips optional · Disk Cleanup scope/category list polish optional · filter-chip leftover tips optional · remaining useful non-blocking `pmset -g` adapters only if clearly distinct (`disk` == `custom`; `uuidlog` blocks); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3085
+
+- Standing-backlog fuel after Credentials Mastodon·Browser·Cursor·Telegram·Slack Tab-first v0.1.3084: CPU header Refresh·Settings and footer version·GitHub tips still started with bare “← → / h l · Home/End…” while Logs / Disk Cleanup / icon-line already sat on Tab-first KISS tips. Digester empty; design-review due=false — polish-without-capture; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory soft-state closed; not another keep-pNN clone.
 ## Overnight note 2026-11-25 ~20:35 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Brave · Redmine · MCP already shipped as v0.1.3083).
