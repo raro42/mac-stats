@@ -1,3 +1,19 @@
+## Overnight note 2026-11-25 ~23:18 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear tiny port this tick.
+- Debug.log: soul/content noise only (no product ERROR/panic).
+- Fuel: standing backlog remaining useful non-blocking `pmset -g` after SoftDisabled…pmhistory closed — `/powerstate` was reserved for IOKit drivers but not shipped; dump is huge so summarize; not tip/keep-pNN/pmhistory clone; Dark layout-daily next calendar day.
+- Shipped **v0.1.3092** — Power state `/powerstate` · `/iokit-drivers` · `/power-state` (+ view/open NL); summarized driver count · root · top descs · below-max; bare stays with agent; `/systemstate` · `/userclients` intact.
+- Ratchet keep @ 8c1cb7052; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…pmhistory + powerstate closed — remaining useful non-blocking `pmset -g` only if clearly distinct (`disk` == `custom`; `uuidlog` / logs block); not another keep-pNN clone · tip train closed for night.
+
+## Overnight merge — v0.1.3092
+
+- Standing-backlog fuel after memory scrub v0.1.3091: ship the reserved IOKit `/powerstate` lane as a Discord-sized summary of `pmset -g powerstate`. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory + powerstate closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~22:49 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; filter-chip tips already shipped as v0.1.3088).
