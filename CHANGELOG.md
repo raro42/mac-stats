@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3070] - 2026-11-25
+
+### Changed
+- Theme HTML keyboard-hint seeds (all shells): drop leftover “Home/End move” so first paint matches warmer JS Tab tips already shipping for Settings / Agent Ops / Perplexity / Debug Log / rings (design-review polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
 ## [0.1.3069] - 2026-11-25
 
 ### Changed
