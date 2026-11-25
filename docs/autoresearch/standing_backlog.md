@@ -1,3 +1,20 @@
+## Overnight note 2026-11-25 ~04:05 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Power history already shipped as v0.1.3072).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: design-review Settings header / Appearance / Changelog after Power history v0.1.3072 — still said “Enter / Space …” while Ollama / modal-header / theme-list already warm; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Backfill: missing keep row for v0.1.3072.
+- Shipped **v0.1.3073** — warmer Settings header · Appearance · Changelog header Tab tips (KISS; Ollama / modal-header parity); Mac capture still TCC-blocked.
+- Ratchet keep @ d1d871bb5 for 3073; backfill keep for 3072; sync-dist + push (UI; Linux rack no /Applications install/kickstart).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…pmhistory closed — remaining useful non-blocking `pmset -g` adapters only if clearly distinct (`disk` == `custom`; `uuidlog` blocks); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3073
+
+- Design-review fuel after Power history v0.1.3072: Settings header · Appearance · Changelog header still used cold “Enter / Space …” phrasing while Ollama header / modal-header fallback / theme-list already sat on shorter warmer KISS Tab tips. Digester empty; design-review due=false — polish-without-capture; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory soft-state closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~03:50 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; theme Tab tip parity already shipped as v0.1.3071).
