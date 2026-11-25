@@ -1,22 +1,23 @@
-# Morning surprise 2026-11-25
+# Morning surprise — 2026-11-25
 
-Overnight autoresearch kept shipping power/pmset instant lanes, then switched to Agent Ops design-review polish.
+Overnight Track B (mac-stats product ratchet). Digester open empty; design-review grace (Agent Ops polish already shipped); layout-daily data-poster marked (Dark next).
 
 ## Shipped
-- **v0.1.3065** Agent Ops leftover kb-hints — filter row · Soul/Skill/Mood · Save/Load/Back · Copy/Load preview · Runs Insights (shorter, warmer Tab tips; polish-without-capture)
-- **v0.1.3064** Battery charge limit — `/battlimit` · `/charge-limit` from `pmset -g battlimit` (lower/upper % or none set)
-- **v0.1.3063** System state — `/systemstate` · `/sysstate` · `/system-power-state` · `/system-capabilities` from `pmset -g systemstate`
-- **v0.1.3062** Raw battery — `/rawbatt` · `/raw-battery` from `pmset -g rawbatt`
-- **v0.1.3061** Sleep/Wake UUID — `/pmuuid` · `/sleep-wake-uuid` from `pmset -g uuid`
-- **v0.1.3060** Accessory power — `/accps` · `/accessory-power` from `pmset -g accps`
-- Earlier tonight: Power everything / live / adapters / custom / source / useractivity / cap / stats / therm / …
+- **v0.1.3066** — Power user-clients instant status from `pmset -g userclients`
+  - Slash + NL: `/userclients` · `/user-clients` · `/pmset-userclients` · `/power-clients` · `/pm-clients` · `/iokit-clients` · `/mac-userclients` (+ view/open/list)
+  - Shows hold count · unique procs · top names (×N)
+  - Does not steal `/useractivity` · `/assertions` · `/tasks` · `/powerstate`
+- **v0.1.3065** — Agent Ops leftover kb-hints (shorter, warmer Tab tips; polish-without-capture)
+- **v0.1.3064** — Battery charge limit from `pmset -g battlimit`
+- **v0.1.3063** — System state from `pmset -g systemstate`
+- **v0.1.3062** — Raw battery from `pmset -g rawbatt`
+- Earlier tonight: Sleep/Wake UUID · Accessory power · Power everything / live / adapters / custom / source / … soft-state lane chain
 
-## Tried / skipped
-- Digester empty (0 runs / 7d)
-- Design review due=false (grace; Mac TCC — polish-without-capture on Agent Ops kb-hints)
-- Layout daily: data-poster marked today; **Dark** next calendar quota
-- `pmset -g profiles` invalid; blocking `history`/`thermlog`/`rawlog` skipped
+## Fuel choice
+Digester empty; design-review already used tonight on Agent Ops; layout-daily Dark waits for next calendar day. Standing backlog asked for useful non-blocking `pmset -g` adapters (not soft-state keep-pNN) — `userclients` returns a live hold list, so ship it.
 
 ## Next
-- Dark layout-daily next calendar day
-- Soft-state leftover closed for SoftDisabled…battlimit — not another keep-pNN pmset clone
+- Dark layout-daily (next calendar quota)
+- Soft-state leftover closed for SoftDisabled…battlimit/userclients
+- Remaining useful non-blocking `pmset -g` adapters only if clearly distinct
+- not another keep-pNN clone

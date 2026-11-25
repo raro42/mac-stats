@@ -1,3 +1,20 @@
+## Overnight note 2026-11-25 ~02:25 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Agent Ops polish already shipped tonight as v0.1.3065).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Agent Ops kb-hints v0.1.3065 — Power user-clients from `pmset -g userclients` (hold count · top procs; non-blocking adapter; not soft-state keep-pNN; not `/useractivity` · `/assertions` · `/tasks` · `/powerstate` clone; Dark layout-daily next calendar day).
+- Backfill: missing keep row for v0.1.3065.
+- Shipped **v0.1.3066** — `/userclients` · `/user-clients` · `/pmset-userclients` · `/power-clients` · `/pm-clients` · `/iokit-clients` · `/mac-userclients` · `/mac-power-clients` + view/open NL; bare userclients/user clients/power clients stay with agent; `/useractivity` · `/assertions` · `/tasks` · `/powerstate` intact; `/help` lists lane.
+- Ratchet keep @ ebefa4496 for 3066; backfill keep for 3065; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled…battlimit/userclients — remaining useful non-blocking `pmset -g` adapters only if clearly distinct; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3066
+
+- Product fuel after Agent Ops kb-hints v0.1.3065: IOKit power user-client holders already readable via `pmset -g userclients` but lacked `/userclients` · `/user-clients` · `/pmset-userclients` · `/power-clients` · `/pm-clients` · `/iokit-clients` · `/mac-userclients` and view/see/open/list phrases while User activity `/useractivity`, Sleep assertions `/assertions`, process list `/tasks`, and IOKit `/powerstate` already had slash+NL. Bare `userclients` / `user clients` / `power clients` stay with the agent. Digester empty; design-review due=false (already used tonight); layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…battlimit/userclients closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~02:15 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
