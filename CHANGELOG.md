@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3075] - 2026-11-25
+
+### Changed
+- Theme HTML Appearance theme-list keyboard-hint seeds (all shells): first-paint Tab tip parity with warmer JS (`Tab a theme · … · Enter applies`; drop leftover “Enter / Space applies theme”) (design-review polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
 ## [0.1.3074] - 2026-11-25
 
 ### Changed
