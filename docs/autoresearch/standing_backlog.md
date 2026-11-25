@@ -1,3 +1,18 @@
+## Overnight note 2026-11-26 ~00:20 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: **due=true** → Data Poster (AI Chat + Monitors); marked 2026-11-26 after ship (Dark next).
+- Sibling: OpenClaw/Hermes present; no clear tiny port this tick.
+- Debug.log: soul/content noise only (no product ERROR/panic).
+- Fuel: layout-daily Data Poster — `#icon-monitors` / `#icon-ollama` (and kin) `.section-open` still mixed accent into `transparent` over opaque CRT chips when panes expand; not tip/keep-pNN/pmset clone.
+- Shipped **v0.1.3094** — opaque poster `--accent` background/border mixes on `#0b0b10` for open section icons.
+- Ratchet keep @ e47689745; sync-dist + install/kickstart + push (UI).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…pmhistory + powerstate + refusal-awareness closed — remaining useful non-blocking `pmset -g` only if clearly distinct (`disk` == `custom`; `uuidlog` / logs block); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3094
+
+- Layout-daily Data Poster: open section icons dropped shared transparent accent washes for opaque poster `--accent` on `#0b0b10`. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26 (Dark due next). Next: Dark layout-daily next calendar day — not another keep-pNN clone.
 ## Overnight note 2026-11-25 ~23:45 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
