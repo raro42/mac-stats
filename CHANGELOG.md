@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3078] - 2026-11-25
+
+### Changed
+- Theme HTML Agent Ops keyboard-hint seeds (all shells): first-paint parity with warmer JS (`Tabs · filters · lists · …`) — drop leftover dense “Tips: 0 overview · …” row (design-review feature-agent-ops polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
 ## [0.1.3077] - 2026-11-25
 
 ### Changed
