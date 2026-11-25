@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3095] - 2026-11-26
+
+### Fixed
+- Dark theme: open section icons (`#icon-monitors` / `#icon-ollama` and kin) drop the shared transparent accent wash for opaque `--accent` mixes on `#000000` when AI Chat / Monitors expand (same class of muddy CRT wash as Data Poster v0.1.3094).
+
 ## [0.1.3094] - 2026-11-26
 
 ### Fixed

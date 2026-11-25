@@ -1985,6 +1985,22 @@ body.theme-data-poster #icon-agent-ops.section-open {
   background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
   border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
 }
+/*
+ * Dark (standing backlog after Data Poster v0.1.3094): same shared `.section-open`
+ * transparent accent wash over opaque `#000000` chips when AI Chat / Monitors
+ * expand. Opaque `--accent` mixes on Dark `--bg` (not a second layout-daily mark).
+ */
+body.theme-dark #icon-monitors.section-open,
+body.theme-dark #icon-ollama.section-open,
+body.theme-dark #icon-perplexity.section-open,
+body.theme-dark #icon-logs.section-open,
+body.theme-dark #icon-disk-cleanup.section-open,
+body.theme-dark #icon-agent-ops.section-open {
+  opacity: 1;
+  color: var(--accent, #00cc66);
+  background: color-mix(in srgb, var(--accent, #00cc66) 14%, #000000);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 32%, #000000);
+}
 body.theme-data-poster #icon-discord.status-good,
 body.theme-data-poster #icon-monitors.status-good,
 body.theme-data-poster #icon-ollama.status-good,
