@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3080] - 2026-11-25
+
+### Changed
+- Theme HTML Monitors add-form keyboard-hint seeds (all shells): first-paint Tab tip parity with warmer JS from v0.1.3079 (`Tab URL · Cancel · Add…`; drop leftover bare ← → / h l · Home/End…) (design-review feature-monitors polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
 ## [0.1.3079] - 2026-11-25
 
 ### Changed
