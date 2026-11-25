@@ -4311,6 +4311,19 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
         || n.contains("until full")
         || n.contains("battery time")
         || n.contains("bat time")
+        // Battery charge limit owns these (not Bat %).
+        || n.contains("battlimit")
+        || n.contains("batt-limit")
+        || n.contains("battery-limit")
+        || n.contains("battery limit")
+        || n.contains("battery-level-limit")
+        || n.contains("battery level limit")
+        || n.contains("charge-limit")
+        || n.contains("charge limit")
+        || n.contains("chargelimit")
+        || n == "/battlimit"
+        || n == "/charge-limit"
+        || n == "/battery-limit"
         // Disk Cleanup owns bare `open disk` / `view disk` (not SSD %).
         || n == "open disk"
         || n == "open the disk"
@@ -8419,8 +8432,20 @@ pub fn looks_like_battery_cycles_request(content: &str) -> bool {
         || n.contains("raw battery")
         || n.contains("raw-battery")
         || n.contains("battery-raw")
+        || n.contains("battlimit")
+        || n.contains("batt-limit")
+        || n.contains("battery-limit")
+        || n.contains("battery limit")
+        || n.contains("battery-level-limit")
+        || n.contains("battery level limit")
+        || n.contains("charge-limit")
+        || n.contains("charge limit")
+        || n.contains("chargelimit")
         || n == "/rawbatt"
         || n == "/raw-battery"
+        || n == "/battlimit"
+        || n == "/charge-limit"
+        || n == "/battery-limit"
         || n == "/battery"
         || n == "/bat"
         || n == "view battery"
@@ -8822,8 +8847,20 @@ pub fn looks_like_battery_time_request(content: &str) -> bool {
         || n.contains("raw battery")
         || n.contains("raw-battery")
         || n.contains("battery-raw")
+        || n.contains("battlimit")
+        || n.contains("batt-limit")
+        || n.contains("battery-limit")
+        || n.contains("battery limit")
+        || n.contains("battery-level-limit")
+        || n.contains("battery level limit")
+        || n.contains("charge-limit")
+        || n.contains("charge limit")
+        || n.contains("chargelimit")
         || n == "/rawbatt"
         || n == "/raw-battery"
+        || n == "/battlimit"
+        || n == "/charge-limit"
+        || n == "/battery-limit"
         || n == "/battery"
         || n == "/bat"
         || n == "view battery"
@@ -31458,8 +31495,20 @@ pub fn looks_like_rawbatt_request(content: &str) -> bool {
         || n.contains("system-state")
         || n.contains("system state")
         || n.contains("sysstate")
+        || n.contains("battlimit")
+        || n.contains("batt-limit")
+        || n.contains("battery-limit")
+        || n.contains("battery limit")
+        || n.contains("battery-level-limit")
+        || n.contains("battery level limit")
+        || n.contains("charge-limit")
+        || n.contains("charge limit")
+        || n.contains("chargelimit")
         || n == "/systemstate"
         || n == "/sysstate"
+        || n == "/battlimit"
+        || n == "/charge-limit"
+        || n == "/battery-limit"
         || n == "rawbatt"
         || n == "the rawbatt"
         || n == "raw-batt"
@@ -31686,6 +31735,15 @@ pub fn looks_like_systemstate_request(content: &str) -> bool {
         || n.contains("rawbatt")
         || n.contains("raw-batt")
         || n.contains("raw battery")
+        || n.contains("battlimit")
+        || n.contains("batt-limit")
+        || n.contains("battery-limit")
+        || n.contains("battery limit")
+        || n.contains("battery-level-limit")
+        || n.contains("battery level limit")
+        || n.contains("charge-limit")
+        || n.contains("charge limit")
+        || n.contains("chargelimit")
         || n.contains("pmuuid")
         || n.contains("sleep-wake-uuid")
         || n.contains("sleep wake uuid")
@@ -31705,6 +31763,9 @@ pub fn looks_like_systemstate_request(content: &str) -> bool {
         || n == "/power-live"
         || n == "/powerstate"
         || n == "/power-state"
+        || n == "/battlimit"
+        || n == "/charge-limit"
+        || n == "/battery-limit"
         || n == "/tasks"
         || n == "/battery"
         || n == "/bat"
@@ -31903,6 +31964,317 @@ pub fn format_systemstate_report() -> String {
         return "**System state** — _no system power state on this Mac right now._".to_string();
     }
     format!("**System state** · `{v}`")
+}
+
+
+/// Battery charge limit — lower/upper % (or none set) from `pmset -g battlimit`.
+/// Slash + view/open NL (`/battlimit` · `/charge-limit` · `view battlimit`).
+/// Bare `battlimit` / `battery limit` / `charge limit` stay with the agent;
+/// `/battery` · `/bat` stay Bat %; `/cycles` stays SPPower cycles;
+/// `/battery-time` stays ETA; `/rawbatt` stays Raw battery; `/accps` stays Accessory power.
+pub fn looks_like_battlimit_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("rawbatt")
+        || n.contains("raw-batt")
+        || n.contains("raw battery")
+        || n.contains("raw-battery")
+        || n.contains("battery-raw")
+        || n.contains("systemstate")
+        || n.contains("system-state")
+        || n.contains("system state")
+        || n.contains("sysstate")
+        || n.contains("accps")
+        || n.contains("accessory power")
+        || n.contains("accessory batteries")
+        || n.contains("pmps")
+        || n.contains("power source")
+        || n.contains("battery-time")
+        || n.contains("battery time")
+        || n.contains("bat-time")
+        || n.contains("cycles")
+        || n.contains("battery-health")
+        || n.contains("battery health")
+        || n == "/rawbatt"
+        || n == "/raw-battery"
+        || n == "/systemstate"
+        || n == "/sysstate"
+        || n == "/accps"
+        || n == "/pmps"
+        || n == "/battery-time"
+        || n == "/cycles"
+        || n == "/battery-health"
+        || n == "/tasks"
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/ups"
+        || n == "/adapter"
+        || n == "/charger"
+        // Bat % owns plain battery level / charge level (not charge *limit*).
+        || n == "battery level"
+        || n == "the battery level"
+        || n == "charge level"
+        || n == "the charge level"
+        || n == "view battery"
+        || n == "view the battery"
+        || n == "open battery"
+        || n == "open the battery"
+        || n == "list battery"
+        || n == "list the battery"
+        || n == "see battery"
+        || n == "see the battery"
+        // Bare phrases stay with the agent.
+        || n == "battlimit"
+        || n == "the battlimit"
+        || n == "batt-limit"
+        || n == "the batt-limit"
+        || n == "batt limit"
+        || n == "the batt limit"
+        || n == "pmsetbattlimit"
+        || n == "the pmsetbattlimit"
+        || n == "pmset-battlimit"
+        || n == "the pmset-battlimit"
+        || n == "pmset battlimit"
+        || n == "the pmset battlimit"
+        || n == "pm-battlimit"
+        || n == "the pm-battlimit"
+        || n == "battery-limit"
+        || n == "the battery-limit"
+        || n == "battery limit"
+        || n == "the battery limit"
+        || n == "battery-level-limit"
+        || n == "the battery-level-limit"
+        || n == "battery level limit"
+        || n == "the battery level limit"
+        || n == "battery-level-limits"
+        || n == "the battery-level-limits"
+        || n == "battery level limits"
+        || n == "the battery level limits"
+        || n == "charge-limit"
+        || n == "the charge-limit"
+        || n == "charge limit"
+        || n == "the charge limit"
+        || n == "charge-limits"
+        || n == "the charge-limits"
+        || n == "charge limits"
+        || n == "the charge limits"
+        || n == "batterylimit"
+        || n == "the batterylimit"
+        || n == "chargelimit"
+        || n == "the chargelimit"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+            "/battlimit"
+            | "/battlimit-status"
+            | "/battlimit-state"
+            | "/batt-limit"
+            | "/batt-limit-status"
+            | "/batt-limit-state"
+            | "/pmset-battlimit"
+            | "/pmset-battlimit-status"
+            | "/pmset-battlimit-state"
+            | "/pmsetbattlimit"
+            | "/pmsetbattlimit-status"
+            | "/pm-battlimit"
+            | "/pm-battlimit-status"
+            | "/battery-limit"
+            | "/battery-limit-status"
+            | "/battery-limit-state"
+            | "/batterylimit"
+            | "/batterylimit-status"
+            | "/battery-level-limit"
+            | "/battery-level-limit-status"
+            | "/battery-level-limits"
+            | "/battery-level-limits-status"
+            | "/charge-limit"
+            | "/charge-limit-status"
+            | "/charge-limit-state"
+            | "/chargelimit"
+            | "/chargelimit-status"
+            | "/charge-limits"
+            | "/charge-limits-status"
+            | "/mac-battlimit"
+            | "/mac-batt-limit"
+            | "/mac-pmset-battlimit"
+            | "/mac-battery-limit"
+            | "/mac-charge-limit"
+            | "/mac-battery-level-limit"
+            | "/mac-battlimit-status"
+            | "/mac-charge-limit-status"
+            | "battlimit status"
+            | "the battlimit status"
+            | "battlimit state"
+            | "the battlimit state"
+            | "batt-limit status"
+            | "the batt-limit status"
+            | "battery-limit status"
+            | "the battery-limit status"
+            | "battery limit status"
+            | "the battery limit status"
+            | "battery-level-limit status"
+            | "the battery-level-limit status"
+            | "battery level limit status"
+            | "the battery level limit status"
+            | "battery level limits status"
+            | "the battery level limits status"
+            | "charge-limit status"
+            | "the charge-limit status"
+            | "charge limit status"
+            | "the charge limit status"
+            | "pmset-battlimit status"
+            | "the pmset-battlimit status"
+            | "pmset battlimit status"
+            | "the pmset battlimit status"
+            | "my battlimit"
+            | "my battlimit status"
+            | "my battery limit"
+            | "my battery-limit"
+            | "my charge limit"
+            | "my charge-limit"
+            | "is battlimit ok"
+            | "is the battlimit ok"
+            | "how's battlimit"
+            | "hows battlimit"
+            | "how's the battlimit"
+            | "hows the battlimit"
+            | "how's battery limit"
+            | "hows battery limit"
+            | "how's charge limit"
+            | "hows charge limit"
+            | "what's my battlimit"
+            | "whats my battlimit"
+            | "what is my battlimit"
+            | "what's my battlimit status"
+            | "whats my battlimit status"
+            | "what is my battlimit status"
+            | "what's my battery limit"
+            | "whats my battery limit"
+            | "what is my battery limit"
+            | "what's my charge limit"
+            | "whats my charge limit"
+            | "what is my charge limit"
+            | "what's the battlimit"
+            | "whats the battlimit"
+            | "what is the battlimit"
+            | "what's the battlimit status"
+            | "whats the battlimit status"
+            | "what is the battlimit status"
+            | "what's the battery limit"
+            | "whats the battery limit"
+            | "what is the battery limit"
+            | "what's the charge limit"
+            | "whats the charge limit"
+            | "what is the charge limit"
+            | "what's the battery level limit"
+            | "whats the battery level limit"
+            | "what is the battery level limit"
+            | "view battlimit"
+            | "view the battlimit"
+            | "view battlimit status"
+            | "view the battlimit status"
+            | "view batt-limit"
+            | "view the batt-limit"
+            | "view battery-limit"
+            | "view the battery-limit"
+            | "view battery limit"
+            | "view the battery limit"
+            | "view battery-level-limit"
+            | "view the battery-level-limit"
+            | "view battery level limit"
+            | "view the battery level limit"
+            | "view battery level limits"
+            | "view the battery level limits"
+            | "view charge-limit"
+            | "view the charge-limit"
+            | "view charge limit"
+            | "view the charge limit"
+            | "view pmset-battlimit"
+            | "view the pmset-battlimit"
+            | "view pmset battlimit"
+            | "view the pmset battlimit"
+            | "see battlimit"
+            | "see the battlimit"
+            | "see battery limit"
+            | "see the battery limit"
+            | "see charge limit"
+            | "see the charge limit"
+            | "see battery level limits"
+            | "see the battery level limits"
+            | "open battlimit"
+            | "open the battlimit"
+            | "open battlimit status"
+            | "open the battlimit status"
+            | "open batt-limit"
+            | "open battery-limit"
+            | "open battery limit"
+            | "open charge-limit"
+            | "open charge limit"
+            | "open battery level limit"
+            | "open battery level limits"
+            | "open pmset-battlimit"
+            | "list battlimit"
+            | "list the battlimit"
+            | "list battlimit status"
+            | "list the battlimit status"
+            | "list batt-limit"
+            | "list the batt-limit"
+            | "list battery-limit"
+            | "list the battery-limit"
+            | "list battery limit"
+            | "list the battery limit"
+            | "list charge-limit"
+            | "list the charge-limit"
+            | "list charge limit"
+            | "list the charge limit"
+            | "list battery level limits"
+            | "list the battery level limits"
+    )
+}
+
+/// Zero-LLM battery charge limit from `pmset -g battlimit` (macOS-only; empty elsewhere).
+pub fn format_battlimit_report() -> String {
+    let v = crate::metrics::get_battlimit_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Battery limit** — _no charge-limit info on this Mac right now._".to_string();
+    }
+    format!("**Battery limit** · `{v}`")
 }
 
 

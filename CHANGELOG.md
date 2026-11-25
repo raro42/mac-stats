@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3064] - 2026-11-25
+
+### Added
+- Instant Battery charge limit accepts `/battlimit` · `/battlimit-status` · `/battlimit-state` · `/batt-limit` · `/batt-limit-status` · `/batt-limit-state` · `/pmset-battlimit` · `/pmset-battlimit-status` · `/pmset-battlimit-state` · `/pmsetbattlimit` · `/pmsetbattlimit-status` · `/pm-battlimit` · `/pm-battlimit-status` · `/battery-limit` · `/battery-limit-status` · `/battery-limit-state` · `/batterylimit` · `/batterylimit-status` · `/battery-level-limit` · `/battery-level-limit-status` · `/battery-level-limits` · `/battery-level-limits-status` · `/charge-limit` · `/charge-limit-status` · `/charge-limit-state` · `/chargelimit` · `/chargelimit-status` · `/charge-limits` · `/charge-limits-status` · `/mac-battlimit` · `/mac-batt-limit` · `/mac-pmset-battlimit` · `/mac-battery-limit` · `/mac-charge-limit` · `/mac-battery-level-limit` · `/mac-battlimit-status` · `/mac-charge-limit-status` and view/see/open/list NL (`view battlimit`, `open charge-limit`, `list battery limit`, …), matching “battlimit status” / “is battlimit ok” / “what's my battlimit” / “what's the charge limit”. Bare `battlimit` / `battery limit` / `charge limit` stay with the agent; `/battery` · `/bat` stay Bat %; `/cycles` · `/battery-health` stay SPPower cycles; `/battery-time` stays ETA; `/rawbatt` stays Raw battery; `/accps` · `/accessory-power` stay Accessory power; `/systemstate` stays System state. Uses `pmset -g battlimit` (lower/upper % or none set). Operator `/help` lists the new lane.
+
 ## [0.1.3063] - 2026-11-25
 
 ### Added

@@ -7378,6 +7378,66 @@ mod tests {
         );
     }
 
+    #[test]
+    fn battlimit_slash_and_view_open_do_not_steal_battery_rawbatt_or_bare() {
+        assert!(looks_like_battlimit_request("/battlimit"));
+        assert!(looks_like_battlimit_request("/battlimit-status"));
+        assert!(looks_like_battlimit_request("/batt-limit"));
+        assert!(looks_like_battlimit_request("/pmset-battlimit"));
+        assert!(looks_like_battlimit_request("/battery-limit"));
+        assert!(looks_like_battlimit_request("/charge-limit"));
+        assert!(looks_like_battlimit_request("/battery-level-limits"));
+        assert!(looks_like_battlimit_request("/mac-battlimit"));
+        assert!(looks_like_battlimit_request("/mac-charge-limit"));
+        assert!(looks_like_battlimit_request("view battlimit"));
+        assert!(looks_like_battlimit_request("open charge-limit"));
+        assert!(looks_like_battlimit_request("list battery limit"));
+        assert!(looks_like_battlimit_request("battlimit status"));
+        assert!(looks_like_battlimit_request("is battlimit ok"));
+        assert!(looks_like_battlimit_request("what's my battlimit"));
+        assert!(looks_like_battlimit_request("what's the charge limit"));
+        assert!(looks_like_battlimit_request("view battery level limits"));
+        assert!(!looks_like_battlimit_request("battlimit"));
+        assert!(!looks_like_battlimit_request("battery limit"));
+        assert!(!looks_like_battlimit_request("charge limit"));
+        assert!(!looks_like_battlimit_request("battery level"));
+        assert!(!looks_like_battlimit_request("/battery"));
+        assert!(!looks_like_battlimit_request("view battery"));
+        assert!(!looks_like_battlimit_request("/cycles"));
+        assert!(!looks_like_battlimit_request("/battery-time"));
+        assert!(!looks_like_battlimit_request("/rawbatt"));
+        assert!(!looks_like_battlimit_request("/systemstate"));
+        assert!(!looks_like_battlimit_request("/tasks"));
+        assert!(!looks_like_battlimit_request("enable battlimit"));
+        assert!(!looks_like_rawbatt_request("/battlimit"));
+        assert!(!looks_like_rawbatt_request("view battlimit"));
+        assert!(!looks_like_systemstate_request("/battlimit"));
+        assert!(!looks_like_battery_cycles_request("/battlimit"));
+        assert!(!looks_like_battery_time_request("/battlimit"));
+        let s = try_operator_instant_reply("/battlimit").unwrap();
+        assert!(
+            s.contains("**Battery limit**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view battlimit").unwrap();
+        assert!(
+            viewed.contains("**Battery limit**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open charge-limit").unwrap();
+        assert!(
+            open.contains("**Battery limit**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("battlimit").is_none());
+        assert!(try_operator_instant_reply("battery limit").is_none());
+        let bat = try_operator_instant_reply("/battery").unwrap();
+        assert!(
+            !bat.contains("**Battery limit**"),
+            "Bat % /battery must stay put, got: {bat}"
+        );
+    }
+
 
     #[test]
     fn sysload_slash_and_view_open_do_not_steal_load_heat_or_bare() {

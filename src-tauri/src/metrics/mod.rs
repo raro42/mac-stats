@@ -9450,6 +9450,148 @@ pub fn get_systemstate_status() -> String {
     }
 }
 
+/// Parse `pmset -g battlimit` → compact charge-limit status.
+/// Samples:
+///   No battery level limits set
+///   Battery level limits:
+///     lowerLimit = 20
+///     upperLimit = 80
+pub(crate) fn parse_pmset_battlimit(raw: &str) -> Option<String> {
+    let mut lower: Option<String> = None;
+    let mut upper: Option<String> = None;
+    let mut none_set = false;
+    let mut notes: Vec<String> = Vec::new();
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let lower_l = t.to_ascii_lowercase();
+        if lower_l.contains("no battery level limits")
+            || lower_l == "no limits set"
+            || lower_l.contains("no charge limit")
+            || lower_l.contains("limits not set")
+        {
+            none_set = true;
+            continue;
+        }
+        if lower_l.starts_with("battery level limits")
+            || lower_l.starts_with("charge limit")
+            || lower_l.starts_with("battery charge limit")
+        {
+            // Header only — values usually follow on later lines.
+            continue;
+        }
+        let key_val = |s: &str| -> Option<(String, String)> {
+            if let Some(idx) = s.find('=') {
+                let (k, v) = s.split_at(idx);
+                let k = k.trim().to_ascii_lowercase();
+                let v = v.trim().trim_start_matches('=').trim().trim_matches('%');
+                if !k.is_empty() && !v.is_empty() {
+                    return Some((k, v.to_string()));
+                }
+            }
+            if let Some(idx) = s.find(':') {
+                let (k, v) = s.split_at(idx);
+                let k = k.trim().to_ascii_lowercase();
+                let v = v.trim().trim_start_matches(':').trim().trim_matches('%');
+                if !k.is_empty() && !v.is_empty() {
+                    return Some((k, v.to_string()));
+                }
+            }
+            None
+        };
+        if let Some((k, v)) = key_val(t) {
+            if k.contains("lower") {
+                lower = Some(v);
+                continue;
+            }
+            if k.contains("upper") || k == "limit" || k.contains("chargelimit") {
+                upper = Some(v);
+                continue;
+            }
+        }
+        // Fallback: keep a short informative line (skip usage / error noise).
+        if lower_l.starts_with("error")
+            || lower_l.starts_with("usage:")
+            || lower_l.starts_with("see pmset")
+        {
+            continue;
+        }
+        if t.len() <= 120 {
+            notes.push(t.to_string());
+        }
+    }
+    let mut bits: Vec<String> = Vec::new();
+    if none_set && lower.is_none() && upper.is_none() {
+        bits.push("none set".to_string());
+    }
+    if let Some(l) = lower {
+        bits.push(format!("lower {l}%"));
+    }
+    if let Some(u) = upper {
+        bits.push(format!("upper {u}%"));
+    }
+    if bits.is_empty() {
+        bits.extend(notes.into_iter().take(3));
+    }
+    if bits.is_empty() {
+        return None;
+    }
+    let mut out = bits.join(" · ");
+    if out.len() > 420 {
+        out.truncate(417);
+        out.push_str("…");
+    }
+    Some(out)
+}
+
+/// Compact battery charge-limit status for Discord-sized chips.
+pub(crate) fn format_battlimit_parts(info: Option<&str>) -> String {
+    info.map(str::trim)
+        .filter(|s| !s.is_empty())
+        .map(|s| s.to_string())
+        .unwrap_or_default()
+}
+
+/// macOS battery charge limit from `pmset -g battlimit` (lower/upper % or none set).
+/// Distinct from Bat % `/battery`, cycle health `/cycles`, battery ETA `/battery-time`,
+/// Raw battery `/rawbatt`, Accessory power `/accps`, Power source `/pmps`.
+/// Used by Discord/operator instant `/battlimit` · `/charge-limit` lane.
+pub fn get_battlimit_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "battlimit"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("battlimit: pmset -g battlimit non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("battlimit: pmset -g battlimit spawn failed");
+                return String::new();
+            }
+        };
+        let info = format_battlimit_parts(parse_pmset_battlimit(&stdout).as_deref());
+        if info.is_empty() {
+            debug3!("battlimit: empty status");
+        } else {
+            debug3!("battlimit status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -15748,6 +15890,31 @@ Current Power State: 3
         assert_eq!(format_systemstate_parts(None), "");
         assert_eq!(parse_pmset_systemstate(""), None);
         assert_eq!(parse_pmset_systemstate("nope"), None);
+    }
+}
+
+#[cfg(test)]
+mod battlimit_parse_tests {
+    use super::{format_battlimit_parts, parse_pmset_battlimit};
+
+    const NONE: &str = "No battery level limits set\n";
+    const LIMITS: &str = "\
+Battery level limits:
+  lowerLimit = 20
+  upperLimit = 80
+";
+
+    #[test]
+    fn parse_pmset_battlimit_reads_none_and_bounds() {
+        let none = parse_pmset_battlimit(NONE).expect("parsed none");
+        assert!(none.contains("none set"), "got: {none}");
+        let s = parse_pmset_battlimit(LIMITS).expect("parsed limits");
+        assert!(s.contains("lower 20%"), "got: {s}");
+        assert!(s.contains("upper 80%"), "got: {s}");
+        assert_eq!(format_battlimit_parts(Some(&s)), s);
+        assert_eq!(format_battlimit_parts(None), "");
+        assert_eq!(parse_pmset_battlimit(""), None);
+        assert_eq!(parse_pmset_battlimit("Usage: pmset"), None);
     }
 }
 
