@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3061] - 2026-11-25
+
+### Added
+- Instant Sleep/Wake UUID accepts `/pmuuid` · `/pmuuid-status` · `/pmuuid-state` · `/pm-uuid` · `/pm-uuid-status` · `/pm-uuid-state` · `/pmset-uuid` · `/pmset-uuid-status` · `/pmset-uuid-state` · `/pmsetuuid` · `/pmsetuuid-status` · `/sleep-wake-uuid` · `/sleep-wake-uuid-status` · `/sleep-wake-uuid-state` · `/sleepwake-uuid` · `/sleepwake-uuid-status` · `/sleepwakeuuid` · `/sleepwakeuuid-status` · `/sw-uuid` · `/sw-uuid-status` · `/swuuid` · `/swuuid-status` · `/mac-pmuuid` · `/mac-pm-uuid` · `/mac-pmset-uuid` · `/mac-sleep-wake-uuid` · `/mac-sleepwake-uuid` · `/mac-sw-uuid` · `/mac-pmuuid-status` · `/mac-sleep-wake-uuid-status` and view/see/open/list NL (`view pmuuid`, `open sleep-wake-uuid`, `list sleep wake uuid`, …), matching “pmuuid status” / “is pmuuid ok” / “what's my pmuuid” / “what's the sleep wake uuid”. Bare `pmuuid` / `sleep wake uuid` stay with the agent; `/uuid` · `/hw-uuid` stay hardware UUID; `/pmlog` · `/power-log` stay Power log; `/pmstats` · `/power-stats` stay Power stats; `/assertions` stay Sleep assertions. Uses `pmset -g uuid` (active sleep/wake cycle UUID). Operator `/help` lists the new lane.
+
 ## [0.1.3060] - 2026-11-25
 
 ### Added

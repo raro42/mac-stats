@@ -9508,6 +9508,13 @@ pub fn looks_like_hardware_uuid_request(content: &str) -> bool {
         || n.contains("change")
         || n.contains("set ")
         || n.contains("reset")
+        || n.contains("pmuuid")
+        || n.contains("pm-uuid")
+        || n.contains("pmset-uuid")
+        || n.contains("sleep-wake-uuid")
+        || n.contains("sleep wake uuid")
+        || n.contains("sleep/wake uuid")
+        || n.contains("sw-uuid")
         // Serial / bare short stay elsewhere.
         || n == "/serial"
         || n == "/sn"
@@ -31037,6 +31044,266 @@ pub fn format_accps_report() -> String {
         return "**Accessory power** — _no accessory power sources on this Mac right now._".to_string();
     }
     format!("**Accessory power** · `{v}`")
+}
+
+/// Sleep/Wake UUID — active cycle UUID from `pmset -g uuid`.
+/// Slash + view/open NL (`/pmuuid` · `/sleep-wake-uuid` · `view pmuuid`).
+/// Bare `pmuuid` / `sleep wake uuid` stay with the agent;
+/// `/uuid` · `/hw-uuid` stay hardware UUID; `/pmlog` stays Power log; `/pmstats` stays Power stats;
+/// `/assertions` stays Sleep assertions.
+pub fn looks_like_pmuuid_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("path")
+        || contains_age_token(&n)
+        || n.contains("size")
+        || n.contains("json")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.starts_with("enable ")
+        || n.starts_with("disable ")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("password")
+        || n.contains("screenshot")
+        || n.contains("resolution")
+        || n.contains("connect")
+        || n.contains("tunnel")
+        || n.split_whitespace().any(|w| w == "discard")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("generate")
+        || n.contains("random")
+        || n.contains("firewall")
+        || n.contains("overnight")
+        || n.contains("harness")
+        || n.contains("launchd")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("hardware uuid")
+        || n.contains("platform uuid")
+        || n.contains("device uuid")
+        || n.contains("hw-uuid")
+        || n.contains("hw uuid")
+        || n == "/uuid"
+        || n == "/hw-uuid"
+        || n == "/hwuuid"
+        || n == "/hardware-uuid"
+        || n == "/platform-uuid"
+        || n == "/device-uuid"
+        || n == "/mac-uuid"
+        || n == "view uuid"
+        || n == "open uuid"
+        || n == "list uuid"
+        || n == "see uuid"
+        || n == "view hardware uuid"
+        || n == "open hardware uuid"
+        || n.contains("accps")
+        || n.contains("accessory power")
+        || n.contains("accessory batteries")
+        || n.contains("pmps")
+        || n.contains("power source")
+        || n.contains("pmlog")
+        || n.contains("power log")
+        || n.contains("pmstats")
+        || n.contains("power stats")
+        || n.contains("sleep-wake-log")
+        || n.contains("sleep wake log")
+        || n.contains("sleep-wake-stats")
+        || n.contains("sleep wake stats")
+        || n.contains("assertions")
+        || n.contains("pmlive")
+        || n.contains("pmeverything")
+        || n.contains("pmadapters")
+        || n.contains("pmcustom")
+        || n == "/battery"
+        || n == "/bat"
+        || n == "/tasks"
+        || n == "/serial"
+        || n == "/udid"
+        || n == "pmuuid"
+        || n == "the pmuuid"
+        || n == "pm-uuid"
+        || n == "the pm-uuid"
+        || n == "pm uuid"
+        || n == "the pm uuid"
+        || n == "pmsetuuid"
+        || n == "the pmsetuuid"
+        || n == "pmset-uuid"
+        || n == "the pmset-uuid"
+        || n == "pmset uuid"
+        || n == "the pmset uuid"
+        || n == "sleep-wake-uuid"
+        || n == "the sleep-wake-uuid"
+        || n == "sleep wake uuid"
+        || n == "the sleep wake uuid"
+        || n == "sleep/wake uuid"
+        || n == "the sleep/wake uuid"
+        || n == "sleepwake-uuid"
+        || n == "the sleepwake-uuid"
+        || n == "sleepwake uuid"
+        || n == "the sleepwake uuid"
+        || n == "sw-uuid"
+        || n == "the sw-uuid"
+        || n == "sw uuid"
+        || n == "the sw uuid"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+            "/pmuuid"
+            | "/pmuuid-status"
+            | "/pmuuid-state"
+            | "/pm-uuid"
+            | "/pm-uuid-status"
+            | "/pm-uuid-state"
+            | "/pmset-uuid"
+            | "/pmset-uuid-status"
+            | "/pmset-uuid-state"
+            | "/pmsetuuid"
+            | "/pmsetuuid-status"
+            | "/sleep-wake-uuid"
+            | "/sleep-wake-uuid-status"
+            | "/sleep-wake-uuid-state"
+            | "/sleepwake-uuid"
+            | "/sleepwake-uuid-status"
+            | "/sleepwakeuuid"
+            | "/sleepwakeuuid-status"
+            | "/sw-uuid"
+            | "/sw-uuid-status"
+            | "/swuuid"
+            | "/swuuid-status"
+            | "/mac-pmuuid"
+            | "/mac-pm-uuid"
+            | "/mac-pmset-uuid"
+            | "/mac-sleep-wake-uuid"
+            | "/mac-sleepwake-uuid"
+            | "/mac-sw-uuid"
+            | "/mac-pmuuid-status"
+            | "/mac-sleep-wake-uuid-status"
+            | "pmuuid status"
+            | "the pmuuid status"
+            | "pmuuid state"
+            | "the pmuuid state"
+            | "pm-uuid status"
+            | "the pm-uuid status"
+            | "pm uuid status"
+            | "the pm uuid status"
+            | "pmset-uuid status"
+            | "the pmset-uuid status"
+            | "pmset uuid status"
+            | "the pmset uuid status"
+            | "sleep-wake-uuid status"
+            | "the sleep-wake-uuid status"
+            | "sleep wake uuid status"
+            | "the sleep wake uuid status"
+            | "sleep/wake uuid status"
+            | "the sleep/wake uuid status"
+            | "sw-uuid status"
+            | "the sw-uuid status"
+            | "my pmuuid"
+            | "my pmuuid status"
+            | "my sleep wake uuid"
+            | "my sleep-wake-uuid"
+            | "is pmuuid ok"
+            | "is the pmuuid ok"
+            | "how's pmuuid"
+            | "hows pmuuid"
+            | "how's the pmuuid"
+            | "hows the pmuuid"
+            | "how's sleep wake uuid"
+            | "hows sleep wake uuid"
+            | "what's my pmuuid"
+            | "whats my pmuuid"
+            | "what is my pmuuid"
+            | "what's my pmuuid status"
+            | "whats my pmuuid status"
+            | "what is my pmuuid status"
+            | "what's my sleep wake uuid"
+            | "whats my sleep wake uuid"
+            | "what is my sleep wake uuid"
+            | "what's my sleep-wake-uuid"
+            | "whats my sleep-wake-uuid"
+            | "what is my sleep-wake-uuid"
+            | "what's the pmuuid"
+            | "whats the pmuuid"
+            | "what is the pmuuid"
+            | "what's the pmuuid status"
+            | "whats the pmuuid status"
+            | "what is the pmuuid status"
+            | "what's the sleep wake uuid"
+            | "whats the sleep wake uuid"
+            | "what is the sleep wake uuid"
+            | "what's the sleep-wake-uuid"
+            | "whats the sleep-wake-uuid"
+            | "what is the sleep-wake-uuid"
+            | "view pmuuid"
+            | "view the pmuuid"
+            | "view pmuuid status"
+            | "view the pmuuid status"
+            | "view pm-uuid"
+            | "view the pm-uuid"
+            | "view pm uuid"
+            | "view the pm uuid"
+            | "view pmset-uuid"
+            | "view the pmset-uuid"
+            | "view pmset uuid"
+            | "view the pmset uuid"
+            | "view sleep-wake-uuid"
+            | "view the sleep-wake-uuid"
+            | "view sleep wake uuid"
+            | "view the sleep wake uuid"
+            | "view sleep/wake uuid"
+            | "view the sleep/wake uuid"
+            | "view sleepwake-uuid"
+            | "view sw-uuid"
+            | "see pmuuid"
+            | "see the pmuuid"
+            | "see sleep wake uuid"
+            | "see the sleep wake uuid"
+            | "see sleep-wake-uuid"
+            | "see the sleep-wake-uuid"
+            | "open pmuuid"
+            | "open the pmuuid"
+            | "open pmuuid status"
+            | "open the pmuuid status"
+            | "open pm-uuid"
+            | "open pmset-uuid"
+            | "open sleep-wake-uuid"
+            | "open sleep wake uuid"
+            | "open sleep/wake uuid"
+            | "list pmuuid"
+            | "list the pmuuid"
+            | "list pmuuid status"
+            | "list the pmuuid status"
+            | "list pm-uuid"
+            | "list the pm-uuid"
+            | "list sleep-wake-uuid"
+            | "list the sleep-wake-uuid"
+            | "list sleep wake uuid"
+            | "list the sleep wake uuid"
+            | "list sw-uuid"
+    )
+}
+
+/// Zero-LLM sleep/wake UUID from `pmset -g uuid` (macOS-only; empty elsewhere).
+pub fn format_pmuuid_report() -> String {
+    let v = crate::metrics::get_pmuuid_status();
+    let v = v.trim();
+    if v.is_empty() {
+        return "**Sleep/Wake UUID** — _no active sleep/wake UUID on this Mac right now._".to_string();
+    }
+    format!("**Sleep/Wake UUID** · `{v}`")
 }
 
 

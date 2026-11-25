@@ -7197,6 +7197,68 @@ mod tests {
         assert!(try_operator_instant_reply("accessory batteries").is_none());
     }
 
+    #[test]
+    fn pmuuid_slash_and_view_open_do_not_steal_hardware_uuid_or_bare() {
+        assert!(looks_like_pmuuid_request("/pmuuid"));
+        assert!(looks_like_pmuuid_request("/pmuuid-status"));
+        assert!(looks_like_pmuuid_request("/pm-uuid"));
+        assert!(looks_like_pmuuid_request("/pmset-uuid"));
+        assert!(looks_like_pmuuid_request("/sleep-wake-uuid"));
+        assert!(looks_like_pmuuid_request("/sleepwake-uuid"));
+        assert!(looks_like_pmuuid_request("/sw-uuid"));
+        assert!(looks_like_pmuuid_request("/mac-pmuuid"));
+        assert!(looks_like_pmuuid_request("/mac-sleep-wake-uuid"));
+        assert!(looks_like_pmuuid_request("view pmuuid"));
+        assert!(looks_like_pmuuid_request("open sleep-wake-uuid"));
+        assert!(looks_like_pmuuid_request("list sleep wake uuid"));
+        assert!(looks_like_pmuuid_request("pmuuid status"));
+        assert!(looks_like_pmuuid_request("is pmuuid ok"));
+        assert!(looks_like_pmuuid_request("what's my pmuuid"));
+        assert!(looks_like_pmuuid_request("what's the sleep wake uuid"));
+        assert!(looks_like_pmuuid_request("view sleep wake uuid"));
+        assert!(!looks_like_pmuuid_request("pmuuid"));
+        assert!(!looks_like_pmuuid_request("sleep wake uuid"));
+        assert!(!looks_like_pmuuid_request("pmset uuid"));
+        assert!(!looks_like_pmuuid_request("/uuid"));
+        assert!(!looks_like_pmuuid_request("view uuid"));
+        assert!(!looks_like_pmuuid_request("/hw-uuid"));
+        assert!(!looks_like_pmuuid_request("view hardware uuid"));
+        assert!(!looks_like_pmuuid_request("/pmlog"));
+        assert!(!looks_like_pmuuid_request("/pmstats"));
+        assert!(!looks_like_pmuuid_request("/assertions"));
+        assert!(!looks_like_pmuuid_request("/accps"));
+        assert!(!looks_like_pmuuid_request("/tasks"));
+        assert!(!looks_like_pmuuid_request("enable pmuuid"));
+        assert!(!looks_like_hardware_uuid_request("/pmuuid"));
+        assert!(!looks_like_hardware_uuid_request("view pmuuid"));
+        assert!(!looks_like_hardware_uuid_request("view sleep-wake-uuid"));
+        assert!(!looks_like_hardware_uuid_request("what's my sleep wake uuid"));
+        assert!(looks_like_hardware_uuid_request("/uuid"));
+        let s = try_operator_instant_reply("/pmuuid").unwrap();
+        assert!(
+            s.contains("**Sleep/Wake UUID**") && !s.to_lowercase().contains("execution"),
+            "got: {s}"
+        );
+        let viewed = try_operator_instant_reply("view pmuuid").unwrap();
+        assert!(
+            viewed.contains("**Sleep/Wake UUID**") && !viewed.to_lowercase().contains("execution"),
+            "got: {viewed}"
+        );
+        let open = try_operator_instant_reply("open sleep-wake-uuid").unwrap();
+        assert!(
+            open.contains("**Sleep/Wake UUID**") && !open.to_lowercase().contains("execution"),
+            "got: {open}"
+        );
+        assert!(try_operator_instant_reply("pmuuid").is_none());
+        assert!(try_operator_instant_reply("sleep wake uuid").is_none());
+        let hw = try_operator_instant_reply("/uuid").unwrap();
+        assert!(
+            hw.contains("**Hardware UUID**") || hw.to_lowercase().contains("uuid"),
+            "hardware /uuid must stay put, got: {hw}"
+        );
+        assert!(!hw.contains("**Sleep/Wake UUID**"), "got: {hw}");
+    }
+
 
     #[test]
     fn sysload_slash_and_view_open_do_not_steal_load_heat_or_bare() {

@@ -9098,6 +9098,127 @@ pub fn get_accps_status() -> String {
     }
 }
 
+/// Parse `pmset -g uuid` → active sleep/wake UUID string (if present).
+/// Accepts `UUID: …`, `Sleep/Wake UUID: …`, or a bare UUID token on its own line.
+pub(crate) fn parse_pmset_uuid(raw: &str) -> Option<String> {
+    fn looks_like_uuid(tok: &str) -> bool {
+        let t = tok.trim().trim_matches(|c| c == ';' || c == ',' || c == '\'' || c == '"');
+        if t.len() < 32 || t.len() > 40 {
+            return false;
+        }
+        let mut hyphens = 0usize;
+        let mut hex = 0usize;
+        for c in t.chars() {
+            if c == '-' {
+                hyphens += 1;
+            } else if c.is_ascii_hexdigit() {
+                hex += 1;
+            } else {
+                return false;
+            }
+        }
+        hyphens == 4 && hex == 32
+    }
+    for line in raw.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let lower = t.to_ascii_lowercase();
+        if lower.starts_with("uuid")
+            || lower.starts_with("sleep/wake uuid")
+            || lower.starts_with("sleep-wake uuid")
+            || lower.starts_with("sleep wake uuid")
+        {
+            if let Some(v) = extract_quoted_pmset_value(t) {
+                if looks_like_uuid(&v) {
+                    return Some(v);
+                }
+            }
+            if let Some(idx) = t.find(':') {
+                let rest = t[idx + 1..].trim().trim_matches(|c| c == '\'' || c == '"');
+                if looks_like_uuid(rest) {
+                    return Some(rest.to_string());
+                }
+            }
+            for tok in t.split_whitespace() {
+                if looks_like_uuid(tok) {
+                    return Some(
+                        tok.trim()
+                            .trim_matches(|c| c == ';' || c == ',' || c == '\'' || c == '"')
+                            .to_string(),
+                    );
+                }
+            }
+            continue;
+        }
+        if looks_like_uuid(t) {
+            return Some(t.to_string());
+        }
+        for tok in t.split_whitespace() {
+            if looks_like_uuid(tok) {
+                return Some(
+                    tok.trim()
+                        .trim_matches(|c| c == ';' || c == ',' || c == '\'' || c == '"')
+                        .to_string(),
+                );
+            }
+        }
+    }
+    None
+}
+
+/// Compact sleep/wake UUID for Discord-sized status (full UUID; truncate only if absurd).
+pub(crate) fn format_pmuuid_parts(uuid: Option<&str>) -> String {
+    let Some(u) = uuid.map(str::trim).filter(|s| !s.is_empty()) else {
+        return String::new();
+    };
+    if u.len() > 64 {
+        let mut s: String = u.chars().take(61).collect();
+        s.push('…');
+        return s;
+    }
+    u.to_string()
+}
+
+/// macOS active sleep/wake UUID from `pmset -g uuid` (correlates one sleep cycle).
+/// Distinct from hardware / platform UUID `/uuid` · `/hw-uuid`, Power log `/pmlog`,
+/// Power stats `/pmstats`, Sleep assertions `/assertions`.
+/// Used by Discord/operator instant `/pmuuid` · `/sleep-wake-uuid` lane.
+pub fn get_pmuuid_status() -> String {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return String::new();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("/usr/bin/pmset")
+            .args(["-g", "uuid"])
+            .stderr(std::process::Stdio::null())
+            .output();
+        let stdout = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).into_owned()
+            }
+            Ok(_) => {
+                debug3!("pmuuid: pmset -g uuid non-zero");
+                return String::new();
+            }
+            Err(_) => {
+                debug3!("pmuuid: pmset -g uuid spawn failed");
+                return String::new();
+            }
+        };
+        let info = format_pmuuid_parts(parse_pmset_uuid(&stdout).as_deref());
+        if info.is_empty() {
+            debug3!("pmuuid: empty status");
+        } else {
+            debug3!("pmuuid status: '{}'", info);
+        }
+        info
+    }
+}
+
 /// Parse `pmset -g custom` Battery/AC `sleep` minutes → (battery, ac).
 /// Exact key `sleep` only (not `displaysleep` / `disksleep` / `networkoversleep`).
 pub(crate) fn parse_pmset_custom_systemsleep(raw: &str) -> (Option<u32>, Option<u32>) {
@@ -15306,6 +15427,38 @@ Now drawing from 'AC Power'
             parse_pmset_accps(""),
             (None, Vec::<(String, Option<u32>, Option<String>)>::new())
         );
+    }
+}
+
+#[cfg(test)]
+mod pmuuid_parse_tests {
+    use super::{format_pmuuid_parts, parse_pmset_uuid};
+
+    #[test]
+    fn parse_pmset_uuid_reads_labeled_and_bare() {
+        let labeled = "UUID: 12345678-1234-1234-1234-123456789ABC\n";
+        assert_eq!(
+            parse_pmset_uuid(labeled).as_deref(),
+            Some("12345678-1234-1234-1234-123456789ABC")
+        );
+        let sw = "Sleep/Wake UUID: ABCDEF01-2345-6789-ABCD-EF0123456789\n";
+        assert_eq!(
+            parse_pmset_uuid(sw).as_deref(),
+            Some("ABCDEF01-2345-6789-ABCD-EF0123456789")
+        );
+        let bare = "fedcba98-7654-3210-fedc-ba9876543210\n";
+        assert_eq!(
+            parse_pmset_uuid(bare).as_deref(),
+            Some("fedcba98-7654-3210-fedc-ba9876543210")
+        );
+        assert_eq!(parse_pmset_uuid(""), None);
+        assert_eq!(parse_pmset_uuid("no uuid here"), None);
+        assert_eq!(
+            format_pmuuid_parts(Some("12345678-1234-1234-1234-123456789ABC")),
+            "12345678-1234-1234-1234-123456789ABC"
+        );
+        assert_eq!(format_pmuuid_parts(None), "");
+        assert_eq!(format_pmuuid_parts(Some("   ")), "");
     }
 }
 

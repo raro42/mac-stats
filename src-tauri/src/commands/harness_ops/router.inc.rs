@@ -1441,6 +1441,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_accps_request(content) {
         return Some(format_accps_report());
     }
+    // Sleep/Wake UUID from `pmset -g uuid` (bare `pmuuid` / `sleep wake uuid` stay with the agent;
+    // `/uuid` · `/hw-uuid` stay hardware UUID; `/pmlog` stays Power log; `/pmstats` stays Power stats;
+    // `/assertions` stays Sleep assertions).
+    if looks_like_pmuuid_request(content) {
+        return Some(format_pmuuid_report());
+    }
     // Standby delay low (bare `standbydelaylow` / `standby delay low` stay with the agent;
     // `/standbydelay` stays Standby delay; `/standbydelayhigh` stays Standby delay high;
     // `/standby` stays Standby; `/highstandbythreshold` stays High Standby Threshold;
