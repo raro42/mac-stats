@@ -1,3 +1,20 @@
+## Overnight note 2026-11-25 ~01:55 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after System state v0.1.3063 — Battery charge limit from `pmset -g battlimit` (lower/upper % or none set; `profiles` invalid here; history empty; not SoftDisabled/boolean soft-state clone; not `/battery` · `/rawbatt` · `/cycles` clone; Dark layout-daily next calendar day).
+- Backfill: missing keep row for v0.1.3063.
+- Shipped **v0.1.3064** — `/battlimit` · `/batt-limit` · `/pmset-battlimit` · `/battery-limit` · `/charge-limit` · `/battery-level-limits` · `/mac-battlimit` · `/mac-charge-limit` + view/open NL; bare battlimit/battery limit/charge limit stay with agent; `/battery` · `/cycles` · `/battery-time` · `/rawbatt` · `/accps` · `/systemstate` intact; `/help` lists lane.
+- Ratchet keep @ 63c33c990 for 3064; backfill keep for 3063; install/kickstart + push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats/pmcap/useractivity/pmps/pmcustom/pmadapters/pmlive/pmeverything/accps/pmuuid/rawbatt/systemstate/battlimit — try remaining useful `pmset -g` adapters only if non-blocking; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3064
+
+- Product fuel after System state v0.1.3063: charge-limit lower/upper (or none set) already readable via `pmset -g battlimit` but lacked `/battlimit` · `/batt-limit` · `/pmset-battlimit` · `/battery-limit` · `/charge-limit` · `/battery-level-limits` · `/mac-battlimit` and view/see/open/list phrases while Bat % `/battery`, Raw battery `/rawbatt`, cycles `/cycles`, and System state `/systemstate` already had slash+NL. Bare `battlimit` / `battery limit` / `charge limit` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…systemstate/battlimit soft-state closed; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~01:45 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
