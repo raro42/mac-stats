@@ -1,3 +1,21 @@
+## Overnight note 2026-11-25 ~01:20 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: product after Accessory power v0.1.3060 — Sleep/Wake UUID from `pmset -g uuid` (battlimit/rawbatt not useful getters; not SoftDisabled/boolean soft-state clone; not hardware `/uuid`; Dark layout-daily next calendar day).
+- Backfill: missing keep row for v0.1.3060.
+- Shipped **v0.1.3061** — `/pmuuid` · `/pm-uuid` · `/pmset-uuid` · `/sleep-wake-uuid` · `/sleepwake-uuid` · `/sw-uuid` · `/mac-pmuuid` · `/mac-sleep-wake-uuid` + view/open NL; bare pmuuid/sleep wake uuid stay with agent; `/uuid` · `/hw-uuid` · `/pmlog` · `/pmstats` · `/assertions` intact; `/help` lists lane.
+- Ratchet keep @ 19436ee92 for 3061; backfill keep for 3060; push (Rust).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Linux rack: no /Applications install/kickstart (Rust status text only; Mac install next Mac tick).
+- Next fuel: Dark layout-daily next calendar day · soft-state leftover closed for SoftDisabled/assertions/powersched/sysload/ups/pmlog/therm/pmstats/pmcap/useractivity/pmps/pmcustom/pmadapters/pmlive/pmeverything/accps/pmuuid — try `pmset -g systemstate` / `profiles` if useful; history only if non-blocking; not another keep-pNN clone.
+
+## Overnight merge — v0.1.3061
+
+- Product fuel after Accessory power v0.1.3060: active sleep/wake cycle UUID already readable via `pmset -g uuid` but lacked `/pmuuid` · `/pm-uuid` · `/pmset-uuid` · `/sleep-wake-uuid` · `/sleepwake-uuid` · `/sw-uuid` · `/mac-pmuuid` · `/mac-sleep-wake-uuid` and view/see/open/list phrases while hardware UUID `/uuid` · `/hw-uuid`, Power log `/pmlog`, Power stats `/pmstats`, and Sleep assertions `/assertions` already had slash+NL. Bare `pmuuid` / `sleep wake uuid` stay with the agent. Digester empty; design-review due=false — polish-without-capture (Mac TCC); layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…accps/pmuuid soft-state closed; try systemstate/profiles; not another keep-pNN clone.
+
 ## Overnight note 2026-11-25 ~01:02 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Mac TCC — polish-without-capture).

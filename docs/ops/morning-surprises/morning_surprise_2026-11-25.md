@@ -1,16 +1,18 @@
-# Morning surprise — 2026-11-25
+# Morning surprise 2026-11-25
 
-## Shipped overnight
-- **v0.1.3060** — Accessory power instant status from `pmset -g accps`
-  - Slash + NL: `/accps` · `/pmaccps` · `/pm-accps` · `/pmset-accps` · `/accessory-power` · `/accessory-batteries` · `/peripheral-batteries` · `/bt-batteries` · `/mac-accps` (+ view/open/list)
-  - Shows drawing source + InternalBattery / Magic Keyboard / Magic Mouse rows (present devices only)
-  - Does not steal `/pmps` · `/battery` · `/ups` · `/adapter` · `/pmadapters` · `/pmeverything` · `/pmlive`
-- Earlier same night (already on main before this tick): Power everything **v0.1.3059**, Power live **v0.1.3058**, Power adapters **v0.1.3057**, …
+Overnight autoresearch kept shipping power/pmset instant lanes.
 
-## Context
-- Digester open empty; design-review due=false (grace / Mac TCC); layout-daily data-poster marked today (Dark next calendar day).
-- Fuel choice: standing backlog after `pmeverything` — `history` can block; `accps` is fast and user-facing (BT peripheral %).
+## Shipped
+- **v0.1.3061** Sleep/Wake UUID — `/pmuuid` · `/sleep-wake-uuid` · `/pmset-uuid` (+ view/open NL) from `pmset -g uuid`
+- **v0.1.3060** Accessory power — `/accps` · `/accessory-power` · `/accessory-batteries` from `pmset -g accps`
+- Earlier tonight: Power everything / live / adapters / custom / source / useractivity / cap / stats / therm / …
+
+## Tried / skipped
+- Digester empty (0 runs / 7d)
+- Design review due=false (grace; Mac TCC — polish-without-capture)
+- Layout daily: data-poster marked today; **Dark** next calendar quota
+- `battlimit` / `rawbatt` not useful pmset getters (rawlog/pslog block; batt ≡ ps already `/pmps`)
 
 ## Next
 - Dark layout-daily next calendar day
-- Optional: `pmset -g battlimit` / `rawbatt` if useful; avoid blocking `history`/`thermlog`
+- Optional: `pmset -g systemstate` / `profiles` if useful; avoid blocking `history`/`thermlog`/`rawlog`
