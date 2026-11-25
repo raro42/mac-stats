@@ -1,3 +1,19 @@
+## Overnight note 2026-11-25 ~05:22 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; Agent Ops tip seeds already shipped as v0.1.3078).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes missing or no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: design-review feature-monitors after Agent Ops tip seeds v0.1.3078 — Monitors add-form + detail still lacked Tab-first tips while Settings/Ollama/Process Details already warm; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Backfill: missing keep row for v0.1.3078.
+- Shipped **v0.1.3079** — Monitors add-form + detail Tab-first kb-hints (JS); Mac capture still TCC-blocked.
+- Ratchet keep @ 6f3f1faf9 for 3079; backfill keep for 3078; sync-dist + push (UI; Linux rack no /Applications install/kickstart).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…pmhistory closed — Disk Cleanup add-scope leftover “← → / h l · Home/End…” optional Tab-first · Discord/settings toolbars optional Tab-first · remaining useful non-blocking `pmset -g` adapters only if clearly distinct (`disk` == `custom`; `uuidlog` blocks); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3079
+
+- Design-review fuel after Agent Ops tip seeds v0.1.3078: Monitors add-form (URL · Cancel · Add) and detail (Check now · Remove) still started with bare “← → / h l · Home/End…” while Settings / Ollama / Process Details already sat on Tab-first KISS tips. Digester empty; design-review due=false — polish-without-capture feature-monitors; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory soft-state closed; not another keep-pNN clone.
 ## Overnight note 2026-11-25 ~05:06 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Process Details tips already shipped as v0.1.3077).
