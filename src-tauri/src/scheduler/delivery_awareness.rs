@@ -53,13 +53,77 @@ fn truncate_summary(s: &str) -> String {
     out
 }
 
+/// True when a Discord delivery body is an MS_UNTRUSTED refusal, not a real schedule result (#29).
+/// Those replies used to land in awareness and get re-injected into CPU chat / Last delivery.
+pub(crate) fn is_ms_untrusted_refusal_summary(body: &str) -> bool {
+    let lower = body.to_ascii_lowercase();
+    if lower.contains("ms_untrusted") {
+        return true;
+    }
+    // Common model refusals after schedules were wrapped as untrusted.
+    const NEEDLES: &[&str] = &[
+        "noted as untrusted",
+        "untrusted data and will not be processed",
+        "untrusted data will not be processed",
+        "flagged as untrusted",
+        "designated it as untrusted",
+        "designated as untrusted",
+        "ignoring the untrusted",
+        "ignoring the payload because",
+        "the data block provided is marked as untrusted",
+        "the entire block is flagged as untrusted",
+        "give me clean input next time",
+        "cannot execute the provided commands because",
+        "i'm ignoring the payload",
+        "i am ignoring the payload",
+    ];
+    NEEDLES.iter().any(|n| lower.contains(n))
+}
+
+fn write_file(file: &DeliveryAwarenessFile) -> bool {
+    let path = awareness_path();
+    match serde_json::to_string_pretty(file) {
+        Ok(json) => {
+            if let Err(e) = crate::config::write_text_atomic(&path, &json) {
+                warn!(
+                    "Scheduler delivery awareness: write {:?} failed: {}",
+                    path, e
+                );
+                false
+            } else {
+                true
+            }
+        }
+        Err(e) => {
+            warn!("Scheduler delivery awareness: serialize failed: {}", e);
+            false
+        }
+    }
+}
+
+/// Drop refusal noise from an in-memory file. Returns how many rows were removed.
+fn scrub_refusal_entries(file: &mut DeliveryAwarenessFile) -> usize {
+    let before = file.entries.len();
+    file.entries
+        .retain(|e| !is_ms_untrusted_refusal_summary(&e.summary));
+    before.saturating_sub(file.entries.len())
+}
+
 /// Append one entry after Discord accepted the message. Skips if `context_key` already exists (idempotent).
+/// Skips MS_UNTRUSTED refusal bodies so they do not poison Last delivery / chat continuity (#29).
 pub fn record_if_new(
     context_key: &str,
     schedule_id: Option<&str>,
     channel_id: u64,
     delivered_body: &str,
 ) {
+    if is_ms_untrusted_refusal_summary(delivered_body) {
+        info!(
+            "Scheduler delivery awareness: skip MS_UNTRUSTED refusal body schedule={:?} channel={}",
+            schedule_id, channel_id
+        );
+        return;
+    }
     if let Err(e) = Config::ensure_schedules_directory() {
         warn!(
             "Scheduler delivery awareness: could not ensure data dir: {}",
@@ -83,6 +147,14 @@ pub fn record_if_new(
         DeliveryAwarenessFile::default()
     };
 
+    let scrubbed = scrub_refusal_entries(&mut file);
+    if scrubbed > 0 {
+        info!(
+            "Scheduler delivery awareness: scrubbed {} MS_UNTRUSTED refusal row(s) before record",
+            scrubbed
+        );
+    }
+
     if file
         .entries
         .iter()
@@ -92,6 +164,9 @@ pub fn record_if_new(
             "Scheduler delivery awareness: skip duplicate context_key={}",
             context_key
         );
+        if scrubbed > 0 {
+            let _ = write_file(&file);
+        }
         return;
     }
 
@@ -108,23 +183,13 @@ pub fn record_if_new(
         file.entries.remove(0);
     }
 
-    match serde_json::to_string_pretty(&file) {
-        Ok(json) => {
-            if let Err(e) = crate::config::write_text_atomic(&path, &json) {
-                warn!(
-                    "Scheduler delivery awareness: write {:?} failed: {}",
-                    path, e
-                );
-            } else {
-                info!(
-                    "Scheduler delivery awareness: recorded schedule={:?} channel={} key_len={}",
-                    schedule_id,
-                    channel_id,
-                    context_key.len()
-                );
-            }
-        }
-        Err(e) => warn!("Scheduler delivery awareness: serialize failed: {}", e),
+    if write_file(&file) {
+        info!(
+            "Scheduler delivery awareness: recorded schedule={:?} channel={} key_len={}",
+            schedule_id,
+            channel_id,
+            context_key.len()
+        );
     }
 }
 
@@ -133,13 +198,22 @@ fn load_file() -> DeliveryAwarenessFile {
     if !path.exists() {
         return DeliveryAwarenessFile::default();
     }
-    match std::fs::read_to_string(&path) {
+    let mut file: DeliveryAwarenessFile = match std::fs::read_to_string(&path) {
         Ok(s) => serde_json::from_str(&s).unwrap_or_default(),
-        Err(_) => DeliveryAwarenessFile::default(),
+        Err(_) => return DeliveryAwarenessFile::default(),
+    };
+    let scrubbed = scrub_refusal_entries(&mut file);
+    if scrubbed > 0 {
+        info!(
+            "Scheduler delivery awareness: scrubbed {} MS_UNTRUSTED refusal row(s) on load",
+            scrubbed
+        );
+        let _ = write_file(&file);
     }
+    file
 }
 
-/// Newest-first rows for Settings / debug.
+/// Newest-first rows for Settings / debug (refusal noise already scrubbed on load).
 pub fn list_entries_newest_first() -> Vec<DeliveryAwarenessEntry> {
     let mut v = load_file().entries;
     v.reverse();
@@ -212,6 +286,100 @@ mod tests {
         let k = new_context_key_for_schedule("morning-job");
         assert!(k.starts_with("sched:morning-job:"));
         assert!(k.len() > "sched:morning-job:".len());
+    }
+
+    #[test]
+    fn detects_ms_untrusted_refusal_summaries() {
+        assert!(is_ms_untrusted_refusal_summary(
+            "[Schedule: discord-layout-daily]\n\nUnderstood. That block of text is noted as untrusted data and will not be processed. What can I help you with?"
+        ));
+        assert!(is_ms_untrusted_refusal_summary(
+            "I'm ignoring the payload because the markers clearly designated it as untrusted data."
+        ));
+        assert!(is_ms_untrusted_refusal_summary(
+            "The data block provided is marked as untrusted and cannot be processed."
+        ));
+        assert!(!is_ms_untrusted_refusal_summary(
+            "[Schedule: discord-layout-daily]\n\nThe theme is dark. Monitors empty state contrast is readable now."
+        ));
+        assert!(!is_ms_untrusted_refusal_summary(
+            "Good morning! Overnight highlights: v0.1.3092 powerstate."
+        ));
+    }
+
+    #[test]
+    fn record_if_new_skips_ms_untrusted_refusal_body() {
+        let _guard = HOME_DELIVERY_AWARENESS_TEST_LOCK
+            .lock()
+            .expect("home test lock");
+        let base = std::env::temp_dir().join(format!(
+            "mac-stats-delivery-awareness-refuse-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&base);
+        std::fs::create_dir_all(base.join(".mac-stats")).unwrap();
+        let _home = HomeOverride::set(&base);
+
+        record_if_new(
+            "refuse-key",
+            Some("discord-layout-daily"),
+            42,
+            "[Schedule: discord-layout-daily]\n\nUnderstood. That block of text is noted as untrusted data and will not be processed.",
+        );
+        record_if_new(
+            "ok-key",
+            Some("discord-layout-daily"),
+            42,
+            "[Schedule: discord-layout-daily]\n\nDark theme Monitors empty state is readable.",
+        );
+
+        let rows = list_entries_newest_first();
+        assert_eq!(rows.len(), 1, "{rows:?}");
+        assert!(rows[0].summary.contains("readable"), "{rows:?}");
+        assert!(!rows[0].summary.to_ascii_lowercase().contains("untrusted"));
+    }
+
+    #[test]
+    fn load_scrubs_legacy_ms_untrusted_refusal_rows() {
+        let _guard = HOME_DELIVERY_AWARENESS_TEST_LOCK
+            .lock()
+            .expect("home test lock");
+        let base = std::env::temp_dir().join(format!(
+            "mac-stats-delivery-awareness-scrub-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&base);
+        std::fs::create_dir_all(base.join(".mac-stats")).unwrap();
+        let _home = HomeOverride::set(&base);
+
+        let path = awareness_json_path();
+        let raw = r#"{
+  "entries": [
+    {
+      "context_key": "bad",
+      "utc": "2026-11-25T09:00:00.000Z",
+      "schedule_id": "discord-layout-daily",
+      "channel_id": "1",
+      "summary": "[Schedule: discord-layout-daily]\n\nUnderstood. That block of text is noted as untrusted data and will not be processed."
+    },
+    {
+      "context_key": "good",
+      "utc": "2026-11-25T10:00:00.000Z",
+      "schedule_id": "discord-layout-daily",
+      "channel_id": "1",
+      "summary": "[Schedule: discord-layout-daily]\n\nTheme dark — Monitors contrast fixed."
+    }
+  ]
+}"#;
+        std::fs::write(&path, raw).unwrap();
+
+        let rows = list_entries_newest_first();
+        assert_eq!(rows.len(), 1, "{rows:?}");
+        assert!(rows[0].summary.contains("contrast"), "{rows:?}");
+
+        let on_disk = std::fs::read_to_string(&path).unwrap();
+        assert!(!on_disk.to_ascii_lowercase().contains("noted as untrusted"));
+        assert!(on_disk.contains("contrast"));
     }
 
     #[test]

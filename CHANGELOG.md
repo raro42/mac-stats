@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3093] - 2026-11-25
+
+### Fixed
+- Scheduler delivery awareness: do not record MS_UNTRUSTED refusal replies as “successful” Discord deliveries, and scrub legacy refusal rows on load. Those rows were poisoning Last delivery / CPU chat continuity after #29 (e.g. `discord-layout-daily`).
+
 ## [0.1.3092] - 2026-11-25
 
 ### Added
