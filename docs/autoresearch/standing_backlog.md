@@ -1,3 +1,19 @@
+## Overnight note 2026-11-25 ~04:40 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace; theme-list seeds already shipped as v0.1.3075).
+- Layout daily: data-poster marked 2026-11-25 (missing_remaps=none; Dark next calendar quota).
+- Sibling: OpenClaw/Hermes present; no clear port this tick.
+- Debug.log: no ERROR/WARN clusters in 180m window.
+- Fuel: design-review feature-monitors after theme-list seeds v0.1.3075 — list tip said “Enter / d opens” while Enter/Space force a check and d opens details; row tooltip still said “Enter / Space checks now” vs pending “Enter checks now”; not another keep-pNN pmset clone; Dark layout-daily next calendar day.
+- Backfill: missing keep row for v0.1.3075.
+- Shipped **v0.1.3076** — Monitors list + row tooltips: Enter checks · d opens (tips match real keys); Mac capture still TCC-blocked.
+- Ratchet keep @ 1088dfef6 for 3076; backfill keep for 3075; sync-dist + install/kickstart + push (UI).
+- Morning surprise: refresh 2026-11-25 + archive.
+- Next fuel: Dark layout-daily next calendar day · SoftDisabled…pmhistory closed — remaining useful non-blocking `pmset -g` adapters only if clearly distinct (`disk` == `custom`; `uuidlog` blocks); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3076
+
+- Design-review fuel after theme-list seeds v0.1.3075: Monitors list kb-hint still said “Enter / d opens” and UP/DOWN row tooltips still said “Enter / Space checks now” while Enter/Space force a check and d opens details (pending tip already warmer). Digester empty; design-review due=false — polish-without-capture feature-monitors; layout-daily data-poster marked 2026-11-25 (Dark due next calendar quota). Next: Dark layout-daily next calendar day — SoftDisabled…pmhistory soft-state closed; not another keep-pNN clone.
 ## Overnight note 2026-11-25 ~04:30 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace; Settings/Changelog theme seeds already shipped as v0.1.3074).
