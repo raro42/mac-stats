@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3091] - 2026-11-25
+
+### Fixed
+- Memory hygiene: also scrub leftover HTML table scaffolding (`<thead>` / `<tbody>` / `</…>`) and session-compactor / `**DROP:**` / “hallucinated or unverified claims” instruction lines that survived the first MS_UNTRUSTED scrub.
+
 ## [0.1.3090] - 2026-11-25
 
 ### Fixed
