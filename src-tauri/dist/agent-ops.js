@@ -200,8 +200,9 @@
     }
     const items = getOpsFilterRowItems(row);
     hint.hidden = items.length < 2;
+    /* Design-review feature-agent-ops: shorter, warmer filter-row tip (KISS; overview/refresh parity). */
     hint.textContent =
-      '← → / h l · Home/End move · Enter / Space clears when on Clear';
+      'Tab filter · Clear · ← → / h l · Home/End · Enter clears';
   }
 
   /**
@@ -817,8 +818,9 @@ function ensureOpsFileTabKbHint() {
     if (hint.previousElementSibling !== tabs) {
         tabs.insertAdjacentElement('afterend', hint);
     }
+    /* Design-review feature-agent-ops: shorter, warmer file-tab tip (KISS; tab-bar parity). */
     hint.textContent =
-        '← → / h l · Home/End move · Enter / Space switches soul / skill / mood';
+        'Tab Soul · Skill · Mood · ← → / h l · Home/End · Enter switches';
 }
 
 /**
@@ -936,8 +938,9 @@ function ensureOpsAgentEditActionsKbHint() {
     if (hint.previousElementSibling !== row) {
         row.insertAdjacentElement('afterend', hint);
     }
+    /* Design-review feature-agent-ops: shorter, warmer edit-actions tip (KISS; refresh-row parity). */
     hint.textContent =
-        '← → / h l · Home/End move · Enter / Space saves, loads chat, or goes back';
+        'Tab Save · Load · Back · ← → / h l · Home/End · Enter runs it';
 }
 
 /**
@@ -1096,8 +1099,9 @@ function ensureOpsPreviewRowKbHint(spec) {
     }
     const items = getOpsPreviewRowItems(spec);
     hint.hidden = items.length < 2;
+    /* Design-review feature-agent-ops: shorter, warmer preview-row tip (KISS; refresh-row parity). */
     hint.textContent =
-        '← → / h l · Home/End move · Enter / Space copies or loads chat';
+        'Tab Copy · Load · ← → / h l · Home/End · Enter runs it';
 }
 
 function wireOpsPreviewRowToolbarKeyboard(spec) {
@@ -9829,14 +9833,16 @@ function ensureOpsInsightsKbHint(parked) {
         hint.className = 'ops-insights-kb-hint';
         hint.setAttribute('aria-hidden', 'true');
         hint.hidden = true;
+        /* Design-review feature-agent-ops: shorter, warmer Insights tip (KISS; overview parity). */
         hint.textContent =
-            '← → / h l · Home/End move · Enter loads chat · click previews';
+            'Tab a line · ← → / h l · Home/End · Enter loads chat';
     }
     if (hint.parentNode !== card) card.appendChild(hint);
     const items = getOpsInsightsToolbarItems();
     hint.hidden = items.length < 2;
+    /* Design-review feature-agent-ops: shorter, warmer Insights tip (KISS; overview parity). */
     hint.textContent =
-        '← → / h l · Home/End move · Enter loads chat · click previews';
+        'Tab a line · ← → / h l · Home/End · Enter loads chat';
 }
 
 /**

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3065] - 2026-11-25
+
+### Changed
+- Agent Ops keyboard hints (filter row · Soul/Skill/Mood file tabs · Save/Load/Back edit actions · Copy/Load preview · Runs Insights lines): shorter, warmer copy so leftover Tab tips match overview / refresh / chip KISS hints (design-review `feature-agent-ops`; Mac capture still TCC-blocked — polish-without-capture grace).
+
 ## [0.1.3064] - 2026-11-25
 
 ### Added
