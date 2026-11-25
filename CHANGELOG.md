@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.3071] - 2026-11-25
+
+### Changed
+- Theme HTML keyboard-hint seeds (all shells): finish first-paint Tab tip parity with warmer JS (Agent Ops · Perplexity · Debug Log · rings · sparklines · power strip · icon line · filter chips · Details · header/footer) after v0.1.3070 only dropped “Home/End move” (design-review polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
+
 ## [0.1.3070] - 2026-11-25
 
 ### Changed
