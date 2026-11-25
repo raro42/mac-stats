@@ -22273,9 +22273,9 @@ function renderDiskCleanupScopesEmpty(scopesEl) {
 }
 
 /** How to move across Disk Cleanup scope rows when the list has rows. */
-/* Design-review feature-disk-cleanup: shorter, warmer scope-list tip (KISS). */
+/* Standing-backlog feature-disk-cleanup: filter-aware scope tip (Monitors list parity). */
 const DISK_CLEANUP_SCOPE_KB_HINT =
-  'Scopes · ↑↓ / j k · Space enable · R recurse · T Trash · Delete removes · c copies · Esc · ⌘S saves';
+  'All · On · Off · ↑↓ / j k · Space enable · R recurse · T Trash · Delete removes · c copies · Esc clears';
 
 /** Theme HTML ships the hint above the scope list. It stays hidden until rows exist. Create it only on older shells. */
 function ensureDiskCleanupScopeKbHint(scopesEl, show) {
@@ -22306,9 +22306,9 @@ function ensureDiskCleanupScopeKbHint(scopesEl, show) {
 }
 
 /** How to move across Disk Cleanup category rows when the list has rows. */
-/* Design-review feature-disk-cleanup: shorter, warmer category-list tip (KISS). */
+/* Standing-backlog feature-disk-cleanup: filter-aware category tip (Monitors list parity). */
 const DISK_CLEANUP_LIST_KB_HINT =
-  'Categories · ↑↓ / j k · Home/End · Enter cleans when reclaimable · c copies · Esc clears';
+  'All · Reclaim · Big · Clean · ↑↓ / j k · Home/End · Enter cleans · c copies · Esc clears';
 
 /** Theme HTML ships the hint above the category list. It stays hidden until rows exist. Create it only on older shells. */
 function ensureDiskCleanupListKbHint(list, show) {

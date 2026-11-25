@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.3087] - 2026-11-25
+
+### Changed
+- Disk Cleanup scope · category list keyboard hints (+ theme seeds): filter-aware tips (`All · On · Off…` / `All · Reclaim · Big · Clean…`) so first paint matches Monitors / Top Processes list KISS hints (standing-backlog polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
+
 ## [0.1.3086] - 2026-11-25
 
 ### Changed
