@@ -1,7 +1,12 @@
 ## [Unreleased]
 
+## [0.1.3083] - 2026-11-25
+
 ### Fixed
 - Layout (#28): remove History time-range selector from all themes so sparklines stay aligned under gauges; Neon panel scrolls and widens with the window; top title reads `mac-stats` instead of `CPU`.
+
+### Changed
+- Settings Credentials Brave · Redmine · MCP keyboard hints (+ theme seeds): Tab-first tips so first paint matches Perplexity / Discord / Ollama KISS hints (design-review polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
 
 ## [0.1.3082] - 2026-11-25
 

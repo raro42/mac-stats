@@ -14482,10 +14482,10 @@ function refreshBraveSettingsToolbarRovingTabindex(wrap, preferred) {
   }
 }
 
-/* Settings Credentials: shorter, warmer Brave tip (KISS; Ollama / Monitors parity). */
+/* Settings Credentials: Tab-first Brave tip (Perplexity / Discord parity). */
 /** How to move across the Brave key, Save, and Clear when Settings is open. */
 const BRAVE_SETTINGS_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End · arrows at key edges · edges jump to Perplexity or Redmine';
+  'Tab key · Save · Clear · ← → / h l · Home/End · arrows at key edges · edges jump to Perplexity or Redmine';
 
 /**
  * Theme HTML ships the hint under the key field, Save, and Clear.
@@ -14856,9 +14856,9 @@ function refreshRedmineSettingsToolbarRovingTabindex(wrap, preferred) {
 }
 
 /** How to move across the Redmine URL, key, Save, and Clear when Settings is open. */
-/* Settings Credentials: shorter, warmer Redmine tip (KISS; Brave parity). */
+/* Settings Credentials: Tab-first Redmine tip (Brave / Perplexity parity). */
 const REDMINE_SETTINGS_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End · arrows at URL/key edges · edges jump to Brave or Mastodon';
+  'Tab URL · key · Save · Clear · ← → / h l · Home/End · arrows at URL/key edges · edges jump to Brave or Mastodon';
 
 /**
  * Theme HTML ships the hint under the URL field, key field, Save, and Clear.
@@ -15568,9 +15568,9 @@ function refreshMcpSettingsToolbarRovingTabindex(wrap, preferred) {
 }
 
 /** How to move across the MCP URL, stdio, Save, and Clear when Settings is open. */
-/* Settings Credentials: shorter, warmer MCP tip (KISS; Brave parity). */
+/* Settings Credentials: Tab-first MCP tip (Brave / Redmine parity). */
 const MCP_SETTINGS_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End · arrows at URL/stdio edges · edges jump to Mastodon or Browser';
+  'Tab URL · stdio · Save · Clear · ← → / h l · Home/End · arrows at URL/stdio edges · edges jump to Mastodon or Browser';
 
 /**
  * Theme HTML ships the hint under the URL field, stdio field, Save, and Clear.
