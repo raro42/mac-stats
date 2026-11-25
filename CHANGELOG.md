@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3085] - 2026-11-25
+
+### Changed
+- CPU window header · footer keyboard hints (+ theme seeds): Tab-first tips (`Tab Refresh · Settings…` / `Tab version · GitHub…`) so first paint matches Logs / Disk Cleanup / icon-line KISS hints (design-review polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
 ## [0.1.3084] - 2026-11-25
 
 ### Changed

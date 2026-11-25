@@ -25075,9 +25075,9 @@ function ensureCpuHeaderToolbarKbStyles() {
 }
 
 /** How to move across Refresh and Settings. Settings-open still says Credentials. */
-/* Design-review feature-cpu-metrics: shorter, warmer header tip (KISS; rings parity). */
+/* Design-review feature-cpu-metrics: Tab-first header tip (KISS; Logs / Disk Cleanup parity). */
 const HEADER_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End · edges jump to CPU ring (or Credentials) · or Top Processes / footer';
+  'Tab Refresh · Settings · ← → / h l · Home/End · edges jump to CPU ring (or Credentials) · or Top Processes / footer';
 
 /** Theme HTML ships the hint under Refresh and Settings. Create it only on older shells. */
 function ensureCpuHeaderToolbarKbHint() {
@@ -25463,9 +25463,9 @@ function ensureFooterToolbarKbStyles() {
 }
 
 /** Closed window: version opens the changelog. Open panels replace this line. */
-/* Design-review feature-cpu-metrics: shorter, warmer footer tip (KISS; rings parity). */
+/* Design-review feature-cpu-metrics: Tab-first footer tip (KISS; header / Logs parity). */
 const FOOTER_TOOLBAR_KB_HINT_CLOSED =
-  '← → / h l · Home/End · version opens changelog · edges jump to section icons or list';
+  'Tab version · GitHub · ← → / h l · Home/End · version opens changelog · edges jump to section icons or list';
 
 /** Theme HTML ships the hint under the version chip and GitHub link. Create it only on older shells. */
 function ensureFooterToolbarKbHint() {
@@ -25499,13 +25499,13 @@ function ensureFooterToolbarKbHint() {
     window.isSettingsModalOpen();
   const processDetailsOpen = isProcessDetailsModalOpen();
   hint.textContent = changelogOpen
-    ? '← → / h l · Home/End · version ← → changelog · edges jump to section icons'
+    ? 'Tab version · GitHub · ← → / h l · Home/End · version ← → changelog · edges jump to section icons'
     : ollamaSettingsOpen
-      ? '← → / h l · Home/End · version ← → Ollama Save · edges jump to section icons'
+      ? 'Tab version · GitHub · ← → / h l · Home/End · version ← → Ollama Save · edges jump to section icons'
       : settingsOpen
-        ? '← → / h l · Home/End · version ← → Perplexity Clear (or Discord logs) · edges jump to section icons'
+        ? 'Tab version · GitHub · ← → / h l · Home/End · version ← → Perplexity Clear (or Discord logs) · edges jump to section icons'
         : processDetailsOpen
-          ? '← → / h l · Home/End · version ← → Force Quit · edges jump to section icons'
+          ? 'Tab version · GitHub · ← → / h l · Home/End · version ← → Force Quit · edges jump to section icons'
           : FOOTER_TOOLBAR_KB_HINT_CLOSED;
 }
 
