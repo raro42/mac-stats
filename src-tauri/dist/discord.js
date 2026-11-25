@@ -288,10 +288,10 @@
     );
   }
 
-  /* Settings Credentials: shorter, warmer Discord tip (KISS; Ollama / Brave parity). */
+  /* Settings Credentials: Tab-first Discord tip (Ollama / Monitors parity). */
   /** How to move across the Discord token, Save, Clear, and View logs when Settings is open. */
   const DISCORD_TOOLBAR_KB_HINT =
-    "← → / h l · Home/End · arrows at token edges · edges jump to Discord icon or footer version";
+    "Tab token · Save · Clear · View logs · ← → / h l · Home/End · arrows at token edges · edges jump to Discord icon or footer version";
 
   /**
    * Theme HTML ships the hint under the token field, Save, Clear, and View logs.

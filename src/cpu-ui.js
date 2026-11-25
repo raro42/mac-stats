@@ -3591,10 +3591,10 @@
     }
   }
 
-  /* Settings Credentials: shorter, warmer section tip (KISS; toolbar parity). */
+  /* Settings Credentials: Tab-first section tip (Ollama / Discord parity). */
   /** How to move across Credentials controls when Settings is open. */
   const CREDENTIALS_SECTION_KB_HINT =
-    "← → / h l · Home/End · arrows at token/key edges · Discord ↑ header · Perplexity ↑ icon · Clear/View logs → footer · else Product";
+    "Tab Discord · Perplexity · ← → / h l · Home/End · arrows at token/key edges · Discord ↑ header · Perplexity ↑ icon · Clear/View logs → footer · else Product";
 
   function ensureCredentialsSectionKbStyles() {
     if (document.getElementById("mac-stats-credentials-section-kb-styles")) return;

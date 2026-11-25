@@ -18634,9 +18634,9 @@ function refreshPerplexitySettingsToolbarRovingTabindex(wrap, preferred) {
 }
 
 /** How to move across the Perplexity key, Save, and Clear when Settings is open. */
-/* Settings Credentials: shorter, warmer Perplexity tip (KISS; Brave parity). */
+/* Settings Credentials: Tab-first Perplexity tip (Ollama / Discord parity). */
 const PERPLEXITY_SETTINGS_TOOLBAR_KB_HINT =
-  '← → / h l · Home/End · arrows at key edges · edges jump to Perplexity icon or footer version';
+  'Tab key · Save · Clear · ← → / h l · Home/End · arrows at key edges · edges jump to Perplexity icon or footer version';
 
 /**
  * Theme HTML ships the hint under the key field, Save, and Clear.

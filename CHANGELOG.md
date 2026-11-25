@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3082] - 2026-11-25
+
+### Changed
+- Settings Credentials keyboard hints (Discord · Perplexity · section): Tab-first tips so first paint matches Ollama / Monitors / Disk Cleanup KISS hints (design-review polish-without-capture; digester empty; layout-daily Dark waits for next calendar day).
+
 ## [0.1.3081] - 2026-11-25
 
 ### Changed
