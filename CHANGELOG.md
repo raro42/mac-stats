@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3090] - 2026-11-25
+
+### Fixed
+- Memory hygiene: scrub MS_UNTRUSTED leftovers that used `<th>` / `<tr>` / `\text{…}` wrappers, “Treat everything until…”, “untrusted data points”, and “unverified claims” spam (Discord memory was still re-injecting those lines after the `<td>`-only filter).
+
 ## [0.1.3089] - 2026-11-25
 
 ### Fixed
