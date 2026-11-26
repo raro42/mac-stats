@@ -2033,6 +2033,22 @@ body.theme-futuristic #icon-agent-ops.section-open {
   background: color-mix(in srgb, var(--accent, #3bd6ff) 14%, #0b0b10);
   border-color: color-mix(in srgb, var(--accent, #3bd6ff) 32%, #0b0b10);
 }
+/*
+ * Architect (standing backlog after Futuristic v0.1.3097): same shared `.section-open`
+ * transparent accent wash over opaque `#f1f1f1` chips when AI Chat / Monitors
+ * expand. Opaque `--accent` mixes on Architect paper (not a second layout-daily mark).
+ */
+body.theme-architect #icon-monitors.section-open,
+body.theme-architect #icon-ollama.section-open,
+body.theme-architect #icon-perplexity.section-open,
+body.theme-architect #icon-logs.section-open,
+body.theme-architect #icon-disk-cleanup.section-open,
+body.theme-architect #icon-agent-ops.section-open {
+  opacity: 1;
+  color: var(--accent, #232d41);
+  background: color-mix(in srgb, var(--accent, #232d41) 14%, #f1f1f1);
+  border-color: color-mix(in srgb, var(--accent, #232d41) 32%, #f1f1f1);
+}
 body.theme-data-poster #icon-discord.status-good,
 body.theme-data-poster #icon-monitors.status-good,
 body.theme-data-poster #icon-ollama.status-good,
