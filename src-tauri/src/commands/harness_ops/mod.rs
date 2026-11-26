@@ -122,15 +122,18 @@ mod tests {
             9222,
             "Google Chrome",
             CachedBrowserSessionGlance::Absent,
+            0,
         );
         assert!(
             absent.contains("Ready") && absent.contains("idle until BROWSER_*"),
             "{absent}"
         );
+        assert!(!absent.contains("tracked"), "{absent}");
         let busy = format_browser_ready_chip_with_glance(
             9222,
             "Google Chrome",
             CachedBrowserSessionGlance::Busy,
+            0,
         );
         assert!(
             busy.contains("Busy") && busy.contains("session locked"),
@@ -145,12 +148,14 @@ mod tests {
                 idle_secs: 45,
                 headless: true,
             },
+            0,
         );
         assert!(warm.contains("Warm"), "{warm}");
         assert!(warm.contains("tabs **3**"), "{warm}");
         assert!(warm.contains("focus **1**"), "{warm}");
         assert!(warm.contains("headless"), "{warm}");
         assert!(warm.contains("idle 45s"), "{warm}");
+        assert!(!warm.contains("tracked"), "{warm}");
         let warm_m = format_browser_ready_chip_with_glance(
             9222,
             "Chromium",
@@ -160,9 +165,22 @@ mod tests {
                 idle_secs: 120,
                 headless: false,
             },
+            2,
         );
         assert!(warm_m.contains("visible"), "{warm_m}");
         assert!(warm_m.contains("idle 2m"), "{warm_m}");
+        assert!(warm_m.contains("tracked **2**"), "{warm_m}");
+        let absent_tracked = format_browser_ready_chip_with_glance(
+            9222,
+            "Google Chrome",
+            CachedBrowserSessionGlance::Absent,
+            1,
+        );
+        assert!(
+            absent_tracked.contains("idle until BROWSER_*")
+                && absent_tracked.contains("tracked **1**"),
+            "{absent_tracked}"
+        );
     }
 
     #[test]

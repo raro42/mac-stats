@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3120] - 2026-11-27
+
+### Added
+- Discord `/browser` · `/cdp`: show **tracked N** when automation `new_tab` targets wait for session-reset close (OpenClaw close-tracked leftover; calm omit when zero; distinct from Warm CDP tab count).
+
 ## [0.1.3119] - 2026-11-27
 
 ### Fixed

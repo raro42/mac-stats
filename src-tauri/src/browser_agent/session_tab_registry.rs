@@ -131,13 +131,20 @@ pub fn retrack_for_session(session_key: &str, target_ids: impl IntoIterator<Item
     }
 }
 
-/// Count of tracked tabs for a session (tests / diagnostics).
-#[cfg(test)]
+/// Count of tracked tabs for a session (diagnostics / `/browser` glance).
 pub fn count_tracked_for_session(session_key: &str) -> usize {
     let Ok(map) = tracked_tabs().lock() else {
         return 0;
     };
     map.get(session_key).map(|s| s.len()).unwrap_or(0)
+}
+
+/// Total automation tabs tracked across all sessions (OpenClaw close-on-reset leftover).
+pub fn count_tracked_tabs_total() -> usize {
+    let Ok(map) = tracked_tabs().lock() else {
+        return 0;
+    };
+    map.values().map(|s| s.len()).sum()
 }
 
 #[cfg(test)]
@@ -175,10 +182,12 @@ mod tests {
         track_for_active_session("  tab-b  ");
         track_for_active_session("");
         assert_eq!(count_tracked_for_session("discord-1"), 2);
+        assert_eq!(count_tracked_tabs_total(), 2);
 
         let taken = take_tracked_for_session("discord-1");
         assert_eq!(taken.len(), 2);
         assert_eq!(count_tracked_for_session("discord-1"), 0);
+        assert_eq!(count_tracked_tabs_total(), 0);
         reset_for_tests();
     }
 
