@@ -1,3 +1,19 @@
+## Overnight note 2026-11-26 ~06:00 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Dark [DUE] deferred as mark.
+- Sibling: next fuel was Hermes tool-% on Top tools after Discord reconnect ages v0.1.3107.
+- Debug.log: no ERROR/WARN/panic clusters in 180m window.
+- Fuel: sibling Hermes tool-breakdown — Top tools still showed raw name×N without share of all tool calls; not tip/keep-pNN/section-open/pmset/insights Sources·Activity/live-age/reconnect-age clone.
+- Shipped **v0.1.3108** — Top tools `name×N (P%)` on Discord `/insights` + Agent Ops.
+- Ratchet keep @ cb0807e85; sync-dist + install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: OpenClaw session-tab / native tool-loop fidelity if clearly small — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age + chip disc/resume ages + tool-% closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age / reconnect-age / tool-% clone.
+
+## Overnight merge — v0.1.3108
+
+- Sibling Hermes tool-% after Discord reconnect ages v0.1.3107: Top tools show share of all tool calls (`name×N (P%)`). Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26. Next: OpenClaw session-tab / native tool-loop if tiny — not another keep-pNN / section-open / insights / live-age / reconnect-age / tool-% clone.
+
 ## Overnight note 2026-11-26 ~05:15 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
