@@ -2081,6 +2081,23 @@ body.theme-light #icon-agent-ops.section-open {
   background: color-mix(in srgb, var(--accent, #6aa6df) 14%, #f7f7fa);
   border-color: color-mix(in srgb, var(--accent, #6aa6df) 32%, #f7f7fa);
 }
+/*
+ * Swiss Minimalistic (standing backlog after Light v0.1.3100): same shared
+ * `.section-open` transparent accent wash over opaque `#ffffff` chips when
+ * AI Chat / Monitors expand. Opaque `--accent` mixes on Swiss white (not a
+ * second layout-daily mark).
+ */
+body.theme-swiss-minimalistic #icon-monitors.section-open,
+body.theme-swiss-minimalistic #icon-ollama.section-open,
+body.theme-swiss-minimalistic #icon-perplexity.section-open,
+body.theme-swiss-minimalistic #icon-logs.section-open,
+body.theme-swiss-minimalistic #icon-disk-cleanup.section-open,
+body.theme-swiss-minimalistic #icon-agent-ops.section-open {
+  opacity: 1;
+  color: var(--accent, #121216);
+  background: color-mix(in srgb, var(--accent, #121216) 14%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #121216) 32%, #ffffff);
+}
 body.theme-data-poster #icon-discord.status-good,
 body.theme-data-poster #icon-monitors.status-good,
 body.theme-data-poster #icon-ollama.status-good,
