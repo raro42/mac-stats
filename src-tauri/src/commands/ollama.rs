@@ -451,6 +451,9 @@ pub fn answer_with_ollama_and_fetch(
         };
         let coord_key = crate::commands::turn_lifecycle::coordination_key(discord_reply_channel_id);
         crate::commands::turn_lifecycle::register(coord_key, &request_id);
+        // OpenClaw session-tab: own new_tab targets for this turn so session reset can close them.
+        let _browser_session_owner =
+            crate::browser_agent::ActiveBrowserSessionGuard::enter(discord_reply_channel_id);
         let output_gate = crate::commands::turn_lifecycle::new_output_gate_open();
         let request_id_for_timeout = request_id.clone();
         let discord_draft_for_timeout = if silent_user_output {

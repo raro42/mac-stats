@@ -460,6 +460,15 @@ pub fn clear_session(source: &str, session_id: u64) {
         );
     }
     crate::commands::ori_lifecycle::on_session_cleared(source, session_id);
+    // OpenClaw session-tab cleanup: close automation tabs opened with new_tab for this session.
+    let closed =
+        crate::browser_agent::close_tracked_browser_tabs_for_session(source, session_id);
+    if closed > 0 {
+        debug!(
+            "Session memory: closed {} tracked browser tab(s) for {}",
+            closed, key
+        );
+    }
     if let Ok(mut store) = session_store().lock() {
         store.remove(&key);
     }

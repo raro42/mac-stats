@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3116] - 2026-11-26
+
+### Added
+- **Close tracked browser tabs on session end** (OpenClaw session-tab cleanup): tabs opened with `BROWSER_NAVIGATE` + `new_tab` during a Discord/agent turn are closed when that session resets — leaves at least one tab; does not launch Chrome.
+
 ## [0.1.3115] - 2026-11-26
 
 ### Added

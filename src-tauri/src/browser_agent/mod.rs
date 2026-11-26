@@ -26,7 +26,10 @@ mod credentials;
 mod dom_snapshot;
 mod http_fallback;
 mod screenshot_annotate;
+pub(crate) mod session_tab_registry;
 pub mod url_filter;
+
+pub use session_tab_registry::ActiveBrowserSessionGuard;
 
 pub use http_fallback::{click_http, extract_http, input_http, navigate_http};
 
@@ -3961,11 +3964,13 @@ fn close_tab_at_index_inner(index: usize) -> Result<String, String> {
             .cloned()
             .ok_or_else(|| "BROWSER_CLOSE_TAB: tab disappeared".to_string())?
     };
+    let closed_target_id = tab.get_target_id().clone();
     tab.close(false).map_err(|e| {
         let s = format!("BROWSER_CLOSE_TAB: {}", e);
         clear_browser_session_on_error(&s);
         s
     })?;
+    session_tab_registry::untrack_everywhere(closed_target_id.as_str());
     mac_stats_info!(
         "browser/cdp",
         "Browser agent [CDP]: BROWSER_CLOSE_TAB closed index={} (had {} tabs)",
@@ -4880,6 +4885,126 @@ pub enum CachedBrowserSessionGlance {
         idle_secs: u64,
         headless: bool,
     },
+}
+
+/// Close tabs previously opened with `BROWSER_NAVIGATE` + `new_tab` for this session
+/// (OpenClaw `closeTrackedBrowserTabsForSessions` lens).
+///
+/// Does **not** launch Chrome. Leaves at least one tab when the browser still holds pages.
+/// Re-tracks targets if the session mutex is busy (or a close fails) so a later reset can retry.
+pub fn close_tracked_browser_tabs_for_session(source: &str, session_id: u64) -> usize {
+    let key = session_tab_registry::session_key(source, session_id);
+    let targets = session_tab_registry::take_tracked_for_session(&key);
+    if targets.is_empty() {
+        return 0;
+    }
+    let (closed, leftover) = close_cached_tabs_by_target_ids(&targets);
+    if !leftover.is_empty() {
+        session_tab_registry::retrack_for_session(&key, leftover);
+    }
+    if closed > 0 {
+        mac_stats_info!(
+            "browser/cdp",
+            "Browser agent [CDP]: session reset closed {} tracked tab(s) for {}",
+            closed,
+            key
+        );
+    }
+    closed
+}
+
+/// Returns `(closed_count, leftover_target_ids)`.
+/// Leftovers are busy-lock, last-tab keep, or hard close failures — caller retracks them.
+fn close_cached_tabs_by_target_ids(targets: &[String]) -> (usize, Vec<String>) {
+    if targets.is_empty() {
+        return (0, Vec::new());
+    }
+    let want: HashSet<&str> = targets.iter().map(String::as_str).collect();
+    let mut guard = match browser_session().try_lock() {
+        Ok(g) => g,
+        Err(std::sync::TryLockError::WouldBlock) => {
+            mac_stats_warn!(
+                "browser/cdp",
+                "Browser agent [CDP]: session reset could not lock browser to close tracked tabs (busy)"
+            );
+            return (0, targets.to_vec());
+        }
+        Err(std::sync::TryLockError::Poisoned(p)) => p.into_inner(),
+    };
+    let Some((browser, _created, last_used, _headless)) = guard.as_mut() else {
+        // No cached Chrome — drop tracking (nothing to close).
+        return (targets.len(), Vec::new());
+    };
+    *last_used = Instant::now();
+    let tabs = match browser.get_tabs().try_lock() {
+        Ok(t) => t,
+        Err(std::sync::TryLockError::WouldBlock) => {
+            mac_stats_warn!(
+                "browser/cdp",
+                "Browser agent [CDP]: session reset could not lock tab list to close tracked tabs"
+            );
+            return (0, targets.to_vec());
+        }
+        Err(std::sync::TryLockError::Poisoned(p)) => p.into_inner(),
+    };
+    let mut to_close: Vec<Arc<headless_chrome::Tab>> = Vec::new();
+    for tab in tabs.iter() {
+        if want.contains(tab.get_target_id().as_str()) {
+            to_close.push(Arc::clone(tab));
+        }
+    }
+    let open_count = tabs.len();
+    drop(tabs);
+    // Absent from Chrome already → count as closed.
+    let mut closed = targets.len().saturating_sub(to_close.len());
+    // Never close the last remaining page tab (same rule as BROWSER_CLOSE_TAB).
+    let max_close = open_count.saturating_sub(1).min(to_close.len());
+    let mut leftover: Vec<String> = Vec::new();
+    for tab in to_close.iter().skip(max_close) {
+        leftover.push(tab.get_target_id().clone());
+    }
+    for tab in to_close.into_iter().take(max_close) {
+        let tid = tab.get_target_id().clone();
+        match tab.close(false) {
+            Ok(_) => closed += 1,
+            Err(e) => {
+                let msg = e.to_string().to_lowercase();
+                if msg.contains("tab not found")
+                    || msg.contains("target closed")
+                    || msg.contains("target not found")
+                    || msg.contains("no such target")
+                {
+                    closed += 1;
+                } else {
+                    mac_stats_warn!(
+                        "browser/cdp",
+                        "Browser agent [CDP]: session reset failed to close tracked tab {}: {}",
+                        truncate_target_id_for_log(tid.as_str()),
+                        e
+                    );
+                    leftover.push(tid);
+                }
+            }
+        }
+    }
+    if closed > 0 {
+        if let Ok(tabs) = browser.get_tabs().lock() {
+            let new_len = tabs.len();
+            let focus = current_tab_index()
+                .lock()
+                .map(|g| *g)
+                .unwrap_or(0);
+            let new_focus = if new_len == 0 {
+                0
+            } else {
+                focus.min(new_len - 1)
+            };
+            if let Ok(mut g) = current_tab_index().lock() {
+                *g = new_focus;
+            }
+        }
+    }
+    (closed, leftover)
 }
 
 /// Non-blocking peek at the cached automation browser (OpenClaw session-tab lens).
@@ -7065,6 +7190,8 @@ fn navigate_and_get_state_inner(
         cdp_fetch_proxy_auth::ensure_fetch_proxy_auth_on_tab(&new_tab);
         apply_cdp_emulation_to_tab(new_tab.as_ref());
         cdp_trace_archive::maybe_start_recording_after_cdp_session_ready();
+        // OpenClaw session-tab: track automation-opened tabs for session-end cleanup.
+        session_tab_registry::track_for_active_session(new_tab.get_target_id().as_str());
         (browser, new_tab)
     } else {
         get_current_tab().inspect_err(|e| clear_browser_session_on_error(e))?
