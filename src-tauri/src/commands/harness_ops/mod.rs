@@ -77,6 +77,7 @@ mod tests {
         let idle = crate::keyed_queue::SessionQueueSnapshot {
             tracked_session_keys: 0,
             busy_session_keys: 0,
+            waiting_session_refs: 0,
             busy_key_sample: vec![],
         };
         assert_eq!(
@@ -86,11 +87,25 @@ mod tests {
         let busy = crate::keyed_queue::SessionQueueSnapshot {
             tracked_session_keys: 3,
             busy_session_keys: 2,
+            waiting_session_refs: 1,
             busy_key_sample: vec!["discord:1".into(), "discord:2".into()],
         };
         let line = format_session_queue_line(&busy);
         assert!(line.contains("busy **2/3**"), "{line}");
+        assert!(line.contains("wait **1**"), "{line}");
         assert!(line.contains("discord:1"), "{line}");
+        let busy_no_wait = crate::keyed_queue::SessionQueueSnapshot {
+            tracked_session_keys: 1,
+            busy_session_keys: 1,
+            waiting_session_refs: 0,
+            busy_key_sample: vec!["discord:9".into()],
+        };
+        let line_nw = format_session_queue_line(&busy_no_wait);
+        assert!(line_nw.contains("busy **1/1**"), "{line_nw}");
+        assert!(
+            !line_nw.contains("wait"),
+            "idle wait bit must stay calm: {line_nw}"
+        );
         let status = format_status_gateway();
         assert!(
             status.contains("Session queue:"),

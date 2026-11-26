@@ -5586,16 +5586,18 @@ function setText(id, text) {
     if (el) el.textContent = text;
 }
 
-/** OpenClaw session keyed-queue bit for titles (busy N/M · or queue clear). */
+/** OpenClaw session keyed-queue bit for titles (busy N/M · wait W · or queue clear). */
 function formatOpsSessionQueueBit(pressure) {
     const sq = pressure?.sessionKeyedQueue || pressure?.session_keyed_queue || null;
     if (!sq) return '';
     const busy = Number(sq.busySessionKeys ?? sq.busy_session_keys) || 0;
     const tracked = Number(sq.trackedSessionKeys ?? sq.tracked_session_keys) || 0;
+    const wait = Number(sq.waitingSessionRefs ?? sq.waiting_session_refs) || 0;
     if (busy <= 0) {
         return tracked > 0 ? `queue clear · tracked ${tracked}` : 'queue clear';
     }
-    return `sess busy ${busy}/${tracked || busy}`;
+    const waitBit = wait > 0 ? ` · wait ${wait}` : '';
+    return `sess busy ${busy}/${tracked || busy}${waitBit}`;
 }
 
 function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, ollama, brave, browser, mcp, cursor, perplexity, mastodon, telegram, slack, signal, sessionFiles, pressure }) {

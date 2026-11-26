@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3114] - 2026-11-26
+
+### Added
+- Discord `/status` + `/queue` · `/session-queue` **Session queue** wait depth: `wait N` when turns park behind a busy keyed mutex (OpenClaw serialization leftover after busy/tracked). Agent Ops Live/Version titles and operator pressure log show the same bit.
+
 ## [0.1.3113] - 2026-11-26
 
 ### Added

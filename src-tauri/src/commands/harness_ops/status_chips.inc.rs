@@ -116,7 +116,7 @@ pub fn looks_like_status_request(content: &str) -> bool {
 
 
 /// One-screen operator status: version, Discord gateway, digest, next schedule, last delivery.
-/// OpenClaw-style session serialization glance — busy / tracked keys from `keyed_queue`.
+/// OpenClaw-style session serialization glance — busy / tracked / wait depth from `keyed_queue`.
 /// Calm when idle (`queue clear`); samples up to 3 busy keys when work is in flight.
 pub fn format_session_queue_line(snap: &crate::keyed_queue::SessionQueueSnapshot) -> String {
     if snap.busy_session_keys == 0 && snap.tracked_session_keys == 0 {
@@ -132,6 +132,9 @@ pub fn format_session_queue_line(snap: &crate::keyed_queue::SessionQueueSnapshot
         "Session queue: busy **{}/{}**",
         snap.busy_session_keys, snap.tracked_session_keys
     );
+    if snap.waiting_session_refs > 0 {
+        line.push_str(&format!(" · wait **{}**", snap.waiting_session_refs));
+    }
     if !snap.busy_key_sample.is_empty() {
         let sample = snap
             .busy_key_sample

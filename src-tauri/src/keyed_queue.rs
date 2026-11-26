@@ -81,22 +81,31 @@ where
 pub struct SessionQueueSnapshot {
     pub tracked_session_keys: u32,
     pub busy_session_keys: u32,
+    /// Estimated turns waiting behind a held session mutex (OpenClaw serialization wait depth).
+    ///
+    /// Derived from `Arc::strong_count` on busy keys: map slot + holder ≈ 2; each extra clone is a
+    /// waiter in [`run_serial`]. Not an exact Tokio waiter list — good enough for `/queue` / `/status`.
+    pub waiting_session_refs: u32,
     /// Up to 16 keys whose session mutex is currently held (another turn may be waiting on the same key).
     pub busy_key_sample: Vec<String>,
 }
 
-/// Snapshot of keyed session queue: keys still tracked and how many have an active turn (`try_lock` would block).
-/// Does **not** count waiters per key (only “busy or not”). Sync so Discord `/status` / `/queue` stay zero-LLM.
+/// Snapshot of keyed session queue: tracked keys, busy keys, and estimated waiters behind busy locks.
+/// Sync so Discord `/status` / `/queue` stay zero-LLM.
 pub fn snapshot_session_queue() -> SessionQueueSnapshot {
     const MAX_SAMPLE: usize = 16;
     let map = lock_slots();
     let mut tracked_session_keys = 0u32;
     let mut busy_session_keys = 0u32;
+    let mut waiting_session_refs = 0u32;
     let mut busy_key_sample = Vec::new();
     for (key, arc) in map.iter() {
         tracked_session_keys += 1;
         if arc.try_lock().is_err() {
             busy_session_keys += 1;
+            // map entry + running holder ≈ 2; anything above is a clone waiting on `lock().await`.
+            let extras = Arc::strong_count(arc).saturating_sub(2) as u32;
+            waiting_session_refs = waiting_session_refs.saturating_add(extras);
             if busy_key_sample.len() < MAX_SAMPLE {
                 busy_key_sample.push(key.clone());
             }
@@ -106,6 +115,7 @@ pub fn snapshot_session_queue() -> SessionQueueSnapshot {
     SessionQueueSnapshot {
         tracked_session_keys,
         busy_session_keys,
+        waiting_session_refs,
         busy_key_sample,
     }
 }
@@ -207,5 +217,42 @@ mod tests {
         // Other tests may leave keys; just ensure the sync path returns a struct.
         let _ = snap.tracked_session_keys;
         let _ = snap.busy_session_keys;
+        let _ = snap.waiting_session_refs;
+    }
+
+    #[tokio::test]
+    async fn busy_snapshot_counts_waiting_refs() {
+        let (entered_tx, entered_rx) = tokio::sync::oneshot::channel::<()>();
+        let (release_tx, release_rx) = tokio::sync::oneshot::channel::<()>();
+        let h1 = tokio::spawn(async move {
+            run_serial("unit-wait-depth", async move {
+                let _ = entered_tx.send(());
+                let _ = release_rx.await;
+            })
+            .await
+        });
+        entered_rx.await.expect("holder should enter");
+        // Second task clones the Arc and blocks on the same key.
+        let h2 = tokio::spawn(async move {
+            run_serial("unit-wait-depth", async move {
+                // no-op after acquire
+            })
+            .await
+        });
+        // Give the waiter time to clone + park on lock.
+        tokio::time::sleep(std::time::Duration::from_millis(40)).await;
+        let snap = snapshot_session_queue();
+        assert!(
+            snap.busy_session_keys >= 1,
+            "holder must show busy: {:?}",
+            snap
+        );
+        assert!(
+            snap.waiting_session_refs >= 1,
+            "waiter Arc clone must bump wait depth: {:?}",
+            snap
+        );
+        let _ = release_tx.send(());
+        let _ = tokio::join!(h1, h2);
     }
 }

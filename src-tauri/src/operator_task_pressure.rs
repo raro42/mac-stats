@@ -129,7 +129,7 @@ impl OperatorTaskPressureSummary {
         let tf = &self.task_files;
         let sq = &self.session_keyed_queue;
         format!(
-            "sched_entries={} next_in_s={:?} imminent120={} tasks_open={} wip={} sess_busy={}/{} ollama_avail={}/{} ollama_key_waiters={} ollama_err_total={}",
+            "sched_entries={} next_in_s={:?} imminent120={} tasks_open={} wip={} sess_busy={}/{} sess_wait={} ollama_avail={}/{} ollama_key_waiters={} ollama_err_total={}",
             sch.total_entries,
             sch.seconds_until_next_fire,
             sch.imminent_fire_within_120s_count,
@@ -137,6 +137,7 @@ impl OperatorTaskPressureSummary {
             tf.wip,
             sq.busy_session_keys,
             sq.tracked_session_keys,
+            sq.waiting_session_refs,
             q.global_available_permits,
             q.global_total_permits,
             waiters_sum,
