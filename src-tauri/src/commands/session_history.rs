@@ -116,11 +116,10 @@ pub(crate) async fn prepare_conversation_history(
         match compact_conversation_history(&raw_history, question, discord_reply_channel_id).await {
             Ok((mut context, lessons)) => {
                 // Reinject session TODO so long Discord plans survive compression.
-                let todos = crate::commands::session_todo::read(discord_reply_channel_id);
-                if !todos.is_empty() {
-                    context.push_str("\n\n");
-                    context.push_str(&crate::commands::session_todo::format_todos(&todos));
-                }
+                crate::commands::session_todo::append_to_compaction_context(
+                    &mut context,
+                    discord_reply_channel_id,
+                );
                 if lifecycle.emit_cpu_compaction_ui {
                     emit_mac_stats_compaction_event("end", false, request_id, Some(true));
                 }

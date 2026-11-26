@@ -97,7 +97,7 @@ Context is kept under control by **caps** and **compaction** (summarize-then-rep
    - **Optional hooks / transcript:** **`beforeCompactionTranscriptPath`**, **`beforeCompactionHook`**, **`afterCompactionHook`** (and env overrides)—see **docs/data_files_reference.md** (compaction hooks).
 
 2. **Periodic compaction (every 30 minutes)**  
-   A background thread runs every 30 minutes and compacts each in-memory session that has **≥ 4 messages**. For each such session: lessons are appended to global memory; if the session has had **no activity for 30 minutes** it is **cleared**; if it is **active** (activity within 30 min) it is **replaced** with the summary (same as on-request).  
+   A background thread runs every 30 minutes and compacts each in-memory session that has **≥ 4 messages**. For each such session: **Hermes hygiene matches on-request** — `flush_memories_before_compaction` runs before summarize, and session TODOs are reinjected into the CONTEXT via `session_todo::append_to_compaction_context`; then lessons are appended to global memory; if the session has had **no activity for 30 minutes** it is **cleared**; if it is **active** (activity within 30 min) it is **replaced** with the summary (same as on-request).  
    See `run_periodic_session_compaction()` in `commands/compaction.rs` and the thread started from `lib.rs`.
 
 3. **Discord having_fun channels**  

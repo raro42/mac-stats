@@ -48,6 +48,17 @@ pub fn format_todos(items: &[TodoItem]) -> String {
     lines.join("\n")
 }
 
+/// Append session TODOs into a compaction CONTEXT so plans survive summary replace/clear.
+/// Shared by on-request (`prepare_conversation_history`) and periodic compaction.
+pub fn append_to_compaction_context(context: &mut String, discord_channel_id: Option<u64>) {
+    let todos = read(discord_channel_id);
+    if todos.is_empty() {
+        return;
+    }
+    context.push_str("\n\n");
+    context.push_str(&format_todos(&todos));
+}
+
 pub fn read(discord_channel_id: Option<u64>) -> Vec<TodoItem> {
     let key = session_key(discord_channel_id);
     store()
@@ -228,5 +239,20 @@ mod tests {
         let r = handle_todo("done a1", Some(42));
         assert!(r.contains("completed"));
         clear(Some(42));
+    }
+
+    #[test]
+    fn append_to_compaction_context_reinjects_todos() {
+        clear(Some(77));
+        let _ = handle_todo("add t1 | Keep after compact", Some(77));
+        let mut ctx = "CONTEXT summary".to_string();
+        append_to_compaction_context(&mut ctx, Some(77));
+        assert!(ctx.contains("CONTEXT summary"));
+        assert!(ctx.contains("Keep after compact"));
+        assert!(ctx.contains("**Session TODO:**"));
+        clear(Some(77));
+        let mut empty_ctx = "CONTEXT only".to_string();
+        append_to_compaction_context(&mut empty_ctx, Some(77));
+        assert_eq!(empty_ctx, "CONTEXT only");
     }
 }

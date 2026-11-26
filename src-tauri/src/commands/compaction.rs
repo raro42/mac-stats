@@ -266,6 +266,13 @@ pub async fn run_periodic_session_compaction() {
         } else {
             None
         };
+        // Hermes hygiene parity with on-request: curate MEMORY before summarize.
+        crate::commands::curated_memory::flush_memories_before_compaction(
+            &messages,
+            discord_ch,
+            &periodic_rid,
+        )
+        .await;
         let compact_result =
             compact_conversation_history(&messages, &actual_question, discord_ch).await;
         let compact_result = match compact_result {
@@ -290,7 +297,12 @@ pub async fn run_periodic_session_compaction() {
             }
         };
         match compact_result {
-            Ok((context, lessons)) => {
+            Ok((mut context, lessons)) => {
+                // Keep session TODOs in the summary (same as on-request path).
+                crate::commands::session_todo::append_to_compaction_context(
+                    &mut context,
+                    discord_ch,
+                );
                 let lessons_written = lessons
                     .as_ref()
                     .map(|s| !s.trim().is_empty())

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3119] - 2026-11-27
+
+### Fixed
+- **Periodic compaction Hermes hygiene**: the 30-minute sweeper now matches on-request — flush curated `MEMORY:` notes before summarize, and reinject session TODOs into the CONTEXT so idle Discord/local threads (4–7 turns) do not lose plans when compacted.
+
 ## [0.1.3118] - 2026-11-26
 
 ### Added
