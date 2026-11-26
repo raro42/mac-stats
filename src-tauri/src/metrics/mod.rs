@@ -8490,7 +8490,8 @@ fn shorten_pmcustom_key(key: &str) -> String {
 /// macOS Battery/AC power profiles from `pmset -g custom` (diff summary).
 /// Distinct from per-key soft-state (`/powernap`, `/womp`, …), Power capabilities `/pmcap`,
 /// User activity `/useractivity`, Power source `/pmps`, and AC charger `/adapter`.
-/// Used by Discord/operator instant `/pmcustom` · `/power-profiles` lane.
+/// Used by Discord/operator instant `/pmcustom` · `/pmdisk` · `/power-profiles` lane
+/// (`pmset -g disk` ≡ `pmset -g custom` on macOS).
 pub fn get_pmcustom_status() -> String {
     #[cfg(not(target_os = "macos"))]
     {

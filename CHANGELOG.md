@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3103] - 2026-11-26
+
+### Added
+- Instant lane: `/pmdisk` · `/pmset-disk` · `/power-disk` (+ view/open NL) alias the existing Power custom report — on macOS `pmset -g disk` matches `pmset -g custom`. Bare `pmdisk` and `/disk` (Disk Cleanup) stay put.
+
 ## [0.1.3102] - 2026-11-26
 
 ### Fixed

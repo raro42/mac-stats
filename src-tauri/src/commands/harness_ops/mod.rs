@@ -6854,26 +6854,46 @@ mod tests {
     #[test]
     fn pmcustom_slash_and_view_open_do_not_steal_keys_pmcap_or_bare() {
         // Slash + view/open NL -> Power custom (/pmcap · /pmps · /useractivity parity).
+        // `/pmdisk` aliases the same `pmset -g custom` dump (`pmset -g disk` ≡ custom).
         assert!(looks_like_pmcustom_request("/pmcustom"));
         assert!(looks_like_pmcustom_request("/pmcustom-status"));
         assert!(looks_like_pmcustom_request("/pm-custom"));
         assert!(looks_like_pmcustom_request("/pmset-custom"));
+        assert!(looks_like_pmcustom_request("/pmdisk"));
+        assert!(looks_like_pmcustom_request("/pmdisk-status"));
+        assert!(looks_like_pmcustom_request("/pm-disk"));
+        assert!(looks_like_pmcustom_request("/pmset-disk"));
+        assert!(looks_like_pmcustom_request("/power-disk"));
+        assert!(looks_like_pmcustom_request("/mac-pmdisk"));
         assert!(looks_like_pmcustom_request("/power-custom"));
         assert!(looks_like_pmcustom_request("/power-profiles"));
         assert!(looks_like_pmcustom_request("/battery-ac-profiles"));
         assert!(looks_like_pmcustom_request("/mac-pmcustom"));
         assert!(looks_like_pmcustom_request("/mac-power-profiles"));
         assert!(looks_like_pmcustom_request("view pmcustom"));
+        assert!(looks_like_pmcustom_request("view pmdisk"));
         assert!(looks_like_pmcustom_request("open power-profiles"));
+        assert!(looks_like_pmcustom_request("open pmdisk"));
         assert!(looks_like_pmcustom_request("list power profiles"));
+        assert!(looks_like_pmcustom_request("list pmdisk"));
         assert!(looks_like_pmcustom_request("pmcustom status"));
+        assert!(looks_like_pmcustom_request("pmdisk status"));
         assert!(looks_like_pmcustom_request("is pmcustom ok"));
+        assert!(looks_like_pmcustom_request("is pmdisk ok"));
         assert!(looks_like_pmcustom_request("what's my power profiles"));
+        assert!(looks_like_pmcustom_request("what's my pmdisk"));
         assert!(looks_like_pmcustom_request("view battery ac profiles"));
         assert!(!looks_like_pmcustom_request("pmcustom"));
+        assert!(!looks_like_pmcustom_request("pmdisk"));
         assert!(!looks_like_pmcustom_request("power custom"));
         assert!(!looks_like_pmcustom_request("power profiles"));
         assert!(!looks_like_pmcustom_request("pmset custom"));
+        assert!(!looks_like_pmcustom_request("pmset disk"));
+        assert!(!looks_like_pmcustom_request("/disk"));
+        assert!(!looks_like_pmcustom_request("view disk"));
+        assert!(!looks_like_pmcustom_request("open disk"));
+        assert!(!looks_like_pmcustom_request("list disk"));
+        assert!(!looks_like_pmcustom_request("/disksleep"));
         assert!(!looks_like_pmcustom_request("/powernap"));
         assert!(!looks_like_pmcustom_request("view powernap"));
         assert!(!looks_like_pmcustom_request("/womp"));
@@ -6896,15 +6916,28 @@ mod tests {
         assert!(!looks_like_useractivity_request("view pmcustom"));
         assert!(!looks_like_pmps_request("/pmcustom"));
         assert!(!looks_like_power_nap_request("/pmcustom"));
+        assert!(!looks_like_disk_cleanup_request("/pmdisk"));
+        assert!(!looks_like_disk_cleanup_request("view pmdisk"));
         let s = try_operator_instant_reply("/pmcustom").unwrap();
         assert!(
             s.contains("**Power custom**") && !s.to_lowercase().contains("execution"),
             "got: {s}"
         );
+        let disk = try_operator_instant_reply("/pmdisk").unwrap();
+        assert!(
+            disk.contains("**Power custom**") && !disk.to_lowercase().contains("execution"),
+            "got: {disk}"
+        );
         let viewed = try_operator_instant_reply("view pmcustom").unwrap();
         assert!(
             viewed.contains("**Power custom**") && !viewed.to_lowercase().contains("execution"),
             "got: {viewed}"
+        );
+        let viewed_disk = try_operator_instant_reply("view pmdisk").unwrap();
+        assert!(
+            viewed_disk.contains("**Power custom**")
+                && !viewed_disk.to_lowercase().contains("execution"),
+            "got: {viewed_disk}"
         );
         let open = try_operator_instant_reply("open power-profiles").unwrap();
         assert!(
@@ -6912,6 +6945,7 @@ mod tests {
             "got: {open}"
         );
         assert!(try_operator_instant_reply("pmcustom").is_none());
+        assert!(try_operator_instant_reply("pmdisk").is_none());
         assert!(try_operator_instant_reply("power profiles").is_none());
         let pmcap = try_operator_instant_reply("/pmcap");
         if let Some(reply) = pmcap {
