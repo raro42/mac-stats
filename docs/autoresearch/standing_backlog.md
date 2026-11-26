@@ -1,3 +1,19 @@
+## Overnight note 2026-11-26 ~20:05 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Dark [DUE] deferred as mark.
+- Sibling: Hermes overview leftover after Top tools % v0.1.3108 — pre_routed / tool_steps / verify_passed already in runs.jsonl but missing from insights.
+- Debug.log: minor WARN clusters only (quality-review README noise); no ERROR/panic.
+- Fuel: sibling Hermes overview Routing — not tip/keep-pNN/section-open/pmset/insights Sources·Activity/live-age/reconnect-age/tool-% clone.
+- Shipped **v0.1.3109** — Routing `pre-routed N (P%) · avg tools T · verify V/W` on Discord `/insights` + Agent Ops.
+- Ratchet keep @ 1169946cf; sync-dist + install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: OpenClaw session-tab / native tool-loop fidelity if clearly small — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age + chip disc/resume ages + tool-% + Routing closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age / reconnect-age / tool-% / Routing clone.
+
+## Overnight merge — v0.1.3109
+
+- Sibling Hermes overview after Top tools % v0.1.3108: Routing (pre-routed share · avg tool steps · verify pass) on Discord `/insights` + Agent Ops. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26. Next: OpenClaw session-tab / native tool-loop if tiny — not another keep-pNN / section-open / insights / live-age / reconnect-age / tool-% / Routing clone.
+
 ## Overnight note 2026-11-26 ~06:00 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
