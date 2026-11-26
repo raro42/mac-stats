@@ -7,6 +7,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_status_request(content) {
         return Some(format_status_gateway());
     }
+    if looks_like_session_queue_request(content) {
+        return Some(format_session_queue_gateway());
+    }
     if looks_like_discord_gateway_request(content) {
         return Some(format_discord_gateway_chip());
     }

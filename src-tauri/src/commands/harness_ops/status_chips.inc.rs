@@ -116,6 +116,106 @@ pub fn looks_like_status_request(content: &str) -> bool {
 
 
 /// One-screen operator status: version, Discord gateway, digest, next schedule, last delivery.
+/// OpenClaw-style session serialization glance — busy / tracked keys from `keyed_queue`.
+/// Calm when idle (`queue clear`); samples up to 3 busy keys when work is in flight.
+pub fn format_session_queue_line(snap: &crate::keyed_queue::SessionQueueSnapshot) -> String {
+    if snap.busy_session_keys == 0 && snap.tracked_session_keys == 0 {
+        return "Session queue: **queue clear**".into();
+    }
+    if snap.busy_session_keys == 0 {
+        return format!(
+            "Session queue: **queue clear** · tracked **{}**",
+            snap.tracked_session_keys
+        );
+    }
+    let mut line = format!(
+        "Session queue: busy **{}/{}**",
+        snap.busy_session_keys, snap.tracked_session_keys
+    );
+    if !snap.busy_key_sample.is_empty() {
+        let sample = snap
+            .busy_key_sample
+            .iter()
+            .take(3)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join(", ");
+        line.push_str(&format!(" · {sample}"));
+        if snap.busy_key_sample.len() > 3 {
+            line.push_str(&format!(" · +{}", snap.busy_key_sample.len() - 3));
+        }
+    }
+    line
+}
+
+/// Zero-LLM session keyed-queue report (Discord `/queue` · Agent Ops Live title parity).
+pub fn format_session_queue_gateway() -> String {
+    format_session_queue_line(&crate::keyed_queue::snapshot_session_queue())
+}
+
+/// True for `/queue` / `session queue` — keyed-queue busy glance; not digester “queue clear”.
+/// View/see/show me/open/list-the NL. Exact `open queue` / `open the queue` only.
+pub fn looks_like_session_queue_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    // Digester open/stale and free-form “why is the queue…” stay with agent / digest handlers.
+    if n.contains("digest")
+        || n.contains("open candidate")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("ollama http")
+        || n.contains("http queue")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/queue"
+            | "/session-queue"
+            | "/sessionqueue"
+            | "/keyed-queue"
+            | "/keyedqueue"
+            | "session queue"
+            | "keyed queue"
+            | "session keyed queue"
+            | "show queue"
+            | "show the queue"
+            | "show me queue"
+            | "show me the queue"
+            | "show session queue"
+            | "show the session queue"
+            | "show me session queue"
+            | "show me the session queue"
+            | "view queue"
+            | "view the queue"
+            | "view session queue"
+            | "view the session queue"
+            | "see queue"
+            | "see the queue"
+            | "see session queue"
+            | "see the session queue"
+            | "open queue"
+            | "open the queue"
+            | "open session queue"
+            | "open the session queue"
+            | "list queue"
+            | "list the queue"
+            | "list session queue"
+            | "list the session queue"
+            | "the queue"
+            | "the session queue"
+            | "is the queue busy"
+            | "is session queue busy"
+            | "how's the queue"
+            | "hows the queue"
+            | "how's session queue"
+            | "hows session queue"
+    )
+}
+
 pub fn format_status_gateway() -> String {
     let version = crate::config::Config::version();
     let digest = load_digest_summary();
@@ -156,6 +256,8 @@ pub fn format_status_gateway() -> String {
         let preview: String = last.summary.chars().take(72).collect();
         lines.push(format!("Last delivery: {} · {}", last.utc, preview));
     }
+    // OpenClaw session serialization — busy Discord/UI turns (not digester open).
+    lines.push(format_session_queue_gateway());
     lines.join("\n")
 }
 
@@ -3140,6 +3242,7 @@ pub fn format_ops_help_gateway() -> String {
     format!(
         "**mac-stats v{version} — operator commands** (instant, no Ollama)\n\
 • `/status` · `/health` · `/version` · `view status` · `see status` · `show me the status` · `open status` · `list the status` · `view health` · `open health` · `view version` · `open version` — one-screen health (exact open only; not ticket/status-of …)\n\
+• `/queue` · `/session-queue` · `session queue` · `view queue` · `see session queue` · `show me the queue` · `open queue` · `list the session queue` — session keyed-queue busy/tracked (Discord channel serialization; not digester open)\n\
 • `/discord` · `view discord` · `see discord` · `show me the discord` · `open discord` · `list the discord` — Discord Ready / Offline (Agent Ops glance; reconnect cues)\n\
 • `/ollama` · `/llm` · `/model` · `which model` · `what model are you` · `ollama url` · `ollama endpoint` · `where is ollama` · `view ollama` · `see ollama` · `show me the ollama` · `open ollama` · `list the ollama` · `view llm` · `open llm` — Ollama Ready / Offline, including the configured model name and endpoint (menu-bar ✕ · AI Chat glance; circuit). Plural `which models` stays a model list, not this chip. `set url` stays a config change.\n\
 • `/redmine` · `view redmine` · `see redmine` · `show me the redmine` · `open redmine` · `list the redmine` — Redmine Ready / Not set (Agent Ops health; URL + key; no live probe)\n\

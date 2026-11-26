@@ -147,7 +147,7 @@ impl OperatorTaskPressureSummary {
 
 pub async fn build_operator_task_pressure_summary() -> OperatorTaskPressureSummary {
     let ollama_http_queue = crate::ollama_queue::snapshot_http_queue().await;
-    let session_keyed_queue = crate::keyed_queue::snapshot_session_queue().await;
+    let session_keyed_queue = crate::keyed_queue::snapshot_session_queue();
     OperatorTaskPressureSummary {
         collected_at_rfc3339_utc: Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
         scheduler: crate::scheduler::scheduler_operator_snapshot(),

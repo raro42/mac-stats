@@ -5586,7 +5586,19 @@ function setText(id, text) {
     if (el) el.textContent = text;
 }
 
-function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, ollama, brave, browser, mcp, cursor, perplexity, mastodon, telegram, slack, signal, sessionFiles }) {
+/** OpenClaw session keyed-queue bit for titles (busy N/M · or queue clear). */
+function formatOpsSessionQueueBit(pressure) {
+    const sq = pressure?.sessionKeyedQueue || pressure?.session_keyed_queue || null;
+    if (!sq) return '';
+    const busy = Number(sq.busySessionKeys ?? sq.busy_session_keys) || 0;
+    const tracked = Number(sq.trackedSessionKeys ?? sq.tracked_session_keys) || 0;
+    if (busy <= 0) {
+        return tracked > 0 ? `queue clear · tracked ${tracked}` : 'queue clear';
+    }
+    return `sess busy ${busy}/${tracked || busy}`;
+}
+
+function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, ollama, brave, browser, mcp, cursor, perplexity, mastodon, telegram, slack, signal, sessionFiles, pressure }) {
     const enabled = (agents || []).filter((a) => a.enabled).length;
     const sessionN = (sessionFiles || []).length;
     setText(
@@ -5601,7 +5613,9 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
                 sessionN >= 40 ? `${sessionN}+ session files` : `${sessionN} session file${sessionN === 1 ? '' : 's'}`;
             const up = Number(insights?.process_uptime_secs) || 0;
             const upBit = up > 0 ? ` · up ${fmtUptimeSecs(up)}` : '';
-            agentsHint.title = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${sessLabel}${upBit}`;
+            const queueBit = formatOpsSessionQueueBit(pressure);
+            const queueTitle = queueBit ? ` · ${queueBit}` : '';
+            agentsHint.title = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${sessLabel}${upBit}${queueTitle}`;
         }
         const card = agentsHint.closest('.ops-health-card');
         if (card) {
@@ -6859,7 +6873,7 @@ function appendOverviewLastDeliveryRow(body, d) {
 }
 
 /** Overview Live card: ok/warn/bad wash (health Discord gateway parity). */
-function setOverviewLiveStatus(rows, insights) {
+function setOverviewLiveStatus(rows, insights, pressure) {
     const card = document.getElementById('ops-overview-live');
     if (!card) return;
     card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
@@ -6874,45 +6888,60 @@ function setOverviewLiveStatus(rows, insights) {
     const readyMatch = /last Ready/i.test(dg);
     const liveLabel =
         live.length === 1 ? '1 live session' : `${live.length} live sessions`;
+    const queueBit = formatOpsSessionQueueBit(pressure);
+    const queueSuffix = queueBit ? ` · ${queueBit}` : '';
+    const sq = pressure?.sessionKeyedQueue || pressure?.session_keyed_queue || null;
+    const busyN = Number(sq?.busySessionKeys ?? sq?.busy_session_keys) || 0;
 
     if (stage === 'disconnected') {
         card.classList.add('ops-health-bad');
         card.title = live.length
-            ? `Discord disconnected · ${liveLabel} still listed`
-            : 'Discord disconnected · no live sessions';
+            ? `Discord disconnected · ${liveLabel} still listed${queueSuffix}`
+            : `Discord disconnected · no live sessions${queueSuffix}`;
         return;
     }
     if (discN > 0 || resumeN > 0 || stage === 'resuming') {
         card.classList.add('ops-health-warn');
         card.title = live.length
-            ? `Gateway reconnect noise · ${liveLabel}`
-            : 'Gateway reconnect noise · no live sessions';
+            ? `Gateway reconnect noise · ${liveLabel}${queueSuffix}`
+            : `Gateway reconnect noise · no live sessions${queueSuffix}`;
         return;
     }
     if (!live.length) {
         // Idle + Discord Ready is calm — not amber “warn” (false alarm when nothing is wrong).
         const ready = stage === 'connected' || readyMatch;
+        if (busyN > 0) {
+            // Turns still serialized with no listed live row (e.g. ui-chat / scheduler).
+            card.classList.add('ops-health-warn');
+            card.title = `Session queue busy · no live chats listed${queueSuffix}`;
+            return;
+        }
         if (ready) {
             card.classList.add('ops-health-ok');
-            card.title = 'Waiting · gateway ready · no live chats yet';
+            card.title = `Waiting · gateway ready · no live chats yet${queueSuffix}`;
         } else {
             card.classList.add('ops-health-warn');
-            card.title = 'No live sessions';
+            card.title = `No live sessions${queueSuffix}`;
         }
+        return;
+    }
+    if (busyN > 0) {
+        card.classList.add('ops-health-warn');
+        card.title = `${liveLabel}${queueSuffix}`;
         return;
     }
     card.classList.add('ops-health-ok');
     card.title =
         stage === 'connected' || readyMatch
-            ? `${liveLabel} · gateway ready`
-            : liveLabel;
+            ? `${liveLabel} · gateway ready${queueSuffix}`
+            : `${liveLabel}${queueSuffix}`;
 }
 
-function renderOverviewLive(rows, insights) {
+function renderOverviewLive(rows, insights, pressure) {
     const body = document.getElementById('ops-overview-live-body');
     if (!body) return;
     body.innerHTML = '';
-    setOverviewLiveStatus(rows, insights);
+    setOverviewLiveStatus(rows, insights, pressure);
     if (!rows || !rows.length) {
         // Idle Live is calm (v0.1.919) — "Quiet" matches Ready wash, not a bare 0.
         paintOpsOverviewHeadCount('ops-overview-live', 'Quiet', { zero: true });
@@ -7839,6 +7868,8 @@ async function refreshAgentOps(opts = {}) {
                 () => invoke('list_scheduler_delivery_awareness').catch(() => null),
                 () => invoke('list_schedules').catch(() => []),
                 () => invoke('get_feature_health', { refresh: false }).catch(() => []),
+                // OpenClaw session serialization — busy Discord/UI turns (not digester open).
+                () => invoke('get_operator_task_pressure_summary').catch(() => null),
             ],
         ];
         const collected = [];
@@ -7857,6 +7888,7 @@ async function refreshAgentOps(opts = {}) {
             deliveries,
             schedules,
             features,
+            pressure,
         ] = collected;
         // Alt-tab during Agent Ops IPC: drop the big DOM rebuild (#14).
         if (agentOpsWorkPaused()) {
@@ -7914,11 +7946,12 @@ async function refreshAgentOps(opts = {}) {
             slack,
             signal,
             sessionFiles: files || [],
+            pressure,
         });
         opsAgentsCache = agents || [];
         renderOverviewAgents(opsAgentsCache);
         renderOverviewSchedules(schedules || [], deliveries || []);
-        renderOverviewLive(live || [], insights);
+        renderOverviewLive(live || [], insights, pressure);
         renderOverviewKnowledge(memory || []);
         renderOverviewRecent(files || []);
         renderOverviewRuns(insights);

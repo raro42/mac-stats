@@ -58,9 +58,46 @@ mod tests {
     #[test]
     fn operator_instant_reply_covers_gateway_commands() {
         assert!(try_operator_instant_reply("/status").is_some());
+        assert!(try_operator_instant_reply("/queue").is_some());
+        assert!(try_operator_instant_reply("/session-queue").is_some());
+        assert!(try_operator_instant_reply("session queue").is_some());
         assert!(try_operator_instant_reply("/keep-p47").is_some());
         assert!(try_operator_instant_reply("/keep-p4").is_some());
         assert!(try_operator_instant_reply("results.tsv path").is_some());
+    }
+
+    #[test]
+    fn session_queue_glance_openclaw_serialization() {
+        assert!(looks_like_session_queue_request("/queue"));
+        assert!(looks_like_session_queue_request("view session queue"));
+        assert!(looks_like_session_queue_request("is the queue busy"));
+        // Digester open stays put.
+        assert!(!looks_like_session_queue_request("digest queue"));
+        assert!(!looks_like_session_queue_request("why is the queue stuck"));
+        let idle = crate::keyed_queue::SessionQueueSnapshot {
+            tracked_session_keys: 0,
+            busy_session_keys: 0,
+            busy_key_sample: vec![],
+        };
+        assert_eq!(
+            format_session_queue_line(&idle),
+            "Session queue: **queue clear**"
+        );
+        let busy = crate::keyed_queue::SessionQueueSnapshot {
+            tracked_session_keys: 3,
+            busy_session_keys: 2,
+            busy_key_sample: vec!["discord:1".into(), "discord:2".into()],
+        };
+        let line = format_session_queue_line(&busy);
+        assert!(line.contains("busy **2/3**"), "{line}");
+        assert!(line.contains("discord:1"), "{line}");
+        let status = format_status_gateway();
+        assert!(
+            status.contains("Session queue:"),
+            "status must include session queue glance: {status}"
+        );
+        let focused = try_operator_instant_reply("/queue").expect("queue instant");
+        assert!(focused.contains("Session queue:"), "{focused}");
     }
 
     #[test]

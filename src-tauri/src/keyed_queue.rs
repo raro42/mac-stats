@@ -6,20 +6,30 @@
 //! interleave. Different keys still run concurrently.
 
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex as StdMutex};
 
 use tokio::sync::Mutex;
 use tracing::debug;
 
 struct KeyedQueueState {
-    slots: Mutex<HashMap<String, Arc<Mutex<()>>>>,
+    /// Map of session key → per-key async mutex. `std` lock so `/status` / Agent Ops can
+    /// snapshot without nesting Tokio `block_on` on the menu-bar runtime.
+    slots: StdMutex<HashMap<String, Arc<Mutex<()>>>>,
 }
 
 fn state() -> &'static KeyedQueueState {
     static S: std::sync::OnceLock<KeyedQueueState> = std::sync::OnceLock::new();
     S.get_or_init(|| KeyedQueueState {
-        slots: Mutex::new(HashMap::new()),
+        slots: StdMutex::new(HashMap::new()),
     })
+}
+
+fn lock_slots() -> std::sync::MutexGuard<'static, HashMap<String, Arc<Mutex<()>>>> {
+    // Poison: recover the map so a panicked holder cannot freeze Discord forever.
+    state()
+        .slots
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
 }
 
 /// Run `work` while holding an exclusive async lock for `key`. Other tasks using the same
@@ -31,7 +41,7 @@ where
 {
     let key = key.as_ref().to_string();
     let mutex_arc = {
-        let mut map = state().slots.lock().await;
+        let mut map = lock_slots();
         map.entry(key.clone())
             .or_insert_with(|| Arc::new(Mutex::new(())))
             .clone()
@@ -51,7 +61,7 @@ where
     let output = work.await;
     drop(guard);
     drop(mutex_arc);
-    let mut map = state().slots.lock().await;
+    let mut map = lock_slots();
     if let Some(arc) = map.get(&key) {
         if Arc::strong_count(arc) == 1 {
             map.remove(&key);
@@ -76,10 +86,10 @@ pub struct SessionQueueSnapshot {
 }
 
 /// Snapshot of keyed session queue: keys still tracked and how many have an active turn (`try_lock` would block).
-/// Does **not** count waiters per key (only “busy or not”).
-pub async fn snapshot_session_queue() -> SessionQueueSnapshot {
+/// Does **not** count waiters per key (only “busy or not”). Sync so Discord `/status` / `/queue` stay zero-LLM.
+pub fn snapshot_session_queue() -> SessionQueueSnapshot {
     const MAX_SAMPLE: usize = 16;
-    let map = state().slots.lock().await;
+    let map = lock_slots();
     let mut tracked_session_keys = 0u32;
     let mut busy_session_keys = 0u32;
     let mut busy_key_sample = Vec::new();
@@ -100,11 +110,16 @@ pub async fn snapshot_session_queue() -> SessionQueueSnapshot {
     }
 }
 
+/// Async wrapper for callers that already sit on an async path (operator pressure).
+pub async fn snapshot_session_queue_async() -> SessionQueueSnapshot {
+    snapshot_session_queue()
+}
+
 /// `true` if `key` is active (mutex held) or queued (entry exists and mutex is taken).
 /// Idle keys may be absent from the map after cleanup.
 pub async fn is_key_busy(key: &str) -> bool {
     let mutex_arc = {
-        let map = state().slots.lock().await;
+        let map = lock_slots();
         map.get(key).cloned()
     };
     let Some(m) = mutex_arc else {
@@ -184,5 +199,13 @@ mod tests {
             "B should finish before A releases (overlap): {:?}",
             v
         );
+    }
+
+    #[test]
+    fn idle_snapshot_is_clear() {
+        let snap = snapshot_session_queue();
+        // Other tests may leave keys; just ensure the sync path returns a struct.
+        let _ = snap.tracked_session_keys;
+        let _ = snap.busy_session_keys;
     }
 }

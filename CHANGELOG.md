@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3113] - 2026-11-26
+
+### Added
+- Discord `/status` + `/queue` · `/session-queue` **Session queue**: busy/tracked keyed-queue glance (OpenClaw session serialization; calm **queue clear** when idle). Agent Ops Live + Version titles show the same busy bit from operator pressure.
+
 ## [0.1.3112] - 2026-11-26
 
 ### Added
