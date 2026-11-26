@@ -1,3 +1,19 @@
+## Overnight note 2026-11-26 ~23:55 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Dark [DUE] deferred as mark.
+- Sibling: OpenClaw Discord reconnect leftover after native pairing v0.1.3117 — chip/insights showed disc/resume ages but not disc→Ready recovery length (reconnect-stall lens).
+- Debug.log: minor WARN clusters only (quality-review README noise); no ERROR/panic.
+- Fuel: sibling Discord reconnect robustness (last reconnect Ns) — not tip/keep-pNN/section-open/pmset/insights Sources·Activity/live-age/reconnect-age/tool-%/Routing/Notable/LLM-skips/Replies/Session-queue/Browser-Warm/close-tracked/native-pair clone.
+- Shipped **v0.1.3118** — Discord `/discord` + Agent Ops show `last reconnect Ns` (disc→Ready recovery).
+- Ratchet keep @ c997e4e88; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: Hermes compaction hygiene / Agent Ops design-review when due — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age + chip disc/resume ages + tool-% + Routing + Notable + LLM skips + Replies + Session queue busy/tracked + wait depth + Browser Warm glance + close-tracked-tabs + native-only pairing + last reconnect duration closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age / reconnect-age / tool-% / Routing / Notable / LLM-skips / Replies / Session-queue / Browser-Warm / close-tracked / native-pair / last-reconnect clone.
+
+## Overnight merge — v0.1.3118
+
+- Sibling OpenClaw Discord reconnect after native pairing v0.1.3117: disc→Ready recovery length on `/discord` + Agent Ops. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26. Next: Hermes compaction / design-review when due — not another keep-pNN / section-open / insights / Session-queue / Browser-Warm / close-tracked / native-pair / last-reconnect clone.
+
 ## Overnight note 2026-11-26 ~23:30 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
