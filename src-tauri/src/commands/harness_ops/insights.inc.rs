@@ -91,6 +91,22 @@ pub(super) fn format_notable_insights_line(insights: &RunsInsights) -> String {
     )
 }
 
+/// CapEx glance from runs.jsonl `skipped_*_llm` — plan · verify · criteria · topic.
+pub(super) fn format_llm_skips_insights_line(insights: &RunsInsights) -> String {
+    let turns = insights.turns.max(1) as f64;
+    let bit = |label: &str, n: usize| {
+        let pct = (n as f64) * 100.0 / turns;
+        format!("{label} **{n}** ({pct:.0}%)")
+    };
+    format!(
+        "LLM skips: {} · {} · {} · {}",
+        bit("plan", insights.skipped_plan_count),
+        bit("verify", insights.skipped_verify_count),
+        bit("criteria", insights.skipped_criteria_count),
+        bit("topic", insights.skipped_topic_count),
+    )
+}
+
 /// Short Discord/gateway report (Hermes `/insights` lite).
 pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     let mut lines = Vec::new();
@@ -254,6 +270,10 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     // Hermes Notable leftover — Most tool calls turn (runs.jsonl tool_steps).
     if insights.turns > 0 {
         lines.push(format_notable_insights_line(insights));
+    }
+    // CapEx leftover — skipped_*_llm shares already on runs.jsonl but missing from insights.
+    if insights.turns > 0 {
+        lines.push(format_llm_skips_insights_line(insights));
     }
     if !insights.slowest.is_empty() {
         lines.push("**Slowest**".into());

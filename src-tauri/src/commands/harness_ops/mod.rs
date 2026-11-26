@@ -8293,4 +8293,22 @@ mod tests {
         let empty = format_notable_insights_line(&insights);
         assert!(empty.contains("no tools yet"), "got: {empty}");
     }
+
+    #[test]
+    fn format_llm_skips_insights_capex_glance() {
+        let mut insights = compute_runs_insights(1);
+        insights.turns = 10;
+        insights.skipped_plan_count = 8;
+        insights.skipped_verify_count = 7;
+        insights.skipped_criteria_count = 9;
+        insights.skipped_topic_count = 6;
+        let line = format_llm_skips_insights_line(&insights);
+        assert!(line.contains("plan **8** (80%)"), "got: {line}");
+        assert!(line.contains("verify **7** (70%)"), "got: {line}");
+        assert!(line.contains("criteria **9** (90%)"), "got: {line}");
+        assert!(line.contains("topic **6** (60%)"), "got: {line}");
+        let text = format_runs_insights_gateway(&insights);
+        assert!(text.contains("LLM skips:"), "got: {text}");
+        assert!(text.contains("plan **8** (80%)"), "got: {text}");
+    }
 }

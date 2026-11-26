@@ -111,6 +111,14 @@ pub struct RunsInsights {
     pub most_tools_wall_ms: u64,
     /// Lane of the most-tools turn.
     pub most_tools_lane: String,
+    /// Turns that skipped plan LLM (`skipped_plan_llm` in runs.jsonl) — CapEx glance.
+    pub skipped_plan_count: usize,
+    /// Turns that skipped verify LLM.
+    pub skipped_verify_count: usize,
+    /// Turns that skipped criteria LLM.
+    pub skipped_criteria_count: usize,
+    /// Turns that skipped topic LLM.
+    pub skipped_topic_count: usize,
     pub candidates: Vec<RunInsightCandidate>,
     pub slowest: Vec<RunTurnSummary>,
     pub recent: Vec<RunTurnSummary>,
@@ -469,6 +477,10 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         most_tools_preview: String::new(),
         most_tools_wall_ms: 0,
         most_tools_lane: String::new(),
+        skipped_plan_count: 0,
+        skipped_verify_count: 0,
+        skipped_criteria_count: 0,
+        skipped_topic_count: 0,
         candidates: vec![],
         slowest: vec![],
         recent: vec![],
@@ -511,6 +523,10 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
     let mut most_tools_preview = String::new();
     let mut most_tools_wall_ms = 0u64;
     let mut most_tools_lane = String::new();
+    let mut skipped_plan_count = 0usize;
+    let mut skipped_verify_count = 0usize;
+    let mut skipped_criteria_count = 0usize;
+    let mut skipped_topic_count = 0usize;
 
     for line in text.lines() {
         let line = line.trim();
@@ -602,6 +618,34 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
             most_tools_lane = lane.clone();
             most_tools_preview = question_preview.chars().take(48).collect();
         }
+        if v
+            .get("skipped_plan_llm")
+            .and_then(|x| x.as_bool())
+            .unwrap_or(false)
+        {
+            skipped_plan_count += 1;
+        }
+        if v
+            .get("skipped_verify_llm")
+            .and_then(|x| x.as_bool())
+            .unwrap_or(false)
+        {
+            skipped_verify_count += 1;
+        }
+        if v
+            .get("skipped_criteria_llm")
+            .and_then(|x| x.as_bool())
+            .unwrap_or(false)
+        {
+            skipped_criteria_count += 1;
+        }
+        if v
+            .get("skipped_topic_llm")
+            .and_then(|x| x.as_bool())
+            .unwrap_or(false)
+        {
+            skipped_topic_count += 1;
+        }
         if let Some(c) = classify_candidate(&lane, wall, &tools, &question_preview, &request_id) {
             candidates.push(c);
         }
@@ -691,6 +735,10 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         most_tools_preview,
         most_tools_wall_ms,
         most_tools_lane,
+        skipped_plan_count,
+        skipped_verify_count,
+        skipped_criteria_count,
+        skipped_topic_count,
         candidates,
         slowest,
         recent,

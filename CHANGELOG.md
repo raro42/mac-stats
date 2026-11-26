@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3111] - 2026-11-26
+
+### Added
+- Runs Insights / Discord `/insights` **LLM skips**: plan · verify · criteria · topic skip shares from `runs.jsonl` `skipped_*_llm` (Agent Ops + gateway) — CapEx glance after Notable.
+
 ## [0.1.3110] - 2026-11-26
 
 ### Added

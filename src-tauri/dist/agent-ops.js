@@ -5501,6 +5501,22 @@ function formatNotableInsightsLine(insights) {
     return `most tools ${steps} · ${lane} · ${wall} · ${preview}`;
 }
 
+/** CapEx leftover — skipped_*_llm shares (plan · verify · criteria · topic). */
+function formatLlmSkipsInsightsLine(insights) {
+    const turns = Math.max(1, Number(insights?.turns) || 0);
+    const bit = (label, n) => {
+        const count = Number(n) || 0;
+        const pct = Math.round((count * 100) / turns);
+        return `${label} ${count} (${pct}%)`;
+    };
+    return [
+        bit('plan', insights?.skipped_plan_count),
+        bit('verify', insights?.skipped_verify_count),
+        bit('criteria', insights?.skipped_criteria_count),
+        bit('topic', insights?.skipped_topic_count),
+    ].join(' · ');
+}
+
 function fmtAge(ms) {
     // Empty age: match run meta "Unknown" (bare blank / em dash reads like missing data).
     if (!ms) return 'Unknown';
@@ -5839,6 +5855,9 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
             }
             if (Number(insights.most_tools_steps) > 0) {
                 latBits.push(`notable ${formatNotableInsightsLine(insights)}`);
+            }
+            if (Number(insights.turns) > 0) {
+                latBits.push(`skips ${formatLlmSkipsInsightsLine(insights)}`);
             }
         }
         const hintLines = hints.length ? hints.slice(0, 5) : [];
@@ -10501,6 +10520,32 @@ function renderOpsRuns(insights) {
                 empty.innerHTML =
                     `<div class="ops-empty-filter-title">No notable yet</div>` +
                     `<div class="ops-empty-tab-hint">Most tool calls appears after turns land</div>`;
+                card.appendChild(empty);
+            }
+        }
+        {
+            // LLM skips (CapEx leftover) — skipped_*_llm from runs.jsonl.
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'LLM skips';
+            card.appendChild(sub);
+            const turnsN = Number(insights.turns) || 0;
+            if (turnsN > 0) {
+                const skipsEl = document.createElement('div');
+                skipsEl.className = 'ops-row-meta';
+                skipsEl.textContent = formatLlmSkipsInsightsLine(insights);
+                skipsEl.title =
+                    'Share of turns that skipped plan / verify / criteria / topic LLM (CapEx)';
+                card.appendChild(skipsEl);
+            } else {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'LLM skips appear after Discord or chat turns land';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No skips yet</div>` +
+                    `<div class="ops-empty-tab-hint">Plan · verify · criteria · topic skip shares appear after turns land</div>`;
                 card.appendChild(empty);
             }
         }
