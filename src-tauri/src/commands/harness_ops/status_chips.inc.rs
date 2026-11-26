@@ -242,6 +242,7 @@ pub fn looks_like_discord_gateway_request(content: &str) -> bool {
 
 
 /// Zero-LLM Discord Ready / Offline chip (Agent Ops collapsed-glance parity).
+/// Includes last disc / last resume ages when present — same cues as the insights line.
 pub fn format_discord_gateway_chip() -> String {
     let ready = crate::discord::discord_bot_gateway_ready();
     let token = crate::discord::discord_bot_token_configured();
@@ -252,6 +253,10 @@ pub fn format_discord_gateway_chip() -> String {
     let ready_ago = crate::discord::discord_last_ready_at()
         .map(|t| format!("{}s ago", t.elapsed().as_secs()))
         .unwrap_or_else(|| "never".into());
+    let disc_ago = crate::discord::discord_last_disconnect_at()
+        .map(|t| format!("{}s ago", t.elapsed().as_secs()));
+    let resume_ago = crate::discord::discord_last_resume_at()
+        .map(|t| format!("{}s ago", t.elapsed().as_secs()));
     let stage_lower = stage.to_lowercase();
     if !token {
         return "**Discord** · Offline · no token in Keychain".to_string();
@@ -260,6 +265,14 @@ pub fn format_discord_gateway_chip() -> String {
         let mut line = format!("**Discord** · Offline · last Ready {ready_ago}");
         if disc_n > 0 {
             line.push_str(&format!(" · disc×{disc_n}"));
+            if let Some(ref ago) = disc_ago {
+                line.push_str(&format!(" · last disc {ago}"));
+            }
+        }
+        if resume_n > 0 {
+            if let Some(ref ago) = resume_ago {
+                line.push_str(&format!(" · last resume {ago}"));
+            }
         }
         if !stage.is_empty() && stage != "unknown" {
             line.push_str(&format!(" · stage={stage}"));
@@ -273,8 +286,19 @@ pub fn format_discord_gateway_chip() -> String {
     };
     if disc_n > 0 {
         line.push_str(&format!(" · disc×{disc_n}"));
+        if let Some(ref ago) = disc_ago {
+            line.push_str(&format!(" · last disc {ago}"));
+        }
     } else if resume_n > 0 && !line.contains("Resuming") {
         line.push_str(&format!(" · res×{resume_n}"));
+    }
+    if resume_n > 0 {
+        if let Some(ref ago) = resume_ago {
+            // Avoid duplicating when the Resuming headline already carries ready age only.
+            if !line.contains("last resume") {
+                line.push_str(&format!(" · last resume {ago}"));
+            }
+        }
     }
     line.push_str(&format!(" · stage={stage} · ready×{ready_n}"));
     line

@@ -2892,14 +2892,21 @@ function applyOpsDiscordAttentionGlanceState() {
     glance.classList.toggle('has-warn', parsed.wash === 'warn');
     if (text) {
         if (parsed.wash === 'offline') {
-            text.textContent = 'Discord · Offline · check gateway';
+            text.textContent = parsed.lastDisc
+                ? `Discord · Offline · last disc ${parsed.lastDisc}`
+                : 'Discord · Offline · check gateway';
         } else if (parsed.discN > 0) {
-            text.textContent =
+            const discBit =
                 parsed.discN === 1
                     ? 'Discord · Reconnect · disc×1'
                     : `Discord · Reconnect · disc×${parsed.discN}`;
+            text.textContent = parsed.lastDisc
+                ? `${discBit} · ${parsed.lastDisc}`
+                : discBit;
         } else if (parsed.resumeN > 0) {
-            text.textContent = 'Discord · Resuming · check gateway';
+            text.textContent = parsed.lastResume
+                ? `Discord · Resuming · last resume ${parsed.lastResume}`
+                : 'Discord · Resuming · check gateway';
         } else {
             text.textContent = 'Discord · Reconnect · check gateway';
         }
@@ -5144,20 +5151,37 @@ function parseOpsDiscordGateway(dgRaw) {
     }
     let glanceLine = 'Discord · Unknown';
     if (wash === 'offline') {
-        glanceLine = 'Discord · Offline';
+        glanceLine = lastDisc
+            ? `Discord · Offline · last disc ${lastDisc}`
+            : 'Discord · Offline';
     } else if (readyMatch) {
         const age = readyMatch[1].trim();
         glanceLine =
             discN > 0
-                ? `Discord · Ready · ${age} · disc×${discN}`
+                ? lastDisc
+                    ? `Discord · Ready · ${age} · disc×${discN} · ${lastDisc}`
+                    : `Discord · Ready · ${age} · disc×${discN}`
                 : `Discord · Ready · ${age}`;
         if (wash === 'warn' && discN <= 0 && resumeN > 0) {
-            glanceLine = `Discord · Resuming · ${age}`;
+            glanceLine = lastResume
+                ? `Discord · Resuming · ${age} · ${lastResume}`
+                : `Discord · Resuming · ${age}`;
         }
     } else if (dg) {
         glanceLine = `Discord · ${healthText}`;
     }
-    return { dg, healthText, wash, glanceLine, stage, discN, resumeN, readyMatch };
+    return {
+        dg,
+        healthText,
+        wash,
+        glanceLine,
+        stage,
+        discN,
+        resumeN,
+        readyMatch,
+        lastDisc,
+        lastResume,
+    };
 }
 
 /** Collapsed-section glance under Agent Ops header (Discord Ready / Monitors parity). */

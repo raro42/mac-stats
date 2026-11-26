@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3107] - 2026-11-26
+
+### Fixed
+- Discord `/discord` chip + Agent Ops reconnect glances: show **last disc** / **last resume** ages beside disc× / res× (insights-line parity) so reconnect noise is timed, not only counted.
+
 ## [0.1.3106] - 2026-11-26
 
 ### Fixed
