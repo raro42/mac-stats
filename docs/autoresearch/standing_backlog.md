@@ -1,3 +1,19 @@
+## Overnight note 2026-11-27 ~00:50 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Sibling/standing: OpenClaw close-tracked leftover after periodic compaction v0.1.3119 — `/browser` · `/cdp` showed Warm CDP tabs but not how many automation `new_tab` targets wait for session-reset close.
+- Debug.log: minor WARN clusters only (quality-review README noise); no ERROR/panic.
+- Fuel: sibling OpenClaw tracked glance on browser chip — not tip/keep-pNN/section-open/pmset/insights Sources·Activity/live-age/reconnect-age/tool-%/Routing/Notable/LLM-skips/Replies/Session-queue/Browser-Warm/close-tracked/native-pair/last-reconnect/compaction-flush clone.
+- Shipped **v0.1.3120** — Discord `/browser` · `/cdp` show `tracked N` when automation tabs wait for reset close (omit when 0).
+- Ratchet keep @ eda8c1510; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Agent Ops design-review when due / Dark layout-daily / Hermes leftover if tiny — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age + chip disc/resume ages + tool-% + Routing + Notable + LLM skips + Replies + Session queue busy/tracked + wait depth + Browser Warm glance + close-tracked-tabs + native-only pairing + last reconnect duration + periodic compaction flush/TODO + browser tracked glance closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age / reconnect-age / tool-% / Routing / Notable / LLM-skips / Replies / Session-queue / Browser-Warm / close-tracked / native-pair / last-reconnect / compaction-flush / tracked-glance clone.
+
+## Overnight merge — v0.1.3120
+
+- Sibling OpenClaw tracked glance after compaction hygiene v0.1.3119: `/browser` · `/cdp` show automation close-on-reset queue size. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-27. Next: Agent Ops design-review when due / Dark layout — not another keep-pNN / section-open / insights / Session-queue / last-reconnect / compaction-flush / tracked-glance clone.
+
 ## Overnight note 2026-11-27 ~00:25 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
