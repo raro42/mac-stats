@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3117] - 2026-11-26
+
+### Fixed
+- **Native tool-loop history pairing**: conversation sanitize now treats structured `tool_calls` (empty content, no `TOOL:` lines) like text-line tools — inserts synthetic role `tool` results when unpaired (OpenClaw/Hermes fidelity; avoids orphan tool_use before the next user turn).
+
 ## [0.1.3116] - 2026-11-26
 
 ### Added

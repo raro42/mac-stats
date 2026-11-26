@@ -18,12 +18,36 @@ fn assistant_has_executable_tools(content: &str) -> bool {
         .any(|(t, _)| t != "DONE")
 }
 
-fn tool_names_for_log(content: &str) -> String {
-    let names: Vec<_> = parse_all_tools_from_response(content)
+/// True when the assistant carries native `tool_calls` (OpenClaw/Hermes schemas).
+/// Content may be empty after synthesis strip or interrupted native-only turns.
+fn assistant_has_native_tool_calls(msg: &ChatMessage) -> bool {
+    msg.tool_calls
+        .as_ref()
+        .map(|calls| !calls.is_empty())
+        .unwrap_or(false)
+}
+
+/// Text-line tools **or** native structured calls — both need a follow-up result.
+fn assistant_needs_tool_followup(msg: &ChatMessage) -> bool {
+    msg.role == "assistant"
+        && (assistant_has_executable_tools(&msg.content) || assistant_has_native_tool_calls(msg))
+}
+
+fn tool_names_for_log(msg: &ChatMessage) -> String {
+    let mut names: Vec<String> = parse_all_tools_from_response(&msg.content)
         .into_iter()
         .filter(|(t, _)| t != "DONE")
         .map(|(t, _)| t)
         .collect();
+    if let Some(calls) = msg.tool_calls.as_ref() {
+        for call in calls {
+            if let Some(name) = call.function.name.as_ref() {
+                if name != "DONE" && !names.iter().any(|n| n == name) {
+                    names.push(name.clone());
+                }
+            }
+        }
+    }
     if names.is_empty() {
         "(none)".to_string()
     } else {
@@ -131,8 +155,7 @@ pub(crate) fn sanitize_conversation_history(messages: Vec<ChatMessage>) -> Vec<C
 
         if matches!(msg.role.as_str(), "user" | "system" | "tool") && i > 0 {
             let prev = &messages[i - 1];
-            let prev_had_tools =
-                prev.role == "assistant" && assistant_has_executable_tools(&prev.content);
+            let prev_had_tools = assistant_needs_tool_followup(prev);
             if !prev_had_tools && content_looks_like_tool_bundle(&msg.content) {
                 let stripped = strip_tool_like_segments(&msg.content);
                 if stripped.trim().is_empty() {
@@ -154,7 +177,7 @@ pub(crate) fn sanitize_conversation_history(messages: Vec<ChatMessage>) -> Vec<C
             }
         }
 
-        if msg.role == "assistant" && assistant_has_executable_tools(&msg.content) {
+        if assistant_needs_tool_followup(&msg) {
             let next_ok = messages
                 .get(i + 1)
                 .map(next_message_is_tool_followup)
@@ -162,14 +185,10 @@ pub(crate) fn sanitize_conversation_history(messages: Vec<ChatMessage>) -> Vec<C
             if !next_ok {
                 debug2!(
                     "Sanitized history: unpaired tool call(s) [{}] at assistant index {} — inserting synthetic tool result",
-                    tool_names_for_log(&msg.content),
+                    tool_names_for_log(&msg),
                     i
                 );
-                let has_native = msg
-                    .tool_calls
-                    .as_ref()
-                    .map(|t| !t.is_empty())
-                    .unwrap_or(false);
+                let has_native = assistant_has_native_tool_calls(&msg);
                 // Mint missing ids before reading so synthetic tool_call_id pairs with assistant.
                 crate::ollama::ensure_tool_calls_option(&mut msg.tool_calls);
                 out.push(msg);
@@ -241,6 +260,81 @@ mod tests {
         assert_eq!(out[1].content, SYNTHETIC_TOOL_RESULT);
         assert_eq!(out[1].tool_name.as_deref(), Some("FETCH_URL"));
         assert_eq!(out[1].tool_call_id.as_deref(), Some("call_1"));
+    }
+
+    #[test]
+    fn inserts_synthetic_for_native_only_calls_without_text_lines() {
+        // OpenClaw/Hermes: structured tool_calls with empty content (no TOOL: lines).
+        use crate::ollama::{OllamaFunctionCall, OllamaToolCall};
+        let hist = vec![
+            ChatMessage {
+                role: "assistant".into(),
+                content: String::new(),
+                images: None,
+                tool_calls: Some(vec![OllamaToolCall {
+                    call_type: "function".into(),
+                    id: Some("call_native".into()),
+                    function: OllamaFunctionCall {
+                        name: Some("BRAVE_SEARCH".into()),
+                        index: None,
+                        arguments: serde_json::json!({"query": "mac-stats"}),
+                    },
+                }]),
+                tool_name: None,
+                tool_call_id: None,
+            },
+            ChatMessage {
+                role: "user".into(),
+                content: "What did you find?".into(),
+                images: None,
+                tool_calls: None,
+                tool_name: None,
+                tool_call_id: None,
+            },
+        ];
+        let out = sanitize_conversation_history(hist);
+        assert_eq!(out.len(), 3);
+        assert_eq!(out[1].role, "tool");
+        assert_eq!(out[1].content, SYNTHETIC_TOOL_RESULT);
+        assert_eq!(out[1].tool_name.as_deref(), Some("BRAVE_SEARCH"));
+        assert_eq!(out[1].tool_call_id.as_deref(), Some("call_native"));
+        assert_eq!(out[2].role, "user");
+        assert_eq!(out[2].content, "What did you find?");
+    }
+
+    #[test]
+    fn keeps_native_only_assistant_paired_with_tool_role() {
+        use crate::ollama::{OllamaFunctionCall, OllamaToolCall};
+        let hist = vec![
+            ChatMessage {
+                role: "assistant".into(),
+                content: String::new(),
+                images: None,
+                tool_calls: Some(vec![OllamaToolCall {
+                    call_type: "function".into(),
+                    id: Some("call_ok".into()),
+                    function: OllamaFunctionCall {
+                        name: Some("FETCH_URL".into()),
+                        index: None,
+                        arguments: serde_json::json!({"url_or_arg": "https://example.com"}),
+                    },
+                }]),
+                tool_name: None,
+                tool_call_id: None,
+            },
+            ChatMessage {
+                role: "tool".into(),
+                content: "Here is the page content:\n\nok".into(),
+                images: None,
+                tool_calls: None,
+                tool_name: Some("FETCH_URL".into()),
+                tool_call_id: Some("call_ok".into()),
+            },
+        ];
+        let out = sanitize_conversation_history(hist);
+        assert_eq!(out.len(), 2);
+        assert_eq!(out[1].role, "tool");
+        assert_eq!(out[1].tool_call_id.as_deref(), Some("call_ok"));
     }
 
     #[test]
