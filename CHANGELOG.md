@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3115] - 2026-11-26
+
+### Added
+- Discord `/browser` · `/cdp` **Warm** session-tab glance: when a cached CDP session is held, show tabs · focus · headless/visible · idle age (OpenClaw session-tab lens; no `/json/version` probe). Busy/Absent stay calm (**session locked** / **idle until BROWSER_***).
+
 ## [0.1.3114] - 2026-11-26
 
 ### Added

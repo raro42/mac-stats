@@ -1513,7 +1513,7 @@ pub fn looks_like_browser_ready_request(content: &str) -> bool {
 }
 
 
-/// Zero-LLM Browser / CDP Ready chip (config + binary path only; no live `/json/version` probe).
+/// Zero-LLM Browser / CDP Ready chip (config + binary path; cached tab glance, no `/json/version` probe).
 pub fn format_browser_ready_chip() -> String {
     let port = crate::config::Config::browser_cdp_port();
     if !crate::config::Config::browser_tools_enabled() {
@@ -1540,7 +1540,8 @@ pub fn format_browser_ready_chip() -> String {
         short.to_string()
     };
     if chrome_ok {
-        format!("**Browser** · Ready · CDP {port} · `{short}` · idle until BROWSER_*")
+        let glance = crate::browser_agent::snapshot_cached_browser_session();
+        format_browser_ready_chip_with_glance(port, &short, glance)
     } else if crate::config::Config::browser_chromium_executable_configured() {
         format!(
             "**Browser** · Not set · Chromium missing · CDP {port} · fix path in Settings or `browserChromiumExecutable`"
@@ -1549,6 +1550,41 @@ pub fn format_browser_ready_chip() -> String {
         format!(
             "**Browser** · Not set · install Google Chrome · CDP {port} (Settings or `browserChromiumExecutable`)"
         )
+    }
+}
+
+/// Pure formatter for `/browser` · `/cdp` (OpenClaw session-tab warm/busy/absent).
+pub fn format_browser_ready_chip_with_glance(
+    port: u16,
+    short: &str,
+    glance: crate::browser_agent::CachedBrowserSessionGlance,
+) -> String {
+    use crate::browser_agent::CachedBrowserSessionGlance;
+    match glance {
+        CachedBrowserSessionGlance::Absent => format!(
+            "**Browser** · Ready · CDP {port} · `{short}` · idle until BROWSER_*"
+        ),
+        CachedBrowserSessionGlance::Busy => format!(
+            "**Browser** · Busy · CDP {port} · `{short}` · session locked"
+        ),
+        CachedBrowserSessionGlance::Warm {
+            tab_count,
+            focus_index,
+            idle_secs,
+            headless,
+        } => {
+            let mode = if headless { "headless" } else { "visible" };
+            let idle = if idle_secs < 60 {
+                format!("{idle_secs}s")
+            } else if idle_secs < 3600 {
+                format!("{}m", (idle_secs / 60).max(1))
+            } else {
+                format!("{}h", (idle_secs + 1800) / 3600)
+            };
+            format!(
+                "**Browser** · Warm · CDP {port} · `{short}` · tabs **{tab_count}** · focus **{focus_index}** · {mode} · idle {idle}"
+            )
+        }
     }
 }
 
@@ -3254,7 +3290,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/mastodon` · `view mastodon` · `see mastodon` · `show me the mastodon` · `open mastodon` · `list the mastodon` — Mastodon Ready / Not set (instance URL + token; Settings or .config.env; no live probe)\n\
 • `/mcp` · `view mcp` · `see mcp` · `show me the mcp` · `open mcp` · `list the mcp` · `view mcp server` · `open mcp server` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; Settings or .config.env; no live probe)\n\
 • `/cursor` · `/cursor-agent` · `view cursor` · `see cursor` · `show me the cursor` · `open cursor` · `list the cursor` · `view cursor agent` · `open cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH or Settings path; no CLI probe)\n\
-• `/browser` · `/cdp` · `view browser` · `see browser` · `show me the browser` · `open browser` · `list the browser` · `view cdp` · `see cdp` · `show me the cdp` · `open cdp` · `list the cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; Settings or config.json; no live probe)\n\
+• `/browser` · `/cdp` · `view browser` · `see browser` · `show me the browser` · `open browser` · `list the browser` · `view cdp` · `see cdp` · `show me the cdp` · `open cdp` · `list the cdp` — Browser / CDP Ready / Warm tabs·focus / Busy / Off / Not set (Chromium path + port; cached session-tab glance; no `/json/version` probe)\n\
 • `/judge` · `view judge` · `see judge` · `show me the judge` · `open judge` · `list the judge` — Judge Ready / Off (Settings Product · agentJudgeEnabled · failure-only; config only, no judge run)\n\
 • `/ai` · `/ai-agent` · `view ai` · `see ai` · `show me the ai` · `open ai` · `list the ai` · `view ai agent` · `open ai agent` — AI On / Off (Settings Product · aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/compact` · `/menu-bar` · `/cpu-window` · `view compact` · `see compact` · `show me the compact` · `open compact` · `list the compact` · `view menu bar` · `open menu-bar` · `view cpu window` · `open cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\

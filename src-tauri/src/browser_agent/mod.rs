@@ -4866,6 +4866,56 @@ fn browser_session() -> &'static Mutex<Option<(Browser, Instant, Instant, bool)>
     BROWSER_SESSION.get_or_init(|| Mutex::new(None))
 }
 
+/// OpenClaw-style session-tab glance: cached CDP tabs without a `/json/version` probe.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CachedBrowserSessionGlance {
+    /// No `BROWSER_SESSION` held.
+    Absent,
+    /// Session or tab mutex busy (mid-tool); skip live tab count.
+    Busy,
+    /// Cached Chrome still held — tab count + focus from last automation index.
+    Warm {
+        tab_count: usize,
+        focus_index: usize,
+        idle_secs: u64,
+        headless: bool,
+    },
+}
+
+/// Non-blocking peek at the cached automation browser (OpenClaw session-tab lens).
+///
+/// Uses `try_lock` only — never opens CDP or waits on an in-flight BROWSER_* call.
+pub fn snapshot_cached_browser_session() -> CachedBrowserSessionGlance {
+    let guard = match browser_session().try_lock() {
+        Ok(g) => g,
+        Err(std::sync::TryLockError::WouldBlock) => return CachedBrowserSessionGlance::Busy,
+        Err(std::sync::TryLockError::Poisoned(p)) => p.into_inner(),
+    };
+    let Some((browser, _created, last_used, headless)) = guard.as_ref() else {
+        return CachedBrowserSessionGlance::Absent;
+    };
+    let tab_count = match browser.get_tabs().try_lock() {
+        Ok(tabs) => tabs.len(),
+        Err(std::sync::TryLockError::WouldBlock) => return CachedBrowserSessionGlance::Busy,
+        Err(std::sync::TryLockError::Poisoned(p)) => p.into_inner().len(),
+    };
+    let focus_raw = current_tab_index()
+        .lock()
+        .map(|g| *g)
+        .unwrap_or(0);
+    let focus_index = if tab_count == 0 {
+        0
+    } else {
+        focus_raw.min(tab_count - 1)
+    };
+    CachedBrowserSessionGlance::Warm {
+        tab_count,
+        focus_index,
+        idle_secs: last_used.elapsed().as_secs(),
+        headless: *headless,
+    }
+}
+
 fn is_connection_error(err_msg: &str) -> bool {
     err_msg.contains("connection is closed")
         || err_msg.contains("underlying connection")

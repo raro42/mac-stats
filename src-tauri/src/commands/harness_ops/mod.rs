@@ -116,6 +116,56 @@ mod tests {
     }
 
     #[test]
+    fn browser_ready_chip_session_tab_glance() {
+        use crate::browser_agent::CachedBrowserSessionGlance;
+        let absent = format_browser_ready_chip_with_glance(
+            9222,
+            "Google Chrome",
+            CachedBrowserSessionGlance::Absent,
+        );
+        assert!(
+            absent.contains("Ready") && absent.contains("idle until BROWSER_*"),
+            "{absent}"
+        );
+        let busy = format_browser_ready_chip_with_glance(
+            9222,
+            "Google Chrome",
+            CachedBrowserSessionGlance::Busy,
+        );
+        assert!(
+            busy.contains("Busy") && busy.contains("session locked"),
+            "{busy}"
+        );
+        let warm = format_browser_ready_chip_with_glance(
+            9222,
+            "Google Chrome",
+            CachedBrowserSessionGlance::Warm {
+                tab_count: 3,
+                focus_index: 1,
+                idle_secs: 45,
+                headless: true,
+            },
+        );
+        assert!(warm.contains("Warm"), "{warm}");
+        assert!(warm.contains("tabs **3**"), "{warm}");
+        assert!(warm.contains("focus **1**"), "{warm}");
+        assert!(warm.contains("headless"), "{warm}");
+        assert!(warm.contains("idle 45s"), "{warm}");
+        let warm_m = format_browser_ready_chip_with_glance(
+            9222,
+            "Chromium",
+            CachedBrowserSessionGlance::Warm {
+                tab_count: 1,
+                focus_index: 0,
+                idle_secs: 120,
+                headless: false,
+            },
+        );
+        assert!(warm_m.contains("visible"), "{warm_m}");
+        assert!(warm_m.contains("idle 2m"), "{warm_m}");
+    }
+
+    #[test]
     fn ram_ring_chip_ask_does_not_steal_strip_ram() {
         assert_eq!(parse_ring_chip_ask("/ram-ring"), Some(RingChipAsk::Ram));
         assert_eq!(parse_ring_chip_ask("ram ring"), Some(RingChipAsk::Ram));
