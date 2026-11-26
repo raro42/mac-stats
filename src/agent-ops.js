@@ -2910,6 +2910,9 @@ function applyOpsDiscordAttentionGlanceState() {
         } else {
             text.textContent = 'Discord · Reconnect · check gateway';
         }
+        if (parsed.lastReconnect) {
+            text.textContent = `${text.textContent} · reconnect ${parsed.lastReconnect}`;
+        }
     }
     glance.setAttribute('role', 'button');
     glance.tabIndex = 0;
@@ -5121,11 +5124,13 @@ function parseOpsDiscordGateway(dgRaw) {
     const stageMatch = dg.match(/stage=([^\s·]+)/i);
     const lastDiscMatch = dg.match(/last disc\s+([^·]+)/i);
     const lastResumeMatch = dg.match(/last resume\s+([^·]+)/i);
+    const lastReconnectMatch = dg.match(/last reconnect\s+(\d+)\s*s/i);
     const discN = discMatch ? Number(discMatch[1]) : 0;
     const resumeN = resumeMatch ? Number(resumeMatch[1]) : 0;
     const stage = (stageMatch ? stageMatch[1] : '').trim();
     const lastDisc = lastDiscMatch ? lastDiscMatch[1].trim() : '';
     const lastResume = lastResumeMatch ? lastResumeMatch[1].trim() : '';
+    const lastReconnect = lastReconnectMatch ? `${lastReconnectMatch[1]}s` : '';
     // Empty Discord: match aria "status unknown" (bare em dash reads like missing data).
     let healthText = readyMatch ? readyMatch[1].trim() : dg ? 'see Runs' : 'Unknown';
     if (discN > 0) {
@@ -5137,6 +5142,9 @@ function parseOpsDiscordGateway(dgRaw) {
         healthText = lastResume
             ? `${healthText} · res×${resumeN} (${lastResume})`
             : `${healthText} · res×${resumeN}`;
+    }
+    if (lastReconnect) {
+        healthText = `${healthText} · reconnect ${lastReconnect}`;
     }
     const stageLower = stage.toLowerCase();
     let wash = 'empty';
@@ -5154,6 +5162,9 @@ function parseOpsDiscordGateway(dgRaw) {
         glanceLine = lastDisc
             ? `Discord · Offline · last disc ${lastDisc}`
             : 'Discord · Offline';
+        if (lastReconnect) {
+            glanceLine = `${glanceLine} · reconnect ${lastReconnect}`;
+        }
     } else if (readyMatch) {
         const age = readyMatch[1].trim();
         glanceLine =
@@ -5166,6 +5177,9 @@ function parseOpsDiscordGateway(dgRaw) {
             glanceLine = lastResume
                 ? `Discord · Resuming · ${age} · ${lastResume}`
                 : `Discord · Resuming · ${age}`;
+        }
+        if (lastReconnect) {
+            glanceLine = `${glanceLine} · reconnect ${lastReconnect}`;
         }
     } else if (dg) {
         glanceLine = `Discord · ${healthText}`;
@@ -5181,6 +5195,7 @@ function parseOpsDiscordGateway(dgRaw) {
         readyMatch,
         lastDisc,
         lastResume,
+        lastReconnect,
     };
 }
 

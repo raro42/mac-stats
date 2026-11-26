@@ -2234,6 +2234,9 @@ static DISCORD_GATEWAY_CLIENT_STARTED_AT: Mutex<Option<Instant>> = Mutex::new(No
 static DISCORD_READY_COUNT: AtomicU64 = AtomicU64::new(0);
 static DISCORD_RESUME_COUNT: AtomicU64 = AtomicU64::new(0);
 static DISCORD_DISCONNECT_COUNT: AtomicU64 = AtomicU64::new(0);
+/// Seconds from last disconnect Instant → next Ready (u64::MAX = never measured).
+/// OpenClaw reconnect-stall lens: operators see recovery length, not only disc/resume ages.
+static DISCORD_LAST_RECONNECT_SECS: AtomicU64 = AtomicU64::new(u64::MAX);
 
 /// Cache of Discord user id -> display name for reuse in prompts. Updated on each message.
 static DISCORD_USER_NAMES: OnceLock<Mutex<HashMap<u64, String>>> = OnceLock::new();
@@ -3634,6 +3637,8 @@ impl EventHandler for Handler {
         }
         let ready_n = DISCORD_READY_COUNT.fetch_add(1, Ordering::SeqCst) + 1;
         if ready_n > 1 {
+            // Capture disc→Ready recovery before any inferred bump rewrites LAST_DISCONNECT_AT.
+            let disc_at_before = discord_last_disconnect_at();
             // Heartbeat/request_restart sometimes re-Ready without a Connected→* stage
             // update we can count. Keep disconnect× ≥ Ready# − 1 for insights fidelity.
             let disc = DISCORD_DISCONNECT_COUNT.load(Ordering::SeqCst);
@@ -3648,6 +3653,14 @@ impl EventHandler for Handler {
                     bump,
                     ready_n,
                     disc + bump
+                );
+            }
+            if let Some(at) = disc_at_before {
+                let secs = at.elapsed().as_secs();
+                DISCORD_LAST_RECONNECT_SECS.store(secs, Ordering::SeqCst);
+                info!(
+                    "Discord: last reconnect took {}s (disc→Ready #{} this process)",
+                    secs, ready_n
                 );
             }
             info!(
@@ -3995,6 +4008,24 @@ pub fn discord_gateway_reconnect_stats() -> (u64, u64, u64) {
     )
 }
 
+/// Seconds for the last disc→Ready recovery this process, if measured.
+pub fn discord_last_reconnect_secs() -> Option<u64> {
+    let v = DISCORD_LAST_RECONNECT_SECS.load(Ordering::SeqCst);
+    if v == u64::MAX {
+        None
+    } else {
+        Some(v)
+    }
+}
+
+/// Format the optional ` · last reconnect Ns` cue (chip + insights).
+pub(crate) fn format_last_reconnect_cue(secs: Option<u64>) -> String {
+    match secs {
+        Some(s) => format!(" · last reconnect {s}s"),
+        None => String::new(),
+    }
+}
+
 /// One-line gateway reconnect summary for Discord `/insights`.
 pub fn format_discord_gateway_insights_line() -> String {
     let (ready, resume, disconnect) = discord_gateway_reconnect_stats();
@@ -4010,8 +4041,9 @@ pub fn format_discord_gateway_insights_line() -> String {
     let resume_ago = discord_last_resume_at()
         .map(|t| format!(" · last resume {}s ago", t.elapsed().as_secs()))
         .unwrap_or_default();
+    let reconnect = format_last_reconnect_cue(discord_last_reconnect_secs());
     format!(
-        "Discord gateway: ready×{ready} · resume×{resume} · disconnect×{disconnect} · stage={stage} · last Ready {ready_ago}{disc_ago}{resume_ago} · process up {up}",
+        "Discord gateway: ready×{ready} · resume×{resume} · disconnect×{disconnect} · stage={stage} · last Ready {ready_ago}{disc_ago}{resume_ago}{reconnect} · process up {up}",
         ready = ready,
         resume = resume,
         disconnect = disconnect,
@@ -4019,6 +4051,7 @@ pub fn format_discord_gateway_insights_line() -> String {
         ready_ago = ready_ago,
         disc_ago = disc_ago,
         resume_ago = resume_ago,
+        reconnect = reconnect,
         up = crate::state::format_process_uptime(),
     )
 }
@@ -4404,6 +4437,23 @@ mod tests {
         assert_eq!(super::inferred_disconnect_bump(3, 1), 1);
         assert_eq!(super::inferred_disconnect_bump(3, 2), 0);
         assert_eq!(super::inferred_disconnect_bump(4, 1), 2);
+    }
+
+    #[test]
+    fn last_reconnect_cue_formats_measured_recovery() {
+        assert_eq!(super::format_last_reconnect_cue(None), "");
+        assert_eq!(
+            super::format_last_reconnect_cue(Some(0)),
+            " · last reconnect 0s"
+        );
+        assert_eq!(
+            super::format_last_reconnect_cue(Some(4)),
+            " · last reconnect 4s"
+        );
+        assert_eq!(
+            super::format_last_reconnect_cue(Some(120)),
+            " · last reconnect 120s"
+        );
     }
 
     #[test]

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3118] - 2026-11-26
+
+### Added
+- Discord `/discord` chip + Agent Ops reconnect glances: show **last reconnect Ns** (disc→Ready recovery length) beside disc/resume ages — OpenClaw reconnect-stall lens so recovery is timed, not only counted.
+
 ## [0.1.3117] - 2026-11-26
 
 ### Fixed

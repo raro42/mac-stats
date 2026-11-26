@@ -347,7 +347,8 @@ pub fn looks_like_discord_gateway_request(content: &str) -> bool {
 
 
 /// Zero-LLM Discord Ready / Offline chip (Agent Ops collapsed-glance parity).
-/// Includes last disc / last resume ages when present — same cues as the insights line.
+/// Includes last disc / last resume ages and last reconnect recovery when present —
+/// same cues as the insights line.
 pub fn format_discord_gateway_chip() -> String {
     let ready = crate::discord::discord_bot_gateway_ready();
     let token = crate::discord::discord_bot_token_configured();
@@ -362,6 +363,9 @@ pub fn format_discord_gateway_chip() -> String {
         .map(|t| format!("{}s ago", t.elapsed().as_secs()));
     let resume_ago = crate::discord::discord_last_resume_at()
         .map(|t| format!("{}s ago", t.elapsed().as_secs()));
+    let reconnect = crate::discord::format_last_reconnect_cue(
+        crate::discord::discord_last_reconnect_secs(),
+    );
     let stage_lower = stage.to_lowercase();
     if !token {
         return "**Discord** · Offline · no token in Keychain".to_string();
@@ -379,6 +383,7 @@ pub fn format_discord_gateway_chip() -> String {
                 line.push_str(&format!(" · last resume {ago}"));
             }
         }
+        line.push_str(&reconnect);
         if !stage.is_empty() && stage != "unknown" {
             line.push_str(&format!(" · stage={stage}"));
         }
@@ -405,6 +410,7 @@ pub fn format_discord_gateway_chip() -> String {
             }
         }
     }
+    line.push_str(&reconnect);
     line.push_str(&format!(" · stage={stage} · ready×{ready_n}"));
     line
 }
