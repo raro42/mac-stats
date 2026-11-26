@@ -2065,6 +2065,22 @@ body.theme-apple #icon-agent-ops.section-open {
   background: color-mix(in srgb, var(--accent, #8bb4e8) 14%, #ffffff);
   border-color: color-mix(in srgb, var(--accent, #8bb4e8) 32%, #ffffff);
 }
+/*
+ * Light (standing backlog after Apple v0.1.3099): same shared `.section-open`
+ * transparent accent wash over opaque `#f7f7fa` chips when AI Chat / Monitors
+ * expand. Opaque `--accent` mixes on Light paper (not a second layout-daily mark).
+ */
+body.theme-light #icon-monitors.section-open,
+body.theme-light #icon-ollama.section-open,
+body.theme-light #icon-perplexity.section-open,
+body.theme-light #icon-logs.section-open,
+body.theme-light #icon-disk-cleanup.section-open,
+body.theme-light #icon-agent-ops.section-open {
+  opacity: 1;
+  color: var(--accent, #6aa6df);
+  background: color-mix(in srgb, var(--accent, #6aa6df) 14%, #f7f7fa);
+  border-color: color-mix(in srgb, var(--accent, #6aa6df) 32%, #f7f7fa);
+}
 body.theme-data-poster #icon-discord.status-good,
 body.theme-data-poster #icon-monitors.status-good,
 body.theme-data-poster #icon-ollama.status-good,
