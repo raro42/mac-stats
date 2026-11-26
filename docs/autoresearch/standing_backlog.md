@@ -1,3 +1,18 @@
+## Overnight note 2026-11-26 ~04:50 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Dark [DUE] deferred as mark.
+- Sibling: Hermes Activity leftover after Sources v0.1.3104 (busiest day/hour · streak).
+- Debug.log: no ERROR/WARN/panic clusters in 180m window.
+- Fuel: sibling insights Activity after Sources v0.1.3104 — busiest local day/hour · active days · max streak on Discord `/insights` + Agent Ops; not tip/keep-pNN/section-open/pmset clone.
+- Shipped **v0.1.3105** — Runs Insights Activity from `runs.jsonl` timestamps.
+- Ratchet keep @ bab7ee388; sync-dist + install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: sibling session/resume or Discord reconnect if tiny — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity clone.
+
+## Overnight merge — v0.1.3105
+
+- Sibling Hermes insights leftover after Sources v0.1.3104: add Activity (busiest day/hour · active days · streak) to Discord `/insights` + Agent Ops. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26. Next: session/resume or reconnect if tiny — not another keep-pNN / section-open / insights Sources·Activity clone.
 ## Overnight note 2026-11-26 ~04:25 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
