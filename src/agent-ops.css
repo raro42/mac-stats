@@ -2001,6 +2001,22 @@ body.theme-dark #icon-agent-ops.section-open {
   background: color-mix(in srgb, var(--accent, #00cc66) 14%, #000000);
   border-color: color-mix(in srgb, var(--accent, #00cc66) 32%, #000000);
 }
+/*
+ * Neon (standing backlog after Dark v0.1.3095): same shared `.section-open`
+ * transparent accent wash over opaque `#08120c` chips when AI Chat / Monitors
+ * expand. Opaque `--accent` mixes on Neon field (not a second layout-daily mark).
+ */
+body.theme-neon #icon-monitors.section-open,
+body.theme-neon #icon-ollama.section-open,
+body.theme-neon #icon-perplexity.section-open,
+body.theme-neon #icon-logs.section-open,
+body.theme-neon #icon-disk-cleanup.section-open,
+body.theme-neon #icon-agent-ops.section-open {
+  opacity: 1;
+  color: var(--accent, #6dff7b);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 14%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 32%, #08120c);
+}
 body.theme-data-poster #icon-discord.status-good,
 body.theme-data-poster #icon-monitors.status-good,
 body.theme-data-poster #icon-ollama.status-good,
