@@ -5758,6 +5758,10 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
                 .map((pair) => (Array.isArray(pair) ? `${pair[0]}:${pair[1]}` : String(pair)))
                 .join(' · ');
             if (lanes) latBits.push(lanes);
+            const sources = (insights.by_entry || [])
+                .map((pair) => (Array.isArray(pair) ? `${pair[0]}:${pair[1]}` : String(pair)))
+                .join(' · ');
+            if (sources) latBits.push(`src ${sources}`);
         }
         const hintLines = hints.length ? hints.slice(0, 5) : [];
         digestEl.title = [...latBits, ...hintLines].join('\n')
@@ -10254,6 +10258,32 @@ function renderOpsRuns(insights) {
                 empty.innerHTML =
                     `<div class="ops-empty-filter-title">No lanes yet</div>` +
                     `<div class="ops-empty-tab-hint">Lane mix appears after Discord or chat turns land</div>`;
+                card.appendChild(empty);
+            }
+        }
+        {
+            // Sources (Hermes platforms) — runs.jsonl `entry` mix; Lanes / Top tools parity.
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Sources';
+            card.appendChild(sub);
+            const entryRows = insights.by_entry || [];
+            if (entryRows.length) {
+                const entriesEl = document.createElement('div');
+                entriesEl.className = 'ops-row-meta';
+                entriesEl.textContent = entryRows
+                    .map(([k, v]) => `${k}:${v}`)
+                    .join(' · ');
+                card.appendChild(entriesEl);
+            } else {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Source mix appears after Discord or chat turns land';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No sources yet</div>` +
+                    `<div class="ops-empty-tab-hint">Source mix (discord · agent_router · …) appears after turns land</div>`;
                 card.appendChild(empty);
             }
         }

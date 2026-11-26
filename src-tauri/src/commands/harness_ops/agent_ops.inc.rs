@@ -80,6 +80,8 @@ pub struct RunsInsights {
     /// Turns included in p50/mean/max/slowest after shipped-instant noise filters.
     pub latency_sample: usize,
     pub by_lane: Vec<(String, usize)>,
+    /// Hermes-style platform/source mix (`entry` from runs.jsonl: discord, agent_router, …).
+    pub by_entry: Vec<(String, usize)>,
     pub by_tool: Vec<(String, usize)>,
     pub candidates: Vec<RunInsightCandidate>,
     pub slowest: Vec<RunTurnSummary>,
@@ -423,6 +425,7 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         max_ms: 0,
         latency_sample: 0,
         by_lane: vec![],
+        by_entry: vec![],
         by_tool: vec![],
         candidates: vec![],
         slowest: vec![],
@@ -451,6 +454,8 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
     let mut ok_count = 0usize;
     let mut fail_count = 0usize;
     let mut lane_counts: std::collections::BTreeMap<String, usize> =
+        std::collections::BTreeMap::new();
+    let mut entry_counts: std::collections::BTreeMap<String, usize> =
         std::collections::BTreeMap::new();
     let mut tool_counts: std::collections::BTreeMap<String, usize> =
         std::collections::BTreeMap::new();
@@ -490,6 +495,12 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
             .unwrap_or("?")
             .to_string();
         *lane_counts.entry(lane.clone()).or_default() += 1;
+        let entry = v
+            .get("entry")
+            .and_then(|x| x.as_str())
+            .unwrap_or("?")
+            .to_string();
+        *entry_counts.entry(entry).or_default() += 1;
         let tools = v
             .get("tools")
             .and_then(|t| t.as_array())
@@ -568,6 +579,8 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
     }
     recent.reverse();
     let by_lane: Vec<_> = lane_counts.into_iter().collect();
+    let mut by_entry: Vec<_> = entry_counts.into_iter().collect();
+    by_entry.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
     RunsInsights {
         turns,
         ok_count,
@@ -577,6 +590,7 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         max_ms,
         latency_sample,
         by_lane,
+        by_entry,
         by_tool,
         candidates,
         slowest,
@@ -920,6 +934,8 @@ pub(super) fn write_digest_native(days: i64) -> Result<DigestSummary, String> {
     let mut latency_walls: Vec<u64> = Vec::new();
     let mut by_lane: std::collections::BTreeMap<String, usize> =
         std::collections::BTreeMap::new();
+    let mut by_entry: std::collections::BTreeMap<String, usize> =
+        std::collections::BTreeMap::new();
     let mut open: Vec<serde_json::Value> = Vec::new();
     let mut stale: Vec<serde_json::Value> = Vec::new();
     let mut turns = 0usize;
@@ -953,6 +969,12 @@ pub(super) fn write_digest_native(days: i64) -> Result<DigestSummary, String> {
                 .unwrap_or("?")
                 .to_string();
             *by_lane.entry(lane.clone()).or_default() += 1;
+            let entry = rec
+                .get("entry")
+                .and_then(|x| x.as_str())
+                .unwrap_or("?")
+                .to_string();
+            *by_entry.entry(entry).or_default() += 1;
             let tools = rec
                 .get("tools")
                 .and_then(|t| t.as_array())
@@ -1014,6 +1036,7 @@ pub(super) fn write_digest_native(days: i64) -> Result<DigestSummary, String> {
         "p50_ms": p50,
         "max_ms": max_ms,
         "by_lane": by_lane,
+        "by_entry": by_entry,
         "open": open,
         "stale": stale,
         "markdown_path": digest_json_path().with_extension("md").display().to_string(),

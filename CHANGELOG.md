@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3104] - 2026-11-26
+
+### Added
+- Runs Insights / Discord `/insights`: **Sources** line from `runs.jsonl` `entry` (discord · agent_router · …) — Hermes platform mix parity beside Lanes / Top tools (Agent Ops + gateway report).
+
 ## [0.1.3103] - 2026-11-26
 
 ### Added

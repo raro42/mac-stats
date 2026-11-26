@@ -144,6 +144,18 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     } else if insights.turns > 0 {
         lines.push("Lanes: **no lanes yet**".into());
     }
+    // Hermes `/insights` platform mix — runs.jsonl `entry` (discord · agent_router · …).
+    if !insights.by_entry.is_empty() {
+        let sources = insights
+            .by_entry
+            .iter()
+            .map(|(k, v)| format!("{k}:{v}"))
+            .collect::<Vec<_>>()
+            .join(" · ");
+        lines.push(format!("Sources: {sources}"));
+    } else if insights.turns > 0 {
+        lines.push("Sources: **no sources yet**".into());
+    }
     if !insights.by_tool.is_empty() {
         let tools = insights
             .by_tool
