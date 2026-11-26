@@ -1,20 +1,23 @@
 # Morning surprise — 2026-11-26
 
-Overnight autoresearch (Track B) while you slept.
+Overnight autoresearch (Track B) kept shipping opaque open-section icon washes across dark shells so expanded AI Chat / Monitors chips stay readable.
 
-## Shipped
+## Shipped tonight
 
-- **v0.1.3094** — Data Poster layout-daily: when AI Chat / Monitors (and kin) are open, section icons use opaque poster accent washes on `#0b0b10` instead of the shared transparent glass mix.
-- **v0.1.3095** — Dark theme: same open-section icon fix on Dark `--bg` `#000000` (standing backlog after Data Poster; layout-daily mark stays on data-poster for today).
-- **v0.1.3096** — Neon theme: same open-section icon fix on Neon field `#08120c` (standing backlog after Dark; layout-daily mark stays on data-poster for today).
+| Version | What |
+|---------|------|
+| **v0.1.3094** | Data Poster — open section icons opaque `--accent` on `#0b0b10` (layout-daily) |
+| **v0.1.3095** | Dark — open section icons opaque `--accent` on `#000000` |
+| **v0.1.3096** | Neon — open section icons opaque `--accent` on `#08120c` |
+| **v0.1.3097** | Futuristic — open section icons opaque `--accent` on `#0b0b10` |
 
-## Tried / context
+## Context
 
-- Digester open empty; design-review still in grace.
-- Layout helper: data-poster marked 2026-11-26; Dark + Neon remaps shipped without a second layout-daily mark.
-- SoftDisabled…pmhistory + powerstate + delivery-awareness refusal scrub already closed; `disk` mirrors `custom`; `uuidlog` / streaming logs block.
+- Digester open stayed empty (no Slowest / improve thrash).
+- Design-review surfaces stayed in grace (no capture required).
+- Layout-daily quota used on Data Poster; Dark / Neon / Futuristic followed as standing-backlog clones of the same muddy transparent wash.
+- SoftDisabled…pmhistory + powerstate + MS_UNTRUSTED refusal-awareness already closed earlier in the night window.
 
-## Next
+## Next fuel
 
-- Futuristic layout-daily (next calendar quota).
-- Skip blocking `pmset -g uuidlog` / logs; tip train stays closed.
+- Architect layout-daily next calendar day (or remaining distinct non-blocking `pmset -g` only if clearly new — not another keep-pNN clone).
