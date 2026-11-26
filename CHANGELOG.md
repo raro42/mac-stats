@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3102] - 2026-11-26
+
+### Fixed
+- Material theme: open section icons (`#icon-monitors` / `#icon-ollama` and kin) drop the shared transparent accent wash for opaque `--accent` mixes on `#ebe4d9` when AI Chat / Monitors expand (same class of muddy wash as Swiss v0.1.3101 / Light v0.1.3100 / Apple v0.1.3099 / Architect v0.1.3098 / Futuristic v0.1.3097 / Neon v0.1.3096 / Dark v0.1.3095 / Data Poster v0.1.3094).
+
 ## [0.1.3101] - 2026-11-26
 
 ### Fixed

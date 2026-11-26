@@ -2098,6 +2098,23 @@ body.theme-swiss-minimalistic #icon-agent-ops.section-open {
   background: color-mix(in srgb, var(--accent, #121216) 14%, #ffffff);
   border-color: color-mix(in srgb, var(--accent, #121216) 32%, #ffffff);
 }
+/*
+ * Material (standing backlog after Swiss v0.1.3101): same shared
+ * `.section-open` transparent accent wash over opaque `#ebe4d9` chips when
+ * AI Chat / Monitors expand. Opaque `--accent` mixes on Material paper (not a
+ * second layout-daily mark).
+ */
+body.theme-material #icon-monitors.section-open,
+body.theme-material #icon-ollama.section-open,
+body.theme-material #icon-perplexity.section-open,
+body.theme-material #icon-logs.section-open,
+body.theme-material #icon-disk-cleanup.section-open,
+body.theme-material #icon-agent-ops.section-open {
+  opacity: 1;
+  color: var(--accent, #b8a68b);
+  background: color-mix(in srgb, var(--accent, #b8a68b) 14%, #ebe4d9);
+  border-color: color-mix(in srgb, var(--accent, #b8a68b) 32%, #ebe4d9);
+}
 body.theme-data-poster #icon-discord.status-good,
 body.theme-data-poster #icon-monitors.status-good,
 body.theme-data-poster #icon-ollama.status-good,
