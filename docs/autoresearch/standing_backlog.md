@@ -1,3 +1,18 @@
+## Overnight note 2026-11-26 ~01:05 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Neon [DUE] deferred as mark — shipped Neon section-open as standing backlog instead.
+- Sibling: OpenClaw/Hermes present; no clear tiny port this tick.
+- Debug.log: soul/content noise only (no product ERROR/panic).
+- Fuel: standing backlog after Dark v0.1.3095 — Neon `#icon-monitors` / `#icon-ollama` (and kin) `.section-open` still mixed accent into `transparent` over opaque `#08120c` chips when panes expand; not tip/keep-pNN/pmset clone.
+- Shipped **v0.1.3096** — opaque Neon `--accent` background/border mixes on `#08120c` for open section icons.
+- Ratchet keep @ 782002de4; sync-dist + install/kickstart + push (UI).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: Futuristic layout-daily next calendar day · SoftDisabled…pmhistory + powerstate + refusal-awareness closed — remaining useful non-blocking `pmset -g` only if clearly distinct (`disk` == `custom`; `uuidlog` / logs block); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3096
+
+- Standing-backlog Neon open-section icons after Dark v0.1.3095: drop shared transparent accent washes for opaque `--accent` on `#08120c`. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26 (Futuristic next). Next: Futuristic layout-daily next calendar day — not another keep-pNN clone.
 ## Overnight note 2026-11-26 ~00:40 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
