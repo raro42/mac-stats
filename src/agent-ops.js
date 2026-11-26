@@ -5476,6 +5476,20 @@ function formatToolShare(name, count, total) {
     return `${name}×${n} (${pct.toFixed(1)}%)`;
 }
 
+/** Hermes overview leftover — pre-routed share · avg tool steps · verify pass. */
+function formatRoutingInsightsLine(insights) {
+    const turns = Math.max(1, Number(insights?.turns) || 0);
+    const pre = Number(insights?.pre_routed_count) || 0;
+    const pct = (pre * 100) / turns;
+    const avg = Number(insights?.avg_tool_steps);
+    const avgBit = Number.isFinite(avg) ? avg.toFixed(1) : '0.0';
+    let line = `pre-routed ${pre} (${pct.toFixed(1)}%) · avg tools ${avgBit}`;
+    const scored = Number(insights?.verify_scored) || 0;
+    const passed = Number(insights?.verify_pass_count) || 0;
+    if (scored > 0) line += ` · verify ${passed}/${scored}`;
+    return line;
+}
+
 function fmtAge(ms) {
     // Empty age: match run meta "Unknown" (bare blank / em dash reads like missing data).
     if (!ms) return 'Unknown';
@@ -5808,6 +5822,9 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
                 const display = ((hr % 12) || 12);
                 const ampm = hr < 12 ? 'AM' : 'PM';
                 latBits.push(`busy ${insights.busiest_day}s · ${display}${ampm}`);
+            }
+            if (Number(insights.turns) > 0) {
+                latBits.push(`route ${formatRoutingInsightsLine(insights)}`);
             }
         }
         const hintLines = hints.length ? hints.slice(0, 5) : [];
@@ -10410,6 +10427,30 @@ function renderOpsRuns(insights) {
                 empty.innerHTML =
                     `<div class="ops-empty-filter-title">No tools yet</div>` +
                     `<div class="ops-empty-tab-hint">Recent turns used no tools — digester Top tools is clear</div>`;
+                card.appendChild(empty);
+            }
+        }
+        {
+            // Routing (Hermes overview leftover) — pre-routed · avg tools · verify.
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Routing';
+            card.appendChild(sub);
+            const turnsN = Number(insights.turns) || 0;
+            if (turnsN > 0) {
+                const routeEl = document.createElement('div');
+                routeEl.className = 'ops-row-meta';
+                routeEl.textContent = formatRoutingInsightsLine(insights);
+                card.appendChild(routeEl);
+            } else {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Routing appears after Discord or chat turns land';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No routing yet</div>` +
+                    `<div class="ops-empty-tab-hint">Pre-routed share · avg tools · verify appear after turns land</div>`;
                 card.appendChild(empty);
             }
         }

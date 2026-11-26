@@ -8252,4 +8252,24 @@ mod tests {
         assert!(text.contains("RUN_CMD×3 (75.0%)"), "got: {text}");
         assert!(text.contains("FETCH_URL×1 (25.0%)"), "got: {text}");
     }
+
+    #[test]
+    fn format_routing_insights_hermes_overview() {
+        let mut insights = compute_runs_insights(1);
+        insights.turns = 10;
+        insights.pre_routed_count = 4;
+        insights.avg_tool_steps = 1.5;
+        insights.verify_scored = 6;
+        insights.verify_pass_count = 5;
+        let line = format_routing_insights_line(&insights);
+        assert!(
+            line.contains("pre-routed **4** (40.0%)"),
+            "got: {line}"
+        );
+        assert!(line.contains("avg tools **1.5**"), "got: {line}");
+        assert!(line.contains("verify **5/6**"), "got: {line}");
+        let text = format_runs_insights_gateway(&insights);
+        assert!(text.contains("Routing:"), "got: {text}");
+        assert!(text.contains("pre-routed **4** (40.0%)"), "got: {text}");
+    }
 }

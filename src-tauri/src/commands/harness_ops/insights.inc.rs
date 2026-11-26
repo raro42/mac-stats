@@ -48,6 +48,23 @@ pub(super) fn format_tool_share(name: &str, count: usize, total: usize) -> Strin
     format!("{name}×{count} ({pct:.1}%)")
 }
 
+/// Hermes overview leftover: pre-routed share · avg tool steps · verify pass.
+pub(super) fn format_routing_insights_line(insights: &RunsInsights) -> String {
+    let turns = insights.turns.max(1);
+    let pct = (insights.pre_routed_count as f64) * 100.0 / (turns as f64);
+    let mut line = format!(
+        "Routing: pre-routed **{}** ({:.1}%) · avg tools **{:.1}**",
+        insights.pre_routed_count, pct, insights.avg_tool_steps
+    );
+    if insights.verify_scored > 0 {
+        line.push_str(&format!(
+            " · verify **{}/{}**",
+            insights.verify_pass_count, insights.verify_scored
+        ));
+    }
+    line
+}
+
 /// Short Discord/gateway report (Hermes `/insights` lite).
 pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     let mut lines = Vec::new();
@@ -203,6 +220,10 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
         lines.push(format!("Top tools: {tools}"));
     } else if insights.turns > 0 {
         lines.push("Top tools: **no tools yet**".into());
+    }
+    // Hermes overview leftover — pre-route share · avg tool steps · verify pass (runs.jsonl).
+    if insights.turns > 0 {
+        lines.push(format_routing_insights_line(insights));
     }
     if !insights.slowest.is_empty() {
         lines.push("**Slowest**".into());

@@ -95,6 +95,14 @@ pub struct RunsInsights {
     /// Longest run of consecutive local calendar days with activity (Hermes best streak).
     pub max_streak: usize,
     pub by_tool: Vec<(String, usize)>,
+    /// Hermes overview leftover: turns with `pre_routed: true` (instant / slash adapters).
+    pub pre_routed_count: usize,
+    /// Mean `tool_steps` across turns (Hermes avg tools / session analogue).
+    pub avg_tool_steps: f64,
+    /// Turns where `verify_passed` was present (Some).
+    pub verify_scored: usize,
+    /// Among `verify_scored`, how many passed.
+    pub verify_pass_count: usize,
     pub candidates: Vec<RunInsightCandidate>,
     pub slowest: Vec<RunTurnSummary>,
     pub recent: Vec<RunTurnSummary>,
@@ -445,6 +453,10 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         active_days: 0,
         max_streak: 0,
         by_tool: vec![],
+        pre_routed_count: 0,
+        avg_tool_steps: 0.0,
+        verify_scored: 0,
+        verify_pass_count: 0,
         candidates: vec![],
         slowest: vec![],
         recent: vec![],
@@ -479,6 +491,10 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         std::collections::BTreeMap::new();
     let mut activity_tss: Vec<chrono::DateTime<chrono::Utc>> = Vec::new();
     let mut candidates: Vec<RunInsightCandidate> = Vec::new();
+    let mut pre_routed_count = 0usize;
+    let mut tool_steps_sum: u64 = 0;
+    let mut verify_scored = 0usize;
+    let mut verify_pass_count = 0usize;
 
     for line in text.lines() {
         let line = line.trim();
@@ -534,6 +550,22 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
             .unwrap_or_default();
         for t in &tools {
             *tool_counts.entry(t.clone()).or_default() += 1;
+        }
+        if v.get("pre_routed")
+            .and_then(|x| x.as_bool())
+            .unwrap_or(false)
+        {
+            pre_routed_count += 1;
+        }
+        tool_steps_sum += v
+            .get("tool_steps")
+            .and_then(|x| x.as_u64())
+            .unwrap_or(0);
+        if let Some(passed) = v.get("verify_passed").and_then(|x| x.as_bool()) {
+            verify_scored += 1;
+            if passed {
+                verify_pass_count += 1;
+            }
         }
         let question_preview = v
             .get("question_preview")
@@ -604,6 +636,11 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
     let mut by_entry: Vec<_> = entry_counts.into_iter().collect();
     by_entry.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
     let activity = compute_runs_activity_patterns(&activity_tss);
+    let avg_tool_steps = if turns == 0 {
+        0.0
+    } else {
+        tool_steps_sum as f64 / turns as f64
+    };
     RunsInsights {
         turns,
         ok_count,
@@ -621,6 +658,10 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         active_days: activity.active_days,
         max_streak: activity.max_streak,
         by_tool,
+        pre_routed_count,
+        avg_tool_steps,
+        verify_scored,
+        verify_pass_count,
         candidates,
         slowest,
         recent,

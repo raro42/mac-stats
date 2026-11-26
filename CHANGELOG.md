@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3109] - 2026-11-26
+
+### Added
+- Runs Insights / Discord `/insights` **Routing**: pre-routed share · avg tool steps · verify pass from `runs.jsonl` — Hermes overview leftover after Top tools % (Agent Ops + gateway report).
+
 ## [0.1.3108] - 2026-11-26
 
 ### Added
