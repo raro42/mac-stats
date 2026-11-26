@@ -8205,4 +8205,38 @@ mod tests {
         let freq = try_operator_instant_reply("view freq").unwrap();
         assert!(freq.contains("**Freq**") || freq.contains("**Frequency**") || freq.contains("GHz"), "got: {freq}");
     }
+
+    #[test]
+    fn runs_activity_patterns_busiest_and_streak() {
+        use chrono::{TimeZone, Utc};
+        // Mon 10:00, Tue 10:00, Tue 15:00, Thu 15:00 (UTC; local may shift hour — day/streak still hold).
+        let tss = vec![
+            Utc.with_ymd_and_hms(2026, 11, 23, 10, 0, 0).unwrap(), // Mon
+            Utc.with_ymd_and_hms(2026, 11, 24, 10, 0, 0).unwrap(), // Tue
+            Utc.with_ymd_and_hms(2026, 11, 24, 15, 0, 0).unwrap(), // Tue
+            Utc.with_ymd_and_hms(2026, 11, 26, 15, 0, 0).unwrap(), // Thu
+        ];
+        let act = compute_runs_activity_patterns(&tss);
+        assert_eq!(act.busiest_day.as_deref(), Some("Tue"));
+        assert_eq!(act.busiest_day_count, 2);
+        assert_eq!(act.active_days, 3);
+        assert_eq!(act.max_streak, 2); // Mon–Tue consecutive
+        assert!(act.busiest_hour.is_some());
+        assert!(act.busiest_hour_count >= 1);
+        assert_eq!(format_busiest_hour_label(0), "12AM");
+        assert_eq!(format_busiest_hour_label(15), "3PM");
+        assert_eq!(format_busiest_hour_label(12), "12PM");
+
+        let mut insights = compute_runs_insights(5);
+        insights.turns = 4;
+        insights.busiest_day = act.busiest_day.clone();
+        insights.busiest_day_count = act.busiest_day_count;
+        insights.busiest_hour = act.busiest_hour;
+        insights.busiest_hour_count = act.busiest_hour_count;
+        insights.active_days = act.active_days;
+        insights.max_streak = act.max_streak;
+        let text = format_runs_insights_gateway(&insights);
+        assert!(text.contains("Busiest:"), "got: {text}");
+        assert!(text.contains("**Tues**") || text.contains("Tue"), "got: {text}");
+    }
 }

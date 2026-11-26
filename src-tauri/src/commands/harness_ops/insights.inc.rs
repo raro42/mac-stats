@@ -156,6 +156,30 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     } else if insights.turns > 0 {
         lines.push("Sources: **no sources yet**".into());
     }
+    // Hermes `/insights` Activity — busiest local day/hour + active days + streak.
+    if insights.turns > 0 {
+        match (
+            insights.busiest_day.as_deref(),
+            insights.busiest_hour,
+            insights.busiest_day_count,
+            insights.busiest_hour_count,
+        ) {
+            (Some(day), Some(hour), day_n, hour_n) if day_n > 0 && hour_n > 0 => {
+                let hour_label = format_busiest_hour_label(hour);
+                let mut busiest = format!(
+                    "Busiest: **{day}s** ({day_n}) · **{hour_label}** ({hour_n})"
+                );
+                if insights.active_days > 0 {
+                    busiest.push_str(&format!(" · active **{}**", insights.active_days));
+                }
+                if insights.max_streak > 1 {
+                    busiest.push_str(&format!(" · streak **{}**", insights.max_streak));
+                }
+                lines.push(busiest);
+            }
+            _ => lines.push("Busiest: **no activity yet**".into()),
+        }
+    }
     if !insights.by_tool.is_empty() {
         let tools = insights
             .by_tool

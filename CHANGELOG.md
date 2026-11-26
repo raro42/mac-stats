@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3105] - 2026-11-26
+
+### Added
+- Runs Insights / Discord `/insights`: **Activity** glance — busiest local day/hour, active days, and best streak from `runs.jsonl` timestamps (Hermes Activity Patterns leftover after Sources v0.1.3104; Agent Ops + gateway report).
+
 ## [0.1.3104] - 2026-11-26
 
 ### Added

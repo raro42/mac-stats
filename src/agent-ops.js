@@ -5762,6 +5762,12 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
                 .map((pair) => (Array.isArray(pair) ? `${pair[0]}:${pair[1]}` : String(pair)))
                 .join(' · ');
             if (sources) latBits.push(`src ${sources}`);
+            if (insights.busiest_day && insights.busiest_hour != null) {
+                const hr = Number(insights.busiest_hour);
+                const display = ((hr % 12) || 12);
+                const ampm = hr < 12 ? 'AM' : 'PM';
+                latBits.push(`busy ${insights.busiest_day}s · ${display}${ampm}`);
+            }
         }
         const hintLines = hints.length ? hints.slice(0, 5) : [];
         digestEl.title = [...latBits, ...hintLines].join('\n')
@@ -10284,6 +10290,44 @@ function renderOpsRuns(insights) {
                 empty.innerHTML =
                     `<div class="ops-empty-filter-title">No sources yet</div>` +
                     `<div class="ops-empty-tab-hint">Source mix (discord · agent_router · …) appears after turns land</div>`;
+                card.appendChild(empty);
+            }
+        }
+        {
+            // Activity (Hermes busiest day/hour · active days · streak).
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Activity';
+            card.appendChild(sub);
+            const day = insights.busiest_day;
+            const hour = insights.busiest_hour;
+            const dayN = Number(insights.busiest_day_count) || 0;
+            const hourN = Number(insights.busiest_hour_count) || 0;
+            const activeDays = Number(insights.active_days) || 0;
+            const streak = Number(insights.max_streak) || 0;
+            if (day && hour != null && dayN > 0 && hourN > 0) {
+                const hr = Number(hour);
+                const display = (hr % 12) || 12;
+                const ampm = hr < 12 ? 'AM' : 'PM';
+                const bits = [
+                    `${day}s (${dayN})`,
+                    `${display}${ampm} (${hourN})`,
+                ];
+                if (activeDays > 0) bits.push(`${activeDays} active day${activeDays === 1 ? '' : 's'}`);
+                if (streak > 1) bits.push(`streak ${streak}`);
+                const actEl = document.createElement('div');
+                actEl.className = 'ops-row-meta';
+                actEl.textContent = bits.join(' · ');
+                card.appendChild(actEl);
+            } else {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Busiest day and hour appear after dated turns land';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No activity yet</div>` +
+                    `<div class="ops-empty-tab-hint">Busiest day · hour appear after dated turns land</div>`;
                 card.appendChild(empty);
             }
         }

@@ -82,6 +82,18 @@ pub struct RunsInsights {
     pub by_lane: Vec<(String, usize)>,
     /// Hermes-style platform/source mix (`entry` from runs.jsonl: discord, agent_router, …).
     pub by_entry: Vec<(String, usize)>,
+    /// Hermes Activity: weekday label of the busiest local day (`Mon`…`Sun`), when known.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub busiest_day: Option<String>,
+    pub busiest_day_count: usize,
+    /// Hermes Activity: local hour 0–23 of the busiest hour, when known.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub busiest_hour: Option<u32>,
+    pub busiest_hour_count: usize,
+    /// Distinct local calendar days with ≥1 turn.
+    pub active_days: usize,
+    /// Longest run of consecutive local calendar days with activity (Hermes best streak).
+    pub max_streak: usize,
     pub by_tool: Vec<(String, usize)>,
     pub candidates: Vec<RunInsightCandidate>,
     pub slowest: Vec<RunTurnSummary>,
@@ -426,6 +438,12 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         latency_sample: 0,
         by_lane: vec![],
         by_entry: vec![],
+        busiest_day: None,
+        busiest_day_count: 0,
+        busiest_hour: None,
+        busiest_hour_count: 0,
+        active_days: 0,
+        max_streak: 0,
         by_tool: vec![],
         candidates: vec![],
         slowest: vec![],
@@ -459,6 +477,7 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         std::collections::BTreeMap::new();
     let mut tool_counts: std::collections::BTreeMap<String, usize> =
         std::collections::BTreeMap::new();
+    let mut activity_tss: Vec<chrono::DateTime<chrono::Utc>> = Vec::new();
     let mut candidates: Vec<RunInsightCandidate> = Vec::new();
 
     for line in text.lines() {
@@ -470,16 +489,19 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
             Ok(v) => v,
             Err(_) => continue,
         };
+        let parsed_ts = v
+            .get("ts")
+            .and_then(|x| x.as_str())
+            .and_then(parse_run_ts);
         if let Some(since) = since {
-            let ts = v
-                .get("ts")
-                .and_then(|x| x.as_str())
-                .and_then(parse_run_ts);
-            match ts {
+            match parsed_ts {
                 Some(t) if t >= since => {}
                 Some(_) => continue,
                 None => continue,
             }
+        }
+        if let Some(t) = parsed_ts {
+            activity_tss.push(t);
         }
         let wall = v.get("wall_ms").and_then(|x| x.as_u64()).unwrap_or(0);
         walls.push(wall);
@@ -581,6 +603,7 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
     let by_lane: Vec<_> = lane_counts.into_iter().collect();
     let mut by_entry: Vec<_> = entry_counts.into_iter().collect();
     by_entry.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
+    let activity = compute_runs_activity_patterns(&activity_tss);
     RunsInsights {
         turns,
         ok_count,
@@ -591,6 +614,12 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         latency_sample,
         by_lane,
         by_entry,
+        busiest_day: activity.busiest_day,
+        busiest_day_count: activity.busiest_day_count,
+        busiest_hour: activity.busiest_hour,
+        busiest_hour_count: activity.busiest_hour_count,
+        active_days: activity.active_days,
+        max_streak: activity.max_streak,
         by_tool,
         candidates,
         slowest,
@@ -605,6 +634,99 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         process_uptime_secs: crate::state::process_uptime_secs(),
         window_days,
     }
+}
+
+/// Hermes-style activity glance from turn timestamps (local weekday / hour / streak).
+#[derive(Debug, Clone, Default)]
+pub struct RunsActivityPatterns {
+    pub busiest_day: Option<String>,
+    pub busiest_day_count: usize,
+    pub busiest_hour: Option<u32>,
+    pub busiest_hour_count: usize,
+    pub active_days: usize,
+    pub max_streak: usize,
+}
+
+const WEEKDAY_LABELS: [&str; 7] = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+/// Compute busiest day/hour + active days + max consecutive-day streak (Hermes parity).
+pub fn compute_runs_activity_patterns(
+    tss: &[chrono::DateTime<chrono::Utc>],
+) -> RunsActivityPatterns {
+    use chrono::{Datelike, Local, Timelike};
+    if tss.is_empty() {
+        return RunsActivityPatterns::default();
+    }
+    let mut day_counts = [0usize; 7];
+    let mut hour_counts = [0usize; 24];
+    let mut daily: std::collections::BTreeSet<chrono::NaiveDate> =
+        std::collections::BTreeSet::new();
+    for ts in tss {
+        let local = ts.with_timezone(&Local);
+        day_counts[local.weekday().num_days_from_monday() as usize] += 1;
+        hour_counts[local.hour() as usize] += 1;
+        daily.insert(local.date_naive());
+    }
+    let (busiest_day_idx, busiest_day_count) = day_counts
+        .iter()
+        .enumerate()
+        .max_by(|a, b| a.1.cmp(b.1).then(b.0.cmp(&a.0)))
+        .map(|(i, c)| (i, *c))
+        .unwrap_or((0, 0));
+    let (busiest_hour_idx, busiest_hour_count) = hour_counts
+        .iter()
+        .enumerate()
+        .max_by(|a, b| a.1.cmp(b.1).then(b.0.cmp(&a.0)))
+        .map(|(i, c)| (i, *c))
+        .unwrap_or((0, 0));
+    let active_days = daily.len();
+    let max_streak = max_consecutive_day_streak(&daily.into_iter().collect::<Vec<_>>());
+    RunsActivityPatterns {
+        busiest_day: if busiest_day_count > 0 {
+            Some(WEEKDAY_LABELS[busiest_day_idx].to_string())
+        } else {
+            None
+        },
+        busiest_day_count,
+        busiest_hour: if busiest_hour_count > 0 {
+            Some(busiest_hour_idx as u32)
+        } else {
+            None
+        },
+        busiest_hour_count,
+        active_days,
+        max_streak,
+    }
+}
+
+fn max_consecutive_day_streak(dates: &[chrono::NaiveDate]) -> usize {
+    if dates.is_empty() {
+        return 0;
+    }
+    let mut max_streak = 1usize;
+    let mut current = 1usize;
+    for w in dates.windows(2) {
+        let gap = (w[1] - w[0]).num_days();
+        if gap == 1 {
+            current += 1;
+            max_streak = max_streak.max(current);
+        } else if gap > 1 {
+            current = 1;
+        }
+        // gap == 0 (same day) should not happen with a set; ignore.
+    }
+    max_streak
+}
+
+/// Format local hour 0–23 as `12AM` / `1PM` (Hermes gateway glance).
+pub fn format_busiest_hour_label(hour: u32) -> String {
+    let h = hour % 24;
+    let ampm = if h < 12 { "AM" } else { "PM" };
+    let display = match h % 12 {
+        0 => 12,
+        n => n,
+    };
+    format!("{display}{ampm}")
 }
 
 
