@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3106] - 2026-11-26
+
+### Fixed
+- Agent Ops Sessions: live rows (Sessions list + Overview Live) show relative last-activity age (`just now` / `3m ago`) like saved Files — raw RFC3339 stays on the row title for hover (session resume glance).
+
 ## [0.1.3105] - 2026-11-26
 
 ### Added

@@ -5454,6 +5454,15 @@ function fmtAge(ms) {
     return `${Math.floor(age / 86400_000)}d ago`;
 }
 
+/** Live session `last_activity` (RFC3339) → relative age (saved files already use fmtAge(modified_ms)). */
+function fmtActivityIsoAge(iso) {
+    const raw = String(iso || '').trim();
+    if (!raw) return 'Unknown';
+    const t = Date.parse(raw);
+    if (Number.isNaN(t)) return raw;
+    return fmtAge(t);
+}
+
 function fmtUptimeSecs(secs) {
     const s = Math.max(0, Math.floor(Number(secs) || 0));
     if (s < 60) return `${s}s`;
@@ -6835,9 +6844,12 @@ function renderOverviewLive(rows, insights) {
         const sessionId = String(r.session_id || '').trim() || 'Unknown';
         // Empty message count: match size "Unknown" (bare undefined msgs reads like missing data).
         const msgs = fmtCountLabel(r.message_count, 'msgs');
+        const activityRaw = String(r.last_activity || '').trim();
+        const activity = fmtActivityIsoAge(activityRaw);
         // Empty preview: match schedule task "None yet" (omit left thinner meta).
         const previewBit = fmtPreviewSnippet(r.preview);
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${escapeHtml(msgs)} · ${escapeHtml(previewBit)}</div></div>`;
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${escapeHtml(msgs)} · ${escapeHtml(activity)} · ${escapeHtml(previewBit)}</div></div>`;
+        if (activityRaw) btn.title = `Last activity ${activityRaw}`;
         btn.addEventListener('click', async () => {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
@@ -9367,7 +9379,9 @@ function renderOpsLive(rows) {
         btn.type = 'button';
         btn.className = 'ops-row';
         // Empty last activity / source / session id: match run meta "Unknown".
-        const activity = String(r.last_activity || '').trim() || 'Unknown';
+        // Relative age (saved Files already use fmtAge) — raw RFC3339 stays on title for hover.
+        const activityRaw = String(r.last_activity || '').trim();
+        const activity = fmtActivityIsoAge(activityRaw);
         const source = String(r.source || '').trim() || 'Unknown';
         const sessionId = String(r.session_id || '').trim() || 'Unknown';
         // Empty message count: match size "Unknown" (bare undefined msgs reads like missing data).
@@ -9375,6 +9389,7 @@ function renderOpsLive(rows) {
         // Empty preview: match schedule task "None yet" (omit left thinner meta).
         const previewBit = fmtPreviewSnippet(r.preview);
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${escapeHtml(msgs)} · ${escapeHtml(activity)} · ${escapeHtml(previewBit)}</div></div>`;
+        if (activityRaw) btn.title = `Last activity ${activityRaw}`;
         setOpsRowCopyValue(btn, r.session_id || sessionId);
         const openLive = async () => {
             try {
