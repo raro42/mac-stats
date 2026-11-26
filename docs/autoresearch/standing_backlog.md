@@ -1,3 +1,19 @@
+## Overnight note 2026-11-26 ~22:40 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Dark [DUE] deferred as mark.
+- Sibling: OpenClaw browser session-tab leftover after Session queue wait v0.1.3114 — `/browser` always said idle until BROWSER_* even when cached CDP held tabs.
+- Debug.log: minor WARN clusters only (quality-review README noise); no ERROR/panic.
+- Fuel: sibling OpenClaw session-tab Warm glance — not tip/keep-pNN/section-open/pmset/insights Sources·Activity/live-age/reconnect-age/tool-%/Routing/Notable/LLM-skips/Replies/Session-queue clone.
+- Shipped **v0.1.3115** — Discord `/browser` · `/cdp` Warm tabs·focus·idle (cached CDP peek; Busy/Absent calm).
+- Ratchet keep @ 326849f0d; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: OpenClaw native tool-loop fidelity / close-tracked-tabs-on-session-end if clearly small — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age + chip disc/resume ages + tool-% + Routing + Notable + LLM skips + Replies + Session queue busy/tracked + wait depth + Browser Warm glance closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age / reconnect-age / tool-% / Routing / Notable / LLM-skips / Replies / Session-queue / Browser-Warm-chip clone.
+
+## Overnight merge — v0.1.3115
+
+- Sibling OpenClaw session-tab after wait depth v0.1.3114: `/browser` · `/cdp` Warm tabs·focus·idle from cached CDP (no `/json/version`). Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26. Next: native tool-loop / close-tracked-tabs if tiny — not another keep-pNN / section-open / insights / Session-queue / Browser-Warm clone.
+
 ## Overnight note 2026-11-26 ~22:15 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).

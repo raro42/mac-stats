@@ -3,8 +3,9 @@
 Overnight autoresearch kept product moves (not quiet).
 
 ## Shipped
-- **v0.1.3114** — Discord `/status` + `/queue` **Session queue** wait depth: `wait N` when turns park behind a busy keyed mutex (OpenClaw serialization). Agent Ops Live + Version titles + pressure log.
-- **v0.1.3113** — Session queue busy/tracked glance.
+- **v0.1.3115** — Discord `/browser` · `/cdp` **Warm** session-tab glance: tabs · focus · headless/visible · idle age from cached CDP (OpenClaw session-tab; Busy/Absent stay calm).
+- **v0.1.3114** — Session queue wait depth (`wait N`).
+- **v0.1.3113** — Session queue busy/tracked.
 - Earlier tonight: **v0.1.3112** Replies · **v0.1.3111** LLM skips · **v0.1.3110** Notable · **v0.1.3109** Routing.
 
 ## Context
@@ -12,4 +13,4 @@ Overnight autoresearch kept product moves (not quiet).
 - uuidlog still block; SoftDisabled…pmhistory + powerstate + refusal-awareness closed.
 
 ## Next fuel
-OpenClaw native tool-loop / browser session-tab if clearly small — not another Session-queue wait/busy clone.
+OpenClaw native tool-loop / close-tracked-tabs-on-session-end if clearly small — not another Browser-Warm / Session-queue clone.
