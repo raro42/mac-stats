@@ -1,3 +1,18 @@
+## Overnight note 2026-11-26 ~02:45 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Dark [DUE] deferred as mark — shipped Light section-open as standing backlog instead.
+- Sibling: OpenClaw/Hermes present; no clear tiny port this tick.
+- Debug.log: no ERROR/WARN/panic clusters in 180m window.
+- Fuel: standing backlog after Apple v0.1.3099 — Light `#icon-monitors` / `#icon-ollama` (and kin) `.section-open` still mixed accent into `transparent` over opaque `#f7f7fa` chips when panes expand; not tip/keep-pNN/pmset clone.
+- Shipped **v0.1.3100** — opaque Light `--accent` background/border mixes on `#f7f7fa` for open section icons.
+- Ratchet keep @ d8297a839; sync-dist + install/kickstart + push (UI).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: Swiss/Material section-open opaque remaps (same class) · SoftDisabled…pmhistory + powerstate + refusal-awareness closed — remaining useful non-blocking `pmset -g` only if clearly distinct (`disk` == `custom`; `uuidlog` / logs block); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3100
+
+- Standing-backlog Light open-section icons after Apple v0.1.3099: drop shared transparent accent washes for opaque `--accent` on `#f7f7fa`. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26 (Swiss/Material next). Next: Swiss/Material section-open — not another keep-pNN clone.
 ## Overnight note 2026-11-26 ~02:15 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
