@@ -38,6 +38,16 @@ pub(super) fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[Strin
 }
 
 
+/// Compact Top-tools cell: `name×N (P%)` — Hermes tool-share parity.
+pub(super) fn format_tool_share(name: &str, count: usize, total: usize) -> String {
+    let pct = if total > 0 {
+        (count as f64) * 100.0 / (total as f64)
+    } else {
+        0.0
+    };
+    format!("{name}×{count} ({pct:.1}%)")
+}
+
 /// Short Discord/gateway report (Hermes `/insights` lite).
 pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     let mut lines = Vec::new();
@@ -181,11 +191,13 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
         }
     }
     if !insights.by_tool.is_empty() {
+        // Hermes `/insights` tool share — count + % of all tool calls.
+        let tool_total: usize = insights.by_tool.iter().map(|(_, n)| *n).sum();
         let tools = insights
             .by_tool
             .iter()
             .take(8)
-            .map(|(k, v)| format!("{k}×{v}"))
+            .map(|(k, v)| format_tool_share(k, *v, tool_total))
             .collect::<Vec<_>>()
             .join(", ");
         lines.push(format!("Top tools: {tools}"));

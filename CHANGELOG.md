@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3108] - 2026-11-26
+
+### Added
+- Runs Insights / Discord `/insights` **Top tools**: show share of all tool calls (`name×N (P%)`) — Hermes tool-breakdown parity (Agent Ops + gateway report).
+
 ## [0.1.3107] - 2026-11-26
 
 ### Fixed

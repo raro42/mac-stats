@@ -5468,6 +5468,14 @@ function fmtPreviewSnippet(preview) {
     return t || 'None yet';
 }
 
+/** Hermes `/insights` tool share — `name×N (P%)` of all tool calls. */
+function formatToolShare(name, count, total) {
+    const n = Number(count) || 0;
+    const t = Number(total) || 0;
+    const pct = t > 0 ? (n * 100) / t : 0;
+    return `${name}×${n} (${pct.toFixed(1)}%)`;
+}
+
 function fmtAge(ms) {
     // Empty age: match run meta "Unknown" (bare blank / em dash reads like missing data).
     if (!ms) return 'Unknown';
@@ -10380,9 +10388,17 @@ function renderOpsRuns(insights) {
             if (toolRows.length) {
                 const toolsEl = document.createElement('div');
                 toolsEl.className = 'ops-row-meta';
+                const toolTotal = toolRows.reduce(
+                    (sum, pair) => sum + (Number(Array.isArray(pair) ? pair[1] : 0) || 0),
+                    0
+                );
                 toolsEl.textContent = toolRows
                     .slice(0, 6)
-                    .map(([k, v]) => `${k}×${v}`)
+                    .map((pair) => {
+                        const k = Array.isArray(pair) ? pair[0] : String(pair);
+                        const v = Array.isArray(pair) ? pair[1] : 0;
+                        return formatToolShare(k, v, toolTotal);
+                    })
                     .join(', ');
                 card.appendChild(toolsEl);
             } else {

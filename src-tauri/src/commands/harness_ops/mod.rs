@@ -8239,4 +8239,17 @@ mod tests {
         assert!(text.contains("Busiest:"), "got: {text}");
         assert!(text.contains("**Tues**") || text.contains("Tue"), "got: {text}");
     }
+
+    #[test]
+    fn format_tool_share_hermes_pct() {
+        assert_eq!(format_tool_share("RUN_CMD", 3, 10), "RUN_CMD×3 (30.0%)");
+        assert_eq!(format_tool_share("FETCH_URL", 1, 3), "FETCH_URL×1 (33.3%)");
+        assert_eq!(format_tool_share("none", 0, 0), "none×0 (0.0%)");
+        let mut insights = compute_runs_insights(1);
+        insights.turns = 2;
+        insights.by_tool = vec![("RUN_CMD".into(), 3), ("FETCH_URL".into(), 1)];
+        let text = format_runs_insights_gateway(&insights);
+        assert!(text.contains("RUN_CMD×3 (75.0%)"), "got: {text}");
+        assert!(text.contains("FETCH_URL×1 (25.0%)"), "got: {text}");
+    }
 }
