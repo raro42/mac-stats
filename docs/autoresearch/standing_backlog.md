@@ -1,3 +1,18 @@
+## Overnight note 2026-11-26 ~03:55 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Dark [DUE] deferred as mark.
+- Sibling: OpenClaw/Hermes present; no clear tiny port this tick.
+- Debug.log: no ERROR/WARN/panic clusters in 180m window.
+- Fuel: standing backlog after Material section-open v0.1.3102 — `pmset -g disk` ≡ `custom` but `/pmdisk` was unwired while `/pmcustom` existed; uuidlog streams/blocks so skipped; not tip/keep-pNN/section-open clone.
+- Shipped **v0.1.3103** — `/pmdisk` · `/pmset-disk` · `/power-disk` (+ view/open NL) alias Power custom; bare `pmdisk` + `/disk` (Disk Cleanup) stay put.
+- Ratchet keep @ ea0600784; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: sibling session/insights port if tiny — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias clone.
+
+## Overnight merge — v0.1.3103
+
+- Standing-backlog after Material open-section v0.1.3102: wire `/pmdisk` aliases to existing Power custom (`pmset -g disk` ≡ `custom`). Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26. Next: sibling session/insights if tiny — not another keep-pNN / section-open clone.
 ## Overnight note 2026-11-26 ~03:30 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
