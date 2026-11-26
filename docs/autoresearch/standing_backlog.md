@@ -1,3 +1,18 @@
+## Overnight note 2026-11-26 ~04:25 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Dark [DUE] deferred as mark.
+- Sibling: Hermes `/insights` platform mix still missing from mac-stats Runs Insights while `runs.jsonl` already has `entry`.
+- Debug.log: no ERROR/WARN/panic clusters in 180m window.
+- Fuel: sibling insights after `/pmdisk` v0.1.3103 — Sources (`by_entry`) for Discord `/insights` + Agent Ops; Activity (busiest day/hour) deferred; not tip/keep-pNN/section-open/pmset clone.
+- Shipped **v0.1.3104** — Runs Insights Sources from `runs.jsonl` `entry` (discord · agent_router · …).
+- Ratchet keep @ f265b8475; sync-dist + install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: Hermes Activity (busiest day/hour · streak) on insights if tiny — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias clone.
+
+## Overnight merge — v0.1.3104
+
+- Sibling Hermes insights leftover after `/pmdisk` v0.1.3103: add Sources (`by_entry`) to Discord `/insights` + Agent Ops. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26. Next: Activity busiest day/hour if tiny — not another keep-pNN / section-open clone.
 ## Overnight note 2026-11-26 ~03:55 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).

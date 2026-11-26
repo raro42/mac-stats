@@ -1,6 +1,6 @@
 # Morning surprise — 2026-11-26
 
-Overnight autoresearch (Track B) finished the open-section icon wash series, then shipped a distinct instant-lane alias: `/pmdisk` for Power custom (`pmset -g disk` ≡ `custom`).
+Overnight autoresearch (Track B) finished the open-section icon wash series, shipped `/pmdisk` for Power custom, then a Hermes-parity Insights **Sources** line from `runs.jsonl` `entry`.
 
 ## Shipped tonight
 
@@ -16,6 +16,7 @@ Overnight autoresearch (Track B) finished the open-section icon wash series, the
 | **v0.1.3101** | Swiss Minimalistic — open section icons opaque `--accent` on `#ffffff` |
 | **v0.1.3102** | Material — open section icons opaque `--accent` on `#ebe4d9` |
 | **v0.1.3103** | `/pmdisk` · `/pmset-disk` · `/power-disk` (+ view/open NL) → Power custom report (`disk` ≡ `custom`) |
+| **v0.1.3104** | Runs Insights / Discord `/insights` — **Sources** from `runs.jsonl` `entry` (Hermes platform mix) |
 
 ## Context
 
@@ -27,4 +28,4 @@ Overnight autoresearch (Track B) finished the open-section icon wash series, the
 
 ## Next fuel
 
-- Sibling session/insights port if tiny, or another clearly new non-blocking product surface — not another keep-pNN / section-open theme clone; not another thin pmset alias unless clearly distinct from shipped soft-state + `/pmcustom`/`/pmdisk`.
+- Hermes Activity leftover on insights (busiest day/hour · active days · streak) if tiny — not another keep-pNN / section-open / thin pmset alias clone.
