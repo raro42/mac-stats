@@ -1,3 +1,19 @@
+## Overnight note 2026-11-26 ~21:25 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Dark [DUE] deferred as mark.
+- Sibling: Hermes overview leftover after LLM skips v0.1.3111 — reply_chars already on runs.jsonl but missing from insights.
+- Debug.log: minor WARN clusters only (quality-review README noise); no ERROR/panic.
+- Fuel: sibling Hermes overview Replies — not tip/keep-pNN/section-open/pmset/insights Sources·Activity/live-age/reconnect-age/tool-%/Routing/Notable/LLM-skips clone.
+- Shipped **v0.1.3112** — Replies `mean · p50 · max` on Discord `/insights` + Agent Ops.
+- Ratchet keep @ b3facf35f; sync-dist + install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: OpenClaw session-tab / native tool-loop fidelity if clearly small — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age + chip disc/resume ages + tool-% + Routing + Notable + LLM skips + Replies closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age / reconnect-age / tool-% / Routing / Notable / LLM-skips / Replies clone.
+
+## Overnight merge — v0.1.3112
+
+- Sibling Hermes overview after LLM skips v0.1.3111: Replies (mean · p50 · max reply_chars) on Discord `/insights` + Agent Ops. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26. Next: OpenClaw session-tab / native tool-loop if tiny — not another keep-pNN / section-open / insights / live-age / reconnect-age / tool-% / Routing / Notable / LLM-skips / Replies clone.
+
 ## Overnight note 2026-11-26 ~20:55 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
