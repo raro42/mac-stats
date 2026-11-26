@@ -2049,6 +2049,22 @@ body.theme-architect #icon-agent-ops.section-open {
   background: color-mix(in srgb, var(--accent, #232d41) 14%, #f1f1f1);
   border-color: color-mix(in srgb, var(--accent, #232d41) 32%, #f1f1f1);
 }
+/*
+ * Apple (standing backlog after Architect v0.1.3098): same shared `.section-open`
+ * transparent accent wash over opaque `#ffffff` chips when AI Chat / Monitors
+ * expand. Opaque `--accent` mixes on Apple white (not a second layout-daily mark).
+ */
+body.theme-apple #icon-monitors.section-open,
+body.theme-apple #icon-ollama.section-open,
+body.theme-apple #icon-perplexity.section-open,
+body.theme-apple #icon-logs.section-open,
+body.theme-apple #icon-disk-cleanup.section-open,
+body.theme-apple #icon-agent-ops.section-open {
+  opacity: 1;
+  color: var(--accent, #8bb4e8);
+  background: color-mix(in srgb, var(--accent, #8bb4e8) 14%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #8bb4e8) 32%, #ffffff);
+}
 body.theme-data-poster #icon-discord.status-good,
 body.theme-data-poster #icon-monitors.status-good,
 body.theme-data-poster #icon-ollama.status-good,

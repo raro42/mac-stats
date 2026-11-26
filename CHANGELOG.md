@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3099] - 2026-11-26
+
+### Fixed
+- Apple theme: open section icons (`#icon-monitors` / `#icon-ollama` and kin) drop the shared transparent accent wash for opaque `--accent` mixes on `#ffffff` when AI Chat / Monitors expand (same class of muddy wash as Architect v0.1.3098 / Futuristic v0.1.3097 / Neon v0.1.3096 / Dark v0.1.3095 / Data Poster v0.1.3094).
+
 ## [0.1.3098] - 2026-11-26
 
 ### Fixed
