@@ -107,6 +107,19 @@ pub(super) fn format_llm_skips_insights_line(insights: &RunsInsights) -> String 
     )
 }
 
+/// Hermes overview leftover — reply size from runs.jsonl `reply_chars` (mean · p50 · max).
+pub(super) fn format_replies_insights_line(insights: &RunsInsights) -> String {
+    if insights.turns == 0
+        || (insights.reply_chars_max == 0 && insights.reply_chars_mean == 0)
+    {
+        return "Replies: **no replies yet**".into();
+    }
+    format!(
+        "Replies: mean **{}** · p50 **{}** · max **{}**",
+        insights.reply_chars_mean, insights.reply_chars_p50, insights.reply_chars_max
+    )
+}
+
 /// Short Discord/gateway report (Hermes `/insights` lite).
 pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     let mut lines = Vec::new();
@@ -274,6 +287,10 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     // CapEx leftover — skipped_*_llm shares already on runs.jsonl but missing from insights.
     if insights.turns > 0 {
         lines.push(format_llm_skips_insights_line(insights));
+    }
+    // Hermes overview leftover — reply_chars already on runs.jsonl but missing from insights.
+    if insights.turns > 0 {
+        lines.push(format_replies_insights_line(insights));
     }
     if !insights.slowest.is_empty() {
         lines.push("**Slowest**".into());

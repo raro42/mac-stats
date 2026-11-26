@@ -119,6 +119,12 @@ pub struct RunsInsights {
     pub skipped_criteria_count: usize,
     /// Turns that skipped topic LLM.
     pub skipped_topic_count: usize,
+    /// Mean `reply_chars` across turns (Hermes overview reply-size leftover).
+    pub reply_chars_mean: u64,
+    /// Median `reply_chars` across turns.
+    pub reply_chars_p50: u64,
+    /// Max `reply_chars` on any turn.
+    pub reply_chars_max: u64,
     pub candidates: Vec<RunInsightCandidate>,
     pub slowest: Vec<RunTurnSummary>,
     pub recent: Vec<RunTurnSummary>,
@@ -481,6 +487,9 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         skipped_verify_count: 0,
         skipped_criteria_count: 0,
         skipped_topic_count: 0,
+        reply_chars_mean: 0,
+        reply_chars_p50: 0,
+        reply_chars_max: 0,
         candidates: vec![],
         slowest: vec![],
         recent: vec![],
@@ -527,6 +536,7 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
     let mut skipped_verify_count = 0usize;
     let mut skipped_criteria_count = 0usize;
     let mut skipped_topic_count = 0usize;
+    let mut reply_chars_vals: Vec<u64> = Vec::new();
 
     for line in text.lines() {
         let line = line.trim();
@@ -646,6 +656,16 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         {
             skipped_topic_count += 1;
         }
+        // runs.jsonl reply_chars may serialize as u64 or i64.
+        let reply_chars = v
+            .get("reply_chars")
+            .and_then(|x| {
+                x.as_u64()
+                    .or_else(|| x.as_i64().map(|n| n.max(0) as u64))
+                    .or_else(|| x.as_f64().map(|n| n.max(0.0) as u64))
+            })
+            .unwrap_or(0);
+        reply_chars_vals.push(reply_chars);
         if let Some(c) = classify_candidate(&lane, wall, &tools, &question_preview, &request_id) {
             candidates.push(c);
         }
@@ -710,6 +730,19 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
     } else {
         tool_steps_sum as f64 / turns as f64
     };
+    let reply_chars_max = reply_chars_vals.iter().copied().max().unwrap_or(0);
+    let reply_chars_mean = if reply_chars_vals.is_empty() {
+        0
+    } else {
+        reply_chars_vals.iter().sum::<u64>() / reply_chars_vals.len() as u64
+    };
+    let mut reply_sorted = reply_chars_vals;
+    reply_sorted.sort_unstable();
+    let reply_chars_p50 = if reply_sorted.is_empty() {
+        0
+    } else {
+        reply_sorted[reply_sorted.len() / 2]
+    };
     RunsInsights {
         turns,
         ok_count,
@@ -739,6 +772,9 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         skipped_verify_count,
         skipped_criteria_count,
         skipped_topic_count,
+        reply_chars_mean,
+        reply_chars_p50,
+        reply_chars_max,
         candidates,
         slowest,
         recent,

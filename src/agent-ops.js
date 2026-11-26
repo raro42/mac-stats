@@ -5517,6 +5517,15 @@ function formatLlmSkipsInsightsLine(insights) {
     ].join(' · ');
 }
 
+/** Hermes overview leftover — reply size from runs.jsonl `reply_chars`. */
+function formatRepliesInsightsLine(insights) {
+    const mean = Number(insights?.reply_chars_mean) || 0;
+    const p50 = Number(insights?.reply_chars_p50) || 0;
+    const max = Number(insights?.reply_chars_max) || 0;
+    if (mean <= 0 && max <= 0) return 'no replies yet';
+    return `mean ${mean} · p50 ${p50} · max ${max}`;
+}
+
 function fmtAge(ms) {
     // Empty age: match run meta "Unknown" (bare blank / em dash reads like missing data).
     if (!ms) return 'Unknown';
@@ -5858,6 +5867,9 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
             }
             if (Number(insights.turns) > 0) {
                 latBits.push(`skips ${formatLlmSkipsInsightsLine(insights)}`);
+            }
+            if (Number(insights.turns) > 0) {
+                latBits.push(`replies ${formatRepliesInsightsLine(insights)}`);
             }
         }
         const hintLines = hints.length ? hints.slice(0, 5) : [];
@@ -10546,6 +10558,43 @@ function renderOpsRuns(insights) {
                 empty.innerHTML =
                     `<div class="ops-empty-filter-title">No skips yet</div>` +
                     `<div class="ops-empty-tab-hint">Plan · verify · criteria · topic skip shares appear after turns land</div>`;
+                card.appendChild(empty);
+            }
+        }
+        {
+            // Replies (Hermes overview leftover) — reply_chars from runs.jsonl.
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Replies';
+            card.appendChild(sub);
+            const turnsN = Number(insights.turns) || 0;
+            const replyMax = Number(insights.reply_chars_max) || 0;
+            const replyMean = Number(insights.reply_chars_mean) || 0;
+            if (turnsN > 0 && (replyMax > 0 || replyMean > 0)) {
+                const repliesEl = document.createElement('div');
+                repliesEl.className = 'ops-row-meta';
+                repliesEl.textContent = formatRepliesInsightsLine(insights);
+                repliesEl.title = 'Reply size in characters (mean · p50 · max) from runs.jsonl';
+                card.appendChild(repliesEl);
+            } else if (turnsN > 0) {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Reply sizes appear after turns record reply_chars';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No replies yet</div>` +
+                    `<div class="ops-empty-tab-hint">Mean · p50 · max reply size appears after turns land</div>`;
+                card.appendChild(empty);
+            } else {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Replies appear after Discord or chat turns land';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No replies yet</div>` +
+                    `<div class="ops-empty-tab-hint">Reply size appears after turns land</div>`;
                 card.appendChild(empty);
             }
         }

@@ -8311,4 +8311,25 @@ mod tests {
         assert!(text.contains("LLM skips:"), "got: {text}");
         assert!(text.contains("plan **8** (80%)"), "got: {text}");
     }
+
+    #[test]
+    fn format_replies_insights_hermes_overview() {
+        let mut insights = compute_runs_insights(1);
+        insights.turns = 5;
+        insights.reply_chars_mean = 328;
+        insights.reply_chars_p50 = 279;
+        insights.reply_chars_max = 1847;
+        let line = format_replies_insights_line(&insights);
+        assert!(line.contains("mean **328**"), "got: {line}");
+        assert!(line.contains("p50 **279**"), "got: {line}");
+        assert!(line.contains("max **1847**"), "got: {line}");
+        let text = format_runs_insights_gateway(&insights);
+        assert!(text.contains("Replies:"), "got: {text}");
+        assert!(text.contains("mean **328**"), "got: {text}");
+        insights.reply_chars_mean = 0;
+        insights.reply_chars_p50 = 0;
+        insights.reply_chars_max = 0;
+        let empty = format_replies_insights_line(&insights);
+        assert!(empty.contains("no replies yet"), "got: {empty}");
+    }
 }

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3112] - 2026-11-26
+
+### Added
+- Runs Insights / Discord `/insights` **Replies**: mean · p50 · max reply size from `runs.jsonl` `reply_chars` (Hermes overview leftover after LLM skips; Agent Ops + gateway).
+
 ## [0.1.3111] - 2026-11-26
 
 ### Added
