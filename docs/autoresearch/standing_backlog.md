@@ -1,3 +1,19 @@
+## Overnight note 2026-11-26 ~22:15 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Dark [DUE] deferred as mark.
+- Sibling: OpenClaw session serialization leftover after Session queue busy/tracked v0.1.3113 — wait depth lived only as Arc strong_count, not on `/queue`.
+- Debug.log: minor WARN clusters only (quality-review README noise); no ERROR/panic.
+- Fuel: sibling OpenClaw session-queue wait depth — not tip/keep-pNN/section-open/pmset/insights Sources·Activity/live-age/reconnect-age/tool-%/Routing/Notable/LLM-skips/Replies/Session-queue busy/tracked clone.
+- Shipped **v0.1.3114** — Session queue `wait N` on Discord `/status` + `/queue` · `/session-queue`; Agent Ops Live/Version titles + pressure log.
+- Ratchet keep @ f77e6d107; sync-dist + install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: OpenClaw native tool-loop fidelity / browser session-tab if clearly small — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age + chip disc/resume ages + tool-% + Routing + Notable + LLM skips + Replies + Session queue busy/tracked + wait depth closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age / reconnect-age / tool-% / Routing / Notable / LLM-skips / Replies / Session-queue clone.
+
+## Overnight merge — v0.1.3114
+
+- Sibling OpenClaw session-queue after busy/tracked v0.1.3113: wait depth (`wait N` from Arc strong_count behind busy keyed mutex) on Discord `/status` + `/queue` and Agent Ops Live/Version titles. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26. Next: OpenClaw tool-loop / session-tab if tiny — not another keep-pNN / section-open / insights / Session-queue clone.
+
 ## Overnight note 2026-11-26 ~21:50 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
