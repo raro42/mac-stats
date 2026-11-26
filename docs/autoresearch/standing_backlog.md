@@ -1,3 +1,19 @@
+## Overnight note 2026-11-26 ~20:35 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Dark [DUE] deferred as mark.
+- Sibling: Hermes Notable Sessions leftover after Routing v0.1.3109 — most tool_steps turn missing from insights.
+- Debug.log: minor WARN clusters only (quality-review README noise); no ERROR/panic.
+- Fuel: sibling Hermes Notable most-tools — not tip/keep-pNN/section-open/pmset/insights Sources·Activity/live-age/reconnect-age/tool-%/Routing clone.
+- Shipped **v0.1.3110** — Notable `most tools N · lane · wall · preview` on Discord `/insights` + Agent Ops.
+- Ratchet keep @ 7de8c99cb; sync-dist + install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: OpenClaw session-tab / native tool-loop fidelity if clearly small — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age + chip disc/resume ages + tool-% + Routing + Notable closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age / reconnect-age / tool-% / Routing / Notable clone.
+
+## Overnight merge — v0.1.3110
+
+- Sibling Hermes Notable after Routing v0.1.3109: most tool calls turn on Discord `/insights` + Agent Ops. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26. Next: OpenClaw session-tab / native tool-loop if tiny — not another keep-pNN / section-open / insights / live-age / reconnect-age / tool-% / Routing / Notable clone.
+
 ## Overnight note 2026-11-26 ~20:05 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
