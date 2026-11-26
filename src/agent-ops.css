@@ -2017,6 +2017,22 @@ body.theme-neon #icon-agent-ops.section-open {
   background: color-mix(in srgb, var(--accent, #6dff7b) 14%, #08120c);
   border-color: color-mix(in srgb, var(--accent, #6dff7b) 32%, #08120c);
 }
+/*
+ * Futuristic (standing backlog after Neon v0.1.3096): same shared `.section-open`
+ * transparent accent wash over opaque `#0b0b10` chips when AI Chat / Monitors
+ * expand. Opaque `--accent` mixes on Futuristic field (not a second layout-daily mark).
+ */
+body.theme-futuristic #icon-monitors.section-open,
+body.theme-futuristic #icon-ollama.section-open,
+body.theme-futuristic #icon-perplexity.section-open,
+body.theme-futuristic #icon-logs.section-open,
+body.theme-futuristic #icon-disk-cleanup.section-open,
+body.theme-futuristic #icon-agent-ops.section-open {
+  opacity: 1;
+  color: var(--accent, #3bd6ff);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 14%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 32%, #0b0b10);
+}
 body.theme-data-poster #icon-discord.status-good,
 body.theme-data-poster #icon-monitors.status-good,
 body.theme-data-poster #icon-ollama.status-good,

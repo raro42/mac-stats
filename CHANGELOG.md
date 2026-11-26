@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3097] - 2026-11-26
+
+### Fixed
+- Futuristic theme: open section icons (`#icon-monitors` / `#icon-ollama` and kin) drop the shared transparent accent wash for opaque `--accent` mixes on `#0b0b10` when AI Chat / Monitors expand (same class of muddy wash as Neon v0.1.3096 / Dark v0.1.3095 / Data Poster v0.1.3094).
+
 ## [0.1.3096] - 2026-11-26
 
 ### Fixed
