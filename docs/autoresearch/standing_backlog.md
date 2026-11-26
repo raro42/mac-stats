@@ -1,3 +1,18 @@
+## Overnight note 2026-11-26 ~03:30 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Dark [DUE] deferred as mark — shipped Material section-open as standing backlog instead.
+- Sibling: OpenClaw/Hermes present; no clear tiny port this tick.
+- Debug.log: no ERROR/WARN/panic clusters in 180m window.
+- Fuel: standing backlog after Swiss v0.1.3101 — Material `#icon-monitors` / `#icon-ollama` (and kin) `.section-open` still mixed accent into `transparent` over opaque `#ebe4d9` chips when panes expand; not tip/keep-pNN/pmset clone.
+- Shipped **v0.1.3102** — opaque Material `--accent` background/border mixes on `#ebe4d9` for open section icons.
+- Ratchet keep @ e670a08a7; sync-dist + install/kickstart + push (UI).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: SoftDisabled…pmhistory + powerstate + refusal-awareness closed — remaining useful non-blocking `pmset -g` only if clearly distinct (`disk` == `custom`; `uuidlog` / logs block); or sibling session/insights port if tiny — not another keep-pNN / section-open theme clone (theme set complete).
+
+## Overnight merge — v0.1.3102
+
+- Standing-backlog Material open-section icons after Swiss v0.1.3101: drop shared transparent accent washes for opaque `--accent` on `#ebe4d9`. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26 (theme section-open series complete). Next: distinct product fuel — not another keep-pNN / section-open theme clone.
 ## Overnight note 2026-11-26 ~03:05 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
