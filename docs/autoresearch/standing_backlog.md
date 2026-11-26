@@ -1,3 +1,19 @@
+## Overnight note 2026-11-26 ~21:50 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Dark [DUE] deferred as mark.
+- Sibling: OpenClaw session serialization leftover after Replies v0.1.3112 — keyed_queue busy/tracked lived only in operator pressure JSON.
+- Debug.log: minor WARN clusters only (quality-review README noise); no ERROR/panic.
+- Fuel: sibling OpenClaw session-queue — not tip/keep-pNN/section-open/pmset/insights Sources·Activity/live-age/reconnect-age/tool-%/Routing/Notable/LLM-skips/Replies clone.
+- Shipped **v0.1.3113** — Session queue busy/tracked on Discord `/status` + `/queue` · `/session-queue`; Agent Ops Live/Version titles.
+- Ratchet keep @ 7bd88c305; sync-dist + install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: OpenClaw native tool-loop fidelity / browser session-tab if clearly small — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age + chip disc/resume ages + tool-% + Routing + Notable + LLM skips + Replies + Session queue closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age / reconnect-age / tool-% / Routing / Notable / LLM-skips / Replies / Session-queue clone.
+
+## Overnight merge — v0.1.3113
+
+- Sibling OpenClaw session-queue after Replies v0.1.3112: busy/tracked keyed-queue glance on Discord `/status` + `/queue` and Agent Ops Live/Version titles. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26. Next: OpenClaw tool-loop / session-tab if tiny — not another keep-pNN / section-open / insights / Session-queue clone.
+
 ## Overnight note 2026-11-26 ~21:25 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
