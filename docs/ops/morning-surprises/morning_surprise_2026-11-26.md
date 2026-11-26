@@ -3,6 +3,7 @@
 Overnight autoresearch kept product moves (not quiet).
 
 ## Shipped
+- **v0.1.3117** — Native tool-loop history pairing: conversation sanitize treats structured `tool_calls` (empty content, no `TOOL:` lines) like text-line tools and inserts synthetic role `tool` results when unpaired (OpenClaw/Hermes fidelity).
 - **v0.1.3116** — Close tracked browser tabs on Discord session reset: `BROWSER_NAVIGATE` + `new_tab` during a turn is tracked; `clear_session` closes those targets (OpenClaw session-tab cleanup; leaves ≥1 tab; no Chrome launch).
 - **v0.1.3115** — Discord `/browser` · `/cdp` **Warm** session-tab glance: tabs · focus · headless/visible · idle age from cached CDP (OpenClaw session-tab; Busy/Absent stay calm).
 - **v0.1.3114** — Session queue wait depth (`wait N`).
@@ -14,4 +15,4 @@ Overnight autoresearch kept product moves (not quiet).
 - uuidlog still block; SoftDisabled…pmhistory + powerstate + refusal-awareness closed.
 
 ## Next fuel
-OpenClaw native tool-loop fidelity if clearly small — SoftDisabled… + Browser Warm + close-tracked-tabs closed; not another Browser-Warm / Session-queue / close-tracked clone.
+Discord reconnect / Hermes compaction / Agent Ops design-review when due — SoftDisabled… + Browser Warm + close-tracked-tabs + native-only pairing closed; not another Browser-Warm / Session-queue / close-tracked / native-pair clone.

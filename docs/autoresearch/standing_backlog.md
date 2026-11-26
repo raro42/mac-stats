@@ -1,3 +1,19 @@
+## Overnight note 2026-11-26 ~23:30 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Dark [DUE] deferred as mark.
+- Sibling: OpenClaw native tool-loop leftover after close-tracked-tabs v0.1.3116 — conversation sanitize only paired text-line TOOL: calls; native-only tool_calls (empty content) stayed unpaired before the next user turn.
+- Debug.log: minor WARN clusters only (quality-review README noise); no ERROR/panic.
+- Fuel: sibling OpenClaw native tool-loop fidelity (repairToolUseResultPairing) — not tip/keep-pNN/section-open/pmset/insights Sources·Activity/live-age/reconnect-age/tool-%/Routing/Notable/LLM-skips/Replies/Session-queue/Browser-Warm/close-tracked clone.
+- Shipped **v0.1.3117** — sanitize treats structured `tool_calls` like text tools; inserts synthetic role `tool` results when unpaired.
+- Ratchet keep @ d25481bd4; Cargo.lock sync @ 8c3e4288f; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: Discord reconnect robustness / Hermes compaction hygiene / Agent Ops design-review when due — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age + chip disc/resume ages + tool-% + Routing + Notable + LLM skips + Replies + Session queue busy/tracked + wait depth + Browser Warm glance + close-tracked-tabs + native-only pairing closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age / reconnect-age / tool-% / Routing / Notable / LLM-skips / Replies / Session-queue / Browser-Warm / close-tracked / native-pair clone.
+
+## Overnight merge — v0.1.3117
+
+- Sibling OpenClaw native tool-loop after close-tracked-tabs v0.1.3116: sanitize pairs native-only `tool_calls` (empty content). Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26. Next: Discord reconnect / compaction / design-review when due — not another keep-pNN / section-open / insights / Session-queue / Browser-Warm / close-tracked / native-pair clone.
+
 ## Overnight note 2026-11-26 ~23:05 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
