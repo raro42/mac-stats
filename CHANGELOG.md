@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3110] - 2026-11-26
+
+### Added
+- Runs Insights / Discord `/insights` **Notable**: most tool calls turn (steps · lane · wall · preview) from `runs.jsonl` — Hermes Notable Sessions leftover after Routing (Agent Ops + gateway report).
+
 ## [0.1.3109] - 2026-11-26
 
 ### Added

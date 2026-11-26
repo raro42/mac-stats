@@ -103,6 +103,14 @@ pub struct RunsInsights {
     pub verify_scored: usize,
     /// Among `verify_scored`, how many passed.
     pub verify_pass_count: usize,
+    /// Hermes Notable leftover: max `tool_steps` on any turn (Most tool calls).
+    pub most_tools_steps: usize,
+    /// Preview of the most-tools turn (truncated question).
+    pub most_tools_preview: String,
+    /// Wall ms of the most-tools turn.
+    pub most_tools_wall_ms: u64,
+    /// Lane of the most-tools turn.
+    pub most_tools_lane: String,
     pub candidates: Vec<RunInsightCandidate>,
     pub slowest: Vec<RunTurnSummary>,
     pub recent: Vec<RunTurnSummary>,
@@ -457,6 +465,10 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         avg_tool_steps: 0.0,
         verify_scored: 0,
         verify_pass_count: 0,
+        most_tools_steps: 0,
+        most_tools_preview: String::new(),
+        most_tools_wall_ms: 0,
+        most_tools_lane: String::new(),
         candidates: vec![],
         slowest: vec![],
         recent: vec![],
@@ -495,6 +507,10 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
     let mut tool_steps_sum: u64 = 0;
     let mut verify_scored = 0usize;
     let mut verify_pass_count = 0usize;
+    let mut most_tools_steps = 0usize;
+    let mut most_tools_preview = String::new();
+    let mut most_tools_wall_ms = 0u64;
+    let mut most_tools_lane = String::new();
 
     for line in text.lines() {
         let line = line.trim();
@@ -557,10 +573,11 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         {
             pre_routed_count += 1;
         }
-        tool_steps_sum += v
+        let tool_steps = v
             .get("tool_steps")
             .and_then(|x| x.as_u64())
             .unwrap_or(0);
+        tool_steps_sum += tool_steps;
         if let Some(passed) = v.get("verify_passed").and_then(|x| x.as_bool()) {
             verify_scored += 1;
             if passed {
@@ -577,6 +594,14 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
             .and_then(|x| x.as_str())
             .unwrap_or("")
             .to_string();
+        // Hermes Notable: prefer tool_steps; fall back to tools.len() when steps missing.
+        let notable_steps = (tool_steps as usize).max(tools.len());
+        if notable_steps > most_tools_steps {
+            most_tools_steps = notable_steps;
+            most_tools_wall_ms = wall;
+            most_tools_lane = lane.clone();
+            most_tools_preview = question_preview.chars().take(48).collect();
+        }
         if let Some(c) = classify_candidate(&lane, wall, &tools, &question_preview, &request_id) {
             candidates.push(c);
         }
@@ -662,6 +687,10 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         avg_tool_steps,
         verify_scored,
         verify_pass_count,
+        most_tools_steps,
+        most_tools_preview,
+        most_tools_wall_ms,
+        most_tools_lane,
         candidates,
         slowest,
         recent,

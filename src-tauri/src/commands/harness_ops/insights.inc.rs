@@ -65,6 +65,32 @@ pub(super) fn format_routing_insights_line(insights: &RunsInsights) -> String {
     line
 }
 
+/// Hermes Notable leftover: Most tool calls turn (steps · lane · wall · preview).
+pub(super) fn format_notable_insights_line(insights: &RunsInsights) -> String {
+    if insights.most_tools_steps == 0 {
+        return "Notable: **no tools yet**".into();
+    }
+    let wall = if insights.most_tools_wall_ms >= 1000 {
+        format!("{:.1}s", insights.most_tools_wall_ms as f64 / 1000.0)
+    } else {
+        format!("{} ms", insights.most_tools_wall_ms)
+    };
+    let lane = if insights.most_tools_lane.is_empty() {
+        "?"
+    } else {
+        insights.most_tools_lane.as_str()
+    };
+    let preview = if insights.most_tools_preview.is_empty() {
+        "(empty)".to_string()
+    } else {
+        insights.most_tools_preview.clone()
+    };
+    format!(
+        "Notable: most tools **{}** · {} · {} · {}",
+        insights.most_tools_steps, lane, wall, preview
+    )
+}
+
 /// Short Discord/gateway report (Hermes `/insights` lite).
 pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     let mut lines = Vec::new();
@@ -224,6 +250,10 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     // Hermes overview leftover — pre-route share · avg tool steps · verify pass (runs.jsonl).
     if insights.turns > 0 {
         lines.push(format_routing_insights_line(insights));
+    }
+    // Hermes Notable leftover — Most tool calls turn (runs.jsonl tool_steps).
+    if insights.turns > 0 {
+        lines.push(format_notable_insights_line(insights));
     }
     if !insights.slowest.is_empty() {
         lines.push("**Slowest**".into());

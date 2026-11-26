@@ -8272,4 +8272,25 @@ mod tests {
         assert!(text.contains("Routing:"), "got: {text}");
         assert!(text.contains("pre-routed **4** (40.0%)"), "got: {text}");
     }
+
+    #[test]
+    fn format_notable_insights_hermes_most_tools() {
+        let mut insights = compute_runs_insights(1);
+        insights.turns = 3;
+        insights.most_tools_steps = 15;
+        insights.most_tools_lane = "direct".into();
+        insights.most_tools_wall_ms = 35586;
+        insights.most_tools_preview = "Current task file content".into();
+        let line = format_notable_insights_line(&insights);
+        assert!(line.contains("most tools **15**"), "got: {line}");
+        assert!(line.contains("direct"), "got: {line}");
+        assert!(line.contains("35.6s"), "got: {line}");
+        assert!(line.contains("Current task file content"), "got: {line}");
+        let text = format_runs_insights_gateway(&insights);
+        assert!(text.contains("Notable:"), "got: {text}");
+        assert!(text.contains("most tools **15**"), "got: {text}");
+        insights.most_tools_steps = 0;
+        let empty = format_notable_insights_line(&insights);
+        assert!(empty.contains("no tools yet"), "got: {empty}");
+    }
 }

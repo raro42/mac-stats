@@ -5490,6 +5490,17 @@ function formatRoutingInsightsLine(insights) {
     return line;
 }
 
+/** Hermes Notable leftover — Most tool calls turn (steps · lane · wall · preview). */
+function formatNotableInsightsLine(insights) {
+    const steps = Number(insights?.most_tools_steps) || 0;
+    if (steps <= 0) return 'no tools yet';
+    const wallMs = Number(insights?.most_tools_wall_ms) || 0;
+    const wall = wallMs >= 1000 ? `${(wallMs / 1000).toFixed(1)}s` : `${Math.round(wallMs)} ms`;
+    const lane = String(insights?.most_tools_lane || '').trim() || '?';
+    const preview = String(insights?.most_tools_preview || '').trim() || '(empty)';
+    return `most tools ${steps} · ${lane} · ${wall} · ${preview}`;
+}
+
 function fmtAge(ms) {
     // Empty age: match run meta "Unknown" (bare blank / em dash reads like missing data).
     if (!ms) return 'Unknown';
@@ -5825,6 +5836,9 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
             }
             if (Number(insights.turns) > 0) {
                 latBits.push(`route ${formatRoutingInsightsLine(insights)}`);
+            }
+            if (Number(insights.most_tools_steps) > 0) {
+                latBits.push(`notable ${formatNotableInsightsLine(insights)}`);
             }
         }
         const hintLines = hints.length ? hints.slice(0, 5) : [];
@@ -10451,6 +10465,42 @@ function renderOpsRuns(insights) {
                 empty.innerHTML =
                     `<div class="ops-empty-filter-title">No routing yet</div>` +
                     `<div class="ops-empty-tab-hint">Pre-routed share · avg tools · verify appear after turns land</div>`;
+                card.appendChild(empty);
+            }
+        }
+        {
+            // Notable (Hermes leftover) — Most tool calls turn from runs.jsonl.
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Notable';
+            card.appendChild(sub);
+            const turnsN = Number(insights.turns) || 0;
+            const mostSteps = Number(insights.most_tools_steps) || 0;
+            if (turnsN > 0 && mostSteps > 0) {
+                const notableEl = document.createElement('div');
+                notableEl.className = 'ops-row-meta';
+                notableEl.textContent = formatNotableInsightsLine(insights);
+                notableEl.title = 'Hermes Notable — turn with the most tool steps';
+                card.appendChild(notableEl);
+            } else if (turnsN > 0) {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Most-tools turn appears after a turn uses tools';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No tools yet</div>` +
+                    `<div class="ops-empty-tab-hint">Most tool calls appears after a turn uses tools</div>`;
+                card.appendChild(empty);
+            } else {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Notable appears after Discord or chat turns land';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No notable yet</div>` +
+                    `<div class="ops-empty-tab-hint">Most tool calls appears after turns land</div>`;
                 card.appendChild(empty);
             }
         }
