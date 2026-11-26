@@ -1,3 +1,18 @@
+## Overnight note 2026-11-26 ~01:50 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Architect [idle] deferred as mark — shipped Architect section-open as standing backlog instead.
+- Sibling: OpenClaw/Hermes present; no clear tiny port this tick.
+- Debug.log: no ERROR/WARN/panic clusters in 180m window.
+- Fuel: standing backlog after Futuristic v0.1.3097 — Architect `#icon-monitors` / `#icon-ollama` (and kin) `.section-open` still mixed accent into `transparent` over opaque `#f1f1f1` chips when panes expand; not tip/keep-pNN/pmset clone.
+- Shipped **v0.1.3098** — opaque Architect `--accent` background/border mixes on `#f1f1f1` for open section icons.
+- Ratchet keep @ 4800f9f4c; sync-dist + install/kickstart + push (UI).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: Apple/Light/Swiss/Material section-open opaque remaps (same class) · SoftDisabled…pmhistory + powerstate + refusal-awareness closed — remaining useful non-blocking `pmset -g` only if clearly distinct (`disk` == `custom`; `uuidlog` / logs block); not another keep-pNN clone.
+
+## Overnight merge — v0.1.3098
+
+- Standing-backlog Architect open-section icons after Futuristic v0.1.3097: drop shared transparent accent washes for opaque `--accent` on `#f1f1f1`. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26 (Apple/Light next). Next: Apple/Light/Swiss/Material section-open — not another keep-pNN clone.
 ## Overnight note 2026-11-26 ~01:25 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
