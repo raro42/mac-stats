@@ -1,3 +1,18 @@
+## Overnight note 2026-11-26 ~05:15 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-26 (due=false); Dark [DUE] deferred as mark.
+- Sibling: next fuel was session/resume after Insights Activity v0.1.3105.
+- Debug.log: no ERROR/WARN/panic clusters in 180m window.
+- Fuel: sibling session/resume — live Sessions rows still showed raw RFC3339 while saved Files used fmtAge; not tip/keep-pNN/section-open/pmset/insights clone.
+- Shipped **v0.1.3106** — Agent Ops live last-activity relative age (Sessions + Overview Live); RFC3339 on title hover.
+- Ratchet keep @ c96d77bf2; sync-dist + install/kickstart + push (UI).
+- Morning surprise: refresh 2026-11-26 + archive.
+- Next fuel: OpenClaw Discord reconnect (chip last disc/resume ages) or Hermes tool-% if tiny — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age clone.
+
+## Overnight merge — v0.1.3106
+
+- Sibling session/resume after Insights Activity v0.1.3105: live Sessions + Overview Live show relative last-activity age like saved Files. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-26. Next: Discord reconnect chip ages or Hermes tool-% if tiny — not another keep-pNN / section-open / insights Sources·Activity / live-age clone.
 ## Overnight note 2026-11-26 ~04:50 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
