@@ -1,3 +1,19 @@
+## Overnight note 2026-11-28 ~00:20 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace).
+- Layout daily: due=true → **data-poster** (missing_remaps=none; screen missing / new day).
+- Sibling/standing: Monitors settings empty + summary still cold ("No monitors configured") while list empty already **Nothing watching yet**.
+- Debug.log: single-instance WARN only (pre-ship).
+- Fuel: layout-daily Monitors empty Nothing watching yet — not tip/keep-pNN/section-open/pmset/insights/Warm/Longest/Quiet-*/Empty-*/tab-empty/tracked/owner/last-fail/focus-page/Most-reply/open-scroll clone.
+- Shipped **v0.1.3144** — Monitors settings + summary **Nothing watching yet** (+ aria); list empty parity.
+- Ratchet keep @ 11ae6c66a; install/kickstart + push (runtime). Layout marked data-poster 2026-11-28.
+- Morning surprise: refresh 2026-11-28 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet-* + Empty-* + tab Quiet + Monitors Nothing-watching + tracked sessions + active owner + last-fail + focus-page + Most reply + Ops open-scroll closed; uuidlog remains block; not another insights/Warm/Quiet-*/Empty-*/tab-empty/Monitors-empty/tracked-sessions/owner/last-fail/focus-page/Most-reply/open-scroll clone.
+
+## Overnight merge — v0.1.3144
+
+- Layout-daily Data Poster Monitors empty after tab Quiet parity v0.1.3143: settings+summary Nothing watching yet. Digester empty; design-review grace; layout-daily marked 2026-11-28. Next: Dark layout-daily / Agent Ops recapture when TCC allows — not another Quiet-*/Empty-*/Monitors-empty clone.
+
 ## Overnight note 2026-11-27 ~23:52 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace) — proceeded: standing backlog pointed at tab empty leftover after Empty ledger v0.1.3142.
