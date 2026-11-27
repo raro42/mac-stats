@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3145] - 2026-11-28
+
+### Changed
+- Disk Cleanup scopes empty: **Nothing to tidy yet** (+ aria; list empty **Nothing to reclaim yet** parity; drop cold “No scopes yet”).
+
 ## [0.1.3144] - 2026-11-28
 
 ### Changed

@@ -21505,7 +21505,7 @@ function applyDiskCleanupEnabledScopesCardState(enabledCount, totalCount) {
     card.title = 'Click to add a cleanup scope';
     card.setAttribute(
       'aria-label',
-      'No scopes yet — click to add a cleanup path'
+      'Nothing to tidy yet — click to add a cleanup path'
     );
   }
   refreshDiskCleanupMetaRovingTabindex();
@@ -22241,8 +22241,8 @@ function renderDiskCleanupScopesEmpty(scopesEl) {
   if (!wrap) {
     scopesEl.innerHTML =
       `<div class="disk-cleanup-empty disk-cleanup-scopes-empty" role="status">` +
-      `<div class="disk-cleanup-empty-msg">No scopes yet</div>` +
-      `<div class="disk-cleanup-empty-hint">Add a path below. Built-in scopes show here after a refresh.</div>` +
+      `<div class="disk-cleanup-empty-msg">Nothing to tidy yet</div>` +
+      `<div class="disk-cleanup-empty-hint">Add a path below — built-ins show after a refresh.</div>` +
       `<button type="button" class="disk-cleanup-empty-cta">Add a scope</button>` +
       `</div>`;
     wrap = scopesEl.querySelector('.disk-cleanup-scopes-empty');
