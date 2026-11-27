@@ -1,24 +1,33 @@
 # Morning surprise — 2026-11-27
 
-Overnight autoresearch kept shipping while digester open stayed empty.
+Overnight autoresearch (Track B) kept shipping while digester open stayed empty.
 
-## Shipped (highlights)
+## Shipped tonight (keep)
 
-- **v0.1.3142** — Agent Ops Overview **Runs** empty: **Empty ledger** + Ready wash (Empty roster parity; not Quiet-*).
-- **v0.1.3141** — Agent Ops Overview **Agents** empty: **Empty roster** + Ready wash (not another Quiet-* name).
-- **v0.1.3140** — Schedules empty **Quiet board**.
-- **v0.1.3139** — Knowledge empty **Quiet vault**.
-- **v0.1.3138** — Recent empty **Quiet shelf**.
-- **v0.1.3137** — `?open=agent-ops` scrolls Ops into view.
-- **v0.1.3136** — Insights **Most reply** (Hermes leftover).
-- Earlier night: browser Warm page/last-fail/owner/tracked · insights Longest/Tool calls · Quiet desk.
+| Version | What |
+|--------|------|
+| **v0.1.3143** | Agent Ops Schedules · Sessions · Knowledge **tab** empties: Quiet board / Quiet desk / Quiet vault (Overview parity) |
+| **v0.1.3142** | Overview Runs empty: Empty ledger |
+| **v0.1.3141** | Overview Agents empty: Empty roster |
+| **v0.1.3140** | Overview Schedules empty: Quiet board |
+| **v0.1.3139** | Overview Knowledge empty: Quiet vault |
+| **v0.1.3138** | Overview Recent empty: Quiet shelf |
+| **v0.1.3137** | `?open=agent-ops` scrolls Ops into view |
+| **v0.1.3136** | `/insights` Most reply (Hermes Notable leftover) |
+| **v0.1.3135** | `/browser` Warm page host |
+| **v0.1.3134** | `/browser` Ready/Busy last fail |
 
-## Tried / deferred
+## Fuel notes
 
-- Agent Ops `feature-agent-ops.png` recapture still TCC-blocked (`screencapture -l`).
-- Dark layout-daily still [DUE] for next calendar day (data-poster already marked today).
-- uuidlog / SoftDisabled pmset adapters remain blocked.
+- Digester open: empty all night (0 Slowest / 7d).
+- Design review: grace (Agent Ops); polish without fresh screenshot (Screen Recording TCC blocked `screencapture -l`).
+- Layout daily: data-poster marked 2026-11-27; Dark still due next calendar day.
+- SoftDisabled… / uuidlog remain blocked (not pmset-log adapters).
 
 ## Next
 
-Dark layout-daily · Agent Ops recapture when TCC allows · OpenClaw leftover if tiny — not another Quiet-*/Empty-roster/Empty-ledger clone.
+- Dark layout-daily next calendar day
+- Agent Ops recapture when TCC allows
+- OpenClaw leftover only if tiny and not another Quiet-*/Empty-*/tab-empty clone
+
+Generated: 2026-11-27T23:53:10+01:00

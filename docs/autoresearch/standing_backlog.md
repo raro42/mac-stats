@@ -1,3 +1,18 @@
+## Overnight note 2026-11-27 ~23:52 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace) — proceeded: standing backlog pointed at tab empty leftover after Empty ledger v0.1.3142.
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Sibling/standing: Schedules · Sessions · Knowledge **tabs** still cold ("No schedules yet" / "No live sessions" / "No knowledge files yet") while Overview Quiet board / Quiet desk / Quiet vault already calm.
+- Debug.log: single-instance WARN only (pre-ship).
+- Fuel: design-review leftover Agent Ops tab empty Quiet board/desk/vault parity — not tip/keep-pNN/section-open/pmset/insights/Warm/Longest/Quiet-*/Empty-*/tracked/owner/last-fail/focus-page/Most-reply/open-scroll clone (tab titles only).
+- Shipped **v0.1.3143** — Schedules · Sessions · Knowledge tab empties **Quiet board / Quiet desk / Quiet vault** + warmer copy (Overview empty parity).
+- Ratchet keep @ 2a08340ee; install/kickstart + push (runtime). Capture of feature-agent-ops.png deferred (Screen Recording TCC / screencapture -l).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet desk + Quiet shelf + Quiet vault + Quiet board + Empty roster + Empty ledger + tab Quiet board/desk/vault + tracked sessions + active owner + last-fail + focus-page + Most reply + Ops open-scroll closed; uuidlog remains block; not another insights/Warm/Quiet-*/Empty-*/tab-empty/tracked-sessions/owner/last-fail/focus-page/Most-reply/open-scroll clone.
+
+## Overnight merge — v0.1.3143
+
+- Design-review leftover tab empties after Empty ledger v0.1.3142: Quiet board/desk/vault titles on Schedules · Sessions · Knowledge tabs. Digester empty; design-review slot used; layout-daily data-poster marked 2026-11-27. Next: Dark layout-daily / Agent Ops recapture when TCC allows — not another Quiet-*/Empty-*/tab-empty clone.
 ## Overnight note 2026-11-27 ~23:26 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace) — proceeded: standing backlog pointed at Agent Ops after Empty roster v0.1.3141.
