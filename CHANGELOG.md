@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3131] - 2026-11-27
+
+### Added
+- Discord `/browser` · `/cdp`: show **N sess** beside tracked tabs when close-on-reset tabs span more than one session key (OpenClaw per-session map leftover; calm omit when a single session).
+
 ## [0.1.3130] - 2026-11-27
 
 ### Changed

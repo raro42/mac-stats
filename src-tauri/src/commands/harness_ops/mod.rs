@@ -123,6 +123,7 @@ mod tests {
             "Google Chrome",
             CachedBrowserSessionGlance::Absent,
             0,
+            0,
             None,
         );
         assert!(
@@ -134,6 +135,7 @@ mod tests {
             9222,
             "Google Chrome",
             CachedBrowserSessionGlance::Busy,
+            0,
             0,
             None,
         );
@@ -152,6 +154,7 @@ mod tests {
                 headless: true,
                 chrome_pid: Some(4242),
             },
+            0,
             0,
             None,
         );
@@ -175,6 +178,7 @@ mod tests {
                 chrome_pid: None,
             },
             2,
+            1,
             Some(125),
         );
         assert!(warm_m.contains("visible"), "{warm_m}");
@@ -183,17 +187,37 @@ mod tests {
         assert!(!warm_m.contains("pid"), "{warm_m}");
         assert!(warm_m.contains("tracked **2**"), "{warm_m}");
         assert!(warm_m.contains("oldest 2m"), "{warm_m}");
+        assert!(
+            !warm_m.contains("sess"),
+            "single-session tracked stays calm: {warm_m}"
+        );
+        let multi_sess = format_browser_ready_chip_with_glance(
+            9222,
+            "Google Chrome",
+            CachedBrowserSessionGlance::Absent,
+            3,
+            2,
+            Some(40),
+        );
+        assert!(
+            multi_sess.contains("tracked **3**")
+                && multi_sess.contains("**2** sess")
+                && multi_sess.contains("oldest 40s"),
+            "{multi_sess}"
+        );
         let absent_tracked = format_browser_ready_chip_with_glance(
             9222,
             "Google Chrome",
             CachedBrowserSessionGlance::Absent,
+            1,
             1,
             Some(12),
         );
         assert!(
             absent_tracked.contains("idle until BROWSER_*")
                 && absent_tracked.contains("tracked **1**")
-                && absent_tracked.contains("oldest 12s"),
+                && absent_tracked.contains("oldest 12s")
+                && !absent_tracked.contains("sess"),
             "{absent_tracked}"
         );
         // Count without age stays calm (omit oldest).
@@ -202,6 +226,7 @@ mod tests {
             "Google Chrome",
             CachedBrowserSessionGlance::Absent,
             3,
+            1,
             None,
         );
         assert!(

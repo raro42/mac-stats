@@ -158,6 +158,15 @@ pub fn count_tracked_tabs_total() -> usize {
     map.values().map(|s| s.len()).sum()
 }
 
+/// Session keys with ≥1 tracked tab (OpenClaw per-session map leftover).
+/// Distinct from tab count — two Discord channels can each hold close-on-reset tabs.
+pub fn count_tracked_sessions() -> usize {
+    let Ok(map) = tracked_tabs().lock() else {
+        return 0;
+    };
+    map.values().filter(|s| !s.is_empty()).count()
+}
+
 /// Age in seconds of the oldest tracked tab (OpenClaw `trackedAt` leftover).
 /// `None` when nothing is tracked.
 pub fn oldest_tracked_age_secs() -> Option<u64> {
@@ -213,11 +222,28 @@ mod tests {
         track_for_active_session("");
         assert_eq!(count_tracked_for_session("discord-1"), 2);
         assert_eq!(count_tracked_tabs_total(), 2);
+        assert_eq!(count_tracked_sessions(), 1);
 
         let taken = take_tracked_for_session("discord-1");
         assert_eq!(taken.len(), 2);
         assert_eq!(count_tracked_for_session("discord-1"), 0);
         assert_eq!(count_tracked_tabs_total(), 0);
+        assert_eq!(count_tracked_sessions(), 0);
+        reset_for_tests();
+    }
+
+    #[test]
+    fn count_tracked_sessions_spans_keys() {
+        let _lock = registry_test_lock();
+        reset_for_tests();
+        let _g1 = ActiveBrowserSessionGuard::enter(Some(1));
+        track_for_active_session("a");
+        drop(_g1);
+        let _g2 = ActiveBrowserSessionGuard::enter(Some(2));
+        track_for_active_session("b");
+        track_for_active_session("c");
+        assert_eq!(count_tracked_tabs_total(), 3);
+        assert_eq!(count_tracked_sessions(), 2);
         reset_for_tests();
     }
 
