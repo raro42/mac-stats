@@ -1,3 +1,19 @@
+## Overnight note 2026-11-27 ~03:30 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Sibling/standing: OpenClaw startedAt leftover after Channels v0.1.3125 — `/browser` · `/cdp` Warm showed idle (last_used) but not Chrome spawn lifetime (`created` Instant / OpenClaw `RunningChrome.startedAt`).
+- Debug.log: no ERROR/WARN/panic clusters in window.
+- Fuel: sibling OpenClaw Warm up age — not tip/keep-pNN/section-open/pmset/insights Sources·Activity/live-age/reconnect-age/tool-%/Routing/Notable/LLM-skips/Replies/Session-queue/Browser-Warm/close-tracked/native-pair/last-reconnect/compaction-flush/tracked-glance/sessions-idle/tracked-oldest/Active-time/Period/Channels clone.
+- Shipped **v0.1.3126** — Discord `/browser` · `/cdp` Warm show `up` age beside `idle` (OpenClaw startedAt).
+- Ratchet keep @ 69fea3c90; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Agent Ops design-review when due / Dark layout-daily / Hermes leftover if tiny — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age + chip disc/resume ages + tool-% + Routing + Notable + LLM skips + Replies + Session queue busy/tracked + wait depth + Browser Warm glance + close-tracked-tabs + native-only pairing + last reconnect duration + periodic compaction flush/TODO + browser tracked glance + sessions idle glance + trackedAt oldest + Active time + Period + Channels + Warm up age closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age / reconnect-age / tool-% / Routing / Notable / LLM-skips / Replies / Session-queue / Browser-Warm / close-tracked / native-pair / last-reconnect / compaction-flush / tracked-glance / sessions-idle / tracked-oldest / Active-time / Period / Channels / Warm-up clone.
+
+## Overnight merge — v0.1.3126
+
+- Sibling OpenClaw startedAt after Channels v0.1.3125: `/browser` · `/cdp` Warm show up age beside idle. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-27. Next: Agent Ops design-review when due / Dark layout — not another keep-pNN / section-open / insights / Session-queue / last-reconnect / compaction-flush / tracked-glance / sessions-idle / tracked-oldest / Active-time / Period / Channels / Warm-up clone.
+
 ## Overnight note 2026-11-27 ~03:00 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).

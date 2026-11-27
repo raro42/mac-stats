@@ -3,6 +3,7 @@
 Overnight autoresearch kept product moves (not quiet).
 
 ## Shipped
+- **v0.1.3126** — Discord `/browser` · `/cdp` **Warm**: show **up** age (Chrome spawn; OpenClaw `startedAt`) beside **idle** (last BROWSER_* use).
 - **v0.1.3125** — Runs Insights / Discord `/insights`: **Channels** distinct Discord `channel_id` count · busiest share (Hermes Platforms leftover after Sources; calm when none).
 - **v0.1.3124** — Runs Insights / Discord `/insights`: **Period** first → last local day from `runs.jsonl` `ts` (Hermes Period leftover; calm when no dates).
 - **v0.1.3123** — Runs Insights / Discord `/insights`: **Active** total wall time · avg turn from `runs.jsonl` `wall_ms` (Hermes Active time leftover; calm when no turns).
@@ -23,4 +24,4 @@ Overnight autoresearch kept product moves (not quiet).
 - uuidlog still block; SoftDisabled…pmhistory + powerstate + refusal-awareness closed.
 
 ## Next fuel
-Agent Ops design-review when due / Dark layout-daily / OpenClaw leftover if tiny — SoftDisabled… + Browser Warm + close-tracked + native-pair + last-reconnect + periodic compaction flush/TODO + browser tracked glance + sessions idle glance + trackedAt oldest + Active time + Period + Channels closed; not another Active-time / Period / Channels / sessions-idle / tracked-glance / tracked-oldest / last-reconnect / compaction-flush / Session-queue clone.
+Agent Ops design-review when due / Dark layout-daily / Hermes leftover if tiny — SoftDisabled… + Browser Warm + close-tracked + native-pair + last-reconnect + periodic compaction flush/TODO + browser tracked glance + sessions idle glance + trackedAt oldest + Active time + Period + Channels + Warm up age closed; not another Active-time / Period / Channels / sessions-idle / tracked-glance / tracked-oldest / last-reconnect / compaction-flush / Session-queue / Warm-up clone.
