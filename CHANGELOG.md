@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3135] - 2026-11-27
+
+### Added
+- Discord `/browser` · `/cdp` **Warm**: show **page** host for the focused tab when known (OpenClaw session-tab page leftover; calm omit on blank / Chrome-internal URLs).
+
 ## [0.1.3134] - 2026-11-27
 
 ### Added

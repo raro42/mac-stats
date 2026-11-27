@@ -155,6 +155,7 @@ mod tests {
             CachedBrowserSessionGlance::Warm {
                 tab_count: 3,
                 focus_index: 1,
+                focus_host: Some("example.com".into()),
                 up_secs: 300,
                 idle_secs: 45,
                 headless: true,
@@ -169,6 +170,7 @@ mod tests {
         assert!(warm.contains("Warm"), "{warm}");
         assert!(warm.contains("tabs **3**"), "{warm}");
         assert!(warm.contains("focus **1**"), "{warm}");
+        assert!(warm.contains("page **example.com**"), "{warm}");
         assert!(warm.contains("headless"), "{warm}");
         assert!(warm.contains("up 5m"), "{warm}");
         assert!(warm.contains("idle 45s"), "{warm}");
@@ -184,6 +186,7 @@ mod tests {
             CachedBrowserSessionGlance::Warm {
                 tab_count: 1,
                 focus_index: 0,
+                focus_host: None,
                 up_secs: 90,
                 idle_secs: 120,
                 headless: false,
@@ -199,6 +202,10 @@ mod tests {
         assert!(warm_m.contains("up 1m"), "{warm_m}");
         assert!(warm_m.contains("idle 2m"), "{warm_m}");
         assert!(!warm_m.contains("pid"), "{warm_m}");
+        assert!(
+            !warm_m.contains("page "),
+            "blank focus host stays calm: {warm_m}"
+        );
         assert!(warm_m.contains("tracked **2**"), "{warm_m}");
         assert!(warm_m.contains("oldest 2m"), "{warm_m}");
         assert!(
@@ -260,6 +267,7 @@ mod tests {
             CachedBrowserSessionGlance::Warm {
                 tab_count: 1,
                 focus_index: 0,
+                focus_host: Some("docs.example.org".into()),
                 up_secs: 10,
                 idle_secs: 2,
                 headless: true,
@@ -270,6 +278,10 @@ mod tests {
             Some(5),
             Some("discord-42"),
             None,
+        );
+        assert!(
+            with_owner.contains("page **docs.example.org**"),
+            "{with_owner}"
         );
         assert!(
             with_owner.contains("owner **discord-42**")

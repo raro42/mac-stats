@@ -4896,7 +4896,7 @@ fn browser_session() -> &'static Mutex<Option<(Browser, Instant, Instant, bool)>
 }
 
 /// OpenClaw-style session-tab glance: cached CDP tabs without a `/json/version` probe.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CachedBrowserSessionGlance {
     /// No `BROWSER_SESSION` held.
     Absent,
@@ -4906,6 +4906,8 @@ pub enum CachedBrowserSessionGlance {
     Warm {
         tab_count: usize,
         focus_index: usize,
+        /// Host of the focused tab URL when known (OpenClaw session-tab page leftover; omit blank/internal).
+        focus_host: Option<String>,
         /// Seconds since Chrome was spawned (OpenClaw `RunningChrome.startedAt`).
         up_secs: u64,
         idle_secs: u64,
@@ -5035,6 +5037,22 @@ fn close_cached_tabs_by_target_ids(targets: &[String]) -> (usize, Vec<String>) {
     (closed, leftover)
 }
 
+/// Host for `/browser` Warm focus glance — skip blank / Chrome-internal pages.
+fn focus_page_host_for_glance(url: &str) -> Option<String> {
+    let u = Url::parse(url.trim()).ok()?;
+    match u.scheme() {
+        "about" | "chrome" | "chrome-error" | "chrome-extension" | "data" | "devtools" | "blob" => {
+            return None;
+        }
+        _ => {}
+    }
+    let host = u.host_str()?.trim();
+    if host.is_empty() {
+        return None;
+    }
+    Some(host.to_string())
+}
+
 /// Non-blocking peek at the cached automation browser (OpenClaw session-tab lens).
 ///
 /// Uses `try_lock` only — never opens CDP or waits on an in-flight BROWSER_* call.
@@ -5047,19 +5065,29 @@ pub fn snapshot_cached_browser_session() -> CachedBrowserSessionGlance {
     let Some((browser, created, last_used, headless)) = guard.as_ref() else {
         return CachedBrowserSessionGlance::Absent;
     };
-    let tab_count = match browser.get_tabs().try_lock() {
-        Ok(tabs) => tabs.len(),
-        Err(std::sync::TryLockError::WouldBlock) => return CachedBrowserSessionGlance::Busy,
-        Err(std::sync::TryLockError::Poisoned(p)) => p.into_inner().len(),
-    };
     let focus_raw = current_tab_index()
         .lock()
         .map(|g| *g)
         .unwrap_or(0);
-    let focus_index = if tab_count == 0 {
-        0
-    } else {
-        focus_raw.min(tab_count - 1)
+    let (tab_count, focus_index, focus_host) = match browser.get_tabs().try_lock() {
+        Ok(tabs) => {
+            let n = tabs.len();
+            let idx = if n == 0 { 0 } else { focus_raw.min(n - 1) };
+            let host = tabs
+                .get(idx)
+                .and_then(|t| focus_page_host_for_glance(t.get_url().as_str()));
+            (n, idx, host)
+        }
+        Err(std::sync::TryLockError::WouldBlock) => return CachedBrowserSessionGlance::Busy,
+        Err(std::sync::TryLockError::Poisoned(p)) => {
+            let tabs = p.into_inner();
+            let n = tabs.len();
+            let idx = if n == 0 { 0 } else { focus_raw.min(n - 1) };
+            let host = tabs
+                .get(idx)
+                .and_then(|t| focus_page_host_for_glance(t.get_url().as_str()));
+            (n, idx, host)
+        }
     };
     // Prefer headless_chrome child PID; fall back to owned visible spawn tracker.
     let chrome_pid = browser
@@ -5076,6 +5104,7 @@ pub fn snapshot_cached_browser_session() -> CachedBrowserSessionGlance {
     CachedBrowserSessionGlance::Warm {
         tab_count,
         focus_index,
+        focus_host,
         up_secs: created.elapsed().as_secs(),
         idle_secs: last_used.elapsed().as_secs(),
         headless: *headless,

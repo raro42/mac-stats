@@ -405,3 +405,15 @@ use super::*;
     fn managed_tab_cap_focus_index_clamps_high() {
         assert_eq!(new_focus_index_after_close(10, 0, 3), 2);
     }
+
+    #[test]
+    fn focus_page_host_for_glance_skips_blank_and_keeps_http() {
+        assert_eq!(
+            focus_page_host_for_glance("https://example.com/path?q=1"),
+            Some("example.com".into())
+        );
+        assert_eq!(focus_page_host_for_glance("about:blank"), None);
+        assert_eq!(focus_page_host_for_glance("chrome://newtab/"), None);
+        assert_eq!(focus_page_host_for_glance("chrome-error://chromewebdata/"), None);
+        assert_eq!(focus_page_host_for_glance(""), None);
+    }
