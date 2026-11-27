@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3140] - 2026-11-27
+
+### Changed
+- Agent Ops Overview **Schedules** empty: **Quiet board** title + warmer copy; Ready (ok) wash instead of amber warn (Quiet vault parity).
+
 ## [0.1.3139] - 2026-11-27
 
 ### Changed

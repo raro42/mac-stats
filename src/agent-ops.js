@@ -6893,8 +6893,9 @@ function setOverviewSchedulesStatus(schedules, deliveries) {
     if (!card) return;
     card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
     if (!schedules || !schedules.length) {
-        card.classList.add('ops-health-warn');
-        card.title = 'No schedules yet';
+        // Idle Schedules is calm (Quiet vault parity) — empty board is Ready, not amber warn.
+        card.classList.add('ops-health-ok');
+        card.title = 'Quiet board — cron and at-jobs show up when you add them';
         return;
     }
     let deliveryAgeMs = NaN;
@@ -6932,11 +6933,13 @@ function renderOverviewSchedules(schedules, deliveries) {
     body.innerHTML = '';
     setOverviewSchedulesStatus(schedules, deliveries);
     if (!schedules || !schedules.length) {
-        paintOpsOverviewHeadCount('ops-overview-schedules', 'None yet', { zero: true });
+        // Design-review feature-agent-ops: warm Schedules empty (Quiet vault parity; drop stacked "No schedules…").
+        paintOpsOverviewHeadCount('ops-overview-schedules', 'Quiet', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
-          'No schedules yet — add one on the Schedules tab',
+          'Quiet for now — cron and at-jobs land here when you add them',
           'schedules',
-          'Open Schedules'
+          'Open Schedules',
+          'Quiet board'
         );
         return;
     }
