@@ -125,18 +125,21 @@ mod tests {
             0,
             0,
             None,
+            None,
         );
         assert!(
             absent.contains("Ready") && absent.contains("idle until BROWSER_*"),
             "{absent}"
         );
         assert!(!absent.contains("tracked"), "{absent}");
+        assert!(!absent.contains("owner"), "{absent}");
         let busy = format_browser_ready_chip_with_glance(
             9222,
             "Google Chrome",
             CachedBrowserSessionGlance::Busy,
             0,
             0,
+            None,
             None,
         );
         assert!(
@@ -156,6 +159,7 @@ mod tests {
             },
             0,
             0,
+            None,
             None,
         );
         assert!(warm.contains("Warm"), "{warm}");
@@ -180,6 +184,7 @@ mod tests {
             2,
             1,
             Some(125),
+            None,
         );
         assert!(warm_m.contains("visible"), "{warm_m}");
         assert!(warm_m.contains("up 1m"), "{warm_m}");
@@ -198,6 +203,7 @@ mod tests {
             3,
             2,
             Some(40),
+            None,
         );
         assert!(
             multi_sess.contains("tracked **3**")
@@ -212,6 +218,7 @@ mod tests {
             1,
             1,
             Some(12),
+            None,
         );
         assert!(
             absent_tracked.contains("idle until BROWSER_*")
@@ -228,10 +235,47 @@ mod tests {
             3,
             1,
             None,
+            None,
         );
         assert!(
             tracked_no_age.contains("tracked **3**") && !tracked_no_age.contains("oldest"),
             "{tracked_no_age}"
+        );
+        // Active owner (OpenClaw ActiveBrowserSessionGuard) — distinct from tracked/Warm.
+        let with_owner = format_browser_ready_chip_with_glance(
+            9222,
+            "Google Chrome",
+            CachedBrowserSessionGlance::Warm {
+                tab_count: 1,
+                focus_index: 0,
+                up_secs: 10,
+                idle_secs: 2,
+                headless: true,
+                chrome_pid: None,
+            },
+            1,
+            1,
+            Some(5),
+            Some("discord-42"),
+        );
+        assert!(
+            with_owner.contains("owner **discord-42**")
+                && with_owner.contains("tracked **1**")
+                && !with_owner.contains("sess"),
+            "{with_owner}"
+        );
+        let owner_only = format_browser_ready_chip_with_glance(
+            9222,
+            "Google Chrome",
+            CachedBrowserSessionGlance::Absent,
+            0,
+            0,
+            None,
+            Some("local-0"),
+        );
+        assert!(
+            owner_only.contains("owner **local-0**") && !owner_only.contains("tracked"),
+            "{owner_only}"
         );
     }
 

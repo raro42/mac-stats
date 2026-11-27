@@ -186,6 +186,18 @@ pub fn oldest_tracked_age_secs() -> Option<u64> {
     oldest.map(|at| at.elapsed().as_secs())
 }
 
+/// Active automation owner key while an agent turn holds `ActiveBrowserSessionGuard`.
+/// Distinct from tracked tab/session counts — shows who may open close-on-reset tabs now.
+/// `None` when no turn owns the browser (calm omit on `/browser`).
+pub fn active_session_owner() -> Option<String> {
+    let Ok(g) = active_session_key().lock() else {
+        return None;
+    };
+    g.as_ref()
+        .map(|k| k.trim().to_string())
+        .filter(|k| !k.is_empty())
+}
+
 #[cfg(test)]
 pub fn reset_for_tests() {
     if let Ok(mut map) = tracked_tabs().lock() {
@@ -300,5 +312,21 @@ mod tests {
         assert!(age2 >= age.unwrap_or(0), "re-track must not rewind age");
         reset_for_tests();
         assert_eq!(oldest_tracked_age_secs(), None);
+    }
+
+    #[test]
+    fn active_session_owner_follows_guard() {
+        let _lock = registry_test_lock();
+        reset_for_tests();
+        assert_eq!(active_session_owner(), None);
+        {
+            let _g = ActiveBrowserSessionGuard::enter(Some(42));
+            assert_eq!(active_session_owner().as_deref(), Some("discord-42"));
+        }
+        assert_eq!(active_session_owner(), None);
+        let _local = ActiveBrowserSessionGuard::enter(None);
+        assert_eq!(active_session_owner().as_deref(), Some("local-0"));
+        reset_for_tests();
+        assert_eq!(active_session_owner(), None);
     }
 }

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3132] - 2026-11-27
+
+### Added
+- Discord `/browser` · `/cdp`: show **owner** session key when an agent turn holds the browser (`ActiveBrowserSessionGuard`; OpenClaw active-session leftover; calm omit when idle).
+
 ## [0.1.3131] - 2026-11-27
 
 ### Added

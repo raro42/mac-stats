@@ -1551,6 +1551,7 @@ pub fn format_browser_ready_chip() -> String {
         let tracked_sessions =
             crate::browser_agent::session_tab_registry::count_tracked_sessions();
         let oldest = crate::browser_agent::session_tab_registry::oldest_tracked_age_secs();
+        let owner = crate::browser_agent::session_tab_registry::active_session_owner();
         format_browser_ready_chip_with_glance(
             port,
             &short,
@@ -1558,6 +1559,7 @@ pub fn format_browser_ready_chip() -> String {
             tracked,
             tracked_sessions,
             oldest,
+            owner.as_deref(),
         )
     } else if crate::config::Config::browser_chromium_executable_configured() {
         format!(
@@ -1574,6 +1576,7 @@ pub fn format_browser_ready_chip() -> String {
 /// `tracked` = automation `new_tab` targets queued for session-reset close (0 = omit).
 /// `tracked_sessions` = session keys with ≥1 tracked tab (OpenClaw per-session map; calm omit when ≤1).
 /// `oldest_tracked_secs` = age of the oldest tracked tab (OpenClaw `trackedAt`; omit when none).
+/// `active_owner` = session key holding `ActiveBrowserSessionGuard` (calm omit when none).
 pub fn format_browser_ready_chip_with_glance(
     port: u16,
     short: &str,
@@ -1581,8 +1584,10 @@ pub fn format_browser_ready_chip_with_glance(
     tracked: usize,
     tracked_sessions: usize,
     oldest_tracked_secs: Option<u64>,
+    active_owner: Option<&str>,
 ) -> String {
     use crate::browser_agent::CachedBrowserSessionGlance;
+    let owner_bit = format_browser_owner_bit(active_owner);
     let tracked_bit = if tracked > 0 {
         let mut bit = format!(" · tracked **{tracked}**");
         // Multi-session close queue: show sess N only when >1 (single-session stays calm).
@@ -1598,10 +1603,10 @@ pub fn format_browser_ready_chip_with_glance(
     };
     match glance {
         CachedBrowserSessionGlance::Absent => format!(
-            "**Browser** · Ready · CDP {port} · `{short}` · idle until BROWSER_*{tracked_bit}"
+            "**Browser** · Ready · CDP {port} · `{short}` · idle until BROWSER_*{owner_bit}{tracked_bit}"
         ),
         CachedBrowserSessionGlance::Busy => format!(
-            "**Browser** · Busy · CDP {port} · `{short}` · session locked{tracked_bit}"
+            "**Browser** · Busy · CDP {port} · `{short}` · session locked{owner_bit}{tracked_bit}"
         ),
         CachedBrowserSessionGlance::Warm {
             tab_count,
@@ -1619,10 +1624,25 @@ pub fn format_browser_ready_chip_with_glance(
                 .map(|p| format!(" · pid **{p}**"))
                 .unwrap_or_default();
             format!(
-                "**Browser** · Warm · CDP {port} · `{short}` · tabs **{tab_count}** · focus **{focus_index}** · {mode} · up {up} · idle {idle}{pid_bit}{tracked_bit}"
+                "**Browser** · Warm · CDP {port} · `{short}` · tabs **{tab_count}** · focus **{focus_index}** · {mode} · up {up} · idle {idle}{pid_bit}{owner_bit}{tracked_bit}"
             )
         }
     }
+}
+
+/// Compact `· owner **key**` when an agent turn holds the browser (OpenClaw active session).
+pub(crate) fn format_browser_owner_bit(active_owner: Option<&str>) -> String {
+    let Some(raw) = active_owner.map(str::trim).filter(|s| !s.is_empty()) else {
+        return String::new();
+    };
+    let short = if raw.chars().count() > 28 {
+        let mut s: String = raw.chars().take(25).collect();
+        s.push('…');
+        s
+    } else {
+        raw.to_string()
+    };
+    format!(" · owner **{short}**")
 }
 
 /// Compact age for Warm up/idle / tracked oldest (secs → `45s` / `2m` / `1h`).
