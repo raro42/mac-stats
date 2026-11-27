@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3144] - 2026-11-28
+
+### Changed
+- External / Monitors empty: settings panel + summary use **Nothing watching yet** (list empty parity; drop cold “No monitors configured”).
+
 ## [0.1.3143] - 2026-11-27
 
 ### Changed

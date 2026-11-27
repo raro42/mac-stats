@@ -8701,8 +8701,8 @@ async function refreshMonitorsSettingsList() {
     if (list.length === 0) {
       settingsList.innerHTML =
         `<div class="monitors-empty monitors-settings-empty" role="status">` +
-        `<div class="monitors-empty-msg">No monitors configured</div>` +
-        `<div class="monitors-empty-hint">Add a site to start uptime checks.</div>` +
+        `<div class="monitors-empty-msg">Nothing watching yet</div>` +
+        `<div class="monitors-empty-hint">Add a site to see uptime here.</div>` +
         `<button type="button" class="monitors-empty-cta">Add a monitor</button>` +
         `</div>`;
       settingsList.querySelector('.monitors-empty-cta')?.addEventListener('click', (e) => {
@@ -8794,7 +8794,7 @@ function applyMonitorsSummaryState({ anyDown, allUp, empty, slowestId }) {
   summary.setAttribute('tabindex', '0');
   if (empty) {
     summary.title = 'Click to add a monitor';
-    summary.setAttribute('aria-label', 'No monitors configured — click to add');
+    summary.setAttribute('aria-label', 'Nothing watching yet — click to add');
   } else if (anyDown) {
     summary.title = 'Click to open the first DOWN monitor';
     summary.setAttribute('aria-label', 'Monitors summary — click to open first DOWN site');
@@ -10792,7 +10792,8 @@ async function updateMonitorsSummary() {
 
     if (list.length === 0) {
       if (!iconOnly) {
-        summaryText.textContent = 'No monitors configured';
+        // List / settings empty parity (layout-daily) — drop cold "No monitors configured".
+        summaryText.textContent = 'Nothing watching yet';
         summaryText.removeAttribute('title');
         applyMonitorsSummaryState({ anyDown: false, allUp: false, empty: true });
       }
