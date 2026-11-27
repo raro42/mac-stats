@@ -131,6 +131,12 @@ pub struct RunsInsights {
     pub active_wall_ms: u64,
     /// Mean `wall_ms` across all turns (Hermes avg session / avg turn analogue).
     pub avg_wall_ms: u64,
+    /// Hermes Period leftover: first local calendar day of turns (`Nov 20`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub period_start: Option<String>,
+    /// Hermes Period leftover: last local calendar day of turns (`Nov 26`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub period_end: Option<String>,
     pub candidates: Vec<RunInsightCandidate>,
     pub slowest: Vec<RunTurnSummary>,
     pub recent: Vec<RunTurnSummary>,
@@ -514,6 +520,8 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         reply_chars_max: 0,
         active_wall_ms: 0,
         avg_wall_ms: 0,
+        period_start: None,
+        period_end: None,
         candidates: vec![],
         slowest: vec![],
         recent: vec![],
@@ -774,6 +782,8 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
     } else {
         active_wall_ms / turns as u64
     };
+    // Hermes Period: first → last local calendar day from runs.jsonl `ts`.
+    let (period_start, period_end) = period_labels_from_tss(&activity_tss);
     RunsInsights {
         turns,
         ok_count,
@@ -808,6 +818,8 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         reply_chars_max,
         active_wall_ms,
         avg_wall_ms,
+        period_start,
+        period_end,
         candidates,
         slowest,
         recent,
@@ -821,6 +833,34 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         process_uptime_secs: crate::state::process_uptime_secs(),
         window_days,
     }
+}
+
+/// Hermes Period labels from UTC timestamps (`Nov 20`, `Nov 26, 2025` when year differs).
+pub(super) fn period_labels_from_tss(
+    tss: &[chrono::DateTime<chrono::Utc>],
+) -> (Option<String>, Option<String>) {
+    use chrono::Local;
+    let Some(min_t) = tss.iter().min().copied() else {
+        return (None, None);
+    };
+    let Some(max_t) = tss.iter().max().copied() else {
+        return (None, None);
+    };
+    let start_local = min_t.with_timezone(&Local);
+    let end_local = max_t.with_timezone(&Local);
+    let start_y = start_local.format("%Y").to_string();
+    let end_y = end_local.format("%Y").to_string();
+    let start = if start_y == end_y {
+        start_local.format("%b %d").to_string()
+    } else {
+        start_local.format("%b %d, %Y").to_string()
+    };
+    let end = if start_y == end_y {
+        end_local.format("%b %d").to_string()
+    } else {
+        end_local.format("%b %d, %Y").to_string()
+    };
+    (Some(start), Some(end))
 }
 
 /// Hermes-style activity glance from turn timestamps (local weekday / hour / streak).

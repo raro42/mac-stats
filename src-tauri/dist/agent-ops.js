@@ -5549,6 +5549,15 @@ function formatRepliesInsightsLine(insights) {
     return `mean ${mean} · p50 ${p50} · max ${max}`;
 }
 
+/** Hermes Period leftover — first → last local day from runs.jsonl `ts`. */
+function formatPeriodInsightsLine(insights) {
+    const start = String(insights?.period_start || '').trim();
+    const end = String(insights?.period_end || '').trim();
+    if (!start || !end) return 'no dates yet';
+    if (start === end) return start;
+    return `${start} — ${end}`;
+}
+
 /** Compact wall duration for Active time / avg turn (`450ms` / `3.2s` / `12m` / `2h`). */
 function formatWallDurationMs(ms) {
     const n = Math.max(0, Math.floor(Number(ms) || 0));
@@ -5932,6 +5941,9 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
             }
             if (Number(insights.turns) > 0 && Number(insights.active_wall_ms) > 0) {
                 latBits.push(`active ${formatActiveTimeInsightsLine(insights)}`);
+            }
+            if (Number(insights.turns) > 0 && (insights.period_start || insights.period_end)) {
+                latBits.push(`period ${formatPeriodInsightsLine(insights)}`);
             }
         }
         const hintLines = hints.length ? hints.slice(0, 5) : [];
@@ -10728,6 +10740,43 @@ function renderOpsRuns(insights) {
                 empty.innerHTML =
                     `<div class="ops-empty-filter-title">No time yet</div>` +
                     `<div class="ops-empty-tab-hint">Active wall time appears after turns land</div>`;
+                card.appendChild(empty);
+            }
+        }
+        {
+            // Period (Hermes overview leftover) — first → last local day from runs.jsonl `ts`.
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Period';
+            card.appendChild(sub);
+            const turnsN = Number(insights.turns) || 0;
+            const periodLabel = formatPeriodInsightsLine(insights);
+            if (turnsN > 0 && periodLabel !== 'no dates yet') {
+                const periodEl = document.createElement('div');
+                periodEl.className = 'ops-row-meta';
+                periodEl.textContent = periodLabel;
+                periodEl.title =
+                    'First → last local calendar day from runs.jsonl ts — Hermes Period';
+                card.appendChild(periodEl);
+            } else if (turnsN > 0) {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Period appears after turns record timestamps';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No dates yet</div>` +
+                    `<div class="ops-empty-tab-hint">First → last day appears after turns land</div>`;
+                card.appendChild(empty);
+            } else {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Period appears after Discord or chat turns land';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No dates yet</div>` +
+                    `<div class="ops-empty-tab-hint">Period span appears after turns land</div>`;
                 card.appendChild(empty);
             }
         }

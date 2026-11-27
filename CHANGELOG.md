@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3124] - 2026-11-27
+
+### Added
+- Runs Insights / Discord `/insights`: show **Period** first → last local day from `runs.jsonl` `ts` (Hermes Period leftover; calm when no dates).
+
 ## [0.1.3123] - 2026-11-27
 
 ### Added

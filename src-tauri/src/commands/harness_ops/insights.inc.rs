@@ -150,6 +150,22 @@ pub(super) fn format_active_time_insights_line(insights: &RunsInsights) -> Strin
     )
 }
 
+/// Hermes Period leftover — first → last local calendar day from runs.jsonl `ts`.
+pub(super) fn format_period_insights_line(insights: &RunsInsights) -> String {
+    match (
+        insights.period_start.as_deref(),
+        insights.period_end.as_deref(),
+    ) {
+        (Some(start), Some(end)) if start == end => {
+            format!("Period: **{start}**")
+        }
+        (Some(start), Some(end)) => {
+            format!("Period: **{start}** — **{end}**")
+        }
+        _ => "Period: **no dates yet**".into(),
+    }
+}
+
 /// Short Discord/gateway report (Hermes `/insights` lite).
 pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     let mut lines = Vec::new();
@@ -325,6 +341,10 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     // Hermes Active time leftover — sum/mean wall_ms already on runs.jsonl.
     if insights.turns > 0 {
         lines.push(format_active_time_insights_line(insights));
+    }
+    // Hermes Period leftover — first → last local day from runs.jsonl `ts`.
+    if insights.turns > 0 {
+        lines.push(format_period_insights_line(insights));
     }
     if !insights.slowest.is_empty() {
         lines.push("**Slowest**".into());

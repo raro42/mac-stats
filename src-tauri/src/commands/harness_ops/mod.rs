@@ -8531,4 +8531,25 @@ mod tests {
         assert_eq!(format_wall_duration_ms(450), "450ms");
         assert_eq!(format_wall_duration_ms(3200), "3.2s");
     }
+
+    #[test]
+    fn format_period_insights_hermes_overview() {
+        let mut insights = compute_runs_insights(1);
+        insights.turns = 4;
+        insights.period_start = Some("Jul 20".into());
+        insights.period_end = Some("Nov 26".into());
+        let line = format_period_insights_line(&insights);
+        assert!(line.contains("Period: **Jul 20** — **Nov 26**"), "got: {line}");
+        let text = format_runs_insights_gateway(&insights);
+        assert!(text.contains("Period:"), "got: {text}");
+        assert!(text.contains("Jul 20"), "got: {text}");
+        insights.period_start = Some("Nov 26".into());
+        insights.period_end = Some("Nov 26".into());
+        let same = format_period_insights_line(&insights);
+        assert_eq!(same, "Period: **Nov 26**");
+        insights.period_start = None;
+        insights.period_end = None;
+        let empty = format_period_insights_line(&insights);
+        assert!(empty.contains("no dates yet"), "got: {empty}");
+    }
 }
