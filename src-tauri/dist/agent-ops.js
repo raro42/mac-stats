@@ -7059,12 +7059,14 @@ function renderOverviewLive(rows, insights, pressure) {
         const dg = insights?.discord_gateway || '';
         const ready =
             /last Ready/i.test(dg) || /stage=connected/i.test(dg);
+        // Design-review feature-agent-ops: warm Live empty (drop stacked "Nothing…"; Quiet head already signals idle).
         body.innerHTML = opsOverviewEmptyHtml(
           ready
-            ? 'Nothing live yet — chats show up here while agents run'
-            : 'Nothing live yet — check Discord Ready, then come back',
+            ? 'Quiet for now — live chats land here while agents run'
+            : 'Gateway still waking — check Discord Ready, then peek back',
           'sessions',
-          'Open Sessions'
+          'Open Sessions',
+          'Quiet desk'
         );
         return;
     }

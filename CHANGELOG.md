@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3130] - 2026-11-27
+
+### Changed
+- Agent Ops overview **Live** empty: warmer **Quiet desk** title + copy (drop stacked “Nothing…”; gateway-waking tip when Discord is not Ready). Design-review polish (capture deferred — CPU window stayed on metrics).
+
 ## [0.1.3129] - 2026-11-27
 
 ### Added
