@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3122] - 2026-11-27
+
+### Added
+- Discord `/browser` · `/cdp`: show **oldest** age beside **tracked N** for automation tabs waiting on session-reset close (OpenClaw `trackedAt` leftover; calm omit when zero tracked).
+
 ## [0.1.3121] - 2026-11-27
 
 ### Added

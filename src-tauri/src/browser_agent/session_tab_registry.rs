@@ -3,12 +3,19 @@
 //! Tabs opened via `BROWSER_NAVIGATE` with `new_tab` are recorded under the active
 //! agent session key. On Discord/UI session clear we close those targets so Chrome
 //! does not keep orphaned automation tabs after reset.
+//!
+//! Each target stores `tracked_at` (OpenClaw `trackedAt`) so `/browser` can show
+//! how long the oldest close-on-reset tab has been waiting.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
+use std::time::Instant;
 
-fn tracked_tabs() -> &'static Mutex<HashMap<String, HashSet<String>>> {
-    static S: OnceLock<Mutex<HashMap<String, HashSet<String>>>> = OnceLock::new();
+/// Target id → when it was first tracked for this session.
+type TrackedTargets = HashMap<String, Instant>;
+
+fn tracked_tabs() -> &'static Mutex<HashMap<String, TrackedTargets>> {
+    static S: OnceLock<Mutex<HashMap<String, TrackedTargets>>> = OnceLock::new();
     S.get_or_init(|| Mutex::new(HashMap::new()))
 }
 
@@ -61,6 +68,7 @@ fn normalize_target_id(raw: &str) -> Option<String> {
 }
 
 /// Record a tab opened for the active session (no-op when no active owner).
+/// Re-tracking the same target keeps the original `tracked_at`.
 pub fn track_for_active_session(target_id: &str) {
     let Some(tid) = normalize_target_id(target_id) else {
         return;
@@ -73,7 +81,8 @@ pub fn track_for_active_session(target_id: &str) {
         return;
     };
     if let Ok(mut map) = tracked_tabs().lock() {
-        map.entry(key).or_default().insert(tid);
+        let entry = map.entry(key).or_default();
+        entry.entry(tid).or_insert_with(Instant::now);
     }
 }
 
@@ -108,26 +117,28 @@ pub fn take_tracked_for_session(session_key: &str) -> Vec<String> {
     let Some(set) = map.remove(key) else {
         return Vec::new();
     };
-    set.into_iter().collect()
+    set.into_keys().collect()
 }
 
-/// Re-insert targets after a failed close attempt.
+/// Re-insert targets after a failed close attempt (fresh `tracked_at`).
 pub fn retrack_for_session(session_key: &str, target_ids: impl IntoIterator<Item = String>) {
     let key = session_key.trim();
     if key.is_empty() {
         return;
     }
-    let mut ids: HashSet<String> = target_ids
+    let now = Instant::now();
+    let mut ids: TrackedTargets = target_ids
         .into_iter()
-        .filter_map(|t| normalize_target_id(&t))
+        .filter_map(|t| normalize_target_id(&t).map(|id| (id, now)))
         .collect();
     if ids.is_empty() {
         return;
     }
     if let Ok(mut map) = tracked_tabs().lock() {
-        map.entry(key.to_string())
-            .or_default()
-            .extend(ids.drain());
+        let entry = map.entry(key.to_string()).or_default();
+        for (id, at) in ids.drain() {
+            entry.entry(id).or_insert(at);
+        }
     }
 }
 
@@ -145,6 +156,25 @@ pub fn count_tracked_tabs_total() -> usize {
         return 0;
     };
     map.values().map(|s| s.len()).sum()
+}
+
+/// Age in seconds of the oldest tracked tab (OpenClaw `trackedAt` leftover).
+/// `None` when nothing is tracked.
+pub fn oldest_tracked_age_secs() -> Option<u64> {
+    let Ok(map) = tracked_tabs().lock() else {
+        return None;
+    };
+    let mut oldest: Option<Instant> = None;
+    for set in map.values() {
+        for at in set.values() {
+            oldest = Some(match oldest {
+                Some(prev) if *at < prev => *at,
+                Some(prev) => prev,
+                None => *at,
+            });
+        }
+    }
+    oldest.map(|at| at.elapsed().as_secs())
 }
 
 #[cfg(test)]
@@ -225,5 +255,24 @@ mod tests {
         track_for_active_session("ui-tab");
         assert_eq!(count_tracked_for_session("local-0"), 1);
         reset_for_tests();
+    }
+
+    #[test]
+    fn oldest_tracked_age_secs_reports_when_tracked() {
+        let _lock = registry_test_lock();
+        reset_for_tests();
+        assert_eq!(oldest_tracked_age_secs(), None);
+        let _g = ActiveBrowserSessionGuard::enter(Some(3));
+        track_for_active_session("aged");
+        let age = oldest_tracked_age_secs();
+        assert!(age.is_some(), "expected age after track");
+        assert!(age.unwrap() < 5, "fresh track should be near zero secs");
+        // Re-track same id must keep original tracked_at (not reset).
+        std::thread::sleep(std::time::Duration::from_millis(20));
+        track_for_active_session("aged");
+        let age2 = oldest_tracked_age_secs().unwrap_or(0);
+        assert!(age2 >= age.unwrap_or(0), "re-track must not rewind age");
+        reset_for_tests();
+        assert_eq!(oldest_tracked_age_secs(), None);
     }
 }

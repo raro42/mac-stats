@@ -123,6 +123,7 @@ mod tests {
             "Google Chrome",
             CachedBrowserSessionGlance::Absent,
             0,
+            None,
         );
         assert!(
             absent.contains("Ready") && absent.contains("idle until BROWSER_*"),
@@ -134,6 +135,7 @@ mod tests {
             "Google Chrome",
             CachedBrowserSessionGlance::Busy,
             0,
+            None,
         );
         assert!(
             busy.contains("Busy") && busy.contains("session locked"),
@@ -149,6 +151,7 @@ mod tests {
                 headless: true,
             },
             0,
+            None,
         );
         assert!(warm.contains("Warm"), "{warm}");
         assert!(warm.contains("tabs **3**"), "{warm}");
@@ -166,20 +169,36 @@ mod tests {
                 headless: false,
             },
             2,
+            Some(125),
         );
         assert!(warm_m.contains("visible"), "{warm_m}");
         assert!(warm_m.contains("idle 2m"), "{warm_m}");
         assert!(warm_m.contains("tracked **2**"), "{warm_m}");
+        assert!(warm_m.contains("oldest 2m"), "{warm_m}");
         let absent_tracked = format_browser_ready_chip_with_glance(
             9222,
             "Google Chrome",
             CachedBrowserSessionGlance::Absent,
             1,
+            Some(12),
         );
         assert!(
             absent_tracked.contains("idle until BROWSER_*")
-                && absent_tracked.contains("tracked **1**"),
+                && absent_tracked.contains("tracked **1**")
+                && absent_tracked.contains("oldest 12s"),
             "{absent_tracked}"
+        );
+        // Count without age stays calm (omit oldest).
+        let tracked_no_age = format_browser_ready_chip_with_glance(
+            9222,
+            "Google Chrome",
+            CachedBrowserSessionGlance::Absent,
+            3,
+            None,
+        );
+        assert!(
+            tracked_no_age.contains("tracked **3**") && !tracked_no_age.contains("oldest"),
+            "{tracked_no_age}"
         );
     }
 

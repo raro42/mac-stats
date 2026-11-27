@@ -1548,7 +1548,8 @@ pub fn format_browser_ready_chip() -> String {
     if chrome_ok {
         let glance = crate::browser_agent::snapshot_cached_browser_session();
         let tracked = crate::browser_agent::session_tab_registry::count_tracked_tabs_total();
-        format_browser_ready_chip_with_glance(port, &short, glance, tracked)
+        let oldest = crate::browser_agent::session_tab_registry::oldest_tracked_age_secs();
+        format_browser_ready_chip_with_glance(port, &short, glance, tracked, oldest)
     } else if crate::config::Config::browser_chromium_executable_configured() {
         format!(
             "**Browser** · Not set · Chromium missing · CDP {port} · fix path in Settings or `browserChromiumExecutable`"
@@ -1562,15 +1563,21 @@ pub fn format_browser_ready_chip() -> String {
 
 /// Pure formatter for `/browser` · `/cdp` (OpenClaw session-tab warm/busy/absent).
 /// `tracked` = automation `new_tab` targets queued for session-reset close (0 = omit).
+/// `oldest_tracked_secs` = age of the oldest tracked tab (OpenClaw `trackedAt`; omit when none).
 pub fn format_browser_ready_chip_with_glance(
     port: u16,
     short: &str,
     glance: crate::browser_agent::CachedBrowserSessionGlance,
     tracked: usize,
+    oldest_tracked_secs: Option<u64>,
 ) -> String {
     use crate::browser_agent::CachedBrowserSessionGlance;
     let tracked_bit = if tracked > 0 {
-        format!(" · tracked **{tracked}**")
+        let mut bit = format!(" · tracked **{tracked}**");
+        if let Some(secs) = oldest_tracked_secs {
+            bit.push_str(&format!(" · oldest {}", format_tracked_age_secs(secs)));
+        }
+        bit
     } else {
         String::new()
     };
@@ -1588,17 +1595,22 @@ pub fn format_browser_ready_chip_with_glance(
             headless,
         } => {
             let mode = if headless { "headless" } else { "visible" };
-            let idle = if idle_secs < 60 {
-                format!("{idle_secs}s")
-            } else if idle_secs < 3600 {
-                format!("{}m", (idle_secs / 60).max(1))
-            } else {
-                format!("{}h", (idle_secs + 1800) / 3600)
-            };
+            let idle = format_tracked_age_secs(idle_secs);
             format!(
                 "**Browser** · Warm · CDP {port} · `{short}` · tabs **{tab_count}** · focus **{focus_index}** · {mode} · idle {idle}{tracked_bit}"
             )
         }
+    }
+}
+
+/// Compact age for Warm idle / tracked oldest (secs → `45s` / `2m` / `1h`).
+pub(crate) fn format_tracked_age_secs(secs: u64) -> String {
+    if secs < 60 {
+        format!("{secs}s")
+    } else if secs < 3600 {
+        format!("{}m", (secs / 60).max(1))
+    } else {
+        format!("{}h", (secs + 1800) / 3600)
     }
 }
 
@@ -3304,7 +3316,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/mastodon` · `view mastodon` · `see mastodon` · `show me the mastodon` · `open mastodon` · `list the mastodon` — Mastodon Ready / Not set (instance URL + token; Settings or .config.env; no live probe)\n\
 • `/mcp` · `view mcp` · `see mcp` · `show me the mcp` · `open mcp` · `list the mcp` · `view mcp server` · `open mcp server` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; Settings or .config.env; no live probe)\n\
 • `/cursor` · `/cursor-agent` · `view cursor` · `see cursor` · `show me the cursor` · `open cursor` · `list the cursor` · `view cursor agent` · `open cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH or Settings path; no CLI probe)\n\
-• `/browser` · `/cdp` · `view browser` · `see browser` · `show me the browser` · `open browser` · `list the browser` · `view cdp` · `see cdp` · `show me the cdp` · `open cdp` · `list the cdp` — Browser / CDP Ready / Warm tabs·focus / tracked (session-reset close queue) / Busy / Off / Not set (Chromium path + port; cached session-tab glance; no `/json/version` probe)\n\
+• `/browser` · `/cdp` · `view browser` · `see browser` · `show me the browser` · `open browser` · `list the browser` · `view cdp` · `see cdp` · `show me the cdp` · `open cdp` · `list the cdp` — Browser / CDP Ready / Warm tabs·focus / tracked N · oldest (session-reset close queue + OpenClaw trackedAt age) / Busy / Off / Not set (Chromium path + port; cached session-tab glance; no `/json/version` probe)\n\
 • `/judge` · `view judge` · `see judge` · `show me the judge` · `open judge` · `list the judge` — Judge Ready / Off (Settings Product · agentJudgeEnabled · failure-only; config only, no judge run)\n\
 • `/ai` · `/ai-agent` · `view ai` · `see ai` · `show me the ai` · `open ai` · `list the ai` · `view ai agent` · `open ai agent` — AI On / Off (Settings Product · aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/compact` · `/menu-bar` · `/cpu-window` · `view compact` · `see compact` · `show me the compact` · `open compact` · `list the compact` · `view menu bar` · `open menu-bar` · `view cpu window` · `open cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
