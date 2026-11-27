@@ -12,6 +12,8 @@ pub struct LiveSessionSummary {
     pub message_count: usize,
     pub last_activity: String,
     pub preview: String,
+    /// True when last activity is past the periodic compaction idle threshold (30m).
+    pub idle: bool,
 }
 
 
@@ -186,17 +188,33 @@ pub fn parse_session_filename(name: &str) -> (String, String) {
 }
 
 
+/// True when `last_activity` RFC3339 is at/past the periodic compaction idle threshold.
+pub(crate) fn live_session_idle_from_rfc3339(ts: &str) -> bool {
+    let Ok(parsed) = chrono::DateTime::parse_from_rfc3339(ts.trim()) else {
+        return false;
+    };
+    let mins = chrono::Utc::now()
+        .signed_duration_since(parsed.with_timezone(&chrono::Utc))
+        .num_minutes();
+    mins >= crate::commands::compaction::INACTIVE_THRESHOLD_MINUTES
+}
+
 /// In-memory Discord/UI sessions currently held by the process.
 #[tauri::command]
 pub fn list_live_sessions() -> Vec<LiveSessionSummary> {
     let mut rows: Vec<_> = crate::session_memory::list_sessions()
         .into_iter()
-        .map(|e| LiveSessionSummary {
-            source: e.source,
-            session_id: e.session_id,
-            message_count: e.message_count,
-            last_activity: e.last_activity.to_rfc3339(),
-            preview: e.preview,
+        .map(|e| {
+            let last_activity = e.last_activity.to_rfc3339();
+            let idle = live_session_idle_from_rfc3339(&last_activity);
+            LiveSessionSummary {
+                source: e.source,
+                session_id: e.session_id,
+                message_count: e.message_count,
+                last_activity,
+                preview: e.preview,
+                idle,
+            }
         })
         .collect();
     rows.sort_by(|a, b| b.last_activity.cmp(&a.last_activity));

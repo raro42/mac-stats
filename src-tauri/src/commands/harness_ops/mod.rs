@@ -184,6 +184,46 @@ mod tests {
     }
 
     #[test]
+    fn live_session_idle_near_compaction_threshold() {
+        use chrono::{Duration, Utc};
+        let fresh = Utc::now().to_rfc3339();
+        assert!(
+            !live_session_idle_from_rfc3339(&fresh),
+            "fresh activity must not be idle"
+        );
+        let old = (Utc::now() - Duration::minutes(31)).to_rfc3339();
+        assert!(
+            live_session_idle_from_rfc3339(&old),
+            "31m past threshold must be idle"
+        );
+        let edge = (Utc::now() - Duration::minutes(30)).to_rfc3339();
+        assert!(
+            live_session_idle_from_rfc3339(&edge),
+            "exactly 30m must be idle"
+        );
+        assert!(
+            !live_session_idle_from_rfc3339("not-a-ts"),
+            "bad timestamps stay calm"
+        );
+        assert_eq!(
+            format_sessions_title(SessionsListFilter::All, 2, 3, 0),
+            "**Sessions** — 2 live · 3 files"
+        );
+        assert_eq!(
+            format_sessions_title(SessionsListFilter::All, 2, 3, 1),
+            "**Sessions** — 2 live · 3 files · idle **1**"
+        );
+        assert_eq!(
+            format_sessions_title(SessionsListFilter::Live, 4, 0, 2),
+            "**Sessions · Live** — 4 · idle **2**"
+        );
+        assert_eq!(
+            format_sessions_title(SessionsListFilter::Files, 0, 5, 9),
+            "**Sessions · Files** — 5"
+        );
+    }
+
+    #[test]
     fn ram_ring_chip_ask_does_not_steal_strip_ram() {
         assert_eq!(parse_ring_chip_ask("/ram-ring"), Some(RingChipAsk::Ram));
         assert_eq!(parse_ring_chip_ask("ram ring"), Some(RingChipAsk::Ram));

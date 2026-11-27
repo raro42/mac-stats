@@ -36174,26 +36174,43 @@ pub(super) fn age_from_ms(ms: u64) -> String {
 }
 
 
+/// Title for `/sessions` (Hermes idle-near-compaction leftover: calm omit when idle_n == 0).
+pub(crate) fn format_sessions_title(
+    filter: SessionsListFilter,
+    live_n: usize,
+    files_n: usize,
+    idle_n: usize,
+) -> String {
+    let idle_bit = if idle_n > 0 {
+        format!(" · idle **{idle_n}**")
+    } else {
+        String::new()
+    };
+    match filter {
+        SessionsListFilter::All => {
+            format!("**Sessions** — {live_n} live · {files_n} files{idle_bit}")
+        }
+        SessionsListFilter::Live => format!("**Sessions · Live** — {live_n}{idle_bit}"),
+        SessionsListFilter::Files => format!("**Sessions · Files** — {files_n}"),
+    }
+}
+
 /// Zero-LLM sessions report (Agent Ops Sessions All · Live · Files filter parity).
 pub fn format_sessions_gateway(filter: SessionsListFilter) -> String {
     let live = list_live_sessions();
     let files = list_session_files(Some(20)).unwrap_or_default();
     let live_n = live.len();
     let files_n = files.len();
-    let title = match filter {
-        SessionsListFilter::All => {
-            format!("**Sessions** — {live_n} live · {files_n} files")
-        }
-        SessionsListFilter::Live => format!("**Sessions · Live** — {live_n}"),
-        SessionsListFilter::Files => format!("**Sessions · Files** — {files_n}"),
-    };
+    let idle_n = live.iter().filter(|s| s.idle).count();
+    let title = format_sessions_title(filter, live_n, files_n, idle_n);
     let mut lines = vec![title];
 
     fn live_row(s: &LiveSessionSummary) -> String {
         let preview = truncate_preview(&s.preview, 60);
         let age = age_from_rfc3339(&s.last_activity);
+        let idle_bit = if s.idle { " · idle" } else { "" };
         let mut row = format!(
-            "• `{}:{}` · {} msg · {age}",
+            "• `{}:{}` · {} msg · {age}{idle_bit}",
             s.source, s.session_id, s.message_count
         );
         if !preview.is_empty() {

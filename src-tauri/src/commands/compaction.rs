@@ -21,7 +21,8 @@ const COMPACTOR_CASUAL_CONTEXT: &str =
 /// Minimum messages to compact in the 30-min periodic pass (lower than on-request 8 so we flush more).
 const PERIODIC_COMPACTION_MIN_MESSAGES: usize = 4;
 /// Sessions with no activity for this long are considered inactive; after compacting they are cleared.
-const INACTIVE_THRESHOLD_MINUTES: i64 = 30;
+/// Shared with `/sessions` · Agent Ops Live idle glance (Hermes near-reset cue).
+pub(crate) const INACTIVE_THRESHOLD_MINUTES: i64 = 30;
 
 /// Truncate `text` to at most `MAX_COMPACTION_CONTEXT_BYTES`, cutting at the
 /// last sentence boundary (`.` / `!` / `?`) within budget to keep the summary

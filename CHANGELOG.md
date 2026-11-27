@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3121] - 2026-11-27
+
+### Added
+- Discord `/sessions` + Agent Ops Live: show **idle N** when live sessions are past the 30-minute compaction threshold (Hermes near-reset leftover; calm omit when zero; row cue `· idle`).
+
 ## [0.1.3120] - 2026-11-27
 
 ### Added

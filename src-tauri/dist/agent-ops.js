@@ -1862,7 +1862,15 @@ function paintOpsSessionKindChips() {
     const filesAll = opsSessionFilesCache || [];
     const liveEl = wrap.querySelector('[data-ops-session-kind-count="live"]');
     const filesEl = wrap.querySelector('[data-ops-session-kind-count="files"]');
-    paintOpsKindCount(liveEl, liveAll.length);
+    const idleLive = liveAll.filter((r) => r && r.idle).length;
+    if (liveEl) {
+        if (idleLive > 0 && liveAll.length > 0) {
+            liveEl.textContent = `${liveAll.length} · idle ${idleLive}`;
+            liveEl.classList.toggle('is-zero', false);
+        } else {
+            paintOpsKindCount(liveEl, liveAll.length);
+        }
+    }
     paintOpsKindCount(filesEl, filesAll.length);
     wrap.querySelectorAll('[data-ops-session-kind]').forEach((btn) => {
         const key = btn.getAttribute('data-ops-session-kind');
@@ -6974,7 +6982,10 @@ function renderOverviewLive(rows, insights, pressure) {
         );
         return;
     }
-    paintOpsOverviewHeadCount('ops-overview-live', `${rows.length} live`);
+    const idleN = rows.filter((r) => r && r.idle).length;
+    const liveHead =
+        idleN > 0 ? `${rows.length} live · idle ${idleN}` : `${rows.length} live`;
+    paintOpsOverviewHeadCount('ops-overview-live', liveHead);
     rows.slice(0, 3).forEach((r) => {
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -6986,10 +6997,15 @@ function renderOverviewLive(rows, insights, pressure) {
         const msgs = fmtCountLabel(r.message_count, 'msgs');
         const activityRaw = String(r.last_activity || '').trim();
         const activity = fmtActivityIsoAge(activityRaw);
+        const idleBit = r.idle ? ' · idle' : '';
         // Empty preview: match schedule task "None yet" (omit left thinner meta).
         const previewBit = fmtPreviewSnippet(r.preview);
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${escapeHtml(msgs)} · ${escapeHtml(activity)} · ${escapeHtml(previewBit)}</div></div>`;
-        if (activityRaw) btn.title = `Last activity ${activityRaw}`;
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${escapeHtml(msgs)} · ${escapeHtml(activity)}${escapeHtml(idleBit)} · ${escapeHtml(previewBit)}</div></div>`;
+        if (activityRaw) {
+            btn.title = r.idle
+                ? `Last activity ${activityRaw} · idle past 30m compaction`
+                : `Last activity ${activityRaw}`;
+        }
         btn.addEventListener('click', async () => {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
@@ -9498,7 +9514,9 @@ function renderOpsLive(rows) {
     }
     const filtered = all.filter((r) =>
         sessionRowMatchesFilter(
-            `${r.source} ${r.session_id} ${r.preview || ''} ${r.last_activity || ''}`
+            `${r.source} ${r.session_id} ${r.preview || ''} ${r.last_activity || ''}${
+                r.idle ? ' idle' : ''
+            }`
         )
     );
     if (!all.length) {
@@ -9526,14 +9544,19 @@ function renderOpsLive(rows) {
         // Relative age (saved Files already use fmtAge) — raw RFC3339 stays on title for hover.
         const activityRaw = String(r.last_activity || '').trim();
         const activity = fmtActivityIsoAge(activityRaw);
+        const idleBit = r.idle ? ' · idle' : '';
         const source = String(r.source || '').trim() || 'Unknown';
         const sessionId = String(r.session_id || '').trim() || 'Unknown';
         // Empty message count: match size "Unknown" (bare undefined msgs reads like missing data).
         const msgs = fmtCountLabel(r.message_count, 'msgs');
         // Empty preview: match schedule task "None yet" (omit left thinner meta).
         const previewBit = fmtPreviewSnippet(r.preview);
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${escapeHtml(msgs)} · ${escapeHtml(activity)} · ${escapeHtml(previewBit)}</div></div>`;
-        if (activityRaw) btn.title = `Last activity ${activityRaw}`;
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${escapeHtml(msgs)} · ${escapeHtml(activity)}${escapeHtml(idleBit)} · ${escapeHtml(previewBit)}</div></div>`;
+        if (activityRaw) {
+            btn.title = r.idle
+                ? `Last activity ${activityRaw} · idle past 30m compaction`
+                : `Last activity ${activityRaw}`;
+        }
         setOpsRowCopyValue(btn, r.session_id || sessionId);
         const openLive = async () => {
             try {
