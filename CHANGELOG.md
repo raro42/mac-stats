@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3129] - 2026-11-27
+
+### Added
+- Runs Insights / Discord `/insights`: show **Longest** turn (max `wall_ms` · lane · preview) — Hermes Notable leftover after most-tools / Tool calls total.
+
 ## [0.1.3128] - 2026-11-27
 
 ### Added

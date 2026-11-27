@@ -8482,6 +8482,24 @@ mod tests {
     }
 
     #[test]
+    fn format_longest_insights_hermes_notable() {
+        let mut insights = compute_runs_insights(1);
+        insights.turns = 4;
+        insights.longest_wall_ms = 125_000;
+        insights.longest_wall_lane = "direct".into();
+        insights.longest_wall_preview = "Overnight harness tick".into();
+        let line = format_longest_insights_line(&insights);
+        assert!(line.contains("Longest: **2m**"), "got: {line}");
+        assert!(line.contains("direct"), "got: {line}");
+        assert!(line.contains("Overnight harness tick"), "got: {line}");
+        let text = format_runs_insights_gateway(&insights);
+        assert!(text.contains("Longest: **2m**"), "got: {text}");
+        insights.longest_wall_ms = 0;
+        let empty = format_longest_insights_line(&insights);
+        assert!(empty.contains("no time yet"), "got: {empty}");
+    }
+
+    #[test]
     fn format_llm_skips_insights_capex_glance() {
         let mut insights = compute_runs_insights(1);
         insights.turns = 10;

@@ -122,6 +122,12 @@ pub struct RunsInsights {
     pub most_tools_wall_ms: u64,
     /// Lane of the most-tools turn.
     pub most_tools_lane: String,
+    /// Hermes Notable leftover: max `wall_ms` on any turn (Longest session → longest turn).
+    pub longest_wall_ms: u64,
+    /// Preview of the longest-wall turn (truncated question).
+    pub longest_wall_preview: String,
+    /// Lane of the longest-wall turn.
+    pub longest_wall_lane: String,
     /// Turns that skipped plan LLM (`skipped_plan_llm` in runs.jsonl) — CapEx glance.
     pub skipped_plan_count: usize,
     /// Turns that skipped verify LLM.
@@ -524,6 +530,9 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         most_tools_preview: String::new(),
         most_tools_wall_ms: 0,
         most_tools_lane: String::new(),
+        longest_wall_ms: 0,
+        longest_wall_preview: String::new(),
+        longest_wall_lane: String::new(),
         skipped_plan_count: 0,
         skipped_verify_count: 0,
         skipped_criteria_count: 0,
@@ -579,6 +588,9 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
     let mut most_tools_preview = String::new();
     let mut most_tools_wall_ms = 0u64;
     let mut most_tools_lane = String::new();
+    let mut longest_wall_ms = 0u64;
+    let mut longest_wall_preview = String::new();
+    let mut longest_wall_lane = String::new();
     let mut skipped_plan_count = 0usize;
     let mut skipped_verify_count = 0usize;
     let mut skipped_criteria_count = 0usize;
@@ -688,6 +700,12 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
             most_tools_wall_ms = wall;
             most_tools_lane = lane.clone();
             most_tools_preview = question_preview.chars().take(48).collect();
+        }
+        // Hermes Notable leftover: Longest session → longest turn by wall_ms.
+        if wall > longest_wall_ms {
+            longest_wall_ms = wall;
+            longest_wall_lane = lane.clone();
+            longest_wall_preview = question_preview.chars().take(48).collect();
         }
         if v
             .get("skipped_plan_llm")
@@ -849,6 +867,9 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         most_tools_preview,
         most_tools_wall_ms,
         most_tools_lane,
+        longest_wall_ms,
+        longest_wall_preview,
+        longest_wall_lane,
         skipped_plan_count,
         skipped_verify_count,
         skipped_criteria_count,

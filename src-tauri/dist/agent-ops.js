@@ -5531,6 +5531,27 @@ function formatNotableInsightsLine(insights) {
     return `most tools ${steps} · ${lane} · ${wall} · ${preview}`;
 }
 
+/** Compact wall for Longest glance (`45ms` / `3.2s` / `12m` / `2h`). */
+function formatWallDurationMs(ms) {
+    const n = Number(ms) || 0;
+    if (n < 1000) return `${Math.round(n)}ms`;
+    if (n < 60_000) {
+        const secs = n / 1000;
+        return secs >= 10 ? `${Math.round(secs)}s` : `${secs.toFixed(1)}s`;
+    }
+    if (n < 3_600_000) return `${Math.max(1, Math.floor(n / 60_000))}m`;
+    return `${Math.round((n + 1_800_000) / 3_600_000)}h`;
+}
+
+/** Hermes Notable leftover — Longest session → longest turn by wall_ms. */
+function formatLongestInsightsLine(insights) {
+    const wallMs = Number(insights?.longest_wall_ms) || 0;
+    if (wallMs <= 0) return 'no time yet';
+    const lane = String(insights?.longest_wall_lane || '').trim() || '?';
+    const preview = String(insights?.longest_wall_preview || '').trim() || '(empty)';
+    return `${formatWallDurationMs(wallMs)} · ${lane} · ${preview}`;
+}
+
 /** CapEx leftover — skipped_*_llm shares (plan · verify · criteria · topic). */
 function formatLlmSkipsInsightsLine(insights) {
     const turns = Math.max(1, Number(insights?.turns) || 0);
@@ -5959,6 +5980,9 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
             }
             if (Number(insights.most_tools_steps) > 0) {
                 latBits.push(`notable ${formatNotableInsightsLine(insights)}`);
+            }
+            if (Number(insights.turns) > 0 && Number(insights.longest_wall_ms) > 0) {
+                latBits.push(`longest ${formatLongestInsightsLine(insights)}`);
             }
             if (Number(insights.turns) > 0) {
                 latBits.push(`skips ${formatLlmSkipsInsightsLine(insights)}`);
@@ -10730,6 +10754,42 @@ function renderOpsRuns(insights) {
                 empty.innerHTML =
                     `<div class="ops-empty-filter-title">No notable yet</div>` +
                     `<div class="ops-empty-tab-hint">Most tool calls appears after turns land</div>`;
+                card.appendChild(empty);
+            }
+        }
+        {
+            // Longest (Hermes Notable leftover) — max wall_ms turn from runs.jsonl.
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Longest';
+            card.appendChild(sub);
+            const turnsN = Number(insights.turns) || 0;
+            const longestMs = Number(insights.longest_wall_ms) || 0;
+            if (turnsN > 0 && longestMs > 0) {
+                const longestEl = document.createElement('div');
+                longestEl.className = 'ops-row-meta';
+                longestEl.textContent = formatLongestInsightsLine(insights);
+                longestEl.title = 'Hermes Notable — turn with the longest wall time';
+                card.appendChild(longestEl);
+            } else if (turnsN > 0) {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Longest turn appears after wall_ms lands on a turn';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No time yet</div>` +
+                    `<div class="ops-empty-tab-hint">Longest wall appears after turns land</div>`;
+                card.appendChild(empty);
+            } else {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Longest appears after Discord or chat turns land';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No longest yet</div>` +
+                    `<div class="ops-empty-tab-hint">Longest wall appears after turns land</div>`;
                 card.appendChild(empty);
             }
         }

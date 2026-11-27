@@ -99,6 +99,29 @@ pub(super) fn format_notable_insights_line(insights: &RunsInsights) -> String {
     )
 }
 
+/// Hermes Notable leftover: Longest session → longest turn by `wall_ms`.
+pub(super) fn format_longest_insights_line(insights: &RunsInsights) -> String {
+    if insights.turns == 0 || insights.longest_wall_ms == 0 {
+        return "Longest: **no time yet**".into();
+    }
+    let lane = if insights.longest_wall_lane.is_empty() {
+        "?"
+    } else {
+        insights.longest_wall_lane.as_str()
+    };
+    let preview = if insights.longest_wall_preview.is_empty() {
+        "(empty)".to_string()
+    } else {
+        insights.longest_wall_preview.clone()
+    };
+    format!(
+        "Longest: **{}** · {} · {}",
+        format_wall_duration_ms(insights.longest_wall_ms),
+        lane,
+        preview
+    )
+}
+
 /// CapEx glance from runs.jsonl `skipped_*_llm` — plan · verify · criteria · topic.
 pub(super) fn format_llm_skips_insights_line(insights: &RunsInsights) -> String {
     let turns = insights.turns.max(1) as f64;
@@ -368,6 +391,10 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     // Hermes Notable leftover — Most tool calls turn (runs.jsonl tool_steps).
     if insights.turns > 0 {
         lines.push(format_notable_insights_line(insights));
+    }
+    // Hermes Notable leftover — Longest session → longest turn by wall_ms.
+    if insights.turns > 0 {
+        lines.push(format_longest_insights_line(insights));
     }
     // CapEx leftover — skipped_*_llm shares already on runs.jsonl but missing from insights.
     if insights.turns > 0 {
