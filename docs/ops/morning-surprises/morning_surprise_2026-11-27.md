@@ -3,6 +3,7 @@
 Overnight autoresearch kept product moves (not quiet).
 
 ## Shipped
+- **v0.1.3121** — Discord `/sessions` + Agent Ops Live: **idle N** when live sessions are past the 30-minute compaction threshold (Hermes near-reset leftover; calm omit when zero; row cue `· idle`).
 - **v0.1.3120** — Discord `/browser` · `/cdp`: **tracked N** when automation `new_tab` targets wait for session-reset close (OpenClaw close-tracked leftover; calm omit when zero; distinct from Warm CDP tab count).
 - **v0.1.3119** — Periodic compaction Hermes hygiene: 30-minute sweeper flushes curated `MEMORY:` notes and reinjects session TODOs into CONTEXT before idle replace/clear (parity with on-request; idle Discord/local threads keep plans).
 - **v0.1.3118** — Discord `/discord` chip + Agent Ops: **last reconnect Ns** (disc→Ready recovery length) beside disc/resume ages — OpenClaw reconnect-stall lens.
@@ -18,4 +19,4 @@ Overnight autoresearch kept product moves (not quiet).
 - uuidlog still block; SoftDisabled…pmhistory + powerstate + refusal-awareness closed.
 
 ## Next fuel
-Agent Ops design-review when due / Dark layout-daily — SoftDisabled… + Browser Warm + close-tracked + native-pair + last-reconnect + periodic compaction flush/TODO + browser tracked glance closed; not another tracked-glance / last-reconnect / compaction-flush / Session-queue clone.
+Agent Ops design-review when due / Dark layout-daily — SoftDisabled… + Browser Warm + close-tracked + native-pair + last-reconnect + periodic compaction flush/TODO + browser tracked glance + sessions idle glance closed; not another sessions-idle / tracked-glance / last-reconnect / compaction-flush / Session-queue clone.
