@@ -1,3 +1,19 @@
+## Overnight note 2026-11-27 ~03:00 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Sibling/standing: Hermes Platforms leftover after Period v0.1.3124 — `/insights` + Agent Ops showed Sources by entry but not distinct Discord `channel_id` count · busiest share.
+- Debug.log: no ERROR/WARN/panic clusters in window.
+- Fuel: sibling Hermes Channels on insights — not tip/keep-pNN/section-open/pmset/insights Sources·Activity/live-age/reconnect-age/tool-%/Routing/Notable/LLM-skips/Replies/Session-queue/Browser-Warm/close-tracked/native-pair/last-reconnect/compaction-flush/tracked-glance/sessions-idle/tracked-oldest/Active-time/Period clone.
+- Shipped **v0.1.3125** — Runs Insights / Discord `/insights` show Channels distinct · busiest share (omit calm when none).
+- Ratchet keep @ 840e45207; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Agent Ops design-review when due / Dark layout-daily / OpenClaw leftover if tiny — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age + chip disc/resume ages + tool-% + Routing + Notable + LLM skips + Replies + Session queue busy/tracked + wait depth + Browser Warm glance + close-tracked-tabs + native-only pairing + last reconnect duration + periodic compaction flush/TODO + browser tracked glance + sessions idle glance + trackedAt oldest + Active time + Period + Channels closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age / reconnect-age / tool-% / Routing / Notable / LLM-skips / Replies / Session-queue / Browser-Warm / close-tracked / native-pair / last-reconnect / compaction-flush / tracked-glance / sessions-idle / tracked-oldest / Active-time / Period / Channels clone.
+
+## Overnight merge — v0.1.3125
+
+- Sibling Hermes Channels after Period v0.1.3124: `/insights` + Agent Ops show distinct Discord channel_id · busiest share. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-27. Next: Agent Ops design-review when due / Dark layout — not another keep-pNN / section-open / insights / Session-queue / last-reconnect / compaction-flush / tracked-glance / sessions-idle / tracked-oldest / Active-time / Period / Channels clone.
+
 ## Overnight note 2026-11-27 ~02:35 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
