@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3142] - 2026-11-27
+
+### Changed
+- Agent Ops Overview **Runs** empty: **Empty ledger** title + warmer copy; Ready (ok) wash instead of amber warn (Empty roster parity; not another Quiet-* name).
+
 ## [0.1.3141] - 2026-11-27
 
 ### Changed

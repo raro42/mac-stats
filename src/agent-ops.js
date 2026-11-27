@@ -6710,8 +6710,9 @@ function setOverviewRunsStatus(insights) {
     const failN = Number(insights?.fail_count) || 0;
     const openN = Number(insights?.digest_open_count) || 0;
     if (!insights || (!recent.length && !(Number(insights?.turns) > 0))) {
-        card.classList.add('ops-health-warn');
-        card.title = 'No runs yet';
+        // Idle Runs is calm (Empty roster parity) — empty ledger is Ready, not amber warn.
+        card.classList.add('ops-health-ok');
+        card.title = 'Empty ledger — turns land after Discord or chat';
         return;
     }
     if (failN > 0) {
@@ -6738,11 +6739,13 @@ function renderOverviewRuns(insights) {
     const recent = Array.isArray(insights?.recent) ? insights.recent : [];
     setOverviewRunsStatus(insights);
     if (!recent.length) {
-        paintOpsOverviewHeadCount('ops-overview-runs', 'None yet', { zero: true });
+        // Design-review feature-agent-ops: warm Runs empty (Empty roster parity; drop stacked "No runs…").
+        paintOpsOverviewHeadCount('ops-overview-runs', 'Ready', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
-            'No runs yet — turns land after Discord or chat',
+            'Quiet for now — turns land here after Discord or chat',
             'runs',
-            'Open Runs'
+            'Open Runs',
+            'Empty ledger'
         );
         return;
     }
@@ -10456,16 +10459,16 @@ function renderOpsRuns(insights) {
             empty.className =
               'ops-empty ops-empty-compact ops-empty-tab ops-empty-filter-miss is-calm';
             empty.setAttribute('role', 'status');
-            empty.title = 'Turns land after Discord or chat';
+            empty.title = 'Quiet for now — turns land here after Discord or chat';
             empty.innerHTML =
-                `<div class="ops-empty-filter-title">No runs yet</div>` +
-                `<div class="ops-empty-tab-hint">Turns land after Discord or chat</div>` +
+                `<div class="ops-empty-filter-title">Empty ledger</div>` +
+                `<div class="ops-empty-tab-hint">Quiet for now — turns land here after Discord or chat</div>` +
                 `<button type="button" class="ops-clear-filter" data-ops-open-ai-chat="1">Open AI Chat</button>`;
             card.appendChild(empty);
         } else {
             el.innerHTML = opsTabEmptyHtml(
-              'No runs yet',
-              'Turns land after Discord or chat',
+              'Empty ledger',
+              'Quiet for now — turns land here after Discord or chat',
               { action: 'ai-chat', label: 'Open AI Chat' }
             );
         }
