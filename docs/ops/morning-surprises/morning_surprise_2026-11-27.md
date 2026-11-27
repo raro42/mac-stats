@@ -1,25 +1,23 @@
 # Morning surprise — 2026-11-27
 
-Overnight Track B kept shipping while digester open stayed empty.
+Overnight autoresearch kept shipping while digester open stayed empty.
 
-## Shipped tonight (highlights)
+## Shipped (highlights)
 
-| Version | What |
-|---------|------|
-| **v0.1.3140** | Agent Ops Overview **Schedules** empty → **Quiet board** (Ready wash + warmer copy; Quiet vault parity). `feature-agent-ops.png` recapture deferred (Screen Recording TCC). |
-| **v0.1.3139** | Agent Ops Overview **Knowledge** empty → **Quiet vault** (Ready wash + warmer copy; Quiet shelf parity). |
-| **v0.1.3138** | Agent Ops Overview **Recent** empty → **Quiet shelf** (Ready wash + warmer copy; Quiet desk parity). |
-| **v0.1.3137** | `?open=agent-ops` scrolls Ops into view after expand. |
-| **v0.1.3136** | `/insights` **Most reply** (max reply_chars). |
-| **v0.1.3135** | `/browser` Warm **page** host. |
-| **v0.1.3134** | `/browser` Ready/Busy **last fail**. |
-| **v0.1.3132** | `/browser` **owner** session key. |
-| **v0.1.3131** | `/browser` **N sess** when multi-session tracked. |
-| **v0.1.3130** | Agent Ops Live empty **Quiet desk**. |
+- **v0.1.3141** — Agent Ops Overview **Agents** empty: **Empty roster** + Ready wash (not another Quiet-* name).
+- **v0.1.3140** — Schedules empty **Quiet board**.
+- **v0.1.3139** — Knowledge empty **Quiet vault**.
+- **v0.1.3138** — Recent empty **Quiet shelf**.
+- **v0.1.3137** — `?open=agent-ops` scrolls Ops into view.
+- **v0.1.3136** — Insights **Most reply** (Hermes leftover).
+- Earlier night: browser Warm page/last-fail/owner/tracked · insights Longest/Tool calls · Quiet desk.
 
-## Fuel notes
+## Tried / deferred
 
-- Digester open: empty all night.
-- Design review: Quiet desk + Quiet shelf + Quiet vault + Quiet board (grace slots); screenshot still TCC-blocked.
-- Layout daily: data-poster marked 2026-11-27; Dark next calendar day.
-- Next: Dark layout-daily / Agent Ops recapture when TCC allows / tiny OpenClaw leftover — not Quiet-desk/Quiet-shelf/Quiet-vault/Quiet-board clones.
+- Agent Ops `feature-agent-ops.png` recapture still TCC-blocked (`screencapture -l`).
+- Dark layout-daily still [DUE] for next calendar day (data-poster already marked today).
+- uuidlog / SoftDisabled pmset adapters remain blocked.
+
+## Next
+
+Dark layout-daily · Agent Ops recapture when TCC allows · OpenClaw leftover if tiny — not another Quiet-*/Empty-roster clone.
