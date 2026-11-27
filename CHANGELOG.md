@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3136] - 2026-11-27
+
+### Added
+- Runs Insights / Discord `/insights`: show **Most reply** (max `reply_chars` · lane · wall · preview) — Hermes Notable Most messages leftover after Longest.
+
 ## [0.1.3135] - 2026-11-27
 
 ### Added

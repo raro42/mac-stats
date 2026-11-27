@@ -5552,6 +5552,17 @@ function formatLongestInsightsLine(insights) {
     return `${formatWallDurationMs(wallMs)} · ${lane} · ${preview}`;
 }
 
+/** Hermes Notable leftover — Most messages → most reply_chars turn. */
+function formatMostReplyInsightsLine(insights) {
+    const chars = Number(insights?.most_reply_chars) || 0;
+    if (chars <= 0) return 'no replies yet';
+    const lane = String(insights?.most_reply_lane || '').trim() || '?';
+    const preview = String(insights?.most_reply_preview || '').trim() || '(empty)';
+    const wallMs = Number(insights?.most_reply_wall_ms) || 0;
+    const wallBit = wallMs > 0 ? ` · ${formatWallDurationMs(wallMs)}` : '';
+    return `${chars} chars · ${lane}${wallBit} · ${preview}`;
+}
+
 /** CapEx leftover — skipped_*_llm shares (plan · verify · criteria · topic). */
 function formatLlmSkipsInsightsLine(insights) {
     const turns = Math.max(1, Number(insights?.turns) || 0);
@@ -5983,6 +5994,9 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
             }
             if (Number(insights.turns) > 0 && Number(insights.longest_wall_ms) > 0) {
                 latBits.push(`longest ${formatLongestInsightsLine(insights)}`);
+            }
+            if (Number(insights.turns) > 0 && Number(insights.most_reply_chars) > 0) {
+                latBits.push(`most-reply ${formatMostReplyInsightsLine(insights)}`);
             }
             if (Number(insights.turns) > 0) {
                 latBits.push(`skips ${formatLlmSkipsInsightsLine(insights)}`);
@@ -10792,6 +10806,43 @@ function renderOpsRuns(insights) {
                 empty.innerHTML =
                     `<div class="ops-empty-filter-title">No longest yet</div>` +
                     `<div class="ops-empty-tab-hint">Longest wall appears after turns land</div>`;
+                card.appendChild(empty);
+            }
+        }
+        {
+            // Most reply (Hermes Notable leftover) — max reply_chars turn from runs.jsonl.
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Most reply';
+            card.appendChild(sub);
+            const turnsN = Number(insights.turns) || 0;
+            const mostReply = Number(insights.most_reply_chars) || 0;
+            if (turnsN > 0 && mostReply > 0) {
+                const replyEl = document.createElement('div');
+                replyEl.className = 'ops-row-meta';
+                replyEl.textContent = formatMostReplyInsightsLine(insights);
+                replyEl.title =
+                    'Hermes Notable — turn with the most reply characters (Most messages)';
+                card.appendChild(replyEl);
+            } else if (turnsN > 0) {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Most reply appears after turns record reply_chars';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No replies yet</div>` +
+                    `<div class="ops-empty-tab-hint">Most reply turn appears after reply_chars land</div>`;
+                card.appendChild(empty);
+            } else {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Most reply appears after Discord or chat turns land';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No most reply yet</div>` +
+                    `<div class="ops-empty-tab-hint">Most reply appears after turns land</div>`;
                 card.appendChild(empty);
             }
         }

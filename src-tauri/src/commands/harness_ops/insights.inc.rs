@@ -122,6 +122,32 @@ pub(super) fn format_longest_insights_line(insights: &RunsInsights) -> String {
     )
 }
 
+/// Hermes Notable leftover: Most messages → most reply (`reply_chars` · lane · preview).
+pub(super) fn format_most_reply_insights_line(insights: &RunsInsights) -> String {
+    if insights.turns == 0 || insights.most_reply_chars == 0 {
+        return "Most reply: **no replies yet**".into();
+    }
+    let lane = if insights.most_reply_lane.is_empty() {
+        "?"
+    } else {
+        insights.most_reply_lane.as_str()
+    };
+    let preview = if insights.most_reply_preview.is_empty() {
+        "(empty)".to_string()
+    } else {
+        insights.most_reply_preview.clone()
+    };
+    let wall = if insights.most_reply_wall_ms > 0 {
+        format!(" · {}", format_wall_duration_ms(insights.most_reply_wall_ms))
+    } else {
+        String::new()
+    };
+    format!(
+        "Most reply: **{}** chars · {}{} · {}",
+        insights.most_reply_chars, lane, wall, preview
+    )
+}
+
 /// CapEx glance from runs.jsonl `skipped_*_llm` — plan · verify · criteria · topic.
 pub(super) fn format_llm_skips_insights_line(insights: &RunsInsights) -> String {
     let turns = insights.turns.max(1) as f64;
@@ -395,6 +421,10 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     // Hermes Notable leftover — Longest session → longest turn by wall_ms.
     if insights.turns > 0 {
         lines.push(format_longest_insights_line(insights));
+    }
+    // Hermes Notable leftover — Most messages → most reply_chars turn.
+    if insights.turns > 0 {
+        lines.push(format_most_reply_insights_line(insights));
     }
     // CapEx leftover — skipped_*_llm shares already on runs.jsonl but missing from insights.
     if insights.turns > 0 {

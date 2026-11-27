@@ -142,6 +142,14 @@ pub struct RunsInsights {
     pub reply_chars_p50: u64,
     /// Max `reply_chars` on any turn.
     pub reply_chars_max: u64,
+    /// Hermes Notable leftover: max `reply_chars` turn (Most messages → most reply).
+    pub most_reply_chars: u64,
+    /// Preview of the most-reply turn (truncated question).
+    pub most_reply_preview: String,
+    /// Lane of the most-reply turn.
+    pub most_reply_lane: String,
+    /// Wall ms of the most-reply turn.
+    pub most_reply_wall_ms: u64,
     /// Hermes Active time leftover: sum of all `wall_ms` (burned wall clock).
     pub active_wall_ms: u64,
     /// Mean `wall_ms` across all turns (Hermes avg session / avg turn analogue).
@@ -540,6 +548,10 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         reply_chars_mean: 0,
         reply_chars_p50: 0,
         reply_chars_max: 0,
+        most_reply_chars: 0,
+        most_reply_preview: String::new(),
+        most_reply_lane: String::new(),
+        most_reply_wall_ms: 0,
         active_wall_ms: 0,
         avg_wall_ms: 0,
         period_start: None,
@@ -591,6 +603,10 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
     let mut longest_wall_ms = 0u64;
     let mut longest_wall_preview = String::new();
     let mut longest_wall_lane = String::new();
+    let mut most_reply_chars = 0u64;
+    let mut most_reply_preview = String::new();
+    let mut most_reply_lane = String::new();
+    let mut most_reply_wall_ms = 0u64;
     let mut skipped_plan_count = 0usize;
     let mut skipped_verify_count = 0usize;
     let mut skipped_criteria_count = 0usize;
@@ -745,6 +761,13 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
             })
             .unwrap_or(0);
         reply_chars_vals.push(reply_chars);
+        // Hermes Notable leftover: Most messages → most reply_chars turn.
+        if reply_chars > most_reply_chars {
+            most_reply_chars = reply_chars;
+            most_reply_wall_ms = wall;
+            most_reply_lane = lane.clone();
+            most_reply_preview = question_preview.chars().take(48).collect();
+        }
         if let Some(c) = classify_candidate(&lane, wall, &tools, &question_preview, &request_id) {
             candidates.push(c);
         }
@@ -877,6 +900,10 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         reply_chars_mean,
         reply_chars_p50,
         reply_chars_max,
+        most_reply_chars,
+        most_reply_preview,
+        most_reply_lane,
+        most_reply_wall_ms,
         active_wall_ms,
         avg_wall_ms,
         period_start,

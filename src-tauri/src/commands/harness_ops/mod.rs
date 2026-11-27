@@ -8625,6 +8625,26 @@ mod tests {
     }
 
     #[test]
+    fn format_most_reply_insights_hermes_notable() {
+        let mut insights = compute_runs_insights(1);
+        insights.turns = 5;
+        insights.most_reply_chars = 1847;
+        insights.most_reply_lane = "direct".into();
+        insights.most_reply_wall_ms = 12_500;
+        insights.most_reply_preview = "Summarize overnight keeps".into();
+        let line = format_most_reply_insights_line(&insights);
+        assert!(line.contains("Most reply: **1847** chars"), "got: {line}");
+        assert!(line.contains("direct"), "got: {line}");
+        assert!(line.contains("12s") || line.contains("13s"), "got: {line}");
+        assert!(line.contains("Summarize overnight keeps"), "got: {line}");
+        let text = format_runs_insights_gateway(&insights);
+        assert!(text.contains("Most reply: **1847** chars"), "got: {text}");
+        insights.most_reply_chars = 0;
+        let empty = format_most_reply_insights_line(&insights);
+        assert!(empty.contains("no replies yet"), "got: {empty}");
+    }
+
+    #[test]
     fn format_llm_skips_insights_capex_glance() {
         let mut insights = compute_runs_insights(1);
         insights.turns = 10;
