@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3143] - 2026-11-27
+
+### Changed
+- Agent Ops **Schedules · Sessions · Knowledge** tab empties: **Quiet board / Quiet desk / Quiet vault** titles + warmer copy (Overview empty parity after v0.1.3140–3139–3130).
+
 ## [0.1.3142] - 2026-11-27
 
 ### Changed

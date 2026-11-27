@@ -7651,9 +7651,10 @@ function renderOpsSchedulesTab(schedules, deliveries) {
     if (list) {
         list.innerHTML = '';
         if (!schedAll.length) {
+            // Tab empty title matches Overview Quiet board (v0.1.3140).
             list.innerHTML = opsTabEmptyHtml(
-              'No schedules yet',
-              'Add one from Discord or the Schedules tools when you are ready'
+              'Quiet board',
+              'Quiet for now — cron and at-jobs land here when you add them'
             );
         } else if (!schedFiltered.length) {
             list.innerHTML = opsFilterMissHtml(
@@ -9636,9 +9637,10 @@ function renderOpsLive(rows) {
         )
     );
     if (!all.length) {
+        // Tab empty title matches Overview Quiet desk (v0.1.3130).
         el.innerHTML = opsTabEmptyHtml(
-          'No live sessions',
-          'A chat appears here while an agent runs',
+          'Quiet desk',
+          'Quiet for now — live chats land here while agents run',
           { action: 'ai-chat', label: 'Open AI Chat' }
         );
         paintOpsSessionFilterFromCaches();
@@ -9809,9 +9811,10 @@ function renderOpsMemory(files) {
         memoryRowMatchesFilter(`${f.name || ''} ${f.kind || ''} ${f.path || ''}`)
     );
     if (!all.length) {
+        // Tab empty title matches Overview Quiet vault (v0.1.3139).
         el.innerHTML = opsTabEmptyHtml(
-          'No knowledge files yet',
-          'Soul and memory notes show up here once they land on disk'
+          'Quiet vault',
+          'Quiet for now — soul and memory land here when agents write them'
         );
         paintOpsFilterMatch('ops-memory-filter', 0, 0, opsMemoryFilterQ);
         return;
