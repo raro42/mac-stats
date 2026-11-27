@@ -1,3 +1,19 @@
+## Overnight note 2026-11-27 ~22:15 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace) — proceeded: standing backlog pointed at Agent Ops after Quiet shelf v0.1.3138.
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Sibling/standing: Overview Knowledge empty still amber-warned with cold "No knowledge files…" (Live Quiet desk + Recent Quiet shelf already calm).
+- Debug.log: single-instance WARN only (pre-ship).
+- Fuel: design-review Agent Ops Knowledge empty Quiet vault — not tip/keep-pNN/section-open/pmset/insights/Warm/Longest/Quiet-desk/Quiet-shelf/tracked/owner/last-fail/focus-page/Most-reply/open-scroll clone.
+- Shipped **v0.1.3139** — Overview Knowledge empty **Quiet vault** + warmer copy; Ready (ok) wash instead of amber warn.
+- Ratchet keep @ 65a5c29b9; install/kickstart + push (runtime). Capture of feature-agent-ops.png deferred (Screen Recording TCC / screencapture -l).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet desk + Quiet shelf + Quiet vault + tracked sessions + active owner + last-fail + focus-page + Most reply + Ops open-scroll closed; uuidlog remains block; not another insights/Warm/Quiet-desk/Quiet-shelf/Quiet-vault/tracked-sessions/owner/last-fail/focus-page/Most-reply/open-scroll clone.
+
+## Overnight merge — v0.1.3139
+
+- Design-review Agent Ops Knowledge empty after Quiet shelf v0.1.3138: Quiet vault title + Ready wash. Digester empty; design-review slot used; layout-daily data-poster marked 2026-11-27. Next: Dark layout-daily / Agent Ops recapture when TCC allows — not another insights/Warm/Quiet-desk/Quiet-shelf/Quiet-vault clone.
+
 ## Overnight note 2026-11-27 ~21:55 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace) — proceeded: standing backlog pointed at Agent Ops recapture after open-scroll v0.1.3137.
