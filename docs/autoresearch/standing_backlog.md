@@ -1,3 +1,19 @@
+## Overnight note 2026-11-27 ~20:35 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace; Agent Ops slot used Quiet desk v0.1.3130).
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Sibling/standing: OpenClaw session-tab page leftover after last-fail — `/browser` Warm showed focus index but not the focused tab host.
+- Debug.log: no ERROR/WARN/panic clusters in window (pre-ship).
+- Fuel: sibling OpenClaw focus page host on `/browser` Warm — not tip/keep-pNN/section-open/pmset/insights/Warm-up/pid/Longest/Quiet-desk/tracked-sessions/owner/last-fail clone.
+- Shipped **v0.1.3135** — Discord `/browser` · `/cdp` Warm show **page** host for focused tab (calm omit blank / Chrome-internal).
+- Ratchet keep @ 73cfc1507; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when scroll works / Hermes leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet desk + tracked sessions + active owner + last-fail + focus-page closed; uuidlog remains block; not another insights/Warm/Quiet-desk/tracked-sessions/owner/last-fail/focus-page clone.
+
+## Overnight merge — v0.1.3135
+
+- Sibling OpenClaw focus page host after last-fail v0.1.3134: `/browser` · `/cdp` Warm show page host when focused tab URL is known. Digester empty; design-review slot used; layout-daily data-poster marked 2026-11-27. Next: Dark layout-daily / Agent Ops recapture — not another insights/Warm/Quiet-desk/tracked-sessions/owner/last-fail/focus-page clone.
+
 ## Overnight note 2026-11-27 ~20:10 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace; Agent Ops slot used Quiet desk v0.1.3130).
