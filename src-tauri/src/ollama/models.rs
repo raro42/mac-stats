@@ -171,10 +171,11 @@ impl ModelCatalog {
     }
 
     /// Eligible local models only (no cloud). Role resolution uses this only; cloud is used only when the user explicitly configures it (e.g. model in agent.json or default).
+    /// Skips specialized non-chat models (e.g. OCR) so `role=small` cannot pick them.
     fn eligible_local(&self) -> impl Iterator<Item = &ClassifiedModel> {
-        self.models
-            .iter()
-            .filter(|m| m.param_billions <= MAX_AUTO_PARAMS_B && !m.is_cloud)
+        self.models.iter().filter(|m| {
+            m.param_billions <= MAX_AUTO_PARAMS_B && !m.is_cloud && !is_specialized_non_chat(&m.name)
+        })
     }
 
     fn pick_vision(&self) -> Option<&ClassifiedModel> {
@@ -348,7 +349,20 @@ pub fn is_cloud_model(name: &str) -> bool {
     name.to_lowercase().contains("cloud")
 }
 
+/// True for OCR / extract-only models that must not win `role=small` / general auto-picks.
+pub fn is_specialized_non_chat(name: &str) -> bool {
+    let lower = name.to_lowercase();
+    lower.contains("ocr") || lower.contains("lightonocr")
+}
+
 fn classify_model(summary: &ModelSummary) -> Option<ClassifiedModel> {
+    if is_specialized_non_chat(&summary.name) {
+        debug!(
+            "ModelCatalog: skipping specialized non-chat model '{}'",
+            summary.name
+        );
+        return None;
+    }
     let param_billions = parse_param_size(summary)?;
     let capability = detect_capability(summary);
     let size_tier = if param_billions < 4.0 {
@@ -375,6 +389,17 @@ fn parse_param_size(summary: &ModelSummary) -> Option<f64> {
     if let Some(ref details) = summary.details {
         if let Some(ref ps) = details.parameter_size {
             let cleaned = ps.trim().to_uppercase();
+            // "7.6B" → billions; "596M" → millions → billions.
+            if let Some(num) = cleaned.strip_suffix('B') {
+                if let Ok(n) = num.parse::<f64>() {
+                    return Some(n);
+                }
+            }
+            if let Some(num) = cleaned.strip_suffix('M') {
+                if let Ok(n) = num.parse::<f64>() {
+                    return Some(n / 1000.0);
+                }
+            }
             let cleaned = cleaned.trim_end_matches('B');
             if let Ok(n) = cleaned.parse::<f64>() {
                 return Some(n);
@@ -515,6 +540,23 @@ mod tests {
         let catalog = ModelCatalog::from_model_list(&models);
         let resolved = catalog.resolve_role("small").unwrap();
         assert_eq!(resolved.name, "deepscaler:latest");
+    }
+
+    #[test]
+    fn classify_small_skips_ocr_models() {
+        let models = vec![
+            make_model(
+                "hf.co/DevQuasar/lightonai.LightOnOCR-2-1B-GGUF:Q4_K_M",
+                "596M",
+                "qwen3",
+            ),
+            make_model("huihui_ai/granite3.2-abliterated:2b", "2.5B", "granite"),
+            make_model("gemma4:latest", "8.0B", "gemma4"),
+        ];
+        let catalog = ModelCatalog::from_model_list(&models);
+        assert!(!catalog.has_model("hf.co/DevQuasar/lightonai.LightOnOCR-2-1B-GGUF:Q4_K_M"));
+        let resolved = catalog.resolve_role("small").unwrap();
+        assert_eq!(resolved.name, "huihui_ai/granite3.2-abliterated:2b");
     }
 
     #[test]

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3133] - 2026-11-27
+
+### Fixed
+- ModelCatalog `role=small` no longer auto-picks OCR / LightOnOCR models (they are not chat models). Smallest real chat model wins (e.g. granite 2.5B).
+
 ## [0.1.3132] - 2026-11-27
 
 ### Added
