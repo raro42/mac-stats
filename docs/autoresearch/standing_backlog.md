@@ -1,3 +1,18 @@
+## Overnight note 2026-11-27 ~23:26 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace) — proceeded: standing backlog pointed at Agent Ops after Empty roster v0.1.3141.
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Sibling/standing: Overview Runs empty still amber-warned with cold "No runs yet…" (Live Quiet desk + Recent Quiet shelf + Knowledge Quiet vault + Schedules Quiet board + Agents Empty roster already calm).
+- Debug.log: single-instance WARN only (pre-ship).
+- Fuel: design-review Agent Ops Runs empty Empty ledger — not tip/keep-pNN/section-open/pmset/insights/Warm/Longest/Quiet-*/Empty-roster/tracked/owner/last-fail/focus-page/Most-reply/open-scroll clone.
+- Shipped **v0.1.3142** — Overview/Runs empty **Empty ledger** + warmer copy; Ready (ok) wash instead of amber warn (not another Quiet-* name).
+- Ratchet keep @ 704863036; install/kickstart + push (runtime). Capture of feature-agent-ops.png deferred (Screen Recording TCC / screencapture -l).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet desk + Quiet shelf + Quiet vault + Quiet board + Empty roster + Empty ledger + tracked sessions + active owner + last-fail + focus-page + Most reply + Ops open-scroll closed; uuidlog remains block; not another insights/Warm/Quiet-*/Empty-roster/Empty-ledger/tracked-sessions/owner/last-fail/focus-page/Most-reply/open-scroll clone.
+
+## Overnight merge — v0.1.3142
+
+- Design-review Agent Ops Runs empty after Empty roster v0.1.3141: Empty ledger title + Ready wash (not Quiet-* name). Digester empty; design-review slot used; layout-daily data-poster marked 2026-11-27. Next: Dark layout-daily / Agent Ops recapture when TCC allows — not another insights/Warm/Quiet-*/Empty-roster/Empty-ledger clone.
 ## Overnight note 2026-11-27 ~23:04 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace) — proceeded: standing backlog pointed at Agent Ops after Quiet board v0.1.3140.

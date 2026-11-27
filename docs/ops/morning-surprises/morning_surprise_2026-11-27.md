@@ -4,6 +4,7 @@ Overnight autoresearch kept shipping while digester open stayed empty.
 
 ## Shipped (highlights)
 
+- **v0.1.3142** — Agent Ops Overview **Runs** empty: **Empty ledger** + Ready wash (Empty roster parity; not Quiet-*).
 - **v0.1.3141** — Agent Ops Overview **Agents** empty: **Empty roster** + Ready wash (not another Quiet-* name).
 - **v0.1.3140** — Schedules empty **Quiet board**.
 - **v0.1.3139** — Knowledge empty **Quiet vault**.
@@ -20,4 +21,4 @@ Overnight autoresearch kept shipping while digester open stayed empty.
 
 ## Next
 
-Dark layout-daily · Agent Ops recapture when TCC allows · OpenClaw leftover if tiny — not another Quiet-*/Empty-roster clone.
+Dark layout-daily · Agent Ops recapture when TCC allows · OpenClaw leftover if tiny — not another Quiet-*/Empty-roster/Empty-ledger clone.
