@@ -1,3 +1,18 @@
+## Overnight note 2026-11-27 ~02:05 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Sibling/standing: Hermes Active time leftover after trackedAt oldest v0.1.3122 — `/insights` + Agent Ops showed latency p50/mean but not burned wall clock (sum/mean wall_ms).
+- Debug.log: no ERROR/WARN/panic clusters in window.
+- Fuel: sibling Hermes Active time on insights — not tip/keep-pNN/section-open/pmset/insights Sources·Activity/live-age/reconnect-age/tool-%/Routing/Notable/LLM-skips/Replies/Session-queue/Browser-Warm/close-tracked/native-pair/last-reconnect/compaction-flush/tracked-glance/sessions-idle/tracked-oldest clone.
+- Shipped **v0.1.3123** — Runs Insights / Discord `/insights` show Active total · avg turn from wall_ms (omit calm when no turns).
+- Ratchet keep @ 919937464; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Agent Ops design-review when due / Dark layout-daily / OpenClaw leftover if tiny — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age + chip disc/resume ages + tool-% + Routing + Notable + LLM skips + Replies + Session queue busy/tracked + wait depth + Browser Warm glance + close-tracked-tabs + native-only pairing + last reconnect duration + periodic compaction flush/TODO + browser tracked glance + sessions idle glance + trackedAt oldest + Active time closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age / reconnect-age / tool-% / Routing / Notable / LLM-skips / Replies / Session-queue / Browser-Warm / close-tracked / native-pair / last-reconnect / compaction-flush / tracked-glance / sessions-idle / tracked-oldest / Active-time clone.
+
+## Overnight merge — v0.1.3123
+
+- Sibling Hermes Active time after trackedAt oldest v0.1.3122: `/insights` + Agent Ops show total wall · avg turn. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-27. Next: Agent Ops design-review when due / Dark layout — not another keep-pNN / section-open / insights / Session-queue / last-reconnect / compaction-flush / tracked-glance / sessions-idle / tracked-oldest / Active-time clone.
 ## Overnight note 2026-11-27 ~01:45 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).

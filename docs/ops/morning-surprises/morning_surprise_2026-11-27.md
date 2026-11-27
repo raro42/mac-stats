@@ -3,6 +3,7 @@
 Overnight autoresearch kept product moves (not quiet).
 
 ## Shipped
+- **v0.1.3123** — Runs Insights / Discord `/insights`: **Active** total wall time · avg turn from `runs.jsonl` `wall_ms` (Hermes Active time leftover; calm when no turns).
 - **v0.1.3122** — Discord `/browser` · `/cdp`: **oldest** age beside **tracked N** for automation tabs waiting on session-reset close (OpenClaw `trackedAt` leftover; calm omit when zero tracked).
 - **v0.1.3121** — Discord `/sessions` + Agent Ops Live: **idle N** when live sessions are past the 30-minute compaction threshold (Hermes near-reset leftover; calm omit when zero; row cue `· idle`).
 - **v0.1.3120** — Discord `/browser` · `/cdp`: **tracked N** when automation `new_tab` targets wait for session-reset close (OpenClaw close-tracked leftover; calm omit when zero; distinct from Warm CDP tab count).
@@ -20,4 +21,4 @@ Overnight autoresearch kept product moves (not quiet).
 - uuidlog still block; SoftDisabled…pmhistory + powerstate + refusal-awareness closed.
 
 ## Next fuel
-Agent Ops design-review when due / Dark layout-daily / Hermes leftover if tiny — SoftDisabled… + Browser Warm + close-tracked + native-pair + last-reconnect + periodic compaction flush/TODO + browser tracked glance + sessions idle glance + trackedAt oldest closed; not another sessions-idle / tracked-glance / tracked-oldest / last-reconnect / compaction-flush / Session-queue clone.
+Agent Ops design-review when due / Dark layout-daily / OpenClaw leftover if tiny — SoftDisabled… + Browser Warm + close-tracked + native-pair + last-reconnect + periodic compaction flush/TODO + browser tracked glance + sessions idle glance + trackedAt oldest + Active time closed; not another Active-time / sessions-idle / tracked-glance / tracked-oldest / last-reconnect / compaction-flush / Session-queue clone.
