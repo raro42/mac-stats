@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3123] - 2026-11-27
+
+### Added
+- Runs Insights / Discord `/insights`: show **Active** total wall time · avg turn from `runs.jsonl` `wall_ms` (Hermes Active time leftover; calm when no turns).
+
 ## [0.1.3122] - 2026-11-27
 
 ### Added

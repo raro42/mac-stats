@@ -127,6 +127,10 @@ pub struct RunsInsights {
     pub reply_chars_p50: u64,
     /// Max `reply_chars` on any turn.
     pub reply_chars_max: u64,
+    /// Hermes Active time leftover: sum of all `wall_ms` (burned wall clock).
+    pub active_wall_ms: u64,
+    /// Mean `wall_ms` across all turns (Hermes avg session / avg turn analogue).
+    pub avg_wall_ms: u64,
     pub candidates: Vec<RunInsightCandidate>,
     pub slowest: Vec<RunTurnSummary>,
     pub recent: Vec<RunTurnSummary>,
@@ -508,6 +512,8 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         reply_chars_mean: 0,
         reply_chars_p50: 0,
         reply_chars_max: 0,
+        active_wall_ms: 0,
+        avg_wall_ms: 0,
         candidates: vec![],
         slowest: vec![],
         recent: vec![],
@@ -761,6 +767,13 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
     } else {
         reply_sorted[reply_sorted.len() / 2]
     };
+    // Hermes Active time: sum of wall_ms (all turns) + mean wall (avg turn).
+    let active_wall_ms = walls.iter().copied().sum::<u64>();
+    let avg_wall_ms = if turns == 0 {
+        0
+    } else {
+        active_wall_ms / turns as u64
+    };
     RunsInsights {
         turns,
         ok_count,
@@ -793,6 +806,8 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         reply_chars_mean,
         reply_chars_p50,
         reply_chars_max,
+        active_wall_ms,
+        avg_wall_ms,
         candidates,
         slowest,
         recent,

@@ -5549,6 +5549,26 @@ function formatRepliesInsightsLine(insights) {
     return `mean ${mean} · p50 ${p50} · max ${max}`;
 }
 
+/** Compact wall duration for Active time / avg turn (`450ms` / `3.2s` / `12m` / `2h`). */
+function formatWallDurationMs(ms) {
+    const n = Math.max(0, Math.floor(Number(ms) || 0));
+    if (n < 1000) return `${n}ms`;
+    if (n < 60_000) {
+        const secs = n / 1000;
+        return secs >= 10 ? `${Math.round(secs)}s` : `${secs.toFixed(1)}s`;
+    }
+    if (n < 3_600_000) return `${Math.max(1, Math.floor(n / 60_000))}m`;
+    return `${Math.round((n + 1_800_000) / 3_600_000)}h`;
+}
+
+/** Hermes Active time leftover — sum + mean of runs.jsonl `wall_ms`. */
+function formatActiveTimeInsightsLine(insights) {
+    const active = Number(insights?.active_wall_ms) || 0;
+    const avg = Number(insights?.avg_wall_ms) || 0;
+    if (active <= 0) return 'no time yet';
+    return `Active: ${formatWallDurationMs(active)} · avg turn ${formatWallDurationMs(avg)}`;
+}
+
 function fmtAge(ms) {
     // Empty age: match run meta "Unknown" (bare blank / em dash reads like missing data).
     if (!ms) return 'Unknown';
@@ -5909,6 +5929,9 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
             }
             if (Number(insights.turns) > 0) {
                 latBits.push(`replies ${formatRepliesInsightsLine(insights)}`);
+            }
+            if (Number(insights.turns) > 0 && Number(insights.active_wall_ms) > 0) {
+                latBits.push(`active ${formatActiveTimeInsightsLine(insights)}`);
             }
         }
         const hintLines = hints.length ? hints.slice(0, 5) : [];
@@ -10668,6 +10691,43 @@ function renderOpsRuns(insights) {
                 empty.innerHTML =
                     `<div class="ops-empty-filter-title">No replies yet</div>` +
                     `<div class="ops-empty-tab-hint">Reply size appears after turns land</div>`;
+                card.appendChild(empty);
+            }
+        }
+        {
+            // Active time (Hermes overview leftover) — sum + mean wall_ms from runs.jsonl.
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Active';
+            card.appendChild(sub);
+            const turnsN = Number(insights.turns) || 0;
+            const activeMs = Number(insights.active_wall_ms) || 0;
+            if (turnsN > 0 && activeMs > 0) {
+                const activeEl = document.createElement('div');
+                activeEl.className = 'ops-row-meta';
+                activeEl.textContent = formatActiveTimeInsightsLine(insights);
+                activeEl.title =
+                    'Burned wall clock from runs.jsonl wall_ms (total · avg turn) — Hermes Active time';
+                card.appendChild(activeEl);
+            } else if (turnsN > 0) {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Active time appears after turns record wall_ms';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No time yet</div>` +
+                    `<div class="ops-empty-tab-hint">Total · avg turn wall time appears after turns land</div>`;
+                card.appendChild(empty);
+            } else {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Active time appears after Discord or chat turns land';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No time yet</div>` +
+                    `<div class="ops-empty-tab-hint">Active wall time appears after turns land</div>`;
                 card.appendChild(empty);
             }
         }

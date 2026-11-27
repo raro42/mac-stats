@@ -8511,4 +8511,24 @@ mod tests {
         let empty = format_replies_insights_line(&insights);
         assert!(empty.contains("no replies yet"), "got: {empty}");
     }
+
+    #[test]
+    fn format_active_time_insights_hermes_overview() {
+        let mut insights = compute_runs_insights(1);
+        insights.turns = 4;
+        insights.active_wall_ms = 125_000;
+        insights.avg_wall_ms = 31_250;
+        let line = format_active_time_insights_line(&insights);
+        assert!(line.contains("Active: **2m**"), "got: {line}");
+        assert!(line.contains("avg turn **31s**"), "got: {line}");
+        let text = format_runs_insights_gateway(&insights);
+        assert!(text.contains("Active:"), "got: {text}");
+        assert!(text.contains("**2m**"), "got: {text}");
+        insights.active_wall_ms = 0;
+        insights.avg_wall_ms = 0;
+        let empty = format_active_time_insights_line(&insights);
+        assert!(empty.contains("no time yet"), "got: {empty}");
+        assert_eq!(format_wall_duration_ms(450), "450ms");
+        assert_eq!(format_wall_duration_ms(3200), "3.2s");
+    }
 }

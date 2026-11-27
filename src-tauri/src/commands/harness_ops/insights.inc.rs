@@ -120,6 +120,36 @@ pub(super) fn format_replies_insights_line(insights: &RunsInsights) -> String {
     )
 }
 
+/// Compact wall duration for Active time / avg turn (`45ms` / `3.2s` / `12m` / `2h`).
+pub(super) fn format_wall_duration_ms(ms: u64) -> String {
+    if ms < 1000 {
+        format!("{ms}ms")
+    } else if ms < 60_000 {
+        let secs = ms as f64 / 1000.0;
+        if secs >= 10.0 {
+            format!("{:.0}s", secs)
+        } else {
+            format!("{:.1}s", secs)
+        }
+    } else if ms < 3_600_000 {
+        format!("{}m", (ms / 60_000).max(1))
+    } else {
+        format!("{}h", (ms + 1_800_000) / 3_600_000)
+    }
+}
+
+/// Hermes Active time leftover — sum + mean of runs.jsonl `wall_ms`.
+pub(super) fn format_active_time_insights_line(insights: &RunsInsights) -> String {
+    if insights.turns == 0 || insights.active_wall_ms == 0 {
+        return "Active: **no time yet**".into();
+    }
+    format!(
+        "Active: **{}** · avg turn **{}**",
+        format_wall_duration_ms(insights.active_wall_ms),
+        format_wall_duration_ms(insights.avg_wall_ms)
+    )
+}
+
 /// Short Discord/gateway report (Hermes `/insights` lite).
 pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     let mut lines = Vec::new();
@@ -291,6 +321,10 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     // Hermes overview leftover — reply_chars already on runs.jsonl but missing from insights.
     if insights.turns > 0 {
         lines.push(format_replies_insights_line(insights));
+    }
+    // Hermes Active time leftover — sum/mean wall_ms already on runs.jsonl.
+    if insights.turns > 0 {
+        lines.push(format_active_time_insights_line(insights));
     }
     if !insights.slowest.is_empty() {
         lines.push("**Slowest**".into());
