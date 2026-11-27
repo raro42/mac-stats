@@ -6,7 +6,8 @@ Overnight Track B kept shipping while digester open stayed empty.
 
 | Version | What |
 |---------|------|
-| **v0.1.3139** | Agent Ops Overview **Knowledge** empty → **Quiet vault** (Ready wash + warmer copy; Quiet shelf parity). `feature-agent-ops.png` recapture deferred (Screen Recording TCC). |
+| **v0.1.3140** | Agent Ops Overview **Schedules** empty → **Quiet board** (Ready wash + warmer copy; Quiet vault parity). `feature-agent-ops.png` recapture deferred (Screen Recording TCC). |
+| **v0.1.3139** | Agent Ops Overview **Knowledge** empty → **Quiet vault** (Ready wash + warmer copy; Quiet shelf parity). |
 | **v0.1.3138** | Agent Ops Overview **Recent** empty → **Quiet shelf** (Ready wash + warmer copy; Quiet desk parity). |
 | **v0.1.3137** | `?open=agent-ops` scrolls Ops into view after expand. |
 | **v0.1.3136** | `/insights` **Most reply** (max reply_chars). |
@@ -19,6 +20,6 @@ Overnight Track B kept shipping while digester open stayed empty.
 ## Fuel notes
 
 - Digester open: empty all night.
-- Design review: Quiet desk + Quiet shelf + Quiet vault (grace slots); screenshot still TCC-blocked.
+- Design review: Quiet desk + Quiet shelf + Quiet vault + Quiet board (grace slots); screenshot still TCC-blocked.
 - Layout daily: data-poster marked 2026-11-27; Dark next calendar day.
-- Next: Dark layout-daily / Agent Ops recapture when TCC allows / tiny OpenClaw leftover — not Quiet-desk/Quiet-shelf/Quiet-vault clones.
+- Next: Dark layout-daily / Agent Ops recapture when TCC allows / tiny OpenClaw leftover — not Quiet-desk/Quiet-shelf/Quiet-vault/Quiet-board clones.
