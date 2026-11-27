@@ -1,3 +1,20 @@
+## Overnight note 2026-11-28 ~00:45 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace).
+- Layout daily: data-poster already marked 2026-11-28 (due=false); Dark [DUE] next calendar day.
+- Sibling/standing: Disk Cleanup scopes empty still cold ("No scopes yet") while list empty already **Nothing to reclaim yet**.
+- Debug.log: single-instance WARN only (pre-ship).
+- Fuel: Disk Cleanup scopes empty Nothing to tidy yet — not tip/keep-pNN/section-open/pmset/insights/Warm/Longest/Quiet-*/Empty-*/tab-empty/Monitors-empty/tracked/owner/last-fail/focus-page/Most-reply/open-scroll clone.
+- Shipped **v0.1.3145** — Disk Cleanup scopes empty **Nothing to tidy yet** (+ aria + theme first-paint); list empty parity.
+- Ratchet keep @ 16b7d72d4; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-28 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet-* + Empty-* + tab Quiet + Monitors Nothing-watching + Disk Cleanup Nothing-to-tidy + tracked sessions + active owner + last-fail + focus-page + Most reply + Ops open-scroll closed; uuidlog remains block; not another insights/Warm/Quiet-*/Empty-*/tab-empty/Monitors-empty/Disk-Cleanup-scopes/tracked-sessions/owner/last-fail/focus-page/Most-reply/open-scroll clone.
+
+## Overnight merge — v0.1.3145
+
+- Disk Cleanup scopes empty after Monitors Nothing watching v0.1.3144: Nothing to tidy yet (list Nothing to reclaim yet parity). Digester empty; design-review grace; layout-daily data-poster marked 2026-11-28. Next: Dark layout-daily / Agent Ops recapture when TCC allows — not another Quiet-*/Empty-*/Monitors-empty/Disk-Cleanup-scopes clone.
+
+
 ## Overnight note 2026-11-28 ~00:20 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace).
