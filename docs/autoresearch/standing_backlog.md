@@ -1,3 +1,19 @@
+## Overnight note 2026-11-27 ~05:40 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace; Agent Ops slot already used Quiet desk v0.1.3130).
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Sibling/standing: OpenClaw per-session map leftover after Quiet desk — `/browser` showed tracked N · oldest but not how many session keys hold close-on-reset tabs.
+- Debug.log: no ERROR/WARN/panic clusters in window.
+- Fuel: sibling OpenClaw tracked sessions on `/browser` — not tip/keep-pNN/section-open/pmset/insights/Warm/Longest/Quiet-desk/tracked-count-only clone.
+- Shipped **v0.1.3131** — Discord `/browser` · `/cdp` show **N sess** when tracked tabs span >1 session keys (calm omit when single session).
+- Ratchet keep @ 5e49dd68b; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when scroll works / Hermes leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet desk + tracked sessions closed; uuidlog remains block; not another insights/Warm/Longest/Quiet-desk/tracked-sessions clone.
+
+## Overnight merge — v0.1.3131
+
+- Sibling OpenClaw tracked sessions after Quiet desk v0.1.3130: `/browser` · `/cdp` show N sess when close-on-reset spans >1 session keys. Digester empty; design-review slot used; layout-daily data-poster marked 2026-11-27. Next: Dark layout-daily / Agent Ops recapture — not another insights/Warm/Quiet-desk/tracked-sessions clone.
+
 ## Overnight note 2026-11-27 ~05:13 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace) — proceeded per skill (digester empty + backlog pointed here).
