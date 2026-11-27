@@ -6590,8 +6590,9 @@ function setOverviewAgentsStatus(agents) {
     card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
     const rows = Array.isArray(agents) ? agents : [];
     if (!rows.length) {
-        card.classList.add('ops-health-warn');
-        card.title = 'No agents yet';
+        // Idle Agents is calm (Quiet board parity) — empty roster is Ready, not amber warn.
+        card.classList.add('ops-health-ok');
+        card.title = 'Empty roster — add folders under ~/.mac-stats/agents';
         return;
     }
     const enabledN = rows.filter((a) => a.enabled).length;
@@ -6616,12 +6617,13 @@ function renderOverviewAgents(agents) {
     const rows = Array.isArray(agents) ? agents.slice() : [];
     setOverviewAgentsStatus(rows);
     if (!rows.length) {
-        // Empty head pill: Digest uses "Queue clear"; raw "0" reads like an error.
-        paintOpsOverviewHeadCount('ops-overview-agents', 'None yet', { zero: true });
+        // Design-review feature-agent-ops: warm Agents empty (Quiet board parity; drop stacked "No agents…").
+        paintOpsOverviewHeadCount('ops-overview-agents', 'Ready', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
-            'No agents yet — add folders under ~/.mac-stats/agents',
+            'Add folders under ~/.mac-stats/agents when you are ready',
             'agents',
-            'Open Agents'
+            'Open Agents',
+            'Empty roster'
         );
         return;
     }
@@ -8151,8 +8153,8 @@ function renderOpsAgents(agents) {
     );
     if (!all.length) {
         list.innerHTML = opsTabEmptyHtml(
-          'No agents yet',
-          'Add agent folders under ~/.mac-stats/agents'
+          'Empty roster',
+          'Add folders under ~/.mac-stats/agents when you are ready'
         );
         paintOpsFilterMatch('ops-agents-filter', 0, 0, opsAgentsFilterQ);
         paintOpsAgentsEnabledChips();

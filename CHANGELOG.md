@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3141] - 2026-11-27
+
+### Changed
+- Agent Ops Overview **Agents** empty: **Empty roster** title + warmer copy; Ready (ok) wash instead of amber warn (Quiet board parity; not another Quiet-* name).
+
 ## [0.1.3140] - 2026-11-27
 
 ### Changed
