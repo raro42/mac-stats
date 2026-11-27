@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3134] - 2026-11-27
+
+### Added
+- Discord `/browser` · `/cdp` **Ready** / **Busy**: show **last fail** when the last CDP `/json/version` or WebSocket attach probe failed (OpenClaw `detectError` leftover; calm omit when Warm or no fail).
+
 ## [0.1.3133] - 2026-11-27
 
 ### Fixed

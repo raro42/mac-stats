@@ -4726,6 +4726,30 @@ pub(crate) fn format_last_browser_error_context(
         .map(|h| format_context_suffix_from_health(h, nav_url_changed, 190))
 }
 
+/// Last CDP `/json/version` or WebSocket attach failure (OpenClaw `detectError` leftover).
+///
+/// Calm `None` when no probe ran or the last probe succeeded — `/browser` Ready can then
+/// show a short **last fail** bit without a live session.
+pub fn last_cdp_probe_fail_summary() -> Option<String> {
+    let guard = last_browser_health().lock().ok()?;
+    let health = guard.as_ref()?;
+    if health.ws_ok == Some(false) {
+        let raw = health
+            .ws_err_summary
+            .as_deref()
+            .unwrap_or("ws attach failed");
+        return Some(truncate_compact(raw, 36));
+    }
+    if health.cdp_http_ok == Some(false) {
+        let raw = health
+            .cdp_http_err_summary
+            .as_deref()
+            .unwrap_or("cdp http failed");
+        return Some(truncate_compact(raw, 36));
+    }
+    None
+}
+
 fn element_label_for_status(i: &Interactable) -> String {
     let label = if let Some(a) = i.accessible_name.as_ref().filter(|s| !s.trim().is_empty()) {
         a.as_str()

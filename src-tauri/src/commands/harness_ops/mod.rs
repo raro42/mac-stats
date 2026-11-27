@@ -126,6 +126,7 @@ mod tests {
             0,
             None,
             None,
+            None,
         );
         assert!(
             absent.contains("Ready") && absent.contains("idle until BROWSER_*"),
@@ -133,12 +134,14 @@ mod tests {
         );
         assert!(!absent.contains("tracked"), "{absent}");
         assert!(!absent.contains("owner"), "{absent}");
+        assert!(!absent.contains("last fail"), "{absent}");
         let busy = format_browser_ready_chip_with_glance(
             9222,
             "Google Chrome",
             CachedBrowserSessionGlance::Busy,
             0,
             0,
+            None,
             None,
             None,
         );
@@ -161,6 +164,7 @@ mod tests {
             0,
             None,
             None,
+            Some("connection refused"),
         );
         assert!(warm.contains("Warm"), "{warm}");
         assert!(warm.contains("tabs **3**"), "{warm}");
@@ -170,6 +174,10 @@ mod tests {
         assert!(warm.contains("idle 45s"), "{warm}");
         assert!(warm.contains("pid **4242**"), "{warm}");
         assert!(!warm.contains("tracked"), "{warm}");
+        assert!(
+            !warm.contains("last fail"),
+            "Warm omits stale last-fail: {warm}"
+        );
         let warm_m = format_browser_ready_chip_with_glance(
             9222,
             "Chromium",
@@ -184,6 +192,7 @@ mod tests {
             2,
             1,
             Some(125),
+            None,
             None,
         );
         assert!(warm_m.contains("visible"), "{warm_m}");
@@ -204,6 +213,7 @@ mod tests {
             2,
             Some(40),
             None,
+            None,
         );
         assert!(
             multi_sess.contains("tracked **3**")
@@ -218,6 +228,7 @@ mod tests {
             1,
             1,
             Some(12),
+            None,
             None,
         );
         assert!(
@@ -234,6 +245,7 @@ mod tests {
             CachedBrowserSessionGlance::Absent,
             3,
             1,
+            None,
             None,
             None,
         );
@@ -257,6 +269,7 @@ mod tests {
             1,
             Some(5),
             Some("discord-42"),
+            None,
         );
         assert!(
             with_owner.contains("owner **discord-42**")
@@ -272,10 +285,41 @@ mod tests {
             0,
             None,
             Some("local-0"),
+            None,
         );
         assert!(
             owner_only.contains("owner **local-0**") && !owner_only.contains("tracked"),
             "{owner_only}"
+        );
+        // OpenClaw detectError leftover — last CDP probe fail on Ready (omit when Warm).
+        let ready_fail = format_browser_ready_chip_with_glance(
+            9222,
+            "Google Chrome",
+            CachedBrowserSessionGlance::Absent,
+            0,
+            0,
+            None,
+            None,
+            Some("connection refused"),
+        );
+        assert!(
+            ready_fail.contains("Ready")
+                && ready_fail.contains("last fail **connection refused**"),
+            "{ready_fail}"
+        );
+        let busy_fail = format_browser_ready_chip_with_glance(
+            9222,
+            "Google Chrome",
+            CachedBrowserSessionGlance::Busy,
+            0,
+            0,
+            None,
+            None,
+            Some("ws attach failed"),
+        );
+        assert!(
+            busy_fail.contains("Busy") && busy_fail.contains("last fail **ws attach failed**"),
+            "{busy_fail}"
         );
     }
 
