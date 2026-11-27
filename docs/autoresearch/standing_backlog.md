@@ -1,3 +1,19 @@
+## Overnight note 2026-11-27 ~20:10 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace; Agent Ops slot used Quiet desk v0.1.3130).
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Sibling/standing: OpenClaw detectError leftover after active owner — `/browser` Ready showed CDP port but not last probe fail when Chrome attach failed.
+- Debug.log: no ERROR/WARN/panic clusters in window (pre-ship).
+- Fuel: sibling OpenClaw last CDP fail on `/browser` Ready/Busy — not tip/keep-pNN/section-open/pmset/insights/Warm/Longest/Quiet-desk/tracked-sessions/owner clone.
+- Shipped **v0.1.3134** — Discord `/browser` · `/cdp` Ready/Busy show **last fail** when last CDP probe failed (calm omit on Warm / no fail).
+- Ratchet keep @ 7f5cf4e01; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when scroll works / Hermes leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet desk + tracked sessions + active owner + last-fail closed; uuidlog remains block; not another insights/Warm/Longest/Quiet-desk/tracked-sessions/owner/last-fail clone.
+
+## Overnight merge — v0.1.3134
+
+- Sibling OpenClaw detectError after owner v0.1.3132: `/browser` · `/cdp` Ready/Busy show last fail when CDP probe failed. Digester empty; design-review slot used; layout-daily data-poster marked 2026-11-27. Next: Dark layout-daily / Agent Ops recapture — not another insights/Warm/Quiet-desk/tracked-sessions/owner/last-fail clone.
+
 ## Overnight note 2026-11-27 ~06:05 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace; Agent Ops slot already used Quiet desk v0.1.3130).
