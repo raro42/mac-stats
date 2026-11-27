@@ -3,6 +3,7 @@
 Overnight autoresearch kept product moves (not quiet).
 
 ## Shipped
+- **v0.1.3129** — Runs Insights / Discord `/insights`: show **Longest** turn (max `wall_ms` · lane · preview) — Hermes Notable leftover after most-tools / Tool calls total.
 - **v0.1.3128** — Runs Insights / Discord `/insights`: show **Tool calls** total (sum of `runs.jsonl` `tool_steps`) on the Turns line and as its own glance (Hermes overview leftover after Top tools share).
 - **v0.1.3127** — Discord `/browser` · `/cdp` **Warm**: show **pid** when Chrome OS process id is known (OpenClaw `RunningChrome.pid`; calm omit when attach-only / unknown).
 - **v0.1.3126** — Discord `/browser` · `/cdp` **Warm**: show **up** age (Chrome spawn; OpenClaw `startedAt`) beside **idle** (last BROWSER_* use).
@@ -26,4 +27,4 @@ Overnight autoresearch kept product moves (not quiet).
 - uuidlog still block; SoftDisabled…pmhistory + powerstate + refusal-awareness closed.
 
 ## Next fuel
-Agent Ops design-review when due / Dark layout-daily / OpenClaw leftover if tiny — SoftDisabled… + Browser Warm + close-tracked + native-pair + last-reconnect + periodic compaction flush/TODO + browser tracked glance + sessions idle glance + trackedAt oldest + Active time + Period + Channels + Warm up age + Warm pid + Tool calls total closed; not another Active-time / Period / Channels / sessions-idle / tracked-glance / tracked-oldest / last-reconnect / compaction-flush / Session-queue / Warm-up / Warm-pid / Tool-calls clone.
+Agent Ops design-review when due / Dark layout-daily / OpenClaw leftover if tiny — SoftDisabled… + Browser Warm + close-tracked + native-pair + last-reconnect + periodic compaction flush/TODO + browser tracked glance + sessions idle glance + trackedAt oldest + Active time + Period + Channels + Warm up age + Warm pid + Tool calls total + Longest turn closed; not another Active-time / Period / Channels / sessions-idle / tracked-glance / tracked-oldest / last-reconnect / compaction-flush / Session-queue / Warm-up / Warm-pid / Tool-calls / Longest clone.
