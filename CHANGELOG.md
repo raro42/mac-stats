@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3138] - 2026-11-27
+
+### Changed
+- Agent Ops Overview **Recent** empty: **Quiet shelf** title + warmer copy; Ready (ok) wash instead of amber warn (Quiet desk parity).
+
 ## [0.1.3137] - 2026-11-27
 
 ### Fixed

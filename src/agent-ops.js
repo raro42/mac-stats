@@ -7263,8 +7263,9 @@ function setOverviewRecentStatus(files) {
     card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
     const rows = Array.isArray(files) ? files : [];
     if (!rows.length) {
-        card.classList.add('ops-health-warn');
-        card.title = 'No recent chats — session memory shows up here';
+        // Idle Recent is calm (Quiet desk parity) — empty shelf is Ready, not amber warn.
+        card.classList.add('ops-health-ok');
+        card.title = 'Quiet shelf — session memory shows up after chats land';
         return;
     }
     const newestMs = rows.reduce((max, f) => {
@@ -7301,11 +7302,13 @@ function renderOverviewRecent(files) {
     body.innerHTML = '';
     setOverviewRecentStatus(files);
     if (!files || !files.length) {
-        paintOpsOverviewHeadCount('ops-overview-recent', 'None yet', { zero: true });
+        // Design-review feature-agent-ops: warm Recent empty (Quiet desk parity; drop stacked "No recent…").
+        paintOpsOverviewHeadCount('ops-overview-recent', 'Quiet', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
-          'No recent chats — session memory shows up here',
+          'Quiet for now — session memory lands here after Discord chats',
           'sessions',
-          'Open Sessions'
+          'Open Sessions',
+          'Quiet shelf'
         );
         return;
     }
