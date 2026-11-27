@@ -11453,8 +11453,19 @@ function escapeHtml(s) {
       if (!section) return;
       const key = String(section).trim().toLowerCase();
       if (key === 'agent-ops' || key === 'agent_ops' || key === 'ops') {
+        // Expand + scroll into view (parity with ai-chat / monitors / processes).
+        // Without scroll, design-review capture stays on metrics above the fold.
         applyOpsCollapsed(false);
         selectOpsTab('runs');
+        const scrollOps = () => {
+          const opsSection =
+            document.getElementById('agent-ops-section') ||
+            document.querySelector('.agent-ops-section');
+          scrollStart(opsSection);
+        };
+        scrollOps();
+        setTimeout(scrollOps, 400);
+        setTimeout(scrollOps, 1200);
       } else if (
         key === 'ai-chat' ||
         key === 'ai_chat' ||

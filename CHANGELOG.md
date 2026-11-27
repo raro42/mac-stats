@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3137] - 2026-11-27
+
+### Fixed
+- Agent Ops `?open=agent-ops` / `MAC_STATS_OPEN_SECTION=agent-ops`: scroll the Ops section into view after expand (parity with AI Chat · Monitors · Processes). Design-review capture no longer stays on metrics above the fold.
+
 ## [0.1.3136] - 2026-11-27
 
 ### Added
