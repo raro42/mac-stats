@@ -1,3 +1,19 @@
+## Overnight note 2026-11-27 ~04:17 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Sibling/standing: Hermes Tool calls total leftover after Warm pid v0.1.3127 — `/insights` + Agent Ops showed Top tools share but not overview total (sum of `tool_steps`).
+- Debug.log: no ERROR/WARN/panic clusters in window.
+- Fuel: sibling Hermes Tool calls total on insights — not tip/keep-pNN/section-open/pmset/insights Sources·Activity/live-age/reconnect-age/tool-%/Routing/Notable/LLM-skips/Replies/Session-queue/Browser-Warm/close-tracked/native-pair/last-reconnect/compaction-flush/tracked-glance/sessions-idle/tracked-oldest/Active-time/Period/Channels/Warm-up/Warm-pid clone.
+- Shipped **v0.1.3128** — Runs Insights / Discord `/insights` show Tool calls total (sum of `runs.jsonl` `tool_steps`) on Turns line + own glance.
+- Ratchet keep @ 2c6982a58; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Agent Ops design-review when due / Dark layout-daily / OpenClaw leftover if tiny — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age + chip disc/resume ages + tool-% + Routing + Notable + LLM skips + Replies + Session queue busy/tracked + wait depth + Browser Warm glance + close-tracked-tabs + native-only pairing + last reconnect duration + periodic compaction flush/TODO + browser tracked glance + sessions idle glance + trackedAt oldest + Active time + Period + Channels + Warm up age + Warm pid + Tool calls total closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age / reconnect-age / tool-% / Routing / Notable / LLM-skips / Replies / Session-queue / Browser-Warm / close-tracked / native-pair / last-reconnect / compaction-flush / tracked-glance / sessions-idle / tracked-oldest / Active-time / Period / Channels / Warm-up / Warm-pid / Tool-calls clone.
+
+## Overnight merge — v0.1.3128
+
+- Sibling Hermes Tool calls total after Warm pid v0.1.3127: `/insights` + Agent Ops show total tool_steps. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-27. Next: Agent Ops design-review when due / Dark layout — not another keep-pNN / section-open / insights / Session-queue / last-reconnect / compaction-flush / tracked-glance / sessions-idle / tracked-oldest / Active-time / Period / Channels / Warm-up / Warm-pid / Tool-calls clone.
+
 ## Overnight note 2026-11-27 ~03:50 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
