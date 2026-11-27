@@ -1,3 +1,19 @@
+## Overnight note 2026-11-27 ~06:05 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace; Agent Ops slot already used Quiet desk v0.1.3130).
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Sibling/standing: OpenClaw ActiveBrowserSessionGuard leftover after tracked sessions — `/browser` showed tracked N · oldest · sess but not which session key currently owns automation.
+- Debug.log: single-instance WARN only.
+- Fuel: sibling OpenClaw active owner on `/browser` — not tip/keep-pNN/section-open/pmset/insights/Warm/Longest/Quiet-desk/tracked-sessions clone.
+- Shipped **v0.1.3132** — Discord `/browser` · `/cdp` show **owner** key when a turn holds the browser (calm omit when idle).
+- Ratchet keep @ 6d6c66184; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when scroll works / Hermes leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet desk + tracked sessions + active owner closed; uuidlog remains block; not another insights/Warm/Longest/Quiet-desk/tracked-sessions/owner clone.
+
+## Overnight merge — v0.1.3132
+
+- Sibling OpenClaw active owner after tracked sessions v0.1.3131: `/browser` · `/cdp` show owner key while ActiveBrowserSessionGuard held. Digester empty; design-review slot used; layout-daily data-poster marked 2026-11-27. Next: Dark layout-daily / Agent Ops recapture — not another insights/Warm/Quiet-desk/tracked-sessions/owner clone.
+
 ## Overnight note 2026-11-27 ~05:40 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace; Agent Ops slot already used Quiet desk v0.1.3130).
