@@ -224,9 +224,36 @@ queue_has_live_work() {
 
 cycle_sleep_seconds() {
   if queue_has_live_work; then
+    # Live FEAT/WIP without a coder just hammers GitHub (see issue #29 spam).
+    if [[ "${AGENT_USE_CURSOR}" != "1" ]] || ! command -v cursor-agent >/dev/null 2>&1; then
+      echo "$sleepseconds"
+      return 0
+    fi
     echo "$busy_sleep_seconds"
   else
     echo "$sleepseconds"
+  fi
+}
+
+# Post a status comment once per distinct body per issue.
+# Without this, a stuck WIP re-comments every busy tick (issue #29: ~2500 identical Agent 002 lines).
+maybe_gh_comment() {
+  local issue_n="$1"
+  local body="$2"
+  local stamp="${STATEDIR}/gh-comment-${issue_n}.txt"
+  local prev=""
+  mkdir -p "$STATEDIR"
+  if [[ -f "$stamp" ]]; then
+    prev="$(cat "$stamp" 2>/dev/null || true)"
+  fi
+  if [[ "$prev" == "$body" ]]; then
+    echo "----- skip duplicate comment on #${issue_n}"
+    return 0
+  fi
+  if ./scripts/gh-safe.sh issue comment "$issue_n" --body "$body" 2>/dev/null; then
+    printf '%s' "$body" >"$stamp"
+  else
+    echo "----- comment failed on #${issue_n}" >&2
   fi
 }
 
@@ -256,7 +283,8 @@ close_github_issue_for_task() {
   gh issue edit "$n" --repo "$GH_REPO" --add-label "agent:done" 2>/dev/null || true
   gh issue edit "$n" --repo "$GH_REPO" --remove-label "agent:wip" 2>/dev/null || true
   gh issue edit "$n" --repo "$GH_REPO" --remove-label "agent:planned" 2>/dev/null || true
-  ./scripts/gh-safe.sh issue comment "$n" --body "Agent 004: handoff complete (\`${task_base}\`). Closing." 2>/dev/null || true
+  maybe_gh_comment "$n" "Agent 004: handoff complete (\`${task_base}\`). Closing."
+  rm -f "${STATEDIR}/gh-comment-${n}.txt"
   gh issue close "$n" --repo "$GH_REPO" --reason completed
 }
 
@@ -342,7 +370,11 @@ step_002_coder() {
     echo "----- 002: GitHub issue #${issue_n} -> agent:wip"
     gh issue edit "$issue_n" --repo "$GH_REPO" --add-label "agent:wip" 2>/dev/null || true
     gh issue edit "$issue_n" --repo "$GH_REPO" --remove-label "agent:planned" 2>/dev/null || true
-    ./scripts/gh-safe.sh issue comment "$issue_n" --body "Agent 002: coding (\`$(basename "$task")\`). Tester gets UNTESTED- when the batch is ready." 2>/dev/null || true
+    maybe_gh_comment "$issue_n" "Agent 002: coding (\`$(basename "$task")\`). Tester gets UNTESTED- when the batch is ready."
+  fi
+
+  if [[ "${AGENT_USE_CURSOR}" != "1" ]] || ! command -v cursor-agent >/dev/null 2>&1; then
+    echo "----- 002: WARNING stuck WIP $(basename "$task") — cursor-agent off; not coding, not re-commenting" >&2
   fi
 
   echo "----- 002: pending $(basename "$task")"
@@ -371,7 +403,7 @@ step_003_tester() {
   issue_n="$(issue_num_from_task "$base")"
   echo "----- 003: testing $(basename "$task")"
   if [[ "$issue_n" =~ ^[0-9]+$ ]]; then
-    ./scripts/gh-safe.sh issue comment "$issue_n" --body "Agent 003: testing (\`$(basename "$task")\`)." 2>/dev/null || true
+    maybe_gh_comment "$issue_n" "Agent 003: testing (\`$(basename "$task")\`)."
   fi
   run_cursor "003" \
     "Follow agents/testing/TESTER.md. Read agents/workspace/lessons.md. Test the GitHub TESTING- task under agents/testing/active/. Prefer cargo check / cargo test in src-tauri/. On pass: move to agents/tasks/CLOSED-N-…. On fail: back to agents/tasks/WIP-N-… with a test report. Do not close the GitHub issue. Do not paste secrets."
@@ -398,7 +430,7 @@ step_004_handoff() {
   grep -qE '^[[:space:]]*-?[[:space:]]*Handoff:[[:space:]]*complete' "$task" && already_complete=1
   echo "----- 004: handoff ${base}"
   if [[ "$already_complete" -ne 1 ]]; then
-    ./scripts/gh-safe.sh issue comment "$issue_n" --body "Agent 004: closing review + changelog (\`${base}\`)." 2>/dev/null || true
+    maybe_gh_comment "$issue_n" "Agent 004: closing review + changelog (\`${base}\`)."
     run_cursor "004" \
       "Follow agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md. Review ${base}. Align CHANGELOG.md. Commit and push origin/main if needed. Then write Handoff: complete in the task file. Do not paste secrets."
   else
