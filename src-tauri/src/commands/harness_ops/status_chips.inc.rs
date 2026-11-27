@@ -1591,19 +1591,21 @@ pub fn format_browser_ready_chip_with_glance(
         CachedBrowserSessionGlance::Warm {
             tab_count,
             focus_index,
+            up_secs,
             idle_secs,
             headless,
         } => {
             let mode = if headless { "headless" } else { "visible" };
+            let up = format_tracked_age_secs(up_secs);
             let idle = format_tracked_age_secs(idle_secs);
             format!(
-                "**Browser** · Warm · CDP {port} · `{short}` · tabs **{tab_count}** · focus **{focus_index}** · {mode} · idle {idle}{tracked_bit}"
+                "**Browser** · Warm · CDP {port} · `{short}` · tabs **{tab_count}** · focus **{focus_index}** · {mode} · up {up} · idle {idle}{tracked_bit}"
             )
         }
     }
 }
 
-/// Compact age for Warm idle / tracked oldest (secs → `45s` / `2m` / `1h`).
+/// Compact age for Warm up/idle / tracked oldest (secs → `45s` / `2m` / `1h`).
 pub(crate) fn format_tracked_age_secs(secs: u64) -> String {
     if secs < 60 {
         format!("{secs}s")
@@ -3316,7 +3318,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/mastodon` · `view mastodon` · `see mastodon` · `show me the mastodon` · `open mastodon` · `list the mastodon` — Mastodon Ready / Not set (instance URL + token; Settings or .config.env; no live probe)\n\
 • `/mcp` · `view mcp` · `see mcp` · `show me the mcp` · `open mcp` · `list the mcp` · `view mcp server` · `open mcp server` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; Settings or .config.env; no live probe)\n\
 • `/cursor` · `/cursor-agent` · `view cursor` · `see cursor` · `show me the cursor` · `open cursor` · `list the cursor` · `view cursor agent` · `open cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH or Settings path; no CLI probe)\n\
-• `/browser` · `/cdp` · `view browser` · `see browser` · `show me the browser` · `open browser` · `list the browser` · `view cdp` · `see cdp` · `show me the cdp` · `open cdp` · `list the cdp` — Browser / CDP Ready / Warm tabs·focus / tracked N · oldest (session-reset close queue + OpenClaw trackedAt age) / Busy / Off / Not set (Chromium path + port; cached session-tab glance; no `/json/version` probe)\n\
+• `/browser` · `/cdp` · `view browser` · `see browser` · `show me the browser` · `open browser` · `list the browser` · `view cdp` · `see cdp` · `show me the cdp` · `open cdp` · `list the cdp` — Browser / CDP Ready / Warm tabs·focus·up·idle (OpenClaw startedAt uptime + last-used idle) / tracked N · oldest (session-reset close queue + OpenClaw trackedAt age) / Busy / Off / Not set (Chromium path + port; cached session-tab glance; no `/json/version` probe)\n\
 • `/judge` · `view judge` · `see judge` · `show me the judge` · `open judge` · `list the judge` — Judge Ready / Off (Settings Product · agentJudgeEnabled · failure-only; config only, no judge run)\n\
 • `/ai` · `/ai-agent` · `view ai` · `see ai` · `show me the ai` · `open ai` · `list the ai` · `view ai agent` · `open ai agent` — AI On / Off (Settings Product · aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/compact` · `/menu-bar` · `/cpu-window` · `view compact` · `see compact` · `show me the compact` · `open compact` · `list the compact` · `view menu bar` · `open menu-bar` · `view cpu window` · `open cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\

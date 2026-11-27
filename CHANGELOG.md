@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3126] - 2026-11-27
+
+### Added
+- Discord `/browser` · `/cdp` **Warm**: show **up** age (Chrome spawn lifetime; OpenClaw `startedAt`) beside **idle** (last BROWSER_* use) — distinct from tracked oldest.
+
 ## [0.1.3125] - 2026-11-27
 
 ### Added

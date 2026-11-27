@@ -4882,6 +4882,8 @@ pub enum CachedBrowserSessionGlance {
     Warm {
         tab_count: usize,
         focus_index: usize,
+        /// Seconds since Chrome was spawned (OpenClaw `RunningChrome.startedAt`).
+        up_secs: u64,
         idle_secs: u64,
         headless: bool,
     },
@@ -5016,7 +5018,7 @@ pub fn snapshot_cached_browser_session() -> CachedBrowserSessionGlance {
         Err(std::sync::TryLockError::WouldBlock) => return CachedBrowserSessionGlance::Busy,
         Err(std::sync::TryLockError::Poisoned(p)) => p.into_inner(),
     };
-    let Some((browser, _created, last_used, headless)) = guard.as_ref() else {
+    let Some((browser, created, last_used, headless)) = guard.as_ref() else {
         return CachedBrowserSessionGlance::Absent;
     };
     let tab_count = match browser.get_tabs().try_lock() {
@@ -5036,6 +5038,7 @@ pub fn snapshot_cached_browser_session() -> CachedBrowserSessionGlance {
     CachedBrowserSessionGlance::Warm {
         tab_count,
         focus_index,
+        up_secs: created.elapsed().as_secs(),
         idle_secs: last_used.elapsed().as_secs(),
         headless: *headless,
     }

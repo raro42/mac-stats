@@ -147,6 +147,7 @@ mod tests {
             CachedBrowserSessionGlance::Warm {
                 tab_count: 3,
                 focus_index: 1,
+                up_secs: 300,
                 idle_secs: 45,
                 headless: true,
             },
@@ -157,6 +158,7 @@ mod tests {
         assert!(warm.contains("tabs **3**"), "{warm}");
         assert!(warm.contains("focus **1**"), "{warm}");
         assert!(warm.contains("headless"), "{warm}");
+        assert!(warm.contains("up 5m"), "{warm}");
         assert!(warm.contains("idle 45s"), "{warm}");
         assert!(!warm.contains("tracked"), "{warm}");
         let warm_m = format_browser_ready_chip_with_glance(
@@ -165,6 +167,7 @@ mod tests {
             CachedBrowserSessionGlance::Warm {
                 tab_count: 1,
                 focus_index: 0,
+                up_secs: 90,
                 idle_secs: 120,
                 headless: false,
             },
@@ -172,6 +175,7 @@ mod tests {
             Some(125),
         );
         assert!(warm_m.contains("visible"), "{warm_m}");
+        assert!(warm_m.contains("up 1m"), "{warm_m}");
         assert!(warm_m.contains("idle 2m"), "{warm_m}");
         assert!(warm_m.contains("tracked **2**"), "{warm_m}");
         assert!(warm_m.contains("oldest 2m"), "{warm_m}");
