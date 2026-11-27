@@ -7158,8 +7158,9 @@ function setOverviewKnowledgeStatus(files) {
     card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
     const rows = Array.isArray(files) ? files : [];
     if (!rows.length) {
-        card.classList.add('ops-health-warn');
-        card.title = 'No knowledge files yet — soul and memory land here';
+        // Idle Knowledge is calm (Quiet shelf parity) — empty vault is Ready, not amber warn.
+        card.classList.add('ops-health-ok');
+        card.title = 'Quiet vault — soul and memory show up when agents write them';
         return;
     }
     const n = rows.length;
@@ -7179,11 +7180,13 @@ function renderOverviewKnowledge(files) {
     body.innerHTML = '';
     setOverviewKnowledgeStatus(files);
     if (!files || !files.length) {
-        paintOpsOverviewHeadCount('ops-overview-knowledge', 'None yet', { zero: true });
+        // Design-review feature-agent-ops: warm Knowledge empty (Quiet shelf parity; drop stacked "No knowledge…").
+        paintOpsOverviewHeadCount('ops-overview-knowledge', 'Quiet', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
-          'No knowledge files yet — open Knowledge when soul or memory land',
+          'Quiet for now — soul and memory land here when agents write them',
           'memory',
-          'Open Knowledge'
+          'Open Knowledge',
+          'Quiet vault'
         );
         return;
     }

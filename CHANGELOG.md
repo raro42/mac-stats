@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3139] - 2026-11-27
+
+### Changed
+- Agent Ops Overview **Knowledge** empty: **Quiet vault** title + warmer copy; Ready (ok) wash instead of amber warn (Quiet shelf parity).
+
 ## [0.1.3138] - 2026-11-27
 
 ### Changed
