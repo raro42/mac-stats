@@ -1,3 +1,19 @@
+## Overnight note 2026-11-27 ~03:50 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (surfaces in grace).
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Sibling/standing: OpenClaw RunningChrome.pid leftover after Warm up age v0.1.3126 — `/browser` · `/cdp` Warm showed up/idle but not Chrome OS process id for kill/debug.
+- Debug.log: no ERROR/WARN/panic clusters in window.
+- Fuel: sibling OpenClaw Warm Chrome pid — not tip/keep-pNN/section-open/pmset/insights Sources·Activity/live-age/reconnect-age/tool-%/Routing/Notable/LLM-skips/Replies/Session-queue/Browser-Warm/close-tracked/native-pair/last-reconnect/compaction-flush/tracked-glance/sessions-idle/tracked-oldest/Active-time/Period/Channels/Warm-up clone.
+- Shipped **v0.1.3127** — Discord `/browser` · `/cdp` Warm show `pid` when known (OpenClaw RunningChrome.pid; omit unknown/attach-only).
+- Ratchet keep @ fbda4c1a2; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Agent Ops design-review when due / Dark layout-daily / Hermes leftover if tiny — SoftDisabled…pmhistory + powerstate + refusal-awareness + disk≡custom + Sources + Activity + live-age + chip disc/resume ages + tool-% + Routing + Notable + LLM skips + Replies + Session queue busy/tracked + wait depth + Browser Warm glance + close-tracked-tabs + native-only pairing + last reconnect duration + periodic compaction flush/TODO + browser tracked glance + sessions idle glance + trackedAt oldest + Active time + Period + Channels + Warm up age + Warm pid closed; uuidlog remains block; not another keep-pNN / section-open / thin pmset alias / insights Sources·Activity / live-age / reconnect-age / tool-% / Routing / Notable / LLM-skips / Replies / Session-queue / Browser-Warm / close-tracked / native-pair / last-reconnect / compaction-flush / tracked-glance / sessions-idle / tracked-oldest / Active-time / Period / Channels / Warm-up / Warm-pid clone.
+
+## Overnight merge — v0.1.3127
+
+- Sibling OpenClaw RunningChrome.pid after Warm up age v0.1.3126: `/browser` · `/cdp` Warm show pid when known. Digester empty; design-review due=false; layout-daily data-poster marked 2026-11-27. Next: Agent Ops design-review when due / Dark layout — not another keep-pNN / section-open / insights / Session-queue / last-reconnect / compaction-flush / tracked-glance / sessions-idle / tracked-oldest / Active-time / Period / Channels / Warm-up / Warm-pid clone.
+
 ## Overnight note 2026-11-27 ~03:30 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).

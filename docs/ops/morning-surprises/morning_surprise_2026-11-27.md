@@ -3,6 +3,7 @@
 Overnight autoresearch kept product moves (not quiet).
 
 ## Shipped
+- **v0.1.3127** — Discord `/browser` · `/cdp` **Warm**: show **pid** when Chrome OS process id is known (OpenClaw `RunningChrome.pid`; calm omit when attach-only / unknown).
 - **v0.1.3126** — Discord `/browser` · `/cdp` **Warm**: show **up** age (Chrome spawn; OpenClaw `startedAt`) beside **idle** (last BROWSER_* use).
 - **v0.1.3125** — Runs Insights / Discord `/insights`: **Channels** distinct Discord `channel_id` count · busiest share (Hermes Platforms leftover after Sources; calm when none).
 - **v0.1.3124** — Runs Insights / Discord `/insights`: **Period** first → last local day from `runs.jsonl` `ts` (Hermes Period leftover; calm when no dates).
@@ -24,4 +25,4 @@ Overnight autoresearch kept product moves (not quiet).
 - uuidlog still block; SoftDisabled…pmhistory + powerstate + refusal-awareness closed.
 
 ## Next fuel
-Agent Ops design-review when due / Dark layout-daily / Hermes leftover if tiny — SoftDisabled… + Browser Warm + close-tracked + native-pair + last-reconnect + periodic compaction flush/TODO + browser tracked glance + sessions idle glance + trackedAt oldest + Active time + Period + Channels + Warm up age closed; not another Active-time / Period / Channels / sessions-idle / tracked-glance / tracked-oldest / last-reconnect / compaction-flush / Session-queue / Warm-up clone.
+Agent Ops design-review when due / Dark layout-daily / Hermes leftover if tiny — SoftDisabled… + Browser Warm + close-tracked + native-pair + last-reconnect + periodic compaction flush/TODO + browser tracked glance + sessions idle glance + trackedAt oldest + Active time + Period + Channels + Warm up age + Warm pid closed; not another Active-time / Period / Channels / sessions-idle / tracked-glance / tracked-oldest / last-reconnect / compaction-flush / Session-queue / Warm-up / Warm-pid clone.
