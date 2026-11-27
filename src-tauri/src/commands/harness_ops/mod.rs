@@ -8552,4 +8552,26 @@ mod tests {
         let empty = format_period_insights_line(&insights);
         assert!(empty.contains("no dates yet"), "got: {empty}");
     }
+
+    #[test]
+    fn format_channels_insights_hermes_platforms() {
+        assert_eq!(format_channel_short("1467450744864243725"), "…3725");
+        assert_eq!(format_channel_short("abc"), "abc");
+        let mut insights = compute_runs_insights(1);
+        insights.turns = 100;
+        insights.channel_count = 3;
+        insights.busiest_channel = Some("…3725".into());
+        insights.busiest_channel_count = 80;
+        let line = format_channels_insights_line(&insights);
+        assert!(line.contains("Channels: **3**"), "got: {line}");
+        assert!(line.contains("busiest **…3725**×80 (80%)"), "got: {line}");
+        let text = format_runs_insights_gateway(&insights);
+        assert!(text.contains("Channels:"), "got: {text}");
+        assert!(text.contains("…3725"), "got: {text}");
+        insights.channel_count = 0;
+        insights.busiest_channel = None;
+        insights.busiest_channel_count = 0;
+        let empty = format_channels_insights_line(&insights);
+        assert!(empty.contains("no channels yet"), "got: {empty}");
+    }
 }

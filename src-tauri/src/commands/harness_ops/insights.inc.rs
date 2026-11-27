@@ -166,6 +166,28 @@ pub(super) fn format_period_insights_line(insights: &RunsInsights) -> String {
     }
 }
 
+/// Hermes Platforms leftover — distinct Discord `channel_id` + busiest share.
+pub(super) fn format_channels_insights_line(insights: &RunsInsights) -> String {
+    if insights.channel_count == 0 {
+        return "Channels: **no channels yet**".into();
+    }
+    let mut line = format!("Channels: **{}**", insights.channel_count);
+    if let Some(ch) = insights.busiest_channel.as_deref() {
+        if insights.busiest_channel_count > 0 {
+            let pct = if insights.turns > 0 {
+                (insights.busiest_channel_count as f64) * 100.0 / (insights.turns as f64)
+            } else {
+                0.0
+            };
+            line.push_str(&format!(
+                " · busiest **{ch}**×{} ({pct:.0}%)",
+                insights.busiest_channel_count
+            ));
+        }
+    }
+    line
+}
+
 /// Short Discord/gateway report (Hermes `/insights` lite).
 pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     let mut lines = Vec::new();
@@ -283,6 +305,10 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
         lines.push(format!("Sources: {sources}"));
     } else if insights.turns > 0 {
         lines.push("Sources: **no sources yet**".into());
+    }
+    // Hermes Platforms leftover — distinct Discord channel_id + busiest share.
+    if insights.turns > 0 {
+        lines.push(format_channels_insights_line(insights));
     }
     // Hermes `/insights` Activity — busiest local day/hour + active days + streak.
     if insights.turns > 0 {

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3125] - 2026-11-27
+
+### Added
+- Runs Insights / Discord `/insights`: show **Channels** distinct Discord `channel_id` count · busiest share (Hermes Platforms leftover after Sources; calm when none).
+
 ## [0.1.3124] - 2026-11-27
 
 ### Added

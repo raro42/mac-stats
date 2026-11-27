@@ -84,6 +84,13 @@ pub struct RunsInsights {
     pub by_lane: Vec<(String, usize)>,
     /// Hermes-style platform/source mix (`entry` from runs.jsonl: discord, agent_router, …).
     pub by_entry: Vec<(String, usize)>,
+    /// Hermes Platforms leftover: distinct Discord `channel_id` values (skip missing).
+    pub channel_count: usize,
+    /// Hermes Platforms leftover: short label of the busiest channel (`…3725`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub busiest_channel: Option<String>,
+    /// Turn count on `busiest_channel`.
+    pub busiest_channel_count: usize,
     /// Hermes Activity: weekday label of the busiest local day (`Mon`…`Sun`), when known.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub busiest_day: Option<String>,
@@ -496,6 +503,9 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         latency_sample: 0,
         by_lane: vec![],
         by_entry: vec![],
+        channel_count: 0,
+        busiest_channel: None,
+        busiest_channel_count: 0,
         busiest_day: None,
         busiest_day_count: 0,
         busiest_hour: None,
@@ -551,6 +561,8 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
     let mut lane_counts: std::collections::BTreeMap<String, usize> =
         std::collections::BTreeMap::new();
     let mut entry_counts: std::collections::BTreeMap<String, usize> =
+        std::collections::BTreeMap::new();
+    let mut channel_counts: std::collections::BTreeMap<String, usize> =
         std::collections::BTreeMap::new();
     let mut tool_counts: std::collections::BTreeMap<String, usize> =
         std::collections::BTreeMap::new();
@@ -613,6 +625,20 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
             .unwrap_or("?")
             .to_string();
         *entry_counts.entry(entry).or_default() += 1;
+        // Hermes Platforms leftover: distinct Discord channel_id (skip null / empty).
+        let channel_id = v.get("channel_id").and_then(|x| {
+            x.as_u64()
+                .map(|n| n.to_string())
+                .or_else(|| x.as_i64().map(|n| n.to_string()))
+                .or_else(|| {
+                    x.as_str()
+                        .map(|s| s.trim().to_string())
+                        .filter(|s| !s.is_empty() && s != "null" && s != "None")
+                })
+        });
+        if let Some(ch) = channel_id {
+            *channel_counts.entry(ch).or_default() += 1;
+        }
         let tools = v
             .get("tools")
             .and_then(|t| t.as_array())
@@ -756,6 +782,12 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
     let by_lane: Vec<_> = lane_counts.into_iter().collect();
     let mut by_entry: Vec<_> = entry_counts.into_iter().collect();
     by_entry.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
+    let channel_count = channel_counts.len();
+    let (busiest_channel, busiest_channel_count) = channel_counts
+        .into_iter()
+        .max_by(|a, b| a.1.cmp(&b.1).then(a.0.cmp(&b.0)))
+        .map(|(id, n)| (Some(format_channel_short(&id)), n))
+        .unwrap_or((None, 0));
     let activity = compute_runs_activity_patterns(&activity_tss);
     let avg_tool_steps = if turns == 0 {
         0.0
@@ -794,6 +826,9 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         latency_sample,
         by_lane,
         by_entry,
+        channel_count,
+        busiest_channel,
+        busiest_channel_count,
         busiest_day: activity.busiest_day,
         busiest_day_count: activity.busiest_day_count,
         busiest_hour: activity.busiest_hour,
@@ -833,6 +868,19 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         process_uptime_secs: crate::state::process_uptime_secs(),
         window_days,
     }
+}
+
+/// Compact Discord channel id for insights (`…3725` when longer than 6 chars).
+pub(super) fn format_channel_short(id: &str) -> String {
+    let id = id.trim();
+    if id.is_empty() {
+        return "?".into();
+    }
+    if id.chars().count() <= 6 {
+        return id.to_string();
+    }
+    let tail: String = id.chars().rev().take(4).collect::<String>().chars().rev().collect();
+    format!("…{tail}")
 }
 
 /// Hermes Period labels from UTC timestamps (`Nov 20`, `Nov 26, 2025` when year differs).

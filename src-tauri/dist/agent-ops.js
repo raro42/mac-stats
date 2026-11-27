@@ -5558,6 +5558,20 @@ function formatPeriodInsightsLine(insights) {
     return `${start} — ${end}`;
 }
 
+/** Hermes Platforms leftover — distinct Discord channel_id + busiest share. */
+function formatChannelsInsightsLine(insights) {
+    const n = Number(insights?.channel_count) || 0;
+    if (n <= 0) return 'no channels yet';
+    const ch = String(insights?.busiest_channel || '').trim();
+    const chN = Number(insights?.busiest_channel_count) || 0;
+    const turns = Math.max(1, Number(insights?.turns) || 0);
+    if (ch && chN > 0) {
+        const pct = Math.round((chN * 100) / turns);
+        return `Channels: ${n} · busiest ${ch}×${chN} (${pct}%)`;
+    }
+    return `Channels: ${n}`;
+}
+
 /** Compact wall duration for Active time / avg turn (`450ms` / `3.2s` / `12m` / `2h`). */
 function formatWallDurationMs(ms) {
     const n = Math.max(0, Math.floor(Number(ms) || 0));
@@ -5921,6 +5935,9 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
                 .map((pair) => (Array.isArray(pair) ? `${pair[0]}:${pair[1]}` : String(pair)))
                 .join(' · ');
             if (sources) latBits.push(`src ${sources}`);
+            if (Number(insights.channel_count) > 0) {
+                latBits.push(formatChannelsInsightsLine(insights));
+            }
             if (insights.busiest_day && insights.busiest_hour != null) {
                 const hr = Number(insights.busiest_hour);
                 const display = ((hr % 12) || 12);
@@ -10507,6 +10524,43 @@ function renderOpsRuns(insights) {
                 empty.innerHTML =
                     `<div class="ops-empty-filter-title">No sources yet</div>` +
                     `<div class="ops-empty-tab-hint">Source mix (discord · agent_router · …) appears after turns land</div>`;
+                card.appendChild(empty);
+            }
+        }
+        {
+            // Channels (Hermes Platforms leftover) — distinct Discord channel_id + busiest share.
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Channels';
+            card.appendChild(sub);
+            const turnsN = Number(insights.turns) || 0;
+            const chN = Number(insights.channel_count) || 0;
+            if (turnsN > 0 && chN > 0) {
+                const chEl = document.createElement('div');
+                chEl.className = 'ops-row-meta';
+                chEl.textContent = formatChannelsInsightsLine(insights);
+                chEl.title =
+                    'Distinct Discord channel_id from runs.jsonl — Hermes Platforms depth (after Sources)';
+                card.appendChild(chEl);
+            } else if (turnsN > 0) {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Channels appear after Discord turns record channel_id';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No channels yet</div>` +
+                    `<div class="ops-empty-tab-hint">Distinct channel count appears after Discord turns land</div>`;
+                card.appendChild(empty);
+            } else {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Channels appear after Discord turns land';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No channels yet</div>` +
+                    `<div class="ops-empty-tab-hint">Channel mix appears after Discord turns land</div>`;
                 card.appendChild(empty);
             }
         }
