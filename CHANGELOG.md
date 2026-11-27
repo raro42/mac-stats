@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3128] - 2026-11-27
+
+### Added
+- Runs Insights / Discord `/insights`: show **Tool calls** total (sum of `runs.jsonl` `tool_steps`) on the Turns line and as its own glance — Hermes overview leftover after Top tools share.
+
 ## [0.1.3127] - 2026-11-27
 
 ### Added

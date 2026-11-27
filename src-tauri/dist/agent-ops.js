@@ -5499,6 +5499,13 @@ function formatToolShare(name, count, total) {
     return `${name}×${n} (${pct.toFixed(1)}%)`;
 }
 
+/** Hermes overview leftover — total tool calls (sum of runs.jsonl `tool_steps`). */
+function formatToolCallsInsightsLine(insights) {
+    const n = Number(insights?.total_tool_calls) || 0;
+    if (n <= 0) return 'none yet';
+    return String(n);
+}
+
 /** Hermes overview leftover — pre-routed share · avg tool steps · verify pass. */
 function formatRoutingInsightsLine(insights) {
     const turns = Math.max(1, Number(insights?.turns) || 0);
@@ -5937,6 +5944,9 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
             if (sources) latBits.push(`src ${sources}`);
             if (Number(insights.channel_count) > 0) {
                 latBits.push(formatChannelsInsightsLine(insights));
+            }
+            if (Number(insights.total_tool_calls) > 0) {
+                latBits.push(`tools ${formatToolCallsInsightsLine(insights)}`);
             }
             if (insights.busiest_day && insights.busiest_hour != null) {
                 const hr = Number(insights.busiest_hour);
@@ -10439,7 +10449,7 @@ function renderOpsRuns(insights) {
             : 'mean n/a · max n/a';
         card.innerHTML = `
             <div class="ops-insight-title">Insights</div>
-            <div class="ops-row-meta">${insights.ok_count}/${insights.turns} ok · ${formatOpsFailBit(insights.fail_count)} · ${headerLat}</div>
+            <div class="ops-row-meta">${insights.ok_count}/${insights.turns} ok · ${formatOpsFailBit(insights.fail_count)} · tools ${formatToolCallsInsightsLine(insights)} · ${headerLat}</div>
             <div class="ops-row-meta">Digest: ${formatOpsDigestOpenBit(insights.digest_open_count)} · ${formatOpsDigestStaleBit(insights.digest_stale_count)}${insights.digest_source ? ` · ${escapeHtml(insights.digest_source)}` : ''}${insights.digest_generated_at ? ` · ${escapeHtml(String(insights.digest_generated_at).slice(0, 19))}` : ''}</div>
         `;
         appendOpsDiscordGatewayLine(card, gateway);
@@ -10599,6 +10609,32 @@ function renderOpsRuns(insights) {
                 empty.innerHTML =
                     `<div class="ops-empty-filter-title">No activity yet</div>` +
                     `<div class="ops-empty-tab-hint">Busiest day · hour appear after dated turns land</div>`;
+                card.appendChild(empty);
+            }
+        }
+        {
+            // Tool calls (Hermes overview leftover) — sum of runs.jsonl tool_steps.
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Tool calls';
+            card.appendChild(sub);
+            const turnsN = Number(insights.turns) || 0;
+            const totalTools = Number(insights.total_tool_calls) || 0;
+            if (turnsN > 0) {
+                const toolsTotalEl = document.createElement('div');
+                toolsTotalEl.className = 'ops-row-meta';
+                toolsTotalEl.textContent =
+                    totalTools > 0 ? String(totalTools) : 'none yet';
+                card.appendChild(toolsTotalEl);
+            } else {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Tool call totals appear after Discord or chat turns land';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No tools yet</div>` +
+                    `<div class="ops-empty-tab-hint">Total tool_steps appear after turns land</div>`;
                 card.appendChild(empty);
             }
         }

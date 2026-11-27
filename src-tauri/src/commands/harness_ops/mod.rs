@@ -8582,4 +8582,19 @@ mod tests {
         let empty = format_channels_insights_line(&insights);
         assert!(empty.contains("no channels yet"), "got: {empty}");
     }
+
+    #[test]
+    fn format_tool_calls_insights_hermes_overview() {
+        let mut insights = compute_runs_insights(1);
+        insights.turns = 12;
+        insights.total_tool_calls = 47;
+        let line = format_tool_calls_insights_line(&insights);
+        assert!(line.contains("Tool calls: **47**"), "got: {line}");
+        let text = format_runs_insights_gateway(&insights);
+        assert!(text.contains("Tool calls: **47**"), "got: {text}");
+        assert!(text.contains("tools **47**"), "got: {text}");
+        insights.total_tool_calls = 0;
+        let empty = format_tool_calls_insights_line(&insights);
+        assert!(empty.contains("none yet"), "got: {empty}");
+    }
 }

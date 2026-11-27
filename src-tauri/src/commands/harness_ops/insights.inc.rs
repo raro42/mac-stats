@@ -48,6 +48,14 @@ pub(super) fn format_tool_share(name: &str, count: usize, total: usize) -> Strin
     format!("{name}×{count} ({pct:.1}%)")
 }
 
+/// Hermes overview leftover: total tool calls (sum of runs.jsonl `tool_steps`).
+pub(super) fn format_tool_calls_insights_line(insights: &RunsInsights) -> String {
+    if insights.total_tool_calls == 0 {
+        return "Tool calls: **none yet**".into();
+    }
+    format!("Tool calls: **{}**", insights.total_tool_calls)
+}
+
 /// Hermes overview leftover: pre-routed share · avg tool steps · verify pass.
 pub(super) fn format_routing_insights_line(insights: &RunsInsights) -> String {
     let turns = insights.turns.max(1);
@@ -204,10 +212,11 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
         };
         lines.push(title);
         lines.push(format!(
-            "Turns: **{}** · ok {} · {} · p50 **{}** · mean {} · max {}{}",
+            "Turns: **{}** · ok {} · {} · tools **{}** · p50 **{}** · mean {} · max {}{}",
             insights.turns,
             insights.ok_count,
             fail_status_bit(insights.fail_count),
+            insights.total_tool_calls,
             if insights.latency_sample == 0 {
                 "n/a".into()
             } else {
@@ -333,6 +342,10 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
             }
             _ => lines.push("Busiest: **no activity yet**".into()),
         }
+    }
+    // Hermes overview leftover — total tool_steps (Sessions|Messages|Tool calls).
+    if insights.turns > 0 {
+        lines.push(format_tool_calls_insights_line(insights));
     }
     if !insights.by_tool.is_empty() {
         // Hermes `/insights` tool share — count + % of all tool calls.

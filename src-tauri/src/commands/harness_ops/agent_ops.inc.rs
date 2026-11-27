@@ -104,6 +104,8 @@ pub struct RunsInsights {
     /// Longest run of consecutive local calendar days with activity (Hermes best streak).
     pub max_streak: usize,
     pub by_tool: Vec<(String, usize)>,
+    /// Hermes overview leftover: sum of `tool_steps` across turns (total tool calls).
+    pub total_tool_calls: usize,
     /// Hermes overview leftover: turns with `pre_routed: true` (instant / slash adapters).
     pub pre_routed_count: usize,
     /// Mean `tool_steps` across turns (Hermes avg tools / session analogue).
@@ -513,6 +515,7 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         active_days: 0,
         max_streak: 0,
         by_tool: vec![],
+        total_tool_calls: 0,
         pre_routed_count: 0,
         avg_tool_steps: 0.0,
         verify_scored: 0,
@@ -789,6 +792,7 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         .map(|(id, n)| (Some(format_channel_short(&id)), n))
         .unwrap_or((None, 0));
     let activity = compute_runs_activity_patterns(&activity_tss);
+    let total_tool_calls = tool_steps_sum as usize;
     let avg_tool_steps = if turns == 0 {
         0.0
     } else {
@@ -836,6 +840,7 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         active_days: activity.active_days,
         max_streak: activity.max_streak,
         by_tool,
+        total_tool_calls,
         pre_routed_count,
         avg_tool_steps,
         verify_scored,
