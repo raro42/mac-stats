@@ -150,6 +150,7 @@ mod tests {
                 up_secs: 300,
                 idle_secs: 45,
                 headless: true,
+                chrome_pid: Some(4242),
             },
             0,
             None,
@@ -160,6 +161,7 @@ mod tests {
         assert!(warm.contains("headless"), "{warm}");
         assert!(warm.contains("up 5m"), "{warm}");
         assert!(warm.contains("idle 45s"), "{warm}");
+        assert!(warm.contains("pid **4242**"), "{warm}");
         assert!(!warm.contains("tracked"), "{warm}");
         let warm_m = format_browser_ready_chip_with_glance(
             9222,
@@ -170,6 +172,7 @@ mod tests {
                 up_secs: 90,
                 idle_secs: 120,
                 headless: false,
+                chrome_pid: None,
             },
             2,
             Some(125),
@@ -177,6 +180,7 @@ mod tests {
         assert!(warm_m.contains("visible"), "{warm_m}");
         assert!(warm_m.contains("up 1m"), "{warm_m}");
         assert!(warm_m.contains("idle 2m"), "{warm_m}");
+        assert!(!warm_m.contains("pid"), "{warm_m}");
         assert!(warm_m.contains("tracked **2**"), "{warm_m}");
         assert!(warm_m.contains("oldest 2m"), "{warm_m}");
         let absent_tracked = format_browser_ready_chip_with_glance(

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3127] - 2026-11-27
+
+### Added
+- Discord `/browser` · `/cdp` **Warm**: show **pid** when Chrome OS process id is known (OpenClaw `RunningChrome.pid`; calm omit when attach-only / unknown).
+
 ## [0.1.3126] - 2026-11-27
 
 ### Added

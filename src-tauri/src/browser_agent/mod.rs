@@ -4886,6 +4886,8 @@ pub enum CachedBrowserSessionGlance {
         up_secs: u64,
         idle_secs: u64,
         headless: bool,
+        /// Chrome OS process id when known (OpenClaw `RunningChrome.pid`; omit when attach-only).
+        chrome_pid: Option<u32>,
     },
 }
 
@@ -5035,12 +5037,25 @@ pub fn snapshot_cached_browser_session() -> CachedBrowserSessionGlance {
     } else {
         focus_raw.min(tab_count - 1)
     };
+    // Prefer headless_chrome child PID; fall back to owned visible spawn tracker.
+    let chrome_pid = browser
+        .get_process_id()
+        .filter(|p| *p > 0)
+        .or_else(|| {
+            let owned = OWNED_VISIBLE_CHROME_CHILD_PID.load(Ordering::SeqCst);
+            if owned > 0 {
+                Some(owned)
+            } else {
+                None
+            }
+        });
     CachedBrowserSessionGlance::Warm {
         tab_count,
         focus_index,
         up_secs: created.elapsed().as_secs(),
         idle_secs: last_used.elapsed().as_secs(),
         headless: *headless,
+        chrome_pid,
     }
 }
 
