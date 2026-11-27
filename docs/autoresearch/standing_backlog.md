@@ -1,3 +1,19 @@
+## Overnight note 2026-11-27 ~21:00 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace; Agent Ops slot used Quiet desk v0.1.3130).
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Sibling/standing: Hermes Notable Most messages leftover after focus-page — `/insights` showed Replies mean·p50·max and Longest wall but not which turn had the most reply chars.
+- Debug.log: no ERROR/WARN/panic clusters in window (pre-ship).
+- Fuel: sibling Hermes Most reply on insights — not tip/keep-pNN/section-open/pmset/insights/Warm/Longest/Quiet-desk/tracked/owner/last-fail/focus-page/Replies-aggregate-only clone.
+- Shipped **v0.1.3136** — Runs Insights / Discord `/insights` show **Most reply** (max reply_chars · lane · wall · preview).
+- Ratchet keep @ 091ea0a97; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when scroll works / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet desk + tracked sessions + active owner + last-fail + focus-page + Most reply closed; uuidlog remains block; not another insights/Warm/Quiet-desk/tracked-sessions/owner/last-fail/focus-page/Most-reply clone.
+
+## Overnight merge — v0.1.3136
+
+- Sibling Hermes Most reply after focus-page v0.1.3135: `/insights` + Agent Ops show max reply_chars · lane · wall · preview. Digester empty; design-review slot used; layout-daily data-poster marked 2026-11-27. Next: Dark layout-daily / Agent Ops recapture — not another insights/Warm/Quiet-desk/tracked-sessions/owner/last-fail/focus-page/Most-reply clone.
+
 ## Overnight note 2026-11-27 ~20:35 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace; Agent Ops slot used Quiet desk v0.1.3130).
