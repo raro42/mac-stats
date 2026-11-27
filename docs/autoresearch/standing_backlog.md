@@ -1,3 +1,19 @@
+## Overnight note 2026-11-27 ~21:25 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace; Agent Ops slot used Quiet desk v0.1.3130).
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Sibling/standing: Agent Ops recapture blocked — `?open=agent-ops` expanded Ops but never scrolled into view (AI Chat / Monitors / Processes already scrolled), so window-only capture stayed on metrics.
+- Debug.log: no ERROR/WARN/panic clusters in window (pre-ship).
+- Fuel: Agent Ops open-section scroll parity — not tip/keep-pNN/section-open/pmset/insights/Warm/Longest/Quiet-desk/tracked/owner/last-fail/focus-page/Most-reply clone.
+- Shipped **v0.1.3137** — `?open=agent-ops` / `MAC_STATS_OPEN_SECTION=agent-ops` scrolls Ops into view after expand (retries 0/400/1200ms).
+- Ratchet keep @ e19b923af; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture now that scroll works / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet desk + tracked sessions + active owner + last-fail + focus-page + Most reply + Ops open-scroll closed; uuidlog remains block; not another insights/Warm/Quiet-desk/tracked-sessions/owner/last-fail/focus-page/Most-reply/open-scroll clone.
+
+## Overnight merge — v0.1.3137
+
+- Agent Ops `?open=agent-ops` scrollIntoView after expand (design-review capture was stuck on metrics). Digester empty; design-review slot used; layout-daily data-poster marked 2026-11-27. Next: Dark layout-daily / Agent Ops recapture — not another insights/Warm/Quiet-desk/tracked/owner/last-fail/focus-page/Most-reply clone.
+
 ## Overnight note 2026-11-27 ~21:00 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace; Agent Ops slot used Quiet desk v0.1.3130).
