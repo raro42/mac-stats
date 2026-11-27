@@ -3,6 +3,7 @@
 Overnight autoresearch kept product moves (not quiet).
 
 ## Shipped
+- **v0.1.3130** — Agent Ops overview **Live** empty: warmer **Quiet desk** title + copy (drop stacked “Nothing…”; gateway-waking tip when Discord is not Ready). Design-review polish; `feature-agent-ops` capture deferred (window stayed on metrics) · polish grace refreshed.
 - **v0.1.3129** — Runs Insights / Discord `/insights`: show **Longest** turn (max `wall_ms` · lane · preview) — Hermes Notable leftover after most-tools / Tool calls total.
 - **v0.1.3128** — Runs Insights / Discord `/insights`: show **Tool calls** total (sum of `runs.jsonl` `tool_steps`) on the Turns line and as its own glance (Hermes overview leftover after Top tools share).
 - **v0.1.3127** — Discord `/browser` · `/cdp` **Warm**: show **pid** when Chrome OS process id is known (OpenClaw `RunningChrome.pid`; calm omit when attach-only / unknown).
@@ -23,8 +24,8 @@ Overnight autoresearch kept product moves (not quiet).
 - Earlier tonight: **v0.1.3112** Replies · **v0.1.3111** LLM skips · **v0.1.3110** Notable · **v0.1.3109** Routing.
 
 ## Context
-- Digester open empty; design-review grace; layout-daily data-poster remaps clean → marked 2026-11-27.
+- Digester open empty; design-review grace refreshed after Live empty polish; layout-daily data-poster remaps clean → marked 2026-11-27.
 - uuidlog still block; SoftDisabled…pmhistory + powerstate + refusal-awareness closed.
 
 ## Next fuel
-Agent Ops design-review when due / Dark layout-daily / OpenClaw leftover if tiny — SoftDisabled… + Browser Warm + close-tracked + native-pair + last-reconnect + periodic compaction flush/TODO + browser tracked glance + sessions idle glance + trackedAt oldest + Active time + Period + Channels + Warm up age + Warm pid + Tool calls total + Longest turn closed; not another Active-time / Period / Channels / sessions-idle / tracked-glance / tracked-oldest / last-reconnect / compaction-flush / Session-queue / Warm-up / Warm-pid / Tool-calls / Longest clone.
+Dark layout-daily next calendar day / Mac Agent Ops recapture when scroll works / OpenClaw leftover if tiny — SoftDisabled… + Browser Warm + close-tracked + native-pair + last-reconnect + periodic compaction flush/TODO + browser tracked glance + sessions idle glance + trackedAt oldest + Active time + Period + Channels + Warm up age + Warm pid + Tool calls total + Longest turn + Quiet desk closed; not another insights / Warm / Longest / Quiet-desk clone.

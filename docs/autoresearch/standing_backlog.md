@@ -1,3 +1,17 @@
+## Overnight note 2026-11-27 ~05:13 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace) — proceeded per skill (digester empty + backlog pointed here).
+- Layout daily: data-poster already marked 2026-11-27 (due=false); Dark [DUE] next calendar day if needed.
+- Fuel: design-review Agent Ops Live empty copy — not tip/keep-pNN/section-open/pmset/insights/Warm/Longest clone.
+- Shipped **v0.1.3130** — Agent Ops Live empty **Quiet desk** + warmer copy; polish grace; capture deferred.
+- Ratchet keep @ dbe253452; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-27 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when scroll works / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet desk closed; uuidlog remains block; not another insights/Warm/Longest/Quiet-desk clone.
+
+## Overnight merge — v0.1.3130
+
+- Design-review Agent Ops Live empty after Longest turn v0.1.3129: Quiet desk title + warmer copy. Digester empty; layout-daily data-poster marked 2026-11-27. Next: Dark layout-daily / Agent Ops recapture — not another insights/Warm/Longest/Quiet-desk clone.
+
 ## Overnight note 2026-11-27 ~04:42 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (surfaces in grace).
