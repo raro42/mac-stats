@@ -36465,6 +36465,20 @@ pub fn looks_like_knowledge_request(content: &str) -> bool {
 }
 
 
+/// Empty-body copy for `/knowledge` filters (Agent Ops Quiet vault parity).
+pub(crate) fn knowledge_empty_body(filter: KnowledgeListFilter) -> &'static str {
+    match filter {
+        // Quiet vault — Agent Ops UI empty parity (drop cold "No knowledge files yet…").
+        KnowledgeListFilter::All => {
+            "_Quiet vault — quiet for now; soul and memory land when agents write them._"
+        }
+        KnowledgeListFilter::Discord => "_Quiet vault — no Discord channel memory yet._",
+        KnowledgeListFilter::Core => {
+            "_Quiet vault — no Core knowledge (soul / global / main) yet._"
+        }
+    }
+}
+
 /// Zero-LLM knowledge report (Agent Ops Knowledge All · Discord · Core filter parity).
 pub fn format_knowledge_gateway(filter: KnowledgeListFilter) -> String {
     let files = list_memory_files().unwrap_or_default();
@@ -36497,10 +36511,7 @@ pub fn format_knowledge_gateway(filter: KnowledgeListFilter) -> String {
     match filter {
         KnowledgeListFilter::All => {
             if files.is_empty() {
-                lines.push(
-                    "_No knowledge files yet — soul/global/main or Discord channel memory._"
-                        .to_string(),
-                );
+                lines.push(knowledge_empty_body(KnowledgeListFilter::All).to_string());
             } else {
                 if discord_n > 0 {
                     lines.push("**Discord**".to_string());
@@ -36536,7 +36547,7 @@ pub fn format_knowledge_gateway(filter: KnowledgeListFilter) -> String {
                 .filter(|f| knowledge_row_is_discord(&f.kind))
                 .collect();
             if rows.is_empty() {
-                lines.push("_No Discord channel memory files yet._".to_string());
+                lines.push(knowledge_empty_body(KnowledgeListFilter::Discord).to_string());
             } else {
                 for f in rows.iter().take(MAX_ROWS) {
                     lines.push(knowledge_row(f));
@@ -36552,7 +36563,7 @@ pub fn format_knowledge_gateway(filter: KnowledgeListFilter) -> String {
                 .filter(|f| knowledge_row_is_core(&f.kind))
                 .collect();
             if rows.is_empty() {
-                lines.push("_No Core knowledge files (soul / global / main) yet._".to_string());
+                lines.push(knowledge_empty_body(KnowledgeListFilter::Core).to_string());
             } else {
                 for f in rows.iter().take(MAX_ROWS) {
                     lines.push(knowledge_row(f));

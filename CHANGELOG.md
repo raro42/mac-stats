@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3154] - 2026-11-28
+
+### Changed
+- Discord `/knowledge` · Discord / Core empty: **Quiet vault** (Agent Ops UI empty parity; drop cold “No knowledge files yet…” / “No Discord channel memory files yet” / “No Core knowledge files…”).
+
 ## [0.1.3153] - 2026-11-28
 
 ### Changed

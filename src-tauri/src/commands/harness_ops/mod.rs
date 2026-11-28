@@ -413,6 +413,37 @@ mod tests {
     }
 
     #[test]
+    fn knowledge_empty_body_quiet_vault_parity() {
+        let all_empty = knowledge_empty_body(KnowledgeListFilter::All);
+        assert!(
+            all_empty.contains("Quiet vault"),
+            "empty /knowledge must say Quiet vault: {all_empty}"
+        );
+        assert!(
+            !all_empty.contains("No knowledge files yet"),
+            "empty /knowledge must drop cold No knowledge files yet: {all_empty}"
+        );
+        let discord_empty = knowledge_empty_body(KnowledgeListFilter::Discord);
+        assert!(
+            discord_empty.contains("Quiet vault"),
+            "empty /knowledge discord must say Quiet vault: {discord_empty}"
+        );
+        assert!(
+            !discord_empty.contains("No Discord channel memory files yet"),
+            "empty /knowledge discord must drop cold copy: {discord_empty}"
+        );
+        let core_empty = knowledge_empty_body(KnowledgeListFilter::Core);
+        assert!(
+            core_empty.contains("Quiet vault"),
+            "empty /knowledge core must say Quiet vault: {core_empty}"
+        );
+        assert!(
+            !core_empty.contains("No Core knowledge files"),
+            "empty /knowledge core must drop cold copy: {core_empty}"
+        );
+    }
+
+    #[test]
     fn ram_ring_chip_ask_does_not_steal_strip_ram() {
         assert_eq!(parse_ring_chip_ask("/ram-ring"), Some(RingChipAsk::Ram));
         assert_eq!(parse_ring_chip_ask("ram ring"), Some(RingChipAsk::Ram));
