@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3147] - 2026-11-28
+
+### Changed
+- Discord `/browser` · `/cdp` Warm: show focused tab **title** when known (OpenClaw browser-tabs title leftover; omit blank / New Tab / untitled; page host unchanged).
+
 ## [0.1.3146] - 2026-11-28
 
 ### Changed

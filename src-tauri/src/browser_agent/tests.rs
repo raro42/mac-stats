@@ -417,3 +417,18 @@ use super::*;
         assert_eq!(focus_page_host_for_glance("chrome-error://chromewebdata/"), None);
         assert_eq!(focus_page_host_for_glance(""), None);
     }
+
+    #[test]
+    fn focus_page_title_for_glance_skips_noise_and_keeps_real() {
+        assert_eq!(
+            focus_page_title_for_glance("Example Domain"),
+            Some("Example Domain".into())
+        );
+        assert_eq!(focus_page_title_for_glance(""), None);
+        assert_eq!(focus_page_title_for_glance("   "), None);
+        assert_eq!(focus_page_title_for_glance("New Tab"), None);
+        assert_eq!(focus_page_title_for_glance("new tab"), None);
+        assert_eq!(focus_page_title_for_glance("Untitled"), None);
+        assert_eq!(focus_page_title_for_glance("about:blank"), None);
+        assert_eq!(focus_page_title_for_glance("chrome://newtab/"), None);
+    }

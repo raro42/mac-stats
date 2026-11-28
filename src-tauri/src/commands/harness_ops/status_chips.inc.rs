@@ -1623,6 +1623,7 @@ pub fn format_browser_ready_chip_with_glance(
             tab_count,
             focus_index,
             focus_host,
+            focus_title,
             up_secs,
             idle_secs,
             headless,
@@ -1631,6 +1632,7 @@ pub fn format_browser_ready_chip_with_glance(
             let mode = if headless { "headless" } else { "visible" };
             let up = format_tracked_age_secs(up_secs);
             let idle = format_tracked_age_secs(idle_secs);
+            let title_bit = format_browser_focus_title_bit(focus_title.as_deref());
             let page_bit = format_browser_focus_page_bit(focus_host.as_deref());
             let pid_bit = chrome_pid
                 .filter(|p| *p > 0)
@@ -1638,10 +1640,25 @@ pub fn format_browser_ready_chip_with_glance(
                 .unwrap_or_default();
             // Warm means a live session — omit stale last-fail noise.
             format!(
-                "**Browser** · Warm · CDP {port} · `{short}` · tabs **{tab_count}** · focus **{focus_index}**{page_bit} · {mode} · up {up} · idle {idle}{pid_bit}{owner_bit}{tracked_bit}"
+                "**Browser** · Warm · CDP {port} · `{short}` · tabs **{tab_count}** · focus **{focus_index}**{title_bit}{page_bit} · {mode} · up {up} · idle {idle}{pid_bit}{owner_bit}{tracked_bit}"
             )
         }
     }
+}
+
+/// Compact `· title **…**` for Warm focus title (OpenClaw browser-tabs title leftover; calm omit blank).
+pub(crate) fn format_browser_focus_title_bit(focus_title: Option<&str>) -> String {
+    let Some(raw) = focus_title.map(str::trim).filter(|s| !s.is_empty()) else {
+        return String::new();
+    };
+    let short = if raw.chars().count() > 28 {
+        let mut s: String = raw.chars().take(25).collect();
+        s.push('…');
+        s
+    } else {
+        raw.to_string()
+    };
+    format!(" · title **{short}**")
 }
 
 /// Compact `· page **host**` for Warm focus URL (OpenClaw session-tab page leftover; calm omit blank).
@@ -3402,7 +3419,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/mastodon` · `view mastodon` · `see mastodon` · `show me the mastodon` · `open mastodon` · `list the mastodon` — Mastodon Ready / Not set (instance URL + token; Settings or .config.env; no live probe)\n\
 • `/mcp` · `view mcp` · `see mcp` · `show me the mcp` · `open mcp` · `list the mcp` · `view mcp server` · `open mcp server` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; Settings or .config.env; no live probe)\n\
 • `/cursor` · `/cursor-agent` · `view cursor` · `see cursor` · `show me the cursor` · `open cursor` · `list the cursor` · `view cursor agent` · `open cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH or Settings path; no CLI probe)\n\
-• `/browser` · `/cdp` · `view browser` · `see browser` · `show me the browser` · `open browser` · `list the browser` · `view cdp` · `see cdp` · `show me the cdp` · `open cdp` · `list the cdp` — Browser / CDP Ready / Warm tabs·focus·page host·up·idle·pid (OpenClaw startedAt uptime + last-used idle + RunningChrome.pid when known + focused tab host when not blank) / tracked N · N sess (when >1 session keys) · oldest (session-reset close queue + OpenClaw per-session map + trackedAt age) / owner (ActiveBrowserSessionGuard) / last fail (OpenClaw detectError leftover when last CDP probe failed; Ready/Busy only) / Busy / Off / Not set (Chromium path + port; cached session-tab glance; no `/json/version` probe)\n\
+• `/browser` · `/cdp` · `view browser` · `see browser` · `show me the browser` · `open browser` · `list the browser` · `view cdp` · `see cdp` · `show me the cdp` · `open cdp` · `list the cdp` — Browser / CDP Ready / Warm tabs·focus·title·page host·up·idle·pid (OpenClaw startedAt uptime + last-used idle + RunningChrome.pid when known + focused tab title when not blank/New Tab + focused tab host when not blank) / tracked N · N sess (when >1 session keys) · oldest (session-reset close queue + OpenClaw per-session map + trackedAt age) / owner (ActiveBrowserSessionGuard) / last fail (OpenClaw detectError leftover when last CDP probe failed; Ready/Busy only) / Busy / Off / Not set (Chromium path + port; cached session-tab glance; no `/json/version` probe)\n\
 • `/judge` · `view judge` · `see judge` · `show me the judge` · `open judge` · `list the judge` — Judge Ready / Off (Settings Product · agentJudgeEnabled · failure-only; config only, no judge run)\n\
 • `/ai` · `/ai-agent` · `view ai` · `see ai` · `show me the ai` · `open ai` · `list the ai` · `view ai agent` · `open ai agent` — AI On / Off (Settings Product · aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/compact` · `/menu-bar` · `/cpu-window` · `view compact` · `see compact` · `show me the compact` · `open compact` · `list the compact` · `view menu bar` · `open menu-bar` · `view cpu window` · `open cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\

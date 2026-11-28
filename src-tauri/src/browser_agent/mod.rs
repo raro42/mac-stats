@@ -4908,6 +4908,8 @@ pub enum CachedBrowserSessionGlance {
         focus_index: usize,
         /// Host of the focused tab URL when known (OpenClaw session-tab page leftover; omit blank/internal).
         focus_host: Option<String>,
+        /// Title of the focused tab when known (OpenClaw `browser tabs` title-first leftover; omit blank/New Tab).
+        focus_title: Option<String>,
         /// Seconds since Chrome was spawned (OpenClaw `RunningChrome.startedAt`).
         up_secs: u64,
         idle_secs: u64,
@@ -5053,6 +5055,34 @@ fn focus_page_host_for_glance(url: &str) -> Option<String> {
     Some(host.to_string())
 }
 
+/// Title for `/browser` Warm focus glance — skip blank / New Tab / untitled noise.
+fn focus_page_title_for_glance(title: &str) -> Option<String> {
+    let t = title.trim();
+    if t.is_empty() {
+        return None;
+    }
+    let lower = t.to_ascii_lowercase();
+    match lower.as_str() {
+        "new tab" | "untitled" | "about:blank" | "chrome" | "chromium" => return None,
+        _ => {}
+    }
+    // Chrome NTP / settings chrome titles stay calm (host bit already omits those URLs).
+    if lower.starts_with("chrome://") || lower.starts_with("chrome-error://") {
+        return None;
+    }
+    Some(t.to_string())
+}
+
+/// Focus host + title from a cached tab (OpenClaw session-tab page leftover).
+fn focus_page_bits_for_tab(tab: &headless_chrome::Tab) -> (Option<String>, Option<String>) {
+    let host = focus_page_host_for_glance(tab.get_url().as_str());
+    let title = tab
+        .get_target_info()
+        .ok()
+        .and_then(|info| focus_page_title_for_glance(&info.title));
+    (host, title)
+}
+
 /// Non-blocking peek at the cached automation browser (OpenClaw session-tab lens).
 ///
 /// Uses `try_lock` only — never opens CDP or waits on an in-flight BROWSER_* call.
@@ -5069,24 +5099,26 @@ pub fn snapshot_cached_browser_session() -> CachedBrowserSessionGlance {
         .lock()
         .map(|g| *g)
         .unwrap_or(0);
-    let (tab_count, focus_index, focus_host) = match browser.get_tabs().try_lock() {
+    let (tab_count, focus_index, focus_host, focus_title) = match browser.get_tabs().try_lock() {
         Ok(tabs) => {
             let n = tabs.len();
             let idx = if n == 0 { 0 } else { focus_raw.min(n - 1) };
-            let host = tabs
+            let (host, title) = tabs
                 .get(idx)
-                .and_then(|t| focus_page_host_for_glance(t.get_url().as_str()));
-            (n, idx, host)
+                .map(|t| focus_page_bits_for_tab(t))
+                .unwrap_or((None, None));
+            (n, idx, host, title)
         }
         Err(std::sync::TryLockError::WouldBlock) => return CachedBrowserSessionGlance::Busy,
         Err(std::sync::TryLockError::Poisoned(p)) => {
             let tabs = p.into_inner();
             let n = tabs.len();
             let idx = if n == 0 { 0 } else { focus_raw.min(n - 1) };
-            let host = tabs
+            let (host, title) = tabs
                 .get(idx)
-                .and_then(|t| focus_page_host_for_glance(t.get_url().as_str()));
-            (n, idx, host)
+                .map(|t| focus_page_bits_for_tab(t))
+                .unwrap_or((None, None));
+            (n, idx, host, title)
         }
     };
     // Prefer headless_chrome child PID; fall back to owned visible spawn tracker.
@@ -5105,6 +5137,7 @@ pub fn snapshot_cached_browser_session() -> CachedBrowserSessionGlance {
         tab_count,
         focus_index,
         focus_host,
+        focus_title,
         up_secs: created.elapsed().as_secs(),
         idle_secs: last_used.elapsed().as_secs(),
         headless: *headless,
