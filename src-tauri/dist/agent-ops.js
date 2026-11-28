@@ -7030,14 +7030,14 @@ function setOverviewLiveStatus(rows, insights, pressure) {
         card.classList.add('ops-health-bad');
         card.title = live.length
             ? `Discord disconnected · ${liveLabel} still listed${queueSuffix}`
-            : `Discord disconnected · no live sessions${queueSuffix}`;
+            : `Quiet desk — Discord disconnected${queueSuffix}`;
         return;
     }
     if (discN > 0 || resumeN > 0 || stage === 'resuming') {
         card.classList.add('ops-health-warn');
         card.title = live.length
             ? `Gateway reconnect noise · ${liveLabel}${queueSuffix}`
-            : `Gateway reconnect noise · no live sessions${queueSuffix}`;
+            : `Quiet desk — gateway reconnect noise${queueSuffix}`;
         return;
     }
     if (!live.length) {
@@ -7051,10 +7051,11 @@ function setOverviewLiveStatus(rows, insights, pressure) {
         }
         if (ready) {
             card.classList.add('ops-health-ok');
-            card.title = `Waiting · gateway ready · no live chats yet${queueSuffix}`;
+            card.title = `Quiet desk — gateway ready · live chats land while agents run${queueSuffix}`;
         } else {
             card.classList.add('ops-health-warn');
-            card.title = `No live sessions${queueSuffix}`;
+            // Quiet desk parity (body empty title) — drop cold "No live sessions".
+            card.title = `Quiet desk — gateway still waking${queueSuffix}`;
         }
         return;
     }

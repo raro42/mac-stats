@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3146] - 2026-11-28
+
+### Changed
+- Agent Ops first-paint empty parity: Overview cards + tab lists + Insights show **Empty roster / Quiet board · desk · vault · shelf / Empty ledger / Queue clear** (matches JS empties; drop cold “None yet” / “No … yet” flash). Live card titles use Quiet desk wording when idle.
+
 ## [0.1.3145] - 2026-11-28
 
 ### Changed
