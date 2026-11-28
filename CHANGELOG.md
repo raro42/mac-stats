@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3155] - 2026-11-28
+
+### Changed
+- Discord `/disk` · `/cleanup` · Reclaim empty: **Nothing to tidy yet** / **Nothing to reclaim yet** (UI Disk Cleanup empty parity; drop cold “No cleanup categories yet” / “Nothing reclaimable right now”).
+
 ## [0.1.3154] - 2026-11-28
 
 ### Changed

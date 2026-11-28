@@ -444,6 +444,28 @@ mod tests {
     }
 
     #[test]
+    fn disk_cleanup_categories_empty_nothing_to_tidy_parity() {
+        let all_empty = disk_cleanup_categories_empty_body(DiskCleanupListFilter::All);
+        assert!(
+            all_empty.contains("Nothing to tidy yet"),
+            "empty /disk must say Nothing to tidy yet: {all_empty}"
+        );
+        assert!(
+            !all_empty.contains("No cleanup categories yet"),
+            "empty /disk must drop cold No cleanup categories yet: {all_empty}"
+        );
+        let reclaim_empty = disk_cleanup_categories_empty_body(DiskCleanupListFilter::Reclaim);
+        assert!(
+            reclaim_empty.contains("Nothing to reclaim yet"),
+            "empty /disk reclaim must say Nothing to reclaim yet: {reclaim_empty}"
+        );
+        assert!(
+            !reclaim_empty.contains("Nothing reclaimable right now"),
+            "empty /disk reclaim must drop cold reclaimable-now copy: {reclaim_empty}"
+        );
+    }
+
+    #[test]
     fn ram_ring_chip_ask_does_not_steal_strip_ram() {
         assert_eq!(parse_ring_chip_ask("/ram-ring"), Some(RingChipAsk::Ram));
         assert_eq!(parse_ring_chip_ask("ram ring"), Some(RingChipAsk::Ram));

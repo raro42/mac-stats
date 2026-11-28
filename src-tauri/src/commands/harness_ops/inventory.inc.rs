@@ -1410,6 +1410,25 @@ pub fn looks_like_disk_cleanup_request(content: &str) -> bool {
 }
 
 
+/// Category-list empty copy for `/disk` · `/cleanup` filters (UI Disk Cleanup parity).
+/// All → Nothing to tidy yet; Reclaim → Nothing to reclaim yet (drop cold "No cleanup categories yet").
+pub(crate) fn disk_cleanup_categories_empty_body(filter: DiskCleanupListFilter) -> &'static str {
+    match filter {
+        DiskCleanupListFilter::All => {
+            // Nothing to tidy yet — UI scopes/categories empty parity.
+            "_Nothing to tidy yet — open Disk Cleanup in the CPU window._"
+        }
+        DiskCleanupListFilter::Reclaim => {
+            // Nothing to reclaim yet — UI list empty parity.
+            "_Nothing to reclaim yet._"
+        }
+        DiskCleanupListFilter::Big => "_No big reclaimable categories (≥50 MB)._",
+        DiskCleanupListFilter::Clean => "_No clean categories right now._",
+        // On/Off use the scopes branch, not this helper.
+        DiskCleanupListFilter::On | DiskCleanupListFilter::Off => "_Nothing here._",
+    }
+}
+
 /// Zero-LLM Disk Cleanup report (scopes On/Off · categories Reclaim/Big/Clean; shallow scan).
 pub fn format_disk_cleanup_gateway(filter: DiskCleanupListFilter) -> String {
     // Shallow preview — no Downloads/Trash (TCC); same as auto-run path.
@@ -1517,16 +1536,7 @@ pub fn format_disk_cleanup_gateway(filter: DiskCleanupListFilter) -> String {
             let mut sorted = filtered;
             sorted.sort_by(|a, b| b.bytes.cmp(&a.bytes).then_with(|| a.label.cmp(&b.label)));
             if sorted.is_empty() {
-                let empty = match filter {
-                    DiskCleanupListFilter::All => {
-                        "_No cleanup categories yet — open Disk Cleanup in the CPU window._"
-                    }
-                    DiskCleanupListFilter::Reclaim => "_Nothing reclaimable right now._",
-                    DiskCleanupListFilter::Big => "_No big reclaimable categories (≥50 MB)._",
-                    DiskCleanupListFilter::Clean => "_No clean categories right now._",
-                    _ => "_Nothing here._",
-                };
-                lines.push(empty.into());
+                lines.push(disk_cleanup_categories_empty_body(filter).into());
             } else {
                 for c in sorted.iter().take(MAX_ROWS) {
                     let size = fmt(c.bytes);
