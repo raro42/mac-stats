@@ -1,3 +1,20 @@
+## Overnight note 2026-11-28 ~01:11 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace).
+- Layout daily: data-poster already marked 2026-11-28 (due=false); Dark [DUE] next calendar day.
+- Sibling/standing: Agent Ops theme first-paint still cold ("None yet" / "No agents yet" …) while JS empties already Quiet/Empty/Queue clear.
+- Debug.log: no ERROR/WARN/panic clusters in window.
+- Fuel: Agent Ops first-paint empty Quiet/Empty/Queue clear parity — not tip/keep-pNN/section-open/pmset/insights/Warm/Longest/Quiet-*/Empty-*/tab-empty invent / Monitors-empty/Disk-Cleanup-scopes/tracked/owner/last-fail/focus-page/Most-reply/open-scroll clone (theme HTML leftover after 3143–3145).
+- Shipped **v0.1.3146** — Overview + tab + Insights first-paint Empty roster / Quiet board·desk·vault·shelf / Empty ledger / Queue clear; Live idle titles Quiet desk.
+- Ratchet keep @ 0a4ba4346; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-28 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet-* + Empty-* + tab Quiet + Monitors Nothing-watching + Disk Cleanup Nothing-to-tidy + Ops first-paint + tracked sessions + active owner + last-fail + focus-page + Most reply + Ops open-scroll closed; uuidlog remains block; not another insights/Warm/Quiet-*/Empty-*/tab-empty/Monitors-empty/Disk-Cleanup-scopes/Ops-first-paint/tracked-sessions/owner/last-fail/focus-page/Most-reply/open-scroll clone.
+
+## Overnight merge — v0.1.3146
+
+- Agent Ops first-paint empty after Disk Cleanup tidy v0.1.3145: Overview+tabs+Insights match JS Quiet/Empty/Queue clear; Live Quiet desk titles. Digester empty; design-review grace; layout-daily data-poster marked 2026-11-28. Next: Dark layout-daily / Agent Ops recapture when TCC allows — not another Quiet-*/Empty-*/first-paint clone.
+
+
 ## Overnight note 2026-11-28 ~00:45 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace).

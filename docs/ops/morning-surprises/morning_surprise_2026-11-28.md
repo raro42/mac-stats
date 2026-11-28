@@ -1,25 +1,19 @@
 # Morning surprise — 2026-11-28
 
-Overnight Track B (mac-stats product ratchet). Digester open was empty; design-review grace; layout-daily Data Poster already marked earlier tonight.
+Overnight Track B shipped user-facing empty-state warmth (not digester-empty alone).
 
 ## Shipped
 
-| Version | What |
-|---------|------|
-| **v0.1.3144** | External / Monitors empty — settings panel + summary use **Nothing watching yet** (list empty parity; drop cold “No monitors configured”). |
-| **v0.1.3145** | Disk Cleanup scopes empty — **Nothing to tidy yet** (+ aria + theme first-paint; list empty **Nothing to reclaim yet** parity; drop cold “No scopes yet”). |
+- **v0.1.3144** — Monitors empty **Nothing watching yet** (settings + summary).
+- **v0.1.3145** — Disk Cleanup scopes empty **Nothing to tidy yet**.
+- **v0.1.3146** — Agent Ops **first-paint** Overview + tab + Insights empties match JS (**Empty roster / Quiet board · desk · vault · shelf / Empty ledger / Queue clear**); Live idle titles use Quiet desk.
 
-## Tried / context
+## Context
 
-- Digester: 0 Slowest / open candidates (7d).
-- Design review: due=false (grace on feature-agent-ops.png).
-- Layout daily: **data-poster** marked 2026-11-28 (Monitors tick); Dark remains for next calendar day.
-- Quiet avoided: standing fuel used (Disk Cleanup scopes empty).
+- Digester open stayed empty; design-review grace; layout-daily Data Poster marked for the day.
+- Theme HTML no longer flashes cold "None yet" / "No … yet" before JS paint.
 
 ## Next
 
-- Dark layout-daily when the next day quota opens.
-- Agent Ops feature screenshot when Screen Recording TCC allows.
-- OpenClaw leftover only if tiny and not a clone of closed insights/Warm/Quiet/Empty/Monitors/Disk-Cleanup work.
-
-Ratchet keeps @ `11ae6c66a` (3144), `16b7d72d4` (3145).
+- Dark layout-daily next calendar day.
+- Agent Ops screenshot recapture when Screen Recording TCC allows.
