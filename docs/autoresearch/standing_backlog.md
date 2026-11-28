@@ -1,3 +1,19 @@
+## Overnight note 2026-11-28 ~02:25 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace).
+- Layout daily: data-poster already marked 2026-11-28 (due=false); Dark [DUE] next calendar day.
+- Sibling/standing: Monitors detail check history still cold ("No local check history yet…") while list/settings already **Nothing watching yet**.
+- Debug.log: no ERROR/WARN/panic clusters in window.
+- Fuel: Monitors detail check history Nothing checked yet — not tip/keep-pNN/section-open/pmset/insights/Warm/Longest/Quiet-*/Empty-*/tab-empty invent / Monitors-list-empty / Disk-Cleanup-scopes / Ops-first-paint / Deliveries-empty / tracked / owner / last-fail / focus-page / focus-title / Most-reply / open-scroll clone.
+- Shipped **v0.1.3149** — Monitors detail check history **Nothing checked yet** (+ warmer hint).
+- Ratchet keep @ ef071cd58; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-28 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet-* + Empty-* + tab Quiet + Monitors Nothing-watching + Disk Cleanup Nothing-to-tidy + Ops first-paint + Deliveries Empty tray + Monitors check-history Nothing checked + tracked sessions + active owner + last-fail + focus-page host + focus title + Most reply + Ops open-scroll closed; uuidlog remains block; not another insights/Warm/Quiet-*/Empty-*/tab-empty/Monitors-empty/Disk-Cleanup-scopes/Ops-first-paint/Deliveries-empty/check-history/tracked-sessions/owner/last-fail/focus-page/focus-title/Most-reply/open-scroll clone.
+
+## Overnight merge — v0.1.3149
+
+- Monitors detail check history after Empty tray v0.1.3148: Nothing checked yet (Nothing watching parity). Digester empty; design-review grace; layout-daily data-poster marked 2026-11-28. Next: Dark layout-daily / Agent Ops recapture when TCC allows — not another Quiet-*/Empty-*/Monitors-list-empty/check-history clone.
+
 ## Overnight note 2026-11-28 ~01:57 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace).
