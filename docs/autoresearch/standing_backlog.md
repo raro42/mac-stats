@@ -1,3 +1,19 @@
+## Overnight note 2026-11-28 ~01:35 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace).
+- Layout daily: data-poster already marked 2026-11-28 (due=false); Dark [DUE] next calendar day.
+- Sibling/standing: OpenClaw browser-tabs title leftover after focus-page host — `/browser` Warm showed page host but not focused tab title.
+- Debug.log: no ERROR/WARN/panic clusters in window.
+- Fuel: sibling OpenClaw focus title on `/browser` Warm — not tip/keep-pNN/section-open/pmset/insights/Warm/Longest/Quiet-*/Empty-*/tab-empty/Monitors-empty/Disk-Cleanup-scopes/Ops-first-paint/tracked/owner/last-fail/focus-page-host/Most-reply/open-scroll clone.
+- Shipped **v0.1.3147** — Discord `/browser` · `/cdp` Warm show focus **title** when known (omit blank / New Tab / untitled; page host unchanged).
+- Ratchet keep @ c7077f094; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-28 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet-* + Empty-* + tab Quiet + Monitors Nothing-watching + Disk Cleanup Nothing-to-tidy + Ops first-paint + tracked sessions + active owner + last-fail + focus-page host + focus title + Most reply + Ops open-scroll closed; uuidlog remains block; not another insights/Warm/Quiet-*/Empty-*/tab-empty/Monitors-empty/Disk-Cleanup-scopes/Ops-first-paint/tracked-sessions/owner/last-fail/focus-page/focus-title/Most-reply/open-scroll clone.
+
+## Overnight merge — v0.1.3147
+
+- Sibling OpenClaw focus title after Ops first-paint v0.1.3146: `/browser` · `/cdp` Warm show title when known. Digester empty; design-review grace; layout-daily data-poster marked 2026-11-28. Next: Dark layout-daily / Agent Ops recapture when TCC allows — not another Quiet-*/Empty-*/focus-page-host clone.
+
 ## Overnight note 2026-11-28 ~01:11 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace).
