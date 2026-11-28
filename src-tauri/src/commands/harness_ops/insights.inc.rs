@@ -249,9 +249,15 @@ pub(super) fn format_channels_insights_line(insights: &RunsInsights) -> String {
 pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     let mut lines = Vec::new();
     if insights.turns == 0 {
+        // Empty ledger — Agent Ops Runs empty parity (drop cold "No turns in … yet").
         let empty_msg = match insights.window_days {
-            Some(d) => format!("No turns in `~/.mac-stats/runs.jsonl` for the last **{d}** days."),
-            None => "No turns in `~/.mac-stats/runs.jsonl` yet.".into(),
+            Some(d) => format!(
+                "**Empty ledger** — no turns in `~/.mac-stats/runs.jsonl` for the last **{d}** days."
+            ),
+            None => {
+                "**Empty ledger** — no turns in `~/.mac-stats/runs.jsonl` yet — turns land after Discord or chat."
+                    .into()
+            }
         };
         lines.push(empty_msg);
     } else {
@@ -340,7 +346,7 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
             lines.push(format!("Last delivery: {} · {}", last.utc, preview));
         }
     }
-    // Empty sections match the CPU window calm copy. Zero turns stay “No turns…”.
+    // Empty sections match the CPU window calm copy. Zero turns use Empty ledger above.
     if !insights.by_lane.is_empty() {
         let lanes = insights
             .by_lane

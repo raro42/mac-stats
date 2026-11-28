@@ -37075,6 +37075,14 @@ pub(super) fn collect_lane_runs(lane_want: &str, limit: usize, days: Option<u32>
 }
 
 
+/// Empty body for `/instant` · `/direct` · `/lite` lane runs (Agent Ops Empty ledger parity).
+pub(crate) fn lane_runs_empty_body(lane_label: &str, window: &str) -> String {
+    // Drop cold "No {lane}-lane turns yet".
+    format!(
+        "**{lane_label} runs** ({window} · runs.jsonl)\n_Empty ledger — {lane_label} turns land after Discord or chat._"
+    )
+}
+
 pub(super) fn format_lane_runs_gateway(lane_label: &str, lane_want: &str, days: Option<u32>) -> String {
     let rows = collect_lane_runs(lane_want, 12, days);
     let window = match days {
@@ -37082,9 +37090,7 @@ pub(super) fn format_lane_runs_gateway(lane_label: &str, lane_want: &str, days: 
         None => "recent".into(),
     };
     if rows.is_empty() {
-        return format!(
-            "**{lane_label} runs** ({window} · runs.jsonl)\nNo {lane_want}-lane turns yet."
-        );
+        return lane_runs_empty_body(lane_label, &window);
     }
     let mut lines = vec![format!(
         "**{lane_label} runs** ({window} · runs.jsonl) — **{}** shown",

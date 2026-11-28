@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3157] - 2026-11-28
+
+### Changed
+- Discord `/instant` · `/direct` · `/lite` · `/insights` empty: **Empty ledger** (Agent Ops Runs empty parity; drop cold “No …-lane turns yet” / bare “No turns in … yet”).
+
 ## [0.1.3156] - 2026-11-28
 
 ### Changed

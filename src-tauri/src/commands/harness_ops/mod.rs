@@ -494,6 +494,40 @@ mod tests {
     }
 
     #[test]
+    fn lane_runs_and_insights_empty_ledger_parity() {
+        let instant = lane_runs_empty_body("Instant", "recent");
+        assert!(
+            instant.contains("Empty ledger"),
+            "empty /instant runs must say Empty ledger: {instant}"
+        );
+        assert!(
+            !instant.contains("No instant-lane turns yet"),
+            "empty /instant runs must drop cold No …-lane turns yet: {instant}"
+        );
+        let direct = lane_runs_empty_body("Direct", "last **7** days");
+        assert!(
+            direct.contains("Empty ledger"),
+            "empty /direct runs must say Empty ledger: {direct}"
+        );
+        assert!(
+            !direct.contains("No direct-lane turns yet"),
+            "empty /direct runs must drop cold No …-lane turns yet: {direct}"
+        );
+        let mut insights_empty = compute_runs_insights(1);
+        insights_empty.turns = 0;
+        insights_empty.window_days = None;
+        let text = format_runs_insights_gateway(&insights_empty);
+        assert!(
+            text.contains("Empty ledger"),
+            "empty /insights must say Empty ledger: {text}"
+        );
+        assert!(
+            !text.starts_with("No turns in"),
+            "empty /insights must not lead with cold No turns in: {text}"
+        );
+    }
+
+    #[test]
     fn ram_ring_chip_ask_does_not_steal_strip_ram() {
         assert_eq!(parse_ring_chip_ask("/ram-ring"), Some(RingChipAsk::Ram));
         assert_eq!(parse_ring_chip_ask("ram ring"), Some(RingChipAsk::Ram));
