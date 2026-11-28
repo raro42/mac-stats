@@ -35536,7 +35536,10 @@ pub fn format_agents_gateway(filter: AgentsListFilter) -> String {
     match filter {
         AgentsListFilter::All => {
             if agents.is_empty() {
-                lines.push("_No agents yet — add one under Agent Ops._".to_string());
+                // Empty roster — Agent Ops UI empty parity (drop cold "No agents yet").
+                lines.push(
+                    "_Empty roster — add folders under ~/.mac-stats/agents._".to_string(),
+                );
             } else {
                 if on_n > 0 {
                     lines.push("**On**".to_string());
@@ -35555,7 +35558,9 @@ pub fn format_agents_gateway(filter: AgentsListFilter) -> String {
         AgentsListFilter::On => {
             let ons: Vec<_> = agents.iter().filter(|a| a.enabled).collect();
             if ons.is_empty() {
-                lines.push("_None on right now._".to_string());
+                lines.push(
+                    "_Empty roster — none on; enable one under Agent Ops · Agents._".to_string(),
+                );
             } else {
                 for a in ons {
                     lines.push(agent_row(a));
@@ -35565,7 +35570,7 @@ pub fn format_agents_gateway(filter: AgentsListFilter) -> String {
         AgentsListFilter::Off => {
             let offs: Vec<_> = agents.iter().filter(|a| !a.enabled).collect();
             if offs.is_empty() {
-                lines.push("_None off right now._".to_string());
+                lines.push("_Empty roster — none off right now._".to_string());
             } else {
                 for a in offs {
                     lines.push(agent_row(a));

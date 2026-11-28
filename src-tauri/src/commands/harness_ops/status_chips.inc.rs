@@ -3435,7 +3435,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/failed` · `/failed 7` · `view failed` · `see failed` · `show me the failed` · `open failed` · `list the failed` — recent failed turns from runs.jsonl (exact open only — not why-did / ticket)\n\
 • `/slow` · `/slow 7` · `view slow` · `see slow` · `show me the slow` · `open slow` · `list the slow` — recent slow turns (≥{slow_ms} ms wall time; exact open only — not why-is / monitor)\n\
 • `/instant` · `/lite` · `/direct` · `/instant 7` · `view instant` · `see instant` · `open instant` · `list the instant` · `view lite` · `open lite` · `view direct` · `open direct` — recent instant-, lite-, or direct-lane turns (exact open only — not make-it)\n\
-• `/agents` · `/agents on` · `/agents off` · `view agents` · `see agents` · `show me the agents` · `open agents` · `list the agents` — Agent Ops On/Off list\n\
+• `/agents` · `/agents on` · `/agents off` · `view agents` · `see agents` · `show me the agents` · `open agents` · `list the agents` — Agent Ops On/Off list (Empty roster when empty)\n\
 • `/skills` · `view skills` · `see skills` · `show me the skills` · `open skills` · `list the skills` — installed skills catalog (Hermes skills_list; no SKILL: run)\n\
 • `/tasks` · `/tasks all` · `view tasks` · `see tasks` · `show me the tasks` · `open tasks` · `list the tasks` — Active (open·WIP) or All task files under `~/.mac-stats/task/`\n\
 • `/plugins` · `/plugins on` · `/plugins off` · `view plugins` · `see plugins` · `show me the plugins` · `open plugins` · `list the plugins` — registered script plugins On/Off list (no script run)\n\

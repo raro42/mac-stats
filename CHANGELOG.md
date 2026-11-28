@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3151] - 2026-11-28
+
+### Changed
+- Discord `/agents` · On / Off empty: **Empty roster** (Agent Ops UI empty parity; drop cold “No agents yet”).
+
 ## [0.1.3150] - 2026-11-28
 
 ### Changed
