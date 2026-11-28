@@ -1,3 +1,19 @@
+## Overnight note 2026-11-28 ~03:20 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace).
+- Layout daily: data-poster already marked 2026-11-28 (due=false); Dark [DUE] next calendar day.
+- Sibling/standing: Discord `/agents` still cold ("No agents yet") while Agent Ops UI already Empty roster.
+- Debug.log: no ERROR/WARN/panic clusters in window.
+- Fuel: Discord `/agents` Empty roster leftover — not tip/keep-pNN/section-open/pmset/insights/Warm/Quiet-*/Empty-* invent / Monitors-list-empty / Disk-Cleanup / Ops-first-paint / Deliveries-UI / check-history / Discord-schedules / tracked / owner / last-fail / focus / Most-reply / open-scroll clone.
+- Shipped **v0.1.3151** — Discord `/agents` **Empty roster** (On/Off filters too).
+- Ratchet keep @ 2f8448516; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-28 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet-* + Empty-* + tab Quiet + Monitors Nothing-watching + Disk Cleanup Nothing-to-tidy + Ops first-paint + Deliveries Empty tray + Monitors check-history Nothing checked + Discord schedules Quiet board·Empty tray + Discord agents Empty roster + tracked sessions + active owner + last-fail + focus-page host + focus title + Most reply + Ops open-scroll closed; uuidlog remains block; not another insights/Warm/Quiet-*/Empty-*/tab-empty/Monitors-empty/Disk-Cleanup-scopes/Ops-first-paint/Deliveries-empty/check-history/Discord-schedules-empty/Discord-agents-empty/tracked-sessions/owner/last-fail/focus-page/focus-title/Most-reply/open-scroll clone.
+
+## Overnight merge — v0.1.3151
+
+- Discord `/agents` Empty roster after `/schedules` Quiet board · Empty tray v0.1.3150 (UI Empty roster leftover). Digester empty; design-review grace; layout-daily data-poster marked 2026-11-28. Next: Dark layout-daily / Agent Ops recapture when TCC allows — not another Quiet-*/Empty-*/Discord-agents clone.
+
 ## Overnight note 2026-11-28 ~02:55 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace).
