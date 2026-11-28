@@ -1,3 +1,19 @@
+## Overnight note 2026-11-28 ~03:45 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace).
+- Layout daily: data-poster already marked 2026-11-28 (due=false); Dark [DUE] next calendar day.
+- Sibling/standing: Discord `/monitors` still cold ("No monitors yet") while UI already Nothing watching yet.
+- Debug.log: no ERROR/WARN/panic clusters in window.
+- Fuel: Discord `/monitors` Nothing watching yet leftover — not tip/keep-pNN/section-open/pmset/insights/Warm/Quiet-*/Empty-* invent / Monitors-list-empty UI / Disk-Cleanup / Ops-first-paint / Deliveries-UI / check-history / Discord-schedules / Discord-agents / tracked / owner / last-fail / focus / Most-reply / open-scroll clone.
+- Shipped **v0.1.3152** — Discord `/monitors` **Nothing watching yet**.
+- Ratchet keep @ 31206ac3e; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-28 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet-* + Empty-* + tab Quiet + Monitors Nothing-watching UI+Discord + Disk Cleanup Nothing-to-tidy + Ops first-paint + Deliveries Empty tray + Monitors check-history Nothing checked + Discord schedules Quiet board·Empty tray + Discord agents Empty roster + tracked sessions + active owner + last-fail + focus-page host + focus title + Most reply + Ops open-scroll closed; uuidlog remains block; not another insights/Warm/Quiet-*/Empty-*/tab-empty/Monitors-empty/Disk-Cleanup-scopes/Ops-first-paint/Deliveries-empty/check-history/Discord-schedules-empty/Discord-agents-empty/Discord-monitors-empty/tracked-sessions/owner/last-fail/focus-page/focus-title/Most-reply/open-scroll clone.
+
+## Overnight merge — v0.1.3152
+
+- Discord `/monitors` Nothing watching yet after `/agents` Empty roster v0.1.3151 (UI Nothing watching leftover). Digester empty; design-review grace; layout-daily data-poster marked 2026-11-28. Next: Dark layout-daily / Agent Ops recapture when TCC allows — not another Quiet-*/Empty-*/Discord-monitors clone.
+
 ## Overnight note 2026-11-28 ~03:20 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace).
