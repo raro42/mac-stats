@@ -1,3 +1,19 @@
+## Overnight note 2026-11-28 ~05:20 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace).
+- Layout daily: data-poster already marked 2026-11-28 (due=false); Dark [DUE] next calendar day.
+- Sibling/standing: Discord `/skills` still cold ("None yet…") while Nothing watching / Nothing to tidy already warm; skills size/age said bare "empty".
+- Debug.log: no ERROR/WARN/panic clusters in window.
+- Fuel: Discord `/skills` Nothing installed yet leftover — not tip/keep-pNN/section-open/pmset/insights/Warm/Quiet-*/Empty-* invent / Monitors-list-empty / Disk-Cleanup-scopes UI / Ops-first-paint / Deliveries-UI / check-history / Discord-schedules / Discord-agents / Discord-monitors / Discord-sessions / Discord-knowledge / Discord-disk-cleanup / tracked / owner / last-fail / focus / Most-reply / open-scroll clone.
+- Shipped **v0.1.3156** — Discord `/skills` · skills size/age **Nothing installed yet**.
+- Ratchet keep @ 8cea90915; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-28 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet-* + Empty-* + tab Quiet + Monitors Nothing-watching UI+Discord + Disk Cleanup Nothing-to-tidy UI+Discord + Ops first-paint + Deliveries Empty tray + Monitors check-history Nothing checked + Discord schedules Quiet board·Empty tray + Discord agents Empty roster + Discord monitors Nothing watching + Discord sessions Quiet desk + Discord knowledge Quiet vault + Discord disk Nothing to tidy + Discord skills Nothing installed + tracked sessions + active owner + last-fail + focus-page host + focus title + Most reply + Ops open-scroll closed; uuidlog remains block; not another insights/Warm/Quiet-*/Empty-*/tab-empty/Monitors-empty/Disk-Cleanup-scopes/Ops-first-paint/Deliveries-empty/check-history/Discord-schedules-empty/Discord-agents-empty/Discord-monitors-empty/Discord-sessions-empty/Discord-knowledge-empty/Discord-disk-cleanup-empty/Discord-skills-empty/tracked-sessions/owner/last-fail/focus-page/focus-title/Most-reply/open-scroll clone.
+
+## Overnight merge — v0.1.3156
+
+- Discord `/skills` Nothing installed yet after `/disk` Nothing to tidy v0.1.3155 (catalog + size/age empty leftover). Digester empty; design-review grace; layout-daily data-poster marked 2026-11-28. Next: Dark layout-daily / Agent Ops recapture when TCC allows — not another Quiet-*/Empty-*/Discord-skills clone.
+
 ## Overnight note 2026-11-28 ~04:55 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace).
