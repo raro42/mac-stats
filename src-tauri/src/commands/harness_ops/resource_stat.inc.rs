@@ -2750,7 +2750,8 @@ pub fn format_skills_size_gateway() -> String {
         }
         Err(e) => format!("**Skills** — could not scan: {e}"),
         Ok((0, 0)) => {
-            "**Skills:** empty · `skills path` for the folder · `/skills` for catalog · `SKILL: <n|topic>` to run · `skills age` for newest mtime."
+            // Nothing installed yet — /skills catalog empty parity (drop cold "empty").
+            "**Skills:** Nothing installed yet · `skills path` for the folder · `/skills` for catalog · `SKILL: <n|topic>` to run · `skills age` for newest mtime."
                 .to_string()
         }
         Ok((bytes, files)) => {
@@ -2773,7 +2774,8 @@ pub fn format_skills_age_gateway() -> String {
         }
         Err(e) => format!("**Skills** — could not scan: {e}"),
         Ok((_, 0)) => {
-            "**Skills:** empty · `skills path` for the folder · `/skills` for catalog · `SKILL: <n|topic>` to run · `skills size` for on-disk bytes."
+            // Nothing installed yet — /skills catalog empty parity (drop cold "empty").
+            "**Skills:** Nothing installed yet · `skills path` for the folder · `/skills` for catalog · `SKILL: <n|topic>` to run · `skills size` for on-disk bytes."
                 .to_string()
         }
         Ok((Some(ms), files)) => {

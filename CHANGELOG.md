@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3156] - 2026-11-28
+
+### Changed
+- Discord `/skills` · skills size/age empty: **Nothing installed yet** (drop cold “None yet” / bare “empty”).
+
 ## [0.1.3155] - 2026-11-28
 
 ### Changed

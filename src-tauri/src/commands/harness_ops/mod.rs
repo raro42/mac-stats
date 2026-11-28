@@ -466,6 +466,34 @@ mod tests {
     }
 
     #[test]
+    fn skills_gateway_empty_nothing_installed_parity() {
+        // Catalog empty body (does not depend on disk skills — assert format helper path via
+        // the empty-branch string constants; live `format_skills_gateway` may list installed).
+        let empty =
+            "_Nothing installed yet — add `skill-<n>-<topic>.md` under `~/.mac-stats/agents/skills/`._";
+        assert!(
+            empty.contains("Nothing installed yet"),
+            "empty /skills must say Nothing installed yet: {empty}"
+        );
+        assert!(
+            !empty.contains("None yet"),
+            "empty /skills must drop cold None yet: {empty}"
+        );
+        // When the catalog is empty on disk, gateway must match the warm body.
+        let live = format_skills_gateway();
+        if live.contains("0 installed") {
+            assert!(
+                live.contains("Nothing installed yet"),
+                "empty /skills gateway must say Nothing installed yet: {live}"
+            );
+            assert!(
+                !live.contains("None yet"),
+                "empty /skills gateway must drop cold None yet: {live}"
+            );
+        }
+    }
+
+    #[test]
     fn ram_ring_chip_ask_does_not_steal_strip_ram() {
         assert_eq!(parse_ring_chip_ask("/ram-ring"), Some(RingChipAsk::Ram));
         assert_eq!(parse_ring_chip_ask("ram ring"), Some(RingChipAsk::Ram));

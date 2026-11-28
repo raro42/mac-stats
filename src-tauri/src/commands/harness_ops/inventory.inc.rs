@@ -35694,8 +35694,9 @@ pub fn format_skills_gateway() -> String {
     };
     let mut lines = vec![title];
     if skills.is_empty() {
+        // Nothing installed yet — drop cold "None yet" (Nothing watching / Nothing to tidy parity).
         lines.push(
-            "_None yet — add `skill-<n>-<topic>.md` under `~/.mac-stats/agents/skills/`._"
+            "_Nothing installed yet — add `skill-<n>-<topic>.md` under `~/.mac-stats/agents/skills/`._"
                 .to_string(),
         );
     } else {
