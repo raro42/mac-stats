@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3149] - 2026-11-28
+
+### Changed
+- External / Monitors detail check history empty: **Nothing checked yet** (+ warmer hint; Nothing watching yet parity; drop cold “No local check history yet…”).
+
 ## [0.1.3148] - 2026-11-28
 
 ### Changed

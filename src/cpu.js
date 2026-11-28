@@ -10689,7 +10689,8 @@ function fillMonitorDetail(detail, monitorId, monitorUrl, status) {
   } else {
     const note = document.createElement('div');
     note.className = 'monitor-detail-note';
-    note.textContent = 'No local check history yet for this monitor.';
+    // Layout-daily leftover after Nothing watching (v0.1.3144) — drop cold "No local check history…".
+    note.textContent = 'Nothing checked yet — press Check now; results stay on this Mac.';
     detail.appendChild(note);
   }
 
