@@ -1,3 +1,19 @@
+## Overnight note 2026-11-28 ~01:57 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace).
+- Layout daily: data-poster already marked 2026-11-28 (due=false); Dark [DUE] next calendar day.
+- Sibling/standing: Schedules Deliveries empty still cold ("No deliveries yet") while Quiet board / Empty ledger already calm.
+- Debug.log: no ERROR/WARN/panic clusters in window.
+- Fuel: Agent Ops Deliveries empty Empty tray — not tip/keep-pNN/section-open/pmset/insights/Warm/Longest/Quiet-*/Empty-roster|ledger invent / tab-empty / Monitors-empty / Disk-Cleanup-scopes / Ops-first-paint / tracked / owner / last-fail / focus-page / focus-title / Most-reply / open-scroll clone.
+- Shipped **v0.1.3148** — Schedules Deliveries empty **Empty tray** (+ warmer hint; theme first-paint; Overview card title).
+- Ratchet keep @ 28f4d0abf; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-28 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet-* + Empty-* + tab Quiet + Monitors Nothing-watching + Disk Cleanup Nothing-to-tidy + Ops first-paint + Deliveries Empty tray + tracked sessions + active owner + last-fail + focus-page host + focus title + Most reply + Ops open-scroll closed; uuidlog remains block; not another insights/Warm/Quiet-*/Empty-*/tab-empty/Monitors-empty/Disk-Cleanup-scopes/Ops-first-paint/Deliveries-empty/tracked-sessions/owner/last-fail/focus-page/focus-title/Most-reply/open-scroll clone.
+
+## Overnight merge — v0.1.3148
+
+- Agent Ops Deliveries empty after Warm focus title v0.1.3147: Empty tray title + warmer copy. Digester empty; design-review grace; layout-daily data-poster marked 2026-11-28. Next: Dark layout-daily / Agent Ops recapture when TCC allows — not another Quiet-*/Empty-*/Deliveries-empty clone.
+
 ## Overnight note 2026-11-28 ~01:35 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace).
