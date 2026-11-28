@@ -10,11 +10,12 @@ Overnight Track B shipped user-facing warmth (not digester-empty alone).
 - **v0.1.3147** — Discord `/browser` · `/cdp` Warm shows focused tab **title** when known (OpenClaw browser-tabs leftover; omit blank / New Tab / untitled).
 - **v0.1.3148** — Agent Ops Schedules **Deliveries** empty **Empty tray** (Quiet board / Empty ledger parity; theme first-paint).
 - **v0.1.3149** — Monitors detail check history empty **Nothing checked yet** (Nothing watching parity; drop cold “No local check history yet…”).
+- **v0.1.3150** — Discord `/schedules` Jobs/Deliveries empty **Quiet board** / **Empty tray** (UI empty parity). Also fixed `/mac-wake-for-network` and `is pmeverything ok` instant matchers.
 
 ## Context
 
 - Digester open stayed empty; design-review grace; layout-daily Data Poster marked for the day.
-- After Empty tray, Monitors detail still showed cold check-history copy when a site had no local log yet.
+- After UI Empty tray, Discord `/schedules` still showed cold “No schedules…” / “No deliveries yet”.
 
 ## Next
 

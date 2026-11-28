@@ -1,3 +1,20 @@
+## Overnight note 2026-11-28 ~02:55 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace).
+- Layout daily: data-poster already marked 2026-11-28 (due=false); Dark [DUE] next calendar day.
+- Sibling/standing: Discord `/schedules` Jobs/Deliveries still cold ("No schedules…" / "No deliveries yet") while Agent Ops UI already Quiet board / Empty tray.
+- Debug.log: no ERROR/WARN/panic clusters in window.
+- Fuel: Discord `/schedules` Quiet board · Empty tray leftover — not tip/keep-pNN/section-open/pmset/insights/Warm/Quiet-*/Empty-* invent / Monitors-list-empty / Disk-Cleanup / Ops-first-paint / Deliveries-UI / check-history / tracked / owner / last-fail / focus / Most-reply / open-scroll clone.
+- Also fixed pre-existing matcher rejects: `/mac-wake-for-network` (ac-wake substring) + `is pmeverything ok` (everything ok substring).
+- Shipped **v0.1.3150** — Discord `/schedules` **Quiet board** / **Empty tray** (+ matcher fixes).
+- Ratchet keep @ 3342320f3; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-28 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet-* + Empty-* + tab Quiet + Monitors Nothing-watching + Disk Cleanup Nothing-to-tidy + Ops first-paint + Deliveries Empty tray + Monitors check-history Nothing checked + Discord schedules Quiet board·Empty tray + tracked sessions + active owner + last-fail + focus-page host + focus title + Most reply + Ops open-scroll closed; uuidlog remains block; not another insights/Warm/Quiet-*/Empty-*/tab-empty/Monitors-empty/Disk-Cleanup-scopes/Ops-first-paint/Deliveries-empty/check-history/Discord-schedules-empty/tracked-sessions/owner/last-fail/focus-page/focus-title/Most-reply/open-scroll clone.
+
+## Overnight merge — v0.1.3150
+
+- Discord `/schedules` Quiet board · Empty tray after Monitors Nothing checked v0.1.3149 (UI Empty tray leftover). Digester empty; design-review grace; layout-daily data-poster marked 2026-11-28. Matcher fixes: `/mac-wake-for-network` + `is pmeverything ok`. Next: Dark layout-daily / Agent Ops recapture when TCC allows — not another Quiet-*/Empty-*/Deliveries/Discord-schedules clone.
+
 ## Overnight note 2026-11-28 ~02:25 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace).
