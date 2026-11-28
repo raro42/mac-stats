@@ -1,3 +1,18 @@
+## Overnight note 2026-11-28 ~04:35 CET
+- Digester open: empty (0 Slowest / 7d).
+- Design review due=false (grace).
+- Layout daily: data-poster already marked 2026-11-28 (due=false); Dark [DUE] next calendar day.
+- Sibling/standing: Discord `/knowledge` still cold ("No knowledge files yet…") while Agent Ops UI already Quiet vault.
+- Debug.log: no ERROR/WARN/panic clusters in window.
+- Fuel: Discord `/knowledge` Quiet vault leftover — not tip/keep-pNN/section-open/pmset/insights/Warm/Quiet-*/Empty-* invent / Monitors-list-empty / Disk-Cleanup / Ops-first-paint / Deliveries-UI / check-history / Discord-schedules / Discord-agents / Discord-monitors / Discord-sessions / tracked / owner / last-fail / focus / Most-reply / open-scroll clone.
+- Shipped **v0.1.3154** — Discord `/knowledge` **Quiet vault** (All · Discord · Core).
+- Ratchet keep @ ded1c4610; install/kickstart + push (runtime).
+- Morning surprise: refresh 2026-11-28 + archive.
+- Next fuel: Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — SoftDisabled… + Longest + Tool calls + Quiet-* + Empty-* + tab Quiet + Monitors Nothing-watching UI+Discord + Disk Cleanup Nothing-to-tidy + Ops first-paint + Deliveries Empty tray + Monitors check-history Nothing checked + Discord schedules Quiet board·Empty tray + Discord agents Empty roster + Discord monitors Nothing watching + Discord sessions Quiet desk + Discord knowledge Quiet vault + tracked sessions + active owner + last-fail + focus-page host + focus title + Most reply + Ops open-scroll closed; uuidlog remains block; not another insights/Warm/Quiet-*/Empty-*/tab-empty/Monitors-empty/Disk-Cleanup-scopes/Ops-first-paint/Deliveries-empty/check-history/Discord-schedules-empty/Discord-agents-empty/Discord-monitors-empty/Discord-sessions-empty/Discord-knowledge-empty/tracked-sessions/owner/last-fail/focus-page/focus-title/Most-reply/open-scroll clone.
+
+## Overnight merge — v0.1.3154
+
+- Discord `/knowledge` Quiet vault after `/sessions` Quiet desk v0.1.3153 (UI Quiet vault leftover). Digester empty; design-review grace; layout-daily data-poster marked 2026-11-28. Next: Dark layout-daily / Agent Ops recapture when TCC allows — not another Quiet-*/Empty-*/Discord-knowledge clone.
 ## Overnight note 2026-11-28 ~04:10 CET
 - Digester open: empty (0 Slowest / 7d).
 - Design review due=false (grace).
