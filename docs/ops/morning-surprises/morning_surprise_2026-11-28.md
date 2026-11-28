@@ -6,6 +6,7 @@ Overnight Track B (mac-stats product ratchet). Digester open stayed empty; desig
 
 | Version | What |
 |--------|------|
+| **v0.1.3153** | Discord `/sessions` empty → **Quiet desk** / **No saved session files** (Agent Ops UI parity) |
 | **v0.1.3152** | Discord `/monitors` empty → **Nothing watching yet** (UI parity) |
 | **v0.1.3151** | Discord `/agents` empty → **Empty roster** |
 | **v0.1.3150** | Discord `/schedules` empty → **Quiet board** / **Empty tray** (+ matcher fixes) |
@@ -25,4 +26,4 @@ Overnight Track B (mac-stats product ratchet). Digester open stayed empty; desig
 
 - Dark layout-daily when the calendar day quota opens.
 - Agent Ops screenshot recapture when Screen Recording TCC allows.
-- Avoid another Quiet-*/Empty-*/Discord-monitors empty-copy clone; pick a tiny OpenClaw leftover or product correctness instead.
+- Avoid another Quiet-*/Empty-*/Discord-sessions empty-copy clone; pick a tiny OpenClaw leftover or product correctness instead.
