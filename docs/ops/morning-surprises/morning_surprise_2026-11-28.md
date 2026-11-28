@@ -4,6 +4,7 @@ Overnight autoresearch kept product moves (digester open empty; design-review gr
 
 ## Shipped tonight
 
+- **v0.1.3157** — Discord `/instant` · `/direct` · `/lite` · `/insights` empty: **Empty ledger** (Agent Ops Runs empty parity; drop cold “No …-lane turns yet” / “No turns in … yet”).
 - **v0.1.3156** — Discord `/skills` · skills size/age empty: **Nothing installed yet** (drop cold “None yet” / bare “empty”).
 - **v0.1.3155** — Discord `/disk` · `/cleanup` · Reclaim empty: **Nothing to tidy yet** / **Nothing to reclaim yet**.
 - **v0.1.3154** — Discord `/knowledge` · Discord / Core empty: **Quiet vault**.
@@ -22,4 +23,4 @@ Overnight autoresearch kept product moves (digester open empty; design-review gr
 
 ## Next fuel
 
-Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — not another Quiet-*/Empty-*/Discord-skills clone.
+Dark layout-daily next calendar day / Mac Agent Ops recapture when TCC allows / OpenClaw leftover if tiny — not another Quiet-*/Empty-*/Discord-runs clone.
