@@ -382,6 +382,34 @@ mod tests {
             format_sessions_title(SessionsListFilter::Files, 0, 5, 9),
             "**Sessions · Files** — 5"
         );
+        assert_eq!(
+            format_sessions_title(SessionsListFilter::All, 0, 0, 0),
+            "**Sessions** — 0 live · 0 files"
+        );
+        // Quiet desk empty copy (Agent Ops UI parity) — pure body helper.
+        let all_empty = sessions_empty_body(SessionsListFilter::All);
+        assert!(
+            all_empty.contains("Quiet desk"),
+            "empty /sessions must say Quiet desk: {all_empty}"
+        );
+        assert!(
+            !all_empty.contains("No live sessions"),
+            "empty /sessions must drop cold No live sessions: {all_empty}"
+        );
+        let live_empty = sessions_empty_body(SessionsListFilter::Live);
+        assert!(
+            live_empty.contains("Quiet desk"),
+            "empty /sessions live must say Quiet desk: {live_empty}"
+        );
+        let files_empty = sessions_empty_body(SessionsListFilter::Files);
+        assert!(
+            files_empty.contains("No saved session files"),
+            "empty /sessions files must match UI: {files_empty}"
+        );
+        assert!(
+            !files_empty.contains("No session files on disk yet"),
+            "empty /sessions files must drop cold disk-yet copy: {files_empty}"
+        );
     }
 
     #[test]

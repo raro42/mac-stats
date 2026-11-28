@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3153] - 2026-11-28
+
+### Changed
+- Discord `/sessions` · Live / Files empty: **Quiet desk** / **No saved session files** (Agent Ops UI empty parity; drop cold “No live sessions…” / “No session files on disk yet”).
+
 ## [0.1.3152] - 2026-11-28
 
 ### Changed

@@ -36217,6 +36217,21 @@ pub(crate) fn format_sessions_title(
     }
 }
 
+/// Empty-body copy for `/sessions` filters (Agent Ops Quiet desk / Files empty parity).
+pub(crate) fn sessions_empty_body(filter: SessionsListFilter) -> &'static str {
+    match filter {
+        // Quiet desk — Agent Ops UI empty parity (drop cold "No live sessions…").
+        SessionsListFilter::All => {
+            "_Quiet desk — quiet for now; live chats land while agents run. Chat in Discord or AI Chat._"
+        }
+        SessionsListFilter::Live => "_Quiet desk — none live right now._",
+        // UI Files empty title: No saved session files (not Quiet desk invent).
+        SessionsListFilter::Files => {
+            "_No saved session files — appears after Discord chats land on disk._"
+        }
+    }
+}
+
 /// Zero-LLM sessions report (Agent Ops Sessions All · Live · Files filter parity).
 pub fn format_sessions_gateway(filter: SessionsListFilter) -> String {
     let live = list_live_sessions();
@@ -36260,10 +36275,7 @@ pub fn format_sessions_gateway(filter: SessionsListFilter) -> String {
     match filter {
         SessionsListFilter::All => {
             if live_n == 0 && files_n == 0 {
-                lines.push(
-                    "_No live sessions or saved files yet — chat in Discord or AI Chat._"
-                        .to_string(),
-                );
+                lines.push(sessions_empty_body(SessionsListFilter::All).to_string());
             } else {
                 if live_n > 0 {
                     lines.push("**Live**".to_string());
@@ -36287,7 +36299,7 @@ pub fn format_sessions_gateway(filter: SessionsListFilter) -> String {
         }
         SessionsListFilter::Live => {
             if live.is_empty() {
-                lines.push("_None live right now._".to_string());
+                lines.push(sessions_empty_body(SessionsListFilter::Live).to_string());
             } else {
                 for s in live.iter().take(MAX_ROWS) {
                     lines.push(live_row(s));
@@ -36299,7 +36311,7 @@ pub fn format_sessions_gateway(filter: SessionsListFilter) -> String {
         }
         SessionsListFilter::Files => {
             if files.is_empty() {
-                lines.push("_No session files on disk yet._".to_string());
+                lines.push(sessions_empty_body(SessionsListFilter::Files).to_string());
             } else {
                 for f in files.iter().take(MAX_ROWS) {
                     lines.push(file_row(f));
