@@ -853,8 +853,9 @@ pub fn format_schedules_gateway(filter: SchedulesListFilter) -> String {
     match filter {
         SchedulesListFilter::All => {
             if jobs_n == 0 && del_n == 0 {
+                // Quiet board + Empty tray — Agent Ops UI empty parity (drop cold "No schedules…").
                 lines.push(
-                    "_No schedules or deliveries yet — add a job under Agent Ops · Schedules._"
+                    "_Quiet board · Empty tray — add a job under Agent Ops · Schedules._"
                         .to_string(),
                 );
             } else {
@@ -867,7 +868,10 @@ pub fn format_schedules_gateway(filter: SchedulesListFilter) -> String {
                         lines.push(format!("_…+{} more_", jobs_n - MAX_ROWS));
                     }
                 } else {
-                    lines.push("_No active jobs._".to_string());
+                    lines.push(
+                        "_Quiet board — no active jobs; add one under Agent Ops · Schedules._"
+                            .to_string(),
+                    );
                 }
                 if del_n > 0 {
                     lines.push("**Deliveries**".to_string());
@@ -878,13 +882,17 @@ pub fn format_schedules_gateway(filter: SchedulesListFilter) -> String {
                         lines.push(format!("_…+{} more_", del_n - MAX_ROWS));
                     }
                 } else {
-                    lines.push("_No deliveries yet._".to_string());
+                    lines.push(
+                        "_Empty tray — quiet until a schedule delivers to Discord._".to_string(),
+                    );
                 }
             }
         }
         SchedulesListFilter::Jobs => {
             if jobs.is_empty() {
-                lines.push("_No active jobs — add one under Agent Ops · Schedules._".to_string());
+                lines.push(
+                    "_Quiet board — add a job under Agent Ops · Schedules._".to_string(),
+                );
             } else {
                 for j in jobs.iter().take(MAX_ROWS) {
                     lines.push(job_row(j));
@@ -897,7 +905,8 @@ pub fn format_schedules_gateway(filter: SchedulesListFilter) -> String {
         SchedulesListFilter::Deliveries => {
             if deliveries.is_empty() {
                 lines.push(
-                    "_No deliveries yet — runs a schedule with a Discord channel ID._".to_string(),
+                    "_Empty tray — quiet until a schedule runs with a Discord channel ID._"
+                        .to_string(),
                 );
             } else {
                 for d in deliveries.iter().take(MAX_ROWS) {
@@ -18002,9 +18011,15 @@ pub fn looks_like_wake_for_network_request(content: &str) -> bool {
         || n.contains("tcpkeepalive")
         || n.contains("acwake")
         || n.contains("ac wake")
-        || n.contains("ac-wake")
+        // Do not use contains("ac-wake") — it matches `/mac-wake-for-network` (…mac-wake…).
+        || n == "ac-wake"
+        || n == "the ac-wake"
+        || n.starts_with("ac-wake ")
+        || n.starts_with("/ac-wake")
+        || n.contains(" wake-on-ac")
         || n.contains("wake on ac")
-        || n.contains("wake-on-ac")
+        || n.starts_with("wake-on-ac")
+        || n.starts_with("/wake-on-ac")
         || n.contains("lidwake")
         || n.contains("lid wake")
         || n.contains("lid-wake")
@@ -30717,10 +30732,11 @@ pub fn looks_like_pmeverything_request(content: &str) -> bool {
         || n.contains("launchd")
         || n.contains("debug.log")
         || n.contains("debug log")
-        || n.contains("everything ok")
-        || n.contains("everything working")
+        // Exact bare "everything ok/working" only — contains() steals `is pmeverything ok`.
         || n == "is everything ok"
         || n == "everything ok"
+        || n == "is everything working"
+        || n == "everything working"
         || n.contains("pmcustom")
         || n.contains("power custom")
         || n.contains("power profiles")

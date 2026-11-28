@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+## [0.1.3150] - 2026-11-28
+
+### Changed
+- Discord `/schedules` · Jobs / Deliveries empty: **Quiet board** / **Empty tray** (Agent Ops UI empty parity; drop cold “No schedules…” / “No deliveries yet”).
+
+### Fixed
+- Discord `/mac-wake-for-network` and `is pmeverything ok` instant matchers (substring false rejects).
+
 ## [0.1.3149] - 2026-11-28
 
 ### Changed
