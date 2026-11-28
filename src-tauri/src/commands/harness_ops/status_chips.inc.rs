@@ -3442,7 +3442,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/sessions` · `/sessions live` · `/sessions files` · `view sessions` · `see sessions` · `show me the sessions` · `open sessions` · `list the sessions` — Agent Ops Live/Files list (idle N = past 30m compaction threshold)\n\
 • `/knowledge` · `/knowledge discord` · `/knowledge core` · `view knowledge` · `see knowledge` · `show me the knowledge` · `open knowledge` · `list the knowledge` — Agent Ops Knowledge list\n\
 • `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` · `view schedules` · `see schedules` · `show me the schedules` · `open schedules` · `list the schedules` — Agent Ops Jobs/Deliveries list (Quiet board / Empty tray when empty)\n\
-• `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` · `view monitors` · `see monitors` · `show me the monitors` · `open monitors` · `list the monitors` — External / Monitors list\n\
+• `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` · `view monitors` · `see monitors` · `show me the monitors` · `open monitors` · `list the monitors` — External / Monitors list (Nothing watching yet when empty)\n\
 • `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` · `view disk` · `see disk` · `show me the disk cleanup` · `open disk` · `list the disk cleanup` — Disk Cleanup list\n\
 • `/logs` · `/logs error` · `/logs warn` · `review logs` · `check logs` · `view logs` · `see logs` · `show me the logs` · `open logs` — Debug Log Error/Warn list\n\
 • `how many log errors` · `log warn count` · `count the errors` · `number of warnings` — Debug Log error/warn counts (tail; inventory count asks only — no line dump; `delete these errors` / `clear the log` / `export warnings` stay with the agent)\n\

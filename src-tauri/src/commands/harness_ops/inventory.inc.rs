@@ -1153,8 +1153,9 @@ pub fn format_monitors_gateway(filter: MonitorsListFilter) -> String {
 
     if filtered.is_empty() {
         let empty = match filter {
+            // Nothing watching yet — UI empty parity (drop cold "No monitors yet").
             MonitorsListFilter::All => {
-                "_No monitors yet — add one under External / Monitors._"
+                "_Nothing watching yet — add one under External / Monitors._"
             }
             MonitorsListFilter::Up => "_No UP monitors right now._",
             MonitorsListFilter::Down => "_Nothing is DOWN right now._",

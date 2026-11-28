@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3152] - 2026-11-28
+
+### Changed
+- Discord `/monitors` empty: **Nothing watching yet** (UI empty parity; drop cold “No monitors yet”).
+
 ## [0.1.3151] - 2026-11-28
 
 ### Changed
