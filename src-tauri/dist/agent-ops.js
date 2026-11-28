@@ -6926,7 +6926,7 @@ function setOverviewSchedulesStatus(schedules, deliveries) {
     if (!hasNext) {
         card.title = 'Schedules present but no next fire time';
     } else if (!Array.isArray(deliveries) || !deliveries.length) {
-        card.title = 'Schedules armed · no deliveries yet';
+        card.title = 'Schedules armed · Empty tray';
     } else {
         card.title = 'Schedules armed · last delivery older than 24h';
     }
@@ -7697,9 +7697,10 @@ function renderOpsSchedulesTab(schedules, deliveries) {
     if (delList) {
         delList.innerHTML = '';
         if (!delAll.length) {
+            // Empty tray — deliveries empty (Empty ledger / Quiet board parity; drop cold "No deliveries yet").
             delList.innerHTML = opsTabEmptyHtml(
-              'No deliveries yet',
-              'Results appear here after a schedule runs'
+              'Empty tray',
+              'Quiet for now — delivery results land here after a schedule runs'
             );
         } else if (!delFiltered.length) {
             delList.innerHTML = opsFilterMissHtml(

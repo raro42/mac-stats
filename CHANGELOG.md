@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.3148] - 2026-11-28
+
+### Changed
+- Agent Ops Schedules **Deliveries** empty: **Empty tray** title + warmer copy (Quiet board / Empty ledger parity; drop cold “No deliveries yet”; theme first-paint match).
+
 ## [0.1.3147] - 2026-11-28
 
 ### Changed
